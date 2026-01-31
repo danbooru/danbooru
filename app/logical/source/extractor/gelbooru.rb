@@ -12,6 +12,10 @@
 module Source
   class Extractor
     class Gelbooru < Source::Extractor
+      def self.enabled?
+        SiteCredential.for_site("Gelbooru").present?
+      end
+
       delegate :artist_name, :profile_url, :display_name, :username, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
       def image_urls

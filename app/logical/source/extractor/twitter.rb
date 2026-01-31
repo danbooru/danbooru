@@ -3,6 +3,10 @@
 # @see Source::URL::Twitter
 class Source::Extractor
   class Twitter < Source::Extractor
+    def self.enabled?
+      SiteCredential.for_site("Twitter").present?
+    end
+
     # List of hashtag suffixes attached to tag other names
     # Ex: 西住みほ生誕祭2019 should be checked as 西住みほ
     # The regexes will not match if there is nothing preceding

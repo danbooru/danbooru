@@ -265,8 +265,8 @@ class TagAliasTest < ActiveSupport::TestCase
 
       should "merge existing artists if there is a conflict" do
         @tag = create(:tag, name: "aaa", category: Tag.categories.artist)
-        @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222")
-        @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
+        @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://x.com/111\n-https://x.com/222")
+        @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://x.com/111\n-https://x.com/333\nhttps://x.com/444")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
 
@@ -278,7 +278,7 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal(false, @artist2.reload.is_deleted)
         assert_equal(%w[111 333 222 aaa], @artist2.other_names)
         assert_equal("g_aaa", @artist2.group_name)
-        assert_equal(%w[-https://twitter.com/222 -https://twitter.com/333 https://twitter.com/111 https://twitter.com/444], @artist2.url_array)
+        assert_equal(%w[-https://x.com/222 -https://x.com/333 https://x.com/111 https://x.com/444], @artist2.url_array)
       end
 
       should "move the is_banned flag from the old artist entry to the new artist entry" do
@@ -292,20 +292,20 @@ class TagAliasTest < ActiveSupport::TestCase
       end
 
       should "ignore the old artist if it has been deleted" do
-        @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222", is_deleted: true)
-        @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
+        @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://x.com/111\n-https://x.com/222", is_deleted: true)
+        @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://x.com/111\n-https://x.com/333\nhttps://x.com/444")
 
         TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
 
         assert_equal(true, @artist1.reload.is_deleted)
         assert_equal(%w[111 222], @artist1.other_names)
         assert_equal("g_aaa", @artist1.group_name)
-        assert_equal(%w[-https://twitter.com/222 https://twitter.com/111], @artist1.url_array)
+        assert_equal(%w[-https://x.com/222 https://x.com/111], @artist1.url_array)
 
         assert_equal(false, @artist2.reload.is_deleted)
         assert_equal(%w[111 333], @artist2.other_names)
         assert_equal("", @artist2.group_name)
-        assert_equal(%w[-https://twitter.com/333 https://twitter.com/111 https://twitter.com/444], @artist2.url_array)
+        assert_equal(%w[-https://x.com/333 https://x.com/111 https://x.com/444], @artist2.url_array)
       end
     end
 

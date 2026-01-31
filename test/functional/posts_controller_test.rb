@@ -899,7 +899,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_post_source_equals("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", "https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", "https://www.pixiv.net/en/artworks/64476642")
 
         assert_post_source_equals("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig")
-        assert_post_source_equals("https://twitter.com/noizave/status/875768175136317440", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://twitter.com/noizave/status/875768175136317440")
+        assert_post_source_equals("https://twitter.com/noizave/status/875768175136317440", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://x.com/noizave/status/875768175136317440")
 
         assert_post_source_equals("https://noizave.tumblr.com/post/162206271767", "https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png")
 

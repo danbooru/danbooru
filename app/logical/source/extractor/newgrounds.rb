@@ -4,6 +4,10 @@
 module Source
   class Extractor
     class Newgrounds < Source::Extractor
+      def self.enabled?
+        SiteCredential.for_site("Newgrounds").present?
+      end
+
       def image_urls
         if parsed_url.full_image_url.present?
           [parsed_url.full_image_url]

@@ -3,6 +3,7 @@ module UploadTestHelper
 
   def create_upload!(source_or_file_path, user:, **params)
     if source_or_file_path =~ %r{\Ahttps?://}i
+      skip "Skipping extractor tests as configured by the environment." if ENV["DANBOORU_SKIP_EXTRACTOR_TESTS"].to_s.truthy?
       skip "Login credentials not configured for #{source_or_file_path}" unless Source::Extractor.find(source_or_file_path).class.enabled?
       source = { source: source_or_file_path }
     else

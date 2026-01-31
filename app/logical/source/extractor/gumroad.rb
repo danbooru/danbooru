@@ -11,6 +11,8 @@ class Source::Extractor
       elsif artist_commentary_desc.present? # post
         urls = artist_commentary_desc.to_s.parse_html.css("img").pluck("src")
         urls.select { |url| Source::URL::Gumroad.parse(url)&.image_url? }
+      else
+        []
       end
     end
 
