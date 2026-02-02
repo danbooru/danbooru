@@ -43,7 +43,7 @@ module UrlTestHelper
             if expected_value.nil?
               assert_nil url.try(attribute)
             else
-              assert_equal url.try(attribute), expected_value
+              assert_equal expected_value, url.try(attribute)
             end
           end
         end
