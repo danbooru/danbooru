@@ -50,11 +50,15 @@ class ForumPost < ApplicationRecord
 
   module SearchMethods
     def visible(user)
-      where(topic_id: ForumTopic.visible(user))
+      if policy(user).show_deleted?
+        where(topic_id: ForumTopic.visible(user))
+      else
+        undeleted.where(topic_id: ForumTopic.visible(user))
+      end
     end
 
     def not_visible(user)
-      where.not(topic_id: ForumTopic.visible(user))
+      visible(user).invert_where
     end
 
     def wiki_link_matches(title)
