@@ -207,16 +207,16 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.newgrounds.com/art/view/sphenodaile/princess-of-the-thorns-pages-11-12-afterwords",
         image_urls: %w[
-          https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.webp?f1702161429
+          https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.jpg?f1702161429
           https://art.ngfiles.com/images/5267000/5267492_276883_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.81ca470f3d2830104e142d2e2b610e4c.jpg?f1702161410
-          https://art.ngfiles.com/images/5267000/5267492_276881_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.9ece029ebd69b6e55dbaf777a30b0e79.webp?f1702161437
-          https://art.ngfiles.com/images/5267000/5267492_276882_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.462b90641c2487627650683f5002c0be.webp?f1702161443
+          https://art.ngfiles.com/images/5267000/5267492_276881_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.9ece029ebd69b6e55dbaf777a30b0e79.jpg?f1702161437
+          https://art.ngfiles.com/images/5267000/5267492_276882_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.462b90641c2487627650683f5002c0be.jpg?f1702161443
         ],
         media_files: [
-          { file_size: 2_076_674 },
+          { file_size: 2_107_866 },
           { file_size: 4_608_194 },
-          { file_size: 3_165_472 },
-          { file_size: 1_047_638 },
+          { file_size: 4_252_477 },
+          { file_size: 2_079_584 },
         ],
         page_url: "https://www.newgrounds.com/art/view/sphenodaile/princess-of-the-thorns-pages-11-12-afterwords",
         profile_urls: %w[https://sphenodaile.newgrounds.com],

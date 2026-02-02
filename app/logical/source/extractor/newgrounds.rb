@@ -33,7 +33,11 @@ module Source
 
           urls += page&.css("#author_comments img[data-user-image='1']").to_a.map { |img| img["data-smartload-src"] || img["src"] }
 
-          urls.compact
+          urls.filter_map do |url|
+            parsed_url = Source::URL.parse(url)
+            next if parsed_url.blank?
+            [parsed_url.candidate_full_image_urls.to_a.find { |url| http_exists?(url) }, parsed_url.full_image_url].compact
+          end.flatten
         end
       end
 
