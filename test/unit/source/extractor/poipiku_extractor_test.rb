@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PoipikuExtractorTest < ActiveSupport::TestCase
+  class PoipikuExtractorTest < ActiveSupport::ExtractorTestCase
     context "A https://poipiku.com/:user_id/:post_id.html page url with a single image" do
       strategy_should_work(
         "https://poipiku.com/583/2867587.html",
@@ -58,7 +58,7 @@ module Source::Tests::Extractor
         media_files: [
           { file_size: 343_562 },
           { file_size: 805_259 },
-          { file_size: 703_879 }
+          { file_size: 703_879 },
         ],
         profile_url: "https://poipiku.com/6849873/",
         profile_urls: %w[https://poipiku.com/6849873/],
@@ -87,7 +87,7 @@ module Source::Tests::Extractor
         media_files: [
           { file_size: 343_562 },
           { file_size: 805_259 },
-          { file_size: 703_879 }
+          { file_size: 703_879 },
         ],
         profile_url: "https://poipiku.com/6849873/",
         profile_urls: %w[https://poipiku.com/6849873/],
@@ -174,7 +174,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://poipiku.com/6849873/8141991.html",
         page_url: "https://poipiku.com/6849873/8141991.html",
-        image_urls: [%r{https://cdn.poipiku.com/006849873/008140534_016466597_y4Z3HEJH1.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},],
+        image_urls: [%r{https://cdn.poipiku.com/006849873/008140534_016466597_y4Z3HEJH1.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*}],
         profile_url: "https://poipiku.com/6849873/",
         display_name: "omo_chi2",
         tag_name: "omo_chi2",
@@ -190,7 +190,7 @@ module Source::Tests::Extractor
       )
     end
 
-    context "Another password-protected page url" do 
+    context "Another password-protected page url" do
       strategy_should_work(
         "https://poipiku.com/11804030/12317737.html",
         image_urls: [
@@ -203,7 +203,7 @@ module Source::Tests::Extractor
           { file_size: 847_898 },
           { file_size: 1_102_184 },
           { file_size: 908_031 },
-          { file_size: 954_805 }
+          { file_size: 954_805 },
         ],
         page_url: "https://poipiku.com/11804030/12317737.html",
         profile_urls: %w[https://poipiku.com/11804030/],
@@ -211,7 +211,7 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           umtkのR18練習まとめ
           password🔑→18歳以上ですか？(yes/no)
         EOS
@@ -228,7 +228,7 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           富入さんとかあの人たち
           パスはクリア後なら名前が分かるあの人
         EOS
@@ -286,7 +286,7 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "🇮🇩 x 🇳🇱"
+        dtext_artist_commentary_desc: "🇮🇩 x 🇳🇱",
       )
     end
 
@@ -341,7 +341,7 @@ module Source::Tests::Extractor
           { file_size: 384_799 },
           { file_size: 56_656 },
           { file_size: 828_595 },
-          { file_size: 365_291 }
+          { file_size: 365_291 },
         ],
         page_url: "https://poipiku.com/9416896/10718302.html",
         profile_urls: %w[https://poipiku.com/9416896/],
@@ -349,7 +349,7 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "箸にも棒にも掛からない"
+        dtext_artist_commentary_desc: "箸にも棒にも掛からない",
       )
     end
 
@@ -370,7 +370,7 @@ module Source::Tests::Extractor
           { file_size: 384_799 },
           { file_size: 56_656 },
           { file_size: 828_595 },
-          { file_size: 365_291 }
+          { file_size: 365_291 },
         ],
         page_url: "https://poipiku.com/9416896/10718302.html",
         profile_urls: %w[https://poipiku.com/9416896/],
@@ -378,7 +378,7 @@ module Source::Tests::Extractor
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "箸にも棒にも掛からない"
+        dtext_artist_commentary_desc: "箸にも棒にも掛からない",
       )
     end
   end

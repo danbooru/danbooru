@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class BilibiliExtractorTest < ActiveSupport::TestCase
+  class BilibiliExtractorTest < ActiveSupport::ExtractorTestCase
     context "A t.bilibili.com/:id post" do
       strategy_should_work(
         "https://t.bilibili.com/686082748803186697",

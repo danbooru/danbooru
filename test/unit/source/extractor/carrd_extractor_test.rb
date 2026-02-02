@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class CarrdExtractorTest < ActiveSupport::TestCase
+  class CarrdExtractorTest < ActiveSupport::ExtractorTestCase
     context "An image URL that doesn't have an _original version" do
       strategy_should_work(
         "https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5",
@@ -202,7 +202,7 @@ module Source::Tests::Extractor
           { file_size: 10_792 },
           { file_size: 11_225 },
           { file_size: 43_359 },
-          { file_size: 31_406 }
+          { file_size: 31_406 },
         ],
         page_url: "https://badkrol.carrd.co/#commission",
         profile_urls: %w[https://badkrol.carrd.co],
@@ -353,7 +353,7 @@ module Source::Tests::Extractor
         username: "silvivtuber",
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp
+        dtext_artist_commentary_desc: <<~EOS.chomp,
           "[image]":[https://silvivtuber.carrd.co/assets/images/image16.jpg]
 
           "[image]":[https://silvivtuber.carrd.co/assets/images/image14.png]

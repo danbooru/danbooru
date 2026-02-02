@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class NullExtractorTest < ActiveSupport::TestCase
+  class NullExtractorTest < ActiveSupport::ExtractorTestCase
     context "An image from an unknown site" do
       strategy_should_work(
         "https://www.marv.jp/uploads/title/10787/6722f3b818ad4.jpg",

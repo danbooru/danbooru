@@ -1,8 +1,9 @@
+var $editor = $("#new_forum_post .dtext-editor").get(0).editor;
 var msg = <%= raw @forum_post.body.to_json %>;
-if ($("#forum_post_body").val().length > 0) {
-  msg = $("#forum_post_body").val() + "\n\n" + msg;
+if ($editor.dtext.length > 0) {
+  msg = $editor.dtext + "\n\n" + msg;
 }
-$("#forum_post_body").val(msg);
+$editor.dtext = msg;
 $("#topic-response").show();
 $("#forum_post_body").get(0).scrollIntoView(false);
 $("#forum_post_body").selectEnd();

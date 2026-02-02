@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class ArtStationExtractorTest < ActiveSupport::TestCase
+  class ArtStationExtractorTest < ActiveSupport::ExtractorTestCase
     context "An ArtStation /artwork/:id URL" do
       strategy_should_work(
         "https://www.artstation.com/artwork/04XA4",

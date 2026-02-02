@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PixivComicExtractorTest < ActiveSupport::TestCase
+  class PixivComicExtractorTest < ActiveSupport::ExtractorTestCase
     context "A magazine cover image" do
       strategy_should_work(
         "https://public-img-comic.pximg.net/images/magazine_cover/e772MnFuZZ5oQsadLQ2b/317.jpg?20240120120001",

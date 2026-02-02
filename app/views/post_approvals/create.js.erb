@@ -1,5 +1,10 @@
 <% if @approval.errors.any? %>
-  Danbooru.Notice.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
+  if ($("#c-modqueue").length) {
+    $("#post_<%= @approval.post.id %>").hide();
+    Danbooru.Notice.error("<%= j format_text("Error on post ##{@approval.post.id}: #{@approval.errors.full_messages.join("; ")}", inline: true) %>");
+  } else {
+    Danbooru.Notice.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
+  }
 <% else %>
   if ($("#c-posts #a-show").length) {
     location.reload();

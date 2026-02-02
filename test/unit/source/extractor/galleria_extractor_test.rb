@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class GalleriaExtractorTest < ActiveSupport::TestCase
+  class GalleriaExtractorTest < ActiveSupport::ExtractorTestCase
     context "An old galleria-img.emotionflow.com sample image URL" do
       strategy_should_work(
         "http://galleria-img.emotionflow.com/user_img9/38279/i679579_387.jpeg_360.jpg?0716161312",

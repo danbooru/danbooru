@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class YoutubeExtractorTest < ActiveSupport::TestCase
+  class YoutubeExtractorTest < ActiveSupport::ExtractorTestCase
     context "A community post sample image URL" do
       strategy_should_work(
         "https://yt3.ggpht.com/U3N1xsa0RLryoiEUvEug69qB3Ke8gSdqXOld3kEU6T8DGCTRnAZdqW9QDt4zSRDKq_Sotb0YpZqG0RY=s1600-rw-nd-v1",

@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class UserProfileComponent < ApplicationComponent
-  attr_reader :user, :current_user
+  attr_reader :user, :current_user, :show_votes
 
   delegate :link_to_wiki, :render_post_gallery, :checkmark_icon, :exclamation_icon, to: :helpers
 
-  def initialize(user:, current_user: nil)
+  def initialize(user:, current_user: nil, show_votes: false)
     super
     @user = user
     @current_user = current_user
+    @show_votes = show_votes
   end
 
   def posts_for_saved_search_category(category)

@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PlurkExtractorTest < ActiveSupport::TestCase
+  class PlurkExtractorTest < ActiveSupport::ExtractorTestCase
     context "An image URL" do
       strategy_should_work(
         "https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg",

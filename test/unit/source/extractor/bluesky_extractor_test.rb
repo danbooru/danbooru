@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class BlueskyExtractorTest < ActiveSupport::TestCase
+  class BlueskyExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       skip "Bluesky credentials not configured" unless Source::Extractor::Bluesky.enabled?
     end

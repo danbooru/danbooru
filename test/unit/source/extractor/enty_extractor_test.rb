@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class EntyExtractorTest < ActiveSupport::TestCase
+  class EntyExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       skip "Dead site?"
     end

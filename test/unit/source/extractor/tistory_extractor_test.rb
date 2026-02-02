@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class TistoryExtractorTest < ActiveSupport::TestCase
+  class TistoryExtractorTest < ActiveSupport::ExtractorTestCase
     context "A daumcdn.net/thumb sample image URL" do
       strategy_should_work(
         "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FRA1tu%2FbtsFf2xGLbg%2FVzHK4tqMEWkeqUgDBxSkkK%2Fimg.jpg ",

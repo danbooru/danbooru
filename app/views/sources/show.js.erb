@@ -5,7 +5,12 @@ Danbooru.RelatedTag.update_selected();
 
 if ($("#c-uploads #a-show").length) {
   Danbooru.Utility.alpineReady(() => {
-    $("#post_artist_commentary_original_title").val(<%= raw @source.dtext_artist_commentary_title.to_json %>);
-    $(".post_artist_commentary_original_description .dtext-editor").get(0).editor.dtext = <%= raw @source.dtext_artist_commentary_desc.to_json %>;
+    let sourceTitle = <%= raw @source.dtext_artist_commentary_title.to_json %>;
+    let sourceDesc = <%= raw @source.dtext_artist_commentary_desc.to_json %>;
+
+    if (sourceTitle || sourceDesc) {
+      $("#post_artist_commentary_original_title").val(sourceTitle);
+      $(".post_artist_commentary_original_description .dtext-editor").get(0).editor.dtext = sourceDesc;
+    }
   });
 }

@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class NaverCafeExtractorTest < ActiveSupport::TestCase
+  class NaverCafeExtractorTest < ActiveSupport::ExtractorTestCase
     context "A cafeptthumb-phinf.pstatic.net sample image URL" do
       strategy_should_work(
         "https://cafeptthumb-phinf.pstatic.net/MjAyMDA3MDZfMTM0/MDAxNTk0MDA2Mjk0MTcw.JA_GkVUpYytyzximdxyl9Y7wtMoBHkPn2p7S3dLLAzYg.XQfw46B7G2ae5nhw7xc3wkWZgYUS9Debf_XIlsED1jgg.PNG/1.png?type=w800",

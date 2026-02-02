@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class Rule34DotUsExtractorTest < ActiveSupport::TestCase
+  class Rule34DotUsExtractorTest < ActiveSupport::ExtractorTestCase
     context "A https://rule34.us/index.php?r=posts/view&id=$post_id URL" do
       strategy_should_work(
         "https://rule34.us/index.php?r=posts/view&id=6204967",

@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class DeviantArtExtractorTest < ActiveSupport::TestCase
+  class DeviantArtExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       skip "DeviantArt API keys not set" unless Source::Extractor::DeviantArt.enabled?
     end

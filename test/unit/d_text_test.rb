@@ -295,7 +295,7 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal('foo" bar baz ":[http://google.com]quux', DText.from_html('foo<a href="http://google.com">  bar  baz  </a>quux'))
       end
 
-      should "ignore <script> tags" do
+      should "ignore script tags" do
         assert_equal("", DText.from_html("<script>alert('lol')</script>"))
       end
 
@@ -323,7 +323,7 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("", DText.from_html("<h4><br></h4>"))
       end
 
-      should "convert <hr> tags to [hr] tags" do
+      should "convert hr tags to [hr] tags" do
         assert_equal("foo\n\n[hr]\n\nbar", DText.from_html("<p>foo</p><hr><p>bar</p>"))
       end
 

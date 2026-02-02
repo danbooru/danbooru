@@ -59,7 +59,7 @@ class TagRelationship < ApplicationRecord
     update!(status: "deleted")
 
     if rejector != User.system
-      category = relationship == "tag alias" ? :tag_alias_delete : :tag_implication_delete
+      category = (relationship == "tag alias") ? :tag_alias_delete : :tag_implication_delete
       ModAction.log("deleted #{relationship} #{antecedent_name} -> #{consequent_name}", category, subject: self, user: rejector)
     end
   end
@@ -82,7 +82,7 @@ class TagRelationship < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :antecedent_name, :consequent_name, :reason, :creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at antecedent_name consequent_name reason creator approver forum_post forum_topic antecedent_tag consequent_tag antecedent_wiki consequent_wiki], current_user: current_user)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -111,7 +111,9 @@ class TagRelationship < ApplicationRecord
         q = q.order(updated_at: :desc)
       when "name"
         q = q.order(antecedent_name: :asc, consequent_name: :asc)
-      when "tag_count"
+      when "antecedent_tag_count"
+        q = q.joins(:antecedent_tag).order("tags.post_count DESC", antecedent_name: :asc, consequent_name: :asc)
+      when "consequent_tag_count"
         q = q.joins(:consequent_tag).order("tags.post_count DESC", antecedent_name: :asc, consequent_name: :asc)
       else
         q = q.apply_default_order(params)

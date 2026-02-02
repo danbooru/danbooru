@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class HentaiFoundryExtractorTest < ActiveSupport::TestCase
+  class HentaiFoundryExtractorTest < ActiveSupport::ExtractorTestCase
     context "A hentai-foundry post" do
       strategy_should_work(
         "https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda",

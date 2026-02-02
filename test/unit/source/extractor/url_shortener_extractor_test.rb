@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class UrlShortenerExtractorTest < ActiveSupport::TestCase
+  class UrlShortenerExtractorTest < ActiveSupport::ExtractorTestCase
     def self.assert_redirects_to(source_url, destination_url)
       context "redirecting #{source_url} to #{destination_url}" do
         strategy_should_work(source_url, redirect_url: destination_url)

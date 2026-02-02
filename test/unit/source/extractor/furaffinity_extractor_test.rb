@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class FuraffinityExtractorTest < ActiveSupport::TestCase
+  class FuraffinityExtractorTest < ActiveSupport::ExtractorTestCase
     context "A furaffinity post" do
       strategy_should_work(
         "https://www.furaffinity.net/view/46821705/",

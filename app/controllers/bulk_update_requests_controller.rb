@@ -11,7 +11,11 @@ class BulkUpdateRequestsController < ApplicationController
   def create
     @bulk_update_request = authorize BulkUpdateRequest.new(user: CurrentUser.user, **permitted_attributes(BulkUpdateRequest))
     @bulk_update_request.save
-    respond_with(@bulk_update_request, :location => bulk_update_requests_path)
+    if request.format.html?
+      respond_with(@bulk_update_request.forum_post || @bulk_update_request.forum_topic || @bulk_update_request)
+    else
+      respond_with(@bulk_update_request)
+    end
   end
 
   def show
@@ -27,19 +31,19 @@ class BulkUpdateRequestsController < ApplicationController
   def update
     @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
     @bulk_update_request.update(permitted_attributes(@bulk_update_request))
-    respond_with(@bulk_update_request, location: bulk_update_requests_path, notice: "Bulk update request updated")
+    respond_with(@bulk_update_request, notice: "BUR ##{@bulk_update_request.id} updated")
   end
 
   def approve
     @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
     @bulk_update_request.approve!(CurrentUser.user)
-    respond_with(@bulk_update_request, :location => bulk_update_requests_path)
+    respond_with(@bulk_update_request, notice: "BUR ##{@bulk_update_request.id} approved")
   end
 
   def destroy
     @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
     @bulk_update_request.reject!(CurrentUser.user)
-    respond_with(@bulk_update_request, location: bulk_update_requests_path, notice: "Bulk update request rejected")
+    respond_with(@bulk_update_request, notice: "BUR ##{@bulk_update_request.id} rejected")
   end
 
   def index

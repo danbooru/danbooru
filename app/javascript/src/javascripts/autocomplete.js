@@ -7,10 +7,11 @@ let Autocomplete = {};
 Autocomplete.VERSION = 3; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
 Autocomplete.MAX_RESULTS = 20;
 
-Autocomplete.WHITESPACE = ' \\t\\r\\n';
-Autocomplete.WORD_SEPARATORS = Autocomplete.WHITESPACE + '_()\\[\\]{}<>`\'"-/;:,.?!';
-Autocomplete.PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*$`);
-Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[^${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*`);
+Autocomplete.TAG_SEPARATORS = ' \\t\\r\\n';
+Autocomplete.WORD_SEPARATORS = '_()\\[\\]{}<>`\'"-/;:,.?!';
+Autocomplete.ALL_SEPARATORS = Autocomplete.TAG_SEPARATORS + Autocomplete.WORD_SEPARATORS;
+Autocomplete.PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.ALL_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.TAG_SEPARATORS}]*$`);
+Autocomplete.NEXT_WORD_REGEXP = new RegExp(`^[^${Autocomplete.ALL_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.TAG_SEPARATORS}]*`);
 
 Autocomplete.initialize_all = function() {
   $.widget("ui.autocomplete", $.ui.autocomplete, {
@@ -112,6 +113,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         $(target).replaceFieldText(before_caret_text + after_caret_text);
         target.selectionStart = target.selectionEnd = before_caret_text.length;
 
+        $(target).trigger("input"); // Manually trigger an input event because programmatically editing the field won't trigger one.
         $(target).autocomplete("search"); // Manually trigger autocomplete because programmatically editing the field won't trigger it.
         e.preventDefault();
       }

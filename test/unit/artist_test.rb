@@ -164,10 +164,10 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "normalize urls before removing duplicates" do
-      @artist = create(:artist, url_string: "https://Twitter.com/o8q https://twitter.com/o8q")
+      @artist = create(:artist, url_string: "https://X.com/o8q https://x.com/o8q")
 
       assert_equal(1, @artist.urls.count)
-      assert_equal(["https://twitter.com/o8q"], @artist.urls.map(&:to_s))
+      assert_equal(["https://x.com/o8q"], @artist.urls.map(&:to_s))
     end
 
     should "ignore pixiv.net/ and pixiv.net/img/ url matches" do
@@ -370,6 +370,7 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "return nothing for unknown nijie artists" do
+        skip "Nijie credentials not configured" unless Source::Extractor::Nijie.enabled?
         assert_artist_not_found("http://nijie.info/view.php?id=157953")
       end
     end

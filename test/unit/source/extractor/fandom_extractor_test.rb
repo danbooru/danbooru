@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class FandomExtractorTest < ActiveSupport::TestCase
+  class FandomExtractorTest < ActiveSupport::ExtractorTestCase
     context "A sample image URL" do
       strategy_should_work(
         "https://static.wikia.nocookie.net/typemoon/images/9/96/Caster_Extra_Takeuchi_design_1.png/revision/latest/scale-to-width-down/1000?cb=20130523100711",

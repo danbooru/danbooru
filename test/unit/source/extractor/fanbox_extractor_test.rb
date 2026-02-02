@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class FanboxExtractorTest < ActiveSupport::TestCase
+  class FanboxExtractorTest < ActiveSupport::ExtractorTestCase
     context "A free Pixiv Fanbox post" do
       strategy_should_work(
         "https://yanmi0308.fanbox.cc/posts/1141325",

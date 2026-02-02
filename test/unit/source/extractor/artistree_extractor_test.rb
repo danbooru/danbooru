@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class ArtistreeExtractorTest < ActiveSupport::TestCase
+  class ArtistreeExtractorTest < ActiveSupport::ExtractorTestCase
     context "An Artistree image URL" do
       strategy_should_work(
         "https://dwxo6p939as9l.cloudfront.net/alysonsega/Full render (Character and/or Background/Object)/Sonicandmariotransparent-rkdqe1.png",

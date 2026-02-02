@@ -3,6 +3,10 @@
 # @see Source::URL::Twitter
 class Source::Extractor
   class Twitter < Source::Extractor
+    def self.enabled?
+      SiteCredential.for_site("Twitter").present?
+    end
+
     # List of hashtag suffixes attached to tag other names
     # Ex: 西住みほ生誕祭2019 should be checked as 西住みほ
     # The regexes will not match if there is nothing preceding
@@ -40,16 +44,15 @@ class Source::Extractor
     end
 
     def page_url
-      "https://twitter.com/#{username}/status/#{status_id}" if status_id.present? && username.present?
+      "https://x.com/#{username}/status/#{status_id}" if status_id.present? && username.present?
     end
 
     def profile_url
-      "https://twitter.com/#{username}" if username.present?
+      "https://x.com/#{username}" if username.present?
     end
 
     def intent_url
-      return nil if user_id.blank?
-      "https://twitter.com/intent/user?user_id=#{user_id}"
+      "https://x.com/i/user/#{user_id}" if user_id.present?
     end
 
     def profile_urls
@@ -74,7 +77,7 @@ class Source::Extractor
 
     def tags
       graphql_tweet.dig(:legacy, :entities, :hashtags).to_a.map do |hashtag|
-        [hashtag[:text], "https://twitter.com/hashtag/#{hashtag[:text]}"]
+        [hashtag[:text], "https://x.com/hashtag/#{hashtag[:text]}"]
       end
     end
 
@@ -89,7 +92,7 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(html_artist_commentary_desc, base_url: "https://twitter.com")
+      DText.from_html(html_artist_commentary_desc, base_url: "https://x.com")
     end
 
     def html_artist_commentary_desc
@@ -101,7 +104,7 @@ class Source::Extractor
       api_entities = graphql_tweet.dig(:note_tweet, :note_tweet_results, :result, :entity_set) || graphql_tweet.dig(:legacy, :entities)
 
       entities += api_entities[:hashtags].to_a.pluck(:indices, :text).map do |e|
-        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://twitter.com/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">##{CGI.escapeHTML(e[1])}</a>} }
+        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://x.com/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">##{CGI.escapeHTML(e[1])}</a>} }
       end
 
       entities += api_entities[:urls].to_a.pluck(:indices, :expanded_url).map do |e|
@@ -109,11 +112,11 @@ class Source::Extractor
       end
 
       entities += api_entities[:user_mentions].to_a.pluck(:indices, :screen_name).map do |e|
-        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://twitter.com/#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">@#{CGI.escapeHTML(e[1])}</a>} }
+        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://x.com/#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">@#{CGI.escapeHTML(e[1])}</a>} }
       end
 
       entities += api_entities[:symbols].to_a.pluck(:indices, :text).map do |e|
-        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://twitter.com/search?q=$#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">$#{CGI.escapeHTML(e[1])}</a>} }
+        { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://x.com/search?q=$#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">$#{CGI.escapeHTML(e[1])}</a>} }
       end
 
       entities += api_entities[:media].to_a.pluck(:indices, :expanded_url).map do |e|

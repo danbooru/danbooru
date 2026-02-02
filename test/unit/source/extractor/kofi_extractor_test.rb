@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class KofiExtractorTest < ActiveSupport::TestCase
+  class KofiExtractorTest < ActiveSupport::ExtractorTestCase
     context "A sample image URL" do
       strategy_should_work(
         "https://storage.ko-fi.com/cdn/useruploads/post/2c42fc4c-6ebb-4b09-9da0-d14b19a105b1_d69ed1ef-bb4c-4c9f-96ed-4cac35ab8c0d.png",
@@ -34,48 +34,30 @@ module Source::Tests::Extractor
 
     context "A gallery item with multiple images" do
       strategy_should_work(
-        "https://ko-fi.com/i/IS6S8U4PAZ",
+        "https://ko-fi.com/i/IV7V6X5X5F",
         image_urls: %w[
-          https://storage.ko-fi.com/cdn/useruploads/display/f744b057-c605-49ae-98ea-c3bcd9da75f7_frieren10.jpg
-          https://storage.ko-fi.com/cdn/useruploads/display/7fbad9e7-5977-4eb2-b4d1-9b25e80e2729_frieren11.jpg
-          https://storage.ko-fi.com/cdn/useruploads/display/6eb3caed-688d-4dfb-adfc-ee80a6b6aae9_frieren12.jpg
-          https://storage.ko-fi.com/cdn/useruploads/display/1457e396-f401-4a77-9c3e-e41b7f612ee2_frieren13.jpg
-          https://storage.ko-fi.com/cdn/useruploads/display/f3e7e80f-7582-4f88-8d36-e719cd224b49_frieren14.jpg
-          https://storage.ko-fi.com/cdn/useruploads/display/63980fa6-c058-4378-9618-34355252e83c_frieren15.jpg
+          https://storage.ko-fi.com/cdn/useruploads/d1d0171b-f1ca-4e37-9eaf-36e67bdf1adc_pto.png
+          https://storage.ko-fi.com/cdn/useruploads/74c47e75-bf57-44fa-915c-61289bc49433_jgf-----.png
+          https://storage.ko-fi.com/cdn/useruploads/d4aa4710-e650-416a-b095-0e32715eed8f_jgf----.png
+          https://storage.ko-fi.com/cdn/useruploads/3adb3c7e-b9f1-4b9d-9266-e101d8037dd6_jgf---.png
+          https://storage.ko-fi.com/cdn/useruploads/7b1ec936-4061-450e-a156-a840759b249c_jgf--.png
+          https://storage.ko-fi.com/cdn/useruploads/6f55b6e4-34ac-4a48-8a04-b808ad59044c_jgf-.png
         ],
         media_files: [
-          { file_size: 85_702 },
-          { file_size: 166_904 },
-          { file_size: 140_965 },
-          { file_size: 136_404 },
-          { file_size: 143_317 },
-          { file_size: 153_648 },
+          { file_size: 522_613 },
+          { file_size: 619_529 },
+          { file_size: 369_934 },
+          { file_size: 1_078_480 },
+          { file_size: 426_912 },
+          { file_size: 519_547 },
         ],
-        page_url: "https://ko-fi.com/i/IS6S8U4PAZ",
-        profile_urls: %w[https://ko-fi.com/nestvirgo https://ko-fi.com/Z8Z05UNZE],
-        display_name: "nestvirgo",
-        username: "nestvirgo",
+        page_url: "https://ko-fi.com/i/IV7V6X5X5F",
+        profile_urls: %w[https://ko-fi.com/D1D5VUW3P],
+        display_name: "ItsSim",
+        username: nil,
         tags: [],
-        dtext_artist_commentary_title: "Frieren Drawing Process",
+        dtext_artist_commentary_title: "Requests from Discord art stream",
         dtext_artist_commentary_desc: "",
-      )
-    end
-
-    context "A gallery item with a downloadable highres image" do
-      strategy_should_work(
-        "https://ko-fi.com/empresstwilight?viewimage=IT6T0N4D36#galleryItemView",
-        image_urls: %w[https://storage.ko-fi.com/cdn/useruploads/93b977cb-22ed-45c1-86ad-2655e0b7d068_ilustración9_2.png],
-        media_files: [{ file_size: 10_629_195 }],
-        page_url: "https://ko-fi.com/empresstwilight?viewimage=IT6T0N4D36",
-        profile_urls: %w[https://ko-fi.com/empresstwilight https://ko-fi.com/Q5Q3L7K01],
-        display_name: "Twilight Sparkle",
-        username: "empresstwilight",
-        tags: [],
-        dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          "www.deviantart.com/empress-twilight":[https://www.deviantart.com/empress-twilight]
-          "ych.art/user/empress-twilight":[https://ych.art/user/empress-twilight]
-        EOS
       )
     end
 

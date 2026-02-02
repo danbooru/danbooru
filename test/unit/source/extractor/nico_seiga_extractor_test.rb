@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class NicoSeigaExtractorTest < ActiveSupport::TestCase
+  class NicoSeigaExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       skip "NicoSeiga credentials not configured" unless Source::Extractor::NicoSeiga.enabled?
     end

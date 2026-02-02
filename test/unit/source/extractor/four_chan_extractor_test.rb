@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class FourChanExtractorTest < ActiveSupport::TestCase
+  class FourChanExtractorTest < ActiveSupport::ExtractorTestCase
     context "A 4chan direct image url without a referer" do
       strategy_should_work(
         "https://i.4cdn.org/vt/1745613423284732.jpg",

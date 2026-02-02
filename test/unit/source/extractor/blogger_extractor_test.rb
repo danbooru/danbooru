@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class BloggerExtractorTest < ActiveSupport::TestCase
+  class BloggerExtractorTest < ActiveSupport::ExtractorTestCase
     context "A blogger.googleusercontent.com/img/b sample image URL" do
       strategy_should_work(
         "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6Jup0xZMWnmN6anXS4vy2nxF7FO6zX-gzBg_4vnj-7ZNFBLPhDHE82PcD9AK98LwgSjzg4qilH5VDMzOj2KDA7eH-KBTMonuTkhihMzxCT3R5qcx_8pBqbtf45ohyiXoQxfFtByFG57dF/s320/tali-litho.jpg",

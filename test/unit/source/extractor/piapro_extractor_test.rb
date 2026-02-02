@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class PiaproExtractorTest < ActiveSupport::TestCase
+  class PiaproExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       skip "Piapro cookie not configured" unless Source::Extractor::Piapro.enabled?
     end

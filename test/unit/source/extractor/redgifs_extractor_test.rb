@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class RedgifsExtractorTest < ActiveSupport::TestCase
+  class RedgifsExtractorTest < ActiveSupport::ExtractorTestCase
     setup do
       # Cache token across tests so that we don't get IP banned for requesting bearer tokens too frequently.
       @bearer_token ||= Source::Extractor::Redgifs.new(nil).bearer_token

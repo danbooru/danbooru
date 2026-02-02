@@ -98,6 +98,10 @@ class Blacklist {
     return this.posts.filter(post => post.blacklisted);
   }
 
+  get blacklistedPostCount() {
+    return new Set(this.blacklistedPosts.map(post => post.post.dataset.id)).size;
+  }
+
   // Remove from storage any rules that have been removed from the blacklist.
   cleanupStorage() {
     Cookie.remove("dab");

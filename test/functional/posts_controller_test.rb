@@ -620,6 +620,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select ".post-flag-reason a:first", "edit"
         end
+
+        should "render html attributes correctly" do
+          get_auth post_path(@post), @user
+
+          assert_response :success
+          assert_select "body[data-post-id=#{@post.id}]" do |element|
+            assert_match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{6}[+-]\d{2}:\d{2}$/, element.attribute("data-post-created-at").value)
+            assert_equal "true", element.attribute("data-current-user-is-member").value
+            assert_equal "false", element.attribute("data-current-user-is-anonymous").value
+            assert_equal @user.level.to_s, element.attribute("data-current-user-level").value
+          end
+        end
       end
 
       context "a deleted post" do
@@ -628,6 +640,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get post_path(@post)
 
           assert_response :success
+        end
+      end
+
+      context "a deleted post uploaded by an admin" do
+        should "be approvable by the same admin" do
+          admin = create(:admin_user)
+          post = create(:post, uploader: admin, is_deleted: true)
+
+          get_auth post_path(post), admin
+
+          assert_response :success
+          assert_select "#post-option-undelete", "Undelete"
         end
       end
 
@@ -875,7 +899,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_post_source_equals("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", "https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", "https://www.pixiv.net/en/artworks/64476642")
 
         assert_post_source_equals("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig")
-        assert_post_source_equals("https://twitter.com/noizave/status/875768175136317440", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://twitter.com/noizave/status/875768175136317440")
+        assert_post_source_equals("https://twitter.com/noizave/status/875768175136317440", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://x.com/noizave/status/875768175136317440")
 
         assert_post_source_equals("https://noizave.tumblr.com/post/162206271767", "https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png")
 

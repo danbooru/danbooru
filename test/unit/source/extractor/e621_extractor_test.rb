@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class E621ExtractorTest < ActiveSupport::TestCase
+  class E621ExtractorTest < ActiveSupport::ExtractorTestCase
     context "A normal post URL" do
       strategy_should_work(
         "https://e621.net/posts/3728701",
@@ -79,7 +79,18 @@ module Source::Tests::Extractor
         image_urls: %w[https://static1.e621.net/data/21/bc/21bc4c5cb770d6e3d28724b6f2ba3a5e.png],
         media_files: [{ file_size: 765_164 }],
         page_url: "https://e621.net/posts/3250507",
-        profile_urls: %w[https://e621.net/users/366015 https://linktr.ee/bnbigus https://bnbigus.tumblr.com https://twitter.com/bnbigus https://www.patreon.com/Bnbigus https://www.furaffinity.net/user/bnbigus https://bnbigus.newgrounds.com https://discord.com/invite/8kpwCUm],
+        profile_urls: %w[
+          https://e621.net/users/366015
+          https://www.furaffinity.net/user/bnbigus
+          https://twitter.com/bnbigus
+          https://bnbigus.newgrounds.com
+          https://bsky.app/profile/bnbigus.bsky.social
+          https://www.patreon.com/Bnbigus
+          https://subscribestar.adult/bnbigus
+          https://discord.com/invite/8kpwCUm
+          https://linktr.ee/bnbigus
+          https://bnbigus.tumblr.com
+        ],
         display_name: nil,
         username: "bnbigus",
         dtext_artist_commentary_title: nil,
@@ -104,26 +115,17 @@ module Source::Tests::Extractor
     context "A login-blocked post" do
       strategy_should_work(
         "https://e621.net/posts/3381431",
-        image_urls: %w[https://static1.e621.net/data/8f/89/8f892998f59d7f74ab93abd551acd77d.png],
-        media_files: [{ file_size: 2_676_305 }],
+        image_urls: %w[https://static1.e621.net/data/76/8d/768dd80eef0e8e5159625f9ec705a2d3.png],
+        media_files: [{ file_size: 9_084_422 }],
         page_url: "https://e621.net/posts/3381431",
-        profile_urls: %w[https://inkbunny.net/TobyBaggins https://inkbunny.net/user.php?user_id=539625],
+        profile_urls: %w[https://inkbunny.net/FoxInShadow https://inkbunny.net/user.php?user_id=273793],
         display_name: nil,
-        username: "TobyBaggins",
-        dtext_artist_commentary_title: "Before We Start",
+        username: "FoxInShadow",
+        dtext_artist_commentary_title: "Rosine and Fiadh",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          Fiadh was so nervous about the upcoming photoshoot that she couldn’t settle down. She kept pacing back and forth so much that Rosine thought the poor doe would collapse. So being the good friend she is, she took Fiadh's hand and told the photographer they would be back soon and led the girl to a private side room. "I am going to show you a relaxing technic before we start the photoshoot. Now take off those clothes, we don't want to get them wrinkled or dirty."
+          Just girls being girls ;)
 
-          "Take off my clothes," Fiadh gasp as she went wide eyed!
-
-          A few minutes later, as the photographer was checking the equipment over, he smirked as he heard a loud shuttering moan from the other room. He knew just how well Rosine's "relaxing technic" worked and expected the young model would be glowing when she came out for her set.
-
-          Rosine belongs to "BChalk":[https://inkbunny.net/BChalk]
-          Fiadh belongs to me    "TobyBaggins":[https://inkbunny.net/TobyBaggins]
-          This stunning work of art is by the wonderful "FoxInShadow":[https://inkbunny.net/FoxInShadow]who also designed both girls.
-
-          --
-          I can't wait to get more pictures of Fiadh and write more about her. hehe I hope you enjoy her as much as I do. 💖
+          Rosine the blue haired doe that belongs to "BChalk":[https://inkbunny.net/BChalk] paying a visit to Fiadh, who belongs to "TobyBaggins":[https://inkbunny.net/TobyBaggins] and who commissioned this piece back in 2022
         EOS
       )
     end

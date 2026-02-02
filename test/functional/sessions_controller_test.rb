@@ -146,7 +146,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow approvers without 2FA to login from a proxy" do
         user = create(:approver_user, password: "password")
-        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
+        Danbooru::IpAddress.any_instance.stubs(:is_proxy?).returns(true)
 
         post session_path, params: { session: { name: user.name, password: "password" } }
 
@@ -158,7 +158,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow inactive accounts without 2FA to login from a proxy" do
         user = create(:user, password: "password", last_logged_in_at: 1.year.ago)
-        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
+        Danbooru::IpAddress.any_instance.stubs(:is_proxy?).returns(true)
 
         post session_path, params: { session: { name: user.name, password: "password" } }
 
@@ -170,7 +170,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "allow approvers with 2FA enabled to login from a proxy" do
         user = create(:user_with_2fa, password: "password", level: User::Levels::APPROVER)
-        ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.1.1.1")
+        Danbooru::IpAddress.any_instance.stubs(:is_proxy?).returns(true)
 
         post session_path, params: { session: { name: user.name, password: "password" } }
 

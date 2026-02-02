@@ -25,6 +25,12 @@
           <th>Status</th>
           <td><%= @bulk_update_request.status %></td>
         </tr>
+        <% if @bulk_update_request.approver.present? %>
+        <tr>
+          <th>Approver</th>
+          <td><%= link_to_user @bulk_update_request.approver %></td>
+        </tr>
+        <% end %>
 
         <% if @bulk_update_request.forum_post.present? %>
           <tr>

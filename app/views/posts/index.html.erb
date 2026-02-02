@@ -101,6 +101,7 @@
     <h2>Edit</h2>
 
     <%= edit_form_for(:post, html: { id: "quick-edit-form" }) do |f| %>
+      <%= f.input :old_tag_string, as: :hidden %>
       <%= f.input :tag_string, label: "Tags", as: :text, input_html: { class: "text-sm", "data-autocomplete": "tag-edit" } %>
       <%= f.submit "Submit", data: { disable_with: false } %>
       <%= f.button :button, "Cancel", name: :cancel, type: :button %>

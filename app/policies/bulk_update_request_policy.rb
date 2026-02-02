@@ -6,15 +6,21 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
   end
 
   def update?
-    unbanned? && !record.is_approved? && (user.is_admin? || record.user_id == user.id)
+    return false if !unbanned? || record.is_approved?
+
+    user.is_admin? || (record.user_id == user.id && !record.has_too_many_votes_to_edit?)
   end
 
   def approve?
-    unbanned? && !record.is_approved? && (user.is_admin? || (user.is_builder? && record.is_tag_move_allowed?))
+    return false if !unbanned? || record.is_approved?
+
+    user.is_admin? || (user.is_builder? && record.is_tag_move_allowed?)
   end
 
   def destroy?
-    record.is_pending? && update?
+    return false if !unbanned? || record.is_approved?
+
+    record.is_pending? && (user.is_admin? || record.user_id == user.id)
   end
 
   def can_update_forum?

@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class ImgurExtractorTest < ActiveSupport::TestCase
+  class ImgurExtractorTest < ActiveSupport::ExtractorTestCase
     context "A direct image URL" do
       strategy_should_work(
         "https://i.imgur.com/AOeREEF.png",

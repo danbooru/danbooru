@@ -1,7 +1,7 @@
 require "test_helper"
 
 module Source::Tests::Extractor
-  class MyPortfolioExtractorTest < ActiveSupport::TestCase
+  class MyPortfolioExtractorTest < ActiveSupport::ExtractorTestCase
     context "A sample image URL" do
       strategy_should_work(
         "https://cdn.myportfolio.com/86bfb012-1d8f-427f-bbbb-287c3b8c0057/c7aa631f-3b26-47c7-9b06-ccddb68f0a91_rw_3840.jpg?h=a9596060df5dd40e5b8dfc1efe01aaed",
