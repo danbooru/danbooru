@@ -1,4 +1,4 @@
-require "test_helper"
+require 'test_helper'
 
 class ArtistURLTest < ActiveSupport::TestCase
   context "An artist url" do
@@ -69,10 +69,10 @@ class ArtistURLTest < ActiveSupport::TestCase
       should normalize_attribute(:url).from("http://www.pixiv.net/fanbox/creator/3113804/post").to("https://www.pixiv.net/fanbox/creator/3113804")
       should normalize_attribute(:url).from("http://omu001.fanbox.cc/posts/39714").to("https://omu001.fanbox.cc")
       should normalize_attribute(:url).from("http://www.pixiv.net/en/users/123").to("https://www.pixiv.net/users/123")
-      should normalize_attribute(:url).from("https://twitter.com/aoimanabu/status/892370963630743552").to("https://x.com/aoimanabu")
-      should normalize_attribute(:url).from("https://twitter.com/BLAH").to("https://x.com/BLAH")
-      should normalize_attribute(:url).from("https://twitter.com/intent/user?user_id=2784590030").to("https://x.com/i/user/2784590030")
-      should normalize_attribute(:url).from("https://twitter.com/i/user/2784590030").to("https://x.com/i/user/2784590030")
+      should normalize_attribute(:url).from("https://twitter.com/aoimanabu/status/892370963630743552").to("https://twitter.com/aoimanabu")
+      should normalize_attribute(:url).from("https://twitter.com/BLAH").to("https://twitter.com/BLAH")
+      should normalize_attribute(:url).from("https://twitter.com/intent/user?user_id=2784590030").to("https://twitter.com/i/user/2784590030")
+      should normalize_attribute(:url).from("https://twitter.com/i/user/2784590030").to("https://twitter.com/i/user/2784590030")
       should normalize_attribute(:url).from("http://twitpic.com/photos/mirakichi").to("http://twitpic.com/photos/mirakichi")
       should normalize_attribute(:url).from("https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png").to("https://nijie.info/members.php?id=236014")
       should normalize_attribute(:url).from("http://nijie.info/members.php?id=161703").to("https://nijie.info/members.php?id=161703")
@@ -96,7 +96,7 @@ class ArtistURLTest < ActiveSupport::TestCase
         assert_search_equals([@bkub_url], artist: { name: "bkub" })
 
         assert_search_equals([@bkub_url], url_matches: "*bkub*")
-        assert_search_equals([@bkub_url], url_matches: "/^https?://bkub.com$/")
+        assert_search_equals([@bkub_url], url_matches: "/^https?://bkub\.com$/")
         assert_search_equals([@bkub_url], url_matches: "https://bkub.com")
         assert_search_equals([@bkub_url], url_matches: "http://bkub.com")
         assert_search_equals([@bkub_url], url_matches: "http://bkub.com/")

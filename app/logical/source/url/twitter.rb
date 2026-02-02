@@ -92,42 +92,42 @@ class Source::URL::Twitter < Source::URL
     in _, "twimg.com", *rest
       nil
 
-    # https://x.com/i/web/status/943446161586733056
+    # https://twitter.com/i/web/status/943446161586733056
     in _, _, "i", "web", "status", status_id
       @status_id = status_id
 
-    # https://x.com/i/status/943446161586733056
-    # https://x.com/motty08111213/status/943446161586733056
-    # https://x.com/@motty08111213/status/943446161586733056
-    # https://x.com/motty08111213/status/943446161586733056?s=19
-    # https://x.com/Kekeflipnote/status/1496555599718498319/video/1
-    # https://x.com/sato_1_11/status/1496489742791475201/photo/2
+    # https://twitter.com/i/status/943446161586733056
+    # https://twitter.com/motty08111213/status/943446161586733056
+    # https://twitter.com/@motty08111213/status/943446161586733056
+    # https://twitter.com/motty08111213/status/943446161586733056?s=19
+    # https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1
+    # https://twitter.com/sato_1_11/status/1496489742791475201/photo/2
     # https://fxtwitter.com/example/status/1548117889437208581.jpg
     in _, _, username, ("status" | "statuses"), status_id, *rest
       username = username.delete_prefix("@")
       @username = username unless username.in?(RESERVED_USERNAMES)
       @status_id = status_id.split(".").first
 
-    # https://x.com/intent/user?user_id=1485229827984531457
+    # https://twitter.com/intent/user?user_id=1485229827984531457
     in _, _, "intent", "user" if params[:user_id].present?
       @user_id = params[:user_id]
 
-    # https://x.com/intent/user?screen_name=ryuudog_NFT
+    # https://twitter.com/intent/user?screen_name=ryuudog_NFT
     in _, _, "intent", "user" if params[:screen_name].present?
       @username = params[:screen_name]
 
-    # https://x.com/i/user/889592953
+    # https://twitter.com/i/user/889592953
     in _, _, "i", "user", user_id
       @user_id = user_id
 
-    # https://x.com/merry_bongbong/header_photo
+    # https://twitter.com/merry_bongbong/header_photo
     in _, _, username, "header_photo" unless username.in?(RESERVED_USERNAMES)
       @profile_banner = true
       @username = username.delete_prefix("@")
 
-    # https://x.com/motty08111213
-    # https://x.com/motty08111213/likes
-    # https://x.com/@eemapso
+    # https://twitter.com/motty08111213
+    # https://twitter.com/motty08111213/likes
+    # https://twitter.com/@eemapso
     in _, _, username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username.delete_prefix("@")
 
@@ -154,19 +154,19 @@ class Source::URL::Twitter < Source::URL
 
   def page_url
     if username.present? && status_id.present?
-      "https://x.com/#{username}/status/#{status_id}"
+      "https://twitter.com/#{username}/status/#{status_id}"
     elsif status_id.present?
-      "https://x.com/i/web/status/#{status_id}"
+      "https://twitter.com/i/web/status/#{status_id}"
     elsif profile_banner? && username.present?
-      "https://x.com/#{username}/header_photo"
+      "https://twitter.com/#{username}/header_photo"
     end
   end
 
   def profile_url
     if username.present?
-      "https://x.com/#{username}"
+      "https://twitter.com/#{username}"
     elsif user_id.present?
-      "https://x.com/i/user/#{user_id}"
+      "https://twitter.com/i/user/#{user_id}"
     end
   end
 end

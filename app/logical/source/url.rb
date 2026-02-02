@@ -21,7 +21,7 @@
 # from there.
 #
 # @example
-#   url = Source::URL.parse("https://x.com/yasunavert/status/1496123903290314755")
+#   url = Source::URL.parse("https://twitter.com/yasunavert/status/1496123903290314755")
 #   url.site_name        # => "Twitter"
 #   url.status_id        # => "1496123903290314755"
 #   url.username         # => "yasunavert"
@@ -201,7 +201,7 @@ module Source
     # Examples:
     #
     # * https://www.pixiv.net/artworks/46324488
-    # * https://x.com/motty08111213/status/943446161586733056
+    # * https://twitter.com/motty08111213/status/943446161586733056
     #
     # @return [Boolean]
     def page_url?
@@ -213,7 +213,7 @@ module Source
     # Examples:
     #
     # * https://www.pixiv.net/users/9948
-    # * https://x.com/i/user/889592953
+    # * https://twitter.com/i/user/889592953
     #
     # @return [Boolean]
     def profile_url?
@@ -258,8 +258,8 @@ module Source
     #
     # * https://www.pixiv.net/member.php?id=9948
     # * https://www.pixiv.net/stacc/bkubb
-    # * https://x.com/bkub_comic
-    # * https://x.com/i/user/889592953
+    # * https://twitter.com/bkub_comic
+    # * https://twitter.com/i/user/889592953
     #
     # @return [String, nil]
     def profile_url
