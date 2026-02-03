@@ -109,9 +109,9 @@
   a.dtext-named-external-link::after {
     // https://stackoverflow.com/a/66093928
     content: "";
-    padding: 0 0.275em;
-    margin: 0 0.25rem;
-    vertical-align: -0.125em;
+    padding: 0 0.25rem;
+    margin: 0 0 0 0.25rem;
+    vertical-align: middle;
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M352 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9L370.7 96 201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L416 141.3l41.4 41.4c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6V32c0-17.7-14.3-32-32-32H352zM80 32C35.8 32 0 67.8 0 112V432c0 44.2 35.8 80 80 80H400c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32V432c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16H192c17.7 0 32-14.3 32-32s-14.3-32-32-32H80z'%3E%3C/path%3E%3C/svg%3E");
     mask-repeat: no-repeat;
     mask-position: center;
@@ -120,10 +120,10 @@
 
   a.dtext-post-search-link::after {
     content: "";
-    padding: 0 0.275em;
-    margin: 0 0.125rem;
-    // https://fontawesome.com/icons/magnifying-glass?f=classic&s=solid
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM272 416C351.5 416 416 351.5 416 272C416 192.5 351.5 128 272 128C192.5 128 128 192.5 128 272C128 351.5 192.5 416 272 416z'%3E%3C/path%3E%3C/svg%3E");
+    padding: 0 0.3125rem;
+    margin: 0 0 0 0.25rem;
+    vertical-align: middle;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z'%3E%3C/path%3E%3C/svg%3E");
     mask-repeat: no-repeat;
     mask-position: center;
     background-color: currentColor;
