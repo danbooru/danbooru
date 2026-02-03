@@ -213,6 +213,7 @@ $spacer: 0.25rem; /* 4px */
 .pr-4 { padding-right: 4 * $spacer; }
 
 .w-auto { width: auto; }
+.\!w-auto { width: auto !important; }
 .w-min  { width: min-content; }
 .w-max  { width: max-content; }
 .w-fit  { width: fit-content; }

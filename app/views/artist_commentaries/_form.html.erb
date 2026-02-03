@@ -1,12 +1,12 @@
 <p>If the artist of this image posted some interesting additional information about this work, you can copy it here (<%= link_to_wiki "learn more", "help:artist_commentary" %>).</p>
 
 <form id="fetch-commentary" class="simple_form">
-  <div class="input">
-    <label for="commentary_source">Copy from</label>
+  <div class="input flex flex-wrap items-center gap-2">
+    <label for="commentary_source" class="whitespace-nowrap">Copy from</label>
     <%= select_tag :commentary_source_type, options_for_select(%w[Source Post]) %>
-    <%= text_field_tag :commentary_source, post.source %>
-    <%= text_field_tag :commentary_post_id, post.parent_id, :style => "display: none;" %>
-    <%= button_tag "Fetch" %>
+    <%= text_field_tag :commentary_source, post.source, class: "!w-auto flex-grow-1", placeholder: "Enter source URL" %>
+    <%= text_field_tag :commentary_post_id, post.parent_id, style: "display: none;", class: "!w-auto flex-grow-1", placeholder: "Enter post ID" %>
+    <%= button_tag "Fetch", class: "button-primary" %>
   </div>
 </form>
 
