@@ -2,7 +2,7 @@
 
 <form id="fetch-commentary" class="simple_form">
   <div class="input">
-    <label>Copy from</label>
+    <label for="commentary_source">Copy from</label>
     <%= select_tag :commentary_source_type, options_for_select(%w[Source Post]) %>
     <%= text_field_tag :commentary_source, post.source %>
     <%= text_field_tag :commentary_post_id, post.parent_id, :style => "display: none;" %>
