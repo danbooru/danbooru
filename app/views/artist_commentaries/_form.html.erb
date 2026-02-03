@@ -17,27 +17,5 @@
   <%= f.input :translated_title, as: :string, input_html: { value: artist_commentary.try(:translated_title) } %>
   <%= f.input :translated_description, input_html: { value: artist_commentary.try(:translated_description) } %>
 
-  <% if post.has_tag?("commentary") %>
-    <%= f.input :remove_commentary_tag, as: :boolean %>
-  <% else %>
-    <%= f.input :add_commentary_tag, as: :boolean %>
-  <% end %>
-
-  <% if post.has_tag?("commentary_request") %>
-    <%= f.input :remove_commentary_request_tag, as: :boolean %>
-  <% else %>
-    <%= f.input :add_commentary_request_tag, as: :boolean %>
-  <% end %>
-
-  <% if post.has_tag?("check_commentary") %>
-    <%= f.input :remove_commentary_check_tag, as: :boolean %>
-  <% else %>
-    <%= f.input :add_commentary_check_tag, as: :boolean %>
-  <% end %>
-
-  <% if post.has_tag?("partial_commentary") %>
-    <%= f.input :remove_partial_commentary_tag, as: :boolean %>
-  <% else %>
-    <%= f.input :add_partial_commentary_tag, as: :boolean %>
-  <% end %>
+  <%= f.input :commentary_tags, label: false, wrapper_html: { class: "radio-button-group thin-x-scrollbar text-xs m-auto w-fit" }, collection: ArtistCommentary::COMMENTARY_TAGS.map { [it.titleize, it] } + [["None", "none"]], as: :radio_buttons, boolean_style: :inline %>
 <% end %>

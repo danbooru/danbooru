@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class ArtistCommentary < ApplicationRecord
-  class RevertError < StandardError; end
+  COMMENTARY_TAGS = [
+    "commentary",
+    "check_commentary",
+    "partial_commentary",
+    "commentary_request",
+    "untranslatable_commentary",
+  ]
 
-  attr_accessor(
-    :remove_commentary_tag, :remove_commentary_request_tag,
-    :remove_commentary_check_tag, :remove_partial_commentary_tag,
-    :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag,
-    :add_partial_commentary_tag
-  )
+  class RevertError < StandardError; end
 
   dtext_attribute :original_title, disable_mentions: true, inline: true
   dtext_attribute :translated_title, disable_mentions: true, inline: true
@@ -23,8 +24,8 @@ class ArtistCommentary < ApplicationRecord
   validates :original_description, length: { maximum: 55_000 }, if: :original_description_changed?
   validates :translated_description, length: { maximum: 55_000 }, if: :translated_description_changed?
   belongs_to :post
-  has_many :versions, -> {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
-  has_one :previous_version, -> {order(id: :desc)}, :class_name => "ArtistCommentaryVersion", :foreign_key => :post_id, :primary_key => :post_id
+  has_many :versions, -> {order("artist_commentary_versions.id ASC")}, class_name: "ArtistCommentaryVersion", dependent: :destroy, foreign_key: :post_id, primary_key: :post_id
+  has_one :previous_version, -> {order(id: :desc)}, class_name: "ArtistCommentaryVersion", foreign_key: :post_id, primary_key: :post_id
   after_save :create_version
   after_commit :tag_post
 
@@ -81,6 +82,8 @@ class ArtistCommentary < ApplicationRecord
       else
         q = q.apply_default_order(params)
       end
+
+      q
     end
   end
 
@@ -94,22 +97,6 @@ class ArtistCommentary < ApplicationRecord
 
   def any_field_present?
     original_present? || translated_present?
-  end
-
-  def tag_post
-    post.remove_tag("commentary") if remove_commentary_tag.to_s.truthy?
-    post.add_tag("commentary") if add_commentary_tag.to_s.truthy?
-
-    post.remove_tag("commentary_request") if remove_commentary_request_tag.to_s.truthy?
-    post.add_tag("commentary_request") if add_commentary_request_tag.to_s.truthy?
-
-    post.remove_tag("check_commentary") if remove_commentary_check_tag.to_s.truthy?
-    post.add_tag("check_commentary") if add_commentary_check_tag.to_s.truthy?
-
-    post.remove_tag("partial_commentary") if remove_partial_commentary_tag.to_s.truthy?
-    post.add_tag("partial_commentary") if add_partial_commentary_tag.to_s.truthy?
-
-    post.save if post.tag_string_changed?
   end
 
   module VersionMethods
@@ -132,16 +119,16 @@ class ArtistCommentary < ApplicationRecord
         original_title: original_title,
         original_description: original_description,
         translated_title: translated_title,
-        translated_description: translated_description
+        translated_description: translated_description,
       )
     end
 
     def create_new_version
       versions.create(
-        :original_title => original_title,
-        :original_description => original_description,
-        :translated_title => translated_title,
-        :translated_description => translated_description
+        original_title: original_title,
+        original_description: original_description,
+        translated_title: translated_title,
+        translated_description: translated_description,
       )
     end
 
@@ -164,6 +151,20 @@ class ArtistCommentary < ApplicationRecord
 
   extend SearchMethods
   include VersionMethods
+
+  def commentary_tags
+    (post.tag_array & COMMENTARY_TAGS).first || "none"
+  end
+
+  def commentary_tags=(value)
+    @commentary_tag = value if value.in?(COMMENTARY_TAGS)
+  end
+
+  def tag_post
+    return unless @commentary_tag.present?
+    post.tag_string = ((post.tag_array - COMMENTARY_TAGS.without(@commentary_tag)) << @commentary_tag).join(" ")
+    post.save!
+  end
 
   def self.available_includes
     [:post]
