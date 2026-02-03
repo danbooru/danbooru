@@ -2,18 +2,25 @@
   <%= simple_form_for(Upload.new, url: uploads_path(format: :json), html: { class: "flex flex-col !m-0", autocomplete: "off" }, remote: true) do |f| %>
     <%= f.input :files, as: :file, wrapper_html: { class: "hidden" }, input_html: { "multiple": max_files_per_upload > 1 }  %>
 
-    <div class="dropzone-container relative input text-center rounded-t-lg cursor-pointer p-4 max-h-360px thin-scrollbar">
-      <div class="dropzone-hint py-4">
-        <div>Choose file or drag image here</div>
-        <div class="hint fineprint">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>.</div>
-      </div>
+    <div class="rounded-t-lg p-4 pb-8 max-h-360px thin-scrollbar source">
+      <label id="source-label" class="w-full text-center mb-1 block !font-normal">Paste URL here</label>
+      <%= f.input :source, label: false, as: :string, placeholder: "Paste a pixiv link, Tweet, etc", input_html: { value: url, class: "text-center bg:card" }, wrapper_html: { class: "px-4 text-center !m-0" } %>
+      <span class="hint text-muted text-xs text-center w-full block mt-1">
+        <%= link_to_wiki "See here", "help:bookmarklet_notice" %> for a list of supported sites.
+      </span>
+      <%= f.input :referer_url, as: :hidden, input_html: { value: referer_url } %>
+      <%= f.submit "Upload", class: "button-primary text-center mx-auto hidden", "data-disable-with": false %>
     </div>
 
-    <p class="text-center">&mdash; or &mdash;</p>
 
-    <%= f.input :source, label: false, as: :string, placeholder: "Paste URL here", input_html: { value: url, class: "text-center" }, wrapper_html: { class: "px-4 text-center" } %>
-    <%= f.input :referer_url, as: :hidden, input_html: { value: referer_url } %>
-    <%= f.submit "Upload", class: "button-primary text-center mx-auto hidden", "data-disable-with": false %>
+    <div class="dropzone-container relative input text-center rounded-t-lg cursor-pointer p-4 pt-2 max-h-360px thin-scrollbar !m-0">
+      <p class="text-center mb-2">&mdash; or &mdash;</p>
+
+      <div class="dropzone-hint">
+        <div>Choose file or drag image here</div>
+        <div class="hint fineprint !p-0">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>.</div>
+      </div>
+    </div>
   <% end %>
 
   <%= spinner_icon(class: "hidden absolute inset-0 m-auto h-12 link-color") %>

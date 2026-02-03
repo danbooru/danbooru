@@ -12,6 +12,7 @@ $spacer: 0.25rem; /* 4px */
 .font-monospace { font-family: var(--monospace-font); }
 .font-header { font-family: var(--header-font); }
 .font-normal { font-weight: normal; }
+.\!font-normal { font-weight: normal !important; }
 .font-bold { font-weight: bold; }
 .font-italic { font-style: italic; }
 
@@ -176,6 +177,7 @@ $spacer: 0.25rem; /* 4px */
 .mr-4  { margin-right: 4 * $spacer; }
 
 .p-0    { padding: 0; }
+.\!p-0  { padding: 0 !important; }
 .p-px   { padding: 1px; }
 .p-0\.5 { padding: 0.5 * $spacer; }
 .p-1  { padding: 1 * $spacer; }
@@ -196,6 +198,7 @@ $spacer: 0.25rem; /* 4px */
 .py-4 { padding-top: 4 * $spacer; padding-bottom: 4 * $spacer; }
 .py-8 { padding-top: 8 * $spacer; padding-bottom: 8 * $spacer; }
 
+.pt-2 { padding-top: 2 * $spacer; }
 .pt-4 { padding-top: 4 * $spacer; }
 .pt-8 { padding-top: 8 * $spacer; }
 
@@ -392,6 +395,7 @@ a.text-error:hover { color: var(--error-hover-color) !important; }
 a.text-warning:hover { color: var(--warning-hover-color) !important; }
 a.text-danger:hover { color: var(--error-hover-color) !important; }
 
+.bg\:card { background-color: var(--card-background-color); }
 .bg\:primary-color { background-color: var(--link-color); }
 .bg\:error-color { background-color: var(--error-color); }
 .bg-transparent { background-color: transparent; }
