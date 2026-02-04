@@ -71,6 +71,19 @@ class Source::Extractor
       graphql_tweet.dig(:core, :user_results, :result, :legacy, :name)
     end
 
+    def graphql_tweet_created_at
+      date_string = graphql_tweet.dig(:legacy, :created_at)
+      if date_string.present?
+        Time.strptime(date_string, "%a %b %d %H:%M:%S %z %Y")
+      end
+    end
+
+    def published_at
+      # The tweet URL's status ID is a snowflake that contains the exact timestamp the tweet was created at.
+      # We only need to fall back to parsing the GraphQL json's created_at field for tweets made before the snowflake system was implemented.
+      parsed_url.parsed_date || parsed_referer&.parsed_date || graphql_tweet_created_at
+    end
+
     def artist_commentary_desc
       graphql_tweet.dig(:note_tweet, :note_tweet_results, :result, :text) || graphql_tweet.dig(:legacy, :full_text)
     end

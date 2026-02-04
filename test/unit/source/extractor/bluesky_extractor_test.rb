@@ -20,11 +20,16 @@ module Source::Tests::Extractor
         display_name: "Ixy(いくしー)",
         username: "ixy",
         tags: [],
+        published_at: Time.utc(2024, 2, 8, 11, 21, 50, 410_000),
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )
     end
 
     context "A post with 'app.bsky.embed.images.view' embed and alt text" do
+      setup do
+        skip "Deleted post"
+      end
+
       strategy_should_work(
         "https://bsky.app/profile/magicianhero.bsky.social/post/3ljtkgqzwvc2t",
         dtext_artist_commentary_title: "",
@@ -41,6 +46,10 @@ module Source::Tests::Extractor
     end
 
     context "A post url with 'app.bsky.embed.recordWithMedia.view' embed and alt text" do
+      setup do
+        skip "Deleted post"
+      end
+
       strategy_should_work(
         "https://bsky.app/profile/yourbaguette.bsky.social/post/3kjarhifsmg26",
         image_urls: [
@@ -112,6 +121,7 @@ module Source::Tests::Extractor
         display_name: "Hi-GO!",
         username: "go-guiltism",
         tags: [],
+        published_at: Time.utc(2024, 2, 15, 7, 12, 37, 327_000),
         dtext_artist_commentary_desc: "Copy-X FullArmed 2",
       )
     end
@@ -126,6 +136,7 @@ module Source::Tests::Extractor
         display_name: "temmie",
         username: "tuyoki",
         tags: [],
+        published_at: Time.utc(2024, 9, 15, 17, 16, 34, 147_000),
         dtext_artist_commentary_desc: "victory pose",
       )
     end
@@ -175,6 +186,7 @@ module Source::Tests::Extractor
         display_name: "Ixy(いくしー)",
         username: "ixy",
         tags: [],
+        published_at: Time.utc(2024, 2, 8, 11, 21, 50, 410_000),
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )
     end
@@ -193,6 +205,7 @@ module Source::Tests::Extractor
           ["逃げ若", "https://bsky.app/hashtag/逃げ若"],
           ["逃げ上手の若君", "https://bsky.app/hashtag/逃げ上手の若君"],
         ],
+        published_at: Time.utc(2024, 9, 15, 8, 24, 51, 499_000),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           8日目 北条時行
@@ -215,6 +228,7 @@ module Source::Tests::Extractor
         display_name: "轟将",
         username: "masarustrongest",
         tags: [],
+        published_at: Time.utc(2025, 4, 28, 4, 19, 54, 45_000),
         dtext_artist_commentary_desc: "Happy 6th Anniversary🌿",
       )
     end
@@ -233,6 +247,7 @@ module Source::Tests::Extractor
         display_name: /Banditelli/,
         username: "banditelli",
         tags: [],
+        published_at: Time.utc(2025, 5, 13, 10, 8, 43, 344_000),
         dtext_artist_commentary_desc: <<~EOS.chomp,
           Hops for all. "#birds":[https://bsky.app/hashtag/birds]
 
@@ -258,6 +273,7 @@ module Source::Tests::Extractor
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
         media_files: [{ file_size: 398_747 }],
         profile_urls: ["https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"],
+        published_at: nil,
       )
     end
 

@@ -19,6 +19,7 @@
       <%= f.input :rating_changed, as: :select, include_blank: true, selected: params.dig(:search, :rating_changed) %>
       <%= f.input :parent_changed, as: :select, include_blank: true, selected: params.dig(:search, :parent_changed) %>
       <%= f.input :source_changed, as: :select, include_blank: true, selected: params.dig(:search, :source_changed) %>
+      <%= f.input :published_at_changed, label: "Publication date changed", as: :select, include_blank: true, selected: params.dig(:search, :published_at_changed) %>
       <%= f.submit "Search" %>
     <% end %>
   </div>

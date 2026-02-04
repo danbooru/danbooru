@@ -18,6 +18,7 @@ module Source::Tests::Extractor
         display_name: "Nardack",
         username: "nardack",
         tags: %w[神崎蘭子 双葉杏 アイドルマスターシンデレラガールズ Star!! アイマス10000users入り],
+        published_at: Time.find_zone("Tokyo").local(2015, 3, 14, 17, 53, 32),
         dtext_artist_commentary_title: "ツイログ",
         dtext_artist_commentary_desc: "",
       )
@@ -35,6 +36,7 @@ module Source::Tests::Extractor
         display_name: "uroobnad2",
         username: "user_myeg3558",
         tags: %w[Ugoira png blue],
+        published_at: Time.find_zone("Tokyo").local(2017, 4, 4, 8, 57, 38),
         dtext_artist_commentary_title: "ugoira",
         dtext_artist_commentary_desc: "",
       )
@@ -62,6 +64,7 @@ module Source::Tests::Extractor
         display_name: "uroobnad2",
         username: "user_myeg3558",
         tags: %w[Ugoira png blue],
+        published_at: Time.find_zone("Tokyo").local(2017, 4, 4, 8, 57, 38),
         dtext_artist_commentary_title: "ugoira",
         dtext_artist_commentary_desc: "",
       )
@@ -79,6 +82,7 @@ module Source::Tests::Extractor
         display_name: "uroobnad2",
         username: "user_myeg3558",
         tags: %w[Ugoira png blue],
+        published_at: Time.find_zone("Tokyo").local(2017, 4, 4, 8, 57, 38),
         dtext_artist_commentary_title: "ugoira",
         dtext_artist_commentary_desc: "",
       )
@@ -91,6 +95,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 10_155 }],
         page_url: "https://www.pixiv.net/artworks/120834265",
         profile_urls: %w[https://www.pixiv.net/users/1802419 https://www.pixiv.net/stacc/thejunebug],
+        published_at: Time.find_zone("Tokyo").local(2024, 7, 24, 8, 46, 41),
       )
     end
 
@@ -105,6 +110,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.pixiv.net/artworks/113760314",
         image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2023/11/27/19/51/28/113760314_ugoira1920x1080.zip?original"],
+        published_at: Time.find_zone("Tokyo").local(2023, 11, 27, 19, 51, 28),
         media_files: [
           {
             file_size: 5_320_292,
@@ -175,6 +181,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://i.pximg.net/img-zip-ugoira/img/2024/03/24/07/15/10/117197872_ugoira1920x1080.zip",
         image_urls: [],
+        published_at: nil,
       )
     end
 
@@ -187,6 +194,7 @@ module Source::Tests::Extractor
         display_name: "イチリ",
         username: "itiri",
         tags: %w[Fate/GrandOrder フランケンシュタイン(Fate) 水着 バーサーかわいい 新宿のアーチャー パパ製造機 Fate/GO5000users入り フランケンシュタイン(水着) セイバー(Fate)],
+        published_at: Time.find_zone("Tokyo").local(2017, 8, 18, 0, 9, 21),
         dtext_artist_commentary_title: "水着フランたそ",
         dtext_artist_commentary_desc: "ますたーもひかげですずむ？",
       )
@@ -201,6 +209,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: nil,
         tags: [],
+        published_at: Time.find_zone("Tokyo").local(2018, 12, 30, 1, 4, 55),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
         deleted: true,
@@ -217,6 +226,7 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/6570768",
         profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
         tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber30000users入り 両手に茎 乱交 輪姦],
+        published_at: Time.find_zone("Tokyo").local(2022, 8, 14, 19, 23, 6),
       )
     end
 
@@ -233,6 +243,7 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/6570768",
         profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
         tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber30000users入り 両手に茎 乱交 輪姦],
+        published_at: Time.find_zone("Tokyo").local(2022, 8, 14, 21, 21, 24),
       )
     end
 
@@ -244,6 +255,7 @@ module Source::Tests::Extractor
         display_name: "Anzatiridonia",
         profile_url: "https://www.pixiv.net/users/33589885",
         tags: %w[AI Re:ゼロから始める異世界生活 レム リゼロ レム(リゼロ) AIイラスト AnythingV3 Present sweater],
+        published_at: Time.find_zone("Tokyo").local(2022, 12, 3, 5, 6, 51),
       )
     end
 
@@ -372,6 +384,7 @@ module Source::Tests::Extractor
         display_name: "uroobnad2",
         username: "user_myeg3558",
         tags: %w[blue png],
+        published_at: Time.find_zone("Tokyo").local(2017, 4, 4, 8, 54, 15),
         dtext_artist_commentary_title: "single image",
         dtext_artist_commentary_desc: "description here",
       )
@@ -387,6 +400,7 @@ module Source::Tests::Extractor
         display_name: "uroobnad2",
         username: "user_myeg3558",
         tags: %w[blue png],
+        published_at: Time.find_zone("Tokyo").local(2017, 4, 4, 8, 54, 15),
         dtext_artist_commentary_title: "single image",
         dtext_artist_commentary_desc: "description here",
       )
@@ -402,6 +416,7 @@ module Source::Tests::Extractor
         display_name: "uroobnad2",
         username: "user_myeg3558",
         tags: %w[blue png],
+        published_at: Time.find_zone("Tokyo").local(2017, 4, 4, 8, 54, 15),
         dtext_artist_commentary_title: "single image",
         dtext_artist_commentary_desc: "description here",
       )
@@ -430,6 +445,7 @@ module Source::Tests::Extractor
           ["聖あげは", "https://www.pixiv.net/tags/聖あげは/artworks"],
           ["入れ替わり", "https://www.pixiv.net/tags/入れ替わり/artworks"],
         ],
+        published_at: Time.find_zone("Tokyo").local(2024, 4, 26, 13, 3, 41),
         dtext_artist_commentary_title: "ひプまとめ",
         dtext_artist_commentary_desc: "主にX(旧:Twitter)に載せた絵の寄せ集めです。",
       )
@@ -453,6 +469,7 @@ module Source::Tests::Extractor
           ["海琴烟", "https://www.pixiv.net/tags/海琴烟/artworks"],
           ["オリジナル10000users入り", "https://www.pixiv.net/tags/オリジナル10000users入り/artworks"],
         ],
+        published_at: Time.find_zone("Tokyo").local(2022, 3, 8, 0, 0, 56),
         dtext_artist_commentary_title: "Destination",
         dtext_artist_commentary_desc: "",
       )
@@ -468,6 +485,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: nil,
         tags: [],
+        published_at: Time.find_zone("Tokyo").local(2014, 12, 18, 10, 31, 23),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -483,6 +501,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: nil,
         tags: [],
+        published_at: Time.find_zone("Tokyo").local(2015, 10, 25, 8, 45, 27),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -494,6 +513,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg],
         media_files: [{ file_size: 532_037 }],
         page_url: "https://www.pixiv.net/novel/show.php?id=8465454",
+        published_at: Time.find_zone("Tokyo").local(2017, 7, 27, 23, 14, 17),
       )
     end
 
@@ -518,6 +538,7 @@ module Source::Tests::Extractor
           ["百合", "https://www.pixiv.net/tags/百合/novels"],
           ["ガルパン小説100users入り", "https://www.pixiv.net/tags/ガルパン小説100users入り/novels"],
         ],
+        published_at: Time.find_zone("Tokyo").local(2017, 7, 27, 23, 14, 17),
         dtext_artist_commentary_title: "さよならのその先へ 後編",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           前回[b]"novel/8414084":[https://www.pixiv.net/novel/show.php?id=8414084][/b]の続きです。
@@ -563,6 +584,7 @@ module Source::Tests::Extractor
         username: nil,
         other_names: [],
         tags: [],
+        published_at: Time.find_zone("Tokyo").local(2022, 11, 2, 10, 4, 22),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -599,6 +621,7 @@ module Source::Tests::Extractor
           ["【SOZアロイスとユーゴ】", "https://www.pixiv.net/tags/【SOZアロイスとユーゴ】/novels"],
           ["アラディア院", "https://www.pixiv.net/tags/アラディア院/novels"],
         ],
+        published_at: Time.find_zone("Tokyo").local(2022, 10, 23, 21, 11, 17),
         dtext_artist_commentary_title: "【PFSOZ】身バレ【アラディア院】",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           リーリンの息子であることは隠していましたが、一部の人間に身バレしました。
@@ -636,6 +659,7 @@ module Source::Tests::Extractor
           ["【SOZアロイスとユーゴ】", "https://www.pixiv.net/tags/【SOZアロイスとユーゴ】/novels"],
           ["創作", "https://www.pixiv.net/tags/創作/novels"],
         ],
+        published_at: Time.find_zone("Tokyo").local(2022, 10, 23, 17, 31, 13),
         dtext_artist_commentary_title: "ユーゴとアロイス",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           PFSOZの自キャラのSS。傾向はブロマンス。友情と家族愛。魔術師リーリンの息子であるユーゴは正体を隠した父親に育てられるが、彼との関係に行き詰まり、外の世界を知ろうとアラディア院の門をたたくのだった。
@@ -671,6 +695,7 @@ module Source::Tests::Extractor
           ["【SOZアロイスとユーゴ】", "https://www.pixiv.net/tags/【SOZアロイスとユーゴ】/novels"],
           ["創作", "https://www.pixiv.net/tags/創作/novels"],
         ],
+        published_at: Time.find_zone("Tokyo").local(2022, 10, 23, 17, 31, 13),
         dtext_artist_commentary_title: "ユーゴとアロイス",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           PFSOZの自キャラのSS。傾向はブロマンス。友情と家族愛。魔術師リーリンの息子であるユーゴは正体を隠した父親に育てられるが、彼との関係に行き詰まり、外の世界を知ろうとアラディア院の門をたたくのだった。
@@ -690,6 +715,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 1_770_646 }],
         page_url: "https://www.pixiv.net/novel/series/9593812",
         profile_url: "https://www.pixiv.net/users/66091066",
+        published_at: Time.find_zone("Tokyo").local(2022, 10, 23, 17, 31, 13),
       )
     end
 
@@ -699,6 +725,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://i.pximg.net/imgaz/upload/20240417/163474511.jpg],
         media_files: [{ file_size: 3_049_892 }],
         page_url: nil,
+        published_at: nil,
       )
     end
   end

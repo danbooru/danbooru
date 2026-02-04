@@ -79,6 +79,12 @@ module Source
         [display_name, (username unless username&.starts_with?("user_"))].compact_blank.uniq(&:downcase)
       end
 
+      def published_at
+        # Parse the date from the first image URL.
+        # The dates from from the API response (createDate/uploadDate) lack seconds.
+        Source::URL.parse(image_urls[0])&.parsed_date
+      end
+
       def artist_commentary_title
         api_response[:title]&.normalize_whitespace
       end

@@ -12,5 +12,10 @@ if ($("#c-uploads #a-show").length) {
       $("#post_artist_commentary_original_title").val(sourceTitle);
       $(".post_artist_commentary_original_description .dtext-editor").get(0).editor.dtext = sourceDesc;
     }
+
+    let publishedAt = <%= raw @source.published_at_string.to_json %>;
+    if (publishedAt) {
+      $("#post_published_at_string").val(publishedAt);
+    }
   });
 }

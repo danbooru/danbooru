@@ -10,7 +10,7 @@ class PostQuery
   UNLIMITED_METATAGS = %w[
     status rating limit is id date age filesize filetype parent child md5 width
     height duration mpixels ratio score upvote downvotes favcount embedded
-    tagcount pixiv_id pixiv
+    tagcount pixiv_id pixiv published publishedage
   ]
 
   # Metatags that define the order of search results. These metatags can't be used more than once per query.
@@ -159,8 +159,8 @@ class PostQuery
   # True if the search depends on the current user because of permissions or privacy settings.
   def is_user_dependent_search?
     metatags.any? do |metatag|
-      # XXX date: is user dependent because it depends on the current user's time zone
-      metatag.name.in?(%w[date upvoter upvote downvoter downvote commenter comm search flagger fav ordfav favgroup ordfavgroup]) ||
+      # XXX date: and published: are user dependent because they depend on the current user's time zone
+      metatag.name.in?(%w[date published upvoter upvote downvoter downvote commenter comm search flagger fav ordfav favgroup ordfavgroup]) ||
       metatag.name == "status" && metatag.value == "unmoderated" ||
       metatag.name == "disapproved" && !metatag.value.downcase.in?(PostDisapproval::REASONS)
     end

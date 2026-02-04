@@ -86,6 +86,10 @@ class Source::Extractor
       super(tag)
     end
 
+    def published_at
+      Time.at(post[:timestamp]).utc if post[:timestamp]
+    end
+
     # The commentary with reblogs presented as a linear list of quotes, rather than as nested quotes.
     def linear_artist_commentary_desc
       return artist_commentary_desc if post[:trail].blank?

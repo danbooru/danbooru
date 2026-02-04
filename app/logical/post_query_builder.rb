@@ -34,7 +34,7 @@ class PostQueryBuilder
     ordpool note comment commentary id rating source status filetype
     disapproved parent child search embedded md5 pixelhash width height mpixels ratio
     score upvotes downvotes favcount filesize date age order limit tagcount pixiv_id pixiv
-    unaliased exif duration random is has ai
+    unaliased exif duration random is has ai published publishedage
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
@@ -45,6 +45,7 @@ class PostQueryBuilder
     downvotes downvotes_asc
     favcount favcount_asc
     created_at created_at_asc
+    published published_asc
     change change_asc
     comment comment_asc
     comment_bumped comment_bumped_asc

@@ -14,6 +14,7 @@ module Source::Tests::Extractor
           profile_url: "https://pawoo.net/@9ed00e924818",
           username: "9ed00e924818",
           display_name: nil,
+          published_at: Time.utc(2017, 4, 17, 20, 43, 37, 620_000),
           dtext_artist_commentary_desc: "a mind forever voyaging through strange seas of thought alone",
           media_files: [{ file_size: 7_680 }],
         )
@@ -42,6 +43,7 @@ module Source::Tests::Extractor
           username: "evazion",
           display_name: nil,
           tags: %w[foo bar baz],
+          published_at: Time.utc(2017, 6, 10, 23, 2, 48, 412_000),
           dtext_artist_commentary_desc: desc,
         )
       end
@@ -53,6 +55,7 @@ module Source::Tests::Extractor
           media_files: [{ file_size: 59_950 }],
           referer: "https://pawoo.net/@evazion/19451018",
           page_url: "https://pawoo.net/@evazion/19451018",
+          published_at: Time.utc(2017, 6, 10, 23, 2, 48, 412_000),
         )
       end
 
@@ -61,6 +64,7 @@ module Source::Tests::Extractor
           "https://pawoo.net/@nonamethankswashere/12345678901234567890",
           profile_url: "https://pawoo.net/@nonamethankswashere",
           username: "nonamethankswashere",
+          published_at: nil,
           deleted: true,
         )
       end
@@ -79,6 +83,7 @@ module Source::Tests::Extractor
           profile_url: "https://baraag.net/@bardbot",
           username: "bardbot",
           display_name: "SpicyBardo🔞",
+          published_at: Time.utc(2021, 2, 15, 2, 4, 53, 255_000),
           dtext_artist_commentary_desc: "🍌",
         )
       end
@@ -88,6 +93,7 @@ module Source::Tests::Extractor
           "https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
           image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
           media_files: [{ file_size: 363_261 }],
+          published_at: nil,
         )
       end
 
@@ -96,6 +102,7 @@ module Source::Tests::Extractor
           "https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
           image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
           media_files: [{ file_size: 363_261 }],
+          published_at: nil,
         )
       end
 
@@ -104,6 +111,7 @@ module Source::Tests::Extractor
           "https://baraag.net/@nonamethankswashere/12345678901234567890",
           profile_url: "https://baraag.net/@nonamethankswashere",
           username: "nonamethankswashere",
+          published_at: nil,
           deleted: true,
         )
       end

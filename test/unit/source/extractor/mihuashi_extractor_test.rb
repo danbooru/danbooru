@@ -11,6 +11,7 @@ module Source::Tests::Extractor
         profile_url: nil,
         display: nil,
         tags: [],
+        published_at: nil,
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -33,6 +34,7 @@ module Source::Tests::Extractor
           ["厚涂", "https://www.mihuashi.com/search?tab=artwork&q=厚涂"],
           ["插图", "https://www.mihuashi.com/search?tab=artwork&q=插图"],
         ],
+        published_at: Time.utc(2024, 5, 29, 8, 12, 57),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -54,6 +56,7 @@ module Source::Tests::Extractor
           ["meme", "https://www.mihuashi.com/search?tab=artwork&q=meme"],
           ["碧蓝档案", "https://www.mihuashi.com/search?tab=artwork&q=碧蓝档案"],
         ],
+        published_at: Time.utc(2024, 3, 10, 2, 54, 34),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -80,6 +83,7 @@ module Source::Tests::Extractor
         ],
         username: "黑石肆维",
         tags: [],
+        published_at: nil,
         dtext_artist_commentary_title: "印象QQ服",
         dtext_artist_commentary_desc: "封面这样的一身服设，拍下请提供设定图，会根据设定绘制印象服设，可以指定风格元素等！\n如想约两件及以上可以拍一个橱窗然后改价！\n流程：草稿-成图（修改意见请尽量在草稿提出，成图后就不能作大面积调整啦抱歉！（颜色成图后也可以随便改））\n\n备注：默认可以二转二改，商用需×3，有需要可以提供透明底线稿，草稿可以推翻重画两次（废稿会回收），小改次数不限，过程中如果觉得不满意到无法进行修改的程度随时可以沟通退稿，我真的很好说话，有意见尽管提出就好！！！\n\n感谢每位约稿的老板！！！",
       )
@@ -94,6 +98,7 @@ module Source::Tests::Extractor
         profile_urls: [],
         username: nil,
         tags: [],
+        published_at: Time.utc(2024, 12, 21, 13, 14, 17),
         dtext_artist_commentary_title: "💖五仁2025个人企划",
         dtext_artist_commentary_desc: "2025年五仁企划留档",
       )
@@ -108,6 +113,7 @@ module Source::Tests::Extractor
         profile_urls: [],
         username: nil,
         tags: [],
+        published_at: Time.utc(2025, 1, 24, 9, 43, 46),
         dtext_artist_commentary_title: "Amorolvido的2025年企💐🪦🕯️",
         dtext_artist_commentary_desc: "Amorolvido的2025年全年企划\n提供了5套设定（1原设+4服设）\n应征可以明确表示想画哪一个o(≧v≦)o\n感谢大家对Amor的喜欢🥺😚❤️\n祝大家25年心想事成万事如意喔",
       )
@@ -128,6 +134,7 @@ module Source::Tests::Extractor
         profile_urls: [],
         username: nil,
         tags: [],
+        published_at: Time.utc(2024, 6, 28, 13, 14, 51),
         dtext_artist_commentary_title: "墨殇离歌Project宣传图-多人互动",
         dtext_artist_commentary_desc: "OC企划宣传图-日系二次元多人宣传图。报价为单张商断报价相信价格根据具体细节沟通确定。详细需求会以文件形式发送给画师，欢迎应征",
       )
@@ -142,6 +149,7 @@ module Source::Tests::Extractor
         profile_urls: [],
         username: nil,
         tags: [],
+        published_at: nil,
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -157,6 +165,7 @@ module Source::Tests::Extractor
         profile_urls: [],
         username: nil,
         tags: [],
+        published_at: Time.utc(2025, 7, 12, 10, 34, 1),
         dtext_artist_commentary_title: "1",
         dtext_artist_commentary_desc: "还原，细致",
       )
@@ -181,6 +190,7 @@ module Source::Tests::Extractor
         profile_urls: [],
         username: nil,
         tags: [],
+        published_at: Time.utc(2024, 10, 29, 4, 43, 58),
         dtext_artist_commentary_title: "一些可以使用的元素",
         dtext_artist_commentary_desc: "生命之流是图1绿色的流动的线，菲拉是图二的黑色斗篷",
       )
@@ -199,6 +209,7 @@ module Source::Tests::Extractor
         ],
         username: "悪の箱",
         tags: [],
+        published_at: Time.utc(2019, 6, 16, 7, 28, 36),
         dtext_artist_commentary_title: "粉蓝夏日泳装",
         dtext_artist_commentary_desc: "成年人也想吹泡泡~(´-ω-`)【粉蓝萝莉的设计真的很棒！！",
       )
@@ -224,11 +235,12 @@ module Source::Tests::Extractor
         page_url: "https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh",
         profile_url: "https://www.mihuashi.com/profiles/492",
         profile_urls: [
-          "https://www.mihuashi.com/users/CR",
+          "https://www.mihuashi.com/users/麻烦花少",
           "https://www.mihuashi.com/profiles/492",
         ],
-        username: "CR",
+        username: "麻烦花少",
         tags: [],
+        published_at: Time.utc(2021, 7, 3, 17, 58, 9),
         dtext_artist_commentary_title: "纸仙云鹤",
         dtext_artist_commentary_desc: "这套时装灵感来自于中国传统剪纸文化，结合了仙鹤和祥云的元素。\n红色的宣纸上剪裁出仙鹤在祥云中飞翔的图案，希望给大家带来温暖的感觉。",
       )
@@ -250,6 +262,7 @@ module Source::Tests::Extractor
           ["Q版", "https://www.mihuashi.com/search?tab=artwork&q=Q版"],
           ["插图", "https://www.mihuashi.com/search?tab=artwork&q=插图"],
         ],
+        published_at: Time.utc(2024, 3, 26, 8, 34, 14),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "蔚蓝档案小桃",
       )

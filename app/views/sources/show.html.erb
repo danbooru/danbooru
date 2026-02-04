@@ -94,6 +94,12 @@
                 Source: <%= external_link_to @source.page_url, class: "inactive-link" %>
               </div>
             <% end %>
+
+            <% if @source.published_at_string.present? %>
+              <div class="prose text-xs text-muted">
+                Publication Date: <%= compact_time(@source.published_at) %>
+              </div>
+            <% end %>
           </div>
         <% end %>
       </div>

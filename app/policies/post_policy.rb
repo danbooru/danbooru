@@ -97,18 +97,18 @@ class PostPolicy < ApplicationPolicy
   end
 
   def permitted_attributes_for_create
-    [:upload_id, :media_asset_id, :upload_media_asset_id, :tag_string, :rating, :parent_id, :source, :is_pending,
+    [:upload_id, :media_asset_id, :upload_media_asset_id, :tag_string, :rating, :parent_id, :source, :is_pending, :published_at_string,
      { artist_commentary: %i[original_title original_description translated_title translated_description] }]
   end
 
   # XXX For UploadsController#show action
   def permitted_attributes_for_show
-    [:tag_string, :rating, :parent_id, :source, :is_pending,
+    [:tag_string, :rating, :parent_id, :source, :published_at_string, :is_pending,
      { artist_commentary: %i[original_title original_description translated_title translated_description] }]
   end
 
   def permitted_attributes_for_update
-    %i[tag_string old_tag_string parent_id old_parent_id source old_source rating old_rating has_embedded_notes]
+    %i[tag_string old_tag_string parent_id old_parent_id source old_source rating old_rating has_embedded_notes published_at_string]
   end
 
   def api_attributes

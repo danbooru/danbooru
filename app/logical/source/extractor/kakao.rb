@@ -4,7 +4,7 @@
 # We can't tell which extractor to use based on the URL itself, but if the referer URL is present we can use it to
 # delegate to the real extractor.
 class Source::Extractor::Kakao < Source::Extractor
-  delegate :page_url, :profile_url, :artist_name, :display_name, :username, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
+  delegate :page_url, :profile_url, :artist_name, :display_name, :username, :tag_name, :published_at, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
   def allow_referer?
     # Ex: https://panchokworkshop.com/520, https://panchok.tistory.com/520, https://post.naver.com/viewer/postView.naver?volumeNo=28956950&memberNo=23461945

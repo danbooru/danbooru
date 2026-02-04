@@ -156,6 +156,10 @@ module Source
         tags
       end
 
+      def published_at
+        Time.iso8601(deviation["publishedTime"]).utc if deviation["publishedTime"]
+      end
+
       def dtext_artist_commentary_desc
         DText.from_html(artist_commentary_desc, base_url: "https://www.deviantart.com", allowed_shortlinks: ["deviantart"]) do |element|
           case element.name

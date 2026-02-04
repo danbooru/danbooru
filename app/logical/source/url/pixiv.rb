@@ -54,6 +54,14 @@ module Source
         parse_filename
         @username = username
 
+      # https://i.pximg.net/user-profile/img/2014/12/18/10/31/23/8733472_7dc7310db6cc37163af145d04499e411_170.jpg
+      in *, "user-profile", "img", year, month, day, hour, min, sec, _ if image_url?
+        @date = [year, month, day, hour, min, sec]
+
+      # https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg
+      in *, "background", "img", year, month, day, hour, min, sec, _ if image_url?
+        @date = [year, month, day, hour, min, sec]
+
       # https://i.pximg.net/imgaz/upload/20240417/163474511.jpg
       # contest images?
       in _, _, "imgaz", "upload", _year_month_day, _ if image_url?
@@ -292,7 +300,7 @@ module Source
 
     def parsed_date
       # Dates in image URLs are in JST (UTC+9)
-      Time.new(*date, "+09:00").in_time_zone("UTC") if date.present?
+      Time.new(*date, "+09:00").utc if date.present?
     end
   end
 end

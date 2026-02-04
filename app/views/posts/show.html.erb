@@ -28,8 +28,14 @@
       </li>
 
       <li id="post-info-date">
-        Date: <%= link_to time_ago_in_words_tagged(@post.created_at), posts_path(tags: "date:#{@post.created_at.to_date}") %>
+        Upload Date: <%= link_to time_ago_in_words_tagged(@post.created_at), posts_path(tags: "date:#{@post.created_at.to_date}") %>
       </li>
+
+      <% if @post.published_at %>
+        <li id="post-info-published-date">
+          Publication Date: <%= link_to time_ago_in_words_tagged(@post.published_at), posts_path(tags: "published:#{@post.published_at.to_date}") %>
+        </li>
+      <% end %>
 
       <% if @post.approver %>
         <li id="post-info-approver">

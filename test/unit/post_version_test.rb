@@ -36,7 +36,7 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that has been created" do
       setup do
         @parent = FactoryBot.create(:post)
-        @post = create(:post, tag_string: "aaa bbb ccc", rating: "e", parent: @parent, source: "http://xyz.com")
+        @post = create(:post, tag_string: "aaa bbb ccc", rating: "e", parent: @parent, source: "http://xyz.com", published_at: Time.zone.parse("2020-01-01"))
       end
 
       should "also create a version" do
@@ -46,13 +46,14 @@ class PostVersionTest < ActiveSupport::TestCase
         assert_equal(@post.rating, @version.rating)
         assert_equal(@post.parent_id, @version.parent_id)
         assert_equal(@post.source, @version.source)
+        assert_equal(@post.published_at, @version.published_at)
       end
     end
 
     context "that should be merged" do
       setup do
         @parent = FactoryBot.create(:post)
-        @post = create(:post, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com")
+        @post = create(:post, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com", published_at: Time.zone.parse("2020-01-01"))
       end
 
       should "delete the previous version" do
@@ -81,8 +82,8 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that has been updated" do
       setup do
         PostVersion.sqs_service.stubs(:merge?).returns(false)
-        @post = create(:post, created_at: 1.minute.ago, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com")
-        @post.update(tag_string: "bbb ccc xxx", source: "")
+        @post = create(:post, created_at: 1.minute.ago, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com", published_at: Time.zone.parse("2020-01-01"))
+        @post.update(tag_string: "bbb ccc xxx", source: "", published_at: Time.zone.parse("2018-01-01"))
       end
 
       should "also create a version" do
@@ -91,6 +92,7 @@ class PostVersionTest < ActiveSupport::TestCase
         assert_equal("bbb ccc xxx", @version.tags)
         assert_equal("q", @version.rating)
         assert_equal("", @version.source)
+        assert_equal(Time.zone.parse("2018-01-01"), @version.published_at)
         assert_nil(@version.parent_id)
       end
 
@@ -121,6 +123,13 @@ class PostVersionTest < ActiveSupport::TestCase
           @parent = create(:post)
           @post.update(parent_id: @parent.id)
           assert_equal(@parent.id, @post.versions.max_by(&:id).parent_id)
+        end
+      end
+
+      should "should create a version if the publication date changes" do
+        assert_difference("@post.versions.size", 1) do
+          @post.update(published_at: Time.zone.parse("2015-01-01"))
+          assert_equal(Time.zone.parse("2015-01-01"), @post.versions.max_by(&:id).published_at)
         end
       end
 

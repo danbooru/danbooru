@@ -44,7 +44,7 @@ class PostVersion < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :updated_at, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version], current_user: current_user)
+      q = search_attributes(params, [:id, :updated_at, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :published_at, :published_at_changed, :version], current_user: current_user)
 
       if params[:changed_tags]
         q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
@@ -94,6 +94,7 @@ class PostVersion < ApplicationRecord
           "rating" => post.rating,
           "parent_id" => post.parent_id,
           "source" => post.source,
+          "published_at" => post.published_at.try(:iso8601),
           "updater_id" => CurrentUser.id,
           "updated_at" => post.updated_at.try(:iso8601),
           "created_at" => post.created_at.try(:iso8601),
@@ -145,6 +146,7 @@ class PostVersion < ApplicationRecord
       rating: "Rating",
       parent_id: "Parent",
       source: "Source",
+      published_at: "Published",
     }
   end
 
@@ -167,6 +169,7 @@ class PostVersion < ApplicationRecord
     latest_tags << "rating:#{post.rating}" if post.rating.present?
     latest_tags << "parent:#{post.parent_id}" if post.parent_id.present?
     latest_tags << "source:#{post.source}" if post.source.present?
+    latest_tags << "published:#{post.published_at&.iso8601}" if post.published_at.present?
 
     if parent_changed
       if parent_id.present?
@@ -193,6 +196,16 @@ class PostVersion < ApplicationRecord
 
       if previous
         delta[:removed_tags] << "source:#{previous.source}"
+      end
+    end
+
+    if published_at_changed
+      if published_at.present?
+        delta[:added_tags] << "published:#{published_at&.iso8601}"
+      end
+
+      if previous
+        delta[:removed_tags] << "published:#{previous.published_at&.iso8601}"
       end
     end
 

@@ -2,7 +2,7 @@
 
 # @see Source::URL::E621
 class Source::Extractor::E621 < Source::Extractor
-  delegate :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
+  delegate :published_at, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
   def image_urls
     if parsed_url.full_image_url.present?

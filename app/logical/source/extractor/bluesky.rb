@@ -145,6 +145,11 @@ class Source::Extractor::Bluesky < Source::Extractor
     end
   end
 
+  def published_at
+    created_at_string = api_response&.dig("thread", "post", "record", "createdAt")
+    Time.iso8601(created_at_string).utc if created_at_string
+  end
+
   # https://www.docs.bsky.app/docs/api/app-bsky-feed-get-post-thread
   memoize def api_response
     return {} unless post_id.present?

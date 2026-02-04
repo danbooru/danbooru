@@ -170,6 +170,8 @@
 
             <%= f.input :source, as: :string, input_html: { value: post.source } %>
 
+            <%= f.input :published_at_string, label: "Publication date", hint: "When the image was published at the source, not when it was drawn." %>
+
             <%= f.simple_fields_for :artist_commentary, post.artist_commentary do |fa| %>
               <%= fa.input :original_title, as: :string %>
               <%= fa.input :original_description, as: :dtext, label: "Original description" %>

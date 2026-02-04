@@ -57,6 +57,7 @@ class Post < ApplicationRecord
   validate :validate_child_count
   validate :validate_changed_tags
   validate :validate_tag_count
+  validate :validate_published_at_string
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
   validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
@@ -70,6 +71,7 @@ class Post < ApplicationRecord
   before_save :has_enough_tags
   before_save :update_tag_post_counts
   before_save :update_tag_category_counts
+  before_save :parse_published_at_string
   before_create :remove_blank_artist_commentary
   before_create :autoban
   after_save :create_version
@@ -102,6 +104,7 @@ class Post < ApplicationRecord
   has_many :embedding_wiki_pages, through: :dtext_links, source: :model, source_type: "WikiPage"
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :post_edit
+  attr_writer :published_at_string
 
   scope :pending, -> { where(is_pending: true) }
   scope :flagged, -> { where(is_flagged: true) }
@@ -121,7 +124,7 @@ class Post < ApplicationRecord
     has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, class_name: "PostVersion", dependent: :destroy
   end
 
-  def self.new_from_upload(upload_media_asset, tag_string: nil, rating: nil, parent_id: nil, source: nil, artist_commentary: {}, is_pending: nil, add_artist_tag: false)
+  def self.new_from_upload(upload_media_asset, tag_string: nil, rating: nil, parent_id: nil, source: nil, published_at_string: nil, artist_commentary: {}, is_pending: nil, add_artist_tag: false)
     upload = upload_media_asset.upload
     media_asset = upload_media_asset.media_asset
 
@@ -145,6 +148,7 @@ class Post < ApplicationRecord
       rating: rating,
       parent_id: parent_id,
       is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy?,
+      published_at_string: published_at_string,
       artist_commentary: commentary,
     )
   end
@@ -627,6 +631,12 @@ class Post < ApplicationRecord
         in "source", value
           self.source = value
 
+        in "published", "none"
+          self.published_at_string = ""
+
+        in "published", value
+          self.published_at_string = value
+
         in "status", "pending"
           self.is_pending = true if new_record?
 
@@ -886,7 +896,7 @@ class Post < ApplicationRecord
     end
 
     def saved_change_to_watched_attributes?
-      saved_change_to_rating? || saved_change_to_source? || saved_change_to_parent_id? || saved_change_to_tag_string?
+      saved_change_to_rating? || saved_change_to_source? || saved_change_to_parent_id? || saved_change_to_published_at? || saved_change_to_tag_string?
     end
 
     def merge_version?
@@ -1167,6 +1177,10 @@ class Post < ApplicationRecord
           attribute_matches(value, :created_at, :date)
         when "age"
           attribute_matches(value, :created_at, :age)
+        when "published"
+          attribute_matches(value, :published_at, :date)
+        when "publishedage"
+          attribute_matches(value, :published_at, :age)
         when "pixiv", "pixiv_id"
           attribute_matches(value, :pixiv_id)
         when "tagcount"
@@ -1605,6 +1619,12 @@ class Post < ApplicationRecord
         when "created_at_asc"
           reorder("posts.created_at ASC")
 
+        when "published", "published_desc"
+          where.not(published_at: nil).reorder("posts.published_at DESC")
+
+        when "published_asc"
+          where.not(published_at: nil).reorder("posts.published_at ASC")
+
         when "change", "change_desc"
           reorder("posts.updated_at DESC, posts.id DESC")
 
@@ -1930,11 +1950,37 @@ class Post < ApplicationRecord
         warnings.add(:base, "Uploads must have at least 10 general tags. Read [[howto:tag]] for guidelines on tagging your uploads")
       end
     end
+
+    def validate_published_at_string
+      return if @published_at_string.blank?
+      time = Time.find_zone("UTC").iso8601(@published_at_string).utc
+      if time > Time.now.utc
+        errors.add(:base, "Publication date '#{@published_at_string}' is in the future")
+      end
+    rescue ArgumentError
+      errors.add(:base, "Publication date '#{@published_at_string}' is not a valid date in ISO 8601 format")
+    end
   end
 
   concerning :ArtistCommentaryMethods do
     def remove_blank_artist_commentary
       self.artist_commentary = nil if !artist_commentary&.any_field_present?
+    end
+  end
+
+  concerning :PublicationDateMethods do
+    def published_at_string
+      @published_at_string || published_at&.getutc&.iso8601
+    end
+
+    def parse_published_at_string
+      if published_at_string.blank?
+        self.published_at = nil
+      else
+        # Assume strings missing explicit timezone info are in UTC, not the user's local time.
+        # This is to prevent simple date strings like "2026-01-01" from being stored in the database as off by the editor's UTC offset.
+        self.published_at = Time.find_zone("UTC").iso8601(published_at_string).utc
+      end
     end
   end
 
@@ -1968,6 +2014,7 @@ class Post < ApplicationRecord
     @pools = nil
     @tag_categories = nil
     @typed_tags = nil
+    @published_at_string = nil
     self
   end
 

@@ -52,7 +52,7 @@ For help, ask in the [#technical](https://discord.com/channels/31043283013808947
 
 ## Services
 
-Danboou depends on a couple of cloud services and several microservices to
+Danbooru depends on a couple of cloud services and several microservices to
 implement certain features.
 
 ### Amazon Web Services

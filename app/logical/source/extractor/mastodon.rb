@@ -72,6 +72,10 @@ class Source::Extractor
       end
     end
 
+    def published_at
+      Time.iso8601(api_response["created_at"]).utc if api_response["created_at"]
+    end
+
     def dtext_artist_commentary_desc
       DText.from_html(artist_commentary_desc, base_url: "https://#{domain}") do |element|
         if element.name == "a"

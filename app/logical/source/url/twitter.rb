@@ -14,6 +14,9 @@ class Source::URL::Twitter < Source::URL
   TWITTER_PROXY_DOMAINS = %w[fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com nitter.net xcancel.com]
   TWITTER_PROXY_HOSTS = %w[nitter.poast.org]
 
+  # Unix time in milliseconds that must be added to the snowflake ID's timestamp.
+  TWITTER_EPOCH = 1288834974657 # rubocop:disable Style/NumericLiterals
+
   attr_reader :status_id, :username, :user_id, :full_image_url
 
   def self.match?(url)
@@ -168,5 +171,14 @@ class Source::URL::Twitter < Source::URL
     elsif user_id.present?
       "https://x.com/i/user/#{user_id}"
     end
+  end
+
+  def parsed_date
+    snowflake_id = status_id.to_i
+    return nil if snowflake_id == 0
+    return nil if snowflake_id < 300_000_000_000_000 # Until 2010-11-04 status IDs were sequential, not snowflakes.
+    unix_time = (snowflake_id >> 22) + TWITTER_EPOCH
+    seconds, milliseconds = unix_time.divmod(1000)
+    Time.at(seconds).change(:usec => milliseconds * 1000).utc
   end
 end

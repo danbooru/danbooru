@@ -10,6 +10,7 @@ module PostVersionsHelper
     added_tags << "rating:#{post_version_value(post_version.rating)}" if post_version.rating_changed
     added_tags << "parent:#{post_version_value(post_version.parent_id)}" if post_version.parent_changed
     added_tags << "source:#{post_version_source(post_version.source)}" if post_version.source_changed
+    added_tags << "published:#{post_version_time(post_version.published_at)}" if post_version.published_at_changed
 
     removed_tags = post_version.removed_tags.compact
 
@@ -21,6 +22,7 @@ module PostVersionsHelper
       other_tags << "rating:#{post_version_value(other.rating)}"
       other_tags << "parent:#{post_version_value(other.parent_id)}"
       other_tags << "source:#{post_version_source(other.source)}"
+      other_tags << "published:#{post_version_time(other.published_at)}"
       obsolete_added_tags = added_tags - other_tags
       obsolete_removed_tags = removed_tags & other_tags
     end
@@ -40,11 +42,18 @@ module PostVersionsHelper
   end
 
   def post_version_field(post_version, field)
-    value = post_version_value(post_version.send(field))
-    prefix = ((field == :parent_id) ? "parent" : field.to_s)
+    if field == :published_at
+      value = post_version_time(post_version.send(field))
+      prefix = "published"
+      title = "Published"
+    else
+      value = post_version_value(post_version.send(field))
+      prefix = ((field == :parent_id) ? "parent" : field.to_s)
+      title = field.to_s.titleize
+    end
     search = "#{prefix}:#{value}"
     display = ((field == :rating) ? post_version.pretty_rating : value)
-    %{<b>#{field.to_s.titleize}:</b> #{link_to(display, posts_path(:tags => search))}}.html_safe
+    %{<b>#{title}:</b> #{link_to(display, posts_path(:tags => search))}}.html_safe
   end
 
   def post_version_value(value)
@@ -60,5 +69,9 @@ module PostVersionsHelper
       # This turns non-web sources with spaces (e.g., "File provided by the artist") into a single clickable entity.
       %{"#{source}"}
     end
+  end
+
+  def post_version_time(time)
+    time&.iso8601 || "none"
   end
 end

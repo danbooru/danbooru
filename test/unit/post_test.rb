@@ -1259,6 +1259,50 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
+        context "for published:<date>" do
+          should "set the publication date with explicit time zone" do
+            @post.update(:tag_string => "published:2026-01-01T12:34:56-0500")
+            assert_equal(Time.find_zone("UTC").local(2026, 1, 1, 17, 34, 56), @post.published_at)
+          end
+
+          should "set the publication date without explicit time zone to UTC instead of the user's time zone" do
+            Time.zone = "Pacific Time (US & Canada)"
+            @post.update(:tag_string => "published:2026-01-01T12:34:56")
+            assert_equal(Time.find_zone("UTC").local(2026, 1, 1, 12, 34, 56), @post.published_at)
+            Time.zone = "Eastern Time (US & Canada)"
+          end
+
+          should "set the publication date without seconds" do
+            @post.update(:tag_string => "published:2026-01-01T12:34Z")
+            assert_equal(Time.find_zone("UTC").local(2026, 1, 1, 12, 34, 0), @post.published_at)
+          end
+
+          should "set the publication date without time" do
+            @post.update(:tag_string => "published:2026-01-01")
+            assert_equal(Time.find_zone("UTC").local(2026, 1, 1, 0, 0, 0), @post.published_at)
+          end
+
+          should "set the publication date before 1970" do
+            @post.update(:tag_string => "published:1952-04-03")
+            assert_equal(Time.find_zone("UTC").local(1952, 4, 3, 0, 0, 0), @post.published_at)
+          end
+
+          should "fail to set the publication date to the future" do
+            @post.update(:tag_string => "published:9999-01-01")
+            assert_nil(@post.published_at)
+          end
+
+          should "clear the publication date" do
+            @post.update(:tag_string => "published:none")
+            assert_nil(@post.published_at)
+          end
+
+          should "fail to set the publication date to an invalid value" do
+            @post.update(:tag_string => "published:foo")
+            assert_nil(@post.published_at)
+          end
+        end
+
         context "of" do
           setup do
             @gold = FactoryBot.create(:gold_user)

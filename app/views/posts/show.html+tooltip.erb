@@ -5,6 +5,12 @@
     <%= time_ago_in_words_tagged(@post.created_at, compact: true) %>
   <% end %>
 
+  <% if @post.published_at %>
+    <%= link_to posts_path(tags: "published:#{@post.published_at.strftime("%Y-%m-%d")}"), class: "post-tooltip-date inactive-link" do %>
+      (<%= time_ago_in_words_tagged(@post.published_at, compact: true) %>)
+    <% end %>
+  <% end %>
+
   <span class="post-tooltip-score">
     <%= render_post_votes @post, current_user: CurrentUser.user %>
   </span>

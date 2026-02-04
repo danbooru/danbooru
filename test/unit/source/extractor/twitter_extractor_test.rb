@@ -9,6 +9,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 203_927, width: 1252, height: 1252 }],
         page_url: nil,
         profile_urls: %w[https://x.com/i/user/417182061145780225],
+        published_at: nil,
       )
     end
 
@@ -31,6 +32,7 @@ module Source::Tests::Extractor
         display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
+        published_at: Time.utc(2017, 12, 20, 11, 41, 7, 961_000),
         dtext_artist_commentary_desc: <<~EOS.chomp,
           岩本町芸能社女優部のタレント3名がHPに公開されました。
           部署が違うので私の担当ではありませんが、みんなとても良い子たちです。
@@ -55,6 +57,7 @@ module Source::Tests::Extractor
         display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
+        published_at: Time.utc(2017, 12, 20, 11, 41, 7, 961_000),
       )
     end
 
@@ -71,6 +74,7 @@ module Source::Tests::Extractor
         display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
+        published_at: Time.utc(2017, 12, 20, 11, 41, 7, 961_000),
       )
     end
 
@@ -87,6 +91,7 @@ module Source::Tests::Extractor
         display_name: "丸茂",
         username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
+        published_at: Time.utc(2017, 12, 20, 11, 41, 7, 961_000),
       )
     end
 
@@ -96,6 +101,7 @@ module Source::Tests::Extractor
         image_urls: ["https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4"],
         page_url: "https://x.com/CincinnatiZoo/status/859073537713328129",
         media_files: [{ file_size: 8_603_100 }],
+        published_at: Time.utc(2017, 5, 1, 15, 54, 26, 862_000),
         dtext_artist_commentary_desc: <<~EOS.chomp,
           Fiona loves playing in the hose water just like her parents! 💦 "#TeamFiona":[https://x.com/hashtag/TeamFiona] "#fionafix":[https://x.com/hashtag/fionafix]
         EOS
@@ -108,6 +114,7 @@ module Source::Tests::Extractor
         "https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:small",
         image_urls: ["https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig"],
         media_files: [{ file_size: 18_058 }],
+        published_at: nil,
       )
     end
 
@@ -116,6 +123,7 @@ module Source::Tests::Extractor
         "https://pbs.twimg.com/ext_tw_video_thumb/1578376127801761793/pu/img/oGcUqPnwRYYhk-gi.jpg:small",
         image_urls: ["https://pbs.twimg.com/ext_tw_video_thumb/1578376127801761793/pu/img/oGcUqPnwRYYhk-gi.jpg:orig"],
         media_files: [{ file_size: 243_227 }],
+        published_at: nil,
       )
     end
 
@@ -125,6 +133,7 @@ module Source::Tests::Extractor
         "https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:small",
         image_urls: ["https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig"],
         media_files: [{ file_size: 106_942 }],
+        published_at: nil,
       )
     end
 
@@ -134,6 +143,7 @@ module Source::Tests::Extractor
         image_urls: ["https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4"],
         media_files: [{ file_size: 542_833 }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -142,6 +152,7 @@ module Source::Tests::Extractor
         "https://twitter.com/i/web/status/1252517866059907073",
         image_urls: ["https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4"],
         media_files: [{ file_size: 542_833 }],
+        published_at: Time.utc(2020, 4, 21, 8, 41, 44, 582_000),
         artist_commentary_desc: "https://t.co/gyTKOSBOQ7",
         dtext_artist_commentary_desc: "",
       )
@@ -158,6 +169,7 @@ module Source::Tests::Extractor
         display_name: "通天機",
         username: "twotenky",
         profile_url: "https://x.com/twotenky",
+        published_at: Time.utc(2022, 10, 6, 1, 22, 20, 937_000),
         artist_commentary_desc: "動画と静止画がセットでお得と聞いて https://t.co/hWvKoHLN7y",
         dtext_artist_commentary_desc: "動画と静止画がセットでお得と聞いて",
       )
@@ -173,6 +185,7 @@ module Source::Tests::Extractor
         profile_urls: ["https://x.com/Strangestone", "https://x.com/i/user/93332575"],
         display_name: "比村奇石",
         username: "Strangestone",
+        published_at: Time.utc(2015, 1, 17, 13, 17, 53, 653_000),
         dtext_artist_commentary_desc: "ブレザーが描きたかったのでJK鈴谷",
       )
     end
@@ -187,6 +200,7 @@ module Source::Tests::Extractor
         display_name: "ショカ",
         username: "shoka_bg",
         tags: %w[ブルアカ],
+        published_at: Time.utc(2023, 4, 7, 14, 21, 39, 702_000),
         dtext_artist_commentary_desc: <<~EOS.chomp,
           風紀委員の実態
           "#ブルアカ":[https://x.com/hashtag/ブルアカ]
@@ -204,6 +218,7 @@ module Source::Tests::Extractor
         display_name: "ラブレミ@うぉるやふぁんくらぶ",
         username: "loveremi_razoku",
         tags: [],
+        published_at: Time.utc(2023, 3, 20, 2, 48, 9, 805_000),
         dtext_artist_commentary_desc: <<~EOS.chomp,
           「ラリアッ党の野望チョコ」
           commission ラリアット さん"@rariatoo":[https://x.com/rariatoo]
@@ -243,6 +258,7 @@ module Source::Tests::Extractor
         display_name: "えむりん",
         username: "emurin",
         tags: %w[odaibako],
+        published_at: Time.utc(2017, 9, 27, 2, 8, 29, 946_000),
         dtext_artist_commentary_desc: <<~EOS.chomp,
           > ほわほわ系クーデレギロチンおねがいします <https://odaibako.net/detail/request/277bac5ea1b34b1abc7ac21dd1031690> "#odaibako":[https://x.com/hashtag/odaibako]
 
@@ -260,6 +276,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: "star_ukmgr",
         tags: [],
+        published_at: Time.utc(2025, 4, 30, 15, 8, 39, 806_000),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -277,6 +294,7 @@ module Source::Tests::Extractor
         display_name: "Noun Project",
         username: "nounproject",
         tags: [],
+        published_at: Time.utc(2014, 12, 5, 19, 2, 50, 61_000),
         dtext_artist_commentary_desc: <<~EOS.chomp,
           More is better. Unlimited is best. NounPro Members now get unlimited icon downloads <http://bit.ly/1yn2KWn>
         EOS
@@ -288,6 +306,7 @@ module Source::Tests::Extractor
         "https://twitter.com/teruyo/status/1058452066060853248",
         profile_url: "https://x.com/teruyo",
         image_urls: [],
+        published_at: Time.utc(2018, 11, 2, 20, 13, 32, 294_000),
         dtext_artist_commentary_desc: "all the women washizutan2 draws look like roast chicken",
       )
     end
@@ -298,6 +317,7 @@ module Source::Tests::Extractor
         image_urls: ["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig"],
         media_files: [{ file_size: 229_661 }],
         profile_url: nil,
+        published_at: nil,
       )
     end
 
@@ -307,6 +327,7 @@ module Source::Tests::Extractor
         image_urls: ["https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg:orig"],
         media_files: [{ file_size: 842_373 }],
         profile_url: nil,
+        published_at: nil,
       )
     end
 
@@ -317,6 +338,7 @@ module Source::Tests::Extractor
         image_urls: ["https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg:orig"],
         media_files: [{ file_size: 842_373 }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -326,6 +348,7 @@ module Source::Tests::Extractor
         deleted: true,
         username: "masayasuf",
         profile_url: "https://x.com/masayasuf",
+        published_at: Time.utc(2017, 6, 2, 20, 12, 47, 18_000),
         dtext_artist_commentary_desc: "",
       )
     end
@@ -336,6 +359,7 @@ module Source::Tests::Extractor
         username: "tanso_panz",
         profile_url: "https://x.com/tanso_panz",
         image_urls: [],
+        published_at: Time.utc(2019, 11, 7, 13, 13, 13, 422_000),
         dtext_artist_commentary_desc: "",
       )
     end
@@ -350,6 +374,7 @@ module Source::Tests::Extractor
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://x.com/motty08111213",
+        published_at: Time.utc(2017, 12, 20, 11, 41, 7, 961_000),
       )
     end
 
@@ -363,6 +388,7 @@ module Source::Tests::Extractor
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://x.com/motty08111213",
+        published_at: Time.utc(2017, 12, 20, 11, 41, 7, 961_000),
       )
     end
 
@@ -374,6 +400,7 @@ module Source::Tests::Extractor
         profile_url: nil,
         # profile_url: "https://x.com/i/user/780804311529906176"
         # XXX we COULD fully support these by setting the page_url to https://x.com/Kekeflipnote/header_photo, but it's a lot of work for a niche case
+        published_at: nil,
       )
     end
 
@@ -384,6 +411,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 108_605 }],
         page_url: nil,
         profile_url: nil,
+        published_at: nil,
       )
     end
 
@@ -394,6 +422,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 159_186 }],
         page_url: nil,
         profile_url: nil,
+        published_at: nil,
       )
     end
 
@@ -506,6 +535,7 @@ module Source::Tests::Extractor
         tags: [
           ["スーパーカブ", "https://x.com/hashtag/スーパーカブ"],
         ],
+        published_at: Time.utc(2022, 5, 4, 13, 30, 0, 325_000),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           GWなので再放送です☺
@@ -550,6 +580,7 @@ module Source::Tests::Extractor
         tags: [
           ["山田999", "https://x.com/hashtag/山田999"],
         ],
+        published_at: Time.utc(2023, 4, 1, 16, 0, 2, 89_000),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           💕••┈┈┈┈┈┈┈┈•• 💕

@@ -193,7 +193,7 @@ services:
     expose:
     - 9324
     volumes:
-      - sqs-data:/data"
+      - sqs-data:/data
     restart: unless-stopped
     stdin_open: true
     tty: true
@@ -204,7 +204,9 @@ services:
         condition: service_started
       postgres:
         condition: service_healthy
-    image: ghcr.io/danbooru/archives:latest
+    # XXX Switch this back once the image has been updated
+    # image: ghcr.io/danbooru/archives:latest
+    build: https://github.com/ToksT/archives.git#publish-time
     environment:
       <<: *sqs-env
       RUN: 1

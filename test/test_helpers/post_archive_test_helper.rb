@@ -21,6 +21,7 @@ module PostArchiveTestHelper
       json["parent_changed"] = (prev.nil? || json.key?("parent_id") && prev.parent_id != json["parent_id"])
       json["source_changed"] = (prev.nil? || json.key?("source") && prev.source != json["source"])
       json["rating_changed"] = (prev.nil? || json.key?("rating") && prev.rating != json["rating"])
+      json["published_at_changed"] = (prev.nil? || json.key?("published_at") && prev.published_at != json["published_at"])
       if merge?(prev, json)
         prev.update_columns(json)
       else

@@ -766,6 +766,27 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "age:<60")
     end
 
+    should "return posts for the published:<d> metatag" do
+      post = create(:post, published_at: Time.zone.parse("2017-05-15 12:00"))
+
+      assert_tag_match([post], "published:2017-05-15")
+
+      assert_tag_match([], "-published:2017-05-15")
+    end
+
+    should "return posts for the publishedage:<n> metatag" do
+      post = create(:post, published_at: Time.zone.now)
+
+      assert_tag_match([post], "publishedage:<60s")
+
+      assert_tag_match([], "publishedage:>1y")
+
+      assert_tag_match([post], "-publishedage:>1y")
+      assert_tag_match([], "-publishedage:<1y")
+
+      assert_tag_match([], "publishedage:<60")
+    end
+
     should "return posts for the ratio:<x:y> metatag" do
       post = create(:post_with_file, filename: "test.jpg")
 
@@ -1322,7 +1343,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
           image_height: 100 * n * n,
           image_width: 100 * (3 - n) * n,
           tag_string: tags[n - 1],
-          media_asset: build(:media_asset, image_height: 100 * n * n, image_width: 100 * (3 - n) * n, file_size: 1.megabyte * n)
+          media_asset: build(:media_asset, image_height: 100 * n * n, image_width: 100 * (3 - n) * n, file_size: 1.megabyte * n),
+          published_at: Time.find_zone("UTC").local(2000, 1, 1, 0, 0, n),
         )
 
         u = create(:user, created_at: 2.weeks.ago)
@@ -1360,6 +1382,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(posts.reverse, "order:md5")
       assert_tag_match(posts.reverse, "order:md5_desc")
       assert_tag_match(posts.reverse, "order:duration_desc")
+      assert_tag_match(posts.reverse, "order:published_desc")
 
       assert_tag_match(posts, "order:id_asc")
       assert_tag_match(posts, "order:score_asc")
@@ -1383,6 +1406,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(posts, "order:notes_asc")
       assert_tag_match(posts, "order:md5_asc")
       assert_tag_match(posts, "order:duration_asc")
+      assert_tag_match(posts, "order:published_asc")
 
       # ordering is unpredictable so can't be tested.
       assert_tag_match([posts.first], "id:#{posts.first.id} order:none")

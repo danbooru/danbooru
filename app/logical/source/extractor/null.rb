@@ -51,6 +51,10 @@ module Source
         sub_extractor&.tags || []
       end
 
+      def published_at
+        sub_extractor&.published_at
+      end
+
       def artist_commentary_title
         sub_extractor&.artist_commentary_title
       end

@@ -17,6 +17,7 @@
   <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, wrapper: "inline-toggle-switch" %>
   <%= f.input :parent_id, label: "Parent", as: :string %>
   <%= f.input :source %>
+  <%= f.input :published_at_string, label: "Publication date", hint: "When the image was published at the source, not when it was drawn." %>
 
   <div class="input fixed-width-container">
     <div class="flex justify-between">

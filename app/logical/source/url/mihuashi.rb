@@ -57,7 +57,8 @@ module Source
 
         # https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523
         # https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh
-        in _, "mihuashi.com", "activities", a_work_activity, "artworks", a_work_id
+        # https://www.mihuashi.com/activities/color-lost-world/activity_artworks/797
+        in _, "mihuashi.com", "activities", a_work_activity, ("artworks" | "activity_artworks"), a_work_id
           @a_work_id = a_work_id
           @a_work_activity = a_work_activity
           @a_work_type = params[:type]

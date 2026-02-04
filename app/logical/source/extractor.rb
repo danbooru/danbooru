@@ -17,6 +17,7 @@
 # * tags - The artist's tags for the work. Used by translated tags.
 # * artist_commentary_title - The artist's title of the work. Used for artist commentaries.
 # * artist_commentary_desc - The artist's description of the work. Used for artist commentaries.
+# * published_at - The time that the post was published at the source.
 #
 module Source
   class Extractor
@@ -344,6 +345,14 @@ module Source
       end
 
       translated_tags
+    end
+
+    def published_at
+      nil
+    end
+
+    def published_at_string
+      published_at&.getutc&.iso8601
     end
 
     def dtext_artist_commentary_title

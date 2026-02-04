@@ -1562,7 +1562,8 @@ CREATE TABLE public.posts (
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
+    tag_count_meta integer DEFAULT 0 NOT NULL,
+    published_at timestamp(6) without time zone
 );
 
 
@@ -1681,7 +1682,9 @@ CREATE TABLE public.post_versions (
     source text,
     tags text NOT NULL,
     added_tags text[] DEFAULT '{}'::text[] NOT NULL,
-    removed_tags text[] DEFAULT '{}'::text[] NOT NULL
+    removed_tags text[] DEFAULT '{}'::text[] NOT NULL,
+    published_at timestamp(6) without time zone,
+    published_at_changed boolean DEFAULT false NOT NULL
 );
 
 
@@ -3342,7 +3345,6 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -5330,6 +5332,13 @@ CREATE INDEX index_post_versions_on_post_id ON public.post_versions USING btree 
 
 
 --
+-- Name: index_post_versions_on_published_at_changed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_published_at_changed ON public.post_versions USING btree (published_at_changed);
+
+
+--
 -- Name: index_post_versions_on_rating_changed; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5488,6 +5497,13 @@ CREATE INDEX index_posts_on_parent_id ON public.posts USING btree (parent_id) WH
 --
 
 CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHERE (pixiv_id IS NOT NULL);
+
+
+--
+-- Name: index_posts_on_published_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_published_at ON public.posts USING btree (published_at);
 
 
 --
@@ -7113,6 +7129,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260130190008'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),

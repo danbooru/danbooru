@@ -101,6 +101,23 @@ module Source
         end
       end
 
+      def published_at
+        date_string = nil
+        if work.present?
+          date_string = work[:created_at]
+        elsif stall.present?
+          # Individual stall images have their upload date in their URLs, but it's a different date for each image.
+          date_string = nil
+        elsif project.present?
+          date_string = project[:created_at]
+        elsif character_card.present?
+          date_string = character_card[:created_at]
+        elsif activity_work.present?
+          date_string = activity_work[:created_at]
+        end
+        Time.iso8601(date_string).utc if date_string
+      end
+
       def user_id
         user[:id] || parsed_url.user_id || parsed_referer&.user_id unless project.present? || character_card.present?
       end

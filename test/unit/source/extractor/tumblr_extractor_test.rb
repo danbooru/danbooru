@@ -19,6 +19,7 @@ module Source::Tests::Extractor
           ["tag1", "https://tumblr.com/tagged/tag1"],
           ["tag2", "https://tumblr.com/tagged/tag2"],
         ],
+        published_at: Time.utc(2017, 6, 21, 19, 27, 29),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "description",
       )
@@ -34,6 +35,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: "nagian",
         tags: [],
+        published_at: Time.utc(2012, 12, 16, 14, 19, 29),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "ゆいあず",
       )
@@ -45,6 +47,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png],
         media_files: [{ file_size: 3_655 }],
         page_url: "https://noizave.tumblr.com/post/162206271767",
+        published_at: Time.utc(2017, 6, 24, 17, 42, 18),
       )
     end
 
@@ -74,6 +77,7 @@ module Source::Tests::Extractor
           ["i'm a squid now", "https://tumblr.com/tagged/i'm a squid now"],
           ["squid", "https://tumblr.com/tagged/squid"],
         ],
+        published_at: Time.utc(2015, 6, 9, 19, 35, 3),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "[b]“SPLATOON SUPER NES VERSION (or more like GBA according to some XD)”[/b]",
       )
@@ -85,6 +89,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_1280.gif],
         media_files: [{ file_size: 110_348 }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -94,6 +99,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_1280.jpg],
         media_files: [{ file_size: 42_997 }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -103,6 +109,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg],
         media_files: [{ file_size: 105_963 }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -112,6 +119,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_1280.png],
         media_files: [{ file_size: 62_658 }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -121,6 +129,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.png],
         media_files: [{ file_size: 296_595, file_ext: :jpg }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -137,6 +146,7 @@ module Source::Tests::Extractor
           ["original", "https://tumblr.com/tagged/original"],
           ["illustration", "https://tumblr.com/tagged/illustration"],
         ],
+        published_at: Time.utc(2020, 5, 31, 20, 39, 53),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -160,6 +170,7 @@ module Source::Tests::Extractor
           ["espclpse", "https://tumblr.com/tagged/espclpse"],
           ["i love rendering teru so much", "https://tumblr.com/tagged/i love rendering teru so much"],
         ],
+        published_at: Time.utc(2022, 6, 9, 10, 9, 30),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "Teru doddle",
       )
@@ -171,6 +182,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4],
         media_files: [{ file_size: 7_960_082 }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -180,6 +192,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://static.tumblr.com/923d3a1b85bdabcb6276ea921911497f/w3ze2u2/mdHpc3im5/tumblr_static_cd6gq50ia8oc8s04kcok44gkc.jpg],
         media_files: [{ file_size: 1_711_890 }],
         page_url: nil,
+        published_at: nil,
       )
     end
 
@@ -198,6 +211,7 @@ module Source::Tests::Extractor
           ["red-hair", "https://tumblr.com/tagged/red-hair"],
           ["red_hair", "https://tumblr.com/tagged/red_hair"],
         ],
+        published_at: Time.utc(2017, 6, 24, 17, 42, 18),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           h2. header
@@ -240,6 +254,7 @@ module Source::Tests::Extractor
         tags: [
           ["tag1 tag2", "https://tumblr.com/tagged/tag1 tag2"],
         ],
+        published_at: Time.utc(2017, 6, 25, 2, 14, 44),
         dtext_artist_commentary_title: "test post",
         dtext_artist_commentary_desc: "description",
       )
@@ -263,6 +278,7 @@ module Source::Tests::Extractor
         tags: [
           ["tag1", "https://tumblr.com/tagged/tag1"],
         ],
+        published_at: Time.utc(2017, 6, 25, 2, 53, 47),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "description",
       )
@@ -286,6 +302,7 @@ module Source::Tests::Extractor
           ["video", "https://tumblr.com/tagged/video"],
           ["my art", "https://tumblr.com/tagged/my art"],
         ],
+        published_at: Time.utc(2022, 10, 13, 6, 9, 41),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "direct quote from kaiba post battle city tournament",
       )
@@ -300,6 +317,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: "ebith1969",
         tags: [],
+        published_at: Time.utc(2013, 4, 17, 19, 0, 34),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "2009.03.05",
       )
@@ -324,6 +342,7 @@ module Source::Tests::Extractor
           ["today yra desperately tries to figure out procreate dreams. tomorrow?? who knows", "https://tumblr.com/tagged/today yra desperately tries to figure out procreate dreams. tomorrow%3F%3F who knows"],
           ["crawls back into cave", "https://tumblr.com/tagged/crawls back into cave"],
         ],
+        published_at: Time.utc(2023, 12, 10, 23, 47, 58),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           the divorce is going well
@@ -343,6 +362,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: "noizave",
         tags: [],
+        published_at: Time.utc(2018, 2, 24, 16, 27, 8),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           [quote]
@@ -382,6 +402,7 @@ module Source::Tests::Extractor
           ["venusaur", "https://tumblr.com/tagged/venusaur"],
           ["grass pokemon", "https://tumblr.com/tagged/grass pokemon"],
         ],
+        published_at: Time.utc(2022, 5, 7, 17, 28, 58),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "‘saur family 🌱",
       )
@@ -397,6 +418,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: "compllege",
         tags: [],
+        published_at: Time.utc(2018, 10, 25, 12, 34, 15),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           CODL-0001 “C-Experiment”
@@ -450,6 +472,7 @@ module Source::Tests::Extractor
           ["is anyone still even here", "https://tumblr.com/tagged/is anyone still even here"],
           ["crawls back into damp cave", "https://tumblr.com/tagged/crawls back into damp cave"],
         ],
+        published_at: Time.utc(2019, 10, 11, 4, 21, 14),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           "@phantom-miria":[https://www.tumblr.com/phantom-miria]
@@ -473,6 +496,7 @@ module Source::Tests::Extractor
           ["is anyone still even here", "https://tumblr.com/tagged/is anyone still even here"],
           ["crawls back into damp cave", "https://tumblr.com/tagged/crawls back into damp cave"],
         ],
+        published_at: Time.utc(2019, 10, 11, 4, 21, 14),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           "@phantom-miria":[https://www.tumblr.com/phantom-miria]
@@ -522,6 +546,7 @@ module Source::Tests::Extractor
           ["Binkan", "https://tumblr.com/tagged/Binkan"],
           ["shimoneta", "https://tumblr.com/tagged/shimoneta"],
         ],
+        published_at: Time.utc(2017, 7, 28, 2, 47, 55),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
@@ -538,6 +563,7 @@ module Source::Tests::Extractor
         tags: [
           ["adorable", "https://tumblr.com/tagged/adorable"],
         ],
+        published_at: Time.utc(2023, 10, 14, 6, 48, 35),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           [quote]
@@ -577,6 +603,7 @@ module Source::Tests::Extractor
           ["my art", "https://tumblr.com/tagged/my art"],
           ["fanart", "https://tumblr.com/tagged/fanart"],
         ],
+        published_at: Time.utc(2022, 10, 2, 22, 39, 57),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           [quote]
@@ -632,6 +659,7 @@ module Source::Tests::Extractor
           ["ok back 2 school", "https://tumblr.com/tagged/ok back 2 school"],
           ["tentatively... i still have to get to the hsy part of the reread so i can draw hsy💜", "https://tumblr.com/tagged/tentatively... i still have to get to the hsy part of the reread so i can draw hsy💜"],
         ],
+        published_at: Time.utc(2022, 1, 5, 0, 8, 7),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           [quote]
@@ -682,6 +710,7 @@ module Source::Tests::Extractor
           ["chilchuck", "https://tumblr.com/tagged/chilchuck"],
           ["fanart", "https://tumblr.com/tagged/fanart"],
         ],
+        published_at: Time.utc(2024, 3, 22, 3, 43, 10),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           [quote]
@@ -703,6 +732,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: "shortgremlinman",
         tags: [],
+        published_at: Time.utc(2023, 1, 30, 13, 20, 25),
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           [quote]
@@ -796,6 +826,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: "shimetsukage",
         tags: [],
+        published_at: nil,
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
