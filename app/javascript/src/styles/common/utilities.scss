@@ -66,6 +66,7 @@ $spacer: 0.25rem; /* 4px */
 
 .break-all { word-break: break-all; overflow-wrap: anywhere; }
 .break-words { word-break: break-word !important; overflow-wrap: anywhere; }
+.break-keep { word-break: keep-all; }
 .whitespace-nowrap { white-space: nowrap; }
 .whitespace-pre { white-space: pre; }
 .whitespace-pre-wrap { white-space: pre-wrap; }
@@ -380,6 +381,7 @@ $spacer: 0.25rem; /* 4px */
 .z-9999 { z-index: 9999; }
 
 .link-color { color: var(--link-color); }
+.hover\:link-color:hover { color: var(--link-hover-color); }
 
 .text-success { color: var(--success-color) !important; }
 .text-error { color: var(--error-color) !important; }

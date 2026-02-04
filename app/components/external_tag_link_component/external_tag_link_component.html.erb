@@ -1,0 +1,15 @@
+<div class="chip-primary flex break-keep text-sm w-fit h-24px">
+  <%= render PopupMenuComponent.new(button_classes: "") do |menu| %>
+    <% menu.with_button do %>
+      <%= tag.span name, href: "javascript:void(0)", class: "link-color hover:link-color wiki-other-name" %>
+    <% end %>
+
+    <% SITE_LIST.each do |site, func| %>
+      <% menu.with_item do %>
+        <%= external_link_to func.call(name), target: "_blank" do %>
+          <%= external_site_icon site.to_s %> <%= site %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
