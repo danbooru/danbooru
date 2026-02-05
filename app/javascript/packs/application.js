@@ -62,7 +62,7 @@ import TimeSeriesComponent from "../src/javascripts/time_series_component.js";
 import Upload from "../src/javascripts/uploads.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
 import Utility from "../src/javascripts/utility.js";
-import Ugoira from "../src/javascripts/ugoira.js";
+import VideoPlayer from "../src/javascripts/video_player.js";
 
 let Danbooru = {};
 Danbooru.Autocomplete = Autocomplete;
@@ -98,7 +98,7 @@ Danbooru.TimeSeriesComponent = TimeSeriesComponent;
 Danbooru.Upload = Upload;
 Danbooru.UserTooltip = UserTooltip;
 Danbooru.Utility = Utility;
-Danbooru.Ugoira = Ugoira;
+Danbooru.VideoPlayer = VideoPlayer;
 
 // Aliases for backwards compatibility with userscripts.
 Utility.notice = Notice.info;

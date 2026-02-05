@@ -16,10 +16,8 @@
       <p>Image unavailable.</p>
     <% elsif is_image? %>
       <%= tag.img src: variant(:original).file_url, width: image_width, height: image_height, draggable: "false", class: "media-asset-image" -%>
-    <% elsif is_video? %>
-      <%= tag.video src: variant(:original).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls", class: "media-asset-image" %>
-    <% elsif is_ugoira? %>
-      <%= render UgoiraComponent.new(media_asset, default_quality: (current_user.default_image_size == "original" ? "original" : "sample"), html: { class: "media-asset-image" }) %>
+    <% elsif is_video? || is_ugoira? %>
+      <%= render VideoComponent.new(media_asset, default_quality: (current_user.default_image_size == "original" ? "original" : "sample"), html: { class: "media-asset-image" }) %>
     <% elsif is_flash? %>
       <%= tag.div "data-swf": variant(:original).file_url, class: "media-asset-image ruffle-container" %>
     <% end %>

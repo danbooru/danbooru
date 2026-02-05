@@ -277,10 +277,8 @@
       <p>This image is unavailable on <%= Danbooru.config.app_name %>. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view (<%= link_to_wiki "learn more", "help:safe_mode" %>).</p>
     <% elsif @post.is_flash? -%>
       <div class="ruffle-container" data-swf="<%= @post.tagged_file_url %>"></div>
-    <% elsif @post.is_video? -%>
-      <%= tag.video(id: "image", class: "fit-width", width: @post.image_width, height: @post.image_height, autoplay: true, loop: true, controls: "controls", src: @post.tagged_file_url) %>
-    <% elsif @post.is_ugoira? -%>
-      <%= render UgoiraComponent.new(@post.media_asset, default_quality: (params.fetch(:size, CurrentUser.user.default_image_size) == "original" ? "original" : "sample"), html: { id: "image" }) %>
+    <% elsif @post.is_video? || @post.is_ugoira? -%>
+      <%= render VideoComponent.new(@post.media_asset, default_quality: (params.fetch(:size, CurrentUser.user.default_image_size) == "original" ? "original" : "sample"), html: { id: "image" }) %>
     <% elsif @post.is_image? -%>
       <picture>
         <%= tag.source media: "(max-width: 660px)", srcset: @post.tagged_large_file_url %>
