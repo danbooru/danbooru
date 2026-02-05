@@ -167,6 +167,8 @@ class SiteCredential < ApplicationRecord
   validates :credential, presence: true
   validate :validate_credential, if: :credential_changed?
 
+  normalizes :credential, with: ->(credential) { credential.transform_values(&:strip) }
+
   after_destroy :create_mod_action
   after_save :create_mod_action
 
