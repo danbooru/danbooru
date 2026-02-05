@@ -369,7 +369,16 @@ module Searchable
       relation = self.relation
 
       if params[key].present?
-        relation = visible(relation, attr).where_numeric_matches(attr, params[key], type)
+        if type == :datetime
+          # Try to parse dates as relative (like <1w) first,
+          # and it that fails then try again as date strings.
+          relation = visible(relation, attr).where_numeric_matches(attr, params[key], :age)
+          if relation.none?
+            relation = visible(self.relation, attr).where_numeric_matches(attr, params[key], type)
+          end
+        else
+          relation = visible(relation, attr).where_numeric_matches(attr, params[key], type)
+        end
       end
 
       if params[:"#{key}_not"].present?
