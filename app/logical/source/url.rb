@@ -213,11 +213,25 @@ module Source
     # Examples:
     #
     # * https://www.pixiv.net/users/9948
-    # * https://x.com/i/user/889592953
+    # * https://x.com/bkub_comic
     #
     # @return [Boolean]
     def profile_url?
       profile_url.present? && !page_url? && !image_url?
+    end
+
+    # True if the URL is a secondary profile page URL.
+    # A secondary URL is an artist URL that we don't normally want to display,
+    # usually because it's redundant with the primary profile URL.
+    #
+    # Examples:
+    #
+    # * https://www.pixiv.net/stacc/bkubb
+    # * https://x.com/i/889592953
+    #
+    # @return [Boolean]
+    def secondary_url?
+      false
     end
 
     # Convert an image URL to the URL of the page containing the image, or
@@ -319,6 +333,10 @@ module Source
 
     def self.profile_url?(url)
       Source::URL.parse(url)&.profile_url?
+    end
+
+    def self.secondary_url?(url)
+      Source::URL.parse(url)&.secondary_url?
     end
 
     def self.bad_link?(url)

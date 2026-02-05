@@ -77,32 +77,7 @@ class ArtistURL < ApplicationRecord
   # A secondary URL is an artist URL that we don't normally want to display,
   # usually because it's redundant with the primary profile URL.
   def secondary_url?
-    case url
-    when %r{pixiv\.net/stacc}i
-      true
-    when %r{pixiv\.net/fanbox}i
-      true
-    when %r{https://x\.com/intent}i
-      true
-    when %r{https://x\.com/i/user}i
-      true
-    when %r{(?:www|com|dic)\.nicovideo\.jp}i
-      true
-    when %r{pawoo\.net/web/accounts}i
-      true
-    when %r{misskey\.(?:io|art|design)/users}i
-      true
-    when %r{inkbunny\.net/user\.php}i
-      true
-    when %r{bsky\.app/profile/did:}i
-      true
-    when %r{lofter\.com/mentionredirect.do}i
-      true
-    when %r{mihuashi\.com/users/}i
-      true
-    else
-      false
-    end
+    parsed_url&.secondary_url?(url)
   end
 
   # The sort order of sites in artist URL lists.

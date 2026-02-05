@@ -203,5 +203,9 @@ module Source
       # elsif image_id.present?
       #   "https://seiga.nicovideo.jp/image/source/#{image_id}"
     end
+
+    def secondary_url?
+      profile_url? && subdomain.in?(%w[www com dic])
+    end
   end
 end

@@ -113,4 +113,8 @@ class Source::URL::Fanbox < Source::URL
       "https://www.pixiv.net/fanbox/creator/#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && user_id.present?
+  end
 end
