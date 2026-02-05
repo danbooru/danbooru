@@ -3,3 +3,5 @@ inherit_from:
 
 Metrics/ClassLength:
   Enabled: false
+Lint/AmbiguousBlockAssociation:
+  Enabled: false

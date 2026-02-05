@@ -74,10 +74,10 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
-        should respond_to_search({}).with { [@bur_forum, @unrelated_forum, @linked_forum, @forum_post] }
+        should respond_to_search({}).with { [@bur_forum, @linked_forum, @forum_post] }
         should respond_to_search(body_matches: "xxx").with { @forum_post }
         should respond_to_search(body_matches: "bababa").with { [] }
-        should respond_to_search(is_deleted: "true").with { @unrelated_forum }
+        should respond_to_search(is_deleted: "true").with { [] }
         should respond_to_search(linked_to: "yyy").with { [@bur_forum, @linked_forum] }
 
         context "using includes" do
@@ -131,6 +131,13 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       should "redirect to the forum topic" do
         get forum_post_path(@forum_post)
         assert_redirected_to forum_topic_path(@forum_post.topic, anchor: "forum_post_#{@forum_post.id}")
+      end
+
+      should "not allow viewing deleted posts" do
+        deleted_forum_post = create(:forum_post, is_deleted: true)
+        get_auth forum_post_path(deleted_forum_post), @user
+
+        assert_response 403
       end
     end
 
