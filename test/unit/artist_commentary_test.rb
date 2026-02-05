@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ArtistCommentaryTest < ActiveSupport::TestCase
   setup do
@@ -58,8 +58,16 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
       end
 
       should "add tags if requested" do
-        @artcomm.update(translated_title: "bar", add_commentary_tag: "1")
-        assert_equal(true, @artcomm.post.reload.has_tag?("commentary"))
+        @artcomm.update(translated_title: "bar", commentary_tags: "commentary")
+        assert(@artcomm.post.reload.has_tag?("commentary"))
+        @artcomm.update(commentary_tags: "partial_commentary")
+        assert_not(@artcomm.post.reload.has_tag?("commentary"))
+        assert(@artcomm.post.has_tag?("partial_commentary"))
+      end
+
+      should "not add unrelated tags" do
+        @artcomm.update(commentary_tags: "foo")
+        assert_not(@artcomm.post.reload.has_tag?("foo"))
       end
 
       should "not create new version if nothing changed" do
@@ -90,7 +98,7 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
           original_title: "  foo\u00A0\t\n",
           original_description: " foo\u00A0\t\n",
           translated_title: "  foo\u00A0\t\n",
-          translated_description: "  foo\u00A0\n"
+          translated_description: "  foo\u00A0\n",
         )
 
         assert_equal("foo", @artcomm.original_title)
