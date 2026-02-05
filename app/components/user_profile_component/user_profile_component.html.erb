@@ -208,10 +208,13 @@
           </tr>
         <% end %>
 
-        <tr>
-          <th>Approvals</th>
-          <td><%= link_to Post.where(approver: user).count, posts_path(tags: "approver:#{user.name}"), rel: "nofollow" %></td>
-        </tr>
+        <% approval_count = Post.where(approver: user).count %>
+        <% if user.is_approver? || approval_count > 0 %>
+          <tr>
+            <th>Approvals</th>
+            <td><%= link_to approval_count, posts_path(tags: "approver:#{user.name}"), rel: "nofollow" %></td>
+          </tr>
+        <% end %>
 
         <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
           <tr>
