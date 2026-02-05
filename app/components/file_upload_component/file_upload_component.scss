@@ -1,7 +1,9 @@
 .file-upload-component {
-  .dropzone-container {
+  div.source {
     background: var(--uploads-dropzone-background);
+  }
 
+  .dropzone-container {
     &.error {
       background: var(--error-background-color);
     }
