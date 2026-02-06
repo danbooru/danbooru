@@ -329,14 +329,6 @@ class MediaFile::Ugoira < MediaFile
         output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-", "-#{File.basename(file&.path.to_s)}"], binmode: true)
         tmpdir_path = tmpdir.path
 
-        # Duplicate last frame to avoid it being displayed only for a very short amount of time.
-        last_file_name = File.basename(frames.last.path)
-        last_index, file_ext = last_file_name.split(".")
-        new_last_filename = "#{"%06d" % (last_index.to_i + 1)}.#{file_ext}"
-        path_from = File.join(tmpdir_path, last_file_name)
-        path_to = File.join(tmpdir_path, new_last_filename)
-        FileUtils.cp(path_from, path_to)
-
         delay_sum = 0
         timecodes_path = File.join(tmpdir_path, "timecodes.tc")
         File.open(timecodes_path, "w+") do |f|
@@ -349,10 +341,20 @@ class MediaFile::Ugoira < MediaFile
           f.write("#{delay_sum}\n")
         end
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir_path}/%06d.#{file_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
+        concat_path = File.join(tmpdir_path, "concat.txt")
+        File.open(concat_path, "w+") do |f|
+          frames.each do |frame|
+            f.write("file '#{frame.file.path}'\n")
+          end
+
+          # Duplicate last frame to avoid it being displayed only for a very short amount of time.
+          f.write("file '#{frames.last.path}'\n")
+        end
+
+        ffmpeg_out, status = Open3.capture2e("ffmpeg -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
         raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir_path}/%06d.#{file_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir_path}/ffmpeg2pass #{tmpdir_path}/tmp.webm")
+        ffmpeg_out, status = Open3.capture2e("ffmpeg -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir_path}/ffmpeg2pass #{tmpdir_path}/tmp.webm")
         raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
         mkvmerge_out, status = Open3.capture2e("mkvmerge -o #{output_file.path} --webm --timecodes 0:#{tmpdir_path}/timecodes.tc #{tmpdir_path}/tmp.webm")

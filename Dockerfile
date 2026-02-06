@@ -149,7 +149,7 @@ ARG FFMPEG_BUILD_OPTIONS="\
     --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=image2 --enable-muxer=null \
   --disable-demuxers \
     --enable-demuxer=mov,mp4,m4a,3gp,3g2,mj2 --enable-demuxer=matroska,webm --enable-demuxer=image2 \
-    --enable-demuxer=apng --enable-demuxer=gif \
+    --enable-demuxer=apng --enable-demuxer=gif --enable-demuxer=concat \
   --disable-filters \
     --enable-filter=scale --enable-filter=thumbnail --enable-filter=silencedetect --enable-filter=ebur128 \
     --enable-filter=aresample --enable-filter=anull --enable-filter=null --enable-filter=copy \
