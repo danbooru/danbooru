@@ -344,11 +344,11 @@ class MediaFile::Ugoira < MediaFile
         concat_path = File.join(tmpdir_path, "concat.txt")
         File.open(concat_path, "w+") do |f|
           frames.each do |frame|
-            f.write("file '#{frame.file.path}'\n")
+            f.write("file '#{File.basename(frame.file.path)}'\n")
           end
 
           # Duplicate last frame to avoid it being displayed only for a very short amount of time.
-          f.write("file '#{frames.last.path}'\n")
+          f.write("file '#{File.basename(frames.last.path)}'\n")
         end
 
         ffmpeg_out, status = Open3.capture2e("ffmpeg -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
