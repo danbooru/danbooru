@@ -25,7 +25,11 @@ class PostVotesController < ApplicationController
   end
 
   def destroy
-    @post_vote = authorize PostVote.find(params[:id])
+    if params[:id]
+      @post_vote = authorize PostVote.find(params[:id])
+    else
+      @post_vote = authorize PostVote.active.find_by!(post_id: params[:post_id], user: CurrentUser.user)
+    end
     @post_vote.locked_update(is_deleted: true, updater: CurrentUser.user)
     @post = @post_vote.post.reload
 

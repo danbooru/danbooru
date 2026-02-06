@@ -3,7 +3,7 @@ import { createTooltip } from "./utility";
 
 class PostVotesTooltipComponent {
   // Trigger on the post score link; see PostVotesComponent.
-  static TARGET_SELECTOR = "span.post-votes span.post-score > a";
+  static TARGET_SELECTOR = "span.post-score a";
   static SHOW_DELAY = 375;
   static HIDE_DELAY = 125;
   static DURATION = 250;
