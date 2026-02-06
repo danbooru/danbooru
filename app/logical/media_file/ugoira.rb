@@ -351,10 +351,10 @@ class MediaFile::Ugoira < MediaFile
           f.write("file '#{File.basename(frames.last.path)}'\n")
         end
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
+        ffmpeg_out, status = Open3.capture2e("ffmpeg -r 25 -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
         raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir_path}/ffmpeg2pass #{tmpdir_path}/tmp.webm")
+        ffmpeg_out, status = Open3.capture2e("ffmpeg -r 25 -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir_path}/ffmpeg2pass #{tmpdir_path}/tmp.webm")
         raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
         mkvmerge_out, status = Open3.capture2e("mkvmerge -o #{output_file.path} --webm --timecodes 0:#{tmpdir_path}/timecodes.tc #{tmpdir_path}/tmp.webm")
