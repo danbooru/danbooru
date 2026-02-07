@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UploadLimitTest < ActiveSupport::TestCase
   context "Upload limits:" do
@@ -19,7 +19,7 @@ class UploadLimitTest < ActiveSupport::TestCase
 
     context "a new post that is deleted within the first 3 days" do
       should "cost the uploader 5 upload slots" do
-        @post = create(:post, uploader: @user, is_deleted: true, created_at: 1.days.ago)
+        @post = create(:post, uploader: @user, is_deleted: true, created_at: 1.day.ago)
 
         assert_equal(5, @user.upload_limit.used_upload_slots)
       end
@@ -107,6 +107,18 @@ class UploadLimitTest < ActiveSupport::TestCase
 
         create(:post, uploader: @user, created_at: 2.hours.ago)
         assert_equal(15, @user.upload_limit.upload_slots)
+      end
+    end
+
+    context "maxed?" do
+      should "work" do
+        points_to_max = UploadLimit.level_to_points(UploadLimit.points_to_level(UploadLimit::MAXIMUM_POINTS))
+
+        create(:post, uploader: @user, created_at: 10.days.ago)
+        @user.update!(upload_points: points_to_max)
+        assert(@user.upload_limit.maxed?)
+        @user.update!(upload_points: points_to_max - 1)
+        assert_not(@user.upload_limit.maxed?)
       end
     end
   end
