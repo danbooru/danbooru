@@ -20,6 +20,24 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A ci.xiaohongshu.com sample image URL" do
+      strategy_should_work(
+        "https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8?imageView2/2/w/100/h/100/q/75",
+        image_urls: %w[https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8],
+        media_files: [{ file_size: 561_862 }],
+        page_url: nil,
+      )
+    end
+
+    context "A ci.xiaohongshu.com/notes_pre_post sample image URL" do
+      strategy_should_work(
+        "https://ci.xiaohongshu.com/notes_pre_post/1040g3k031il3oqupga005nsgsmfg8ue6bq81dbg?imageView2/2/w/format/png",
+        image_urls: %w[https://ci.xiaohongshu.com/notes_pre_post/1040g3k031il3oqupga005nsgsmfg8ue6bq81dbg],
+        media_files: [{ file_size: 1_124_447 }],
+        page_url: nil,
+      )
+    end
+
     context "A img.xiaohongshu.com avatar sample image URL" do
       strategy_should_work(
         "https://img.xiaohongshu.com/avatar/5b56be0014de415b2db830a6.jpg@160w_160h_92q_1e_1c_1x.jpg",
