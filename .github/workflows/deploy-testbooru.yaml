@@ -16,12 +16,6 @@ jobs:
     # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#concurrency
     concurrency: deploy-testbooru
 
-    # The Kubernetes API credentials are kept in the testbooru environment.
-    # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#jobsjob_idenvironment
-    environment:
-      name: testbooru
-      url: https://testbooru.donmai.us
-
     steps:
       # https://github.com/marketplace/actions/kubectl-tool-installer
       - name: Install Kubectl
