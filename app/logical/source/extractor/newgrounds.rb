@@ -92,7 +92,7 @@ module Source
       end
 
       def http
-        super.cookies(vmkIdu5l8m: credentials[:session_cookie])
+        super.cookies(ng_remember: credentials[:session_cookie])
       end
 
       def video_page_url
