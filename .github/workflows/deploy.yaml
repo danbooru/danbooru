@@ -15,14 +15,14 @@ on:
         description: Environment
         options:
           - testbooru
-        default: 'testbooru'
+          - betabooru
+        default: "testbooru"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     environment: ${{ inputs.environment }}
-      
 
     # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#concurrency
     concurrency:
@@ -41,9 +41,21 @@ jobs:
         env:
           KUBECONFIG_YAML: ${{secrets.KUBECONFIG_YAML}}
 
-      - name: Deploy
+      - name: Deploy betabooru
+        if: ${{ inputs.environment == 'betabooru' }}
         run: |
           kubectl config set-context --current --namespace=danbooru
+          kubectl rollout restart deploy/betabooru && kubectl rollout status deploy/betabooru
+
+      - name: Deploy everything
+        if: ${{ inputs.environment != 'betabooru' }}
+        run: |
+          kubectl config set-context --current --namespace=danbooru
+          
+          if kubectl get deploy/betabooru > /dev/null 2>&1; then # no betabooru on testbooru
+              kubectl rollout restart deploy/betabooru && kubectl rollout status deploy/betabooru
+          fi
+          
           kubectl rollout restart deploy/downbooru && kubectl rollout status deploy/downbooru
           kubectl rollout restart deploy/danbooru-cron && kubectl rollout status deploy/danbooru-cron
           kubectl rollout restart deploy/danbooru-jobs && kubectl rollout status deploy/danbooru-jobs
