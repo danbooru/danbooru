@@ -8,7 +8,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs.jpeg],
         media_files: [{ file_size: 203_927, width: 1252, height: 1252 }],
         page_url: nil,
-        profile_urls: %w[https://x.com/i/user/417182061145780225],
+        profile_urls: [],
       )
     end
 

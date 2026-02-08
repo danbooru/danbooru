@@ -65,12 +65,11 @@ class Source::URL::Twitter < Source::URL
     # https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs_400x400.jpeg (sample)
     # https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs.jpeg (full; 1252x1252)
     # https://pbs.twimg.com/profile_images/378800000094437961/99ac06f2873f8597fa5961a404769066.gif (obsolete)
-    in "pbs", "twimg.com", "profile_images", /^\d+$/ => user_id, /^(\w{8})(_\w+)?\.(\w+)$/
-      @user_id = user_id
+    in "pbs", "twimg.com", "profile_images", /^\d+$/ => media_id, /^(\w{8})(_\w+)?\.(\w+)$/
       @file = $1
       @file_size = $2
       @file_ext = $3
-      @full_image_url = "https://pbs.twimg.com/profile_images/#{user_id}/#{$1}.#{file_ext}"
+      @full_image_url = "https://pbs.twimg.com/profile_images/#{media_id}/#{$1}.#{file_ext}"
       @image_sample = @file_size.present?
 
     # https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small
