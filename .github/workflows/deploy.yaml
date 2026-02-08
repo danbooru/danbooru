@@ -1,6 +1,6 @@
-# Deploy the site to https://testbooru.donmai.us on workflow trigger.
+# Deploy the site manually.
 
-name: Deploy Testbooru
+name: Deploy
 
 # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#permissions
 permissions: read-all
@@ -8,13 +8,26 @@ permissions: read-all
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_run
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        required: true
+        description: Environment
+        options:
+          - testbooru
+        default: 'testbooru'
 
 jobs:
-  deploy-testbooru:
+  deploy:
     runs-on: ubuntu-latest
 
+    environment: ${{ inputs.environment }}
+      
+
     # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#concurrency
-    concurrency: deploy-testbooru
+    concurrency:
+      group: deploy
+      cancel-in-progress: true
 
     steps:
       # https://github.com/marketplace/actions/kubectl-tool-installer
@@ -26,9 +39,9 @@ jobs:
           mkdir -p ~/.kube
           echo "$KUBECONFIG_YAML" > ~/.kube/config
         env:
-          KUBECONFIG_YAML: ${{secrets.TESTBOORU_KUBECONFIG}}
+          KUBECONFIG_YAML: ${{secrets.KUBECONFIG_YAML}}
 
-      - name: Deploy to testbooru
+      - name: Deploy
         run: |
           kubectl config set-context --current --namespace=danbooru
           kubectl rollout restart deploy/downbooru && kubectl rollout status deploy/downbooru
