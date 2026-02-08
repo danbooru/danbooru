@@ -4,8 +4,12 @@
   $("#add-to-favorites, #add-fav-button, #remove-from-favorites, #remove-fav-button").toggle();
   $("#remove-fav-button").addClass("animate");
   $("span.post-votes[data-id=<%= @post.id %>]").replaceWith("<%= j render_post_votes @post, current_user: CurrentUser.user %>");
+  $("span.post-score[data-id=<%= @post.id %>]").html("<%= j link_to @post.score, post_votes_path(search: { post_id: @post.id }, variant: :compact) %>");
   $("span.post-favcount[data-id=<%= @post.id %>]").html("<%= j link_to @post.fav_count, favorites_path(post_id: @post.id, variant: :compact) %>");
   $(".fav-buttons").toggleClass("fav-buttons-false").toggleClass("fav-buttons-true");
+  $(".vote-buttons").removeClass("vote-buttons-up vote-buttons-down vote-buttons-none").addClass("vote-buttons-<%= @post.vote_by_current_user&.vote_type || 'none' %>")
 
-  Danbooru.Notice.info("<%= j flash[:notice] %>");
+  <% if flash[:notice] %>
+    Danbooru.Notice.info("<%= j flash[:notice] %>");
+  <% end %>
 <% end %>

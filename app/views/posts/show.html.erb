@@ -291,19 +291,58 @@
     <div id="note-preview"></div>
   <% end -%>
 
-  <% if policy(Favorite).create? %>
-    <div class="fav-buttons-container">
-      <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
-        <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
-          <%= button_tag empty_heart_icon, class: "text-lg py-1 px-3", "data-disable-with": spinner_icon %>
+  <div class="post-toolbar flex gap-1 mb-2">
+    <%= content_tag(:div, class: "vote-buttons vote-buttons-#{@post.vote_by_current_user&.vote_type || 'none'}") do %>
+      <% if CurrentUser.user.is_anonymous? %>
+        <%= tag.span class: "vote-up-button toolbar-button text-lg py-1 px-2", id: "vote-up-button" do %>
+          <%= link_to upvote_icon, login_path(url: request.fullpath) %>
         <% end %>
-
-        <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
-          <%= button_tag solid_heart_icon, class: "text-lg py-1 px-3", "data-disable-with": spinner_icon %>
+      <% else %>
+        <%= form_tag(post_post_votes_path(post_id: @post.id, score: 1), method: "post", class: "toolbar-button", id: "vote-up-button", "data-remote": true) do %>
+          <%= button_tag upvote_icon, class: "text-lg py-1 px-2 #{"cursor-not-allowed" if !policy(PostVote).create?}", "data-disable-with": spinner_icon, disabled: !policy(PostVote).create? %>
+        <% end %>
+        <%= form_tag(post_post_votes_path(post_id: @post.id), method: "delete", class: "toolbar-button", id: "vote-up-unvote-button", "data-remote": true) do %>
+          <%= button_tag upvote_icon, class: "text-lg py-1 px-2 #{"cursor-not-allowed" if !policy(PostVote).create?}", "data-disable-with": spinner_icon, disabled: !policy(PostVote).create? %>
         <% end %>
       <% end %>
-    </div>
-  <% end %>
+
+      <%= tag.span class: "post-score text-lg py-1 px-3", "data-id": @post.id do %>
+        <%= link_to @post.score, post_votes_path(search: { post_id: @post.id }, variant: :compact), rel: "nofollow" %>
+      <% end %>
+
+      <% if CurrentUser.user.is_anonymous? %>
+        <%= tag.span class: "vote-down-button toolbar-button text-lg py-1 px-2", id: "vote-down-button" do %>
+          <%= link_to downvote_icon, login_path(url: request.fullpath) %>
+        <% end %>
+      <% else %>
+        <%= form_tag(post_post_votes_path(post_id: @post.id, score: -1), method: "post", class: "toolbar-button", id: "vote-down-button", "data-remote": true) do %>
+          <%= button_tag downvote_icon, class: "text-lg py-1 px-2 #{"cursor-not-allowed" if !policy(PostVote).create?}", "data-disable-with": spinner_icon, disabled: !policy(PostVote).create? %>
+        <% end %>
+        <%= form_tag(post_post_votes_path(post_id: @post.id), method: "delete", class: "toolbar-button", id: "vote-down-unvote-button", "data-remote": true) do %>
+          <%= button_tag downvote_icon, class: "text-lg py-1 px-2 #{"cursor-not-allowed" if !policy(PostVote).create?}", "data-disable-with": spinner_icon, disabled: !policy(PostVote).create? %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
+      <% if CurrentUser.user.is_anonymous? %>
+        <%= tag.span class: "add-fav-button toolbar-button text-lg py-1 px-2", id: "add-fav-button" do %>
+          <%= link_to solid_heart_icon, login_path(url: request.fullpath) %>
+        <% end %>
+      <% else %>
+        <%= form_tag(favorites_path(post_id: @post.id), method: "post", class: "toolbar-button", id: "add-fav-button", "data-remote": true) do %>
+          <%= button_tag solid_heart_icon, class: "text-lg py-1 px-2 #{"cursor-not-allowed" if !policy(Favorite).create?}", "data-disable-with": spinner_icon, disabled: !policy(Favorite).create? %>
+        <% end %>
+        <%= form_tag(favorite_path(@post.id), method: "delete", class: "toolbar-button", id: "remove-fav-button", "data-remote": true) do %>
+          <%= button_tag solid_heart_icon, class: "text-lg py-1 px-2 #{"cursor-not-allowed" if !policy(Favorite).create?}", "data-disable-with": spinner_icon, disabled: !policy(Favorite).create? %>
+        <% end %>
+      <% end %>
+
+      <%= tag.span class: "post-favcount text-lg py-1 px-3", "data-id": @post.id do %>
+        <%= link_to @post.fav_count, post_favorites_path(@post), rel: "nofollow" %>
+      <% end %>
+    <% end %>
+  </div>
 
   <section id="mark-as-translated-section">
     <%= edit_form_for(@post, url: mark_as_translated_post_path(@post), method: :put) do |f| %>
