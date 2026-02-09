@@ -6,7 +6,7 @@ Links.initializeAll = function() {
 }
 
 Links.initializeLinks = function(type) {
-  const re = new RegExp(`${type}s/(\\d+)`);
+  const re = new RegExp(`${type}s/(\\d+)$`);
   $(`a[href^='/${type}s/']`).on("click.danbooru", function(e) {
     const id = e.target.href.match(re)?.[1];
     const ref = `#${type}_${id}`;
