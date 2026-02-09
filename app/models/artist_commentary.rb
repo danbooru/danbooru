@@ -2,10 +2,18 @@
 
 class ArtistCommentary < ApplicationRecord
   COMMENTARY_TAGS = [
+    # this is the order in which the commentary form displays the tags
     "commentary",
     "check_commentary",
     "partial_commentary",
     "commentary_request",
+    "untranslatable_commentary",
+  ]
+
+  COMMENTARY_SUBTAGS = [
+    # these are the prioritized tags when prefilling the commentary form
+    "check_commentary",
+    "partial_commentary",
     "untranslatable_commentary",
   ]
 
@@ -153,7 +161,7 @@ class ArtistCommentary < ApplicationRecord
   include VersionMethods
 
   def commentary_tags
-    (post.tag_array & COMMENTARY_TAGS).first || "none"
+    (post.tag_array & COMMENTARY_SUBTAGS).first || (post.tag_array & COMMENTARY_TAGS).first || "none"
   end
 
   def commentary_tags=(value)
