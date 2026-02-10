@@ -673,5 +673,27 @@ module Source::Tests::Extractor
         assert_equal([@artist], Source::Extractor.find("https://x.com/ebihurya332/status/1759409576095711667").artists)
       end
     end
+
+    context "A tweet scheduled in advance" do
+      strategy_should_work(
+        "https://x.com/youjosenki/status/2019697579219681539",
+        image_urls: %w[https://video.twimg.com/amplify_video/2009493594315571200/vid/avc1/720x1280/rJhLuwIJ15-8HEoH.mp4?tag=14],
+        image_sources: [{ published_at: Time.parse("2026-01-09T05:13:02.127000Z") }],
+        media_files: [{ file_size: 5_514_218 }],
+        page_url: "https://x.com/youjosenki/status/2019697579219681539",
+        profile_url: "https://x.com/youjosenki",
+        profile_urls: %w[https://x.com/youjosenki https://x.com/i/user/769619180949602304],
+        display_name: "「幼女戦記」アニメ公式【TVシリーズ第2期 2026年放送決定！】",
+        username: "youjosenki",
+        published_at: Time.parse("2026-02-06T09:00:01.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          第1期 第5話より
+          TVアニメ「幼女戦記Ⅱ」2026年放送決定！
+        EOS
+      )
+    end
   end
 end

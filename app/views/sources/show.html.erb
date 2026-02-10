@@ -75,14 +75,27 @@
 
             <% if @source.image_urls.present? %>
               <div class="grid grid-cols-<%= @source.image_urls.size.clamp(1..4) %> gap-2">
-                <% @source.image_urls.each do |url| %>
-                  <% if Source::URL.parse(url)&.file_ext.in?(%w[mp4 webm]) %>
-                    <%= tag.video src: url, referrerpolicy: "no-referrer", class: "max-w-full max-h-screen rounded object-cover", loop: true, controls: true %>
-                  <% else %>
-                    <%= external_link_to url, class: "w-fit h-fit" do %>
-                      <%= tag.img src: url, referrerpolicy: "no-referrer", class: "max-w-full max-h-screen rounded object-cover #{"w-full aspect-square" if @source.image_urls.size > 1}" %>
+                <% @source.image_sources.each do |image_source| %>
+                  <div style="width: fit-content;">
+                    <% if image_source.parsed_url&.file_ext.in?(%w[mp4 webm]) %>
+                      <%= tag.video src: image_source.parsed_url.original_url, referrerpolicy: "no-referrer", class: "max-w-full max-h-screen rounded object-cover", loop: true, controls: true %>
+                    <% else %>
+                      <%= external_link_to image_source.parsed_url.original_url, class: "w-fit h-fit" do %>
+                        <%= tag.img src: image_source.parsed_url.original_url, referrerpolicy: "no-referrer", class: "max-w-full max-h-screen rounded object-cover #{"w-full aspect-square" if @source.image_urls.size > 1}" %>
+                      <% end %>
                     <% end %>
-                  <% end %>
+
+                    <% if image_source.published_at.present? %>
+                      <p class="prose text-xs text-muted" style="text-align: center;">
+                        Published: <%= compact_time(image_source.published_at) %>
+                      </p>
+                    <% end %>
+                    <% if image_source.updated_at.present? %>
+                      <p class="prose text-xs text-muted" style="text-align: center;">
+                        Updated: <%= compact_time(image_source.updated_at) %>
+                      </p>
+                    <% end %>
+                  </div>
                 <% end %>
               </div>
             <% end %>

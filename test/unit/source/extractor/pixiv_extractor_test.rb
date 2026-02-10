@@ -248,6 +248,11 @@ module Source::Tests::Extractor
           https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p1.png
           https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p2.png
         ],
+        image_sources: [
+          { published_at: Time.parse("2022-08-14T12:21:24.000000Z") },
+          { published_at: Time.parse("2022-08-14T12:21:24.000000Z") },
+          { published_at: Time.parse("2022-08-14T12:21:24.000000Z") },
+        ],
         dtext_artist_commentary_title: "シャイリリー",
         display_name: "影おじ (隠れエリア)",
         profile_url: "https://www.pixiv.net/users/6570768",

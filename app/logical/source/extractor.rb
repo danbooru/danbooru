@@ -411,6 +411,11 @@ module Source
       http_downloader.head(url).status.success?
     end
 
+    # @return [Array<Source::Extractor>] Return the list of image URL extractors.
+    def image_sources
+      image_urls.map { |image_url| Source::Extractor.find(image_url, parent_extractor: self) }
+    end
+
     # @return [Enumerator] An enumerator that lets you iterate across the chain of parent extractors.
     def each_parent
       return enum_for(:each_parent) unless block_given?
