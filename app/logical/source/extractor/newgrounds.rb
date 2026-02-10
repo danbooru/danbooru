@@ -47,6 +47,15 @@ module Source
         images.pluck("image")
       end
 
+      def published_at
+        if parsed_url.image_url?
+          nil
+        else
+          date_string = page&.css("meta[itemprop=datePublished]")&.attr("content")
+          Time.iso8601(date_string).utc if date_string
+        end
+      end
+
       def tags
         page&.css("#sidestats .tags a").to_a.map do |tag|
           [tag.text, "https://www.newgrounds.com/search/conduct/art?match=tags&tags=#{tag.text}"]
@@ -92,7 +101,7 @@ module Source
       end
 
       def http
-        super.cookies(vmkIdu5l8m: credentials[:session_cookie])
+        super.cookies(ng_remember: credentials[:session_cookie])
       end
 
       def video_page_url

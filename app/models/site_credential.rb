@@ -65,8 +65,8 @@ class SiteCredential < ApplicationRecord
     }, {
       id: 1200,
       name: "Newgrounds",
-      default_credential: { session_cookie: Danbooru.config.newgrounds_session_cookie },
-      help: %{Your "Newgrounds":https://www.newgrounds.com 'vmkIdu5l8m' cookie.},
+      default_credential: { session_cookie: Danbooru.config.newgrounds_ng_remember_cookie },
+      help: %{Your "Newgrounds":https://www.newgrounds.com 'ng_remember' cookie.},
     }, {
       id: 1300,
       name: "Nico Seiga",

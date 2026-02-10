@@ -71,6 +71,21 @@ class Source::Extractor
       graphql_tweet.dig(:core, :user_results, :result, :legacy, :name)
     end
 
+    def graphql_tweet_created_at
+      date_string = graphql_tweet.dig(:legacy, :created_at)
+      if date_string.present?
+        Time.strptime(date_string, "%a %b %d %H:%M:%S %z %Y").utc
+      end
+    end
+
+    def published_at
+      if parsed_url.image_url?
+        parsed_url.parsed_date
+      else
+        graphql_tweet_created_at || parsed_url.parsed_date
+      end
+    end
+
     def artist_commentary_desc
       graphql_tweet.dig(:note_tweet, :note_tweet_results, :result, :text) || graphql_tweet.dig(:legacy, :full_text)
     end

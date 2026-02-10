@@ -15,6 +15,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://noizave.tumblr.com],
         display_name: nil,
         username: "noizave",
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["tag1", "https://tumblr.com/tagged/tag1"],
           ["tag2", "https://tumblr.com/tagged/tag2"],
@@ -33,6 +35,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://nagian.tumblr.com],
         display_name: nil,
         username: "nagian",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "ゆいあず",
@@ -45,6 +49,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png],
         media_files: [{ file_size: 3_655 }],
         page_url: "https://noizave.tumblr.com/post/162206271767",
+        published_at: nil,
+        updated_at: nil,
       )
     end
 
@@ -57,6 +63,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://jonroru.tumblr.com],
         display_name: nil,
         username: "jonroru",
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["splatoon", "https://tumblr.com/tagged/splatoon"],
           ["pixel art", "https://tumblr.com/tagged/pixel art"],
@@ -85,6 +93,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/ee02048f5578595badc95905e17154b4/tumblr_inline_ofbr4452601sk4jd9_1280.gif],
         media_files: [{ file_size: 110_348 }],
         page_url: nil,
+        published_at: nil,
+        updated_at: nil,
       )
     end
 
@@ -94,6 +104,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_1280.jpg],
         media_files: [{ file_size: 42_997 }],
         page_url: nil,
+        published_at: nil,
+        updated_at: nil,
       )
     end
 
@@ -103,6 +115,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg],
         media_files: [{ file_size: 105_963 }],
         page_url: nil,
+        published_at: nil,
+        updated_at: nil,
       )
     end
 
@@ -112,6 +126,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_1280.png],
         media_files: [{ file_size: 62_658 }],
         page_url: nil,
+        published_at: nil,
+        updated_at: nil,
       )
     end
 
@@ -121,6 +137,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.png],
         media_files: [{ file_size: 296_595, file_ext: :jpg }],
         page_url: nil,
+        published_at: nil,
+        updated_at: nil,
       )
     end
 
@@ -133,6 +151,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://make-do5.tumblr.com],
         display_name: nil,
         username: "make-do5",
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["original", "https://tumblr.com/tagged/original"],
           ["illustration", "https://tumblr.com/tagged/illustration"],
@@ -151,6 +171,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://esper-eclipse.tumblr.com],
         display_name: nil,
         username: "esper-eclipse",
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["diddle", "https://tumblr.com/tagged/diddle"],
           ["audibly laughed i think i will start calling doodles diddles", "https://tumblr.com/tagged/audibly laughed i think i will start calling doodles diddles"],
@@ -171,6 +193,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://va.media.tumblr.com/tumblr_pgohk0TjhS1u7mrsl.mp4],
         media_files: [{ file_size: 7_960_082 }],
         page_url: nil,
+        published_at: nil,
+        updated_at: nil,
       )
     end
 
@@ -180,6 +204,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://static.tumblr.com/923d3a1b85bdabcb6276ea921911497f/w3ze2u2/mdHpc3im5/tumblr_static_cd6gq50ia8oc8s04kcok44gkc.jpg],
         media_files: [{ file_size: 1_711_890 }],
         page_url: nil,
+        published_at: nil,
+        updated_at: nil,
       )
     end
 
@@ -192,6 +218,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://noizave.tumblr.com],
         display_name: nil,
         username: "noizave",
+        published_at: Time.parse("2017-06-24T17:42:18.000000Z"),
+        updated_at: nil,
         tags: [
           ["tag", "https://tumblr.com/tagged/tag"],
           ["red hair", "https://tumblr.com/tagged/red hair"],
@@ -237,6 +265,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://noizave.tumblr.com],
         display_name: nil,
         username: "noizave",
+        published_at: Time.parse("2017-06-25T02:14:44.000000Z"),
+        updated_at: nil,
         tags: [
           ["tag1 tag2", "https://tumblr.com/tagged/tag1 tag2"],
         ],
@@ -260,6 +290,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://noizave.tumblr.com],
         display_name: nil,
         username: "noizave",
+        published_at: Time.parse("2017-06-25T02:53:47.000000Z"),
+        updated_at: nil,
         tags: [
           ["tag1", "https://tumblr.com/tagged/tag1"],
         ],
@@ -277,6 +309,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://cloudstation.tumblr.com],
         display_name: nil,
         username: "cloudstation",
+        published_at: Time.parse("2022-10-13T06:09:41.000000Z"),
+        updated_at: nil,
         tags: [
           ["I heard this audio and ran to make this", "https://tumblr.com/tagged/I heard this audio and ran to make this"],
           ["seto kaiba", "https://tumblr.com/tagged/seto kaiba"],
@@ -299,6 +333,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://ebith1969.tumblr.com],
         display_name: nil,
         username: "ebith1969",
+        published_at: Time.parse("2013-04-17T19:00:34.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "2009.03.05",
@@ -314,6 +350,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://yraa.tumblr.com],
         display_name: nil,
         username: "yraa",
+        published_at: Time.parse("2023-12-10T23:47:58.000000Z"),
+        updated_at: nil,
         tags: [
           ["or maybe it is just... going", "https://tumblr.com/tagged/or maybe it is just... going"],
           ["genshin impact", "https://tumblr.com/tagged/genshin impact"],
@@ -342,6 +380,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://noizave.tumblr.com],
         display_name: nil,
         username: "noizave",
+        published_at: Time.parse("2018-02-24T16:27:08.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -365,6 +405,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://munespice.tumblr.com],
         display_name: nil,
         username: "munespice",
+        published_at: Time.parse("2022-05-07T17:28:58.000000Z"),
+        updated_at: nil,
         tags: [
           ["bulbasaur", "https://tumblr.com/tagged/bulbasaur"],
           ["munespice", "https://tumblr.com/tagged/munespice"],
@@ -396,6 +438,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://compllege.tumblr.com],
         display_name: nil,
         username: "compllege",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -443,6 +487,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://yraa.tumblr.com],
         display_name: nil,
         username: "yraa",
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["ffxiv", "https://tumblr.com/tagged/ffxiv"],
           ["draw", "https://tumblr.com/tagged/draw"],
@@ -466,6 +512,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://yraa.tumblr.com],
         display_name: nil,
         username: "yraa",
+        published_at: Time.parse("2019-10-11T04:21:14.000000Z"),
+        updated_at: nil,
         tags: [
           ["ffxiv", "https://tumblr.com/tagged/ffxiv"],
           ["draw", "https://tumblr.com/tagged/draw"],
@@ -514,6 +562,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://techsupportdog.tumblr.com],
         display_name: nil,
         username: "techsupportdog",
+        published_at: Time.parse("2017-07-28T02:47:55.000000Z"),
+        updated_at: nil,
         tags: [
           ["anime girl", "https://tumblr.com/tagged/anime girl"],
           ["anime art", "https://tumblr.com/tagged/anime art"],
@@ -535,6 +585,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://lizalfosrise.tumblr.com],
         display_name: nil,
         username: "lizalfosrise",
+        published_at: Time.parse("2023-10-14T06:48:35.000000Z"),
+        updated_at: nil,
         tags: [
           ["adorable", "https://tumblr.com/tagged/adorable"],
         ],
@@ -568,6 +620,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://dee-toraburu.tumblr.com],
         display_name: nil,
         username: "dee-toraburu",
+        published_at: Time.parse("2022-10-02T22:39:57.000000Z"),
+        updated_at: nil,
         tags: [
           ["fullmetal alchemist", "https://tumblr.com/tagged/fullmetal alchemist"],
           ["fullmetal alchemist brotherhood", "https://tumblr.com/tagged/fullmetal alchemist brotherhood"],
@@ -626,6 +680,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://timestables.tumblr.com],
         display_name: nil,
         username: "timestables",
+        published_at: Time.parse("2022-01-05T00:08:07.000000Z"),
+        updated_at: nil,
         tags: [
           ["orv", "https://tumblr.com/tagged/orv"],
           ["myart", "https://tumblr.com/tagged/myart"],
@@ -672,6 +728,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://dumpsterf11re.tumblr.com],
         display_name: nil,
         username: "dumpsterf11re",
+        published_at: Time.parse("2024-03-22T03:43:10.000000Z"),
+        updated_at: nil,
         tags: [
           ["dungeon meshi", "https://tumblr.com/tagged/dungeon meshi"],
           ["tw blood", "https://tumblr.com/tagged/tw blood"],
@@ -702,6 +760,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://shortgremlinman.tumblr.com],
         display_name: nil,
         username: "shortgremlinman",
+        published_at: Time.parse("2023-01-30T13:20:25.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -795,6 +855,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://shimetsukage.tumblr.com],
         display_name: nil,
         username: "shimetsukage",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
