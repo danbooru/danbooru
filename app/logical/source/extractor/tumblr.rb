@@ -46,6 +46,14 @@ class Source::Extractor
       "https://#{username}.tumblr.com" if username.present?
     end
 
+    def published_at
+      if parsed_url.image_url?
+        nil
+      elsif post[:timestamp]
+        Time.at(post[:timestamp]).utc
+      end
+    end
+
     def artist_commentary_title
       case post[:type]
       when "text", "link"

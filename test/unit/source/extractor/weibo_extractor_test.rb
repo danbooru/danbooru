@@ -20,6 +20,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.weibo.com/u/5501756072],
         display_name: "阿尔托莉雅厨",
         username: nil,
+        published_at: Time.parse("2020-05-21T01:21:27.000000Z"),
+        updated_at: nil,
         tags: [
           ["fgo", "https://s.weibo.com/weibo?q=%23fgo%23"],
           ["Alter组", "https://s.weibo.com/weibo?q=%23Alter组%23"],
@@ -51,6 +53,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.weibo.com/u/5501756072],
         display_name: "阿尔托莉雅厨",
         username: nil,
+        published_at: Time.parse("2020-05-21T01:21:27.000000Z"),
+        updated_at: nil,
         tags: [
           ["fgo", "https://s.weibo.com/weibo?q=%23fgo%23"],
           ["Alter组", "https://s.weibo.com/weibo?q=%23Alter组%23"],
@@ -74,6 +78,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.weibo.com/u/5501756072],
         display_name: "阿尔托莉雅厨",
         username: nil,
+        published_at: Time.parse("2020-04-26T13:15:31.000000Z"),
+        updated_at: nil,
         tags: [
           ["明日方舟", "https://s.weibo.com/weibo?q=%23明日方舟%23"],
         ],
@@ -96,6 +102,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.weibo.com/u/7817290049],
         display_name: "帕姆的收藏夹",
         username: nil,
+        published_at: Time.parse("2023-06-19T10:04:11.000000Z"),
+        updated_at: nil,
         tags: [
           ["崩坏星穹铁道", "https://s.weibo.com/weibo?q=%23崩坏星穹铁道%23"],
           ["星穹铁道1.1", "https://s.weibo.com/weibo?q=%23星穹铁道1.1%23"],
@@ -112,6 +120,10 @@ module Source::Tests::Extractor
 
     # XXX The video URL returns 404.
     context "A Weibo video with an empty playback_list" do
+      setup do
+        skip "Deleted post"
+      end
+
       strategy_should_work(
         "https://weibo.com/1501933722/4142890299009993",
         image_urls: [%r{http://f.us.sinaimg.cn/004zstGKlx07dAHg4ZVu010f01000OOl0k01.mp4\?Expires=.*&ssig=.*&KID=unistore,video}],
@@ -162,6 +174,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.weibo.com/u/2427303621],
         display_name: "痞影人科莱昂",
         username: nil,
+        published_at: Time.parse("2023-03-15T07:52:01.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -201,6 +215,8 @@ module Source::Tests::Extractor
         profile_urls: [],
         display_name: nil,
         username: nil,
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -218,6 +234,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.weibo.com/u/2125874520],
         display_name: "偷菜佬TC",
         username: nil,
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["马上就上手的舰B", "https://s.weibo.com/weibo?q=%23马上就上手的舰B%23"],
         ],
@@ -241,6 +259,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.weibo.com/u/6476636003],
         display_name: nil,
         username: nil,
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -257,6 +277,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.weibo.com/u/6582241007],
         display_name: "号布谷鸟",
         username: nil,
+        published_at: Time.parse("2022-05-10T13:47:36.000000Z"),
+        updated_at: nil,
         tags: [
           ["快递组", "https://s.weibo.com/weibo?q=%23快递组%23"],
         ],

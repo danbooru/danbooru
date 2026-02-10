@@ -96,6 +96,15 @@ class Source::Extractor::Bluesky < Source::Extractor
     parsed_url.post_id || parsed_referer&.post_id
   end
 
+  def published_at
+    if parsed_url.image_url?
+      nil
+    else
+      created_at_string = api_response&.dig("thread", "post", "record", "createdAt")
+      Time.iso8601(created_at_string).utc if created_at_string
+    end
+  end
+
   def artist_commentary_desc
     api_response&.dig("thread", "post", "record", "text") || ""
   end

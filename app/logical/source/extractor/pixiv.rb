@@ -79,6 +79,35 @@ module Source
         [display_name, (username unless username&.starts_with?("user_"))].compact_blank.uniq(&:downcase)
       end
 
+      def api_created_date
+        Time.iso8601(api_response["createDate"]).utc if api_response["createDate"]
+      end
+
+      def api_updated_date
+        if api_novel_series.present?
+          date_string = api_response["updateDate"]
+        else
+          date_string = api_response["uploadDate"]
+        end
+        Time.iso8601(date_string).utc if date_string
+      end
+
+      def published_at
+        if parsed_url.image_url?
+          parsed_url.parsed_date
+        else
+          api_created_date
+        end
+      end
+
+      def updated_at
+        if parsed_url.image_url?
+          nil
+        else
+          api_updated_date
+        end
+      end
+
       def artist_commentary_title
         api_response[:title]&.normalize_whitespace
       end

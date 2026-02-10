@@ -14,6 +14,8 @@
 # * display_name - The artist's display name, if they have one.
 # * username - The artist's username, if they have one.
 # * other_names - Extra names used in new artist entries.
+# * published_at - The time that this URL was first published at the source.
+# * updated_at - The time that this URL was last updated at the source.
 # * tags - The artist's tags for the work. Used by translated tags.
 # * artist_commentary_title - The artist's title of the work. Used for artist commentaries.
 # * artist_commentary_desc - The artist's description of the work. Used for artist commentaries.
@@ -309,6 +311,14 @@ module Source
       )
     end
 
+    def published_at
+      nil
+    end
+
+    def updated_at
+      nil
+    end
+
     def tags
       (@tags || []).uniq
     end
@@ -380,6 +390,8 @@ module Source
           profile_urls: profile_urls,
           artists: artists.as_json(only: %i[id name]),
         },
+        published_at: published_at,
+        updated_at: updated_at,
         tags: tags,
         artist_commentary: {
           title: artist_commentary_title,
@@ -438,13 +450,28 @@ module Source
             <%= image_urls.join("\n    ") %>
           ],
           media_files: [
-            <%= file_sizes.join(",\n    ") %>
+            <%= file_sizes.join(",\n    ") %>,
           ],
         <% end %>
           page_url: <%= page_url.inspect %>,
+          profile_url: <%= profile_url.inspect %>,
+        <% if profile_urls.empty? %>
+          profile_urls: [],
+        <% else %>
           profile_urls: %w[<%= profile_urls.join(" ") %>],
+        <% end %>
           display_name: <%= display_name.inspect %>,
           username: <%= username.inspect %>,
+        <% if published_at.nil? %>
+          published_at: nil,
+        <% else %>
+          published_at: Time.parse(<%= published_at.iso8601(fraction_digits=6).inspect %>),
+        <% end %>
+        <% if updated_at.nil? %>
+          updated_at: nil,
+        <% else %>
+          updated_at: Time.parse(<%= updated_at.iso8601(fraction_digits=6).inspect %>),
+        <% end %>
         <% if tags.empty? %>
           tags: [],
         <% else %>
@@ -453,10 +480,12 @@ module Source
           ],
         <% end %>
           dtext_artist_commentary_title: <%= dtext_artist_commentary_title.inspect %>,
-        <% if dtext_artist_commentary_desc.lines.size <= 1 %>
-          dtext_artist_commentary_desc: <%= dtext_artist_commentary_desc.inspect %>
+        <% if dtext_artist_commentary_desc.nil? -%>
+          dtext_artist_commentary_desc: nil,
+        <% elsif dtext_artist_commentary_desc.lines.size <= 1 %>
+          dtext_artist_commentary_desc: <%= dtext_artist_commentary_desc.inspect %>,
         <% else %>
-          dtext_artist_commentary_desc: <<~EOS.chomp
+          dtext_artist_commentary_desc: <<~EOS.chomp,
         <%= dtext_artist_commentary_desc.to_s.gsub(/^/, "    ") %>
           EOS
         <% end %>

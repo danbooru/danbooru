@@ -19,12 +19,18 @@ module Source::Tests::Extractor
         page_url: "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
         display_name: "Ixy(いくしー)",
         username: "ixy",
+        published_at: Time.parse("2024-02-08T11:21:50.410000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )
     end
 
     context "A post with 'app.bsky.embed.images.view' embed and alt text" do
+      setup do
+        skip "Deleted post"
+      end
+
       strategy_should_work(
         "https://bsky.app/profile/magicianhero.bsky.social/post/3ljtkgqzwvc2t",
         dtext_artist_commentary_title: "",
@@ -41,6 +47,10 @@ module Source::Tests::Extractor
     end
 
     context "A post url with 'app.bsky.embed.recordWithMedia.view' embed and alt text" do
+      setup do
+        skip "Deleted post"
+      end
+
       strategy_should_work(
         "https://bsky.app/profile/yourbaguette.bsky.social/post/3kjarhifsmg26",
         image_urls: [
@@ -111,6 +121,8 @@ module Source::Tests::Extractor
         page_url: "https://bsky.app/profile/did:plc:owc2r2dsewj3hk73rtd746zh/post/3klgth6lilt2l",
         display_name: "Hi-GO!",
         username: "go-guiltism",
+        published_at: Time.parse("2024-02-15T07:12:37.327000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_desc: "Copy-X FullArmed 2",
       )
@@ -125,6 +137,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://bsky.app/profile/tuyoki.bsky.social https://bsky.app/profile/did:plc:mymwxdm4zedrqufkotuxn72k],
         display_name: "temmie",
         username: "tuyoki",
+        published_at: Time.parse("2024-09-15T17:16:34.147000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_desc: "victory pose",
       )
@@ -174,6 +188,8 @@ module Source::Tests::Extractor
         page_url: "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
         display_name: "Ixy(いくしー)",
         username: "ixy",
+        published_at: Time.parse("2024-02-08T11:21:50.410000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )
@@ -188,6 +204,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://bsky.app/profile/mzmanjo.bsky.social https://bsky.app/profile/did:plc:4ix5icku4nehfgpkyhtrpto6],
         display_name: "アンジョー",
         username: "mzmanjo",
+        published_at: Time.parse("2024-09-15T08:24:51.499000Z"),
+        updated_at: nil,
         tags: [
           ["100日チャレンジ", "https://bsky.app/hashtag/100日チャレンジ"],
           ["逃げ若", "https://bsky.app/hashtag/逃げ若"],
@@ -214,6 +232,8 @@ module Source::Tests::Extractor
         page_url: "https://bsky.app/profile/did:plc:pz2wk53vr3jjy3fssbfhndjs/post/3lntvzjfhbs2u",
         display_name: "轟将",
         username: "masarustrongest",
+        published_at: Time.parse("2025-04-28T04:19:54.045000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_desc: "Happy 6th Anniversary🌿",
       )
@@ -232,6 +252,8 @@ module Source::Tests::Extractor
         page_url: "https://bsky.app/profile/did:plc:555c53zqgqs55yh6gvttf5uv/post/3lp2aj326uc25",
         display_name: /Banditelli/,
         username: "banditelli",
+        published_at: Time.parse("2025-05-13T10:08:43.344000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_desc: <<~EOS.chomp,
           Hops for all. "#birds":[https://bsky.app/hashtag/birds]
@@ -258,6 +280,8 @@ module Source::Tests::Extractor
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
         media_files: [{ file_size: 398_747 }],
         profile_urls: ["https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"],
+        published_at: nil,
+        updated_at: nil,
       )
     end
 

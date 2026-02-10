@@ -3,7 +3,7 @@
 module Source
   class URL
     class Mihuashi < Source::URL
-      attr_reader :username, :user_id, :work_id, :stall_id, :project_id, :character_id, :a_work_id, :a_work_activity, :a_work_type, :full_image_url
+      attr_reader :username, :user_id, :work_id, :stall_id, :project_id, :character_id, :a_work_id, :a_work_activity, :a_work_type, :full_image_url, :date, :zone
 
       def self.match?(url)
         url.domain == "mihuashi.com"
@@ -21,18 +21,34 @@ module Source
         # https://image-assets.mihuashi.com/permanent/3684329|-2025/05/18/12/Fk7FRRsUA6QW80rthbEJULPuA5nQ_5546.jpg!sq300.2x
         # https://image-assets.mihuashi.com/pfop/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg
         # https://image-assets.mihuashi.com/44571|-2021/09/16/18/FvNAijlnNYfJtaVQdZNoDYHj9mPP.png!artwork.detail
-        in ("image-assets" | "activity-assets"), "mihuashi.com", *, /^(\d+)\|-\d{4}$/ => dir, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
+        in ("image-assets" | "activity-assets"), "mihuashi.com", *, /^(\d+)\|-(\d{4})$/ => dir, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
           @full_image_url = to_s.split("!").first.gsub("pfop/", "")
-          @user_id = dir.match(/^(\d+)\|-\d{4}$/)[1]
+          @user_id, year = dir.match(/^(\d+)\|-(\d{4})$/).captures
+          # New URL format, times in CST
+          @date = [year, month, day, hour]
+          @zone = "+08:00"
+
+        # https://activity-assets.mihuashi.com/2021/07/04/01/FvJ4MjqshV3u2etTc_8-gD4vFfy-.jpg
+        in ("image-assets" | "activity-assets"), "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, /^([^!]+)(?:!.+)?$/ => file
+          @full_image_url = "https://#{subdomain}.mihuashi.com/#{year}/#{month}/#{day}/#{hour}/#{$1}"
+          # New URL format, times in CST
+          @date = [year, month, day, hour]
+          @zone = "+08:00"
 
         # https://image-assets.mihuashi.com/2016/12/08/13/gx77j3j5vdtseg9xqmmgovzxj4yhtwpm/红白_.jpg
         # https://activity-assets.mihuashi.com/2019/05/03/09/yh2td3fkw381mtsjtn4p7ob1iyc2s25r/yh2td3fkw381mtsjtn4p7ob1iyc2s25r.png
         in ("image-assets" | "activity-assets"), "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, dir, /^([^!]+)(?:!.+)?$/ => file
           @full_image_url = "https://#{subdomain}.mihuashi.com/#{year}/#{month}/#{day}/#{hour}/#{dir}/#{$1}"
+          # Old URL format, times in UTC
+          @date = [year, month, day, hour]
+          @zone = "+00:00"
 
         # https://images.mihuashi.com/2016/06/17/23/thpe8pgsekfzw23ammqnmdmtpdj6me22/Q板天子.png
         in "images", "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, dir, /^([^!]+)(?:!.+)?$/ => file
           @full_image_url = "https://image-assets.mihuashi.com/#{year}/#{month}/#{day}/#{hour}/#{dir}/#{$1}"
+          # Old URL format, times in UTC
+          @date = [year, month, day, hour]
+          @zone = "+00:00"
 
         # https://www.mihuashi.com/artworks/15092919
         # https://www.mihuashi.com/artworks/13693110
@@ -57,7 +73,8 @@ module Source
 
         # https://www.mihuashi.com/activities/houkai3-stigmata/artworks/8523
         # https://www.mihuashi.com/activities/jw3-exterior-12/artworks/10515?type=zjjh
-        in _, "mihuashi.com", "activities", a_work_activity, "artworks", a_work_id
+        # https://www.mihuashi.com/activities/color-lost-world/activity_artworks/797
+        in _, "mihuashi.com", "activities", a_work_activity, ("artworks" | "activity_artworks"), a_work_id
           @a_work_id = a_work_id
           @a_work_activity = a_work_activity
           @a_work_type = params[:type]
@@ -104,6 +121,10 @@ module Source
         elsif user_id.present?
           "https://www.mihuashi.com/profiles/#{user_id}"
         end
+      end
+
+      def parsed_date
+        Time.new(*date, 0, 0, zone).utc if date.present? && zone.present?
       end
     end
   end

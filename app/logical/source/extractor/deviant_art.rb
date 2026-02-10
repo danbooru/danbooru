@@ -129,6 +129,14 @@ module Source
         display_name&.downcase || parsed_url.username || parsed_referer&.username
       end
 
+      def published_at
+        if parsed_url.image_url?
+          nil
+        elsif deviation["publishedTime"]
+          Time.iso8601(deviation["publishedTime"]).utc
+        end
+      end
+
       def artist_commentary_title
         deviation["title"] || api_metadata["title"]
       end
