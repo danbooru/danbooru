@@ -53,12 +53,6 @@ ArtistCommentary.initialize_edit_commentary_dialog = function() {
     e.preventDefault();
     $("#add-commentary-dialog").dialog("open");
   });
-
-  $('#fetch-commentary select[name="commentary_source_type"]').change(function() {
-    $("#fetch-commentary input").toggle();
-  });
-
-  $('#fetch-commentary button[type="submit"]').on("click.danbooru", ArtistCommentary.fetch_commentary);
 }
 
 ArtistCommentary.fetch_commentary = function() {
