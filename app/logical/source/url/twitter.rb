@@ -141,6 +141,12 @@ class Source::URL::Twitter < Source::URL
     in _, _, "intent", "user" if params[:screen_name].present?
       @username = params[:screen_name]
 
+    # https://x.com/intent/favorite?tweet_id=2020838133525520807
+    # https://x.com/intent/retweet?tweet_id=2020838133525520807
+    in _, _, "intent", ("favorite" | "retweet") if params[:tweet_id].present?
+      @status_id = params[:tweet_id]
+      @base10_snowflake_id = @status_id
+
     # https://x.com/i/user/889592953
     in _, _, "i", "user", user_id
       @user_id = user_id

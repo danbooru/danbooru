@@ -100,6 +100,42 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A https://x.com/intent/favorite?tweet_id=:id url" do
+      strategy_should_work(
+        "https://x.com/intent/favorite?tweet_id=2020838133525520807",
+        image_urls: %w[https://pbs.twimg.com/media/HAt1kgFbcAAD8xF.jpg:orig],
+        media_files: [{ file_size: 334_077 }],
+        page_url: "https://x.com/rousei13/status/2020838133525520807",
+        profile_url: "https://x.com/rousei13",
+        profile_urls: %w[https://x.com/rousei13 https://x.com/i/user/928581189442482178],
+        display_name: "ろうせい",
+        username: "rousei13",
+        published_at: Time.parse("2026-02-09T12:32:11.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "誰もお前を愛さないパロ",
+      )
+    end
+
+    context "A https://x.com/intent/retweet?tweet_id=:id url" do
+      strategy_should_work(
+        "https://x.com/intent/retweet?tweet_id=2020838133525520807",
+        image_urls: %w[https://pbs.twimg.com/media/HAt1kgFbcAAD8xF.jpg:orig],
+        media_files: [{ file_size: 334_077 }],
+        page_url: "https://x.com/rousei13/status/2020838133525520807",
+        profile_url: "https://x.com/rousei13",
+        profile_urls: %w[https://x.com/rousei13 https://x.com/i/user/928581189442482178],
+        display_name: "ろうせい",
+        username: "rousei13",
+        published_at: Time.parse("2026-02-09T12:32:11.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "誰もお前を愛さないパロ",
+      )
+    end
+
     context "A video tweet" do
       strategy_should_work(
         "https://twitter.com/CincinnatiZoo/status/859073537713328129",
