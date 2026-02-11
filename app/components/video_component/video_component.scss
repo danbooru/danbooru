@@ -1,0 +1,101 @@
+/* Show the controls only when the video is hovered, paused, or when the options menu is open */
+.video-component:hover, .video-component[data-paused="true"], .video-component:has(a.popup-menu-button[aria-expanded="true"]) {
+  .video-controls {
+    opacity: 100%;
+  }
+}
+
+/* Stretch the video to fit the screen in fullscreen mode */
+.video-component:fullscreen video {
+  width: 100%;
+}
+
+.video-component {
+  background-color: var(--video-background-color);
+}
+
+.video-controls {
+  &, .tippy-box {
+    background-color: #1f202cc0; // fallback
+    background-color: rgb(from var(--video-controls-background-color) r g b / 80%);
+    border: 0;
+  }
+
+  /* XXX Fix corners not being rounded when hovering over last item in options menu */
+  .popup-menu:has(a.popup-menu-button[aria-expanded="true"]) .tippy-box {
+    overflow: hidden;
+  }
+
+  &, a.popup-menu-button, .tippy-content li, .tippy-content a {
+    color: var(--video-controls-icon-color);
+  }
+
+  .icon:hover {
+    color: var(--video-controls-icon-hover-color);
+  }
+
+  .tippy-content {
+    padding: 0;
+
+    li:has(a):hover {
+      background-color: #3f4058cc; // fallback
+      background-color: rgb(from var(--video-controls-popup-hover-background-color) r g b / 80%);
+    }
+
+    hr {
+      border-color: var(--video-controls-divider-color);
+    }
+  }
+
+  .video-slider {
+    --playback-progress: 0%;
+    --load-progress: 0%;
+
+    &::-moz-range-track {
+      height: 0.375rem;
+      border-radius: 1rem;
+      background: linear-gradient(to right, var(--video-slider-playback-color) 0% var(--playback-progress), var(--video-slider-loading-color) var(--playback-progress) var(--load-progress), var(--video-slider-unloaded-color) var(--playback-progress) 100%);
+    }
+
+    &::-webkit-slider-runnable-track {
+      height: 0.375rem;
+      border-radius: 1rem;
+      background: linear-gradient(to right, var(--video-slider-playback-color) 0% var(--playback-progress), var(--video-slider-loading-color) var(--playback-progress) var(--load-progress), var(--video-slider-unloaded-color) var(--playback-progress) 100%);
+    }
+  }
+
+  .volume-slider {
+    --volume: 0;
+
+    &::-moz-range-track {
+      height: 0.375rem;
+      border-radius: 1rem;
+      background: linear-gradient(to right, var(--video-slider-playback-color) 0% calc(var(--volume) * 100%), var(--video-slider-loading-color) calc(var(--volume) * 100%) 100%);
+    }
+
+    &::-webkit-slider-runnable-track {
+      height: 0.375rem;
+      border-radius: 1rem;
+      background: linear-gradient(to right, var(--video-slider-playback-color) 0% calc(var(--volume) * 100%), var(--video-slider-loading-color) calc(var(--volume) * 100%) 100%);
+    }
+  }
+
+  .video-slider, .volume-slider {
+    &::-moz-range-thumb {
+      background-color: var(--video-controls-icon-color);
+      border-color: var(--video-controls-icon-color);
+      height: 0.75rem;
+      width: 0.75rem;
+    }
+
+    &::-webkit-slider-thumb {
+      appearance: none;
+      background-color: var(--video-controls-icon-color);
+      border-radius: 1rem;
+      height: 0.75rem;
+      width: 0.75rem;
+      position: relative;
+      top: -50%;
+    }
+  }
+}
