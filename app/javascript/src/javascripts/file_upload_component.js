@@ -13,6 +13,7 @@ export default class FileUploadComponent {
 
   constructor($component) {
     this.$component = $component;
+    this.$component.on("ajax:send", e => this.loadingStart());
     this.$component.on("ajax:success", e => this.onSubmit(e));
     this.$component.on("ajax:error", e => this.onError(e));
     this.$dropTarget.on("paste.danbooru", e => this.onPaste(e));
@@ -136,6 +137,7 @@ export default class FileUploadComponent {
 
   // Called when creating the upload failed because of a non-2xx response (usually a rate limiting error or a validation error).
   async onError(e) {
+    this.loadingStop();
     let upload = e.originalEvent?.detail?.[0];
     let message = uploadError(upload);
 
