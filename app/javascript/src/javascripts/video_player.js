@@ -155,13 +155,18 @@ export default class VideoPlayer {
       this.currentTime -= this.duration * 0.01;
     } else if (event.key === "ArrowRight" && !this.scrubbing) {
       this.currentTime += this.duration * 0.01;
+    } else if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(event.key) && !this.scrubbing) {
+      this.currentTime = this.duration * (parseInt(event.key) / 10);
     } else if (event.key === "ArrowDown" && !this.scrubbingVolume) {
       this.volume -= 0.1;
     } else if (event.key === "ArrowUp" && !this.scrubbingVolume) {
       this.volume += 0.1;
+    } else if (event.key === "m" && !this.scrubbingVolume) {
+      this.toggleMute();
     }
 
-    if ([" ", "ArrowLeft", "ArrowRight"].includes(event.key) || (["ArrowDown", "ArrowUp"].includes(event.key) && this.hasSound)) {
+    if ([" ", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "ArrowLeft", "ArrowRight"].includes(event.key) ||
+       (["m", "ArrowDown", "ArrowUp"].includes(event.key) && this.hasSound)) {
       return false;
     }
   }
