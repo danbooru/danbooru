@@ -1,8 +1,12 @@
 import { clamp, round } from "./utility";
+import debounce from "lodash/debounce";
 import UgoiraRenderer from './ugoira_renderer.js';
 import VideoRenderer from './video_renderer.js';
 
 export default class VideoPlayer {
+  MAX_PLAYBACK_RATE = 2.0;
+  PLAYBACK_RATE_STEP = 0.25;
+
   constructor(container) {
     this.$container = $(container);
     this.paused = true;
@@ -15,6 +19,8 @@ export default class VideoPlayer {
     this.hasSound = this.$container.data("has-sound");
 
     this._currentTime = 0;
+    this._playbackRate = 1.0;
+    this._showPlaybackRate = false;
     this._volume = JSON.parse(localStorage.getItem("video.volume")) ?? 1.0;
     this._muted = JSON.parse(localStorage.getItem("video.muted")) ?? false;
     this._previousVolume = this._volume;
@@ -49,6 +55,9 @@ export default class VideoPlayer {
     this.$container.find("canvas, video").on("progress", event => this.currentTime = this.video.currentTime);
     this.$container.find("canvas, video").on("timeupdate", event => this.currentTime = this.video.currentTime);
     this.$container.find("canvas, video").on("durationchange", event => this.duration = this.video.duration);
+    this.$container.find("canvas, video").on("ratechange", event => this.playbackRate = this.video.playbackRate);
+    this.$container.find("canvas, video").on("ratechange", event => this._showPlaybackRate = true);
+    this.$container.find("canvas, video").on("ratechange", debounce(event => this._showPlaybackRate = false, 1000)); // hide after 1 second of no changes to the playback rate
     this.$container.find("canvas, video").on("play", event => this.onPlay());
     this.$container.find("canvas, video").on("pause", event => this.onPause());
     this.$container.find("canvas, video").on("volumechange", event => this.onVolumeChange());
@@ -157,6 +166,10 @@ export default class VideoPlayer {
       this.currentTime += this.duration * 0.01;
     } else if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(event.key) && !this.scrubbing) {
       this.currentTime = this.duration * (parseInt(event.key) / 10);
+    } else if (event.key === "<" && !this.scrubbing) {
+      this.playbackRate -= this.PLAYBACK_RATE_STEP;
+    } else if (event.key === ">" && !this.scrubbing) {
+      this.playbackRate += this.PLAYBACK_RATE_STEP;
     } else if (event.key === "ArrowDown" && !this.scrubbingVolume) {
       this.volume -= 0.1;
     } else if (event.key === "ArrowUp" && !this.scrubbingVolume) {
@@ -165,7 +178,7 @@ export default class VideoPlayer {
       this.toggleMute();
     }
 
-    if ([" ", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "ArrowLeft", "ArrowRight"].includes(event.key) ||
+    if ([" ", "<", ">", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "ArrowLeft", "ArrowRight"].includes(event.key) ||
        (["m", "ArrowDown", "ArrowUp"].includes(event.key) && this.hasSound)) {
       return false;
     }
@@ -199,6 +212,7 @@ export default class VideoPlayer {
     this.duration = this.video.duration || 0;
 
     this.video.currentTime = this.currentTime;
+    this.video.playbackRate = this.playbackRate;
     this.video.volume = this.volume;
     this.video.muted = this.muted;
 
@@ -271,6 +285,18 @@ export default class VideoPlayer {
 
     if (this.video.currentTime !== time) {
       this.video.currentTime = time;
+    }
+  }
+
+  get playbackRate() {
+    return this._playbackRate;
+  }
+
+  set playbackRate(rate) {
+    this._playbackRate = round(clamp(rate, this.PLAYBACK_RATE_STEP, this.MAX_PLAYBACK_RATE), this.PLAYBACK_RATE_STEP);
+
+    if (this.video.playbackRate !== this._playbackRate) {
+      this.video.playbackRate = this._playbackRate;
     }
   }
 

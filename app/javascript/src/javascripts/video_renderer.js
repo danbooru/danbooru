@@ -74,6 +74,10 @@ export default class VideoRenderer {
     return this.video.playbackRate;
   }
 
+  set playbackRate(value) {
+    this.video.playbackRate = value;
+  }
+
   get volume() {
     return this.video.volume;
   }

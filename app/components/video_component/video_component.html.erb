@@ -7,6 +7,7 @@
             "x-bind:data-paused": "String(player.paused)",
             "x-bind:data-muted": "String(player.muted)",
             "x-bind:data-volume": "String(player.volume)",
+            "x-bind:data-playback-rate": "String(player.playbackRate)",
             "x-data": "{ player: new Danbooru.VideoPlayer($el) }",
             "x-init": "player.initialize()",
             **html_options.except(:class) do %>
@@ -20,6 +21,8 @@
   <% end %>
 
   <%= spinner_icon class: "absolute h-16 max-h-1/4 text-inverse", "x-show": "player.loadProgress === '0%'", "x-cloak": true %>
+
+  <span class="playback-rate-indicator absolute p-4 rounded text-xl text-inverse select-none" x-text="player.playbackRate.toFixed(2) + 'x'" x-cloak x-show="player._showPlaybackRate"></span>
 
   <div class="video-controls @container flex items-center absolute bottom-0 w-full h-8 px-2 gap-2 opacity-0 transition-opacity" x-cloak>
     <div class="flex-none w-6 h-full cursor-pointer @max-120px:hidden">
