@@ -15,9 +15,9 @@ export default class VideoPlayer {
     this.hasSound = this.$container.data("has-sound");
 
     this._currentTime = 0;
-    this._volume = parseFloat(localStorage.getItem("volume")) ?? 1.0;
+    this._volume = JSON.parse(localStorage.getItem("video.volume")) ?? 1.0;
+    this._muted = JSON.parse(localStorage.getItem("video.muted")) ?? false;
     this._previousVolume = this._volume;
-    this._muted = !this.$container.data("has-sound");
 
     this._variants = {};
     this.$container.find(".video-variant").each((index, element) => {
@@ -244,7 +244,8 @@ export default class VideoPlayer {
   onVolumeChange() {
     this._volume = this.video.volume;
     this._muted = this.video.muted;
-    localStorage.setItem("volume", this._volume);
+    localStorage.setItem("video.volume", this._volume);
+    localStorage.setItem("video.muted", this._muted);
   }
 
   toggleMute() {
