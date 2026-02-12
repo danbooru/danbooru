@@ -22,7 +22,14 @@ export default class VideoRenderer {
   }
 
   pause() {
-    this.video.pause();
+    if (this.video.paused) {
+      return;
+    }
+
+    return new Promise((resolve) => {
+      this.video.addEventListener('pause', resolve, { once: true });
+      this.video.pause();
+    });
   }
 
   onPause() {
