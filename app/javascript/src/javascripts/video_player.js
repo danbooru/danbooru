@@ -7,15 +7,23 @@ export default class VideoPlayer {
     this.$container = $(container);
     this.paused = true;
     this.duration = 0;
+    this.video = null;
+    this.quality = null;
+    this.resumePlayback = false;
+    this.scrubbing = false;
+    this.scrubbingVolume = false;
+    this.hasSound = this.$container.data("has-sound");
+
     this._currentTime = 0;
-    this._volume = parseFloat(localStorage.getItem("volume")) || 1.0;
+    this._volume = parseFloat(localStorage.getItem("volume")) ?? 1.0;
+    this._previousVolume = this._volume;
     this._muted = !this.$container.data("has-sound");
 
     this._variants = {};
     this.$container.find(".video-variant").each((index, element) => {
       let $element = $(element);
       let variant = $element.data("variant");
-      
+
       if ($element.is("canvas")) {
         const fileUrl = $element.data("src");
         const fileSize = $element.data("file-size");
@@ -50,6 +58,7 @@ export default class VideoPlayer {
     this.$container.find(".volume-slider").on("pointerdown", event => this.onVolumeDragStart(event));
     this.$container.find(".volume-slider").on("pointerup", event => this.onVolumeDragEnd(event));
     this.$container.find(".volume-slider").on("input", event => this.onVolumeDrag(event));
+    this.$container.find(".video-slider, .volume-slider").on("keydown", event => this.onKeypress(event));
 
     let quality = this.$container.data("quality");
     this.setQuality(quality);
@@ -117,10 +126,7 @@ export default class VideoPlayer {
   onVolumeDragStart(event) {
     if (event.pointerType !== "mouse" || event.button === 0) {
       this.scrubbingVolume = true;
-
-      if (this.volume > 0) {
-        this._previousVolume = this.volume;
-      }
+      this._previousVolume = this.volume;
     }
   }
 
@@ -132,40 +138,37 @@ export default class VideoPlayer {
 
   onVolumeDragEnd(event) {
     if (this.scrubbingVolume) {
+      // Treat dragging the volume to 0% as muting the video instead of lowering the volume so that unmuting will restore the previous volume
       if (this.volume === 0) {
         this.volume = this._previousVolume;
         this.muted = true;
       }
+
       this.scrubbingVolume = false;
     }
   }
 
-  // Called when a key is pressed while the player has focus. Ignores keypresses while the playback slider is being dragged.
   onKeypress(event) {
-    if (this.scrubbing) {
-      return;
-    }
-
-    if (event.key === " ") {
+    if (event.key === " " && !this.scrubbing) {
       this.togglePlaying();
-    } else if (event.key === "ArrowLeft") {
+    } else if (event.key === "ArrowLeft" && !this.scrubbing) {
       this.currentTime -= this.duration * 0.01;
-    } else if (event.key === "ArrowRight") {
+    } else if (event.key === "ArrowRight" && !this.scrubbing) {
       this.currentTime += this.duration * 0.01;
-    } else if (event.key === "ArrowDown") {
+    } else if (event.key === "ArrowDown" && !this.scrubbingVolume) {
       this.volume -= 0.1;
-    } else if (event.key === "ArrowUp") {
+    } else if (event.key === "ArrowUp" && !this.scrubbingVolume) {
       this.volume += 0.1;
-    } else {
-      return;
     }
 
-    event.preventDefault();
+    if ([" ", "ArrowLeft", "ArrowRight"].includes(event.key) || (["ArrowDown", "ArrowUp"].includes(event.key) && this.hasSound)) {
+      return false;
+    }
   }
 
   // Pauses the video while the user is tabbed out.
   onVisibilityChange(event) {
-    if (this.muted || this.volume === 0) {
+    if (this.inferredVolume === 0) {
       if (document.hidden) {
         this.pause();
       } else {
@@ -215,10 +218,11 @@ export default class VideoPlayer {
   }
 
   set volume(value) {
+    value = parseFloat(value) ?? 1.0;
     value = round(value, 0.01);
     value = clamp(value, 0.0, 1.0);
 
-    if (this.video.volume !== value) {
+    if (this.hasSound && this.video.volume !== value) {
       this.video.volume = value;
     }
 
@@ -232,20 +236,21 @@ export default class VideoPlayer {
   }
 
   set muted(value) {
-    if (this.video.muted !== value) {
+    if (this.hasSound && this.video.muted !== value) {
       this.video.muted = value;
     }
   }
 
-  onVolumeChange(event) {
+  onVolumeChange() {
     this._volume = this.video.volume;
     this._muted = this.video.muted;
     localStorage.setItem("volume", this._volume);
   }
 
   toggleMute() {
-    if (this.muted) {
+    if (this.inferredVolume === 0) {
       this.muted = false;
+      this.volume = clamp(this.volume, 0.1, 1.0); // when unmuting, raise the volume if it was at 0% so that it doesn't remain silent
     } else {
       this.muted = true;
     }

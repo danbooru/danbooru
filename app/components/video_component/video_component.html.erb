@@ -1,4 +1,15 @@
-<%= tag.div style: "aspect-ratio: #{media_asset.image_width} / #{media_asset.image_height}", class: ["video-component relative flex items-center justify-center", html_options[:class]], tabindex: 0, "data-quality": default_quality, "data-has-sound": media_asset.has_sound?, "x-bind:data-paused": "String(player.paused)", "x-data": "{ player: new Danbooru.VideoPlayer($el) }", "x-init": "player.initialize()", **html_options.except(:class) do %>
+<%= tag.div style: "aspect-ratio: #{media_asset.image_width} / #{media_asset.image_height}",
+            class: ["video-component relative flex items-center justify-center",
+            html_options[:class]],
+            tabindex: 0,
+            "data-quality": default_quality,
+            "data-has-sound": media_asset.has_sound?,
+            "x-bind:data-paused": "String(player.paused)",
+            "x-bind:data-muted": "String(player.muted)",
+            "x-bind:data-volume": "String(player.volume)",
+            "x-data": "{ player: new Danbooru.VideoPlayer($el) }",
+            "x-init": "player.initialize()",
+            **html_options.except(:class) do %>
   <% variants.each do |variant| %>
     <% variant = media_asset.variant(variant) %>
     <% if variant.file_ext == "zip" %>
@@ -25,8 +36,8 @@
 
     <% if media_asset.has_sound? %>
       <div class="flex-none w-6 h-full cursor-pointer" x-on:click="player.toggleMute()">
-        <%= sound_icon class: "h-full py-2", "x-show": "!player.muted && player.volume !== 0" %>
-        <%= sound_off_icon class: "h-full py-2", "x-show": "player.muted || player.volume === 0" %>
+        <%= sound_icon class: "h-full py-2", "x-show": "player.inferredVolume !== 0" %>
+        <%= sound_off_icon class: "h-full py-2", "x-show": "player.inferredVolume === 0" %>
       </div>
       <%= tag.input type: "range", class: "volume-slider w-1/4 max-w-120px h-full appearance-none border-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "0.01", min: 0, max: 1, "x-bind:value": "player.inferredVolume", "x-bind:style": '{ "--volume": player.inferredVolume }' %>
     <% else %>
