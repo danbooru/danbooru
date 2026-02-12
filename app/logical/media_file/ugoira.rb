@@ -345,7 +345,7 @@ class MediaFile::Ugoira < MediaFile
 
         # H.264 only supports even dimensions, so pad by 1 pixel in width or height to fit
         ffmpeg_out, status = Open3.capture2e(
-          "ffmpeg -f concat -i #{concat_path} -c:v libx264 -preset medium -profile:v high -crf 14 -pix_fmt yuv420p -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -fps_mode:v passthrough -movflags +faststart -f mp4 -y #{output_file.path}"
+          "ffmpeg -f concat -i #{concat_path} -c:v libx264 -preset medium -profile:v high -crf 14 -pix_fmt yuv420p -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2:0:0:white' -fps_mode:v passthrough -movflags +faststart -f mp4 -y #{output_file.path}"
         )
         raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
