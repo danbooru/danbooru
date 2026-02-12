@@ -318,47 +318,36 @@ class MediaFile::Ugoira < MediaFile
     MediaFile::Ugoira.new(file)
   end
 
-  # Convert a ugoira to a webm.
+  # Convert a ugoira to MP4.
   # XXX should take width and height and resize image
   def convert
     synchronize do
       @convert ||= begin
-        raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
-        raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_delays.present?
+        raise NotImplementedError, "can't convert ugoira to mp4: ffmpeg not installed" unless self.class.videos_enabled?
+        raise RuntimeError, "can't convert ugoira mp4: no ugoira frame data was provided" unless frame_delays.present?
 
         output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-", "-#{File.basename(file&.path.to_s)}"], binmode: true)
         tmpdir_path = tmpdir.path
 
-        delay_sum = 0
-        timecodes_path = File.join(tmpdir_path, "timecodes.tc")
-        File.open(timecodes_path, "w+") do |f|
-          f.write("# timecode format v2\n")
-          frame_delays.each do |delay|
-            f.write("#{delay_sum}\n")
-            delay_sum += delay
-          end
-          f.write("#{delay_sum}\n")
-          f.write("#{delay_sum}\n")
-        end
-
         concat_path = File.join(tmpdir_path, "concat.txt")
         File.open(concat_path, "w+") do |f|
-          frames.each do |frame|
+          frames.zip(frame_delays).each do |frame, delay|
             f.write("file '#{File.basename(frame.file.path)}'\n")
+            f.write("duration #{delay / 1000.0}\n")
           end
 
-          # Duplicate last frame to avoid it being displayed only for a very short amount of time.
+          # Duplicate last frame for 0 duration
+          # Some browsers seem to display this last frame at the file's FPS (25fps), instead of the specified timecode
+          # Chrome handles this 0-length frame well, Firefox shows the incorrect duration but plays for the correct duration
           f.write("file '#{File.basename(frames.last.path)}'\n")
+          f.write("duration 0\n")
         end
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -r 25 -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -pix_fmt yuv420p -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
+        # H.264 only supports even dimensions, so pad by 1 pixel in width or height to fit
+        ffmpeg_out, status = Open3.capture2e(
+          "ffmpeg -f concat -i #{concat_path} -c:v libx264 -tune animation -preset medium -profile:v high -crf 14 -pix_fmt yuv420p -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -fps_mode:v passthrough -movflags +faststart -f mp4 -y #{output_file.path}"
+        )
         raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
-
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -r 25 -f concat -i #{tmpdir_path}/concat.txt -codec:v libvpx-vp9 -crf 12 -b:v 0 -pix_fmt yuv420p -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir_path}/ffmpeg2pass #{tmpdir_path}/tmp.webm")
-        raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
-
-        mkvmerge_out, status = Open3.capture2e("mkvmerge -o #{output_file.path} --webm --timecodes 0:#{tmpdir_path}/timecodes.tc #{tmpdir_path}/tmp.webm")
-        raise Error, "mkvmerge failed: #{mkvmerge_out}" unless status.success?
 
         MediaFile.open(output_file)
       end

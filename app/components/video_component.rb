@@ -28,10 +28,6 @@ class VideoComponent < ApplicationComponent
   end
 
   def variant_name(variant)
-    if variant == :sample && media_asset.is_ugoira?
-      "WebM"
-    else
-      variant.to_s.titleize
-    end
+    variant.to_s.titleize
   end
 end

@@ -141,10 +141,10 @@ EOS
 # Build FFmpeg. Output is in /usr/local.
 FROM build-base AS build-ffmpeg
 ARG FFMPEG_VERSION
-ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev"
+ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev libx264-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
   --disable-ffplay --disable-network --disable-doc --disable-static --enable-shared \
-  --enable-libvpx --enable-libdav1d --enable-zlib \
+  --enable-libvpx --enable-libdav1d --enable-zlib --enable-gpl --enable-libx264 \
   --disable-muxers \
     --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=image2 --enable-muxer=null \
   --disable-demuxers \
@@ -152,9 +152,9 @@ ARG FFMPEG_BUILD_OPTIONS="\
     --enable-demuxer=apng --enable-demuxer=gif --enable-demuxer=concat \
   --disable-filters \
     --enable-filter=scale --enable-filter=thumbnail --enable-filter=silencedetect --enable-filter=ebur128 \
-    --enable-filter=aresample --enable-filter=anull --enable-filter=null --enable-filter=copy \
+    --enable-filter=aresample --enable-filter=anull --enable-filter=null --enable-filter=copy --enable-filter=pad \
   --disable-encoders \
-    --enable-encoder=libvpx_vp8 --enable-encoder=libvpx_vp9 --enable-encoder=png --enable-encoder=null \
+    --enable-encoder=libx264 --enable-encoder=png --enable-encoder=null \
     --enable-encoder=wrapped_avframe --enable-encoder=pcm_s16le \
   --disable-decoders \
     --enable-decoder=vp8 --enable-decoder=vp9 --enable-decoder=h264 --enable-decoder=hevc --enable-decoder=libdav1d \
@@ -308,6 +308,7 @@ FROM base AS danbooru-base
 WORKDIR /danbooru
 
 COPY --link --from=build-ffmpeg /usr/local /usr/local
+COPY --link --from=build-ffmpeg /usr/lib /usr/lib
 COPY --link --from=build-exiftool /usr/local /usr/local
 COPY --link --from=build-openresty /usr/local /usr/local
 COPY --link --from=build-vips /usr/local /usr/local

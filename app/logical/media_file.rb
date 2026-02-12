@@ -71,7 +71,7 @@ class MediaFile
 
   # @return [Boolean] true if we can generate video previews.
   def self.videos_enabled?
-    system("ffmpeg -version > /dev/null") && system("mkvmerge --version > /dev/null")
+    system("ffmpeg -version > /dev/null")
   end
 
   # Initialize a MediaFile from a regular File.

@@ -159,7 +159,7 @@ class MediaAsset < ApplicationRecord
       in :"720x720"
         "webp"
       in :sample if media_asset.is_animated?
-        "webm"
+        "mp4"
       in :sample | :full if media_asset.is_static_image?
         "jpg"
       in :original
