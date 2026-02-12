@@ -66,9 +66,9 @@ export default class VideoPlayer {
     this.paused = false;
   }
 
-  pause() {
+  async pause() {
     this.resumePlayback = !this.paused;
-    this.video?.pause();
+    await this.video?.pause();
   }
 
   onPause() {
@@ -176,12 +176,14 @@ export default class VideoPlayer {
 
   // Sets the video to either the original or the sample. Playback will continue from the
   // current time when the video is switched.
-  setQuality(quality) {
+  async setQuality(quality) {
     if (quality === this.quality) {
       return;
     }
 
-    this.pause();
+    if (this.video) {
+      await this.pause();
+    }
     this.quality = quality;
     this.video = this._variants[quality];
 
@@ -271,6 +273,10 @@ export default class VideoPlayer {
     // XXX Hack to force Alpine to update the progress bar every time the time is updated, because browsers don't always
     // send the final progress event when the video finishes loading, which causes the loading bar to get stuck below 100%.
     this.currentTime;
+
+    if (!this.video) {
+      return "0%";
+    }
 
     let buffered = this.video.buffered;
     let bufferedDuration = buffered.length > 0 ? buffered.end(buffered.length - 1) : 0;
