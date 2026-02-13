@@ -17,6 +17,7 @@ on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_run
   workflow_run:
     workflows: ["Docker Build"]
+    branches: [master]
     types: [completed]
 
   workflow_dispatch:
@@ -35,7 +36,9 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     # Don't run the test suite multiple times for the same commit.
-    concurrency: "test-${{ github.sha }}"
+    concurrency: 
+      group: "test-${{ github.sha }}"
+      cancel-in-progress: true
 
     runs-on: ubuntu-latest
 
