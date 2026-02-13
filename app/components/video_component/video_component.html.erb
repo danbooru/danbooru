@@ -1,9 +1,11 @@
 <%= tag.div style: "aspect-ratio: #{media_asset.image_width} / #{media_asset.image_height}",
-            class: ["video-component relative flex items-center justify-center",
-            html_options[:class]],
+            class: ["video-component relative flex items-center justify-center", html_options[:class]],
             tabindex: 0,
             "data-quality": default_quality,
+            "data-autoplay": autoplay,
+            "data-muted": muted,
             "data-has-sound": media_asset.has_sound?,
+            "x-bind:data-state": "player.state",
             "x-bind:data-paused": "String(player.paused)",
             "x-bind:data-muted": "String(player.muted)",
             "x-bind:data-volume": "String(player.volume)",
@@ -24,12 +26,12 @@
 
   <span class="playback-rate-indicator absolute p-4 rounded text-xl text-inverse select-none" x-text="player.playbackRate.toFixed(2) + 'x'" x-cloak x-show="player._showPlaybackRate"></span>
 
-  <div class="absolute p-4 rounded text-xl text-inverse text-center" x-cloak x-show="player.state === 'error'">
-    <p>An error occurred while loading the video.</p>
-    <p class="text-sm text-muted" x-text="player._error"></p>
+  <div class="video-component-error-message @container absolute w-full p-4 rounded text-inverse text-center leading-normal" x-cloak x-show="player.state === 'error'">
+    <p class="text-xl @max-270px:text-sm">An error occurred while loading the video.</p>
+    <p class="text-sm @max-270px:text-xs text-muted" x-text="player._error"></p>
   </div>
 
-  <div class="video-controls @container flex items-center absolute bottom-0 w-full h-8 px-2 gap-2 opacity-0 transition-opacity" x-cloak>
+  <div class="video-controls @container flex items-center absolute bottom-0 w-full h-8 px-2 gap-2 opacity-0 transition-opacity" x-cloak x-show="player.state === 'ready'">
     <div class="flex-none w-6 h-full cursor-pointer @max-120px:hidden">
       <%= play_icon class: "h-full w-full py-2", "x-show": "player.paused", "x-on:click": "player.play()" %>
       <%= pause_icon class: "h-full w-full py-2", "x-show": "!player.paused", "x-on:click": "player.pause()" %>
@@ -49,7 +51,7 @@
       </div>
       <%= tag.input type: "range", class: "volume-slider w-1/4 max-w-120px h-full appearance-none border-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "0.01", min: 0, max: 1, "x-bind:value": "player.inferredVolume", "x-bind:style": '{ "--volume": player.inferredVolume }' %>
     <% else %>
-      <%= no_sound_icon class: "flex-none w-6 h-full py-2 text-muted pointer-events-none" %>
+      <%= no_sound_icon class: "flex-none w-6 h-full py-2 text-muted pointer-events-none @max-270px:hidden" %>
     <% end %>
 
     <% if variants.size > 1 %>

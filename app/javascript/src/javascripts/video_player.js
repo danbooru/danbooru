@@ -16,6 +16,7 @@ export default class VideoPlayer {
     this.resumePlayback = false;
     this.scrubbing = false;
     this.scrubbingVolume = false;
+    this.autoplay = this.$container.data("autoplay");
     this.hasSound = this.$container.data("has-sound");
 
     this._error = null;
@@ -23,7 +24,7 @@ export default class VideoPlayer {
     this._playbackRate = 1.0;
     this._showPlaybackRate = false;
     this._volume = JSON.parse(localStorage.getItem("video.volume")) ?? 1.0;
-    this._muted = JSON.parse(localStorage.getItem("video.muted")) ?? false;
+    this._muted = this.$container.data("muted") || (JSON.parse(localStorage.getItem("video.muted")) ?? false);
     this._previousVolume = this._volume;
 
     this._variants = {};
@@ -75,7 +76,7 @@ export default class VideoPlayer {
     this.setQuality(quality);
 
     // Autoplay unless blacklisted. Ignore autoplay errors due to browser restrictions.
-    if (this.$container.closest(".blacklisted-active").length === 0) {
+    if (this.autoplay && this.$container.closest(".blacklisted-active").length === 0) {
       this.play().catch(() => {});
     }
   }

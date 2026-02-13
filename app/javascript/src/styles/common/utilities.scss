@@ -663,4 +663,6 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
 
 @container (max-width: 270px) {
   .\@max-270px\:hidden { display: none; }
+  .\@max-270px\:text-sm { font-size: var(--text-sm); }
+  .\@max-270px\:text-xs { font-size: var(--text-xs); }
 }

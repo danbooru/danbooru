@@ -10,7 +10,9 @@
   width: 100%;
 }
 
-.video-component {
+/* Make the background black while loading or showing an error so we can see the white spinner or error text against the
+ * black background. Leave it transparent while playing so we can tell if the video has a transparent background. */
+.video-component:not([data-state="ready"]), .video-component-error-message {
   background-color: var(--video-background-color);
 }
 
