@@ -20,9 +20,14 @@
     <% end %>
   <% end %>
 
-  <%= spinner_icon class: "absolute h-16 max-h-1/4 text-inverse", "x-show": "player.loadProgress === '0%'", "x-cloak": true %>
+  <%= spinner_icon class: "absolute h-16 max-h-1/4 text-inverse", "x-show": "player.state === 'loading'", "x-cloak": true %>
 
   <span class="playback-rate-indicator absolute p-4 rounded text-xl text-inverse select-none" x-text="player.playbackRate.toFixed(2) + 'x'" x-cloak x-show="player._showPlaybackRate"></span>
+
+  <div class="absolute p-4 rounded text-xl text-inverse text-center" x-cloak x-show="player.state === 'error'">
+    <p>An error occurred while loading the video.</p>
+    <p class="text-sm text-muted" x-text="player._error"></p>
+  </div>
 
   <div class="video-controls @container flex items-center absolute bottom-0 w-full h-8 px-2 gap-2 opacity-0 transition-opacity" x-cloak>
     <div class="flex-none w-6 h-full cursor-pointer @max-120px:hidden">

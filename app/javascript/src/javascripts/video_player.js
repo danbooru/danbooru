@@ -18,6 +18,7 @@ export default class VideoPlayer {
     this.scrubbingVolume = false;
     this.hasSound = this.$container.data("has-sound");
 
+    this._error = null;
     this._currentTime = 0;
     this._playbackRate = 1.0;
     this._showPlaybackRate = false;
@@ -76,8 +77,28 @@ export default class VideoPlayer {
     this.play().catch(() => {});
   }
 
+  get state() {
+    if (this._error) {
+      return "error";
+    } else if (this.loadProgress === "0%") {
+      return "loading";
+    } else {
+      return "ready";
+    }
+  }
+
   async play() {
-    await this.video?.play();
+    try {
+      await this.video?.play();
+    } catch (error) {
+      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play#exceptions
+      if (error instanceof DOMException && error.name === "NotSupportedError") {
+        this._error = "Your browser doesn't support this video format.";
+        return;
+      }
+
+      throw error;
+    }
   }
 
   onPlay() {
