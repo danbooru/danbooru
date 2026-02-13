@@ -1,19 +1,12 @@
 # frozen_string_literal: true
 
 class ArtistCommentary < ApplicationRecord
+  # this is the order in which the commentary form displays the tags
   COMMENTARY_TAGS = [
-    # this is the order in which the commentary form displays the tags
     "commentary",
     "check_commentary",
     "partial_commentary",
     "commentary_request",
-    "untranslatable_commentary",
-  ]
-
-  COMMENTARY_SUBTAGS = [
-    # these are the prioritized tags when prefilling the commentary form
-    "partial_commentary",
-    "check_commentary",
     "untranslatable_commentary",
   ]
 
@@ -161,16 +154,23 @@ class ArtistCommentary < ApplicationRecord
   include VersionMethods
 
   def commentary_tags
-    (COMMENTARY_SUBTAGS & post.tag_array).first || (post.tag_array & COMMENTARY_TAGS).first || "none"
+    if post.has_tag?("untranslatable_commentary")
+      # XXX This is at the end of the list, but it needs to be
+      # selected instead of `commentary` as they are used together.
+      "untranslatable_commentary"
+    else
+      (COMMENTARY_TAGS & post.tag_array).first || "none"
+    end
   end
 
   def commentary_tags=(value)
-    @commentary_tag = value if value.in?(COMMENTARY_TAGS)
+    @commentary_tag = value if value.in?(COMMENTARY_TAGS) || value == "none"
   end
 
   def tag_post
     return unless @commentary_tag.present?
-    post.tag_string = ((post.tag_array - COMMENTARY_TAGS.without(@commentary_tag)) << @commentary_tag).join(" ")
+    post.remove_tag(*COMMENTARY_TAGS)
+    post.add_tag(@commentary_tag) unless @commentary_tag == "none"
     post.save!
   end
 

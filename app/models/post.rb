@@ -656,12 +656,12 @@ class Post < ApplicationRecord
       tag_array.include?(tag)
     end
 
-    def add_tag(tag)
-      self.tag_string = "#{tag_string} #{tag}"
+    def add_tag(*tags)
+      self.tag_string = [tag_string, *tags].join(" ").strip
     end
 
-    def remove_tag(tag)
-      self.tag_string = (tag_array - Array(tag)).join(" ")
+    def remove_tag(*tags)
+      self.tag_string = (tag_array - tags).join(" ")
     end
 
     def tag_categories

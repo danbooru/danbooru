@@ -65,6 +65,13 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
         assert(@artcomm.post.has_tag?("partial_commentary"))
       end
 
+      should "remove tags if requested" do
+        @artcomm.post.update!(tag_string: "partial_commentary commentary")
+        @artcomm.update!(commentary_tags: "none")
+        assert_not(@artcomm.post.reload.has_tag?("commentary"))
+        assert_not(@artcomm.post.has_tag?("partial_commentary"))
+      end
+
       should "not add unrelated tags" do
         @artcomm.update(commentary_tags: "foo")
         assert_not(@artcomm.post.reload.has_tag?("foo"))
