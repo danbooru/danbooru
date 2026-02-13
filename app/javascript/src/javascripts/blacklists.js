@@ -162,7 +162,8 @@ class Post {
     this.post.classList.remove("blacklisted-hidden", "blacklisted-blurred");
     this.post.classList.add("blacklist-initialized", "blacklisted-active", this.blacklistClass);
 
-    let video = this.post.querySelector("video#image");
+    // XXX We should be calling pause() on the video player component instead of on the <video> itself, but the component may not be initialized yet.
+    let video = this.post.querySelector(".video-component video");
     if (video) {
       video.pause();
       video.currentTime = 0;
@@ -173,11 +174,6 @@ class Post {
   show() {
     this.post.classList.remove("blacklisted-active", "blacklisted-hidden", "blacklisted-blurred");
     this.post.classList.add("blacklist-initialized");
-
-    let video = this.post.querySelector("video#image");
-    if (video) {
-      video.play();
-    }
   }
 }
 

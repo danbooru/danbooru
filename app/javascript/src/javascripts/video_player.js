@@ -62,6 +62,7 @@ export default class VideoPlayer {
     this.$container.find("canvas, video").on("play", event => this.onPlay());
     this.$container.find("canvas, video").on("pause", event => this.onPause());
     this.$container.find("canvas, video").on("volumechange", event => this.onVolumeChange());
+    this.$container.find("canvas, video").on("error", event => this._error ??= event.target.error?.message ?? "An unknown error occurred while loading the video.");
     this.$container.find(".video-slider").on("pointerdown", event => this.onDragStart(event));
     this.$container.find(".video-slider").on("pointerup", event => this.onDragEnd(event));
     this.$container.find(".video-slider").on("input", event => this.onDrag(event));
@@ -73,8 +74,10 @@ export default class VideoPlayer {
     let quality = this.$container.data("quality");
     this.setQuality(quality);
 
-    // Ignore autoplay errors due to browser restrictions.
-    this.play().catch(() => {});
+    // Autoplay unless blacklisted. Ignore autoplay errors due to browser restrictions.
+    if (this.$container.closest(".blacklisted-active").length === 0) {
+      this.play().catch(() => {});
+    }
   }
 
   get state() {
