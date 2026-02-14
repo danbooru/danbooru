@@ -524,6 +524,59 @@ class MediaFileTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "Conversion of a ugoira" do
+      should "work for a ugoira with JPEG frames" do
+        MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") do |ugoira|
+          video = ugoira.convert
+
+          assert_equal([384, 384], ugoira.dimensions)
+          assert_equal([384, 384], video.dimensions)
+          assert_equal(10, ugoira.frame_count)
+          assert_equal(11, video.frame_count) # count the duplicate frame at the end
+          assert_equal([170] * 10, ugoira.frame_delays)
+          assert_equal([170] * 11, video.frame_durations)
+          assert_equal(1.7, ugoira.duration)
+          assert_equal(1.7, video.duration)
+          assert_equal("yuv420p", video.pix_fmt)
+          assert_equal(true, video.is_supported?)
+        end
+      end
+
+      should "work for a ugoira with PNG frames" do
+        MediaFile.open("test/files/ugoira/ugoira-100260240-png-danbooru.zip") do |ugoira|
+          video = ugoira.convert
+
+          assert_equal([370, 370], ugoira.dimensions)
+          assert_equal([370, 370], video.dimensions)
+          assert_equal(8, ugoira.frame_count)
+          assert_equal(9, video.frame_count) # count the duplicate frame at the end
+          assert_equal([125] * 8, ugoira.frame_delays)
+          assert_equal([125] * 9, video.frame_durations)
+          assert_equal(1.0, ugoira.duration)
+          assert_equal(1.0, video.duration)
+          assert_equal("yuv420p", video.pix_fmt)
+          assert_equal(true, video.is_supported?)
+        end
+      end
+
+      should "work for a ugoira with GIF frames" do
+        MediaFile.open("test/files/ugoira/ugoira-108469527-gif-danbooru.zip") do |ugoira|
+          video = ugoira.convert
+
+          assert_equal([300, 300], ugoira.dimensions)
+          assert_equal([300, 300], video.dimensions)
+          assert_equal(30, ugoira.frame_count)
+          assert_equal(31, video.frame_count) # count the duplicate frame at the end
+          assert_equal([70] * 30, ugoira.frame_delays)
+          assert_equal([70] * 31, video.frame_durations)
+          assert_equal(2.1, ugoira.duration)
+          assert_equal(2.1, video.duration)
+          assert_equal("yuv420p", video.pix_fmt)
+          assert_equal(true, video.is_supported?)
+        end
+      end
+    end
   end
 
   context "for an mp4 file " do
