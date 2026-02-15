@@ -121,9 +121,3 @@ body[data-current-user-is-approver="true"] .post-preview {
     border-color: var(--preview-has-children-color) var(--preview-flagged-color) var(--preview-flagged-color) var(--preview-has-parent-color);
   }
 }
-
-@media screen and (max-width: 660px) {
-  .post-preview-image {
-    border: none !important;
-  }
-}
