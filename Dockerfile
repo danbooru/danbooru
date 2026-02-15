@@ -56,7 +56,7 @@ EOF
   apt-get install -y --no-install-recommends \
     postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0t64 liblcms2-2 libpng16-16 libexpat1 \
-    libglib2.0-0 libgif7 libexif12 libheif1 libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
+    libglib2.0-0 libgif7 libexif12 libheif1 libx264-164 libx265-199 libsvtav1enc1d1 libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
     libreadline8t64 libarchive-zip-perl tini busybox less ncdu curl
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs mount procps python3 tzdata
@@ -141,21 +141,22 @@ EOS
 # Build FFmpeg. Output is in /usr/local.
 FROM build-base AS build-ffmpeg
 ARG FFMPEG_VERSION
-ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev"
+ARG FFMPEG_BUILD_DEPS="nasm libx264-dev libx265-dev libsvtav1enc-dev libvpx-dev libdav1d-dev zlib1g-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
-  --disable-ffplay --disable-network --disable-doc --disable-static --enable-shared \
-  --enable-libvpx --enable-libdav1d --enable-zlib \
+  --disable-ffplay --disable-network --disable-doc --disable-static --enable-shared --enable-gpl \
+  --enable-libx264 --enable-libx265 --enable-libsvtav1 --enable-libvpx --enable-libdav1d --enable-zlib \
   --disable-muxers \
-    --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=image2 --enable-muxer=null \
+    --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=matroska --enable-muxer=image2 --enable-muxer=null \
   --disable-demuxers \
     --enable-demuxer=mov,mp4,m4a,3gp,3g2,mj2 --enable-demuxer=matroska,webm --enable-demuxer=image2 \
     --enable-demuxer=apng --enable-demuxer=gif --enable-demuxer=concat \
   --disable-filters \
     --enable-filter=scale --enable-filter=thumbnail --enable-filter=silencedetect --enable-filter=ebur128 \
     --enable-filter=aresample --enable-filter=anull --enable-filter=null --enable-filter=copy \
+    --enable-filter=pad --enable-filter=fillborders \
   --disable-encoders \
-    --enable-encoder=libvpx_vp8 --enable-encoder=libvpx_vp9 --enable-encoder=png --enable-encoder=null \
-    --enable-encoder=wrapped_avframe --enable-encoder=pcm_s16le \
+    --enable-encoder=libvpx_vp8 --enable-encoder=libvpx_vp9 --enable-encoder=libx264 --enable-encoder=libx265 --enable-encoder=libsvtav1 \
+    --enable-encoder=png --enable-encoder=null --enable-encoder=wrapped_avframe --enable-encoder=pcm_s16le \
   --disable-decoders \
     --enable-decoder=vp8 --enable-decoder=vp9 --enable-decoder=h264 --enable-decoder=hevc --enable-decoder=libdav1d \
     --enable-decoder=mpeg4 --enable-decoder=mjpeg --enable-decoder=png --enable-decoder=apng --enable-decoder=gif \

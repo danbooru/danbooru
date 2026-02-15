@@ -1,0 +1,83 @@
+#!/usr/bin/env ruby
+
+APP_PATH = File.expand_path("../config/application", __dir__)
+require_relative "../config/environment"
+
+require "optparse"
+
+progname = File.basename($PROGRAM_NAME)
+options = {}
+
+parser = OptionParser.new do |opts|
+  opts.banner = <<~EOS
+    #{progname} - Convert media files to a different format
+
+    Usage: #{progname} [options] FILE
+  EOS
+
+  opts.on("-o FILE", "--output=FILE", "Write output to FILE (default: out.webm)") do |file|
+    options[:output] = file
+  end
+
+  opts.on("-f", "--format=FORMAT", %i[mp4 webm mkv], "Output file format (mp4, webm, or mkv)") do |format|
+    options[:format] = format.to_sym
+  end
+
+  opts.on("-c", "--codec=CODEC", %i[h264 h265 vp8 vp9 av1], "Video codec (h264, h265, vp8, vp9, or av1)") do |codec|
+    options[:codec] = codec.to_sym
+  end
+
+  opts.on("-q", "--quality=QUALITY", %i[high lossless], "Quality level (high or lossless)") do |quality|
+    options[:quality] = quality.to_sym
+  end
+
+  opts.on("-s", "--scale=WxH", "Resize to given dimensions") do |scale|
+    options[:width] = scale.split("x").first.to_i
+    options[:height] = scale.split("x").last.to_i
+  end
+
+  opts.on("--pix-fmt=PIX_FMT", %i[yuv420p yuva420p yuv444p], "Pixel format (yuv420p, yuva420p, or yuv444p)") do |pix_fmt|
+    options[:pix_fmt] = pix_fmt.to_sym
+  end
+
+  opts.on("-t", "--[no-]two-pass", "Enable two-pass encoding (slower but higher quality). Default: yes for vp8/vp9, no for h264/h265/av1") do |two_pass|
+    options[:two_pass] = two_pass
+  end
+
+  opts.on("-h", "--help", "Show this help message") do
+    puts opts
+    exit
+  end
+end
+
+begin
+  parser.parse!
+rescue OptionParser::ParseError => e
+  warn e.message
+  exit 1
+end
+
+if ARGV.empty?
+  warn parser
+  exit 1
+end
+
+input_file = MediaFile.open(ARGV[0])
+output_path = options[:output] || "out.webm"
+format = options[:format] || File.extname(output_path).delete_prefix(".").to_sym
+
+video = nil
+time = Benchmark.realtime do
+  video = input_file.convert(format: format, **options.slice(:codec, :quality, :width, :height, :pix_fmt, :two_pass))
+  FileUtils.cp(video.path, output_path)
+rescue => e
+  warn "Error: #{e.message}"
+  exit 1
+end
+
+input_file_size = ActiveSupport::NumberHelper.number_to_human_size(input_file.size)
+output_file_size = ActiveSupport::NumberHelper.number_to_human_size(File.size(output_path))
+compression_ratio = File.size(output_path).to_f / input_file.size
+speed = input_file.duration / time
+
+puts "#{output_path} - #{video.width}x#{video.height} #{output_file_size}/#{input_file_size} (#{compression_ratio.round(2)}x) in #{time.round(3)}s/#{input_file.duration}s (#{speed.round(2)}x encoding speed)"

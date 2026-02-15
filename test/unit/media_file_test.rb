@@ -526,54 +526,100 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     context "Conversion of a ugoira" do
-      should "work for a ugoira with JPEG frames" do
-        MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") do |ugoira|
-          video = ugoira.convert
+      context "with odd dimensions" do
+        setup do
+          @frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
+          @ugoira = MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: @frame_delays)
+        end
 
-          assert_equal([384, 384], ugoira.dimensions)
-          assert_equal([384, 384], video.dimensions)
-          assert_equal(10, ugoira.frame_count)
-          assert_equal(11, video.frame_count) # count the duplicate frame at the end
-          assert_equal([170] * 10, ugoira.frame_delays)
-          assert_equal([170] * 11, video.frame_durations)
-          assert_equal(1.7, ugoira.duration)
-          assert_equal(1.7, video.duration)
-          assert_equal("yuv420p", video.pix_fmt)
-          assert_equal(true, video.is_supported?)
+        should "pad the dimensions for h264, h265, and av1" do
+          assert_equal([64, 64], @ugoira.convert(width: 63, height: 63, format: :mp4, codec: :h264).dimensions)
+          assert_equal([64, 64], @ugoira.convert(width: 63, height: 63, format: :mp4, codec: :h265).dimensions)
+          assert_equal([64, 64], @ugoira.convert(width: 63, height: 63, format: :webm, codec: :av1).dimensions)
+        end
+
+        should "not pad the dimensions for vp8 or vp9" do
+          assert_equal([63, 63], @ugoira.convert(width: 63, height: 63, format: :webm, codec: :vp8).dimensions)
+          assert_equal([63, 63], @ugoira.convert(width: 63, height: 63, format: :webm, codec: :vp9).dimensions)
         end
       end
 
-      should "work for a ugoira with PNG frames" do
-        MediaFile.open("test/files/ugoira/ugoira-100260240-png-danbooru.zip") do |ugoira|
-          video = ugoira.convert
+      formats = { mp4: %i[h264 hevc vp9 av1], webm: %i[vp8 vp9] }
 
-          assert_equal([370, 370], ugoira.dimensions)
-          assert_equal([370, 370], video.dimensions)
-          assert_equal(8, ugoira.frame_count)
-          assert_equal(9, video.frame_count) # count the duplicate frame at the end
-          assert_equal([125] * 8, ugoira.frame_delays)
-          assert_equal([125] * 9, video.frame_durations)
-          assert_equal(1.0, ugoira.duration)
-          assert_equal(1.0, video.duration)
-          assert_equal("yuv420p", video.pix_fmt)
-          assert_equal(true, video.is_supported?)
+      formats.each do |format, codecs|
+        codecs.each do |codec|
+          context "with JPEG frames" do
+            should "work when converting to a #{codec} #{format}" do
+              MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") do |ugoira|
+                video = ugoira.convert(format: format, codec: codec)
+
+                assert_equal(format, video.file_ext)
+                assert_equal(codec, video.video_codec.to_sym)
+                assert_equal([384, 384], ugoira.dimensions)
+                assert_equal([384, 384], video.dimensions)
+                assert_equal(10, ugoira.frame_count)
+                assert_equal(10, video.frame_count)
+                assert_equal([170] * 10, ugoira.frame_delays)
+                assert_equal([170] * 10, video.frame_durations)
+                assert_equal(1.7, ugoira.duration)
+                assert_equal(1.7, video.duration)
+                assert_equal(1.7, video.playback_duration)
+                assert_equal(codec.in?(%i[h264 hevc]) ? "yuvj420p" : "yuv420p", video.pix_fmt)
+                assert_equal(true, video.is_supported?)
+              end
+            end
+          end
+
+          context "with PNG frames" do
+            should "work when converting to a #{codec} #{format}" do
+              MediaFile.open("test/files/ugoira/ugoira-100260240-png-danbooru.zip") do |ugoira|
+                video = ugoira.convert(format: format, codec: codec)
+
+                assert_equal(format, video.file_ext)
+                assert_equal(codec, video.video_codec.to_sym)
+                assert_equal([370, 370], ugoira.dimensions)
+                assert_equal([370, 370], video.dimensions)
+                assert_equal(8, ugoira.frame_count)
+                assert_equal(8, video.frame_count)
+                assert_equal(1.0, ugoira.duration)
+                assert_equal(1.0, video.duration)
+                assert_equal([125] * 8, ugoira.frame_delays)
+                assert_equal([125] * 8, video.frame_durations)
+                assert_equal("yuv420p", video.pix_fmt)
+                assert_equal(true, video.is_supported?)
+              end
+            end
+          end
+
+          context "with GIF frames" do
+            should "work when converting to a #{codec} #{format}" do
+              MediaFile.open("test/files/ugoira/ugoira-108469527-gif-danbooru.zip") do |ugoira|
+                video = ugoira.convert(format: format, codec: codec)
+
+                assert_equal(format, video.file_ext)
+                assert_equal(codec, video.video_codec.to_sym)
+                assert_equal([300, 300], ugoira.dimensions)
+                assert_equal([300, 300], video.dimensions)
+                assert_equal(30, ugoira.frame_count)
+                assert_equal(30, video.frame_count)
+                assert_equal([70] * 30, ugoira.frame_delays)
+                assert_equal([70] * 30, video.frame_durations)
+                assert_equal(2.1, ugoira.duration)
+                assert_equal(2.1, video.duration)
+                assert_equal("yuv420p", video.pix_fmt)
+                assert_equal(true, video.is_supported?)
+              end
+            end
+          end
         end
-      end
 
-      should "work for a ugoira with GIF frames" do
-        MediaFile.open("test/files/ugoira/ugoira-108469527-gif-danbooru.zip") do |ugoira|
-          video = ugoira.convert
+        should "generate the correct frame durations for a variable frame rate ugoira converted to #{format}" do
+          ugoira = MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: [1000, 2000, 3000, 4000, 5000])
+          video = ugoira.convert(format: format)
 
-          assert_equal([300, 300], ugoira.dimensions)
-          assert_equal([300, 300], video.dimensions)
-          assert_equal(30, ugoira.frame_count)
-          assert_equal(31, video.frame_count) # count the duplicate frame at the end
-          assert_equal([70] * 30, ugoira.frame_delays)
-          assert_equal([70] * 31, video.frame_durations)
-          assert_equal(2.1, ugoira.duration)
-          assert_equal(2.1, video.duration)
-          assert_equal("yuv420p", video.pix_fmt)
-          assert_equal(true, video.is_supported?)
+          assert_equal([1000, 2000, 3000, 4000, 5000], video.frame_durations)
+          assert_equal(15.0, video.duration)
+          assert_equal(15.0, video.playback_duration)
         end
       end
     end

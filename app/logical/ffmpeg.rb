@@ -28,7 +28,7 @@ class FFmpeg
     # https://ffmpeg.org/ffmpeg.html#Main-options
     # https://ffmpeg.org/ffmpeg-filters.html#thumbnail
     # "-vf 'select=eq(n\\,0)+eq(key\\,1)+gt(scene\\,0.015),loop=loop=-1:size=2,trim=start_frame=1' -frames:v 1 -f image2"
-    output = shell!("ffmpeg -i #{file.path.shellescape} -vf thumbnail=300 -frames:v 1 -y #{vp.path.shellescape}")
+    FFmpeg.shell!("ffmpeg -i #{file.path.shellescape} -vf thumbnail=300 -frames:v 1 -y #{vp.path.shellescape}")
 
     MediaFile.open(vp)
   end
@@ -47,7 +47,7 @@ class FFmpeg
   #
   # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
   memoize def metadata
-    output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams -show_packets -show_frames #{file.path.shellescape}")
+    output = FFmpeg.shell!("ffprobe -v quiet -print_format json -show_format -show_streams -show_packets -show_frames #{file.path.shellescape}")
     output.parse_json || {}
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
@@ -82,13 +82,9 @@ class FFmpeg
   #   streams, this will be the frame count of the longest stream. Note that a static AVIF image can contain up to four
   #   streams: one for the static image, one for an auxiliary video, and an optional alpha channel stream for each.
   memoize def frame_count
-    if video_streams.pluck(:nb_frames).compact.present?
-      video_streams.pluck(:nb_frames).map(&:to_i).max
-    elsif playback_info.key?(:frame)
-      playback_info[:frame].to_i
-    else
-      nil
-    end
+    frame_count = video_streams.pluck(:frames).map(&:size).max
+
+    frame_count || playback_info[:frame].to_i
   end
 
   # @return [Array<Integer>] The duration of each video frame in milliseconds. The durations may be different if the
@@ -96,7 +92,7 @@ class FFmpeg
   #   are no video streams, this will be an empty array.
   memoize def frame_durations
     # video_stream[:frames].pluck(:duration) # XXX Duration is only available for .webm files, not .mp4
-    video_stream[:frames].pluck(:best_effort_timestamp_time).push(playback_duration).each_cons(2).map do |before, after|
+    video_stream[:frames].pluck(:best_effort_timestamp_time).push(duration).each_cons(2).map do |before, after|
       ((after.to_f - before.to_f) * 1000).round
     end
   end
@@ -304,7 +300,7 @@ class FFmpeg
     # https://ffmpeg.org/ffmpeg-filters.html#ebur128-1
     # XXX `-c copy` is faster, but it doesn't decompress the stream so it can't detect corrupt videos.
     output, progress = Danbooru::Tempfile.create do |tempfile|
-      output = shell!("ffmpeg -hide_banner -i #{file.path.shellescape} -progress #{tempfile.path} -af silencedetect=noise=0.0001:duration=0.25s,ebur128=metadata=1:dualmono=true:peak=true -f null /dev/null")
+      output = FFmpeg.shell!("ffmpeg -hide_banner -i #{file.path.shellescape} -progress #{tempfile.path} -af silencedetect=noise=0.0001:duration=0.25s,ebur128=metadata=1:dualmono=true:peak=true -f null /dev/null")
       [output, tempfile.read]
     end
 
@@ -364,14 +360,14 @@ class FFmpeg
     { error: e.message.strip }.with_indifferent_access
   end
 
-  def shell!(command)
+  def self.shell!(command)
     program = command.shellsplit.first
     output, status = Open3.capture2e(command)
-    raise Error, "#{program} failed: #{parse_errors(output)}" if !status.success?
-    output.force_encoding("ASCII-8BIT")
-  end
+    if !status.success?
+      errors = output.split(/\r?\n/).grep(/^(Error|\[\w+ @ 0x\h+\])/).uniq.join("\n")
+      raise Error, "#{program} failed: #{errors}"
+    end
 
-  def parse_errors(output)
-    output.split(/\r?\n/).grep(/^(Error|\[\w+ @ 0x\h+\])/).uniq.join("\n")
+    output.force_encoding("ASCII-8BIT")
   end
 end
