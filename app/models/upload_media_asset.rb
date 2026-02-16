@@ -135,10 +135,9 @@ class UploadMediaAsset < ApplicationRecord
   # Calls `process_upload!`
   def async_process_upload!
     if file.present?
-      ProcessUploadMediaAssetJob.perform_now(self)
-    else
-      ProcessUploadMediaAssetJob.perform_later(self)
+      storage_service.store(file, staged_file_path)
     end
+    ProcessUploadMediaAssetJob.perform_later(self)
   end
 
   def process_upload!
@@ -146,6 +145,9 @@ class UploadMediaAsset < ApplicationRecord
 
     if file.present?
       media_file = MediaFile.open(file)
+    elsif file_upload?
+      staged_file = storage_service.open(staged_file_path)
+      media_file = MediaFile.open(staged_file)
     else
       media_file = source_extractor.download_file!(source_url)
     end
@@ -160,6 +162,15 @@ class UploadMediaAsset < ApplicationRecord
     update!(status: :failed, error: e.message)
   ensure
     media_file&.close
+    storage_service.delete(staged_file_path) if file_upload?
+  end
+
+  def storage_service
+    Danbooru.config.storage_manager
+  end
+
+  def staged_file_path
+    "tmp/upload-media-asset/#{id}"
   end
 
   def update_upload_status
