@@ -59,7 +59,9 @@ class Artist < ApplicationRecord
 
       self.urls = string.to_s.scan(/[^[:space:]]+/).map do |url|
         is_active, url = ArtistURL.parse_prefix(url)
-        self.urls.find_or_initialize_by(url: url, is_active: is_active)
+        artist_url = self.urls.find_or_initialize_by(url: url)
+        artist_url.is_active = is_active
+        artist_url
       end.uniq(&:url)
 
       self.url_string_changed = (url_string_was != url_string)
