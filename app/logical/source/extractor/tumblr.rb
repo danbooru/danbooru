@@ -89,11 +89,6 @@ class Source::Extractor
       end.uniq
     end
 
-    def normalize_tag(tag)
-      tag = tag.tr("-", "_")
-      super(tag)
-    end
-
     # The commentary with reblogs presented as a linear list of quotes, rather than as nested quotes.
     def linear_artist_commentary_desc
       return artist_commentary_desc if post[:trail].blank?
