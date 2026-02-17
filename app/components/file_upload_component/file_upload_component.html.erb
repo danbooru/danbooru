@@ -1,10 +1,10 @@
-<div class="file-upload-component relative card w-md max-w-full" data-drop-target="<%= j drop_target %>" data-max-file-size="<%= j max_file_size %>" data-max-files-per-upload="<%= j max_files_per_upload %>">
+<div class="file-upload-component relative card w-md max-w-full border-0" data-drop-target="<%= j drop_target %>" data-max-file-size="<%= j max_file_size %>" data-max-files-per-upload="<%= j max_files_per_upload %>">
   <%= simple_form_for(Upload.new, url: uploads_path(format: :json), html: { class: "flex flex-col !m-0", autocomplete: "off" }, remote: true) do |f| %>
     <%= f.input :files, as: :file, wrapper_html: { class: "hidden" }, input_html: { "multiple": max_files_per_upload > 1 }  %>
 
-    <div class="rounded-t-lg p-4 pb-8 max-h-360px thin-scrollbar source">
+    <div class="rounded-t-lg p-4 pb-8 max-h-360px thin-scrollbar bg-dropzone">
       <label id="source-label" class="w-full text-center mb-1 block !font-normal">Paste URL here</label>
-      <%= f.input :source, label: false, as: :string, placeholder: "Paste a pixiv link, Tweet, etc", input_html: { value: url, class: "text-center bg:card" }, wrapper_html: { class: "px-4 text-center !m-0" } %>
+      <%= f.input :source, label: false, as: :string, placeholder: "Paste a pixiv link, tweet, etc", input_html: { value: url, class: "text-center bg:card" }, wrapper_html: { class: "px-4 text-center !m-0" } %>
       <span class="hint text-muted text-xs text-center w-full block mt-1">
         <%= link_to_wiki "See here", "help:bookmarklet_notice" %> for a list of supported sites.
       </span>
@@ -13,7 +13,7 @@
     </div>
 
 
-    <div class="dropzone-container relative input text-center rounded-t-lg cursor-pointer p-4 pt-2 max-h-360px thin-scrollbar !m-0">
+    <div class="dropzone-container relative input text-center rounded-b-lg cursor-pointer p-4 pt-2 max-h-360px thin-scrollbar !m-0">
       <p class="text-center mb-2">&mdash; or &mdash;</p>
 
       <div class="dropzone-hint">
@@ -32,7 +32,7 @@
         <span class="dz-size" data-dz-size></span>
       </div>
 
-      <div class="dz-progress absolute bottom-0 left-0 w-full h-1">
+      <div class="dz-progress absolute bottom-0 left-0 w-full h-1 rounded-b-lg overflow-hidden">
         <div class="dz-upload h-1" data-dz-uploadprogress></div>
       </div>
 
