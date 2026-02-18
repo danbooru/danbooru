@@ -8,6 +8,7 @@ class UsersController < ApplicationController
 
   def new
     @user = authorize User.new
+    @url = params.dig(:user, :url).presence || params[:url].presence || root_path
     respond_with(@user)
   end
 
@@ -65,12 +66,13 @@ class UsersController < ApplicationController
   def create
     user_signup = UserSignup.new(request)
     @user = authorize(user_signup.user)
+    @url = params.dig(:user, :url).presence || params[:url].presence || root_path
 
     if @user.save(context: [:create, :deliverable])
       set_current_user
     end
 
-    respond_with(@user)
+    respond_with(@user, location: @url)
   end
 
   def update
