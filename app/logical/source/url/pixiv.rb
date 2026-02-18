@@ -7,7 +7,7 @@ module Source
     def self.match?(url)
       return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::PixivComic.match?(url) || Source::URL::PixivFactory.match?(url) || Source::URL::Booth.match?(url)
 
-      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl])
+      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net])
     end
 
     def parse
@@ -78,7 +78,7 @@ module Source
 
       # https://www.pixiv.net/en/artworks/46324488
       # https://www.pixiv.net/artworks/46324488
-      in _, "pixiv.net", *, "artworks", work_id
+      in _, ("pixiv.net" | "phixiv.net"), *, "artworks", work_id
         @work_id = work_id
 
       # https://www.pixiv.net/novel/show.php?id=9434677
@@ -102,7 +102,7 @@ module Source
       # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
-      in _, "pixiv.net", "member_illust.php" if params[:illust_id].present?
+      in _, ("pixiv.net" | "phixiv.net"), "member_illust.php" if params[:illust_id].present?
         @work_id = params[:illust_id]
 
       # https://www.pixiv.net/member.php?id=339253
