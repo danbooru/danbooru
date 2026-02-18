@@ -171,4 +171,8 @@ class UploadMediaAsset < ApplicationRecord
       end
     end
   end
+
+  def self.available_includes
+    [:upload, :media_asset, :post]
+  end
 end

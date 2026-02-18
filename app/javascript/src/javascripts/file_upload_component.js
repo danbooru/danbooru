@@ -108,7 +108,7 @@ export default class FileUploadComponent {
   async pollStatus(upload) {
     this.loadingStart();
 
-    while (upload.media_asset_count <= 1 && upload.status !== "completed" && upload.status !== "error") {
+    while (upload.media_asset_count == 0 && upload.status !== "error") {
       await delay(FileUploadComponent.POLL_DELAY);
       upload = await $.get(`/uploads/${upload.id}.json`);
     }

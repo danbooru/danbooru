@@ -1,0 +1,100 @@
+<% media_asset = upload_media_asset.media_asset %>
+
+<%= render MediaAssetComponent.new(media_asset: media_asset, current_user: CurrentUser.user, outer_classes: "h-full top-0", inner_classes: "mx-auto", dynamic_height: false, scroll_on_zoom: true) do |component| %>
+  <% component.with_footer do %>
+    <% if policy(media_asset).can_see_image? %>
+      <div class="flex flex-wrap flex-none gap-2 items-center justify-center text-xs my-1">
+        <% if media_asset.source_urls.present? %>
+          <span>
+            <% media_asset.source_urls.take(5).each do |url| %>
+              <%= external_link_to url, external_site_icon(Source::URL.site_name(url), class: "h-4"), title: url, class: "inline-block align-top" %>
+            <% end %>
+          </span>
+        <% end %>
+
+        <%= link_to_media_asset media_asset %>
+
+        <span>
+          <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
+            <% menu.with_item(hide_on_click: true) do %>
+              <%= link_to "#{media_asset.original.file_url}?download=1", download: media_asset.original.file_name do %>
+                <%= download_icon %> Download
+              <% end %>
+            <% end %>
+
+            <% menu.with_item(hide_on_click: true) do %>
+              <%= link_to "javascript:void(0)", class: "media-asset-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('asset ##{j media_asset.id}')" do %>
+                <%= hashtag_icon %> Copy ID
+              <% end %>
+            <% end %>
+
+            <% menu.with_item do %>
+              <hr class="border">
+            <% end %>
+
+            <% menu.with_item do %>
+              <%= external_link_to "https://saucenao.com/search.php?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                <%= search_icon %> SauceNAO
+              <% end %>
+            <% end %>
+
+            <% menu.with_item do %>
+              <%= external_link_to "https://ascii2d.net/search/url/#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                <%= search_icon %> Ascii2D
+              <% end %>
+            <% end %>
+
+            <% menu.with_item do %>
+              <%= external_link_to "https://yandex.com/images/search?rpt=imageview&url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                <%= search_icon %> Yandex
+              <% end %>
+            <% end %>
+
+            <% menu.with_item do %>
+              <%= external_link_to "https://lens.google.com/uploadbyurl?url=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                <%= search_icon %> Google
+              <% end %>
+            <% end %>
+
+            <% menu.with_item do %>
+              <%= external_link_to "https://www.bing.com/images/searchbyimage?cbir=sbi&imgurl=#{CGI.escape(media_asset.original.file_url)}", target: "_blank" do %>
+                <%= search_icon %> Bing
+              <% end %>
+            <% end %>
+
+            <% menu.with_item do %>
+              <%= link_to iqdb_queries_path(search: { media_asset_id: media_asset.id }), target: "_blank" do %>
+                <%= search_icon %> <%= Danbooru.config.app_name %>
+              <% end %>
+            <% end %>
+          <% end %>
+        </span>
+
+        <div class="inline-block">
+          <% if upload_media_asset.file_upload? %>
+            <%= external_link_to "https://saucenao.com/search.php?url=#{Danbooru::URL.escape(media_asset.original.file_url)}", "No Source", target: "_blank", class: "upload-no-source-warning button-danger button-xs" %>
+          <% elsif upload_media_asset.bad_link? %>
+            <%= link_to "Bad Source", wiki_page_path("bad_link"), class: "upload-source-warning button-danger button-xs" %>
+          <% end %>
+
+          <% if upload_media_asset.image_sample? %>
+            <%= link_to "Image Sample", wiki_page_path("image_sample"), class: "upload-sample-warning button-danger button-xs" %>
+          <% end %>
+
+          <% if media_asset.is_ai_generated? %>
+            <%= link_to "AI-Generated", wiki_page_path("ai-generated"), class: "upload-ai-warning button-danger button-xs" %>
+          <% end %>
+
+          <% duplicates = Post.joins(:media_asset).where("media_assets.pixel_hash": media_asset.pixel_hash).load %>
+          <% if duplicates.size == 1 %>
+            <%= link_to "Pixel-Perfect Duplicate", duplicates.first, class: "upload-pixel-perfect-duplicate-warning button-danger button-xs" %>
+          <% elsif duplicates.size > 1 %>
+            <a class="upload-duplicate-warning button-danger button-xs" href="javascript:$('a.tab.similar-tab').get(0).click()">Pixel-Perfect Duplicate</a>
+          <% else %>
+            <a class="upload-duplicate-warning button-danger button-xs hidden" href="javascript:$('a.tab.similar-tab').get(0).click()">Duplicate</a>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
