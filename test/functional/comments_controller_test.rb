@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class CommentsControllerTest < ActionDispatch::IntegrationTest
   context "A comments controller" do
@@ -26,6 +26,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           assert_select "div#post_#{@post.id}", 1
           assert_select "div#post_#{@post.id} .comment", 1
           assert_select "div#post_#{@post.id} .show-all-comments-link", 0
+
+          assert_select ".new-comment a", count: 1, text: "Leave a comment"
         end
 
         should "not bump posts with nonbumping comments" do

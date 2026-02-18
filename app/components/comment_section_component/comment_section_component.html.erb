@@ -11,10 +11,12 @@
     <% end %>
   </div>
 
-  <% if policy(Comment).create? %>
-    <div class="new-comment">
-      <p><%= link_to "Post comment", new_comment_path(comment: { post_id: post.id }), class: "expand-comment-response" %></p>
+  <div class="new-comment">
+    <% if policy(Comment).create? %>
+      <p><%= link_to "Leave a comment", new_comment_path(comment: { post_id: post.id }), class: "expand-comment-response" %></p>
       <%= render "comments/form", comment: post.comments.new, hidden: true %>
-    </div>
-  <% end %>
+    <% elsif current_user.is_anonymous? %>
+      <p><%= link_to "Leave a comment", login_path(url: request.fullpath) %></p>
+    <% end %>
+  </div>
 </div>
