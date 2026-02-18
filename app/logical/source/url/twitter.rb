@@ -169,4 +169,10 @@ class Source::URL::Twitter < Source::URL
       "https://x.com/i/user/#{user_id}"
     end
   end
+
+  def self.tag_url_for(tag_name, **_args)
+    tag_name = Danbooru::URL.escape(tag_name)
+
+    "https://x.com/hashtag/#{tag_name}"
+  end
 end

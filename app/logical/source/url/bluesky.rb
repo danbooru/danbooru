@@ -69,4 +69,10 @@ class Source::URL::Bluesky < Source::URL
       "https://bsky.app/profile/#{user_did}"
     end
   end
+
+  def self.tag_url_for(tag_name, **_args)
+    tag_name = Danbooru::URL.escape(tag_name)
+
+    "https://bsky.app/hashtag/#{tag_name}"
+  end
 end

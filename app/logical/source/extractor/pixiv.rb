@@ -132,21 +132,21 @@ module Source
         end
 
         tags = api_tags.map do |tag|
-          [tag, "https://www.pixiv.net/tags/#{Danbooru::URL.escape(tag)}/#{tag_type}"]
+          [tag, Source::URL::Pixiv.tag_url_for(tag, tag_type)]
         end
 
         if api_illust["aiType"] == 2
           # XXX There's no way to search for posts with the AI flag on Pixiv. The "AI" tag is the closest equivalent.
-          tags += [["AI", "https://www.pixiv.net/tags/AI/#{tag_type}"]]
+          tags += [["AI", Source::URL::Pixiv.tag_url_for("AI", tag_type)]]
         end
 
         if api_illust["request"].present?
           # XXX There's no way to search for posts commissioned via Pixiv Requests on Pixiv. The "依頼絵" ("commission") tag is the closest equivalent.
-          tags += [["pixiv_commission", "https://www.pixiv.net/tags/依頼絵/#{tag_type}"]]
+          tags += [["pixiv_commission", Source::URL::Pixiv.tag_url_for("依頼絵", tag_type)]]
         end
 
         if api_response["isOriginal"].present?
-          tags += [["original", "https://www.pixiv.net/tags/オリジナル/#{tag_type}"]]
+          tags += [["original", Source::URL::Pixiv.tag_url_for("オリジナル", tag_type)]]
         end
 
         tags
@@ -205,11 +205,11 @@ module Source
           userId: api_response[:userId].to_i,
           createDate: api_response[:createDate], # when the ugoira was first uploaded
           uploadDate: api_response[:uploadDate], # when the ugoira was last revised (same as the creation date if not revised)
-        })
+        },)
       end
 
       def translate_tag(tag)
-        translated_tags = super(tag)
+        translated_tags = super
 
         if translated_tags.empty? && tag.include?("/")
           translated_tags = tag.split("/").flat_map { |translated_tag| super(translated_tag) }

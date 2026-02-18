@@ -2,7 +2,7 @@
 
 # This component is used to render the other names list on wiki pages.
 class ExternalTagLinkComponent < ApplicationComponent
-  SITE_LIST = Danbooru.config.tag_lookup_sites
+  SITE_LIST = Danbooru.config.tag_lookup_sites.map(&:titleize).map { |site| [site, "Source::URL::#{site}".safe_constantize] }
 
   attr_reader :name
 

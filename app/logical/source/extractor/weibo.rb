@@ -52,7 +52,7 @@ module Source
         tags = page_json[:text]&.parse_html&.css(".surl-text").to_a.map(&:text).select { |text| text&.match?(/^\#.*\#$/) }
         tags.map do |tag|
           tag = tag.delete_prefix("#").delete_suffix("#")
-          [tag, "https://s.weibo.com/weibo?q=#{Danbooru::URL.escape("##{tag}#")}"]
+          [tag, Source::URL::Weibo.tag_url_for(tag)]
         end
       end
 

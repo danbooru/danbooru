@@ -4,10 +4,10 @@
       <%= tag.span name, href: "javascript:void(0)", class: "link-color hover:link-color wiki-other-name" %>
     <% end %>
 
-    <% SITE_LIST.each do |site, func| %>
+    <% SITE_LIST.each do |site_name, site| %>
       <% menu.with_item do %>
-        <%= external_link_to func.call(name), target: "_blank" do %>
-          <%= external_site_icon site.to_s %> <%= site %>
+        <%= external_link_to site.tag_url_for(name), target: "_blank" do %>
+          <%= external_site_icon site_name %> <%= site_name %>
         <% end %>
       <% end %>
     <% end %>

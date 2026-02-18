@@ -77,7 +77,7 @@ class Source::Extractor
 
     def tags
       graphql_tweet.dig(:legacy, :entities, :hashtags).to_a.map do |hashtag|
-        [hashtag[:text], "https://x.com/hashtag/#{hashtag[:text]}"]
+        [hashtag[:text], Source::URL::Twitter.tag_url_for(hashtag[:text])]
       end
     end
 
