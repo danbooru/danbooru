@@ -223,6 +223,7 @@ export default class UgoiraRenderer {
     this._canvas = canvas;      // The <canvas> element the ugoira is drawn on.
     this._previousTime = null;  // The time in seconds of the last requestAnimationFrame call. Used for measuring elapsed time.
     this._currentTime = 0;      // The current playback time in seceonds (e.g 3.2 means we're 3.2 seconds into the ugoira).
+    this._playbackRate = 1.0;   // The speed multiplier for playback (e.g. 2 means play at double speed).
     this._animationId = null;   // The handle for the requestAnimationFrame callback that updates the canvas.
     this._loadedFrame = null;   // The frame number of the latest frame that is ready to be drawn.
     this._currentFrame = null;  // The frame that is currently being displayed on the canvas.
@@ -259,7 +260,7 @@ export default class UgoiraRenderer {
   }
 
   // Plays the ugoira. Starts the callback that renders the ugoira frames.
-  play() {
+  async play() {
     this.paused = false;
 
     this._previousTime = null;
@@ -280,7 +281,7 @@ export default class UgoiraRenderer {
     let now = this.now();
     let elapsedTime = now - (this._previousTime ?? now);
 
-    this.currentTime = (this.currentTime + elapsedTime) % this.duration;
+    this.currentTime = (this.currentTime + elapsedTime * this.playbackRate) % this.duration;
     this._previousTime = now;
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
   }
@@ -332,5 +333,32 @@ export default class UgoiraRenderer {
   // Returns the current time in seconds.
   now() {
     return performance.now() / 1000;
+  }
+
+  get volume() {
+    return 0;
+  }
+
+  set volume(value) {
+  }
+
+  get muted() {
+    return true;
+  }
+
+  set muted(value) {
+  }
+
+  get playbackRate() {
+    return this._playbackRate;
+  }
+
+  set playbackRate(rate) {
+    let oldRate = this._playbackRate;
+    this._playbackRate = rate;
+
+    if (rate !== oldRate) {
+      this.triggerEvent("ratechange");
+    }
   }
 }

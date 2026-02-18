@@ -6,7 +6,7 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def show?
-    policy(record.topic).show?
+    policy(record.topic).show? && (!record.is_deleted? || show_deleted?)
   end
 
   def create?
@@ -38,7 +38,7 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def show_deleted?
-    !record.is_deleted? || user.is_moderator?
+    user.is_moderator?
   end
 
   def can_see_updater_notice?

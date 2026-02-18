@@ -7,22 +7,6 @@ class Source::Extractor
       SiteCredential.for_site("Twitter").present?
     end
 
-    # List of hashtag suffixes attached to tag other names
-    # Ex: 西住みほ生誕祭2019 should be checked as 西住みほ
-    # The regexes will not match if there is nothing preceding
-    # the pattern to avoid creating empty strings.
-    COMMON_TAG_REGEXES = [
-      /(?<!\A)生誕祭(?:\d*)\z/,
-      /(?<!\A)誕生祭(?:\d*)\z/,
-      /(?<!\A)版もうひとつの深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)版深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)版深夜の真剣お絵かき60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)版深夜のお絵描き60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)版真剣お絵描き60分一本勝(?:_\d+)?\z/,
-      /(?<!\A)版お絵描き60分一本勝負(?:_\d+)?\z/,
-    ]
-
     def image_urls
       # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
       if parsed_url.full_image_url.present?
@@ -71,6 +55,21 @@ class Source::Extractor
       graphql_tweet.dig(:core, :user_results, :result, :legacy, :name)
     end
 
+    def graphql_tweet_created_at
+      date_string = graphql_tweet.dig(:legacy, :created_at)
+      if date_string.present?
+        Time.strptime(date_string, "%a %b %d %H:%M:%S %z %Y").utc
+      end
+    end
+
+    def published_at
+      if parsed_url.image_url?
+        parsed_url.parsed_date
+      else
+        graphql_tweet_created_at || parsed_url.parsed_date
+      end
+    end
+
     def artist_commentary_desc
       graphql_tweet.dig(:note_tweet, :note_tweet_results, :result, :text) || graphql_tweet.dig(:legacy, :full_text)
     end
@@ -79,16 +78,6 @@ class Source::Extractor
       graphql_tweet.dig(:legacy, :entities, :hashtags).to_a.map do |hashtag|
         [hashtag[:text], Source::URL::Twitter.tag_url_for(hashtag[:text])]
       end
-    end
-
-    def normalize_tag(tag)
-      COMMON_TAG_REGEXES.each do |rg|
-        norm_tag = tag.gsub(rg, "")
-        if norm_tag != tag
-          return norm_tag
-        end
-      end
-      tag
     end
 
     def dtext_artist_commentary_desc

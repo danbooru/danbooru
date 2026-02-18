@@ -9,6 +9,13 @@ class ModActionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "work for `Accept: */*`" do
+        create(:mod_action, description: "[[test]]")
+        get mod_actions_path, headers: { "Accept" => "*/*" }
+
+        assert_response :success
+      end
+
       should "hide ip ban actions from non-moderators" do
         ip_ban = create(:ip_ban)
         create(:mod_action, description: "undeleted ip ban for #{ip_ban.ip_addr}", subject: ip_ban)

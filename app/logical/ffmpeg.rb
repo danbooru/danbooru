@@ -27,6 +27,7 @@ class FFmpeg
 
     # https://ffmpeg.org/ffmpeg.html#Main-options
     # https://ffmpeg.org/ffmpeg-filters.html#thumbnail
+    # "-vf 'select=eq(n\\,0)+eq(key\\,1)+gt(scene\\,0.015),loop=loop=-1:size=2,trim=start_frame=1' -frames:v 1 -f image2"
     output = shell!("ffmpeg -i #{file.path.shellescape} -vf thumbnail=300 -frames:v 1 -y #{vp.path.shellescape}")
 
     MediaFile.open(vp)
@@ -45,8 +46,8 @@ class FFmpeg
   # @see https://gist.github.com/nrk/2286511
   #
   # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
-  def metadata
-    output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams -show_packets #{file.path.shellescape}")
+  memoize def metadata
+    output = shell!("ffprobe -v quiet -print_format json -show_format -show_streams -show_packets -show_frames #{file.path.shellescape}")
     output.parse_json || {}
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
@@ -63,26 +64,40 @@ class FFmpeg
   # @see https://trac.ffmpeg.org/wiki/FFprobeTips#Duration
   # @return [Float, nil] The duration of the video or animation in seconds, or nil if unknown.
   def duration
-    if metadata.dig(:format, :duration).present?
-      metadata.dig(:format, :duration).to_f
-    elsif playback_info.has_key?(:time)
-      hours, minutes, seconds = playback_info[:time].split(/:/)
-      hours.to_f*60*60 + minutes.to_f*60 + seconds.to_f
-    else
-      nil
-    end
+    container_duration || playback_duration
+  end
+
+  # @return [Float, nil] The duration of the video in seconds, according to the container metadata. May not match the
+  #   true duration of the video in case the container metadata is wrong or the video is truncated.
+  memoize def container_duration
+    metadata.dig(:format, :duration).to_f if metadata.dig(:format, :duration).present?
+  end
+
+  # @return [Float, nil] The true duration of the video in seconds, as determined by actually playing it.
+  memoize def playback_duration
+    playback_info[:out_time_us].to_f / 1_000_000.0 if playback_info[:out_time_us].present?
   end
 
   # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown. If the video has multiple
   #   streams, this will be the frame count of the longest stream. Note that a static AVIF image can contain up to four
   #   streams: one for the static image, one for an auxiliary video, and an optional alpha channel stream for each.
-  def frame_count
+  memoize def frame_count
     if video_streams.pluck(:nb_frames).compact.present?
       video_streams.pluck(:nb_frames).map(&:to_i).max
     elsif playback_info.key?(:frame)
       playback_info[:frame].to_i
     else
       nil
+    end
+  end
+
+  # @return [Array<Integer>] The duration of each video frame in milliseconds. The durations may be different if the
+  #   video has a variable frame rate. If there are multiple video streams, this will be the first stream, and if there
+  #   are no video streams, this will be an empty array.
+  memoize def frame_durations
+    # video_stream[:frames].pluck(:duration) # XXX Duration is only available for .webm files, not .mp4
+    video_stream[:frames].pluck(:best_effort_timestamp_time).push(playback_duration).each_cons(2).map do |before, after|
+      ((after.to_f - before.to_f) * 1000).round
     end
   end
 
@@ -103,6 +118,7 @@ class FFmpeg
     video_stream[:pix_fmt]
   end
 
+  # @return [String, nil] The video codec of the first video stream, or nil if there is no video.
   def video_codec
     video_stream[:codec_name]
   end
@@ -119,14 +135,21 @@ class FFmpeg
     end
   end
 
+  # @return [Hash] A hash containing information about the first video stream in the file (if there are
+  #   multiple), or an empty hash if there are no video streams.
   def video_stream
     video_streams.first || {}
   end
 
+  # @return [Array<Hash>] An array of hashes for each video stream in the file.
   def video_streams
-    metadata[:streams].to_a.select { |stream| stream[:codec_type] == "video" }
+    metadata[:streams].to_a.select { |stream| stream[:codec_type] == "video" }.each do |stream|
+      stream[:packets] = packets.select { |frame| frame[:codec_type] == "video" && frame[:stream_index] == stream[:index] }
+      stream[:frames] = frames.select { |frame| frame[:media_type] == "video" && frame[:stream_index] == stream[:index] }
+    end
   end
 
+  # @return [String, nil] The audio codec of the audio stream, or nil if there is no audio.
   def audio_codec
     audio_stream[:codec_name]
   end
@@ -143,12 +166,18 @@ class FFmpeg
     end
   end
 
+  # @return [Hash] A hash containing information about the first audio stream in the file (if there are
+  #   multiple), or an empty hash if there are no audio streams.
   def audio_stream
     audio_streams.first || {}
   end
 
+  # @return [Array<Hash>] An array of hashes for each audio stream in the file.
   def audio_streams
-    metadata[:streams].to_a.select { |stream| stream[:codec_type] == "audio" }
+    metadata[:streams].to_a.select { |stream| stream[:codec_type] == "audio" }.each do |stream|
+      stream[:packets] = packets.select { |frame| frame[:codec_type] == "audio" && frame[:stream_index] == stream[:index] }
+      stream[:frames] = frames.select { |frame| frame[:media_type] == "audio" && frame[:stream_index] == stream[:index] }
+    end
   end
 
   # @return [Boolean] True if the file has an audio track. The audio track may be silent.
@@ -159,7 +188,7 @@ class FFmpeg
   # @return [Float, nil] The total duration in seconds of all silent sections of the audio track.
   #   Nil if the file doesn't have an audio track.
   def silence_duration
-    playback_info[:silence].pluck("silence_duration").sum if has_audio?
+    playback_info[:silence].to_a.pluck("silence_duration").sum if has_audio?
   end
 
   # @return [Float, nil] The percentage of the video that is silent, from 0% to 100%, or nil if the file doesn't
@@ -226,25 +255,36 @@ class FFmpeg
     playback_info.dig(:ebur128, :Peak) if has_audio?
   end
 
-  def packets
-    metadata[:packets].to_a
+  # @return [Array<Hash>] An array of hashes for each video or audio frame in the file. Note that videos can have
+  #   multiple video or audio streams, so each frame has a stream index to distinguish each stream.
+  def frames
+    metadata[:packets_and_frames].to_a.select { |data| data[:type] == "frame" }
   end
 
+  # @return [Array<Hash>] An array of hashes for each video or audio packet in the file. A packet is a compressed chunk
+  #   of data which may contain multiple frames. Note that videos can have multiple video or audio streams, so each
+  #   packet has a stream index to distinguish each stream.
+  def packets
+    metadata[:packets_and_frames].to_a.select { |data| data[:type] == "packet" }
+  end
+
+  # @return [Array<Hash>] An array of hashes for each video packet in the file.
   def video_packets
     packets.select { |stream| stream[:codec_type] == "video" }
   end
 
+  # @return [Array<Hash>] An array of hashes for each audio packet in the file.
   def audio_packets
     packets.select { |stream| stream[:codec_type] == "audio" }
   end
 
-  # @return [Integer] The size of the compressed video stream in bytes.
-  def video_size
+  # @return [Integer] The total compressed size of all video streams in bytes, or 0 if there are no video streams.
+  memoize def video_size
     video_packets.pluck("size").map(&:to_i).sum
   end
 
-  # @return [Integer] The size of the compressed audio stream in bytes.
-  def audio_size
+  # @return [Integer] The total compressed size of all audio streams in bytes, or 0 if there are no audio streams.
+  memoize def audio_size
     audio_packets.pluck("size").map(&:to_i).sum
   end
 
@@ -254,22 +294,28 @@ class FFmpeg
   end
 
   # @return [String, nil] The error message if the video is unplayable, or nil if no error.
-  def error
+  memoize def error
     metadata[:error] || playback_info[:error]
   end
 
-  # Decode the full video and return a hash containing the frame count, fps, runtime, and the sizes of the decompressed video and audio streams.
-  def playback_info
+  # @return [Hash] Decode the full video and return a hash containing the frame count, fps, runtime, and the sizes of the decompressed video and audio streams.
+  memoize def playback_info
     # https://ffmpeg.org/ffmpeg-filters.html#silencedetect
     # https://ffmpeg.org/ffmpeg-filters.html#ebur128-1
     # XXX `-c copy` is faster, but it doesn't decompress the stream so it can't detect corrupt videos.
-    output = shell!("ffmpeg -hide_banner -i #{file.path.shellescape} -af silencedetect=noise=0.0001:duration=0.25s,ebur128=metadata=1:dualmono=true:peak=true -f null /dev/null")
+    output, progress = Danbooru::Tempfile.create do |tempfile|
+      output = shell!("ffmpeg -hide_banner -i #{file.path.shellescape} -progress #{tempfile.path} -af silencedetect=noise=0.0001:duration=0.25s,ebur128=metadata=1:dualmono=true:peak=true -f null /dev/null")
+      [output, tempfile.read]
+    end
+
     lines = output.split(/\r\n|\r|\n/)
 
-    # time_line = "frame=   10 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.48 bitrate=N/A speed= 179x"
-    # time_info = { "frame"=>"10", "fps"=>"0.0", "q"=>"-0.0", "Lsize"=>"N/A", "time"=>"00:00:00.48", "bitrate"=>"N/A", "speed"=>"188x" }
-    time_line = lines.grep(/\Aframe=/).last.strip
-    time_info = time_line.scan(/\S+=\s*\S+/).map { |pair| pair.split(/=\s*/) }.to_h
+    # ...
+    # frame=10
+    # out_time_ms=1000000
+    # ...
+    # progress=end
+    time_info = progress.split(/(?=frame=)/).last.lines.to_h { |line| line.chomp.split("=", 2) }
 
     # size_line = "[out#0/null @ 0x7f0b1ba2f300] video:36kBkB audio:16kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"
     # size_info = { "video" => 36000, "audio" => 16000, "subtitle" => 0, "other streams" => 0, "global headers" => 0, "muxing overhead" => 0 }
@@ -328,6 +374,4 @@ class FFmpeg
   def parse_errors(output)
     output.split(/\r?\n/).grep(/^(Error|\[\w+ @ 0x\h+\])/).uniq.join("\n")
   end
-
-  memoize :metadata, :playback_info, :frame_count, :duration, :error, :video_size, :audio_size
 end

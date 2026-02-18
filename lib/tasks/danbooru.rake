@@ -8,7 +8,7 @@ namespace :danbooru do
   desc "Run the cronjob scheduler"
   task cron: :environment do
     RackMetricsServer.new.start
-    Clockwork::run
+    Clockwork.run
   end
 
   namespace :images do
@@ -18,7 +18,7 @@ namespace :danbooru do
       dry_run = ENV.fetch("DRY_RUN", "false").truthy?
 
       if dry_run
-        STDERR.puts "Not making any changes. Do `DRY_RUN=false bin/rails danbooru:images:reindex_iqdb` to reindex the posts."
+        warn "Not making any changes. Do `DRY_RUN=false bin/rails danbooru:images:reindex_iqdb` to reindex the posts."
       end
 
       Post.where(condition).parallel_find_each do |post|
@@ -34,7 +34,7 @@ namespace :danbooru do
       dry_run = ENV.fetch("DRY_RUN", "true").truthy?
 
       if dry_run
-        STDERR.puts "Not making any changes. Do `DRY_RUN=false bin/rails danbooru:images:regenerate_metadata` to actually update the metadata."
+        warn "Not making any changes. Do `DRY_RUN=false bin/rails danbooru:images:regenerate_metadata` to actually update the metadata."
       end
 
       MediaAsset.active.where(condition).parallel_find_each do |asset|
@@ -97,11 +97,10 @@ namespace :danbooru do
           media_file: media_file.as_json.except("metadata"),
           error: e.to_s,
         }
-        STDERR.puts hash.to_json
+        warn hash.to_json
       rescue StandardError => e
         hash = { id: asset.id, error: e.to_s }
-        STDERR.puts hash.to_json
-
+        warn hash.to_json
       ensure
         media_file&.close
       end
@@ -191,15 +190,17 @@ namespace :danbooru do
   namespace :database do
     desc "Backup the database to a file. Usage: bin/rails danbooru:database:backup > danbooru-backup.pg_dump"
     task backup: :environment do
-      postgres_url = ActiveRecord::Base.configurations.find_db_config(Rails.env).url
-      STDERR.puts "pg_dumpall --clean --if-exists --verbose --dbname #{postgres_url}"
+      postgres_url = Addressable::URI.parse(ActiveRecord::Base.configurations.find_db_config(Rails.env).url)
+      postgres_url.query_values = postgres_url.query_values.without("pool").presence
+      warn "pg_dumpall --clean --if-exists --verbose --dbname #{postgres_url}"
       system(*%W[pg_dumpall --clean --if-exists --verbose --dbname #{postgres_url}])
     end
 
     desc "Restore the database from a backup. Usage: bin/rails danbooru:database:restore < danbooru-backup.pg_dump"
     task restore: :environment do
-      postgres_url = ActiveRecord::Base.configurations.find_db_config(Rails.env).url
-      STDERR.puts "psql --echo-all #{postgres_url}"
+      postgres_url = Addressable::URI.parse(ActiveRecord::Base.configurations.find_db_config(Rails.env).url)
+      postgres_url.query_values = postgres_url.query_values.without("pool").presence
+      warn "psql --echo-all #{postgres_url}"
       system(*%W[psql --echo-all #{postgres_url}])
     end
   end

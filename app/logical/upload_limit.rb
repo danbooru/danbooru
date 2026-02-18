@@ -49,7 +49,7 @@ class UploadLimit
 
   # @return [Boolean] true if the user is at max level.
   def maxed?
-    user.upload_points >= MAXIMUM_POINTS
+    upload_slots >= max_upload_slots
   end
 
   # @return [Integer] The number of appeals the user can make before they run out of upload slots.
@@ -62,7 +62,7 @@ class UploadLimit
   def used_upload_slots
     pending_count = user.posts.pending.count
     appealed_count = user.post_appeals.pending.count
-    early_deleted_count = user.posts.deleted.where("created_at >= ?", Danbooru.config.moderation_period.ago).count
+    early_deleted_count = user.posts.deleted.where(created_at: Danbooru.config.moderation_period.ago..).count
 
     pending_count + (early_deleted_count * DELETION_COST) + (appealed_count * APPEAL_COST)
   end
@@ -78,6 +78,10 @@ class UploadLimit
     slots = upload_level + Danbooru.config.extra_upload_slots.to_i
     slots = slots.clamp(0..5) if !user.posts.exists?(created_at: ..1.hour.ago)
     slots
+  end
+
+  def max_upload_slots
+    UploadLimit.points_to_level(MAXIMUM_POINTS) + Danbooru.config.extra_upload_slots.to_i
   end
 
   # @return [Integer] The user's current upload level. Ranges from 0 to 35.
@@ -161,7 +165,7 @@ class UploadLimit
   # @param level [Integer] the current upload level
   # @return [Integer] The number of points needed to reach the next upload level
   def self.points_for_next_level(level)
-    100 + 20 * [level - 10, 0].max
+    100 + (20 * [level - 10, 0].max)
   end
 
   # Calculate the level that corresponds to a given number of upload points.

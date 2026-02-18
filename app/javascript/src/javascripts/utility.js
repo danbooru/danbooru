@@ -14,6 +14,10 @@ export function delay(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
+export function round(value, precision) {
+  return Math.round(value / precision) * precision;
+}
+
 Utility.meta = function(key) {
   return $("meta[name=" + key + "]").attr("content");
 }

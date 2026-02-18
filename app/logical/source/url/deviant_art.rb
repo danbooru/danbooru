@@ -267,7 +267,7 @@ module Source
     end
 
     def image_url?
-      file.present?
+      file.present? || jwt.present?
     end
 
     def profile_url

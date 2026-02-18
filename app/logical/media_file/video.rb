@@ -5,7 +5,7 @@
 #
 # @see https://github.com/streamio/streamio-ffmpeg
 class MediaFile::Video < MediaFile
-  delegate :duration, :frame_count, :frame_rate, :has_audio?, :is_corrupt?, :major_brand, :pix_fmt,
+  delegate :duration, :frame_durations, :frame_count, :frame_rate, :has_audio?, :is_corrupt?, :major_brand, :pix_fmt,
     :video_codec, :video_bit_rate, :video_stream, :video_streams, :audio_codec, :audio_bit_rate,
     :audio_stream, :audio_streams, :silence_duration, :silence_percentage, :average_loudness,
     :peak_loudness, :loudness_range, :error, to: :video

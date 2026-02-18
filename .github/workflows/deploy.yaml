@@ -1,0 +1,60 @@
+# Deploy to betabooru or testbooru after a successful Docker Build workflow.
+
+name: Deploy
+
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#permissions
+permissions: read-all
+
+# https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_run
+on:
+  workflow_run:
+    workflows: ["Docker Build"]
+    branches: [betabooru, testbooru]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        required: true
+        description: Environment
+        options:
+          - testbooru
+          - betabooru
+        default: "testbooru"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+
+    # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idenvironment
+    environment: ${{ inputs.environment || github.event.workflow_run.head_branch || 'unknown'}}
+
+    # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#concurrency
+    concurrency:
+      group: deploy-${{ inputs.environment || github.event.workflow_run.head_branch || 'unknown' }}
+      cancel-in-progress: true
+
+    steps:
+      # https://github.com/marketplace/actions/kubectl-tool-installer
+      - name: Install Kubectl
+        uses: Azure/setup-kubectl@v4.0.1
+
+      - name: Configure Kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_YAML" > ~/.kube/config
+          kubectl config set-context --current --namespace=danbooru
+        env:
+          KUBECONFIG_YAML: ${{secrets.KUBECONFIG_YAML}}
+
+      - name: Deploy
+        run: |
+          if kubectl get deploy/betabooru > /dev/null 2>&1; then
+            kubectl rollout restart deploy/betabooru && kubectl rollout status deploy/betabooru
+          else # no betabooru on testbooru
+            kubectl rollout restart deploy/downbooru && kubectl rollout status deploy/downbooru
+            kubectl rollout restart deploy/danbooru-cron && kubectl rollout status deploy/danbooru-cron
+            kubectl rollout restart deploy/danbooru-jobs && kubectl rollout status deploy/danbooru-jobs
+            kubectl rollout restart deploy/danbooru && kubectl rollout status deploy/danbooru
+          fi

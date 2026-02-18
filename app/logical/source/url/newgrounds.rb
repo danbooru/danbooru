@@ -35,23 +35,19 @@ class Source::URL::Newgrounds < Source::URL
 
     # https://art.ngfiles.com/medium_views/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.webp?f1702161430
     # https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.jpg?f1702161372
-    in "art.ngfiles.com", ("medium_views" | "images") => image_type, dir, /^(\d+)_(\d+)_([^_]+)_(.*)\.(\h{32})\.\w+$/
+    in "art.ngfiles.com", ("medium_views" | "images"), _dir, /^(\d+)_(\d+)_([^_]+)_(.*)\.(\h{32})\.\w+$/
       @project_id = $1
       @image_id = $2
       @username = $3
       @work_title = $4
       @image_hash = $5
 
-      if image_type == "images"
-        @full_image_url = original_url.to_s
-      else
-        # Some full size images can have both .jpg and .webp versions. We assume the JPEG is superior.
-        #
-        # https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.jpg?f1702161372
-        # https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.webp?f1702161372
-        @candidate_full_image_urls = %w[png jpg gif webp].map do |file_ext|
-          original_url.to_s.gsub("/medium_views/", "/images/").gsub(".webp", ".#{file_ext}")
-        end
+      # Some full size images can have both .jpg and .webp versions. We assume the JPEG is superior.
+      #
+      # https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.jpg?f1702161372
+      # https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.webp?f1702161372
+      @candidate_full_image_urls = %w[png jpg gif webp].map do |file_ext|
+        original_url.to_s.gsub("/medium_views/", "/images/").gsub(".webp", ".#{file_ext}")
       end
 
     # https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg

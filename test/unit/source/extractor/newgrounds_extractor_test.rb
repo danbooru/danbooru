@@ -11,6 +11,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://hcnone.newgrounds.com],
         display_name: "hcnone",
         username: "hcnone",
+        published_at: Time.parse("2020-12-11T06:30:33.000000Z"),
+        updated_at: nil,
         tags: [
           ["sephiroth", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=sephiroth"],
           ["supersmashbros", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=supersmashbros"],
@@ -29,6 +31,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://hcnone.newgrounds.com],
         display_name: "hcnone",
         username: "hcnone",
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["sephiroth", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=sephiroth"],
           ["supersmashbros", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=supersmashbros"],
@@ -47,6 +51,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://jenjamik.newgrounds.com],
         display_name: "Jenjamik",
         username: "jenjamik",
+        published_at: Time.parse("2010-05-20T20:08:52.000000Z"),
+        updated_at: nil,
         tags: [
           ["link", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=link"],
           ["loop", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=loop"],
@@ -79,6 +85,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://bluethebone.newgrounds.com],
         display_name: "bluethebone",
         username: "bluethebone",
+        published_at: Time.parse("2020-06-23T16:07:41.000000Z"),
+        updated_at: nil,
         tags: [
           ["80s-anime", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=80s-anime"],
           ["90s-anime", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=90s-anime"],
@@ -135,6 +143,8 @@ module Source::Tests::Extractor
         profile_urls: [],
         display_name: nil,
         username: nil,
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -156,6 +166,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://natthelich.newgrounds.com],
         display_name: "NatTheLich",
         username: "natthelich",
+        published_at: Time.parse("2020-11-26T04:30:31.000000Z"),
+        updated_at: nil,
         tags: [
           ["oc", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=oc"],
           ["spider", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=spider"],
@@ -180,6 +192,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://sphenodaile.newgrounds.com],
         display_name: "Sphenodaile",
         username: "sphenodaile",
+        published_at: Time.parse("2023-11-25T23:48:24.000000Z"),
+        updated_at: nil,
         tags: [
           ["bouncy-breasts", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=bouncy-breasts"],
           ["breasts", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=breasts"],
@@ -207,21 +221,23 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.newgrounds.com/art/view/sphenodaile/princess-of-the-thorns-pages-11-12-afterwords",
         image_urls: %w[
-          https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.webp?f1702161429
+          https://art.ngfiles.com/images/5267000/5267492_276880_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.1403130356bd217fb99f7ae3f9ce6029.jpg?f1702161429
           https://art.ngfiles.com/images/5267000/5267492_276883_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.81ca470f3d2830104e142d2e2b610e4c.jpg?f1702161410
-          https://art.ngfiles.com/images/5267000/5267492_276881_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.9ece029ebd69b6e55dbaf777a30b0e79.webp?f1702161437
-          https://art.ngfiles.com/images/5267000/5267492_276882_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.462b90641c2487627650683f5002c0be.webp?f1702161443
+          https://art.ngfiles.com/images/5267000/5267492_276881_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.9ece029ebd69b6e55dbaf777a30b0e79.jpg?f1702161437
+          https://art.ngfiles.com/images/5267000/5267492_276882_sphenodaile_princess-of-the-thorns-pages-9-10-afterwords.462b90641c2487627650683f5002c0be.jpg?f1702161443
         ],
         media_files: [
-          { file_size: 2_076_674 },
+          { file_size: 2_107_866 },
           { file_size: 4_608_194 },
-          { file_size: 3_165_472 },
-          { file_size: 1_047_638 },
+          { file_size: 4_252_477 },
+          { file_size: 2_079_584 },
         ],
         page_url: "https://www.newgrounds.com/art/view/sphenodaile/princess-of-the-thorns-pages-11-12-afterwords",
         profile_urls: %w[https://sphenodaile.newgrounds.com],
         display_name: "Sphenodaile",
         username: "sphenodaile",
+        published_at: Time.parse("2023-12-09T23:15:58.000000Z"),
+        updated_at: nil,
         tags: [
           ["comic", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=comic"],
           ["medieval", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=medieval"],
@@ -248,6 +264,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://sphenodaile.newgrounds.com],
         display_name: nil,
         username: "sphenodaile",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -263,6 +281,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://sphenodaile.newgrounds.com],
         display_name: nil,
         username: "sphenodaile",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -277,6 +297,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://natthelich.newgrounds.com],
         display_name: nil,
         username: "natthelich",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -315,6 +337,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://boxofwant.newgrounds.com],
         display_name: "BoxOfWant",
         username: "boxofwant",
+        published_at: Time.parse("2021-01-04T07:42:02.000000Z"),
+        updated_at: nil,
         tags: [
           ["annie-hughes", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=annie-hughes"],
           ["iron-giant", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=iron-giant"],
@@ -333,6 +357,8 @@ module Source::Tests::Extractor
         profile_urls: %w[https://jakada.newgrounds.com],
         display_name: "Jakada",
         username: "jakada",
+        published_at: Time.parse("2023-02-15T20:51:17.000000Z"),
+        updated_at: nil,
         tags: [
           ["doggystyle", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=doggystyle"],
           ["monster-girl", "https://www.newgrounds.com/search/conduct/art?match=tags&tags=monster-girl"],

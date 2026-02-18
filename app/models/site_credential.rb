@@ -65,8 +65,8 @@ class SiteCredential < ApplicationRecord
     }, {
       id: 1200,
       name: "Newgrounds",
-      default_credential: { session_cookie: Danbooru.config.newgrounds_session_cookie },
-      help: %{Your "Newgrounds":https://www.newgrounds.com 'vmkIdu5l8m' cookie.},
+      default_credential: { session_cookie: Danbooru.config.newgrounds_ng_remember_cookie },
+      help: %{Your "Newgrounds":https://www.newgrounds.com 'ng_remember' cookie.},
     }, {
       id: 1300,
       name: "Nico Seiga",
@@ -166,6 +166,8 @@ class SiteCredential < ApplicationRecord
   validates :site, presence: true, inclusion: { in: sites.keys, allow_nil: true }
   validates :credential, presence: true
   validate :validate_credential, if: :credential_changed?
+
+  normalizes :credential, with: ->(credential) { credential.transform_values(&:strip) }
 
   after_destroy :create_mod_action
   after_save :create_mod_action

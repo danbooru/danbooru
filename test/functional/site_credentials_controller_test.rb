@@ -21,7 +21,7 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "create a new site credential" do
-        post_auth site_credentials_path, @admin, params: { site_credential: { site: "Pixiv", credential: { phpsessid: "foo" }}}
+        post_auth site_credentials_path, @admin, params: { site_credential: { site: "Pixiv", credential: { phpsessid: " foo " }}}
         assert_response 302
 
         assert_equal("Pixiv", SiteCredential.last.site)

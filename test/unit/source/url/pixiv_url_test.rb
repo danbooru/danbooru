@@ -32,6 +32,7 @@ module Source::Tests::URL
         assert_illust_id(18_557_054, "http://www.pixiv.net/en/artworks/18557054")
         assert_illust_id(18_557_054, "http://www.pixiv.net/artworks/18557054")
         assert_illust_id(18_557_054, "http://p.tl/i/18557054")
+        assert_illust_id(18_557_054, "http://phixiv.net/artworks/18557054")
       end
 
       should "parse ids from expicit/guro illust urls" do
@@ -90,6 +91,7 @@ module Source::Tests::URL
           "https://www.pixiv.net/artworks/46324488",
           "http://www.pixiv.net/i/18557054",
           "http://p.tl/i/18557054",
+          "http://phixiv.net/artworks/18557054",
           "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054",
           "http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054",
           "http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054",
@@ -136,6 +138,11 @@ module Source::Tests::URL
 
         url_parser_should_work("http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip",
                                page_url: "https://www.pixiv.net/artworks/44524589",)
+      end
+
+      context "for proxies" do
+        url_parser_should_work("http://phixiv.net/artworks/18557054",
+                               page_url: "https://www.pixiv.net/artworks/18557054",)
       end
 
       context "for novel images" do

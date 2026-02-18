@@ -20,9 +20,11 @@ class Source::URL::Xiaohongshu < Source::URL
       @full_image_url = ["https://ci.xiaohongshu.com", *subdirs, image_id].join("/")
 
     # https://ci.xiaohongshu.com/bd871b0f-f9e7-54da-fd39-80b6af034dad?imageView2/2/w/100/h/100/q/75 (sample)
+    # https://ci.xiaohongshu.com/notes_pre_post/1040g3k031il3oqupga005nsgsmfg8ue6bq81dbg?imageView2/2/w/format/png (sample)
     # https://ci.xiaohongshu.com/bd871b0f-f9e7-54da-fd39-80b6af034dad (full)
     # https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8 (full)
-    in "ci", "xiaohongshu.com", image_id
+    # https://ci.xiaohongshu.com/notes_pre_post/1040g3k031il3oqupga005nsgsmfg8ue6bq81dbg (full)
+    in "ci", "xiaohongshu.com", *rest
       @full_image_url = without(:query).to_s
 
     # https://img.xiaohongshu.com/avatar/5b56be0014de415b2db830a6.jpg@160w_160h_92q_1e_1c_1x.jpg (profile picture, sample)

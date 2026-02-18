@@ -46,6 +46,14 @@ class Source::Extractor
       "https://#{username}.tumblr.com" if username.present?
     end
 
+    def published_at
+      if parsed_url.image_url?
+        nil
+      elsif post[:timestamp]
+        Time.at(post[:timestamp]).utc
+      end
+    end
+
     def artist_commentary_title
       case post[:type]
       when "text", "link"
@@ -79,11 +87,6 @@ class Source::Extractor
       post[:tags].to_a.map do |tag|
         [tag, Source::URL::Tumblr.tag_url_for(tag)]
       end.uniq
-    end
-
-    def normalize_tag(tag)
-      tag = tag.tr("-", "_")
-      super(tag)
     end
 
     # The commentary with reblogs presented as a linear list of quotes, rather than as nested quotes.

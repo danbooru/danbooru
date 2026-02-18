@@ -45,6 +45,7 @@ import ForumPostComponent from "../src/javascripts/forum_post_component.js";
 import FormValidator from "../src/javascripts/form_validator.js";
 import HelpTooltipComponent from "../src/javascripts/help_tooltip_component.js";
 import IqdbQuery from "../src/javascripts/iqdb_queries.js";
+import Links from "../src/javascripts/links.js";
 import Note from "../src/javascripts/notes.js";
 import Notice from "../src/javascripts/notice.js";
 import MediaAssetComponent from "../src/javascripts/media_asset_component.js";
@@ -61,7 +62,7 @@ import TimeSeriesComponent from "../src/javascripts/time_series_component.js";
 import Upload from "../src/javascripts/uploads.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
 import Utility from "../src/javascripts/utility.js";
-import Ugoira from "../src/javascripts/ugoira.js";
+import VideoPlayer from "../src/javascripts/video_player.js";
 
 let Danbooru = {};
 Danbooru.Autocomplete = Autocomplete;
@@ -80,6 +81,7 @@ Danbooru.ForumPostComponent = ForumPostComponent;
 Danbooru.FormValidator = FormValidator;
 Danbooru.HelpTooltipComponent = HelpTooltipComponent;
 Danbooru.IqdbQuery = IqdbQuery;
+Danbooru.Links = Links;
 Danbooru.MediaAssetComponent = MediaAssetComponent;
 Danbooru.Note = Note;
 Danbooru.Notice = Notice;
@@ -96,7 +98,7 @@ Danbooru.TimeSeriesComponent = TimeSeriesComponent;
 Danbooru.Upload = Upload;
 Danbooru.UserTooltip = UserTooltip;
 Danbooru.Utility = Utility;
-Danbooru.Ugoira = Ugoira;
+Danbooru.VideoPlayer = VideoPlayer;
 
 // Aliases for backwards compatibility with userscripts.
 Utility.notice = Notice.info;

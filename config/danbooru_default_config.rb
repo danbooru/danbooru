@@ -458,9 +458,9 @@ module Danbooru
       nil
     end
 
-    # Your Newgrounds "vmkIdu5l8m" cookie. Login to Newgrounds then use the
-    # devtools to find the "vmkIdu5l8m" cookie.
-    def newgrounds_session_cookie
+    # Your Newgrounds "ng_remember" cookie. Login to Newgrounds then use the
+    # devtools to find the "ng_remember" cookie.
+    def newgrounds_ng_remember_cookie
       nil
     end
 

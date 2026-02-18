@@ -59,6 +59,14 @@ class Source::Extractor
       parsed_url.work_id || parsed_referer&.work_id
     end
 
+    def published_at
+      if parsed_url.image_url?
+        nil
+      elsif api_response["created_at"]
+        Time.iso8601(api_response["created_at"]).utc
+      end
+    end
+
     def artist_commentary_desc
       commentary = "".dup
       commentary << "<p>#{api_response["spoiler_text"]}</p>" if api_response["spoiler_text"].present?

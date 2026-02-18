@@ -192,10 +192,9 @@ class DText
       variant = asset.variant(:"720x720")
       asset_html = %{<a class="inline-block" href="#{href}"><img src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}"></a>}
     elsif asset.is_ugoira?
-      asset_html = ApplicationController.new.view_context.render(UgoiraComponent.new(asset, default_quality: :sample))
+      asset_html = ApplicationController.new.view_context.render(VideoComponent.new(asset, default_quality: :sample))
     elsif asset.is_video?
-      variant = asset.variant(:original)
-      asset_html = %{<video src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}" autoplay controls muted loop>}
+      asset_html = ApplicationController.new.view_context.render(VideoComponent.new(asset, muted: true))
     end
 
     node.inner_html  = %{<div class="media-embed-image">#{asset_html}</div>}
