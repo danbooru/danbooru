@@ -79,6 +79,10 @@ module IconHelper
     svg_icon_tag("solid-heart", "solid-heart", viewBox: "0 0 512 512", **options)
   end
 
+  def solid_star_icon(**options)
+    svg_icon_tag("solid-star", "solid-star", viewBox: "0 0 640 640", **options)
+  end
+
   def comments_icon(**options)
     svg_icon_tag("comments", "comments", viewBox: "0 0 640 512", **options)
   end

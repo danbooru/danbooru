@@ -46,6 +46,10 @@ class PostVote < ApplicationRecord
     score < 0
   end
 
+  def vote_type
+    is_positive? ? :up : :down
+  end
+
   def remove_conflicting_votes
     PostVote.active.where.not(id: id).where(post: post, user: user).each do |vote|
       vote.soft_delete!(updater: updater)
