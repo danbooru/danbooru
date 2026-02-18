@@ -2,10 +2,10 @@
 
 module WikiPagesHelper
   def wiki_page_other_names_list(wiki_page)
-    names_html = wiki_page.other_names.map do |name|
-      link_to(name, "https://www.pixiv.net/tags/#{u(name)}/artworks", class: "wiki-other-name chip-primary text-sm truncate")
+    html = wiki_page.other_names.map do |name|
+      render ExternalTagLinkComponent.new(name)
     end
 
-    tag.p safe_join(names_html, " "), class: "flex flex-wrap gap-1"
+    tag.div safe_join(html, " "), class: "flex gap-1 flex-wrap"
   end
 end

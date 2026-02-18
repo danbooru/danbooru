@@ -311,5 +311,12 @@ module Source
       # Dates in image URLs are in JST (UTC+9)
       Time.new(*date, "+09:00").utc if date.present?
     end
+
+    def self.tag_url_for(tag_name, **args)
+      tag_name = Danbooru::URL.escape(tag_name)
+      tag_type = args[:tag_type] || "artworks"
+
+      "https://www.pixiv.net/tags/#{tag_name}/#{tag_type}"
+    end
   end
 end

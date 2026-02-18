@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # This file contains all the configuration settings for Danbooru.
 #
@@ -914,6 +915,11 @@ module Danbooru
 
     def reactions
       {}
+    end
+
+    # A list of sites that will be displayed as dropdown for external tag links in other names for wiki pages.
+    def tag_lookup_sites
+      ["pixiv", "twitter", "bluesky", "weibo", "lofter", "tumblr"]
     end
   end
 

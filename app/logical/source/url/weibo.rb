@@ -135,4 +135,10 @@ class Source::URL::Weibo < Source::URL
       mobile_url
     end
   end
+
+  def self.tag_url_for(tag_name, **_args)
+    tag_name = Danbooru::URL.escape("##{tag_name}#")
+
+    "https://s.weibo.com/weibo?q=#{tag_name}"
+  end
 end

@@ -128,4 +128,10 @@ class Source::URL::Tumblr < Source::URL
       site
     end
   end
+
+  def self.tag_url_for(tag_name, **_args)
+    tag_name = Danbooru::URL.escape(tag_name)
+
+    "https://tumblr.com/tagged/#{tag_name}"
+  end
 end

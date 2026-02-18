@@ -301,6 +301,15 @@ module Source
       nil
     end
 
+    # Generate the canonical tag url for a website.
+    #
+    # @param tag [String] The tag name
+    # @param args [Hash] An optional amount of args that might specify what type of tag to consider
+    # @return [String, nil] The url for the tag
+    def self.tag_url_for(tag_name, **args) # rubocop:disable Lint/UnusedMethodArgument
+      nil
+    end
+
     def self.site_name(url)
       Source::URL.parse(url)&.site_name
     end

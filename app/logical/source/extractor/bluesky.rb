@@ -150,7 +150,7 @@ class Source::Extractor::Bluesky < Source::Extractor
     api_response&.dig("thread", "post", "record", "facets").to_a.pluck("features").flatten.select do |f|
       f["$type"] == "app.bsky.richtext.facet#tag"
     end.pluck("tag").map do |tag|
-      [tag, "https://bsky.app/hashtag/#{Danbooru::URL.escape(tag)}"]
+      [tag, URL::Source::Bluesky.tag_url_for(tag)]
     end
   end
 

@@ -74,4 +74,10 @@ class Source::URL::Lofter < Source::URL
       "https://www.lofter.com/mentionredirect.do?blogId=#{user_id}"
     end
   end
+
+  def self.tag_url_for(tag_name, **_args)
+    tag_name = Danbooru::URL.escape(tag_name)
+
+    "https://www.lofter.com/tag/#{tag_name}"
+  end
 end
