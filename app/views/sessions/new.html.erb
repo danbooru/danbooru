@@ -10,7 +10,7 @@
       <h1 class="pb-4">Login</h1>
 
       <%= edit_form_for(@session, as: :session, url: session_path, html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
-        <%= f.input :url, as: :hidden, input_html: { value: params[:url] } %>
+        <%= f.input :url, as: :hidden, input_html: { value: @url } %>
         <%= f.input :name, label: "Name or Email", input_html: { autofocus: true, autocapitalize: "none", value: params.dig(:session, :name) } %>
         <%= f.input :password, hint: link_to("Forgot password?", password_reset_path), input_html: { autocomplete: "current-password" } %>
         <%= captcha_tag class: "mb-4", action: :login %>
@@ -18,7 +18,7 @@
       <% end %>
 
       <p class="fineprint">
-        Don't have an account? <%= link_to "Create a new account", new_user_path %>.
+        Don't have an account? <%= link_to "Create a new account", new_user_path(url: @url) %>.
       </p>
     </div>
   </div>
