@@ -72,6 +72,13 @@ export default class VideoPlayer {
     this.$container.find(".volume-slider").on("input", event => this.onVolumeDrag(event));
     this.$container.find(".video-slider, .volume-slider").on("keydown", event => this.onKeypress(event));
 
+    let hideVolumeSlider = debounce(() => this._showVolumeSlider = false, 100);
+    this.$container.find(".volume-controls").on("mouseenter", event => {
+      hideVolumeSlider.cancel();
+      this._showVolumeSlider = true;
+    });
+    this.$container.find(".volume-controls").on("mouseleave", event => hideVolumeSlider());
+
     let quality = this.$container.data("quality");
     this.setQuality(quality);
 

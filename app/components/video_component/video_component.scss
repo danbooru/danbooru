@@ -22,7 +22,7 @@
 }
 
 .video-controls {
-  &, .tippy-box {
+  &, .tippy-box, .volume-slider {
     background-color: #1f202cc0; // fallback
     background-color: rgb(from var(--video-controls-background-color) r g b / 80%);
     border: 0;
@@ -73,6 +73,7 @@
 
   .volume-slider {
     --volume: 0;
+    transform: translateY(-2px);
 
     &::-moz-range-track {
       height: 0.375rem;
