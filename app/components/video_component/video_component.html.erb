@@ -45,11 +45,13 @@
     </span>
 
     <% if media_asset.has_sound? %>
-      <div class="flex-none w-6 h-full cursor-pointer" x-on:click="player.toggleMute()">
-        <%= sound_icon class: "h-full py-2", "x-show": "player.inferredVolume !== 0" %>
-        <%= sound_off_icon class: "h-full py-2", "x-show": "player.inferredVolume === 0" %>
+      <div class="volume-controls relative h-full">
+        <div class="w-6 h-full cursor-pointer" x-on:click="player.toggleMute()">
+          <%= sound_icon class: "h-full py-2", "x-show": "player.inferredVolume !== 0" %>
+          <%= sound_off_icon class: "h-full py-2", "x-show": "player.inferredVolume === 0" %>
+        </div>
+        <input type="range" class="volume-slider w-120px h-full p-2 appearance-none border-0 bg-transparent p-0 cursor-pointer absolute origin-left -rotate-90 -top-1/2 left-1/2 opacity-0 pointer-events-none transition-opacity" tabindex="-1" value="0", step="0.01" min="0" max="1" x-bind:value="player.inferredVolume" x-bind:class='{ "opacity-0 pointer-events-none": !player._showVolumeSlider }' x-bind:style='{ "--volume": player.inferredVolume }' />
       </div>
-      <%= tag.input type: "range", class: "volume-slider w-1/4 max-w-120px h-full appearance-none border-0 bg-transparent p-0 cursor-pointer", tabindex: -1, value: 0, step: "0.01", min: 0, max: 1, "x-bind:value": "player.inferredVolume", "x-bind:style": '{ "--volume": player.inferredVolume }' %>
     <% else %>
       <%= no_sound_icon class: "flex-none w-6 h-full py-2 text-muted pointer-events-none @max-270px:hidden" %>
     <% end %>
