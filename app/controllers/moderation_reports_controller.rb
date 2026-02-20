@@ -3,11 +3,6 @@
 class ModerationReportsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  def new
-    @moderation_report = authorize ModerationReport.new(permitted_attributes(ModerationReport))
-    respond_with(@moderation_report)
-  end
-
   def index
     @moderation_reports = authorize ModerationReport.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @moderation_reports = @moderation_reports.includes(:creator, :model) if request.format.html?
@@ -18,6 +13,11 @@ class ModerationReportsController < ApplicationController
   def show
     authorize ModerationReport
     redirect_to moderation_reports_path(search: { id: params[:id] })
+  end
+
+  def new
+    @moderation_report = authorize ModerationReport.new(permitted_attributes(ModerationReport))
+    respond_with(@moderation_report)
   end
 
   def create

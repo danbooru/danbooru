@@ -9,17 +9,6 @@ class ForumTopicsController < ApplicationController
     redirect_to root_path
   end
 
-  def new
-    @forum_topic = authorize ForumTopic.new
-    @forum_topic.original_post = ForumPost.new
-    respond_with(@forum_topic)
-  end
-
-  def edit
-    @forum_topic = authorize ForumTopic.find(params[:id])
-    respond_with(@forum_topic)
-  end
-
   def index
     if request.format.html?
       limit = params.fetch(:limit, 40)
@@ -50,6 +39,17 @@ class ForumTopicsController < ApplicationController
       @forum_posts = @forum_posts.reverse_order.load
     end
 
+    respond_with(@forum_topic)
+  end
+
+  def new
+    @forum_topic = authorize ForumTopic.new
+    @forum_topic.original_post = ForumPost.new
+    respond_with(@forum_topic)
+  end
+
+  def edit
+    @forum_topic = authorize ForumTopic.find(params[:id])
     respond_with(@forum_topic)
   end
 
