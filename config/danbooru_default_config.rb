@@ -634,8 +634,9 @@ module Danbooru
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
-      %w[ai-generated ai-assisted anime_screencap bad_source duplicate hard_translated image_sample md5_mismatch
-      nude_filter off-topic paid_reward resized third-party_edit]
+      %w[ai-generated ai-assisted anime_screenshot game_screenshot bad_source duplicate
+      hard-translated image_sample md5_mismatch nude_filter off-topic paid_reward resized
+      third-party_edit]
     end
 
     # Whether the Gold account upgrade page should be enabled.
