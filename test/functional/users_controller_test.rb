@@ -369,6 +369,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           @feedback = create(:user_feedback, user: @member, category: :positive)
         end
 
+        should "render for an XHR request" do
+          get user_path(@member, variant: "tooltip"), headers: { "Accept" => "*/*" }, xhr: true
+
+          assert_response :success
+        end
+
         should "render for a banned user" do
           get_auth user_path(@banned, variant: "tooltip"), @user
 

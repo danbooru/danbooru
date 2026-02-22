@@ -256,9 +256,7 @@ class ApplicationController < ActionController::Base
     request.variant = params[:variant].try(:to_sym)
 
     # Fix `request.format.html?` returning false when the request is made with `Accept: */*`
-    if request.format == Mime::ALL
-      request.format = request.xhr? ? :js : :html
-    end
+    request.format = :html if request.format == Mime::ALL
   end
 
   def check_get_body

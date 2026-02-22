@@ -25,6 +25,15 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
 
   context "Autocomplete controller" do
     context "index action" do
+      should "work for XHR requests" do
+        create(:tag, name: "azur_lane")
+
+        get autocomplete_index_path(search: { query: "azur", type: "tag_query" }), headers: { "Accept" => "*/*" }, xhr: true
+
+        assert_response :success
+        assert_equal(["azur_lane"], response.parsed_body.css("li").map { |html| html["data-autocomplete-value"] })
+      end
+
       should "work for opensearch queries" do
         create(:tag, name: "azur_lane")
 
