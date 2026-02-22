@@ -25,14 +25,14 @@ class FavoriteGroupsController < ApplicationController
     respond_with(@favorite_group)
   end
 
-  def create
-    @favorite_group = authorize FavoriteGroup.new(creator: CurrentUser.user, **permitted_attributes(FavoriteGroup))
-    @favorite_group.save
+  def edit
+    @favorite_group = authorize FavoriteGroup.find(params[:id])
     respond_with(@favorite_group)
   end
 
-  def edit
-    @favorite_group = authorize FavoriteGroup.find(params[:id])
+  def create
+    @favorite_group = authorize FavoriteGroup.new(creator: CurrentUser.user, **permitted_attributes(FavoriteGroup))
+    @favorite_group.save
     respond_with(@favorite_group)
   end
 

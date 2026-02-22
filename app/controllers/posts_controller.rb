@@ -58,14 +58,6 @@ class PostsController < ApplicationController
     end
   end
 
-  def update
-    @post = authorize Post.find(params[:id])
-    @post.update(permitted_attributes(@post))
-    @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
-    respond_with_post_after_update(@post)
-  end
-
   def create
     @upload_media_asset = UploadMediaAsset.find(params[:upload_media_asset_id])
     @post = authorize Post.new_from_upload(@upload_media_asset, **permitted_attributes(Post).to_h.symbolize_keys)
@@ -83,6 +75,14 @@ class PostsController < ApplicationController
       @post.tag_string = params.dig(:post, :tag_string) # Preserve original tag string on validation error
       respond_with(@post, render: { template: "upload_media_assets/show" })
     end
+  end
+
+  def update
+    @post = authorize Post.find(params[:id])
+    @post.update(permitted_attributes(@post))
+    @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
+    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
+    respond_with_post_after_update(@post)
   end
 
   def destroy

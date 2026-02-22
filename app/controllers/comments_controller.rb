@@ -20,6 +20,16 @@ class CommentsController < ApplicationController
     end
   end
 
+  def show
+    @comment = authorize Comment.find(params[:id])
+
+    respond_with(@comment) do |format|
+      format.html do
+        redirect_to post_path(@comment.post, anchor: "comment_#{@comment.id}")
+      end
+    end
+  end
+
   def new
     if params[:id]
       quoted_comment = authorize Comment.find(params[:id]), :reply?
@@ -31,11 +41,8 @@ class CommentsController < ApplicationController
     respond_with(@comment)
   end
 
-  def update
-    @comment = Comment.find(params[:id])
-    @comment.attributes = { updater: CurrentUser.user, **permitted_attributes(@comment) }
-    authorize(@comment).save
-
+  def edit
+    @comment = authorize Comment.find(params[:id])
     respond_with(@comment)
   end
 
@@ -45,24 +52,17 @@ class CommentsController < ApplicationController
 
     respond_with(@comment, notice: "Comment posted") do |format|
       format.html do
-        redirect_back fallback_location: (@comment.post || comments_path)
+        redirect_back fallback_location: @comment.post || comments_path
       end
     end
   end
 
-  def edit
-    @comment = authorize Comment.find(params[:id])
+  def update
+    @comment = Comment.find(params[:id])
+    @comment.attributes = { updater: CurrentUser.user, **permitted_attributes(@comment) }
+    authorize(@comment).save
+
     respond_with(@comment)
-  end
-
-  def show
-    @comment = authorize Comment.find(params[:id])
-
-    respond_with(@comment) do |format|
-      format.html do
-        redirect_to post_path(@comment.post, anchor: "comment_#{@comment.id}")
-      end
-    end
   end
 
   def destroy

@@ -3,25 +3,11 @@
 class ForumPostsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  def new
-    @forum_post = authorize ForumPost.new_reply(params)
-    respond_with(@forum_post)
-  end
-
-  def edit
-    @forum_post = authorize ForumPost.find(params[:id])
-    respond_with(@forum_post)
-  end
-
   def index
     @forum_posts = authorize ForumPost.visible(CurrentUser.user).paginated_search(params)
     @forum_posts = @forum_posts.includes(:topic, :creator) if request.format.html?
 
     respond_with(@forum_posts)
-  end
-
-  def search
-    authorize ForumPost
   end
 
   def show
@@ -34,6 +20,20 @@ class ForumPostsController < ApplicationController
         redirect_to forum_topic_path(@forum_post.topic, page: page, anchor: "forum_post_#{@forum_post.id}")
       end
     end
+  end
+
+  def new
+    @forum_post = authorize ForumPost.new_reply(params)
+    respond_with(@forum_post)
+  end
+
+  def edit
+    @forum_post = authorize ForumPost.find(params[:id])
+    respond_with(@forum_post)
+  end
+
+  def search
+    authorize ForumPost
   end
 
   def create

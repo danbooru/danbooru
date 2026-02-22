@@ -3,11 +3,6 @@
 class PostFlagsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  def new
-    @post_flag = authorize PostFlag.new(permitted_attributes(PostFlag))
-    respond_with(@post_flag)
-  end
-
   def index
     @post_flags = authorize PostFlag.paginated_search(params)
 
@@ -20,13 +15,6 @@ class PostFlagsController < ApplicationController
     respond_with(@post_flags)
   end
 
-  def create
-    @post_flag = authorize PostFlag.new(creator: CurrentUser.user, **permitted_attributes(PostFlag))
-    @post_flag.save
-
-    respond_with(@post_flag, notice: "Post flagged")
-  end
-
   def show
     @post_flag = authorize PostFlag.find(params[:id])
     respond_with(@post_flag) do |fmt|
@@ -34,9 +22,21 @@ class PostFlagsController < ApplicationController
     end
   end
 
+  def new
+    @post_flag = authorize PostFlag.new(permitted_attributes(PostFlag))
+    respond_with(@post_flag)
+  end
+
   def edit
     @post_flag = authorize PostFlag.find(params[:id])
     respond_with(@post_flag)
+  end
+
+  def create
+    @post_flag = authorize PostFlag.new(creator: CurrentUser.user, **permitted_attributes(PostFlag))
+    @post_flag.save
+
+    respond_with(@post_flag, notice: "Post flagged")
   end
 
   def update

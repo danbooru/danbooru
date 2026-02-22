@@ -3,17 +3,6 @@
 class DmailsController < ApplicationController
   respond_to :html, :xml, :js, :json
 
-  def new
-    if params[:respond_to_id]
-      parent = authorize Dmail.find(params[:respond_to_id]), :show?
-      @dmail = parent.build_response(:forward => params[:forward])
-    else
-      @dmail = authorize Dmail.new(permitted_attributes(Dmail))
-    end
-
-    respond_with(@dmail)
-  end
-
   def index
     @dmails = authorize Dmail.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @dmails = @dmails.includes(:owner, :to, :from) if request.format.html?
@@ -31,6 +20,17 @@ class DmailsController < ApplicationController
 
     if request.format.html? && @dmail.owner == CurrentUser.user
       @dmail.update!(is_read: true)
+    end
+
+    respond_with(@dmail)
+  end
+
+  def new
+    if params[:respond_to_id]
+      parent = authorize Dmail.find(params[:respond_to_id]), :show?
+      @dmail = parent.build_response(:forward => params[:forward])
+    else
+      @dmail = authorize Dmail.new(permitted_attributes(Dmail))
     end
 
     respond_with(@dmail)

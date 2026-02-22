@@ -4,16 +4,6 @@ class UploadsController < ApplicationController
   respond_to :html, :xml, :json, :js
   skip_before_action :verify_authenticity_token, only: [:create], if: -> { request.xhr? }
 
-  def new
-    @upload = authorize Upload.new(uploader: CurrentUser.user, source: params[:url], referer_url: params[:ref], **permitted_attributes(Upload))
-    respond_with(@upload)
-  end
-
-  def create
-    @upload = authorize Upload.new(uploader: CurrentUser.user, **permitted_attributes(Upload))
-    @upload.save
-    respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
-  end
 
   def index
     @mode = params.fetch(:mode, "gallery")
@@ -46,5 +36,16 @@ class UploadsController < ApplicationController
     else
       respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
     end
+  end
+
+  def new
+    @upload = authorize Upload.new(uploader: CurrentUser.user, source: params[:url], referer_url: params[:ref], **permitted_attributes(Upload))
+    respond_with(@upload)
+  end
+
+  def create
+    @upload = authorize Upload.new(uploader: CurrentUser.user, **permitted_attributes(Upload))
+    @upload.save
+    respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
   end
 end
