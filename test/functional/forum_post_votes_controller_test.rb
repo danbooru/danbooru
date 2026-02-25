@@ -91,6 +91,14 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
         end
       end
+
+      should "not allow members to destroy their votes on approved BURs" do
+        as(@user) { @bulk_update_request.update!(status: :approved) }
+        assert_difference("ForumPostVote.count", 0) do
+          delete_auth forum_post_vote_path(@forum_post_vote.id, format: :js), @user
+          assert_response 403
+        end
+      end
     end
   end
 end
