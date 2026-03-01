@@ -62,8 +62,78 @@ div.post_rating > label {
 }
 
 div#c-posts {
-  form#remove-fav-button button:not([disabled]) .icon {
-    color: var(--remove-favorite-button);
+  .fav-buttons, .vote-buttons {
+    display: inline-flex;
+
+    button {
+      border: none;
+      background: none;
+      box-shadow:none;
+    }
+
+    .toolbar-button {
+      background-color: var(--form-input-background);
+      border: 1px solid var(--form-input-border-color);
+    }
+
+    #vote-up-button, #vote-up-unvote-button, #add-fav-button, #remove-fav-button {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    #vote-down-button, #vote-down-unvote-button {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    #vote-up-unvote-button {
+      background-color: var(--chip-green-background-color);
+      border-color: var(--chip-green-border-color);
+
+      &:has(button:hover) {
+        background-color: var(--chip-green-background-hover-color);
+        border-color: var(--chip-green-border-hover-color);
+      }
+    }
+
+    #vote-down-unvote-button {
+      background-color: var(--chip-red-background-color);
+      border-color: var(--chip-red-border-color);
+
+      &:has(button:hover) {
+        background-color: var(--chip-red-background-hover-color);
+        border-color: var(--chip-red-border-hover-color);
+      }
+    }
+
+    #remove-fav-button {
+      background-color: var(--chip-yellow-background-color);
+      border-color: var(--chip-yellow-border-color);
+
+      &:has(button:hover) {
+        background-color: var(--chip-yellow-background-hover-color);
+        border-color: var(--chip-yellow-border-hover-color);
+      }
+    }
+
+    .post-favcount, .post-score {
+      border: 1px solid var(--form-input-border-color);
+      background-color: var(--form-input-background);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .post-score {
+      border-left: none;
+      border-right: none;
+    }
+
+    .post-favcount {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+      border-left: none;
+    }
   }
 
   #remove-fav-button.animate i {
@@ -76,6 +146,84 @@ div#c-posts {
 
   .fav-buttons-false #remove-fav-button {
     display: none;
+  }
+
+  .vote-buttons-up {
+    #vote-up-button, #vote-down-unvote-button {
+      display: none;
+    }
+  }
+
+  .vote-buttons-none {
+    #vote-up-unvote-button, #vote-down-unvote-button {
+      display: none;
+    }
+  }
+
+  .vote-buttons-down {
+    #vote-up-unvote-button, #vote-down-button {
+      display: none;
+    }
+  }
+
+  #add-fav-button {
+    button:not([disabled]), a {
+      color: var(--add-favorite-button-color);
+
+      &:hover {
+        color: var(--add-favorite-button-hover-color);
+      }
+    }
+  }
+
+  #remove-fav-button {
+    button:not([disabled]), a {
+      color: var(--remove-favorite-button-color);
+
+      &:hover {
+        color: var(--remove-favorite-button-hover-color);
+      }
+    }
+  }
+
+  #vote-up-button {
+    button:not([disabled]), a {
+      color: var(--vote-up-button-color);
+
+      &:hover {
+        color: var(--vote-up-button-hover-color);
+      }
+    }
+  }
+
+  #vote-up-unvote-button {
+    button:not([disabled]), a {
+      color: var(--vote-up-unvote-button-color);
+
+      &:hover {
+        color: var(--vote-up-unvote-button-hover-color);
+      }
+    }
+  }
+
+  #vote-down-button {
+    button:not([disabled]), a {
+      color: var(--vote-down-button-color);
+
+      &:hover {
+        color: var(--vote-down-button-hover-color);
+      }
+    }
+  }
+
+  #vote-down-unvote-button {
+    button:not([disabled]), a {
+      color: var(--vote-down-unvote-button-color);
+
+      &:hover {
+        color: var(--vote-down-unvote-button-hover-color);
+      }
+    }
   }
 
   .post-notice {
