@@ -122,8 +122,16 @@ class Upload < ApplicationRecord
     where(upload_media_assets.where("upload_media_assets.upload_id = uploads.id").arel.exists)
   end
 
+  def self.any_source_matches(source)
+    upload_media_assets = UploadMediaAsset.where_ilike(:source_url, source)
+    q = where_ilike(:source, source)
+    q = q.or(where_ilike(:referer_url, source))
+    q = q.or(where(upload_media_assets.where("upload_media_assets.upload_id = uploads.id").arel.exists))
+    q
+  end
+
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :source, :referer_url, :status, :media_asset_count, :uploader, :upload_media_assets, :media_assets, :posts], current_user: current_user)
+    q = search_attributes(params, %i[id created_at updated_at source referer_url status media_asset_count uploader upload_media_assets media_assets posts], current_user: current_user)
 
     if params[:ai_tags_match].present?
       min_score = params.fetch(:min_score, 50).to_i
@@ -134,6 +142,10 @@ class Upload < ApplicationRecord
       q = q.where.not(id: Upload.where.missing(:posts))
     elsif params[:is_posted].to_s.falsy?
       q = q.where(id: Upload.where.missing(:posts))
+    end
+
+    if params[:any_source_matches].present?
+      q = q.any_source_matches(params[:any_source_matches])
     end
 
     case params[:order]
