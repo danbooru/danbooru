@@ -32,9 +32,17 @@ module Source::Tests::Extractor
     context "A document post" do
       strategy_should_work(
         "https://vk.com/doc495199190_630536868",
-        image_urls: [%r{https://pp.userapi.com/c235131/u495199190/docs/d59/\h{12}/Strakh_Pakhnet_Lyubovyu.png}],
+        image_urls: [%r{https://psv4.userapi.com/s/v1/d/[A-Za-z0-9_-]+/Strakh_Pakhnet_Lyubovyu.png\?cs=\d+x\d+}],
         media_files: [{ file_size: 1_437_077 }],
         page_url: "https://vk.com/doc495199190_630536868", # XXX wrong?
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -52,10 +60,8 @@ module Source::Tests::Extractor
         page_url: "https://vk.com/wall-221992613_185",
         profile_url: "https://vk.com/tarry221992613",
         profile_urls: %w[https://vk.com/tarry221992613 https://vk.com/wall-221992613],
-        display_name: "tarry",
+        display_name: "Tarry | Live2d artist",
         username: "tarry221992613",
-        tag_name: "tarry221992613",
-        other_names: ["tarry", "tarry221992613"],
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -173,21 +179,6 @@ module Source::Tests::Extractor
       )
     end
 
-    context "A wall post with an attached doc file that is an image" do
-      strategy_should_work(
-        "https://vk.com/wall-191516762_1706",
-        image_urls: [%r{https://pp.userapi.com/c235131/u495199190/docs/d59/\h{12}/Strakh_Pakhnet_Lyubovyu.png}],
-        media_files: [{ file_size: 1_437_077 }],
-        page_url: "https://vk.com/wall-191516762_1706",
-        profile_urls: %w[https://vk.com/cloppppi https://vk.com/wall-191516762],
-        display_name: "cloospi (архив)",
-        username: "cloppppi",
-        tags: [],
-        dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "the smell of fear...",
-      )
-    end
-
     context "A wall post with multiple attached doc files" do
       strategy_should_work(
         "https://vk.com/raw_files_raw?w=wall-184253008_27",
@@ -197,11 +188,11 @@ module Source::Tests::Extractor
           "https://pp.userapi.com/6_9o9t6Edk2ZmK3dmXphXuu4sjOMsnflqjnJPw/YJQ237Sddy4.jpg",
           "https://pp.userapi.com/11RZLv9b-6pLrXjyvpJ9bZRC2uqI3u9bnMvZrg/VpVaJMQjFLY.jpg",
           "https://pp.userapi.com/Z8rYUU0dAWLmrpa1xtfunVDrG9vvsNM2ytUI_Q/XhdUKOkaaak.jpg",
-          %r{https://pp.userapi.com/c536436/u421323995/docs/d7/\h{12}/Sasha03811.nef},
-          %r{https://pp.userapi.com/c536436/u421323995/docs/d46/\h{12}/Sasha03842.nef},
-          %r{https://pp.userapi.com/c536436/u421323995/docs/d22/\h{12}/Sasha03843.nef},
-          %r{https://pp.userapi.com/c536436/u421323995/docs/d21/\h{12}/Sasha03853.nef},
-          %r{https://pp.userapi.com/c536436/u421323995/docs/d21/\h{12}/Sasha03869.nef},
+          %r{https://psv4.userapi.com/s/v1/d/[A-Za-z0-9_-]+/Sasha03811.nef\?cs=\d+x\d+},
+          %r{https://psv4.userapi.com/s/v1/d/[A-Za-z0-9_-]+/Sasha03842.nef\?cs=\d+x\d+},
+          %r{https://psv4.userapi.com/s/v1/d/[A-Za-z0-9_-]+/Sasha03843.nef\?cs=\d+x\d+},
+          %r{https://psv4.userapi.com/s/v1/d/[A-Za-z0-9_-]+/Sasha03853.nef\?cs=\d+x\d+},
+          %r{https://psv4.userapi.com/s/v1/d/[A-Za-z0-9_-]+/Sasha03869.nef\?cs=\d+x\d+},
         ],
         media_files: [
           { file_size: 2_192_319 },
@@ -231,21 +222,37 @@ module Source::Tests::Extractor
       )
     end
 
-    context "A wall post with a `w` param" do
+    context "A wall post with .MediaGrid__interactive images" do
       strategy_should_work(
-        "https://vk.com/public191516762?w=wall-191516762_2283",
-        image_urls: [%r{https://pp.userapi.com/c236331/u495199190/docs/d20/\h{12}/gift_1.png}],
-        media_files: [{ file_size: 4_252_200 }],
-        page_url: "https://vk.com/wall-191516762_2283",
-        profile_urls: %w[https://vk.com/cloppppi https://vk.com/wall-191516762],
-        display_name: "cloospi (архив)",
-        username: "cloppppi",
-        tags: [],
+        "https://vk.com/kamoen?w=wall-61570093_6129",
+        image_urls: [
+          "https://pp.userapi.com/l69OLNvW5JpX3-0jMdC8_XlUYMi1x44_Axdwpw/hcQIK3JoxXY.jpg",
+          "https://pp.userapi.com/ps1VIiQiUArk8SGia1p7eTF_6ocdmRZamvvleQ/1RqPTMUzM9s.jpg",
+          %r{https://psv4.userapi.com/s/v1/d/[A-Za-z0-9_-]+/document.gif\?cs=\d+x\d+},
+        ],
+        media_files: [
+          { file_size: 188_821 },
+          { file_size: 468_542 },
+          { file_size: 9_449_083 },
+        ],
+        page_url: "https://vk.com/wall-61570093_6129",
+        profile_urls: %w[https://vk.com/kamoen https://vk.com/wall-61570093],
+        display_name: "ω MioMio ω",
+        username: "kamoen",
+        published_at: nil,
+        updated_at: nil,
+        tags: [
+          ["Скетч", "https://vk.com/feed?section=search&q=%23%D0%A1%D0%BA%D0%B5%D1%82%D1%87"],
+          ["ResidentEvil", "https://vk.com/feed?section=search&q=%23ResidentEvil"],
+          ["LadyDimitrescu", "https://vk.com/feed?section=search&q=%23LadyDimitrescu"],
+        ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          моя первая полноценная работа в цвете
+          "#Скетч":[https://vk.com/feed?section=search&q=%23%D0%A1%D0%BA%D0%B5%D1%82%D1%87] "#ResidentEvil":[https://vk.com/feed?section=search&q=%23ResidentEvil] "#LadyDimitrescu":[https://vk.com/feed?section=search&q=%23LadyDimitrescu]
+          Я правда не фанат Resident Evil, да и с фендомом плохо знакома, но я не могла пройти мимо таких шикарных дам. ( ͡° ͜ʖ ͡°)
+          Леди Димитреску и ее "дочери".
 
-          гифт для "лучшей хорни лисы":[https://vk.com/awful_queen]
+          P.S: Извиняюсь за свое долгое отсутствие. Была занята. ><
         EOS
       )
     end
@@ -253,15 +260,12 @@ module Source::Tests::Extractor
     context "A photo post" do
       strategy_should_work(
         "https://vk.com/photo-111670353_456283040",
-        image_urls: %w[https://pp.userapi.com/c845418/v845418711/ee7ae/sUnnv5p1mcA.jpg],
+        image_urls: ["https://sun9-50.userapi.com/s/v1/ig1/yuyVcW9tBo56TUNqIoQnGCuKH_QDL-8iEZ9HhqHSTyEKwXt6NPvlq6xsuUYZKQy1i3LC_Vwb.jpg?quality=96&as=32x25,48x38,72x57,108x85,160x127,240x190,360x285,480x380,540x427,640x506,720x569,1080x854&from=bu&cs=99999x99999"],
         media_files: [{ file_size: 309_615 }],
         page_url: "https://vk.com/photo-111670353_456283040",
-        profile_url: "https://vk.com/a.a.maltsev",
-        profile_urls: %w[https://vk.com/a.a.maltsev https://vk.com/wall10879681],
-        display_name: "Alexander Maltsev",
-        username: "a.a.maltsev",
-        tag_name: "a.a.maltsev",
-        other_names: ["Alexander Maltsev", "a.a.maltsev"],
+        profile_urls: %w[https://vk.com/sgips https://vk.com/wall-111670353],
+        display_name: "Секретный гараж | Параллельный СССР",
+        username: "sgips",
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -271,7 +275,7 @@ module Source::Tests::Extractor
     context "A photo in a comment on a wall post (mobile version)" do
       strategy_should_work(
         "https://m.vk.com/photo-143305139_457245182?list=wall-143305139_11133",
-        image_urls: %w[https://pp.userapi.com/cVSC2N_f8Gdou4EA6NspTDPTd3SRKpcaFUZ_tQ/VfhBKGBr30g.jpg],
+        image_urls: ["https://sun9-82.userapi.com/s/v1/ig2/AFxC0mg2RFaJNkKI-2SZI0MRJh7j3LPA3IxwyR3NWjv7c-ORpcoUAqPIRM-q1agdATTZAQDhKWosNajAOieOQG5O.jpg?quality=96&as=32x25,48x38,72x56,108x85,160x126,240x188,360x282,480x377,540x424,640x502,720x565,1080x847,1280x1004,1440x1130,1491x1170&from=bu&cs=99999x99999"],
         media_files: [{ file_size: 268_873 }],
         page_url: "https://vk.com/?z=photo-143305139_457245182/wall-143305139_11133",
         profile_url: "https://vk.com/thekilluuu",
@@ -289,13 +293,28 @@ module Source::Tests::Extractor
     context "A photo in a comment on a wall post (desktop version)" do
       strategy_should_work(
         "https://vk.com/wall-143305139_11128?z=photo-143305139_457245182%2Fwall-143305139_11133",
-        image_urls: %w[https://pp.userapi.com/cVSC2N_f8Gdou4EA6NspTDPTd3SRKpcaFUZ_tQ/VfhBKGBr30g.jpg],
+        image_urls: ["https://sun9-82.userapi.com/s/v1/ig2/AFxC0mg2RFaJNkKI-2SZI0MRJh7j3LPA3IxwyR3NWjv7c-ORpcoUAqPIRM-q1agdATTZAQDhKWosNajAOieOQG5O.jpg?quality=96&as=32x25,48x38,72x56,108x85,160x126,240x188,360x282,480x377,540x424,640x502,720x565,1080x847,1280x1004,1440x1130,1491x1170&from=bu&cs=99999x99999"],
         media_files: [{ file_size: 268_873 }],
         page_url: "https://vk.com/?z=photo-143305139_457245182/wall-143305139_11133",
       )
     end
 
-    context "A deleted or nonexistent wall post" do
+    context "A deleted wall post" do
+      strategy_should_work(
+        "https://vk.com/wall-191516762_2283",
+        image_urls: [],
+        media_files: [],
+        page_url: "https://vk.com/wall-191516762_2283",
+        profile_urls: %w[https://vk.com/cloppppi https://vk.com/wall-191516762],
+        display_name: "cloospi (архив)",
+        username: "cloppppi",
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "Post deleted",
+      )
+    end
+
+    context "A nonexistent wall post" do
       strategy_should_work(
         "https://vk.com/wall-999999999999_9999999999",
         image_urls: [],
@@ -312,7 +331,7 @@ module Source::Tests::Extractor
       )
     end
 
-    context "A deleted or nonexistent photo post" do
+    context "A nonexistent photo post" do
       strategy_should_work(
         "https://vk.com/photo-999999999999_9999999999",
         image_urls: [],

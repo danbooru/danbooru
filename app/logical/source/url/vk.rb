@@ -22,6 +22,15 @@ class Source::URL::Vk < Source::URL
     in _, "userapi.com", ("impf" | "impg"), *subdirs, file
       @full_image_url = "https://pp.userapi.com/#{subdirs.join("/")}/#{file}"
 
+    # https://sun9-82.userapi.com/s/v1/ig2/AFxC0mg2RFaJNkKI-2SZI0MRJh7j3LPA3IxwyR3NWjv7c-ORpcoUAqPIRM-q1agdATTZAQDhKWosNajAOieOQG5O.jpg?quality=96&as=32x25,48x38,72x56,108x85,160x126,240x188,360x282,480x377,540x424,640x502,720x565,1080x847,1280x1004,1440x1130,1491x1170&from=bu&cs=1280x0 (sample)
+    # * https://sun9-82.userapi.com/s/v1/ig2/AFxC0mg2RFaJNkKI-2SZI0MRJh7j3LPA3IxwyR3NWjv7c-ORpcoUAqPIRM-q1agdATTZAQDhKWosNajAOieOQG5O.jpg?quality=96&as=32x25,48x38,72x56,108x85,160x126,240x188,360x282,480x377,540x424,640x502,720x565,1080x847,1280x1004,1440x1130,1491x1170&from=bu&cs=99999x99999 (full)
+    # * https://pp.userapi.com/cVSC2N_f8Gdou4EA6NspTDPTd3SRKpcaFUZ_tQ/VfhBKGBr30g.jpg (same as above)
+    # * https://vk.com/wall-143305139_11128?z=photo-143305139_457245182%2Fwall-143305139_11133 (page url for above)
+    # https://psv4.userapi.com/s/v1/d/bZgTPvOyyPCm01sOtQaevZk93NaI1fQ2Ap460dFeFnQ3HZcRk0w5Lod-OK1ouDAQ-gJR2hgAWl3jtE2rNJjENYABUYeTYkeESbWV0AGmmejw8dFx/Sasha03811.nef?cs=99999x99999
+    # https://psv4.userapi.com/s/v1/d/70TsTOU74Yb1WLcBikvYAiE6Ndx552XKzNPVPfHntl36JHI9yCdOxaE6yUEDgGfclpFBqYW6VxM0md28OlwrTeXyBw1pzxZMzwA6oWTC3vt4KVnE/Strakh_Pakhnet_Lyubovyu.png (signed doc URL)
+    in /^(sun|psv)/, "userapi.com", "s", "v1", *_rest
+      @full_image_url = with_params(cs: "99999x99999").to_s
+
     # http://sun4.dataix-kz-akkol.userapi.com/c854320/v854320725/772f0/W3F-BmEDE5c.jpg (redirects to https://pp.userapi.com/c854320/v854320725/772f0/W3F-BmEDE5c.jpg)
     # https://sun9-55.userapi.com/c235131/u495199190/d59/-3/y_1029db78fe.jpg (sample)
     # https://psv4.userapi.com/c235131/u495199190/docs/d59/b94c28ecfbf7/Strakh_Pakhnet_Lyubovyu.png?extra=mZ9zdTdOqm0QPKfsJ8msJr5XMKqxvfSiQNZHBjCceMvuMmxeJiE_bTi12ZXc66HkriH02LKY4aq7tQQh-suMtdtaNYXUNe49sgrS8m3M02eUnwjXzATQ3oHWqB0iuPqfMcmj3uQqmjwsNlc (full)
