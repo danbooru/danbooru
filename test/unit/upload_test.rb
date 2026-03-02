@@ -11,10 +11,10 @@ class UploadTest < ActiveSupport::TestCase
         @asset1 = create(:media_asset, image_width: 720, image_height: 1280, file_size: 1.megabyte, file_ext: "jpg", media_metadata: build(:media_metadata, metadata: { "File:FileType" => "JPEG" }))
         @asset2 = create(:media_asset, image_width: 1920, image_height: 1080, file_size: 2.megabytes, file_ext: "png", duration: 3.0, media_metadata: build(:media_metadata, metadata: { "File:FileType" => "PNG" }))
 
-        @uma1 = build(:upload_media_asset, media_asset: @asset1, status: "active", created_at: Time.zone.now)
-        @uma2 = build(:upload_media_asset, media_asset: @asset2, status: "active", created_at: Time.zone.parse("2022-01-01"))
+        @uma1 = build(:upload_media_asset, media_asset: @asset1, status: "active", created_at: Time.zone.now, source_url: "https://example.com/image.jpg")
+        @uma2 = build(:upload_media_asset, media_asset: @asset2, status: "active", created_at: Time.zone.parse("2022-01-01"), source_url: "file://image.png")
 
-        @upload1 = create(:upload, created_at: Time.zone.now, upload_media_assets: [@uma1])
+        @upload1 = create(:upload, created_at: Time.zone.now, upload_media_assets: [@uma1], source: "https://example.com/posts/1")
         @upload2 = create(:upload, created_at: Time.zone.parse("2022-01-01"), upload_media_assets: [@uma2])
       end
 
@@ -74,6 +74,12 @@ class UploadTest < ActiveSupport::TestCase
       should "return assets for the exif: tag" do
         assert_tag_match([@upload2, @upload1], "exif:File:FileType")
         assert_tag_match([@upload1], "exif:File:FileType=JPEG")
+      end
+
+      should "return search for sources" do
+        assert_equal([@upload1], Upload.any_source_matches("https://example.com/image.jpg"))
+        assert_equal([@upload1], Upload.any_source_matches("https://example.com/posts/1"))
+        assert_equal([@upload2], Upload.any_source_matches("file://image.png"))
       end
     end
 
