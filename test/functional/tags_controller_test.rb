@@ -7,13 +7,6 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       @tag = create(:tag, name: "touhou", category: Tag.categories.copyright, post_count: 1)
     end
 
-    context "edit action" do
-      should "render" do
-        get_auth edit_tag_path(@tag), @user
-        assert_response :success
-      end
-    end
-
     context "index action" do
       should "render" do
         get tags_path
@@ -100,6 +93,29 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "edit action" do
+      should "render" do
+        get_auth edit_tag_path(@tag), @user
+        assert_response :success
+        assert_select("#tag_category")
+      end
+
+      should "not give the option to change the category for a large tag" do
+        @tag.update!(post_count: 1000)
+        get_auth edit_tag_path(@tag), @user
+        assert_response :success
+        assert_not_select("#tag_category")
+      end
+
+      should "not give the option to change the category for artist tags" do
+        @tag = create(:tag, category: Tag.categories.artist)
+        @artist = create(:artist, name: @tag.name)
+        get_auth edit_tag_path(@tag), @user
+        assert_response :success
+        assert_not_select("#tag_category")
+      end
+    end
+
     context "update action" do
       setup do
         @mod = create(:moderator_user)
@@ -151,6 +167,25 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(Tag.categories.copyright, @tag.first_version.category)
           assert_equal(Tag.categories.general, @tag.last_version.category)
         end
+      end
+
+      should "not change category when the tag is too large to be changed by a builder" do
+        @tag = create(:tag, category: Tag.categories.general, post_count: 1001)
+        put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.artist}}
+
+        assert_response 403
+        assert_equal(Tag.categories.general, @tag.reload.category)
+        assert_equal(0, @tag.versions.count)
+      end
+
+      should "not change the category of an artist tag" do
+        @tag = create(:tag, category: Tag.categories.artist)
+        @artist = create(:artist, name: @tag.name)
+
+        put_auth tag_path(@tag), @user, params: { tag: { category: Tag.categories.character }}
+        assert_response 403
+        assert(@tag.reload.artist?)
+        assert_equal(0, @tag.versions.count)
       end
 
       context "for deprecation" do
@@ -240,15 +275,6 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @tag_with_deleted_wiki.reload.is_deprecated?)
           assert_equal(0, @tag_with_deleted_wiki.versions.count)
         end
-      end
-
-      should "not change category when the tag is too large to be changed by a builder" do
-        @tag = create(:tag, category: Tag.categories.general, post_count: 1001)
-        put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.artist}}
-
-        assert_response 403
-        assert_equal(Tag.categories.general, @tag.reload.category)
-        assert_equal(0, @tag.versions.count)
       end
     end
   end
