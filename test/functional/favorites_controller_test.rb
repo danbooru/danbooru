@@ -23,6 +23,8 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
       should "render for /favorites?variant=tooltip" do
         get post_favorites_path(@post, variant: "tooltip")
         assert_response :success
+        assert_select "#page", count: 0
+        assert_select "#page-footer", count: 0
       end
 
       should "render for /users/:id/favorites" do

@@ -12,7 +12,9 @@ class FavoritesController < ApplicationController
     @user = User.find_by_name(user_name) if user_name
 
     @favorites = authorize Favorite.visible(CurrentUser.user).paginated_search(params, defaults: { post_id: @post&.id, user_id: @user&.id })
-    respond_with(@favorites)
+    respond_with(@favorites) do |format|
+      format.html.tooltip { render layout: false }
+    end
   end
 
   def create

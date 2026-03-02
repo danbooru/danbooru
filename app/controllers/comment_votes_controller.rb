@@ -10,7 +10,9 @@ class CommentVotesController < ApplicationController
     comment_id = params[:comment_id] || params[:search][:comment_id]
     @comment = Comment.find(comment_id) if comment_id
 
-    respond_with(@comment_votes)
+    respond_with(@comment_votes) do |format|
+      format.html.tooltip { render layout: false }
+    end
   end
 
   def show

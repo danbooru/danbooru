@@ -28,6 +28,8 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         should "render for a tooltip" do
           get comment_votes_path(comment_id: @comment.id, variant: "tooltip")
           assert_response :success
+          assert_select "#page", count: 0
+          assert_select "#page-footer", count: 0
         end
 
         should respond_to_search({}).with { [] }
@@ -41,6 +43,8 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         should "render for a tooltip" do
           get comment_votes_path(comment_id: @comment.id, variant: "tooltip")
           assert_response :success
+          assert_select "#page", count: 0
+          assert_select "#page-footer", count: 0
         end
 
         should respond_to_search({}).with { [@unrelated_vote, @negative_vote, @vote] }

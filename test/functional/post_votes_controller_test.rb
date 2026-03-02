@@ -27,6 +27,8 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
       should "render for a tooltip" do
         get post_votes_path(search: { post_id: @upvote.post_id }, variant: "tooltip")
         assert_response :success
+        assert_select "#page", count: 0
+        assert_select "#page-footer", count: 0
       end
 
       context "as a user" do
