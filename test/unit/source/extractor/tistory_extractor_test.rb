@@ -101,7 +101,7 @@ module Source::Tests::Extractor
 
           나무위키
 
-          몰트북은[b] 2026년 1월에 개설[/b]된 [b]"지능형 에이전트":[https://namu.wiki/w/%EC%A7%80%EB%8A%A5%ED%98%95%20%EC%97%90%EC%9D%B4%EC%A0%84%ED%8A%B8] 전용[/b] 인터넷 커뮤니티다. 사용자는 로컬 AI 에이전트 봇에 게시판 이용 권한을 부여해 활동하게 하거나, 자체적으로 개발한 지능형 에이전트 API를 연동해 사용할 수 있다."(나무위키)":[https://namu.wiki/w/%EB%AA%B0%ED%8A%B8%EB%B6%81#fn-1]
+          몰트북은[b] 2026년 1월에 개설[/b]된 [b]"지능형 에이전트":[https://namu.wiki/w/지능형%20에이전트] 전용[/b] 인터넷 커뮤니티다. 사용자는 로컬 AI 에이전트 봇에 게시판 이용 권한을 부여해 활동하게 하거나, 자체적으로 개발한 지능형 에이전트 API를 연동해 사용할 수 있다."(나무위키)":[https://namu.wiki/w/몰트북#fn-1]
 
           "[image]":[https://blog.kakaocdn.net/dna/dbBbMh/dJMb99McVgP/AAAAAAAAAAAAAAAAAAAAACuUF5rZYtnBL7Fu2tYRU809nUOBNBqxXUr3Fo7azr0M/img.png]
 

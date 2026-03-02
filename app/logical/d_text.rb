@@ -665,26 +665,29 @@ class DText
         title = html_to_dtext(element, **options, inline: true, &block).squeeze(" ")
         url = element["href"].to_s
 
-        if title.blank?
-          ""
-        elsif !url.match?(%r{\A(https?://|mailto:|//|/)}i)
+        normalized_url = Danbooru::URL.normalize(url, base_url:) || url
+        normalized_title = Danbooru::URL.normalize(title, base_url:) || title
+
+        # <a href="https://example.com"> </a> -> " "
+        # <a href="javascript:alert(1)">text</a> -> "text"
+        if title.blank? || !normalized_url.match?(%r{\A(https?://|mailto:)}i)
           title
-        elsif url.starts_with?("mailto:") && url.delete_prefix("mailto:") == title
-          "<#{url}>"
-        elsif url.starts_with?("//") && title == url # protocol-relative url
-          "<https:#{url}>"
-        elsif url.starts_with?("//") && title != url # protocol-relative url
-          %{"#{title.gsub('"', "&quot;")}":[https:#{url}]}
-        elsif url.starts_with?("/") && base_url.present? && title == url
-          "<#{File.join(base_url, url)}>"
-        elsif url.starts_with?("/") && base_url.present? && title != url
-          %{"#{title.gsub('"', "&quot;")}":[#{File.join(base_url, url)}]}
-        elsif url.starts_with?("/")
+
+        # <a href="/relative">text</a> -> "text" (if base_url is not provided)
+        elsif normalized_url.starts_with?("/")
           title
-        elsif title == url
-          "<#{url}>"
+
+        # <a href="mailto:user@gmail.com">user@gmail.com> -> <mailto:user@gmail.com>
+        elsif normalized_url.starts_with?("mailto:") && normalized_url.delete_prefix("mailto:") == title
+          build_link(normalized_url)
+
+        # <a href="https://example.com">https://example.com</a> -> "<https://example.com>"
+        elsif normalized_title == normalized_url
+          build_link(normalized_url)
+
+        # <a href="https://example.com">example</a> -> '"example":[https://example.com]'
         else
-          %{"#{title.gsub('"', "&quot;")}":[#{url}]}
+          build_link(normalized_url, title: title)
         end
       in "img"
         alt_text = element["title"] || element["alt"] || ""
@@ -712,6 +715,22 @@ class DText
         html_to_dtext(element, **options, &block)
       end
     end.join
+  end
+
+  # Build a DText link. If the link text is the same as the URL, then format it as `<url>`, otherwise as `"title":[url]`.
+  #
+  # @param url [String] The URL.
+  # @param title [String] The link text.
+  # @return [String] The DText link.
+  def self.build_link(url, title: url)
+    if title == url
+      escaped_url = url.gsub("<", "%3C").gsub(">", "%3E")
+      "<#{escaped_url}>"
+    else
+      escaped_title = title.gsub('"', "&quot;")
+      escaped_url = url.gsub("[", "%5B").gsub("]", "%5D")
+      %{"#{escaped_title}":[#{escaped_url}]}
+    end
   end
 
   # Escape a piece of plain text so that special characters aren't interpreted as DText.

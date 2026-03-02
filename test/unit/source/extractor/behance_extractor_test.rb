@@ -538,7 +538,7 @@ module Source::Tests::Extractor
 
           Romeo Arturio
 
-          "FACEBOOK":[https://www.facebook.com/nbaongoc1102] | "ART STATION":[https://www.artstation.com/romeoarturio]| "TWITTER":[https://twitter.com/RomeoArthur1412]
+          "FACEBOOK":[https://www.facebook.com/nbaongoc1102] | "ART STATION":[https://www.artstation.com/romeoarturio] | "TWITTER":[https://twitter.com/RomeoArthur1412]
 
           romeoarthur1412@gmail.com
 

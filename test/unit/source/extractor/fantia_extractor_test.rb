@@ -107,7 +107,7 @@ module Source::Tests::Extractor
           <https://fantia.jp/fanclubs/7/backnumbers?month=202109&plan=3309>
 
           * For those of you overseas who can't pay on Fantia, I've started selling it on Gumroad as well.
-          <https://jackdempa.gumroad.com/>
+          <https://jackdempa.gumroad.com>
 
           -----
 
@@ -127,7 +127,7 @@ module Source::Tests::Extractor
           <https://fantia.jp/fanclubs/7/backnumbers?month=202109&plan=3309>
 
           * 对于那些不能用Fantia支付的海外人士，我也开始在Gumroad上销售。
-          <https://jackdempa.gumroad.com/>
+          <https://jackdempa.gumroad.com>
         EOS
       )
     end

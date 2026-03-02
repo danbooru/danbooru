@@ -213,7 +213,7 @@ module Source::Tests::Extractor
         tags: [],
         artist_commentary_title: "PKMN-King and Queen",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          Commision for "wolfathegoddess2010":[https://wolfathegoddess2010.deviantart.com/]
+          Commision for "wolfathegoddess2010":[https://wolfathegoddess2010.deviantart.com]
 
           Reference:
           Nidoran♂ (King) > "[link]":[https://wolfathegoddess2010.deviantart.com/art/King-and-Anna-pokemon-173524307?q=gallery%3Awolfathegoddess2010%2F11255073&qo=10]
@@ -592,7 +592,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.deviantart.com/sakimichan/art/Tifa-Pullup-pinup-841327466",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          [b]"Pixiv ":[https://www.pixiv.net/member.php?id=3384404]ll"facebook ":[https://www.facebook.com/Sakimichanart/] [/b]ll"Online Store":[https://sakimichanart.storenvy.com/] ll "Tumblr":[https://sakimichan.tumblr.com/] ll [b]"Patreon":[https://www.patreon.com/sakimichan][/b]ll[b]"Artstation":[https://www.artstation.com/artist/sakimichan][/b]l[b]"Instagram":[https://instagram.com/sakimi.chan/][/b] [b]"gumroad(tutorial store)":[https://gumroad.com/sakimichan][/b] [b]cubebrush"(new tutorial store)":[https://cubebrush.co/sakimichan][/b]
+          [b]"Pixiv ":[https://www.pixiv.net/member.php?id=3384404]ll"facebook ":[https://www.facebook.com/Sakimichanart/] [/b]ll"Online Store":[https://sakimichanart.storenvy.com] ll "Tumblr":[https://sakimichan.tumblr.com] ll [b]"Patreon":[https://www.patreon.com/sakimichan][/b]ll[b]"Artstation":[https://www.artstation.com/artist/sakimichan][/b]l[b]"Instagram":[https://instagram.com/sakimi.chan/][/b] [b]"gumroad(tutorial store)":[https://gumroad.com/sakimichan][/b] [b]cubebrush"(new tutorial store)":[https://cubebrush.co/sakimichan][/b]
 
           Tifa is my favorite female character in the final fantasy series ! Also the pull boss was one of my favorite section of the game so i wanted to try painting her doing some (struggled to paint out this idea)^u^~
 
@@ -626,11 +626,11 @@ module Source::Tests::Extractor
 
           I haven't drawn something original in a while this was so much fun!! At first I wasn't going to add a BG but then I realized how hard it is for me not to add a bg xD [s]bc if I don't I feel like I'm lazy and a failure//slapped[/s].It was fun painting the sky and water,though I have a lot to improve on >q</
 
-          Hope you like it! Speedpaint will be up soon "luvluvplz":[https://luvluvplz.deviantart.com/] !
+          Hope you like it! Speedpaint will be up soon "luvluvplz":[https://luvluvplz.deviantart.com] !
 
           ________________________________________________________
 
-          [b]CM info | "fav.me/dbaalkv":[http://fav.me/dbaalkv][/b]
+          [b]CM info | <http://fav.me/dbaalkv>[/b]
         EOS
       )
     end

@@ -117,7 +117,7 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: <<~EOS.chomp,
           It's a 4th piece in a set of 6
           Previous ones being - This is a sequel to my drawings "[b]&quot;Butts&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/butts], "[b]&quot;Bubbs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/bubbs] and "[b]&quot;Diccs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/diccs]
-          "[b]QUEENCOMPLEX.NET[/b]":[https://queencomplex.net/]
+          "[b]QUEENCOMPLEX.NET[/b]":[https://queencomplex.net]
           The place to see my newest drawings
           and the place to support my work.
           "[b]@Queen_Complexxx[/b]":[https://twitter.com/Queen_Complexxx] - My Twitter

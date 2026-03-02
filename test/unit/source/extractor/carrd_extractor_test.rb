@@ -490,7 +490,7 @@ module Source::Tests::Extractor
           h3. STYLE IMITATIONS
 
           [b][u]From Bold Pictures to Moving Pixel Art[/u][/b]
-          Notable styles I can imitate range from Earthbound Sprites to Homestuck Sprites to Paper Mario styled art. I can take other similar styles, however I cannot guarantee they will be as accurate. As these styles range on complexity, the prices will be determined on what style is requested and what is to be drawn. Feel free to email me for a detailed quota!"Click here to see some styled examples!":[https://mimikabii.crd.co/#styles]
+          Notable styles I can imitate range from Earthbound Sprites to Homestuck Sprites to Paper Mario styled art. I can take other similar styles, however I cannot guarantee they will be as accurate. As these styles range on complexity, the prices will be determined on what style is requested and what is to be drawn. Feel free to email me for a detailed quota!"Click here to see some styled examples!":[https://mimikabii.crd.co#styles]
 
           [hr]
 
@@ -516,7 +516,7 @@ module Source::Tests::Extractor
 
           "[image]":[https://mimikabiicoms.crd.co/assets/images/image06.jpg]
 
-          [b][u]Don't see something you were hoping, don't worry![/u][/b]Want a simple GIF animation, or a comic strip, or a meme redraw? Banner? Larger Project? Something that doesn't fit those options? Feel free to email me and we can arrange a commission!"Check out my Gallery to see more of what I can do!":[https://mimikabii.carrd.co/#port1]
+          [b][u]Don't see something you were hoping, don't worry![/u][/b]Want a simple GIF animation, or a comic strip, or a meme redraw? Banner? Larger Project? Something that doesn't fit those options? Feel free to email me and we can arrange a commission!"Check out my Gallery to see more of what I can do!":[https://mimikabii.carrd.co#port1]
         EOS
       )
     end

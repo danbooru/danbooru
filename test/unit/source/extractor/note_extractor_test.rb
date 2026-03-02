@@ -136,7 +136,7 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: <<~EOS.chomp,
           みなさん新年あけましておめでとうございます。2023年もキャビコをどうぞよろしくお願いいたします。
 
-          新年最初にご紹介するのは、キャビコの新しいプラキット化アイテム[b]「メカトロポリス」[/b]です。これをデザインされたのはあのレジェンド"メカデザイナー[b]大河原邦男[/b]":[https://ja.wikipedia.org/wiki/%E5%A4%A7%E6%B2%B3%E5%8E%9F%E9%82%A6%E7%94%B7]氏です。"モデリズム":[http://moderhythm.blog26.fc2.com/]の"小林和史":[https://twitter.com/kobax27]氏が生み出した「"[b]メカトロウィーゴ[/b]":[https://chubu01.wixsite.com/moderhythm/untitled-c119c][b]」[/b]を大河原氏が大胆にアレンジすることで生み出されたのが、今回ご紹介する「メカトロポリス」なるオリジナルロボットです。
+          新年最初にご紹介するのは、キャビコの新しいプラキット化アイテム[b]「メカトロポリス」[/b]です。これをデザインされたのはあのレジェンド"メカデザイナー[b]大河原邦男[/b]":[https://ja.wikipedia.org/wiki/大河原邦男]氏です。"モデリズム":[http://moderhythm.blog26.fc2.com]の"小林和史":[https://twitter.com/kobax27]氏が生み出した「"[b]メカトロウィーゴ[/b]":[https://chubu01.wixsite.com/moderhythm/untitled-c119c][b]」[/b]を大河原氏が大胆にアレンジすることで生み出されたのが、今回ご紹介する「メカトロポリス」なるオリジナルロボットです。
 
           "[image]":[https://assets.st-note.com/img/1672450615522-C1tkj2EAhv.jpg]
 
@@ -196,7 +196,7 @@ module Source::Tests::Extractor
 
           このモックアップは現在、小林氏自らの手によって彩色作業を行ってもらっています。2月26日のキャビコ5周年イベント[b]「おかげさまです。キャビコです。」[/b]では彩色済みのモックアップを展示するとともに、小林氏にも[b]「モデリズム ブース」[/b]を出展していただけることになりました。
 
-          <http://moderhythm.blog26.fc2.com/>
+          <http://moderhythm.blog26.fc2.com>
 
           イベント当日はここでしか買えないアイテムも発売されるかもしれませんので、ぜひ楽しみにしていてください。
 

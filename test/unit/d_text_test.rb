@@ -236,6 +236,9 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal('"example":[https://www.example.com]', DText.from_html('<a href="https://www.example.com">example</a>'))
         assert_equal("<https://www.example.com>", DText.from_html('<a href="https://www.example.com">https://www.example.com</a>'))
 
+        assert_equal('"example":[https://www.example.com]', DText.from_html('<a href="https://www.example.com" rel="nofollow" target="_blank" class="x">example</a>'))
+        assert_equal('"example":[https://www.example.com/path#frag]', DText.from_html('<a href="https://www.example.com/path#frag">example</a>'))
+
         assert_equal("<mailto:user@example.com>", DText.from_html('<a href="mailto:user@example.com">user@example.com</a>'))
         assert_equal('"user":[mailto:user@example.com]', DText.from_html('<a href="mailto:user@example.com">user</a>'))
 
@@ -251,7 +254,18 @@ class DTextTest < ActiveSupport::TestCase
 
         assert_equal("", DText.from_html('<a href="http://example.com"></a>'))
         assert_equal("", DText.from_html('<a href="http://example.com"> </a>'))
-        assert_equal("example", DText.from_html('<a>example</a>'))
+        assert_equal("example", DText.from_html("<a>example</a>"))
+        assert_equal("example", DText.from_html('<a href="garbage">example</a>'))
+
+        assert_equal('"link":[http://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="http://example.com/search[text]=東方">link</a>'))
+        assert_equal('"link":[http://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="http://example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9">link</a>'))
+        assert_equal('"link":[https://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="//example.com/search[text]=東方">link</a>'))
+        assert_equal('"link":[https://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="//example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9">link</a>'))
+        assert_equal('"link":[http://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="/search[text]=東方">link</a>', base_url: "http://example.com"))
+        assert_equal('"link":[http://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="/search%5Btext%5D=%E6%9D%B1%E6%96%B9">link</a>', base_url: "http://example.com"))
+
+        assert_equal("<https://example.com/search[text]=東方>", DText.from_html('<a href="https://example.com/search[text]=東方">https://example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9</a>'))
+        assert_equal("<https://example.com/search[text]=東方>", DText.from_html('<a href="//example.com/search[text]=東方">https://example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9</a>'))
 
         # <small> inside a link should not wrap link text in [tn], since [tn] is invalid inside link text
         assert_equal('"fascinating":[https://example.com]', DText.from_html('<a href="https://example.com"><small>fascinating</small></a>'))

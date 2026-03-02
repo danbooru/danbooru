@@ -471,7 +471,7 @@ module Source::Tests::Extractor
 
           今回はCDではなく、ダウンロードカードの頒布となります。
 
-          デザインは"LiGHTEN":[https://twitter.com/LiGHTEN]、ジャケットイラストは"東山エイト":[http://08b.tokyo/]が担当しています。
+          デザインは"LiGHTEN":[https://twitter.com/LiGHTEN]、ジャケットイラストは"東山エイト":[http://08b.tokyo]が担当しています。
 
           今回は折角なので、制作している風景を撮影し、動画をYoutubeにアップロードいたしました。
 
@@ -662,7 +662,7 @@ module Source::Tests::Extractor
           [b]B[/b][b]o[/b][b]d[/b][b]y[/b][b],[/b][b]M[/b][b]i[/b][b]n[/b][b]d[/b][b]&[/b][b]S[/b][b]o[/b][b]u[/b][b]l[/b]
 
           [tn]Fanart of Alphonse, made for the E.E. Anthology – [/tn]"@equivalentexchangeanthology":[https://www.tumblr.com/equivalentexchangeanthology][tn] ⚕️[/tn]
-          [tn]▪︎ [/tn]"Image description (audio available)":[https://href.li/?https://ee-anthology.dreamwidth.org/tag/artist:+dee+trowble]
+          [tn]▪︎ [/tn]"Image description (audio available)":[https://href.li?https://ee-anthology.dreamwidth.org/tag/artist:+dee+trowble]
         EOS
       )
     end
