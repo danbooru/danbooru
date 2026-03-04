@@ -1167,11 +1167,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "return posts for a pixiv_id: search" do
       post_pixiv42 = create(:post, source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/42_p0.png")
       post_pixiv69 = create(:post, source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/69_p0.png")
+      post_pixiv_bad = create(:post, source: "https://pixiv.net/users/42")
       post_twitter = create(:post, source: "https://twitter.com/BOW999/status/42")
       post_null = create(:post, source: "https://null.com/69")
 
       assert_tag_match([post_pixiv42],               "pixiv_id:42")
-      assert_tag_match([post_null, post_twitter, post_pixiv69], "-pixiv_id:42")
+      assert_tag_match([post_null, post_twitter, post_pixiv_bad, post_pixiv69], "-pixiv_id:42")
 
       assert_tag_match([post_pixiv69, post_pixiv42], "pixiv_id:>=42")
       assert_tag_match([],                           "pixiv_id:<42")
@@ -1179,13 +1180,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([],                           "-pixiv_id:>=42")
       assert_tag_match([post_pixiv69, post_pixiv42], "-pixiv_id:<42")
 
-      assert_tag_match([post_null,    post_twitter], "pixiv_id:none")
+      assert_tag_match([post_null,    post_twitter, post_pixiv_bad], "pixiv_id:none")
       assert_tag_match([post_pixiv69, post_pixiv42], "pixiv_id:any")
 
       assert_tag_match([post_pixiv69, post_pixiv42], "-pixiv_id:none")
-      assert_tag_match([post_null,    post_twitter], "-pixiv_id:any")
+      assert_tag_match([post_null,    post_twitter, post_pixiv_bad], "-pixiv_id:any")
 
-      assert_tag_match([post_null,    post_twitter], "pixiv:none")
+      assert_tag_match([post_null,    post_twitter, post_pixiv_bad], "pixiv:none")
       assert_tag_match([post_pixiv69, post_pixiv42], "pixiv:any")
 
       assert_tag_match([],                           "-pixiv_id:>40,<50")
