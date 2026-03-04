@@ -1165,29 +1165,31 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for a pixiv_id: search" do
-      post1 = create(:post, pixiv_id: nil)
-      post2 = create(:post, pixiv_id: 42, source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/42_p0.png")
+      post_pixiv42 = create(:post, source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/42_p0.png")
+      post_pixiv69 = create(:post, source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/69_p0.png")
+      post_twitter = create(:post, source: "https://twitter.com/BOW999/status/42")
+      post_null = create(:post, source: "https://null.com/69")
 
-      assert_tag_match([post2], "pixiv_id:42")
-      assert_tag_match([post1], "-pixiv_id:42")
+      assert_tag_match([post_pixiv42],               "pixiv_id:42")
+      assert_tag_match([post_null, post_twitter, post_pixiv69], "-pixiv_id:42")
 
-      assert_tag_match([post2], "pixiv_id:>=42")
-      assert_tag_match([],      "pixiv_id:<42")
+      assert_tag_match([post_pixiv69, post_pixiv42], "pixiv_id:>=42")
+      assert_tag_match([],                           "pixiv_id:<42")
 
-      assert_tag_match([],      "-pixiv_id:>=42")
-      assert_tag_match([post2], "-pixiv_id:<42")
+      assert_tag_match([],                           "-pixiv_id:>=42")
+      assert_tag_match([post_pixiv69, post_pixiv42], "-pixiv_id:<42")
 
-      assert_tag_match([post1], "pixiv_id:none")
-      assert_tag_match([post2], "pixiv_id:any")
+      assert_tag_match([post_null,    post_twitter], "pixiv_id:none")
+      assert_tag_match([post_pixiv69, post_pixiv42], "pixiv_id:any")
 
-      assert_tag_match([post2], "-pixiv_id:none")
-      assert_tag_match([post1], "-pixiv_id:any")
+      assert_tag_match([post_pixiv69, post_pixiv42], "-pixiv_id:none")
+      assert_tag_match([post_null,    post_twitter], "-pixiv_id:any")
 
-      assert_tag_match([post1], "pixiv:none")
-      assert_tag_match([post2], "pixiv:any")
+      assert_tag_match([post_null,    post_twitter], "pixiv:none")
+      assert_tag_match([post_pixiv69, post_pixiv42], "pixiv:any")
 
-      assert_tag_match([], "-pixiv_id:>40,<50")
-      assert_tag_match([post2], "-pixiv_id:<40,>50")
+      assert_tag_match([],                           "-pixiv_id:>40,<50")
+      assert_tag_match([post_pixiv42],               "-pixiv_id:<40,>50")
     end
 
     should "return posts for the search: metatag" do
