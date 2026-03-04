@@ -34,6 +34,11 @@ class ReplacePixivIdWithSourceSiteAndSourceIdOnPosts < ActiveRecord::Migration[7
         AND site_id ~ '^\\d{1,19}$'
         AND (length(site_id) < 19 OR site_id <= '9223372036854775807')
     SQL
+
+    execute <<~SQL
+      CREATE INDEX index_posts_on_pixiv_site_id_bigint
+      ON posts ((CASE WHEN lower(site_name) = 'pixiv' AND site_id IS NOT NULL THEN site_id::bigint END))
+    SQL
   end
 
   def down
@@ -42,6 +47,7 @@ class ReplacePixivIdWithSourceSiteAndSourceIdOnPosts < ActiveRecord::Migration[7
     remove_index :posts, name: :index_posts_on_site_name
     remove_index :posts, name: :index_posts_on_site_name_and_site_id
     remove_index :posts, name: :index_posts_on_site_name_and_site_id_bigint
+    remove_index :posts, name: :index_posts_on_pixiv_site_id_bigint
 
     add_column :posts, :pixiv_id, :integer
 
