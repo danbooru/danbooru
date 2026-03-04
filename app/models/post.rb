@@ -1390,7 +1390,7 @@ class Post < ApplicationRecord
           begin
             RangeParser.parse(value, :integer)
             # where clause here must match the clause in index for site_id::bigints
-            where("site_id ~ '^\d{1,19}$' AND (length(site_id) < 19 OR site_id <= '9223372036854775807'").attribute_matches(value, "site_id::bigint")
+            where("site_id ~ '^\\d{1,19}$' AND (length(site_id) < 19 OR site_id <= '9223372036854775807')").attribute_matches(value, "site_id::bigint")
           rescue RangeParser::ParseError
             where(site_id: value)
           end
