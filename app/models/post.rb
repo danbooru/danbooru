@@ -1172,7 +1172,7 @@ class Post < ApplicationRecord
         when "source_id"
           source_id_matches(value)
         when "pixiv", "pixiv_id"
-          source_site_matches("Pixiv").source_id_matches(value)
+          pixiv_id_matches(value)
         when "tagcount"
           attribute_matches(value, :tag_count)
         when "duration"
@@ -1377,7 +1377,7 @@ class Post < ApplicationRecord
       end
 
       def source_site_matches(site)
-        where_iequals(:site_name, site)
+        where("site_name IS NOT NULL AND lower(site_name) = lower(?)", site)
       end
 
       def source_id_matches(value)
@@ -1395,6 +1395,22 @@ class Post < ApplicationRecord
             where(site_id: value)
           end
         end
+      end
+
+      def pixiv_id_matches(value)
+        field = "CASE WHEN lower(site_name) = 'pixiv' AND site_id IS NOT NULL THEN site_id::bigint END"
+        relation = attribute_matches(value, field)
+        operator, arg = RangeParser.parse(value, :integer)
+
+        # Match the behavior of nullable real columns in Searchable#attribute_matches.
+        # This makes `-pixiv_id:42` include rows where pixiv_id is effectively NULL.
+        if (operator in :eq | :not_eq) && arg != nil
+          relation = relation.where("#{field} IS NOT NULL")
+        end
+
+        relation
+      rescue RangeParser::ParseError
+        none
       end
 
       def embedded_matches(embedded)

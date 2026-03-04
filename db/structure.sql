@@ -5484,6 +5484,17 @@ CREATE INDEX index_posts_on_parent_id ON public.posts USING btree (parent_id) WH
 
 
 --
+-- Name: index_posts_on_pixiv_site_id_bigint; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_pixiv_site_id_bigint ON public.posts USING btree ((
+CASE
+    WHEN ((lower((site_name)::text) = 'pixiv'::text) AND (site_id IS NOT NULL)) THEN (site_id)::bigint
+    ELSE NULL::bigint
+END));
+
+
+--
 -- Name: index_posts_on_rating; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7128,6 +7139,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260304000000'),
+('20251212190901'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),
