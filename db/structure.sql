@@ -1558,11 +1558,12 @@ CREATE TABLE public.posts (
     parent_id integer,
     has_children boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
-    pixiv_id integer,
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
+    tag_count_meta integer DEFAULT 0 NOT NULL,
+    site_name character varying,
+    site_id character varying
 );
 
 
@@ -3342,7 +3343,6 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -5484,17 +5484,31 @@ CREATE INDEX index_posts_on_parent_id ON public.posts USING btree (parent_id) WH
 
 
 --
--- Name: index_posts_on_pixiv_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHERE (pixiv_id IS NOT NULL);
-
-
---
 -- Name: index_posts_on_rating; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_posts_on_rating ON public.posts USING btree (rating) WHERE (rating <> 's'::bpchar);
+
+
+--
+-- Name: index_posts_on_site_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_site_name ON public.posts USING btree (lower((site_name)::text)) WHERE (site_name IS NOT NULL);
+
+
+--
+-- Name: index_posts_on_site_name_and_site_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_site_name_and_site_id ON public.posts USING btree (lower((site_name)::text), site_id) WHERE ((site_name IS NOT NULL) AND (site_id IS NOT NULL));
+
+
+--
+-- Name: index_posts_on_site_name_and_site_id_bigint; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_site_name_and_site_id_bigint ON public.posts USING btree (lower((site_name)::text), ((site_id)::bigint)) WHERE ((site_name IS NOT NULL) AND ((site_id)::text ~ '^[0-9]{1,19}$'::text) AND ((site_id)::text <= '9223372036854775807'::text));
 
 
 --
@@ -7113,6 +7127,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260304000000'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),
