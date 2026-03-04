@@ -1,0 +1,193 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+require "erb"
+require "net/http"
+require "json"
+require "open3"
+
+# Generate a changelog between two commits. Parses `git log` and optionally uses `copilot` to summarize the changes.
+class ChangelogGenerator
+  def initialize
+    @options = {
+      repo: `git config --get remote.origin.url`.strip.split(":").last.delete_suffix(".git"), # Name of the Github repo, e.g. danbooru/danbooru
+      commits: "origin/production..master", # The range of commits to include in the changelog
+      format: "dtext",  # Output format ("dtext", "html", or "markdown")
+      model: "auto",    # The model to use for summarization (passed to `copilot --model`)
+      summarize: false, # Whether to summarize the changelog with Copilot
+      verbose: false,   # Whether to print the commands being run
+    }
+  end
+
+  # @param argv [Array<String>] The command-line arguments.
+  def run(argv = ARGV)
+    OptionParser.new do |parser|
+      parser.banner = <<~EOS
+        Usage: #{parser.program_name} [OPTIONS]
+
+        Generate a changelog between two commits (default: since last push to production).
+
+      EOS
+
+      parser.on("-h", "--help", "Show this help message") do
+        puts parser
+        exit
+      end
+
+      parser.on("-v", "--verbose", "Show the commands being run")
+      parser.on("-c", "--commits=RANGE", "Commit range to include in the changelog, in 'from..to' format (default: #{@options[:commits]}")
+      parser.on("-f", "--format=FORMAT", %w[html dtext markdown], "Output format (HTML, DText, Markdown). Default: #{@options[:format]}")
+      parser.on("-r", "--repo=OWNER/NAME", "Name of the GitHub repository (default: #{@options[:repo]})")
+      parser.on("-s", "--summarize", "Summarize the changelog with Copilot (default: #{@options[:summarize]})")
+      parser.on("-m", "--model=MODEL", "Model to use for summarization (default: #{@options[:model]}; see `copilot --help` for models)")
+
+      parser.parse!(argv, into: @options)
+
+      raise "Invalid arguments `#{argv.join(" ")}`" if argv.any?
+    end
+
+    dtext = render_changelog
+    puts format_output(dtext)
+  rescue => e
+    abort "Error: #{e.message}"
+  end
+
+  # @return [String] The changelog in DText format.
+  def render_changelog
+    commit_url = "https://github.com/#{@options[:repo]}/commit"
+    compare_url = "https://github.com/#{@options[:repo]}/compare/#{@options[:commits]}"
+
+    if @options[:summarize]
+      changes, fixes = summarize_changelog
+    else
+      changes, fixes = ["Added a feature."], ["Fixed a bug."]
+    end
+
+    ERB.new(<<~'EOS', trim_mode: "-").result(binding).gsub(/\n\n+/, "\n\n")
+      h4. <%= Time.now.strftime("%Y-%m-%d") %>
+
+      <%- if changes.any? -%>
+      h6. Changes
+      <%- end -%>
+
+      <%- changes.each do |change| -%>
+      * <%= change %>
+      <%- end -%>
+
+      <%- if fixes.any? -%>
+      h6. Fixes
+      <%- end -%>
+
+      <%- fixes.each do |fix| -%>
+      * <%= fix %>
+      <%- end -%>
+
+      [expand=Commits]
+      [table]
+        [thead]
+          [tr]
+            [th]Commit[/th]
+            [th]Message[/th]
+          [/tr]
+        [/thead]
+      <%- commits.each do |commit| -%>
+        [tr][td]"<%= commit[:sha][0..8] %>":[<%= "#{commit_url}/#{commit[:sha]}" %>][/td] [td]<%= commit[:title].chomp(".") %> (<%= commit[:author] %>)[/td][/tr]
+      <%- end -%>
+      [/table]
+      [/expand]
+
+      Full changelog: <%= compare_url %>
+    EOS
+  end
+
+  # @param dtext [String] The changelog in DText format.
+  # @return [String] The changelog in the specified output format.
+  def format_output(dtext)
+    case @options[:format].downcase
+    in "dtext"
+      dtext
+    in "html"
+      require_relative "../config/environment"
+      DText.new(dtext).format_text
+    in "markdown"
+      require_relative "../config/environment"
+      DText.new(dtext).to_markdown
+    end
+  end
+
+  # @return [Array<Hash>] The list of commits, with keys :sha, :title, and :author.
+  def commits
+    @commits ||= shell(%W[git log --topo-order --first-parent --pretty=format:%H%x1f%P%x1f%an%x1f%s%x1f%b%x1e #{@options[:commits]}]).split("\x1e").map do |record|
+      sha, parents, author, message, body = record.split("\x1f", 5)
+      pr_number = message[/\AMerge pull request #(\d+)/, 1]
+
+      # For merge commits, use the title and author of the PR.
+      if pr_number
+        merge_parent_sha = parents.to_s.split[1]
+        merge_author = shell(%W[git show -s --format=%aN #{merge_parent_sha}])
+        author = "pull ##{pr_number} by #{merge_author}"
+        title = body.lines.first
+      else
+        title = message
+      end
+
+      title = title.gsub(/#\d+/, "issue \\0")
+      { sha: sha.strip, title: title.strip, author: author.strip }
+    end
+  end
+
+  # @return [Array<String>, Array<String>] An array of changes and an array of fixes.
+  def summarize_changelog
+    raise "GitHub CLI not found. Install it with `sudo apt-get install gh`." unless system("gh --version > /dev/null")
+    raise "Copilot CLI not found. Install it with `sudo npm install -g @github/copilot`." unless system("which copilot > /dev/null") && !`copilot version > /dev/null < /dev/null`.match?(/Cannot find GitHub Copilot/)
+    raise "GitHub Copilot CLI is not authenticated. Run `gh auth login` to authenticate." unless system("gh auth status > /dev/null 2>&1")
+
+    prompt = ERB.new(<<~'EOS', trim_mode: "-").result(binding)
+      Write release notes for the commits below.
+
+      Return only valid JSON with this exact schema:
+
+      {
+        "changes": ["..."],
+        "fixes": ["..."]
+      }
+
+      Requirements:
+
+      - Put user-visible features/enhancements under "changes".
+      - Put bug fixes/regressions under "fixes".
+      - Keep each item to one sentence.
+      - Don't include internal changes that aren't user-visible.
+      - Read each commit along with any linked issues or pull requests to understand the changes.
+      - Return only JSON and nothing else. Do not return Markdown. Do not wrap the JSON in a code fence.
+
+      Commits:
+
+      <%- commits.each do |commit| -%>
+      - <%= commit[:sha] %>: <%= commit[:title].chomp(".") %> (<%= commit[:author] %>)
+      <%- end -%>
+    EOS
+
+    model = %W[--model #{@options[:model]}] if @options[:model] != "auto"
+    response = shell(["copilot", *model.to_a, "--silent", "--prompt", prompt])
+    payload = JSON.parse(response)
+
+    [payload["changes"], payload["fixes"]]
+  rescue JSON::ParserError
+    raise "Invalid response from Copilot: #{response}"
+  end
+
+  # @param args [Array<String>] The command and its arguments.
+  # @return [String] The combined standard output and standard error of the command.
+  def shell(args)
+    command = args.join(" ")
+
+    warn command if @options[:verbose]
+    output, status = Open3.capture2e(*args)
+    raise "`#{command}` failed" unless status.success?
+
+    output
+  end
+end
+
+ChangelogGenerator.new.run
