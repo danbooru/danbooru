@@ -29,7 +29,10 @@ class ReplacePixivIdWithSourceSiteAndSourceIdOnPosts < ActiveRecord::Migration[7
     execute <<~SQL
       CREATE INDEX index_posts_on_site_name_and_site_id_bigint
       ON posts (lower(site_name), (site_id::bigint))
-      WHERE site_name IS NOT NULL AND site_id ~ '^[0-9]{1,19}$' AND site_id <= '9223372036854775807'
+      WHERE
+        site_name IS NOT NULL
+        AND site_id ~ '^\\d{1,19}$'
+        AND (length(site_id) < 19 OR site_id <= '9223372036854775807')
     SQL
   end
 
