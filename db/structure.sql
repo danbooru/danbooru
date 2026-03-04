@@ -5508,7 +5508,7 @@ CREATE INDEX index_posts_on_site_name_and_site_id ON public.posts USING btree (l
 -- Name: index_posts_on_site_name_and_site_id_bigint; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_site_name_and_site_id_bigint ON public.posts USING btree (lower((site_name)::text), ((site_id)::bigint)) WHERE ((site_name IS NOT NULL) AND ((site_id)::text ~ '^[0-9]{1,19}$'::text) AND ((site_id)::text <= '9223372036854775807'::text));
+CREATE INDEX index_posts_on_site_name_and_site_id_bigint ON public.posts USING btree (lower((site_name)::text), ((site_id)::bigint)) WHERE ((site_name IS NOT NULL) AND ((site_id)::text ~ '^\d{1,19}$'::text) AND ((length((site_id)::text) < 19) OR ((site_id)::text <= '9223372036854775807'::text)));
 
 
 --
