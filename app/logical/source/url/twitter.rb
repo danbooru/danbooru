@@ -167,6 +167,10 @@ class Source::URL::Twitter < Source::URL
     end
   end
 
+  def site_id
+    status_id.to_s if status_id.present?
+  end
+
   def profile_banner?
     @profile_banner == true
   end

@@ -1167,8 +1167,12 @@ class Post < ApplicationRecord
           attribute_matches(value, :created_at, :date)
         when "age"
           attribute_matches(value, :created_at, :age)
+        when "source_site"
+          source_site_matches(value)
+        when "source_id"
+          source_id_matches(value)
         when "pixiv", "pixiv_id"
-          attribute_matches(value, :pixiv_id)
+          source_site_matches("Pixiv").source_id_matches(value)
         when "tagcount"
           attribute_matches(value, :tag_count)
         when "duration"
@@ -1369,6 +1373,27 @@ class Post < ApplicationRecord
           where(source: "")
         else
           where_ilike(:source, source + "*")
+        end
+      end
+
+      def source_site_matches(site)
+        where_iequals(:site_name, site)
+      end
+
+      def source_id_matches(value)
+        case value.to_s.downcase
+        when "any"
+          where.not(site_id: nil)
+        when "none"
+          where(site_id: nil)
+        else
+          begin
+            RangeParser.parse(value, :integer)
+            # where clause here must match the clause in index for site_id::bigint
+            where("site_id ~ '^[0-9]{1,19}$' AND site_id <= '9223372036854775807'").attribute_matches(value, "site_id::bigint")
+          rescue RangeParser::ParseError
+            where(site_id: value)
+          end
         end
       end
 
@@ -1740,9 +1765,14 @@ class Post < ApplicationRecord
       end
 
       def search(params, current_user)
+        if params[:pixiv_id].present?
+          params[:source_site] ||= "Pixiv"
+          params[:source_id] ||= params[:pixiv_id]
+        end
+
         q = search_attributes(
           params,
-          [:id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
+          [:id, :created_at, :updated_at, :rating, :source, :site_name, :site_id, :fav_count,
           :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
           :image_height, :tag_count, :has_children, :has_active_children,
           :is_pending, :is_flagged, :is_deleted, :is_banned,
@@ -1768,10 +1798,19 @@ class Post < ApplicationRecord
     end
   end
 
-  concerning :PixivMethods do
+  concerning :SourceMethods do
     def parse_pixiv_id
-      self.pixiv_id = nil
-      self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
+      self.site_name = nil
+      self.site_id = nil
+
+      return unless parsed_source&.recognized?
+
+      self.site_name = parsed_source.site_name
+      self.site_id = parsed_source.site_id
+    end
+
+    def pixiv_id
+      Integer(site_id, exception: false) if site_name == "Pixiv"
     end
   end
 
