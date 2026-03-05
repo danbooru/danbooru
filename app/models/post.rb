@@ -1167,10 +1167,8 @@ class Post < ApplicationRecord
           attribute_matches(value, :created_at, :date)
         when "age"
           attribute_matches(value, :created_at, :age)
-        when "source_site"
-          source_site_matches(value)
-        when "source_id"
-          source_id_matches(value)
+        when "site"
+          site_matches(value)
         when "pixiv", "pixiv_id"
           attribute_matches(value, :pixiv_id)
         when "tagcount"
@@ -1373,6 +1371,16 @@ class Post < ApplicationRecord
           where(source: "")
         else
           where_ilike(:source, source + "*")
+        end
+      end
+
+      def site_matches(value)
+        source_site, source_id = value.split("/", 2)
+
+        if source_id.present?
+          source_site_matches(source_site).source_id_matches(source_id)
+        else
+          source_site_matches(source_site)
         end
       end
 
@@ -1784,12 +1792,8 @@ class Post < ApplicationRecord
           current_user: current_user
         )
 
-        if params[:source_site].present?
-          q = q.source_site_matches(params[:source_site])
-        end
-
-        if params[:source_id].present?
-          q = q.source_id_matches(params[:source_id])
+        if params[:site].present?
+          q = q.site_matches(params[:site])
         end
 
         if params[:tags].present?

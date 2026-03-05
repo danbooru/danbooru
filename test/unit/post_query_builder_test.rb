@@ -1193,46 +1193,48 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post_pixiv42],               "-pixiv_id:<40,>50")
     end
 
-    should "return posts for a source_site: search" do
+    should "return posts for a site: search" do
       post_pixiv = create(:post, source: "https://www.pixiv.net/artworks/42")
       post_pixiv_profile = create(:post, source: "https://www.pixiv.net/users/42")
       post_twitter = create(:post, source: "https://x.com/BOW999/status/100")
       post_reddit = create(:post, source: "https://www.reddit.com/comments/ttyccp")
       post_unknown = create(:post, source: "https://null.com/69")
 
-      assert_tag_match([post_pixiv_profile, post_pixiv], "source_site:pixiv")
-      assert_tag_match([post_pixiv_profile, post_pixiv], "source_site:PIXIV")
-      assert_tag_match([post_twitter], "source_site:twitter")
-      assert_tag_match([post_reddit], "source_site:reddit")
-      assert_tag_match([post_reddit, post_twitter, post_pixiv_profile, post_pixiv], "source_site:any")
-      assert_tag_match([post_unknown], "source_site:none")
+      assert_tag_match([post_pixiv_profile, post_pixiv], "site:pixiv")
+      assert_tag_match([post_pixiv_profile, post_pixiv], "site:PIXIV")
+      assert_tag_match([post_twitter], "site:twitter")
+      assert_tag_match([post_reddit], "site:reddit")
+      assert_tag_match([post_reddit, post_twitter, post_pixiv_profile, post_pixiv], "site:any")
+      assert_tag_match([post_unknown], "site:none")
 
-      assert_tag_match([post_unknown], "-source_site:any")
-      assert_tag_match([post_reddit, post_twitter, post_pixiv_profile, post_pixiv], "-source_site:none")
+      assert_tag_match([post_unknown], "-site:any")
+      assert_tag_match([post_reddit, post_twitter, post_pixiv_profile, post_pixiv], "-site:none")
 
-      assert_tag_match([post_unknown, post_reddit, post_twitter], "-source_site:pixiv")
-      assert_tag_match([post_unknown, post_twitter, post_pixiv_profile, post_pixiv], "-source_site:reddit")
+      assert_tag_match([post_unknown, post_reddit, post_twitter], "-site:pixiv")
+      assert_tag_match([post_unknown, post_twitter, post_pixiv_profile, post_pixiv], "-site:reddit")
     end
 
-    should "return posts for a source_id: search" do
+    should "return posts for a site:<site>/<id> search" do
       post_pixiv = create(:post, source: "https://www.pixiv.net/artworks/42")
       post_twitter = create(:post, source: "https://x.com/BOW999/status/100")
       post_reddit = create(:post, source: "https://www.reddit.com/comments/ttyccp")
       post_pixiv_profile = create(:post, source: "https://www.pixiv.net/users/42")
       post_unknown = create(:post, source: "https://null.com/69")
 
-      assert_tag_match([post_pixiv], "source_id:42")
-      assert_tag_match([post_twitter], "source_id:100")
-      assert_tag_match([post_reddit], "source_id:ttyccp")
+      assert_tag_match([post_pixiv], "site:pixiv/42")
+      assert_tag_match([post_twitter], "site:twitter/100")
+      assert_tag_match([post_reddit], "site:reddit/ttyccp")
+      assert_tag_match([post_pixiv_profile], "site:pixiv/none")
 
-      assert_tag_match([post_twitter], "source_id:>=100")
-      assert_tag_match([post_pixiv], "source_id:<100")
+      assert_tag_match([post_twitter], "site:twitter/>=100")
+      assert_tag_match([post_pixiv], "site:pixiv/<100")
 
-      assert_tag_match([post_reddit, post_twitter, post_pixiv], "source_id:any")
-      assert_tag_match([post_unknown, post_pixiv_profile], "source_id:none")
+      assert_tag_match([post_reddit, post_twitter, post_pixiv], "site:any/any")
+      assert_tag_match([post_pixiv_profile], "site:any/none")
+      assert_tag_match([post_twitter], "site:any/100")
 
-      assert_tag_match([post_unknown, post_pixiv_profile, post_reddit, post_pixiv], "-source_id:100")
-      assert_tag_match([post_unknown, post_pixiv_profile], "-source_id:any")
+      assert_tag_match([post_unknown, post_pixiv_profile, post_reddit, post_pixiv], "-site:any/100")
+      assert_tag_match([post_unknown, post_pixiv_profile], "-site:any/any")
     end
 
     should "return posts for the search: metatag" do
