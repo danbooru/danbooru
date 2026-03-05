@@ -1195,17 +1195,23 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     should "return posts for a source_site: search" do
       post_pixiv = create(:post, source: "https://www.pixiv.net/artworks/42")
+      post_pixiv_profile = create(:post, source: "https://www.pixiv.net/users/42")
       post_twitter = create(:post, source: "https://x.com/BOW999/status/100")
       post_reddit = create(:post, source: "https://www.reddit.com/comments/ttyccp")
       post_unknown = create(:post, source: "https://null.com/69")
 
-      assert_tag_match([post_pixiv], "source_site:pixiv")
-      assert_tag_match([post_pixiv], "source_site:PIXIV")
+      assert_tag_match([post_pixiv_profile, post_pixiv], "source_site:pixiv")
+      assert_tag_match([post_pixiv_profile, post_pixiv], "source_site:PIXIV")
       assert_tag_match([post_twitter], "source_site:twitter")
       assert_tag_match([post_reddit], "source_site:reddit")
+      assert_tag_match([post_reddit, post_twitter, post_pixiv_profile, post_pixiv], "source_site:any")
+      assert_tag_match([post_unknown], "source_site:none")
+
+      assert_tag_match([post_unknown], "-source_site:any")
+      assert_tag_match([post_reddit, post_twitter, post_pixiv_profile, post_pixiv], "-source_site:none")
 
       assert_tag_match([post_unknown, post_reddit, post_twitter], "-source_site:pixiv")
-      assert_tag_match([post_unknown, post_twitter, post_pixiv], "-source_site:reddit")
+      assert_tag_match([post_unknown, post_twitter, post_pixiv_profile, post_pixiv], "-source_site:reddit")
     end
 
     should "return posts for a source_id: search" do

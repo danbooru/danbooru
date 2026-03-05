@@ -1377,7 +1377,14 @@ class Post < ApplicationRecord
       end
 
       def source_site_matches(site)
-        where("source_name IS NOT NULL AND lower(source_name) = lower(?)", site)
+        case site.to_s.downcase
+        when "any"
+          where.not(source_name: nil)
+        when "none"
+          where(source_name: nil)
+        else
+          where("source_name IS NOT NULL AND lower(source_name) = lower(?)", site)
+        end
       end
 
       def source_id_matches(value)
