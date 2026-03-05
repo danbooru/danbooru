@@ -2,7 +2,7 @@
 
 module Source
   class URL::Pixiv < Source::URL
-    attr_reader :work_id, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame
+    attr_reader :work_id, :image_hash, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame
 
     def self.match?(url)
       url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net]) &&
@@ -42,6 +42,9 @@ module Source
 
       # https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg (sample image; sci = series cover image)
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg (full image)
+      #
+      # https://i.pximg.net/c/250x250_80_a2/img-master/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0_square1200.jpg
+      # https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg
       in *, ("img-original" | "img-master" | "img-zip-ugoira" | "img-inf" | "custom-thumb" | "novel-cover-original" | "novel-cover-master") => image_type, "img", year, month, day, hour, min, sec, _ if image_url?
         @image_type = image_type
         @date = [year, month, day, hour, min, sec]
@@ -156,6 +159,12 @@ module Source
     def parse_filename
       case filename&.split("_").to_a
 
+      # https://i.pximg.net/c/250x250_80_a2/img-master/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0_square1200.jpg
+      # https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg
+      in /^\d+-\h{32}$/ => id_hash, /^p\d+$/ => page, *rest
+        @work_id, @image_hash = id_hash.split("-")
+        @page = page.delete_prefix("p").to_i
+
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
       # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
       # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
@@ -253,11 +262,16 @@ module Source
     def candidate_full_image_urls
       return [] unless image_url? && date.present?
 
+      # https://i.pximg.net/c/250x250_80_a2/img-master/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0_square1200.jpg
+      # https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg
+      if image_hash.present? && work_id.present? && page.present?
+        %w[jpg png gif].map { |ext| "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}-#{image_hash}_p#{page}.#{ext}" }
+
       # https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg
       # https://i.pximg.net/c/360x360_70/custom-thumb/img/2022/03/08/00/00/56/96755248_p0_custom1200.jpg
       # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
       # https://i.pximg.net/custom-thumb/img/2022/03/08/00/00/56/96755248_p0_custom1200.jpg
-      if work_id.present? && page.present?
+      elsif work_id.present? && page.present?
         %w[jpg png gif].map { |ext| "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}_p#{page}.#{ext}" }
 
       # https://i.pximg.net/img-master/img/2024/07/24/08/46/41/120834265_master1200.jpg

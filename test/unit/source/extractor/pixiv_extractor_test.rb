@@ -208,6 +208,32 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A hashed-filename Pixiv artwork URL" do
+      strategy_should_work(
+        "https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg",
+        image_urls: %w[https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg],
+        media_files: [{ file_size: 360_831 }],
+        page_url: "https://www.pixiv.net/artworks/141762848",
+        profile_urls: %w[https://www.pixiv.net/users/213128 https://www.pixiv.net/stacc/witch_shootingstar],
+        display_name: "みーちゃ",
+        username: "witch_shootingstar",
+        published_at: Time.parse("2026-02-28T22:35:25.000000Z"),
+        updated_at: nil,
+        tags: [
+          ["ご注文はうさぎですか?", "https://www.pixiv.net/tags/ご注文はうさぎですか%3F/artworks"],
+          ["桐間紗路", "https://www.pixiv.net/tags/桐間紗路/artworks"],
+          ["シャロ", "https://www.pixiv.net/tags/シャロ/artworks"],
+          ["内田真礼", "https://www.pixiv.net/tags/内田真礼/artworks"],
+        ],
+        dtext_artist_commentary_title: "シャロちゃん",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          🐰＜ Twitter [ [b]"twitter/MityaStar":[https://twitter.com/MityaStar][/b] ]
+          🐰＜ FANBOX [ <https://shootingstar.fanbox.cc> ]
+          🐰＜ Skeb [ <https://skeb.jp/@MityaStar> ]
+        EOS
+      )
+    end
+
     context "A deleted pixiv post" do
       strategy_should_work(
         "https://i.pximg.net/img-original/img/2018/12/30/01/04/55/72373728_p0.png",
