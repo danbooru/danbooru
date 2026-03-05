@@ -105,10 +105,6 @@ module Source
         end
       end
 
-      def site_id
-        work_id.to_s if work_id.present?
-      end
-
       def extractor_class
         if comment_id.present?
           Source::Extractor::RedditComment

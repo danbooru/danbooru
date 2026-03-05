@@ -177,10 +177,10 @@ module Source
       self.class.name.demodulize.titleize
     end
 
-    # The external ID of the page or image that this URL points to.
+    # The external work ID that this URL points to.
     #
     # @return [String, nil]
-    def site_id
+    def work_id
     end
 
     # True if the URL is from a recognized site. False if the URL is from an unrecognized site.

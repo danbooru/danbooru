@@ -214,10 +214,6 @@ module Source
       end
     end
 
-    def site_id
-      work_id.to_s if work_id.present?
-    end
-
     def image_url?
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
       # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png

@@ -1817,8 +1817,8 @@ class Post < ApplicationRecord
       return unless parsed_source&.recognized?
 
       self.source_name = parsed_source.site_name
-      self.source_id = parsed_source.site_id
-      source_id_num = Integer(parsed_source.site_id, exception: false)
+      self.source_id = parsed_source.work_id
+      source_id_num = Integer(parsed_source.work_id, exception: false)
       self.source_id_num = source_id_num if (0...1 << 63).cover?(source_id_num)
       self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
     end

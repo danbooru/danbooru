@@ -167,8 +167,8 @@ class Source::URL::Twitter < Source::URL
     end
   end
 
-  def site_id
-    status_id.to_s if status_id.present?
+  def work_id
+    status_id
   end
 
   def profile_banner?
