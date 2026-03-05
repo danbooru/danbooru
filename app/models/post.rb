@@ -1172,7 +1172,7 @@ class Post < ApplicationRecord
         when "source_id"
           source_id_matches(value)
         when "pixiv", "pixiv_id"
-          pixiv_id_matches(value)
+          attribute_matches(value, :pixiv_id)
         when "tagcount"
           attribute_matches(value, :tag_count)
         when "duration"
@@ -1377,40 +1377,23 @@ class Post < ApplicationRecord
       end
 
       def source_site_matches(site)
-        where("site_name IS NOT NULL AND lower(site_name) = lower(?)", site)
+        where("source_name IS NOT NULL AND lower(source_name) = lower(?)", site)
       end
 
       def source_id_matches(value)
         case value.to_s.downcase
         when "any"
-          where.not(site_id: nil)
+          where.not(source_id: nil)
         when "none"
-          where(site_id: nil)
+          where(source_id: nil)
         else
           begin
             RangeParser.parse(value, :integer)
-            # where clause here must match the clause in index for site_id::bigints
-            where("site_id ~ '^\\d{1,19}$' AND (length(site_id) < 19 OR site_id <= '9223372036854775807')").attribute_matches(value, "site_id::bigint")
+            attribute_matches(value, :source_id_num)
           rescue RangeParser::ParseError
-            where(site_id: value)
+            where(source_id: value)
           end
         end
-      end
-
-      def pixiv_id_matches(value)
-        field = "CASE WHEN lower(site_name) = 'pixiv' AND site_id IS NOT NULL THEN site_id::bigint END"
-        relation = attribute_matches(value, field)
-        operator, arg = RangeParser.parse(value, :integer)
-
-        # Match the behavior of nullable real columns in Searchable#attribute_matches.
-        # This makes `-pixiv_id:42` include rows where pixiv_id is effectively NULL.
-        if (operator in :eq | :not_eq) && arg != nil
-          relation = relation.where("#{field} IS NOT NULL")
-        end
-
-        relation
-      rescue RangeParser::ParseError
-        none
       end
 
       def embedded_matches(embedded)
@@ -1781,19 +1764,22 @@ class Post < ApplicationRecord
       end
 
       def search(params, current_user)
-        if params[:pixiv_id].present?
-          params[:source_site] ||= "Pixiv"
-          params[:source_id] ||= params[:pixiv_id]
-        end
-
         q = search_attributes(
           params,
-          %i[id created_at updated_at rating source site_name site_id fav_count score up_score down_score md5 file_ext
+          %i[id created_at updated_at rating source pixiv_id fav_count score up_score down_score md5 file_ext
              file_size image_width image_height tag_count has_children has_active_children is_pending is_flagged is_deleted
              is_banned last_comment_bumped_at last_commented_at last_noted_at uploader approver parent artist_commentary
              flags appeals notes comments children approvals replacements media_metadata],
           current_user: current_user,
         )
+
+        if params[:source_site].present?
+          q = q.source_site_matches(params[:source_site])
+        end
+
+        if params[:source_id].present?
+          q = q.source_id_matches(params[:source_id])
+        end
 
         if params[:tags].present?
           q = q.where(id: user_tag_match(params[:tags], current_user).select(:id))
@@ -1812,17 +1798,18 @@ class Post < ApplicationRecord
 
   concerning :SourceMethods do
     def parse_pixiv_id
-      self.site_name = nil
-      self.site_id = nil
+      self.source_name = nil
+      self.source_id = nil
+      self.source_id_num = nil
+      self.pixiv_id = nil
 
       return unless parsed_source&.recognized?
 
-      self.site_name = parsed_source.site_name
-      self.site_id = parsed_source.site_id
-    end
-
-    def pixiv_id
-      Integer(site_id, exception: false) if site_name == "Pixiv"
+      self.source_name = parsed_source.site_name
+      self.source_id = parsed_source.site_id
+      source_id_num = Integer(parsed_source.site_id, exception: false)
+      self.source_id_num = source_id_num if (0...1 << 63).cover?(source_id_num)
+      self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
     end
   end
 
