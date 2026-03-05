@@ -1562,8 +1562,10 @@ CREATE TABLE public.posts (
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
     tag_count_meta integer DEFAULT 0 NOT NULL,
-    site_name character varying,
-    site_id character varying
+    pixiv_id integer,
+    source_name character varying,
+    source_id character varying,
+    source_id_num bigint
 );
 
 
@@ -5484,14 +5486,10 @@ CREATE INDEX index_posts_on_parent_id ON public.posts USING btree (parent_id) WH
 
 
 --
--- Name: index_posts_on_pixiv_site_id_bigint; Type: INDEX; Schema: public; Owner: -
+-- Name: index_posts_on_pixiv_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_pixiv_site_id_bigint ON public.posts USING btree ((
-CASE
-    WHEN ((lower((site_name)::text) = 'pixiv'::text) AND (site_id IS NOT NULL)) THEN (site_id)::bigint
-    ELSE NULL::bigint
-END));
+CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHERE (pixiv_id IS NOT NULL);
 
 
 --
@@ -5502,24 +5500,24 @@ CREATE INDEX index_posts_on_rating ON public.posts USING btree (rating) WHERE (r
 
 
 --
--- Name: index_posts_on_site_name; Type: INDEX; Schema: public; Owner: -
+-- Name: index_posts_on_source_name; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_site_name ON public.posts USING btree (lower((site_name)::text)) WHERE (site_name IS NOT NULL);
-
-
---
--- Name: index_posts_on_site_name_and_site_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_site_name_and_site_id ON public.posts USING btree (lower((site_name)::text), site_id) WHERE ((site_name IS NOT NULL) AND (site_id IS NOT NULL));
+CREATE INDEX index_posts_on_source_name ON public.posts USING btree (lower((source_name)::text)) WHERE (source_name IS NOT NULL);
 
 
 --
--- Name: index_posts_on_site_name_and_site_id_bigint; Type: INDEX; Schema: public; Owner: -
+-- Name: index_posts_on_source_name_and_source_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_site_name_and_site_id_bigint ON public.posts USING btree (lower((site_name)::text), ((site_id)::bigint)) WHERE ((site_name IS NOT NULL) AND ((site_id)::text ~ '^\d{1,19}$'::text) AND ((length((site_id)::text) < 19) OR ((site_id)::text <= '9223372036854775807'::text)));
+CREATE INDEX index_posts_on_source_name_and_source_id ON public.posts USING btree (lower((source_name)::text), source_id) WHERE ((source_name IS NOT NULL) AND (source_id IS NOT NULL));
+
+
+--
+-- Name: index_posts_on_source_name_and_source_id_num; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_source_name_and_source_id_num ON public.posts USING btree (lower((source_name)::text), source_id_num) WHERE ((source_name IS NOT NULL) AND (source_id_num IS NOT NULL));
 
 
 --
