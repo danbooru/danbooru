@@ -85,7 +85,7 @@ class Source::Extractor
 
     def tags
       post[:tags].to_a.map do |tag|
-        [tag, "https://tumblr.com/tagged/#{Danbooru::URL.escape(tag)}"]
+        [tag, Source::URL::Tumblr.tag_url_for(tag)]
       end.uniq
     end
 

@@ -51,7 +51,7 @@ module Source
 
       def tags
         post[:tagList].to_a.map do |tag|
-          [tag, "https://www.lofter.com/tag/#{Danbooru::URL.escape(tag)}"]
+          [tag, Source::URL::Lofter.tag_url_for(tag)]
         end
       end
 
