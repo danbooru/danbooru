@@ -23,7 +23,7 @@ class ReportsController < ApplicationController
       @model = Post
       @title = "Posts Report"
       @available_columns = { posts: "COUNT(*)", uploaders: "COUNT(distinct uploader_id)" }
-      @available_groups = %w[uploader uploader.level approver rating is_deleted]
+      @available_groups = %w[uploader uploader.level approver rating source_name is_deleted]
     when "post_approvals"
       @model = PostApproval
       @title = "Post Approvals Report"
