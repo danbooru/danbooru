@@ -7,12 +7,6 @@ class ReplacePixivIdWithSourceSiteAndSourceIdOnPosts < ActiveRecord::Migration[7
     add_column :posts, :source_id_num, :bigint
 
     execute <<~SQL
-      UPDATE posts
-      SET source_name = 'Pixiv', source_id = pixiv_id::varchar, source_id_num = pixiv_id
-      WHERE pixiv_id IS NOT NULL
-    SQL
-
-    execute <<~SQL
       CREATE INDEX index_posts_on_source_name
       ON posts (lower(source_name))
       WHERE source_name IS NOT NULL

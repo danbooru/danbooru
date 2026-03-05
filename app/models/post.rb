@@ -62,7 +62,7 @@ class Post < ApplicationRecord
   validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
   validates :parent, presence: { message: "post does not exist" }, if: -> { parent_id.present? && parent_id_changed? }
-  before_save :parse_pixiv_id
+  before_save :parse_source_id
   before_save :added_tags_are_valid
   before_save :removed_tags_are_valid
   before_save :has_artist_tag
@@ -1801,7 +1801,7 @@ class Post < ApplicationRecord
   end
 
   concerning :SourceMethods do
-    def parse_pixiv_id
+    def parse_source_id
       self.source_name = nil
       self.source_id = nil
       self.source_id_num = nil
