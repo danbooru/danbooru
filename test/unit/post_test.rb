@@ -1880,7 +1880,49 @@ class PostTest < ActiveSupport::TestCase
           should "save the pixiv id" do
             @post.update(source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png")
             assert_equal(46_304_396, @post.pixiv_id)
+            assert_equal("Pixiv", @post.source_name)
+            assert_equal("46304396", @post.source_id)
+            assert_equal(46_304_396, @post.source_id_num)
             @post.pixiv_id = nil
+          end
+        end
+
+        context "that is from twitter" do
+          should "save the source id" do
+            @post.update(source: "https://x.com/BOW999/status/1261877313349640194")
+            assert_equal("Twitter", @post.source_name)
+            assert_equal("1261877313349640194", @post.source_id)
+            assert_equal(1261877313349640194, @post.source_id_num)
+            assert_nil(@post.pixiv_id)
+          end
+        end
+
+        context "that is from reddit" do
+          should "save a non-numeric source id" do
+            @post.update(source: "https://www.reddit.com/comments/ttyccp")
+            assert_equal("Reddit", @post.source_name)
+            assert_equal("ttyccp", @post.source_id)
+            assert_nil(@post.source_id_num)
+            assert_nil(@post.pixiv_id)
+          end
+        end
+
+        context "that has an out-of-range source id" do
+          should "save source_id but clear source_id_num" do
+            @post.update(source: "https://x.com/BOW999/status/9223372036854775808")
+            assert_equal("Twitter", @post.source_name)
+            assert_equal("9223372036854775808", @post.source_id)
+            assert_nil(@post.source_id_num)
+          end
+        end
+
+        context "that is from an unrecognized site" do
+          should "clear the source fields" do
+            @post.update(source: "https://null.com/69")
+            assert_nil(@post.source_name)
+            assert_nil(@post.source_id)
+            assert_nil(@post.source_id_num)
+            assert_nil(@post.pixiv_id)
           end
         end
 
