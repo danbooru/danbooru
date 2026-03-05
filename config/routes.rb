@@ -62,8 +62,9 @@ Rails.application.routes.draw do
     collection do
       get :show_or_new
     end
+    resources :artist_urls, only: [:index, :show, :create, :update, :destroy], path: "urls"
   end
-  resources :artist_urls, only: [:index]
+  resources :artist_urls, only: [:index, :show]
   resources :artist_versions, only: [:index, :show]
   resources :bans
   resources :bulk_update_requests do
