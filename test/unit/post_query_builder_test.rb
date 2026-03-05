@@ -1539,6 +1539,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "order:modqueue random:1")
     end
 
+    should "return posts for order:site/<site>" do
+      post_pixiv42 = create(:post, source: "https://www.pixiv.net/artworks/42")
+      post_pixiv69 = create(:post, source: "https://www.pixiv.net/artworks/69")
+      post_pixiv_profile = create(:post, source: "https://www.pixiv.net/users/42")
+
+      assert_tag_match([post_pixiv69, post_pixiv42, post_pixiv_profile], "site:pixiv order:site/pixiv")
+      assert_tag_match([post_pixiv42, post_pixiv69, post_pixiv_profile], "site:pixiv order:site/pixiv_asc")
+    end
+
     should "return posts for a filesize search" do
       post = create(:post, file_size: 1.megabyte, media_asset: build(:media_asset, file_size: 1.megabyte))
 

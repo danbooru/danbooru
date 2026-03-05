@@ -1736,6 +1736,17 @@ class Post < ApplicationRecord
         when "disapproved_asc"
           group(:id).left_outer_joins(:disapprovals).select("posts.*").select("MAX(post_disapprovals.created_at) AS disapproved_at").reorder("disapproved_at ASC, posts.id ASC")
 
+        when /\Asite\/(?<site>.+?)(?:_(?<direction>asc|desc))?\z/
+          site = $~[:site]
+          direction = ($~[:direction] || "desc").downcase.to_sym
+
+          reorder(
+            Arel::Nodes::Case.new.when(arel_table[:source_name].lower.eq(site.downcase)).then(0).else(1).asc,
+            arel_table[:source_id_num].send(direction).nulls_last,
+            arel_table[:source_id].send(direction).nulls_last,
+            arel_table[:id].send(direction)
+          )
+
         when "none"
           reorder(nil)
 

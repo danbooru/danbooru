@@ -56,6 +56,7 @@ class PostQueryBuilder
     tagcount tagcount_asc
     duration duration_asc
     disapproved disapproved_asc
+    site
     rank
     modqueue
     random
