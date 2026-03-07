@@ -764,6 +764,34 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("e", post1.rating)
       end
 
+      should "not clobber the parent_id of a duplicate" do
+        parent_post = create_post!(rating: "s", media_asset: create(:media_asset))
+        media_asset = create(:media_asset)
+        post1 = create_post!(rating: "s", parent_id: parent_post.id, media_asset: media_asset)
+        create_post!(rating: "s", parent_id: nil, media_asset: media_asset)
+
+        assert_redirected_to post1
+        assert_equal(parent_post.id, post1.reload.parent_id)
+      end
+
+      should "apply metatags to a duplicate" do
+        media_asset = create(:media_asset)
+        post1 = create_post!(rating: "s", media_asset: media_asset)
+        create_post!(rating: "s", tag_string: "fav:me", media_asset: media_asset)
+
+        assert_redirected_to post1
+        assert_equal(1, post1.reload.favorites.count)
+      end
+
+      should "merge tags if rating was forgotten" do
+        media_asset = create(:media_asset)
+        post1 = create_post!(rating: "s", tag_string: "post1", media_asset: media_asset)
+        create_post!(rating: "", tag_string: "post2", media_asset: media_asset)
+
+        assert_redirected_to post1
+        assert_equal("post1 post2", post1.reload.tag_string)
+      end
+
       should "apply the rating from the tags" do
         @post = create_post!(rating: nil, tag_string: "rating:s")
 
