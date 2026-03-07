@@ -68,7 +68,7 @@ class PostsController < ApplicationController
       respond_with(@post, notice: notice)
     elsif @post.errors.of_kind?(:md5, :taken)
       @original_post = Post.find_by!(md5: @post.md5)
-      @original_post.update(rating: @post.rating, parent_id: @post.parent_id, tag_string: "#{@original_post.tag_string} #{@post.tag_string}")
+      @original_post.update(rating: @post.rating.presence || @original_post.rating, parent_id: @post.parent_id || @original_post.parent_id, tag_string: "#{@original_post.tag_string} #{params.dig(:post, :tag_string)}")
       flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       redirect_to @original_post
     else
