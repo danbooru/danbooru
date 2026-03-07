@@ -20,6 +20,12 @@ require "action_view/railtie"
 # require "action_cable/engine"
 require "rails/test_unit/railtie"
 
+require "dotenv"
+
+# Patch Dotenv to log at debug level so that "[dotenv] Loaded .env" messages aren't seen on startup.
+def (Dotenv::Rails.logger).add(_level, ...) = super(Logger::DEBUG, ...)
+Dotenv::Rails.load
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)

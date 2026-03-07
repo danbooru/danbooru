@@ -2,8 +2,6 @@ source 'https://rubygems.org/'
 
 ruby "~> 3.4.5"
 
-gem 'dotenv-rails', require: "dotenv/load"
-
 gem "rails", "~> 8.0"
 gem "pg"
 gem "simple_form"
@@ -69,6 +67,7 @@ gem "abbrev"
 gem "rubyzip", require: "zip"
 gem "webrick"
 gem "useragent"
+gem "dotenv-rails", require: false # This is loaded in application.rb
 
 group :development do
   gem 'rubocop', require: false
