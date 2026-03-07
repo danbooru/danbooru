@@ -16,7 +16,7 @@ class RelatedTagQuery
     @media_asset = media_asset
     @categories = categories
     @categories = @categories.to_s.split(/[[:space:],]/) unless categories.is_a?(Array)
-    @categories = @categories.map { |c| Tag.categories.value_for(c) }
+    @categories = @categories.map { |c| Tag.categories.value_for(c) }.compact
     @order = order
     @search_sample_size = search_sample_size.to_i.clamp(0, 100_000)
     @search_sample_size = 5000 if @search_sample_size == 0

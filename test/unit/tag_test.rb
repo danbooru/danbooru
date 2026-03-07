@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class TagTest < ActiveSupport::TestCase
   setup do
@@ -56,7 +56,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(1, Tag.categories.value_for("artist"))
       assert_equal(1, Tag.categories.value_for("art"))
       assert_equal(5, Tag.categories.value_for("meta"))
-      assert_equal(0, Tag.categories.value_for("unknown"))
+      assert_equal(nil, Tag.categories.value_for("unknown"))
     end
   end
 
@@ -184,6 +184,13 @@ class TagTest < ActiveSupport::TestCase
 
       assert_equal(false, t1.valid?)
       assert_equal(["Can't change the category of an aliased tag"], t1.errors[:base])
+    end
+
+    should "not change category of an artist tag" do
+      tag = create(:tag, category: Tag.categories.artist)
+      create(:artist, name: tag.name)
+      Tag.find_or_create_by_name(tag.name, category: "character", current_user: create(:admin_user))
+      assert(tag.reload.artist?)
     end
 
     should "update post tag counts when the category is changed" do

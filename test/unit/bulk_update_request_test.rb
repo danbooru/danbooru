@@ -57,7 +57,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "category hello -> artist")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't change category of [[hello]] to artist ([[hello]] doesn't exist)"], @bur.errors[:base])
+          assert_equal(["Can't change the category of [[hello]] to artist ([[hello]] doesn't exist)"], @bur.errors[:base])
         end
       end
 
@@ -945,6 +945,33 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal(false, @bur.valid?)
           assert_equal(["Duplicate line found: create implication [[a]] -> [[b]]", "Duplicate line found: create implication [[b]] -> [[a]]"], @bur.errors.full_messages)
+        end
+      end
+
+      context "a bulk update request to change a tag's category" do
+        should "not allow changing a tag to an invalid category" do
+          @tag = create(:tag, name: "foo")
+          @bur = build(:bulk_update_request, script: "category foo -> bar")
+
+          assert_not(@bur.valid?)
+          assert_equal(["Can't change the category of [[foo]] to bar (bar is not a valid category)"], @bur.errors.full_messages)
+        end
+
+        should "not allow changing a tag to its own category" do
+          @tag = create(:tag, name: "touhou", category: Tag.categories.copyright)
+          @bur = build(:bulk_update_request, script: "category touhou -> copyright")
+
+          assert_not(@bur.valid?)
+          assert_equal(["Can't change the category of [[touhou]] to copyright ([[touhou]] is already in that category)"], @bur.errors.full_messages)
+        end
+
+        should "not allow changing an artist tag's category" do
+          @tag = create(:tag, name: "noizave", category: Tag.categories.artist)
+          @artist = create(:artist, name: @tag.name)
+          @bur = build(:bulk_update_request, script: "category noizave -> general")
+
+          assert_not(@bur.valid?)
+          assert_equal(["Can't change the category of [[noizave]] to general ([[noizave]] must be an Artist tag)"], @bur.errors.full_messages)
         end
       end
     end

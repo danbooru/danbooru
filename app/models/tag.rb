@@ -65,10 +65,8 @@ class Tag < ApplicationRecord
       norm_string = string.to_s.downcase
       if norm_string =~ /\A#{TagCategory.category_ids_regex}\z/
         norm_string.to_i
-      elsif TagCategory.mapping[string.to_s.downcase]
-        TagCategory.mapping[string.to_s.downcase]
       else
-        0
+        TagCategory.mapping[string.to_s.downcase]
       end
     end
   end
@@ -197,6 +195,10 @@ class Tag < ApplicationRecord
     end
 
     def validate_category
+      if category != Tag.categories.artist && artist.present?
+        errors.add(:base, "Artist tags must be in the Artist category")
+      end
+
       if is_aliased? && category != aliased_tag.category
         errors.add(:base, "Can't change the category of an aliased tag")
       end
@@ -236,7 +238,7 @@ class Tag < ApplicationRecord
       end
 
       def find_or_create_by_name(name, category: nil, current_user: nil, **options)
-        cat_id = categories.value_for(category)
+        cat_id = categories.value_for(category) || 0
         tag = Tag.find_by(name: normalize_name(name))
 
         if tag.nil?

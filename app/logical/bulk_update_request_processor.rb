@@ -47,7 +47,7 @@ class BulkUpdateRequestProcessor
         [:rename, Tag.normalize_name($1), Tag.normalize_name($2)]
       when /\A(?:mass update|update) (.+?) -> (.*)\z/i
         [:mass_update, $1, $2]
-      when /\Acategory (\S+) -> (#{Tag.categories.regexp})\z/i
+      when /\Acategory (\S+) -> (.*)\z/i
         [:change_category, Tag.normalize_name($1), $2.downcase]
       when /\Aconvert (.+?) -> (.*)\z/i
         [:convert, $1, $2]
@@ -159,8 +159,17 @@ class BulkUpdateRequestProcessor
 
   def validate_change_category(tag_name, category)
     tag = Tag.find_by_name(tag_name)
+
     if tag.nil?
-      errors.add(:base, "Can't change category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] doesn't exist)")
+      errors.add(:base, "Can't change the category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] doesn't exist)")
+    elsif Tag.categories.value_for(category).nil?
+      errors.add(:base, "Can't change the category of [[#{tag_name}]] to #{category} (#{category} is not a valid category)")
+    elsif validation_context == :approval
+      # do nothing
+    elsif Tag.categories.value_for(category) == tag.category
+      errors.add(:base, "Can't change the category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] is already in that category)")
+    elsif Tag.categories.value_for(category) != Tag.categories.artist && tag.artist.present?
+      errors.add(:base, "Can't change the category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] must be an Artist tag)")
     end
   end
 
