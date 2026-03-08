@@ -69,9 +69,9 @@ class DiscordSlashCommand
   concerning :HelperMethods do
     # @return [Hash] The parameters passed to the slash command by the Discord user.
     def params
-      @params ||= data.dig(:data, :options).to_a.map do |opt|
+      @params ||= data.dig(:data, :options).to_a.to_h do |opt|
         [opt[:name], opt[:value]]
-      end.to_h.with_indifferent_access
+      end.with_indifferent_access
     end
 
     # https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
@@ -87,7 +87,7 @@ class DiscordSlashCommand
         data: {
           content: content,
           **options
-        }
+        },
       }
     end
 
@@ -127,7 +127,7 @@ class DiscordSlashCommand
     class_methods do
       # Register all commands with Discord.
       def register_slash_commands!
-        slash_commands.values.each(&:register_slash_command!)
+        slash_commands.each_value(&:register_slash_command!)
       end
 
       # Register the command with Discord (replacing it if it already exists).

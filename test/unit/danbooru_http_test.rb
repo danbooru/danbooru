@@ -180,17 +180,17 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
     context "retriable feature" do
       should "not retry if the Retry-After header is sent with a 2xx or 3xx response" do
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", headers: { "Retry-After": "0" }, body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(1).returns(response_200)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", headers: { "Retry-After": "0" }, body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(1).returns(response200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/200"))
         assert_equal(200, response.status)
       end
 
       should "retry after the max_delay if the server returns a 429 error with no Retry-After header" do
-        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
+        response429 = ::HTTP::Response.new(status: 429, version: "1.1", body: "", request: nil)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response429, response200)
 
         duration = Benchmark.realtime do
           response = Danbooru::Http.use(retriable: { max_delay: 1.second }).get(httpbin_url("status/429"))
@@ -201,27 +201,27 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "retry immediately if the request returns a >=597 error" do
-        response_597 = ::HTTP::Response.new(status: 597, version: "1.1", body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_597, response_200)
+        response597 = ::HTTP::Response.new(status: 597, version: "1.1", body: "", request: nil)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response597, response200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/597"))
         assert_equal(200, response.status)
       end
 
       should "retry if the Retry-After header is an integer" do
-        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": "1" }, body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
+        response429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": "1" }, body: "", request: nil)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response429, response200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/429"))
         assert_equal(200, response.status)
       end
 
       should "retry if the Retry-After header is a date" do
-        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
+        response429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "", request: nil)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response429, response200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/429"))
         assert_equal(200, response.status)

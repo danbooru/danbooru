@@ -4,6 +4,7 @@ class UserProfileComponent < ApplicationComponent
   attr_reader :user, :current_user, :show_votes
 
   delegate :link_to_wiki, :render_post_gallery, :checkmark_icon, :exclamation_icon, to: :helpers
+  delegate :positive_feedback_count, :neutral_feedback_count, :negative_feedback_count, to: :user
 
   def initialize(user:, current_user: nil, show_votes: false)
     super
@@ -34,18 +35,6 @@ class UserProfileComponent < ApplicationComponent
 
   def noted_posts_count
     user.note_versions.distinct.count(:post_id)
-  end
-
-  def positive_feedback_count
-    user.positive_feedback_count
-  end
-
-  def neutral_feedback_count
-    user.neutral_feedback_count
-  end
-
-  def negative_feedback_count
-    user.negative_feedback_count
   end
 
   def saved_search_labels

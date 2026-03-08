@@ -155,19 +155,16 @@ class PoolTest < ActiveSupport::TestCase
           # must be a builder to update deleted pools.
           CurrentUser.user = create(:builder_user)
 
-          @pool.update_attribute(:is_deleted, true)
-          @pool.post_ids += [@p2.id]
-          @pool.save
-          @pool.reload
-          @p2.reload
+          @pool.update(is_deleted: true)
+          @pool.update(post_ids: @pool.post_ids + [@p2.id])
         end
 
         should "add the post to the pool" do
-          assert_equal([@p1.id, @p2.id], @pool.post_ids)
+          assert_equal([@p1.id, @p2.reload.id], @pool.reload.post_ids)
         end
 
         should "increment the post count" do
-          assert_equal(2, @pool.post_count)
+          assert_equal(2, @pool.reload.post_count)
         end
       end
     end

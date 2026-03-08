@@ -11,7 +11,7 @@ class UserActionsController < ApplicationController
     end
 
     @user_actions = authorize UserAction.for_user(CurrentUser.user).paginated_search(params, defaults: { user_id: @user&.id }, count_pages: @user.present?)
-    @user_actions = @user_actions.includes(:user, model: [:artist, :post, :note, :user, :creator, :banner, :bulk_update_request, :tag, :antecedent_tag, :consequent_tag, :model, :topic, :purchaser, :recipient, :forum_topic, forum_post: [:topic], comment: [:creator, :post]]) if request.format.html?
+    @user_actions = @user_actions.includes(:user, model: [:artist, :post, :note, :user, :creator, :banner, :bulk_update_request, :tag, :antecedent_tag, :consequent_tag, :model, :topic, :purchaser, :recipient, :forum_topic, { forum_post: [:topic], comment: [:creator, :post] }]) if request.format.html?
 
     respond_with(@user_actions)
   end

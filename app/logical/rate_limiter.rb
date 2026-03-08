@@ -63,7 +63,7 @@ class RateLimiter
   end
 
   def as_json(options = {})
-    hash = rate_limits.map { |limit| [limit.key, limit.points] }.to_h
+    hash = rate_limits.to_h { |limit| [limit.key, limit.points] }
     super(options).except("keys", "rate_limits").merge(limits: hash)
   end
 

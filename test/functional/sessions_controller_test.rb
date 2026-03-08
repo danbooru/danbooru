@@ -200,7 +200,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
         Danbooru.config.stubs(:captcha_secret_key).returns("2x0000000000000000000000000000000AA") # always fails
 
-        post session_path, params: { session: { name: @user.name, password: "password" }, "cf-turnstile-response": "blah" }
+        post session_path, params: { "session": { name: @user.name, password: "password" }, "cf-turnstile-response": "blah" }
 
         assert_response 401
         assert_nil(session[:user_id])
@@ -215,7 +215,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA") # always passes
 
         freeze_time
-        post session_path, params: { session: { name: @user.name, password: "password", url: users_path }, "cf-turnstile-response": "blah" }
+        post session_path, params: { "session": { name: @user.name, password: "password", url: users_path }, "cf-turnstile-response": "blah" }
 
         assert_redirected_to users_path
         assert_equal(@user.id, session[:user_id])
@@ -576,8 +576,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not log the user in if they enter a used backup code" do
-          @user = create(:user_with_2fa, backup_codes: [11111111, 22222222, 33333333])
-          backup_code = 11111111
+          @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
+          backup_code = 1111_1111
 
           post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path } }
           assert_redirected_to users_path

@@ -87,7 +87,7 @@ module VersionFor
   #
   # The hash looks like `{ attr => [old_value, new_value] }`.
   def diff(version = previous_version)
-    versioned_columns.map { |attr| [attr, [version&.send(attr), send(attr)]] }.to_h
+    versioned_columns.index_with { |attr| [version&.send(attr), send(attr)] }
   end
 
   # Revert the model back to this version.

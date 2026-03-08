@@ -22,7 +22,7 @@ module PostArchiveTestHelper
       json["source_changed"] = (prev.nil? || (json.key?("source") && prev.source != json["source"]))
       json["rating_changed"] = (prev.nil? || (json.key?("rating") && prev.rating != json["rating"]))
       if merge?(prev, json)
-        prev.update_columns(json)
+        prev.update(json)
       else
         # XXX change this to `create!` and fix tests that don't set current user.
         PostVersion.create(json)

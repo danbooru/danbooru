@@ -1713,13 +1713,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       should "return the correct favorite count for a fav:<name> search" do
-        fav = create(:favorite)
-        User.where(id: fav.user).update_all(favorite_count: 42) # XXX favorite_count is readonly; update it this way to bypass the readonly check.
+        user = create(:user, favorite_count: 41)
+        create(:favorite, user: user)
 
-        assert_fast_count(42, "fav:#{fav.user.name}")
-        assert_fast_count(42, "ordfav:#{fav.user.name}")
+        assert_fast_count(42, "fav:#{user.name}")
+        assert_fast_count(42, "ordfav:#{user.name}")
 
-        assert_fast_count(1, "-fav:#{fav.user.name}")
+        assert_fast_count(1, "-fav:#{user.name}")
       end
 
       should "return the correct favorite count for a fav:<name> search for a user with private favorites" do

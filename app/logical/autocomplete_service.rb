@@ -401,7 +401,7 @@ class AutocompleteService
   # @see https://en.wikipedia.org/wiki/OpenSearch
   # @see https://developer.mozilla.org/en-US/docs/Web/OpenSearch
   def autocomplete_opensearch(string)
-    results = autocomplete_tag(string).map { |result| result[:value] }
+    results = autocomplete_tag(string).pluck(:value)
     [query, results]
   end
 

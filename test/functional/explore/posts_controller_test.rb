@@ -21,7 +21,7 @@ module Explore
 
       context "#viewed" do
         should "render" do
-          mock_post_view_rankings(Time.zone.today, [[@post.id, 100]])
+          mock_post_view_rankings(Date.today, [[@post.id, 100]])
           get viewed_explore_posts_path
           assert_response :success
         end
@@ -29,7 +29,7 @@ module Explore
 
       context "#searches" do
         should "render" do
-          mock_post_search_rankings(Time.zone.today, [["1girl", 100], ["original", 50]])
+          mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])
           get searches_explore_posts_path
           assert_response :success
           assert_select "tbody tr", count: 2

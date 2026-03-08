@@ -577,7 +577,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           Danbooru.config.stubs(:captcha_secret_key).returns("2x0000000000000000000000000000000AA") # always fails
 
           assert_no_difference(["User.count"]) do
-            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+            post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
 
             assert_response 401
           end
@@ -587,7 +587,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
           Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA") # always passes
 
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+          post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
 
           assert_redirected_to User.last
           assert_equal("xxx", User.last.name)
@@ -612,7 +612,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         should "not create a user if the captcha response is invalid" do
           assert_no_difference(["User.count"]) do
-            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+            post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
 
             assert_response 401
           end

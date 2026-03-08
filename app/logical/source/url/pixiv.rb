@@ -72,9 +72,9 @@ module Source
       # https://i.pximg.net/imgaz/upload/20240417/163474511.jpg
       # https://i.pximg.net/imgaz/upload/20240809/962537205.jpg
       # contest images?
-      in _, _, "imgaz", "upload", _year_month_day, _ if image_url?
+      in _, _, "imgaz", "upload", year_month_day, _ if image_url?
         @image_type = "imgaz"
-        year, month, day = _year_month_day.match(/^(\d{4})(\d{2})(\d{2})$/).captures
+        year, month, day = year_month_day.match(/^(\d{4})(\d{2})(\d{2})$/).captures
         @date = [year, month, day, 0, 0, 0]
 
       # https://i.pximg.net/imgaz/2022/11/17/21/27/54/contest_pc_header_ja_606.jpg

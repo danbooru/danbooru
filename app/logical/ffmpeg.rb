@@ -121,7 +121,7 @@ class FFmpeg
 
   # @return [Integer, nil] The bit rate of the video stream, in bits per second, or nil if it can't be calculated.
   def video_bit_rate
-    if video_stream.has_key?(:bit_rate)
+    if video_stream.key?(:bit_rate)
       video_stream[:bit_rate].to_i
     # .webm doesn't have the bit rate in the metadata, so we have to calculate it from the video stream size and duration.
     elsif video_size > 0 && duration > 0
@@ -152,7 +152,7 @@ class FFmpeg
 
   # @return [Integer, nil] The bit rate of the audio stream, in bits per second, or nil if it can't be calculated.
   def audio_bit_rate
-    if audio_stream.has_key?(:bit_rate)
+    if audio_stream.key?(:bit_rate)
       audio_stream[:bit_rate].to_i
     # .webm doesn't have the bit rate in the metadata, so we have to calculate it from the audio stream size and duration.
     elsif audio_size > 0 && duration > 0
@@ -316,18 +316,18 @@ class FFmpeg
     # size_line = "[out#0/null @ 0x7f0b1ba2f300] video:36kBkB audio:16kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"
     # size_info = { "video" => 36000, "audio" => 16000, "subtitle" => 0, "other streams" => 0, "global headers" => 0, "muxing overhead" => 0 }
     size_line = lines.grep(/\[.*\] video:/).last.to_s.gsub(/\A\[.*\]/, "").strip
-    size_info = size_line.scan(/[a-z ]+: *[a-z0-9]+/i).map do |pair|
+    size_info = size_line.scan(/[a-z ]+: *[a-z0-9]+/i).to_h do |pair|
       key, value = pair.split(/: */)
       [key.strip, value.to_i * 1000] # [" audio", "16kB"] => ["audio", 16000]
-    end.to_h
+    end
 
     # [silencedetect @ 0x561855af1040] silence_start: -0.00133333e=N/A speed=  25x
     # [silencedetect @ 0x561855af1040] silence_end: 12.052 | silence_duration: 12.0533
     silence_info = lines.grep(/silence_duration/).map do |line|
-      line.scan(/[a-z_]+: *[0-9.]+/i).map do |pair|
+      line.scan(/[a-z_]+: *[0-9.]+/i).to_h do |pair|
         key, value = pair.split(/: */)
         [key, value.to_f]
-      end.to_h
+      end
     end
 
     # [Parsed_ebur128_1 @ 0x5586b53889c0] Summary:
@@ -347,12 +347,12 @@ class FFmpeg
     ebur128_index = lines.rindex { |line| /Parsed_ebur128.*Summary:/ === line }
 
     if ebur128_index
-      ebur128_lines = lines[ebur128_index..ebur128_index + 13].join("\n")
-      ebur128_info = ebur128_lines.scan(/^ *[a-z ]+: *-?(?:inf|[0-9.]+) (?:LUFS|LU|dBFS)$/i).map do |pair|
+      ebur128_lines = lines[ebur128_index..(ebur128_index + 13)].join("\n")
+      ebur128_info = ebur128_lines.scan(/^ *[a-z ]+: *-?(?:inf|[0-9.]+) (?:LUFS|LU|dBFS)$/i).to_h do |pair|
         key, value = pair.split(/: */)
         value = -1000.0 if value == "-inf dBFS" # "Peak: -inf dBFS" for silent audio tracks.
         [key.strip.tr(" ", "_"), value.to_f] # ["LRA low", "-34.3 LUFS"] => ["lra_low", -34.3]
-      end.to_h
+      end
     end
 
     { **time_info, **size_info, silence: silence_info, ebur128: ebur128_info.to_h }.with_indifferent_access

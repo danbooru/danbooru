@@ -93,7 +93,7 @@ class Artist < ApplicationRecord
       end
 
       def normalize_other_names(other_names)
-        other_names.map { |name| normalize_other_name(name) }.uniq.reject(&:blank?)
+        other_names.map { |name| normalize_other_name(name) }.uniq.compact_blank
       end
 
       # XXX Differences from wiki page other names: allow uppercase, use NFC

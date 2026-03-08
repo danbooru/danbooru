@@ -111,7 +111,7 @@ class Post < ApplicationRecord
   scope :approved, -> { where(is_pending: false, is_deleted: false) }
   scope :appealed, -> { where(id: PostAppeal.pending.select(:post_id)) }
   scope :in_modqueue, -> { where_union_all(pending, flagged, appealed) }
-  scope :expired, -> { pending.where("posts.created_at < ?", Danbooru.config.moderation_period.ago) }
+  scope :expired, -> { pending.where(created_at: ...Danbooru.config.moderation_period.ago) }
 
   scope :unflagged, -> { where(is_flagged: false) }
   scope :has_notes, -> { where.not(last_noted_at: nil) }
@@ -413,7 +413,7 @@ class Post < ApplicationRecord
     def validate_new_tags
       return if CurrentUser.user.nil? || CurrentUser.user.is_builder?
 
-      new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
+      new_tags = post_edit.effective_added_tag_names.reject { |name| Tag.exists?(name: name) }
 
       if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
         errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
@@ -748,7 +748,7 @@ class Post < ApplicationRecord
       ancestors = []
       parent = self.parent
 
-      while parent.present? && !self.in?(ancestors)
+      while parent.present? && !in?(ancestors)
         ancestors << parent
         parent = parent.parent
       end
@@ -814,7 +814,7 @@ class Post < ApplicationRecord
       return true if has_active_children?
       return true if has_children? && CurrentUser.user.show_deleted_children?
       return true if has_children? && is_deleted?
-      return false
+      false
     end
 
     def has_visible_children
@@ -969,7 +969,7 @@ class Post < ApplicationRecord
         "parent_id" => parent_id,
         "status" => status,
         "has_children" => has_children?,
-        "created_at" => created_at.to_formatted_s(:db),
+        "created_at" => created_at.to_fs(:db),
         "has_notes" => has_notes?,
         "rating" => rating,
         "author" => uploader.name,

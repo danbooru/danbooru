@@ -82,7 +82,7 @@ class Source::URL::Fanbox < Source::URL
 
   def full_image_url
     # https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png
-    return to_s if image_url? && !to_s.match?(%r{/[cw]/\w+/})
+    to_s if image_url? && !to_s.match?(%r{/[cw]/\w+/})
   end
 
   def candidate_full_image_urls

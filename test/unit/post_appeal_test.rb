@@ -46,7 +46,7 @@ class PostAppealTest < ActiveSupport::TestCase
           should "should not be able to appeal more than their limit" do
             @user = create(:contributor, upload_points: UploadLimit::MAXIMUM_POINTS)
             create(:post, uploader: @user, created_at: 1.day.ago)
-            create_list(:post_appeal, 13, creator: @user)
+            create_list(:post_appeal, 13, creator: @user) # rubocop:disable FactoryBot/ExcessiveCreateList
 
             assert_equal(40, @user.upload_limit.upload_slots)
             assert_equal(39, @user.upload_limit.used_upload_slots)

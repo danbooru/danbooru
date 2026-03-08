@@ -15,12 +15,12 @@ module ApproverPruner
   # Get the list of inactive approvers.
   # @return [Array<User>] the list of inactive approvers
   def inactive_approvers
-    recently_promoted_approvers = UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You gained the ability to approve posts*").pluck(:user_id) # XXX remove in two months
-    recently_promoted_approvers += UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You have been promoted to an Approver*").pluck(:user_id)
+    recently_promoted_approvers = UserFeedback.where(created_at: APPROVAL_PERIOD.ago..).where_like(:body, "*You gained the ability to approve posts*").pluck(:user_id) # XXX remove in two months
+    recently_promoted_approvers += UserFeedback.where(created_at: APPROVAL_PERIOD.ago..).where_like(:body, "*You have been promoted to an Approver*").pluck(:user_id)
 
     approvers = User.where(level: User::Levels::APPROVER).where.not(id: recently_promoted_approvers)
     approvers.select do |approver|
-      approver.post_approvals.where("created_at >= ?", APPROVAL_PERIOD.ago).count < MINIMUM_APPROVALS
+      approver.post_approvals.where(created_at: APPROVAL_PERIOD.ago..).count < MINIMUM_APPROVALS
     end
   end
 
@@ -34,7 +34,7 @@ module ApproverPruner
         Dmail.create_automated(
           to_id: user.id,
           title: "Approver inactivity",
-          body: "You've approved fewer than #{MINIMUM_APPROVALS} posts in the past #{APPROVAL_PERIOD.inspect}. In order to make sure the list of active approvers is up-to-date, you have lost your approval privileges. If you wish to dispute this, you can message an admin to have your permission reinstated."
+          body: "You've approved fewer than #{MINIMUM_APPROVALS} posts in the past #{APPROVAL_PERIOD.inspect}. In order to make sure the list of active approvers is up-to-date, you have lost your approval privileges. If you wish to dispute this, you can message an admin to have your permission reinstated.",
         )
       end
     end

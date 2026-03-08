@@ -36,7 +36,7 @@ class SourceURLTest < ActiveSupport::TestCase
 
     context "the == operator" do
       should "compare URLs strictly" do
-        assert(Source::URL.parse("http://google.com") == Source::URL.parse("http://google.com"))
+        assert(Source::URL.parse("http://google.com") == Source::URL.parse("http://google.com")) # rubocop:disable Lint/BinaryOperatorWithIdenticalOperands
 
         assert(Source::URL.parse("http://google.com")   != Danbooru::URL.parse("http://google.com"))
         assert(Danbooru::URL.parse("http://google.com") != Source::URL.parse("http://google.com"))
@@ -55,7 +55,8 @@ class SourceURLTest < ActiveSupport::TestCase
 
     context "the === operator" do
       should "compare URLs loosely" do
-        assert(Source::URL.parse("http://google.com") === Source::URL.parse("http://google.com"))
+        # rubocop:disable Style/CaseEquality
+        assert(Source::URL.parse("http://google.com") === Source::URL.parse("http://google.com")) # rubocop:disable Lint/BinaryOperatorWithIdenticalOperands
 
         assert(Source::URL.parse("http://google.com")   === Danbooru::URL.parse("http://google.com"))
         assert(Danbooru::URL.parse("http://google.com") === Source::URL.parse("http://google.com"))
@@ -70,6 +71,7 @@ class SourceURLTest < ActiveSupport::TestCase
         assert_not(Source::URL.parse("http://google.com") === Source::URL.parse("http://google.com?"))
         assert_not(Source::URL.parse("http://google.com") === Source::URL.parse("http://google.com#"))
         assert_not(Source::URL.parse("http://google.com") === Source::URL.parse("http://user:pass@google.com#"))
+        # rubocop:enable Style/CaseEquality
       end
     end
 

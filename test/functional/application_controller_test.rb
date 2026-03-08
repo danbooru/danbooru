@@ -105,8 +105,8 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     context "when a user has an invalid username" do
       should "redirect to the name change page" do
-        @user = create(:user)
-        @user.update_columns(name: "foo__bar")
+        @user = build(:user, name: "foo__bar")
+        @user.save!(validate: false)
 
         get_auth posts_path, @user
         assert_redirected_to change_name_user_path(@user)

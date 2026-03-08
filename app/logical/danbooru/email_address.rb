@@ -265,18 +265,18 @@ module Danbooru
     def self.correct(address)
       address = address.gsub(/[[:space:]]+/, " ").strip
 
-      address = address.gsub(/[\\\/]$/, '') # @qq.com\ -> @qq.com, @web.de/ -> @web.de
-      #address = address.gsub(/,/, ".") # foo,bar@gmail.com -> foo.bar@gmail.com | @gmail,com -> @gmail.com
-      address = address.gsub(/^https?:\/\/(www\.)?/i, "") # https://xxx@gmail.com -> xxx@gmail.com
+      address = address.gsub(%r{[\\/]$}, "") # @qq.com\ -> @qq.com, @web.de/ -> @web.de
+      # address = address.gsub(/,/, ".") # foo,bar@gmail.com -> foo.bar@gmail.com | @gmail,com -> @gmail.com
+      address = address.gsub(%r{^https?://(www\.)?}i, "") # https://xxx@gmail.com -> xxx@gmail.com
       address = address.gsub(/^mailto:/i, "") # mailto:foo@gmail.com -> foo@gmail.com
       address = address.gsub(/.* <(.*)>$/, '\1') # foo <bar@gmail.com> -> bar@gmail.com
       address = address.gsub(/@\./, "@") # @.gmail.com -> @gmail.com
       address = address.gsub(/\.+@/, "@") # foo..@gmail.com -> foo@gmail.com
       address = address.gsub(/@com$/i, ".com") # @gmail@com -> @gmail.com
-      address = address.gsub(/\.co,$/i, '.com') # @gmail.co, -> @gmail.com
-      address = address.gsub(/\.com.$/i, '.com') # @gmail.com, -> @gmail.com
-      address = address.gsub(/\.con$/i, '.com') # @gmail.con -> @gmail.com
-      address = address.gsub(/\.\.com$/i, '.com') # @gmail..com -> @gmail.com
+      address = address.gsub(/\.co,$/i, ".com") # @gmail.co, -> @gmail.com
+      address = address.gsub(/\.com.$/i, ".com") # @gmail.com, -> @gmail.com
+      address = address.gsub(/\.con$/i, ".com") # @gmail.con -> @gmail.com
+      address = address.gsub(/\.\.com$/i, ".com") # @gmail..com -> @gmail.com
 
       # @gmail -> @gmail.com
       address = address.gsub(/@gmai$/i, "@gmail.com")

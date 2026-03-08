@@ -48,7 +48,7 @@ class ChangelogGenerator
 
     dtext = render_changelog
     puts format_output(dtext)
-  rescue => e
+  rescue StandardError => e
     abort "Error: #{e.message}"
   end
 
@@ -142,7 +142,7 @@ class ChangelogGenerator
     raise "Copilot CLI not found. Install it with `sudo npm install -g @github/copilot`." unless system("which copilot > /dev/null") && !`copilot version > /dev/null < /dev/null`.match?(/Cannot find GitHub Copilot/)
     raise "GitHub Copilot CLI is not authenticated. Run `gh auth login` to authenticate." unless system("gh auth status > /dev/null 2>&1")
 
-    prompt = ERB.new(<<~'EOS', trim_mode: "-").result(binding)
+    prompt = ERB.new(<<~EOS, trim_mode: "-").result(binding)
       Write release notes for the commits below.
 
       Return only valid JSON with this exact schema:

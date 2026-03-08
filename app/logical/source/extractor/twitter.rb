@@ -16,7 +16,7 @@ class Source::Extractor
       else
         graphql_tweet.dig(:legacy, :extended_entities, :media).to_a.map do |media|
           if media[:type] == "photo"
-            media[:media_url_https] + ":orig"
+            "#{media[:media_url_https]}:orig"
           elsif media[:type].in?(["video", "animated_gif"])
             variants = media.dig(:video_info, :variants)
             videos = variants.select { |variant| variant[:content_type] == "video/mp4" }
@@ -112,12 +112,12 @@ class Source::Extractor
         { first: e[0][0], last: e[0][1], text: e[1], html: "" }
       end
 
-      entities.sort_by! { _1[:first] }
+      entities.sort_by! { it[:first] }
 
       i = 0
       entities.each do |entity|
         # HTML characters in `desc` are already escaped by Twitter, so we don't have to escape them ourselves.
-        html << desc[i..entity[:first] - 1].gsub("\n", "<br>") if i < entity[:first]
+        html << desc[i..(entity[:first] - 1)].gsub("\n", "<br>") if i < entity[:first]
         html << entity[:html]
         i = entity[:last]
       end
@@ -190,7 +190,7 @@ class Source::Extractor
         longform_notetweets_rich_text_read_enabled: true,
         longform_notetweets_inline_media_enabled: true,
         responsive_web_grok_image_annotation_enabled: true,
-        responsive_web_enhance_cards_enabled: false
+        responsive_web_enhance_cards_enabled: false,
       }
 
       parsed_get("/i/api/graphql/_8aYOgEDz35BrBcBal1-_w/TweetDetail", variables: variables.to_json, features: features.to_json) || {}
@@ -208,11 +208,11 @@ class Source::Extractor
 
     def http
       super.headers(
-        authorization: "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA", # non-secret; used by the official client
-        "x-csrf-token": credentials[:csrf_token]
+        "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA", # non-secret; used by the official client
+        "x-csrf-token": credentials[:csrf_token],
       ).cookies(
         auth_token: credentials[:auth_token],
-        ct0: credentials[:csrf_token]
+        ct0: credentials[:csrf_token],
       )
     end
 

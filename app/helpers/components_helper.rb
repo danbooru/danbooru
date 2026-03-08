@@ -9,7 +9,7 @@ module ComponentsHelper
   #
   # @param posts [ActiveRecord::Relation<Post>, Array<Post>] A set of posts.
   # @param options [Hash] A hash of options for the PostGalleryComponent and PostPreviewComponent.
-  def render_post_gallery(posts, **options, &block)
+  def render_post_gallery(posts, **options, &_block)
     posts = posts.includes(:media_asset) if posts.is_a?(ActiveRecord::Relation)
 
     render(PostGalleryComponent.new(**options)) do |gallery|
@@ -90,7 +90,7 @@ module ComponentsHelper
     end
   end
 
-  def help_tooltip(content = nil, icon: help_icon, **options, &block)
+  def help_tooltip(content = nil, icon: help_icon, **options, &_block)
     content = yield if block_given?
     render HelpTooltipComponent.new(icon, content, **options)
   end

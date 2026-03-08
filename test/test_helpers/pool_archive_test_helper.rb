@@ -11,7 +11,7 @@ module PoolArchiveTestHelper
       json = JSON.parse(json)
       prev = PoolVersion.where(pool_id: json["pool_id"]).order("id desc").first
       if merge?(prev, json)
-        prev.update_columns(json)
+        prev.update(json)
       else
         PoolVersion.create!(json)
       end

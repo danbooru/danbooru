@@ -15,9 +15,9 @@ class Cache
   # @param prefix [String] a prefix for each cache key
   # @return [Hash<String, Object>] a map from cache keys to cache values
   def self.get_multi(keys, prefix)
-    sanitized_key_to_key_hash = keys.map do |key|
-      ["#{prefix}:#{Cache.hash(key)}", key]
-    end.to_h
+    sanitized_key_to_key_hash = keys.index_by do |key|
+      "#{prefix}:#{Cache.hash(key)}"
+    end
 
     sanitized_keys = sanitized_key_to_key_hash.keys
     sanitized_key_to_value_hash = Rails.cache.fetch_multi(*sanitized_keys) do |sanitized_key|

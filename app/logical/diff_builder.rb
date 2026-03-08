@@ -17,7 +17,7 @@ class DiffBuilder
     cbo = Diff::LCS::ContextDiffCallbacks.new
     diffs = otharr.diff(thisarr, cbo)
 
-    escape_html = ->(str) {str.gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;')}
+    escape_html = ->(str) { str.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;") }
 
     output = otharr
     output.each { |q| q.replace(escape_html[q]) }
@@ -35,31 +35,31 @@ class DiffBuilder
       newstart = newchange.old_position
       oldstart = hunk.min {|a, b| a.old_position <=> b.old_position}.old_position
 
-      if newchange.action == '+'
-        output.insert(newstart, '</ins>')
+      if newchange.action == "+"
+        output.insert(newstart, "</ins>")
       end
 
       hunk.reverse_each do |chg|
         case chg.action
-        when '-'
+        when "-"
           oldstart = chg.old_position
           output[chg.old_position] = '<span class="paragraph-mark">¶</span><br>' if chg.old_element.match(/^\r?\n$/)
-        when '+'
+        when "+"
           if chg.new_element.match(/^\r?\n$/)
             output.insert(chg.old_position, '<span class="paragraph-mark">¶</span><br>')
           else
-            output.insert(chg.old_position, (escape_html[chg.new_element]).to_s)
+            output.insert(chg.old_position, escape_html[chg.new_element].to_s)
           end
         end
       end
 
-      if newchange.action == '+'
-        output.insert(newstart, '<ins>')
+      if newchange.action == "+"
+        output.insert(newstart, "<ins>")
       end
 
-      if hunk[0].action == '-'
-        output.insert((newstart == oldstart || newchange.action != '+') ? newstart + 1 : newstart, '</del>')
-        output.insert(oldstart, '<del>')
+      if hunk[0].action == "-"
+        output.insert((newstart == oldstart || newchange.action != "+") ? newstart + 1 : newstart, "</del>")
+        output.insert(oldstart, "<del>")
       end
     end
 

@@ -9,7 +9,7 @@ class Source::Extractor::Skland < Source::Extractor
       [parsed_url.to_s]
     elsif article.dig(:item, :videoListSlice).present?
       article.dig(:item, :videoListSlice).to_a.map do |video|
-        video_url = video[:resolutions]&.max_by { _1[:size].to_i }&.dig(:playURL)
+        video_url = video[:resolutions]&.max_by { it[:size].to_i }&.dig(:playURL)
         Source::URL.parse(video_url).try(:full_image_url) || video_url
       end
     else
@@ -111,7 +111,7 @@ class Source::Extractor::Skland < Source::Extractor
   end
 
   memoize def article
-    api_response.dig(:data) || {}
+    api_response[:data] || {}
   end
 
   memoize def api_response

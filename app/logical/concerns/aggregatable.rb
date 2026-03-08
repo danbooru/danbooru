@@ -134,7 +134,7 @@ module Aggregatable
 
   def build_dataframe(query, groups)
     results = query.select_all
-    types = results.columns.map { |column| [column, :object] }.to_h
+    types = results.columns.index_with { :object }
 
     associations = groups.map do |name|
       name = name.split(".").first if name.include?(".")

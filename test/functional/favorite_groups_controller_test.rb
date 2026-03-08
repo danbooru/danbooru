@@ -47,7 +47,8 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "show private favgroups to the creator" do
-        @favgroup.update_columns(is_public: false)
+        @favgroup.is_public = false
+        @favgroup.save!(validate: false)
         get_auth favorite_group_path(@favgroup), @user
         assert_response :success
       end

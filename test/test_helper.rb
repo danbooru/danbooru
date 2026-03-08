@@ -4,8 +4,8 @@ require "simplecov"
 require_relative "../config/environment"
 require "rails/test_help"
 
-Dir["#{Rails.root}/test/factories/*.rb"].sort.each { |file| require file }
-Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
+Rails.root.glob("test/factories/*.rb").each { |file| require file }
+Rails.root.glob("test/test_helpers/*.rb").each { |file| require file }
 
 Minitest::Reporters.use!([
   Minitest::Reporters::ProgressReporter.new,
@@ -48,7 +48,7 @@ class ActiveSupport::TestCase
     end
   end
 
-  parallelize_teardown do |worker|
+  parallelize_teardown do
     SimpleCov.result
   end
 

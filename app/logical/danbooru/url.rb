@@ -240,12 +240,12 @@ module Danbooru
 
     # @return [Danbooru::Domain, nil] The domain name of the URL, or nil if the URL doesn't have a domain.
     memoize def parsed_domain
-      Danbooru::Domain.parse(host) unless host.blank?
+      Danbooru::Domain.parse(host) if host.present?
     end
 
     # @return [Danbooru::IpAddress, nil] The IP address of the URL, if the URL's host is an IP address instead of a domain name.
     memoize def ip_address
-      Danbooru::IpAddress.parse(hostname) unless hostname.blank?
+      Danbooru::IpAddress.parse(hostname) if hostname.present?
     end
 
     # Strict equality on unnormalized URLs. `Danbooru::URL.parse("https://google.com") == Danbooru::URL.parse("https://google.com/")` is false.

@@ -63,7 +63,7 @@ module Source
 
       def http
         super.headers(
-          Authorization: "Bearer null",
+          "Authorization": "Bearer null",
           "sec-fetch-mode": "cors",
           "sec-fetch-site": "same-origin",
         )

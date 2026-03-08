@@ -17,7 +17,7 @@ class Source::Extractor::Patreon < Source::Extractor
     # The list of media objects can contain duplicate files. This happens for old posts with inline images where the
     # first image was made the post's cover image. These files have unique URLs despite being MD5-identical, so we
     # filter them out by their name/size/dimensions. Ex: https://www.patreon.com/posts/sailormoonredraw-37219108.
-    unique_media = media.uniq { _1.values_at(*%w[file_name dimensions size_bytes mimetype]) }
+    unique_media = media.uniq { it.values_at(*%w[file_name dimensions size_bytes mimetype]) }
     unique_media.pluck("display").pluck("url").compact
   end
 
@@ -157,19 +157,19 @@ class Source::Extractor::Patreon < Source::Extractor
   end
 
   def user
-    api_response["included"].to_a.find { _1["type"] == "user" } || {}
+    api_response["included"].to_a.find { it["type"] == "user" } || {}
   end
 
   def media
-    api_response["included"].to_a.select { _1["type"] == "media" }.pluck("attributes")
+    api_response["included"].to_a.select { it["type"] == "media" }.pluck("attributes")
   end
 
   def poll
-    api_response["included"].to_a.find { _1["type"] == "poll" }&.dig("attributes") || {}
+    api_response["included"].to_a.find { it["type"] == "poll" }&.dig("attributes") || {}
   end
 
   def poll_choices
-    api_response["included"].to_a.select { _1["type"] == "poll_choice" }.pluck("attributes").sort_by { _1["position"] }
+    api_response["included"].to_a.select { it["type"] == "poll_choice" }.pluck("attributes").sort_by { it["position"] }
   end
 
   def post_id

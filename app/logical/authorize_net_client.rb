@@ -51,8 +51,8 @@ class AuthorizeNetClient
           },
           refId: reference_id,
           transactionRequest: transaction_request,
-          "hostedPaymentSettings": {
-            "setting": hosted_payment_settings(settings),
+          hostedPaymentSettings: {
+            setting: hosted_payment_settings(settings),
           },
         }
       )
@@ -61,8 +61,8 @@ class AuthorizeNetClient
     def hosted_payment_settings(settings)
       settings.map do |name, hash|
         {
-          "settingName": "hostedPayment#{name.to_s.camelize}Options",
-          "settingValue": hash.to_json,
+          settingName: "hostedPayment#{name.to_s.camelize}Options",
+          settingValue: hash.to_json,
         }
       end
     end
@@ -73,12 +73,12 @@ class AuthorizeNetClient
       body = resp.body.to_s.delete_prefix("\xEF\xBB\xBF") # delete UTF-8 BOM
       json = JSON.parse(body).with_indifferent_access
 
-      if json.dig(:messages, :resultCode) != "Ok"
+      if json.dig(:messages, :resultCode) == "Ok"
+        json
+      else
         code = json.dig(:messages, :message, 0, :code)
         text = json.dig(:messages, :message, 0, :text)
         raise Error, "Authorize.net call failed (request=#{request.keys.first} code=#{code} text=#{text})"
-      else
-        json
       end
     end
 

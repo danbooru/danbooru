@@ -206,7 +206,7 @@ class MediaAsset < ApplicationRecord
       [media_asset, type].hash
     end
 
-    def serializable_hash(*options)
+    def serializable_hash(*_options)
       { type: type, url: file_url, width: width, height: height, file_ext: file_ext }
     end
 
@@ -290,7 +290,7 @@ class MediaAsset < ApplicationRecord
       #
       # This can't be called inside a transaction because the transaction will
       # fail if there's a RecordNotUnique error when the asset already exists.
-      def upload!(media_file, &block)
+      def upload!(media_file, &_block)
         media_file = MediaFile.open(media_file) unless media_file.is_a?(MediaFile)
 
         media_asset = create!(file: media_file, status: :processing)
@@ -346,7 +346,7 @@ class MediaAsset < ApplicationRecord
         elsif media_file.is_corrupt?
           raise Error, "File is corrupt"
         elsif media_file.file_size > MAX_FILE_SIZE
-          raise Error, "File size too large (size: #{media_file.file_size.to_formatted_s(:human_size)}; max size: #{MAX_FILE_SIZE.to_formatted_s(:human_size)})"
+          raise Error, "File size too large (size: #{media_file.file_size.to_fs(:human_size)}; max size: #{MAX_FILE_SIZE.to_fs(:human_size)})"
         elsif media_file.resolution > MAX_IMAGE_RESOLUTION
           raise Error, "Image resolution is too large (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)"
         elsif media_file.width > MAX_IMAGE_WIDTH

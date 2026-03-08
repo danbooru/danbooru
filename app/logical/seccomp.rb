@@ -482,9 +482,9 @@ module Seccomp
   #
   # @return [Hash<Integer, String>] a hash of syscall numbers to syscall names
   def self.syscalls
-    @syscalls ||= 0.upto(8192).map do |n|
-      [n, resolve_syscall_number(n) ]
-    end.to_h.compact
+    @syscalls ||= 0.upto(8192).index_with do |n|
+      resolve_syscall_number(n)
+    end.compact
   end
 
   # Recursively expand a list of syscall names, that may contain a mixture of regular

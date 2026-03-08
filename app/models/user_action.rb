@@ -69,7 +69,7 @@ class UserAction < ApplicationRecord
     UNION ALL
       (#{TagImplication.visible(user).select("'TagImplication', id, creator_id, 'create', created_at").to_sql})
     UNION ALL
-      (#{TagVersion.visible(user).select("'TagVersion', id, updater_id, 'create', created_at").where("updater_id IS NOT NULL").order(created_at: :desc).to_sql})
+      (#{TagVersion.visible(user).select("'TagVersion', id, updater_id, 'create', created_at").where.not(updater_id: nil).order(created_at: :desc).to_sql})
     UNION ALL
       (#{Upload.visible(user).select("'Upload', id, uploader_id, 'create', created_at").order(created_at: :desc).to_sql})
     UNION ALL

@@ -5,3 +5,5 @@ Metrics/ClassLength:
   Enabled: false
 Lint/AmbiguousBlockAssociation:
   Enabled: false
+Lint/UselessAssignment:
+  Enabled: false

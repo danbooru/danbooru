@@ -36,18 +36,18 @@ class SessionLoader
         UserEvent.create_from_request!(user, :failed_login, request)
         errors.add(:base, "You cannot login from a proxy unless you have 2FA enabled")
 
-        return nil
+        nil
       elsif user.totp.present?
         UserEvent.create_from_request!(user, :totp_login_pending_verification, request)
 
-        return user
+        user
       # Require email verification for builders without 2FA enabled who are logging in from a new location.
       elsif user.is_builder? && user.can_receive_email?(require_verified_email: false) && !user.authorized_ip?(ip_address)
         user_event = UserEvent.create_from_request!(user, :login_pending_verification, request)
         user.send_login_verification_email!(request, user_event)
         errors.add(:base, "New login location detected. Check your email to continue")
 
-        return nil
+        nil
       else
         login_user(user, :login)
         user
@@ -128,7 +128,7 @@ class SessionLoader
       UserEvent.create_from_request!(user, :failed_reauthenticate, request)
       errors.add(:password, "is incorrect")
       false
-    elsif !user.totp.present? # right password and user doesn't have 2FA
+    elsif user.totp.blank? # right password and user doesn't have 2FA
       UserEvent.create_from_request!(user, :reauthenticate, request)
       session[:last_authenticated_at] = Time.now.utc.inspect
       true
@@ -195,7 +195,7 @@ class SessionLoader
 
   # @return [Boolean] true if the current request has an API key
   def has_api_authentication?
-    request.authorization.present? || params.has_key?(:login) || params.has_key?(:api_key)
+    request.authorization.present? || params.key?(:login) || params.key?(:api_key)
   end
 
   private
@@ -219,8 +219,8 @@ class SessionLoader
 
   # Sets the current API user based on the HTTP Basic Auth params.
   def authenticate_basic_auth
-    credentials = ::Base64.decode64(request.authorization.split(' ', 2).last || '')
-    login, api_key = credentials.split(/:/, 2)
+    credentials = ::Base64.decode64(request.authorization.split(" ", 2).last || "")
+    login, api_key = credentials.split(":", 2)
     DanbooruLogger.add_attributes("param", login: login)
     authenticate_api_key(login, api_key)
   end

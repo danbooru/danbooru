@@ -4,6 +4,7 @@
 module Danbooru
   class DataFrame
     attr_reader :df
+
     delegate :head, :shape, :names, :types, :rename, :empty?, :each_row, :[], :[]=, to: :df
 
     def initialize(...)
@@ -17,7 +18,7 @@ module Danbooru
         foreign_key = association.foreign_key
         name = association.name.to_s
 
-        next table if !table.names.include?(foreign_key)
+        next table if table.names.exclude?(foreign_key)
 
         ids = table[foreign_key].to_a.uniq.compact_blank
         records = association.klass.where(primary_key => ids).index_by(&primary_key.to_sym)

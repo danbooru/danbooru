@@ -4,13 +4,13 @@ class PaginatorComponentTest < ViewComponent::TestCase
   def render_sequential_paginator(records, page: 1, limit: 3, page_limit: 100)
     records = records.paginate(page, limit: limit, page_limit: page_limit)
     params = ActionController::Parameters.new(controller: records.model_name.plural, action: :index)
-    return render_inline(SequentialPaginatorComponent.new(records: records, params: params))
+    render_inline(SequentialPaginatorComponent.new(records: records, params: params))
   end
 
   def render_numbered_paginator(records, page: 1, limit: 3, page_limit: 100)
     records = records.paginate(page, limit: limit, page_limit: page_limit)
     params = ActionController::Parameters.new(controller: records.model_name.plural, action: :index)
-    return render_inline(NumberedPaginatorComponent.new(records: records, params: params))
+    render_inline(NumberedPaginatorComponent.new(records: records, params: params))
   end
 
   def assert_page(expected_page, link)

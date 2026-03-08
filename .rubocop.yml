@@ -1,14 +1,26 @@
-# some of these settings are overridden in also test/.rubocop.yml
-
+# Some of these settings are overridden in test/.rubocop.yml
+#
+# https://docs.rubocop.org/rubocop/latest/configuration.html
+# https://docs.rubocop.org/rubocop-factory_bot/latest/cops_factorybot.html
+#
+# Ruby: https://rubystyle.guide/
+# Rails: https://rails.rubystyle.guide/
+# Airbnb: https://github.com/airbnb/ruby
+# Gitlab: https://docs.gitlab.com/development/backend/ruby_style_guide/
+# Shopify: https://ruby-style-guide.shopify.dev/
 plugins:
   - rubocop-rails
   - rubocop-factory_bot
 
 AllCops:
   NewCops: enable
+  ActiveSupportExtensionsEnabled: true
+  StringLiteralsFrozenByDefault: true
   Exclude:
-    - "bin/*"
     - "node_modules/**/*"
+    - "public/**/*"
+    - "script/**/*"
+    - "tmp/**/*"
 
 Bundler/OrderedGems:
   Enabled: false
@@ -46,6 +58,9 @@ Layout/SpaceInsideHashLiteralBraces:
 Lint/DuplicateBranch:
   Enabled: false
 
+Lint/SymbolConversion:
+  EnforcedStyle: consistent
+
 Metrics/AbcSize:
   Enabled: false
 
@@ -81,13 +96,16 @@ Metrics/PerceivedComplexity:
 Lint/InheritException:
   EnforcedStyle: standard_error
 
+Naming/BlockForwarding:
+  Enabled: false
+
 Naming/HeredocDelimiterNaming:
   Enabled: false
 
 Naming/MethodParameterName:
   Enabled: false
 
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: false
 
 Rails/Blank:
@@ -163,6 +181,10 @@ Style/MutableConstant:
 Style/NegatedIf:
   Enabled: false
 
+Style/NumericLiterals:
+  AllowedPatterns:
+  - \d{4}(_\d{4})*
+
 Style/NumericPredicate:
   Enabled: false
 
@@ -182,9 +204,6 @@ Style/PerlBackrefs:
   Enabled: false
 
 Style/RedundantAssignment:
-  Enabled: false
-
-Style/RedundantReturn:
   Enabled: false
 
 Style/RegexpLiteral:

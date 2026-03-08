@@ -8,12 +8,12 @@ class DiscordSlashCommand
       name: "url",
       description: "The URL of the image to tag",
       required: false,
-      type: ApplicationCommandOptionType::String
+      type: ApplicationCommandOptionType::String,
     }, {
       name: "confidence",
       description: "The minimum tag confidence level (default: 1%)",
       required: false,
-      type: ApplicationCommandOptionType::Integer
+      type: ApplicationCommandOptionType::Integer,
     }]
 
     def call
@@ -22,8 +22,8 @@ class DiscordSlashCommand
       # Use the given URL, if present, or the last message with an attachment, if not.
       if params[:url].present?
         respond_later { tagme(params[:url], confidence) }
-      elsif result = get_last_message_with_url
-        message, url = result
+      elsif (result = get_last_message_with_url)
+        _message, url = result
         respond_later { tagme(url, confidence) }
       else
         respond_with("No image found. Post an image or provide a URL.")
@@ -38,7 +38,7 @@ class DiscordSlashCommand
       preview = file.preview(size, size)
       ai_tags = autotagger.evaluate!(preview, limit: limit, confidence: confidence)
 
-      return {
+      {
         embeds: [{
           description: build_tag_list(ai_tags),
           author: {
@@ -49,7 +49,7 @@ class DiscordSlashCommand
           image: {
             url: image_url,
           },
-        }]
+        }],
       }
     ensure
       preview&.close

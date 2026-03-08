@@ -354,7 +354,7 @@ class PostQuery
       # @return [AST] A new AST with the tags replaced.
       def replace_tags(replacements)
         rewrite do |node|
-          if node.tag? && replacements.has_key?(node.name)
+          if node.tag? && replacements.key?(node.name)
             node(:tag, replacements[node.name])
           else
             node

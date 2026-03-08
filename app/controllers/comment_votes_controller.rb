@@ -26,7 +26,7 @@ class CommentVotesController < ApplicationController
     @comment.with_lock do
       @comment_vote = authorize CommentVote.new(comment: @comment, score: params[:score], user: CurrentUser.user)
 
-      CommentVote.active.where(comment: @comment, user: CurrentUser.user).each do |vote|
+      CommentVote.active.where(comment: @comment, user: CurrentUser.user).find_each do |vote|
         vote.soft_delete!(updater: CurrentUser.user)
       end
 

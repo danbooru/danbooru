@@ -13,7 +13,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
               post_replacement: {
                 replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg",
                 tags: "replaced -image_sample",
-              }
+              },
             }
 
             assert_redirected_to @post
@@ -55,7 +55,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_replacement: {
               replacement_file: Rack::Test::UploadedFile.new("test/files/test.png"),
               final_source: "blah",
-            }
+            },
           }
 
           assert_redirected_to @post
@@ -73,7 +73,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_id: @post2.id,
             post_replacement: {
               replacement_file: Rack::Test::UploadedFile.new("test/files/test.jpg"),
-            }
+            },
           }
 
           assert_redirected_to @post2
@@ -92,7 +92,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://www.pixiv.net/en/artworks/62247350",
-            }
+            },
           }
 
           assert_redirected_to @post
@@ -118,7 +118,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://www.pixiv.net/en/artworks/62247364",
-            }
+            },
           }
 
           assert_redirected_to @post
@@ -149,7 +149,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png",
-            }
+            },
           }
 
           assert_redirected_to @post
@@ -170,7 +170,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://x.com/motty08111213/status/943446161586733056",
-            }
+            },
           }
 
           assert_redirected_to @post
@@ -188,7 +188,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_id: @post.id,
             post_replacement: {
               replacement_url: "https://twitter.com/dril/status/384408932061417472",
-            }
+            },
           }
 
           assert_redirected_to @post
@@ -205,7 +205,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
               post_id: @post.id,
               post_replacement: {
                 replacement_file: Rack::Test::UploadedFile.new("test/files/ugoira/animation.json"),
-              }
+              },
             }
 
             assert_redirected_to @post
@@ -233,7 +233,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           post_replacement: {
             old_file_size: 23,
             file_size: 42,
-          }
+          },
         }
 
         assert_response :success

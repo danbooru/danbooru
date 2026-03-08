@@ -18,7 +18,7 @@ class PostAppeal < ApplicationRecord
     rejected: 2,
   }
 
-  scope :expired, -> { pending.where("post_appeals.created_at < ?", Danbooru.config.moderation_period.ago) }
+  scope :expired, -> { pending.where(post_appeals: { created_at: ...Danbooru.config.moderation_period.ago }) }
 
   def prune_disapprovals
     PostDisapproval.where(post: post).delete_all

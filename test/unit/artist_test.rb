@@ -672,13 +672,8 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     context "that is deleted" do
-      setup do
-        @artist = create(:artist, url_string: "https://google.com")
-        @artist.update_attribute(:is_deleted, true)
-        @artist.reload
-      end
-
       should "preserve the url string" do
+        @artist = create(:artist, is_deleted: true, url_string: "https://google.com")
         assert_equal(1, @artist.urls.count)
       end
     end

@@ -98,7 +98,7 @@ module ApplicationHelper
   def time_tag(content, time, **options)
     datetime = time.strftime("%Y-%m-%dT%H:%M%:z")
 
-    tag.time content || datetime, datetime: datetime, title: time.to_formatted_s, **options
+    tag.time content || datetime, datetime: datetime, title: time.to_fs, **options
   end
 
   def duration_to_hhmmss(seconds)
@@ -264,7 +264,7 @@ module ApplicationHelper
 
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
     search_form_for(url, classes: "quick-search-form one-line-form py-1.5 px-3 md:w-180px w-full") do |f|
-      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
+      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { "id": nil, "data-autocomplete": autocomplete }
       out += tag.input type: :hidden, name: :redirect, value: redirect
       out += capture { yield f } if block_given?
       out
@@ -331,9 +331,9 @@ module ApplicationHelper
       class: "c-#{controller_param} a-#{action_param} flex flex-col",
       spellcheck: "false",
       data: {
-        controller: controller_param,
-        action: action_param,
-        layout: layout,
+        "controller": controller_param,
+        "action": action_param,
+        "layout": layout,
         "current-user-ip-addr": request.remote_ip,
         "current-user-save-data": CurrentUser.save_data,
         **data_attributes_for(current_user, "current-user", USER_DATA_ATTRIBUTES),
@@ -354,7 +354,7 @@ module ApplicationHelper
   end
 
   def data_attributes_for(record, prefix = "data", attributes = record.html_data_attributes)
-    attributes.map do |attr|
+    attributes.to_h do |attr|
       if attr.is_a?(Array)
         name = attr.map {|sym| sym.to_s.dasherize.delete("?")}.join('-')
         value = record
@@ -383,7 +383,7 @@ module ApplicationHelper
       else
         [:"#{prefix}-#{name}", value]
       end
-    end.to_h
+    end
   end
 
   def page_title(title = nil, suffix: "| #{Danbooru.config.app_name}")

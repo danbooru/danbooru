@@ -138,21 +138,17 @@ class PostTest < ActiveSupport::TestCase
           @pool = create(:pool)
           @pool.add!(@post)
 
-          @deleted_pool = create(:pool)
-          @deleted_pool.add!(@post)
-          @deleted_pool.update_columns(is_deleted: true)
+          @deleted_pool = create(:pool, post_ids: [@post.id], is_deleted: true)
 
           @post.expunge!
-          @pool.reload
-          @deleted_pool.reload
         end
 
         should "remove the post from all pools" do
-          assert_equal([], @pool.post_ids)
+          assert_equal([], @pool.reload.post_ids)
         end
 
         should "remove the post from deleted pools" do
-          assert_equal([], @deleted_pool.post_ids)
+          assert_equal([], @deleted_pool.reload.post_ids)
         end
 
         should "destroy the record" do

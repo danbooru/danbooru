@@ -4,8 +4,8 @@ class ForumTopic < ApplicationRecord
   alias_attribute :category, :category_id
 
   enum :category, {
-    General: 0,
-    Tags: 1,
+    "General": 0,
+    "Tags": 1,
     "Bugs & Features": 2,
   }, scopes: false, instance_methods: false, validate: true, default: "General"
 
@@ -165,7 +165,7 @@ class ForumTopic < ApplicationRecord
   end
 
   def page_for(post_id)
-    (forum_posts.where("id < ?", post_id).count / Danbooru.config.posts_per_page.to_f).ceil
+    (forum_posts.where(id: ...post_id).count / Danbooru.config.posts_per_page.to_f).ceil
   end
 
   def last_page

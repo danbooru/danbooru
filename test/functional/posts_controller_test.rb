@@ -31,7 +31,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        mock_post_search_rankings(Time.zone.today, [["1girl", 100], ["original", 50]])
+        mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])
         create_list(:post, 2)
       end
 
@@ -392,11 +392,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "hide restricted posts" do
-          Post.update_all(is_banned: true)
+          Post.update(is_banned: true)
           get posts_path(format: :atom)
 
           assert_response :success
-          assert_select "entry", 0
+          assert_select("entry", 0)
+          assert_equal(3, Post.count)
         end
       end
 

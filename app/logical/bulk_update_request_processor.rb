@@ -30,7 +30,7 @@ class BulkUpdateRequestProcessor
 
   # Parse the script into a list of commands.
   def commands
-    script.split(/\r\n|\r|\n/).reject(&:blank?).map do |line|
+    script.split(/\r\n|\r|\n/).compact_blank.map do |line|
       line = line.gsub(/[[:space:]]+/, " ").strip
       next if line.empty?
 
@@ -312,9 +312,9 @@ class BulkUpdateRequestProcessor
         when :deprecate
           tag = Tag.find_or_create_by_name(args[0])
           tag.update!(is_deprecated: true, updater: User.system)
-          TagAlias.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
-          TagImplication.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
-          TagImplication.active.where(antecedent_name: tag.name).each { |ti| ti.reject!(User.system) }
+          TagAlias.active.where(consequent_name: tag.name).find_each { |ti| ti.reject!(User.system) }
+          TagImplication.active.where(consequent_name: tag.name).find_each { |ti| ti.reject!(User.system) }
+          TagImplication.active.where(antecedent_name: tag.name).find_each { |ti| ti.reject!(User.system) }
 
         when :undeprecate
           tag = Tag.find_or_create_by_name(args[0])
@@ -457,8 +457,8 @@ class BulkUpdateRequestProcessor
     query = PostQuery.normalize(tag_or_pool)
 
     if query.is_simple_tag?
-      TagImplication.active.where(consequent_name: tag_or_pool).each { |ti| ti.reject!(User.system) }
-      TagImplication.active.where(antecedent_name: tag_or_pool).each { |ti| ti.reject!(User.system) }
+      TagImplication.active.where(consequent_name: tag_or_pool).find_each { |ti| ti.reject!(User.system) }
+      TagImplication.active.where(antecedent_name: tag_or_pool).find_each { |ti| ti.reject!(User.system) }
     end
 
     if query.is_metatag?(:pool)

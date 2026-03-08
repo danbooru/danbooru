@@ -65,13 +65,13 @@ class RangeParser
       [:eq, nil]
     in _ if type in :float | :duration
       value = parse_value(string)
-      [:between, (value * 0.95..value * 1.05)] # add a 5% tolerance for float/duration values
+      [:between, ((value * 0.95)..(value * 1.05))] # add a 5% tolerance for float/duration values
     in /[km]b?\z/i if type == :filesize
       value = parse_value(string)
-      [:between, (value * 0.95..value * 1.05)] # add a 5% tolerance for filesize values
+      [:between, ((value * 0.95)..(value * 1.05))] # add a 5% tolerance for filesize values
     in _ if type in :date | :age
       value = parse_value(string)
-      [:between, (value.beginning_of_day..value.end_of_day)]
+      [:between, value.all_day]
     else
       [:eq, parse_value(string)]
     end
@@ -138,13 +138,13 @@ class RangeParser
       size = Float($1)
       unit = $2
 
-      conversion_factor = case unit
+      case unit
       when /m/i
-        1024 * 1024
+        conversion_factor = 1024 * 1024
       when /k/i
-        1024
+        conversion_factor = 1024
       else
-        1
+        conversion_factor = 1
       end
 
       (size * conversion_factor).to_i
@@ -152,7 +152,6 @@ class RangeParser
     else
       raise NotImplementedError, "unrecognized type #{type} for #{string}"
     end
-
   rescue ArgumentError, ZeroDivisionError => e
     raise ParseError, e.message
   end

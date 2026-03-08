@@ -13,12 +13,18 @@ module ControllerHelper
     RespondToSearchMatcher.new(search_params, other_params)
   end
 
-  class RespondToSearchMatcher < Struct.new(:params, :other_params)
+  class RespondToSearchMatcher
+    attr_reader :params, :other_params
+
+    def initialize(params, other_params)
+      @params, @other_params = params, other_params
+    end
+
     def description
       "should respond to a search for #{params}"
     end
 
-    def matches?(subject, &block)
+    def matches?(subject, &_block)
       search_params = other_params.merge({ search: params })
       expected_items = @test_case.instance_eval(&@expected)
 

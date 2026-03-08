@@ -1210,7 +1210,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
   context "CLI" do
     should "work when called with bin/media-ls" do
-      assert_equal(true, system("#{Rails.root}/bin/media-ls --help > /dev/null 2>&1"))
+      assert_equal(true, system(Rails.root.join("bin/media-ls --help > /dev/null 2>&1").to_s))
     end
 
     should "work" do

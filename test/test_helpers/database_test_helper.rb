@@ -1,7 +1,7 @@
 module DatabaseTestHelper
   # Run a block of code without the database available. This isn't thread safe, but it's okay as long as parallel tests
   # use processes and not threads.
-  def without_database(&block)
+  def without_database(&_block)
     connection = ApplicationRecord.connection_pool.lease_connection
 
     # XXX Horrible hack to make sure the database connection is lost and can't be reconnected. Simply killing the

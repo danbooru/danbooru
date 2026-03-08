@@ -95,7 +95,7 @@ class User < ApplicationRecord
   attribute :favorite_count, default: 0
   attribute :per_page, default: 20
   attribute :theme, default: :auto
-  attribute :upload_points, default: Danbooru.config.initial_upload_points.to_i
+  attribute :upload_points, default: -> { Danbooru.config.initial_upload_points.to_i }
   attribute :bit_prefs, default: 0
   attribute :is_deleted, default: false
 
@@ -651,7 +651,7 @@ class User < ApplicationRecord
       max_updated_at = ForumTopic.visible(self).active.maximum(:updated_at)
       return false if max_updated_at.nil?
       return true if last_forum_read_at.nil?
-      return max_updated_at > last_forum_read_at
+      max_updated_at > last_forum_read_at
     end
   end
 
@@ -889,11 +889,11 @@ class User < ApplicationRecord
       end
 
       if params[:min_level].present?
-        q = q.where("level >= ?", params[:min_level].to_i)
+        q = q.where(level: params[:min_level].to_i..)
       end
 
       if params[:max_level].present?
-        q = q.where("level <= ?", params[:max_level].to_i)
+        q = q.where(level: ..params[:max_level].to_i)
       end
 
       if params[:is_banned].present?

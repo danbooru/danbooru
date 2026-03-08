@@ -58,7 +58,7 @@ class ApiKeyTest < ActiveSupport::TestCase
 
       should "not allow more than 20 API keys per user" do
         user = create(:user)
-        create_list(:api_key, 20, user: user)
+        create_list(:api_key, 20, user: user) # rubocop:disable FactoryBot/ExcessiveCreateList
         api_key = build(:api_key, user: user)
 
         assert_equal(false, api_key.valid?)

@@ -38,11 +38,11 @@ module SeoHelper
           description: Danbooru.config.site_description,
           potentialAction: [{
             "@type": "SearchAction",
-            target: "#{site_url}/posts?tags={search_term_string}",
+            "target": "#{site_url}/posts?tags={search_term_string}",
             "query-input": "required name=search_term_string",
-          }]
-        }.compact
-      ]
+          }],
+        }.compact,
+      ],
     })
   end
 

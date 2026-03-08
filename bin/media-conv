@@ -70,7 +70,7 @@ video = nil
 time = Benchmark.realtime do
   video = input_file.convert(format: format, **options.slice(:codec, :quality, :width, :height, :pix_fmt, :two_pass))
   FileUtils.cp(video.path, output_path)
-rescue => e
+rescue StandardError => e
   warn "Error: #{e.message}"
   exit 1
 end

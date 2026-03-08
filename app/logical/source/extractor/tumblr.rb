@@ -200,7 +200,7 @@ class Source::Extractor
         post_url = image_page_json.dig(:ImageUrlPage, :post, :postUrl)
 
         # The post URL may be a regular Tumblr post or a custom domain; custom domains are extracted to get the real Tumblr page URL.
-        Source::Extractor.find(post_url).page_url.then { Source::URL.parse(_1) }
+        Source::Extractor.find(post_url).page_url.then { Source::URL.parse(it) }
       end
     end
 

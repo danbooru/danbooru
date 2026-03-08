@@ -1,7 +1,7 @@
 require "test_helper"
 
 class StorageManagerTest < ActiveSupport::TestCase
-  def tempfile(data, &block)
+  def tempfile(data, &_block)
     file = Danbooru::Tempfile.new
     file.write(data)
     file.flush
@@ -15,11 +15,12 @@ class StorageManagerTest < ActiveSupport::TestCase
   end
 
   def sftp
-    host = ENV["DANBOORU_SFTP_HOST"]
-    port = ENV["DANBOORU_SFTP_PORT"]
-    user = ENV["DANBOORU_SFTP_USER"]
-    pass = ENV["DANBOORU_SFTP_PASS"]
-    dir  = ENV["DANBOORU_SFTP_DIR"]
+    # Testing the StorageManager::SFTP class requires setting up a SFTP server and configuring the environment variables below.
+    host = ENV.fetch("DANBOORU_SFTP_HOST", nil)
+    port = ENV.fetch("DANBOORU_SFTP_PORT", nil)
+    user = ENV.fetch("DANBOORU_SFTP_USER", nil)
+    pass = ENV.fetch("DANBOORU_SFTP_PASS", nil)
+    dir  = ENV.fetch("DANBOORU_SFTP_DIR", nil)
 
     if host.present? && port.present? && user.present? && pass.present? && dir.present?
       StorageManager::SFTP.new(host, base_dir: dir, ssh_options: { port: port, user: user, password: pass })

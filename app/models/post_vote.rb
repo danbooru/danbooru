@@ -47,7 +47,7 @@ class PostVote < ApplicationRecord
   end
 
   def remove_conflicting_votes
-    PostVote.active.where.not(id: id).where(post: post, user: user).each do |vote|
+    PostVote.active.where.not(id: id).where(post: post, user: user).find_each do |vote|
       vote.soft_delete!(updater: updater)
     end
   end

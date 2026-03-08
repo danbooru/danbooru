@@ -117,9 +117,9 @@ class DText
     name = path[%r!/wiki_pages/(.*)\z!i, 1]
     name = CGI.unescape(name)
     name = WikiPage.normalize_title(name)
-    wiki = wiki_pages.find { _1.title == name }
-    tag = tags.find { _1.name == name }
-    artist = artists.find { _1.name == name }
+    wiki = wiki_pages.find { it.title == name }
+    tag = tags.find { it.name == name }
+    artist = artists.find { it.name == name }
 
     if tag.present?
       node["class"] += " tag-type-#{tag.category}"
@@ -172,10 +172,10 @@ class DText
     caption = node.inner_html.presence
 
     if type == "post"
-      asset = posts.find { _1.id == id }&.media_asset
+      asset = posts.find { it.id == id }&.media_asset
       href = Routes.post_path(id)
     else
-      asset = media_assets.find { _1.id == id }
+      asset = media_assets.find { it.id == id }
       href = Routes.media_asset_path(id)
     end
 
@@ -208,11 +208,11 @@ class DText
 
     case type
     when "tag-alias"
-      request = tag_aliases.find { _1.id == id }
+      request = tag_aliases.find { it.id == id }
     when "tag-implication"
-      request = tag_implications.find { _1.id == id }
+      request = tag_implications.find { it.id == id }
     when "bulk-update-request"
-      request = bulk_update_requests.find { _1.id == id }
+      request = bulk_update_requests.find { it.id == id }
     end
 
     body = case request
@@ -556,7 +556,7 @@ class DText
   # @param options [Hash] The options to pass to DText.escape.
   # @return [String] the DText output.
   def self.from_plaintext(text, **options)
-    escape(text.to_s, **options).then { normalize_whitespace(_1) }
+    escape(text.to_s, **options).then { normalize_whitespace(it) }
   end
 
   # Normalize the whitespace in a piece of DText, and remove any unnecessary whitespace.
@@ -651,7 +651,7 @@ class DText
         "[code]#{content}[/code]" if content.present?
       in "li"
         content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
-        depth = element.ancestors.count { _1.name in "ul" | "ol" }.clamp(1..)
+        depth = element.ancestors.count { it.name in "ul" | "ol" }.clamp(1..)
         list = "*" * depth
         "#{list} #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")

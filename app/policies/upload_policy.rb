@@ -26,6 +26,6 @@ class UploadPolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    [:source, :referer_url, files: {}]
+    [:source, :referer_url, { files: {} }]
   end
 end

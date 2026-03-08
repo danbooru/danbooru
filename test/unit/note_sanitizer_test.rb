@@ -58,7 +58,7 @@ class NoteSanitizerTest < ActiveSupport::TestCase
     end
 
     should "not fail on a frozen string" do
-      assert_equal("", NoteSanitizer.sanitize("".freeze))
+      assert_equal("", NoteSanitizer.sanitize("".freeze)) # rubocop:disable Style/RedundantFreeze
     end
 
     should "not fail on nil" do

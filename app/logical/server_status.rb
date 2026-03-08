@@ -71,7 +71,7 @@ class ServerStatus
       headers = headers.transform_keys { |key| key.delete_prefix("HTTP_").tr("_", "-").startcase }
       headers = headers.except("Cookie")
       headers = headers.transform_values { |v| v.encode("UTF-8", invalid: :replace, undef: :replace) }
-      headers = headers.reject { |k, v| v.blank? }
+      headers = headers.compact_blank
       headers
     end
 
@@ -292,7 +292,7 @@ class ServerStatus
 
     def serialize_result(result)
       result.rows.map do |row|
-        row.each_with_index.map do |column_value, i|
+        row.each_with_index.to_h do |column_value, i|
           column_name = result.columns[i]
 
           if result.column_types[column_name]&.type == :interval
@@ -300,7 +300,7 @@ class ServerStatus
           end
 
           [column_name, column_value]
-        end.to_h
+        end
       end
     end
   end

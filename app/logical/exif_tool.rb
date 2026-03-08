@@ -40,6 +40,7 @@ class ExifTool
   # @see https://exiftool.org/TagNames/index.html
   class Metadata
     attr_reader :metadata
+
     delegate_missing_to :metadata
 
     # @param [Hash] a hash of metadata as returned by ExifTool
@@ -137,11 +138,11 @@ class ExifTool
     end
 
     def width
-      metadata.find { |name, value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageWidth\z/) }&.second
+      metadata.find { |name, _value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageWidth\z/) }&.second
     end
 
     def height
-      metadata.find { |name, value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageHeight\z/) }&.second
+      metadata.find { |name, _value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageHeight\z/) }&.second
     end
 
     # @see http://www.vurdalakov.net/misc/gif/netscape-looping-application-extension

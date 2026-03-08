@@ -242,12 +242,12 @@ module Danbooru
         response = get(url)
 
         raise DownloadError, "#{url} failed with code #{response.status}" if response.status != 200
-        raise FileTooLargeError, "File size too large (size: #{response.content_length.to_i.to_formatted_s(:human_size)}; max size: #{@max_size.to_formatted_s(:human_size)})" if @max_size && response.content_length.to_i > @max_size
+        raise FileTooLargeError, "File size too large (size: #{response.content_length.to_i.to_fs(:human_size)}; max size: #{@max_size.to_formatted_s(:human_size)})" if @max_size && response.content_length.to_i > @max_size
 
         size = 0
         response.body.each do |chunk|
           size += chunk.size
-          raise FileTooLargeError, "File size too large (max size: #{@max_size.to_formatted_s(:human_size)})" if @max_size && size > @max_size
+          raise FileTooLargeError, "File size too large (max size: #{@max_size.to_fs(:human_size)})" if @max_size && size > @max_size
           file.write(chunk)
         end
 

@@ -74,7 +74,7 @@ Rails.application.configure do
 
   # Log SQL queries at INFO level instead of DEBUG level.
   config.active_record.logger = Logger.new(STDERR)
-  def (config.active_record.logger).add(level, message = nil, prog = nil)
+  def (config.active_record.logger).add(_level, message = nil, prog = nil)
     Rails.logger.add(Logger::Severity::INFO, message, prog)
   end
 

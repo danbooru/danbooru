@@ -58,7 +58,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(source: "http://example.com/foobar").with { @upload }
         should respond_to_search(status: "completed").with { @upload }
         should respond_to_search(media_assets: { file_size: 1_000_000 }).with { @upload }
-        should respond_to_search(media_assets: { md5: "blah" }).with { }
+        should respond_to_search(media_assets: { md5: "blah" }).with { [] }
       end
     end
 
@@ -376,7 +376,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, Tag.exists?(name: "new_tag"))
         assert_equal(false, Tag.exists?(name: "rating:g"))
 
-        mock_autotagger_evaluate({ new_tag: 0.542, "rating:g": 0.249 })
+        mock_autotagger_evaluate({ "new_tag": 0.542, "rating:g": 0.249 })
         upload = assert_successful_upload("test/files/test.jpg")
         asset = upload.media_assets.first
 
