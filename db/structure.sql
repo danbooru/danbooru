@@ -1564,8 +1564,9 @@ CREATE TABLE public.posts (
     tag_count_meta integer DEFAULT 0 NOT NULL,
     pixiv_id integer,
     source_name character varying,
+    source_kind character varying,
     source_id character varying,
-    source_id_num bigint
+    source_id_num uuid
 );
 
 
@@ -5497,27 +5498,6 @@ CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHER
 --
 
 CREATE INDEX index_posts_on_rating ON public.posts USING btree (rating) WHERE (rating <> 's'::bpchar);
-
-
---
--- Name: index_posts_on_source_name; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_source_name ON public.posts USING btree (lower((source_name)::text)) WHERE (source_name IS NOT NULL);
-
-
---
--- Name: index_posts_on_source_name_and_source_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_source_name_and_source_id ON public.posts USING btree (lower((source_name)::text), source_id) WHERE ((source_name IS NOT NULL) AND (source_id IS NOT NULL));
-
-
---
--- Name: index_posts_on_source_name_and_source_id_num; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_source_name_and_source_id_num ON public.posts USING btree (lower((source_name)::text), source_id_num) WHERE ((source_name IS NOT NULL) AND (source_id_num IS NOT NULL));
 
 
 --

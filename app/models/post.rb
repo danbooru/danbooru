@@ -42,6 +42,8 @@ class Post < ApplicationRecord
     sfw: ["g", "s"],
   }.with_indifferent_access
 
+  attribute :source_id_num, :uint128
+
   deletable
   has_bit_flags %w[has_embedded_notes _unused_has_cropped is_taken_down]
 
@@ -1829,8 +1831,8 @@ class Post < ApplicationRecord
 
       self.source_name = parsed_source.site_name
       self.source_id = parsed_source.work_id
-      source_id_num = Integer(parsed_source.work_id, exception: false)
-      self.source_id_num = source_id_num if (0...1 << 63).cover?(source_id_num)
+      source_id_num = Integer(self.source_id, exception: false)
+      self.source_id_num = source_id_num if source_id_num.present? && source_id_num >= 0 && source_id_num.bit_length <= 128
       self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
     end
   end
