@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:rate_limit) do
+  factory :rate_limit do
     limited { false }
     points { 0 }
     action { "test" }

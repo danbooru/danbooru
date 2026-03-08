@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:note) do
+  factory :note do
     post
     x { 1 }
     y { 1 }

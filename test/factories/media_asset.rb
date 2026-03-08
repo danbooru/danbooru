@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:media_asset) do
+  factory :media_asset do
     md5 { SecureRandom.hex(16) }
     pixel_hash { SecureRandom.hex(16) }
     file_ext { "jpg" }
@@ -7,6 +7,6 @@ FactoryBot.define do
     file_key { MediaAsset.generate_file_key }
     image_width { 1000 }
     image_height { 1000 }
-    media_metadata { build(:media_metadata, media_asset: instance) }
+    media_metadata { association :media_metadata, media_asset: instance }
   end
 end

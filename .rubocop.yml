@@ -1,7 +1,8 @@
 # some of these settings are overridden in also test/.rubocop.yml
 
-require:
+plugins:
   - rubocop-rails
+  - rubocop-factory_bot
 
 AllCops:
   NewCops: enable

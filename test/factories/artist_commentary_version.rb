@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:artist_commentary_version) do
+  factory :artist_commentary_version do
     post factory: :post
     original_title { Faker::Lorem.paragraph }
     original_description { Faker::Lorem.paragraph }

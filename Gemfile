@@ -72,6 +72,7 @@ gem "dotenv-rails", require: false # This is loaded in application.rb
 group :development do
   gem "rubocop", require: false
   gem "rubocop-rails", require: false
+  gem "rubocop-factory_bot", require: false
   # gem 'meta_request'
   gem "rack-mini-profiler"
   gem "stackprof"

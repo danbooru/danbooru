@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:post_version) do
+  factory :post_version do
     updater
     post
     parent_changed { false }

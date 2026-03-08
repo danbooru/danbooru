@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:ban) do
+  factory :ban do
     banner factory: :admin_user
     user
     reason { Faker::Lorem.sentence }

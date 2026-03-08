@@ -1,7 +1,7 @@
 FactoryBot.define do
-  factory(:post_flag) do
+  factory :post_flag do
     creator
-    post { build(:post) }
+    post
     reason {"xxx"}
   end
 end
