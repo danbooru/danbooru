@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class FavoriteTest < ActiveSupport::TestCase
   setup do
@@ -12,12 +12,12 @@ class FavoriteTest < ActiveSupport::TestCase
     context "removing a favorite" do
       should "update the post and user favorite counts" do
         @user1 = create(:restricted_user)
-        fav = Favorite.create!(post: @p1, user: @user1)
+        Favorite.create!(post: @p1, user: @user1)
 
         assert_equal(1, @user1.reload.favorite_count)
         assert_equal(1, @p1.reload.fav_count)
         assert_equal(0, @p1.reload.score)
-        refute(PostVote.positive.exists?(post: @p1, user: @user))
+        assert_equal(false, PostVote.positive.exists?(post: @p1, user: @user))
 
         Favorite.destroy_by(post: @p1, user: @user1)
 
@@ -28,7 +28,7 @@ class FavoriteTest < ActiveSupport::TestCase
       should "remove the upvote if the user could vote" do
         @user = create(:gold_user)
         @vote = create(:post_vote, post: @p1, user: @user, score: 1)
-        fav = Favorite.create!(post: @p1, user: @user)
+        Favorite.create!(post: @p1, user: @user)
 
         assert_equal(1, @user.reload.favorite_count)
         assert_equal(1, @p1.reload.fav_count)
@@ -40,8 +40,8 @@ class FavoriteTest < ActiveSupport::TestCase
         assert_equal(0, @user.reload.favorite_count)
         assert_equal(0, @p1.reload.fav_count)
         assert_equal(0, @p1.reload.score)
-        refute(PostVote.active.positive.exists?(post: @p1, user: @user))
-        assert(PostVote.deleted.positive.exists?(post: @p1, user: @user))
+        assert_equal(false, PostVote.active.positive.exists?(post: @p1, user: @user))
+        assert_equal(true, PostVote.deleted.positive.exists?(post: @p1, user: @user))
       end
     end
 
@@ -53,7 +53,7 @@ class FavoriteTest < ActiveSupport::TestCase
         assert_equal(1, @user1.reload.favorite_count)
         assert_equal(1, @p1.reload.fav_count)
         assert_equal(0, @p1.reload.score)
-        refute(PostVote.positive.exists?(post: @p1, user: @user1))
+        assert_equal(false, PostVote.positive.exists?(post: @p1, user: @user1))
       end
 
       should "upvote the post if the user can vote" do

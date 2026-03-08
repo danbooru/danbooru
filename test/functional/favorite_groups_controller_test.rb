@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
   context "The favorite groups controller" do
@@ -68,7 +68,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "render" do
-        post_auth favorite_groups_path, @user, params: { favorite_group: FactoryBot.attributes_for(:favorite_group) }
+        post_auth favorite_groups_path, @user, params: { favorite_group: attributes_for(:favorite_group) }
         assert_redirected_to favorite_group_path(FavoriteGroup.last)
       end
     end

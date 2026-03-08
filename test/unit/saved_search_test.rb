@@ -3,7 +3,7 @@ require "test_helper"
 class SavedSearchTest < ActiveSupport::TestCase
   def setup
     super
-    @user = FactoryBot.create(:user)
+    @user = create(:user)
     CurrentUser.user = @user
     @mock_redis = MockRedis.new
     SavedSearch.stubs(:redis).returns(@mock_redis)
@@ -16,8 +16,8 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context ".labels_for" do
     setup do
-      FactoryBot.create(:saved_search, user: @user, label_string: "blah", query: "blah")
-      FactoryBot.create(:saved_search, user: @user, label_string: "zah", query: "blah")
+      create(:saved_search, user: @user, label_string: "blah", query: "blah")
+      create(:saved_search, user: @user, label_string: "zah", query: "blah")
     end
 
     should "fetch the labels used by a user" do
@@ -27,10 +27,10 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context ".queries_for" do
     setup do
-      FactoryBot.create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
-      FactoryBot.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
-      FactoryBot.create(:saved_search, user: @user, label_string: "zah", query: "CCC BBB AAA")
-      FactoryBot.create(:saved_search, user: @user, label_string: "qux", query: " aaa  bbb  ccc ")
+      create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
+      create(:saved_search, user: @user, label_string: "blah", query: "aaa")
+      create(:saved_search, user: @user, label_string: "zah", query: "CCC BBB AAA")
+      create(:saved_search, user: @user, label_string: "qux", query: " aaa  bbb  ccc ")
     end
 
     should "fetch the queries used by a user for a label" do
@@ -169,7 +169,7 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "Creating a saved search" do
     setup do
-      FactoryBot.create(:tag_alias, antecedent_name: "zzz", consequent_name: "yyy", creator: @user)
+      create(:tag_alias, antecedent_name: "zzz", consequent_name: "yyy", creator: @user)
       @saved_search = @user.saved_searches.create(query: " ZZZ xxx ")
     end
 

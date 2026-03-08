@@ -185,7 +185,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response 403
           assert_equal("pending", @bulk_update_request.reload.status)
-          assert_equal(false, TagAlias.where(antecedent_name: "artist1", consequent_name: "artist2").exists?)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "artist1", consequent_name: "artist2"))
         end
 
         should "succeed for a small artist move" do

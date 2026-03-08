@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class MediaFileTest < ActiveSupport::TestCase
   context "#dimensions" do
@@ -139,7 +139,7 @@ class MediaFileTest < ActiveSupport::TestCase
   end
 
   should "determine the correct filesize for a jpeg file" do
-    assert_equal(28086, MediaFile.open("test/files/test.jpg").file_size)
+    assert_equal(28_086, MediaFile.open("test/files/test.jpg").file_size)
   end
 
   context "#preview" do
@@ -215,7 +215,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(5.0,  MediaFile.open("test/files/apng/normal_apng.png").ffmpeg_duration)
       assert_equal(0.04, MediaFile.open("test/files/webp/nyancat.webp").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
       assert_equal(1.92, MediaFile.open("test/files/avif/sequence-with-pitm.avif").ffmpeg_duration)
-      assert_equal(3.962292,  MediaFile.open("test/files/avif/sequence-without-pitm.avif").ffmpeg_duration)
+      assert_equal(3.962292, MediaFile.open("test/files/avif/sequence-without-pitm.avif").ffmpeg_duration)
       assert_equal(0.5,  MediaFile.open("test/files/avif/star-8bpc.avif").ffmpeg_duration)
       assert_equal(1.92, MediaFile.open("test/files/avif/alpha_video.avif").ffmpeg_duration)
     end
@@ -635,18 +635,18 @@ class MediaFileTest < ActiveSupport::TestCase
       file = MediaFile.open("test/files/mp4/test-audio.mp4")
       assert_equal(false, file.is_corrupt?)
       assert_equal(1.002667, file.duration)
-      assert_equal(10/1.002667, file.frame_rate)
+      assert_equal(10 / 1.002667, file.frame_rate)
       assert_equal(10, file.frame_count)
       assert_equal(10, file.metadata["FFmpeg:FrameCount"])
       assert_equal("mp42", file.metadata["FFmpeg:MajorBrand"])
       assert_equal("yuv420p", file.metadata["FFmpeg:PixFmt"])
       assert_equal("h264", file.metadata["FFmpeg:VideoCodec"])
       assert_equal("High", file.metadata["FFmpeg:VideoProfile"])
-      assert_equal(291624, file.metadata["FFmpeg:VideoBitRate"])
+      assert_equal(291_624, file.metadata["FFmpeg:VideoBitRate"])
       assert_equal("aac", file.metadata["FFmpeg:AudioCodec"])
       assert_equal("LC", file.metadata["FFmpeg:AudioProfile"])
       assert_equal("stereo", file.metadata["FFmpeg:AudioLayout"])
-      assert_equal(128002, file.metadata["FFmpeg:AudioBitRate"])
+      assert_equal(128_002, file.metadata["FFmpeg:AudioBitRate"])
       assert_equal(0.1318, file.metadata["FFmpeg:AudioPeakLoudness"].round(4))
       assert_equal(0.0193, file.metadata["FFmpeg:AudioAverageLoudness"].round(4))
       assert_equal(0, file.metadata["FFmpeg:AudioLoudnessRange"])
@@ -665,7 +665,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("yuv420p", file.metadata["FFmpeg:PixFmt"])
       assert_equal("h264", file.metadata["FFmpeg:VideoCodec"])
       assert_equal("Constrained Baseline", file.metadata["FFmpeg:VideoProfile"])
-      assert_equal(25003, file.metadata["FFmpeg:VideoBitRate"])
+      assert_equal(25_003, file.metadata["FFmpeg:VideoBitRate"])
       assert_equal("aac", file.metadata["FFmpeg:AudioCodec"])
       assert_equal("LC", file.metadata["FFmpeg:AudioProfile"])
       assert_equal("stereo", file.metadata["FFmpeg:AudioLayout"])
@@ -687,7 +687,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal("yuv420p", file.metadata["FFmpeg:PixFmt"])
       assert_equal("h264", file.metadata["FFmpeg:VideoCodec"])
       assert_equal("Constrained Baseline", file.metadata["FFmpeg:VideoProfile"])
-      assert_equal(25003, file.metadata["FFmpeg:VideoBitRate"])
+      assert_equal(25_003, file.metadata["FFmpeg:VideoBitRate"])
     end
 
     should "determine the pixel format of the video" do
@@ -713,7 +713,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "handle all supported video types" do
       Dir.glob("test/files/mp4/*.{mp4,m4v}").grep_v(/corrupt/).each do |file|
-        media = MediaFile.open(file) do |media|
+        MediaFile.open(file) do |media|
           assert_equal(false, media.is_corrupt?, "#{file} #{media.error}")
         end
       end
@@ -732,7 +732,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-h265.mp4").is_supported?)
       assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-av1.mp4").is_supported?)
 
-      #assert_equal(true, MediaFile.open("test/files/mp4/test-audio-flac.mp4").is_supported?)
+      # assert_equal(true, MediaFile.open("test/files/mp4/test-audio-flac.mp4").is_supported?)
 
       assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-yuv444p-h264.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-av1.mp4").is_supported?)
@@ -754,16 +754,16 @@ class MediaFileTest < ActiveSupport::TestCase
       file = MediaFile.open("test/files/webm/test-audio.webm")
 
       assert_equal(1.01, file.duration) # 1.01
-      assert_equal(10/1.01, file.frame_rate)
+      assert_equal(10 / 1.01, file.frame_rate)
       assert_equal(10, file.frame_count)
       assert_equal(10, file.metadata["FFmpeg:FrameCount"])
       assert_equal("yuv420p", file.metadata["FFmpeg:PixFmt"])
       assert_equal("vp9", file.metadata["FFmpeg:VideoCodec"])
       assert_equal("Profile 0", file.metadata["FFmpeg:VideoProfile"])
-      assert_equal(432546, file.metadata["FFmpeg:VideoBitRate"])
+      assert_equal(432_546, file.metadata["FFmpeg:VideoBitRate"])
       assert_equal("opus", file.metadata["FFmpeg:AudioCodec"])
       assert_equal("stereo", file.metadata["FFmpeg:AudioLayout"])
-      assert_equal(50661, file.metadata["FFmpeg:AudioBitRate"])
+      assert_equal(50_661, file.metadata["FFmpeg:AudioBitRate"])
       assert_equal(0.1274, file.metadata["FFmpeg:AudioPeakLoudness"].round(4))
       assert_equal(0.0186, file.metadata["FFmpeg:AudioAverageLoudness"].round(4))
       assert_equal(0, file.metadata["FFmpeg:AudioLoudnessRange"])
@@ -774,13 +774,13 @@ class MediaFileTest < ActiveSupport::TestCase
       file = MediaFile.open("test/files/webm/test-silent-audio.webm")
 
       assert_equal(0.501, file.duration)
-      assert_equal(10/0.501, file.frame_rate) # 19.96
+      assert_equal(10 / 0.501, file.frame_rate) # 19.96
       assert_equal(10, file.frame_count)
       assert_equal(10, file.metadata["FFmpeg:FrameCount"])
       assert_equal("yuv420p", file.metadata["FFmpeg:PixFmt"])
       assert_equal("vp8", file.metadata["FFmpeg:VideoCodec"])
       assert_equal("0", file.metadata["FFmpeg:VideoProfile"])
-      assert_equal(188407, file.metadata["FFmpeg:VideoBitRate"])
+      assert_equal(188_407, file.metadata["FFmpeg:VideoBitRate"])
       assert_equal("opus", file.metadata["FFmpeg:AudioCodec"])
       assert_equal("stereo", file.metadata["FFmpeg:AudioLayout"])
       assert_equal(1197, file.metadata["FFmpeg:AudioBitRate"])
@@ -793,13 +793,13 @@ class MediaFileTest < ActiveSupport::TestCase
     should "determine the metadata for a video without audio" do
       file = MediaFile.open("test/files/webm/test-512x512.webm")
       assert_equal(0.48, file.duration)
-      assert_equal(10/0.48, file.frame_rate)
+      assert_equal(10 / 0.48, file.frame_rate)
       assert_equal(10, file.frame_count)
       assert_equal(10, file.metadata["FFmpeg:FrameCount"])
       assert_equal("yuv420p", file.metadata["FFmpeg:PixFmt"])
       assert_equal("vp8", file.metadata["FFmpeg:VideoCodec"])
       assert_equal("0", file.metadata["FFmpeg:VideoProfile"])
-      assert_equal(196650, file.metadata["FFmpeg:VideoBitRate"])
+      assert_equal(196_650, file.metadata["FFmpeg:VideoBitRate"])
     end
 
     should "detect supported files" do

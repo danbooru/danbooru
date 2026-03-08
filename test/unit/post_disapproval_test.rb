@@ -3,7 +3,7 @@ require "test_helper"
 class PostDisapprovalTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @alice = FactoryBot.create(:moderator_user)
+      @alice = create(:moderator_user)
       CurrentUser.user = @alice
     end
 
@@ -13,24 +13,24 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
     context "a post disapproval" do
       setup do
-        @post_1 = FactoryBot.create(:post, :is_pending => true)
-        @post_2 = FactoryBot.create(:post, :is_pending => true)
+        @post1 = create(:post, is_pending: true)
+        @post2 = create(:post, is_pending: true)
       end
 
       should "not allow blank messages" do
-        @post_disapproval = create(:post_disapproval, post: @post_1, message: "")
+        @post_disapproval = create(:post_disapproval, post: @post1, message: "")
         assert_nil(@post_disapproval.message)
       end
 
       context "made by alice" do
         setup do
-          @disapproval = create(:post_disapproval, user: @alice, post: @post_1)
+          @disapproval = create(:post_disapproval, user: @alice, post: @post1)
         end
 
         context "when the current user is alice" do
           should "remove the associated post from alice's moderation queue" do
-            assert_not(Post.available_for_moderation(@alice, :unseen).map(&:id).include?(@post_1.id))
-            assert(Post.available_for_moderation(@alice, :unseen).map(&:id).include?(@post_2.id))
+            assert_not(Post.available_for_moderation(@alice, :unseen).map(&:id).include?(@post1.id))
+            assert(Post.available_for_moderation(@alice, :unseen).map(&:id).include?(@post2.id))
           end
         end
 
@@ -38,16 +38,16 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           should "not remove the associated post from the disapprover's moderation queue" do
             @mod = create(:moderator_user)
 
-            assert(Post.available_for_moderation(@mod, :unseen).map(&:id).include?(@post_1.id))
-            assert(Post.available_for_moderation(@mod, :unseen).map(&:id).include?(@post_2.id))
+            assert(Post.available_for_moderation(@mod, :unseen).map(&:id).include?(@post1.id))
+            assert(Post.available_for_moderation(@mod, :unseen).map(&:id).include?(@post2.id))
           end
         end
       end
 
       context "when pruning" do
         should "prune old disapprovals" do
-          @user = FactoryBot.create(:user)
-          @post = FactoryBot.create(:post, is_pending: true)
+          @user = create(:user)
+          @post = create(:post, is_pending: true)
           create(:post_disapproval, user: @user, post: @post, created_at: 2.months.ago)
           assert_difference("PostDisapproval.count", -1) do
             PostDisapproval.prune!
@@ -55,8 +55,8 @@ class PostDisapprovalTest < ActiveSupport::TestCase
         end
 
         should "not prune recent disapprovals" do
-          @user = FactoryBot.create(:user)
-          @post = FactoryBot.create(:post, is_pending: true)
+          @user = create(:user)
+          @post = create(:post, is_pending: true)
           @disapproval = create(:post_disapproval, user: @user, post: @post, created_at: 7.days.ago)
           assert_no_difference("PostDisapproval.count") do
             PostDisapproval.prune!
@@ -69,8 +69,8 @@ class PostDisapprovalTest < ActiveSupport::TestCase
           @approver = create(:approver)
           @post1 = create(:post, is_pending: true)
           @post2 = create(:post, is_pending: true)
-          disapproval1 = FactoryBot.create(:post_disapproval, user: @approver, post: @post1, reason: "breaks_rules")
-          disapproval2 = FactoryBot.create(:post_disapproval, user: @approver, post: @post2, reason: "poor_quality", message: "bad anatomy")
+          disapproval1 = create(:post_disapproval, user: @approver, post: @post1, reason: "breaks_rules")
+          disapproval2 = create(:post_disapproval, user: @approver, post: @post2, reason: "poor_quality", message: "bad anatomy")
 
           assert_search_equals([disapproval1], reason: "breaks_rules")
           assert_search_equals([disapproval2], message: "bad anatomy")

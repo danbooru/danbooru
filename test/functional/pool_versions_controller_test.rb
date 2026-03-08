@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The pool versions controller" do
@@ -27,7 +27,7 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "list all versions that match the search criteria" do
-        get pool_versions_path, params: {:search => {:updater_id => @user_2.id}}
+        get pool_versions_path, params: {search: {updater_id: @user_2.id}}
         assert_response :success
         assert_select "#pool-version-#{@versions[0].id}", false
         assert_select "#pool-version-#{@versions[1].id}"
@@ -39,7 +39,7 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         @post = as(@user) { create(:post) }
         @pool = as(@user) { create(:pool) }
-        as (@user) { @pool.update(name: "blah", description: "desc", post_ids: [@post.id]) }
+        as(@user) { @pool.update(name: "blah", description: "desc", post_ids: [@post.id]) }
 
         get diff_pool_version_path(@pool.versions.last.id)
         assert_response :success

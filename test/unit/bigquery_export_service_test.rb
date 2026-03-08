@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class BigqueryExportServiceTest < ActiveSupport::TestCase
   context "BigqueryExportService: " do

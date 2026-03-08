@@ -89,12 +89,12 @@ module Danbooru
         authority: parsed_uri.authority,
         path: normalized_path,
         query: Addressable::URI.encode_component(parsed_uri.query, "[[:ascii:]&&[^ ]]"),
-        fragment: parsed_uri.fragment
+        fragment: parsed_uri.fragment,
       )
     end
 
     def initialize
-      @http ||= Danbooru::Http.default
+      @http = Danbooru::Http.default
     end
 
     def initialize_dup(old)

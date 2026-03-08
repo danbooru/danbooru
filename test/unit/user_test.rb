@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
   def assert_promoted_to(new_level, user, promoter)
@@ -16,7 +16,7 @@ class UserTest < ActiveSupport::TestCase
 
   context "A user" do
     setup do
-      @user = FactoryBot.create(:user)
+      @user = create(:user)
       CurrentUser.user = @user
     end
 
@@ -108,7 +108,7 @@ class UserTest < ActiveSupport::TestCase
       end
 
       should "send an automated dmail to the user" do
-        bot = FactoryBot.create(:user)
+        bot = create(:user)
         User.stubs(:system).returns(bot)
 
         assert_difference("Dmail.count", 1) do
@@ -116,7 +116,7 @@ class UserTest < ActiveSupport::TestCase
         end
 
         assert(@user.dmails.exists?(from: bot, to: @user, title: "Your account has been updated"))
-        refute(@user.dmails.exists?(from: bot, to: @user, title: "Your user record has been updated"))
+        assert_not(@user.dmails.exists?(from: bot, to: @user, title: "Your user record has been updated"))
       end
 
       should "max out the user's upload points when promoting to contributor or higher" do
@@ -140,31 +140,31 @@ class UserTest < ActiveSupport::TestCase
     end
 
     should "normalize its level" do
-      user = FactoryBot.create(:user, :level => User::Levels::OWNER)
+      user = create(:user, level: User::Levels::OWNER)
       assert(user.is_owner?)
       assert(user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 
-      user = FactoryBot.create(:user, :level => User::Levels::ADMIN)
-      assert(!user.is_owner?)
-      assert(user.is_moderator?)
-      assert(user.is_gold?)
+      user = create(:user, level: User::Levels::ADMIN)
+      assert_equal(false, user.is_owner?)
+      assert_equal(true, user.is_moderator?)
+      assert_equal(true, user.is_gold?)
 
-      user = FactoryBot.create(:user, :level => User::Levels::MODERATOR)
-      assert(!user.is_admin?)
-      assert(user.is_moderator?)
-      assert(user.is_gold?)
+      user = create(:user, level: User::Levels::MODERATOR)
+      assert_equal(false, user.is_admin?)
+      assert_equal(true, user.is_moderator?)
+      assert_equal(true, user.is_gold?)
 
-      user = FactoryBot.create(:user, :level => User::Levels::GOLD)
-      assert(!user.is_admin?)
-      assert(!user.is_moderator?)
-      assert(user.is_gold?)
+      user = create(:user, level: User::Levels::GOLD)
+      assert_equal(false, user.is_admin?)
+      assert_equal(false, user.is_moderator?)
+      assert_equal(true, user.is_gold?)
 
-      user = FactoryBot.create(:user)
-      assert(!user.is_admin?)
-      assert(!user.is_moderator?)
-      assert(!user.is_gold?)
+      user = create(:user)
+      assert_equal(false, user.is_admin?)
+      assert_equal(false, user.is_moderator?)
+      assert_equal(false, user.is_gold?)
     end
 
     context "name" do
@@ -183,7 +183,7 @@ class UserTest < ActiveSupport::TestCase
       end
 
       should "be less than 25 characters long" do
-        user = build(:user, name: "a"*25)
+        user = build(:user, name: "a" * 25)
         user.save
         assert_equal(["Name must be less than 25 characters long"], user.errors.full_messages)
       end
@@ -274,22 +274,22 @@ class UserTest < ActiveSupport::TestCase
 
       should "work for names containing asterisks or backslashes" do
         @user1 = build(:user, name: "user*1")
-        @user2 = build(:user, name: "user*2")
-        @user3 = build(:user, name: "user\*3")
+        @user2 = build(:user, name: "user\\2")
+        @user3 = build(:user, name: "user\\*3")
 
         @user1.save(validate: false)
         @user2.save(validate: false)
         @user3.save(validate: false)
 
         assert_equal(@user1.id, User.find_by_name("user*1").id)
-        assert_equal(@user2.id, User.find_by_name("user*2").id)
-        assert_equal(@user3.id, User.find_by_name("user\*3").id)
+        assert_equal(@user2.id, User.find_by_name("user\\2").id)
+        assert_equal(@user3.id, User.find_by_name("user\\*3").id)
       end
     end
 
     context "ip address" do
       setup do
-        @user = FactoryBot.create(:user)
+        @user = create(:user)
       end
 
       context "in the json representation" do
@@ -308,7 +308,7 @@ class UserTest < ActiveSupport::TestCase
     context "password" do
       context "in the json representation" do
         setup do
-          @user = FactoryBot.create(:user)
+          @user = create(:user)
         end
 
         should "not appear" do
@@ -318,7 +318,7 @@ class UserTest < ActiveSupport::TestCase
 
       context "in the xml representation" do
         setup do
-          @user = FactoryBot.create(:user)
+          @user = create(:user)
         end
 
         should "not appear" do
@@ -331,15 +331,15 @@ class UserTest < ActiveSupport::TestCase
       should "match wildcards" do
         user1 = build(:user, name: "foo")
         user2 = build(:user, name: "foo*bar")
-        user3 = build(:user, name: "bar\*baz")
+        user3 = build(:user, name: "bar\\*baz")
 
         user1.save(validate: false)
         user2.save(validate: false)
         user3.save(validate: false)
 
         assert_search_equals([user2, user1], name: "foo*")
-        assert_search_equals(user2, name: "foo\*bar")
-        assert_search_equals(user3, name: "bar\\\*baz")
+        assert_search_equals(user2, name: "foo\\*bar")
+        assert_search_equals(user3, name: "bar\\\\*baz")
       end
     end
 

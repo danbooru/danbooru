@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class NotesControllerTest < ActionDispatch::IntegrationTest
   context "The notes controller" do
@@ -59,14 +59,14 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "update a note" do
-        put_auth note_path(@note), @user, params: {:note => {:body => "xyz"}}
+        put_auth note_path(@note), @user, params: {note: {body: "xyz"}}
         assert_redirected_to @note
         assert_equal("xyz", @note.reload.body)
       end
 
       should "not allow changing the post id to another post" do
         @other = create(:post)
-        put_auth note_path(@note), @user, params: {:format => "json", :id => @note.id, :note => {:post_id => @other.id}}
+        put_auth note_path(@note), @user, params: {format: "json", id: @note.id, note: {post_id: @other.id}}
         assert_response 403
         assert_not_equal(@other.id, @note.reload.post_id)
       end
@@ -84,25 +84,25 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
       setup do
         as(@user) do
           travel(1.day) do
-            @note.update(:body => "111")
+            @note.update(body: "111")
           end
           travel(2.days) do
-            @note.update(:body => "222")
+            @note.update(body: "222")
           end
         end
       end
 
       should "revert to a previous version" do
-        put_auth revert_note_path(@note), @user, params: {:version_id => @note.versions.first.id}
+        put_auth revert_note_path(@note), @user, params: {version_id: @note.versions.first.id}
         assert_redirected_to @note
         assert_equal("000", @note.reload.body)
       end
 
       should "not allow reverting to a previous version of another note" do
         as(@user) do
-          @note2 = create(:note, :body => "note 2")
+          @note2 = create(:note, body: "note 2")
         end
-        put_auth revert_note_path(@note), @user, params: { :version_id => @note2.versions.first.id }
+        put_auth revert_note_path(@note), @user, params: { version_id: @note2.versions.first.id }
         assert_not_equal(@note.reload.body, @note2.body)
         assert_response :missing
       end

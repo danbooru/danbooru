@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 class NoteSanitizerTest < ActiveSupport::TestCase
   context "Sanitizing a note" do
     should "strip unsafe tags" do
       body = '<p>test</p> <script>alert("owned")</script>'
-      assert_equal('<p>test</p> ', NoteSanitizer.sanitize(body))
+      assert_equal("<p>test</p> ", NoteSanitizer.sanitize(body))
     end
 
     should "strip unsafe css" do
@@ -28,14 +28,14 @@ class NoteSanitizerTest < ActiveSupport::TestCase
     end
 
     should "strip disallowed style properties" do
-      assert_equal('<p>test</p>', NoteSanitizer.sanitize('<p style="position: fixed;">test</p>'))
-      assert_equal('<p>test</p>', NoteSanitizer.sanitize('<p style="position: sticky;">test</p>'))
-      assert_equal('<p>test</p>', NoteSanitizer.sanitize('<p style="display: none;">test</p>'))
+      assert_equal("<p>test</p>", NoteSanitizer.sanitize('<p style="position: fixed;">test</p>'))
+      assert_equal("<p>test</p>", NoteSanitizer.sanitize('<p style="position: sticky;">test</p>'))
+      assert_equal("<p>test</p>", NoteSanitizer.sanitize('<p style="display: none;">test</p>'))
 
       assert_equal('<p style="color: red;">test</p>', NoteSanitizer.sanitize('<p style="position: fixed; color: red;">test</p>'))
       assert_equal('<p style="color: red;">test</p>', NoteSanitizer.sanitize('<p style="position: fixed; ; ; ; color: red;">test</p>'))
 
-      assert_equal('<p>test</p>', NoteSanitizer.sanitize('<p style=";">test</p>'))
+      assert_equal("<p>test</p>", NoteSanitizer.sanitize('<p style=";">test</p>'))
     end
 
     should "mark links as nofollow" do

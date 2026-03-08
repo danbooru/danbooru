@@ -12,10 +12,10 @@ class IqdbQueriesController < ApplicationController
     @high_similarity_matches, @low_similarity_matches, @matches = client.search(**iqdb_params)
 
     respond_with(@matches, template: "iqdb_queries/show", location: iqdb_queries_path)
-  rescue IqdbClient::Error => error
+  rescue IqdbClient::Error => e
     @high_similarity_matches, @low_similarity_matches, @matches = [], [], []
-    respond_with(@matches, notice: error.message, template: "iqdb_queries/show", location: iqdb_queries_path)
+    respond_with(@matches, notice: e.message, template: "iqdb_queries/show", location: iqdb_queries_path)
   end
 
-  alias create show
+  alias_method :create, :show
 end

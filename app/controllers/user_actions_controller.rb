@@ -4,9 +4,9 @@ class UserActionsController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
-    if user_id = params[:user_id] || params.dig(:search, :user_id)
+    if (user_id = params[:user_id] || params.dig(:search, :user_id))
       @user = User.find(user_id)
-    elsif user_name = params.dig(:search, :user_name)
+    elsif (user_name = params.dig(:search, :user_name))
       @user = User.find_by_name(user_name)
     end
 

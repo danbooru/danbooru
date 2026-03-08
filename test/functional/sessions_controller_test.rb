@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SessionsControllerTest < ActionDispatch::IntegrationTest
   context "the sessions controller" do

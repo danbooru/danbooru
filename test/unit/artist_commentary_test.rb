@@ -2,7 +2,7 @@ require "test_helper"
 
 class ArtistCommentaryTest < ActiveSupport::TestCase
   setup do
-    user = FactoryBot.create(:user)
+    user = create(:user)
     CurrentUser.user = user
   end
 
@@ -11,21 +11,21 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
   end
 
   should "A post should not have more than one commentary" do
-    post = FactoryBot.create(:post)
+    post = create(:post)
 
     assert_raise(ActiveRecord::RecordInvalid) do
-      FactoryBot.create(:artist_commentary, post_id: post.id)
-      FactoryBot.create(:artist_commentary, post_id: post.id)
+      create(:artist_commentary, post_id: post.id)
+      create(:artist_commentary, post_id: post.id)
     end
   end
 
   context "An artist commentary" do
     context "when searched" do
       setup do
-        @post1 = FactoryBot.create(:post, tag_string: "artcomm1")
-        @post2 = FactoryBot.create(:post, tag_string: "artcomm2")
-        @artcomm1 = FactoryBot.create(:artist_commentary, post_id: @post1.id, original_title: "foo", translated_title: "bar")
-        @artcomm2 = FactoryBot.create(:artist_commentary, post_id: @post2.id, original_title: "", original_description: "", translated_title: "", translated_description: "")
+        @post1 = create(:post, tag_string: "artcomm1")
+        @post2 = create(:post, tag_string: "artcomm2")
+        @artcomm1 = create(:artist_commentary, post_id: @post1.id, original_title: "foo", translated_title: "bar")
+        @artcomm2 = create(:artist_commentary, post_id: @post2.id, original_title: "", original_description: "", translated_title: "", translated_description: "")
       end
 
       should "find the correct match" do
@@ -44,7 +44,7 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
 
     context "when created" do
       should "create a new version" do
-        @artcomm = FactoryBot.create(:artist_commentary, original_title: "foo")
+        @artcomm = create(:artist_commentary, original_title: "foo")
 
         assert_equal(1, @artcomm.versions.size)
         assert_equal("foo", @artcomm.versions.last.original_title)

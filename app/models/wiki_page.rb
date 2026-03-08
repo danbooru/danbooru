@@ -3,7 +3,7 @@
 class WikiPage < ApplicationRecord
   class RevertError < StandardError; end
 
-  META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:","api:"]
+  META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:", "api:"]
   MAX_WIKI_LENGTH = 80_000
 
   after_save :create_version
@@ -24,7 +24,7 @@ class WikiPage < ApplicationRecord
 
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> { active }, foreign_key: "name", primary_key: "title"
-  has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
+  has_many :versions, -> { order("wiki_page_versions.id ASC") }, class_name: "WikiPageVersion", dependent: :destroy
 
   deletable
   has_dtext_links :body
@@ -78,7 +78,7 @@ class WikiPage < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_locked, :is_deleted, :body, :title, :other_names, :tag, :artist, :dtext_links], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at is_locked is_deleted body title other_names tag artist dtext_links], current_user: current_user)
       q = q.where_text_matches([:title, :body], params[:title_or_body_matches])
 
       if params[:title_normalize].present?
@@ -182,7 +182,7 @@ class WikiPage < ApplicationRecord
   end
 
   def self.normalize_other_names(other_names)
-    other_names.map { |name| normalize_other_name(name) }.uniq.reject(&:blank?)
+    other_names.map { |name| normalize_other_name(name) }.uniq.compact_blank
   end
 
   def self.normalize_other_name(name)
@@ -217,12 +217,12 @@ class WikiPage < ApplicationRecord
 
   def create_new_version
     versions.create(
-      :updater_id => CurrentUser.id,
-      :title => title,
-      :body => body,
-      :is_locked => is_locked,
-      :is_deleted => is_deleted,
-      :other_names => other_names
+      updater_id: CurrentUser.id,
+      title: title,
+      body: body,
+      is_locked: is_locked,
+      is_deleted: is_deleted,
+      other_names: other_names,
     )
   end
 

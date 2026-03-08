@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
   context "The post approvals controller" do
@@ -13,7 +13,7 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
           post_auth post_approvals_path(post_id: @post.id, format: :js), @approver
 
           assert_response :success
-          assert(!@post.reload.is_pending?)
+          assert_equal(false, @post.reload.is_pending?)
         end
       end
 
@@ -23,7 +23,7 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
           post_auth post_approvals_path(post_id: @post.id, format: :js), @approver
 
           assert_response :success
-          assert(!@post.reload.is_deleted?)
+          assert_equal(false, @post.reload.is_deleted?)
         end
       end
 

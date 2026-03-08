@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
   context "The user upgrades controller" do

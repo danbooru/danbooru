@@ -10,8 +10,8 @@ class StorageManager::SFTP < StorageManager
     keepalive_interval: 5,
     keepalive_maxcount: 3,
     logger: Rails.logger,
-    verbose: Danbooru.config.log_level.to_s == "info" ? :warn : Danbooru.config.log_level, # the :info log level is too verbose
-    non_interactive: true
+    verbose: (Danbooru.config.log_level.to_s == "info") ? :warn : Danbooru.config.log_level, # the :info log level is too verbose
+    non_interactive: true,
   }
 
   attr_reader :host, :pool, :base_dir, :max_requests, :buffer_size, :ssh_options
@@ -39,8 +39,8 @@ class StorageManager::SFTP < StorageManager
 
   def store(file, dest_path)
     dest_path = full_path(dest_path)
-    temp_upload_path = dest_path + "-" + SecureRandom.uuid + ".tmp"
-    dest_backup_path = dest_path + "-" + SecureRandom.uuid + ".bak"
+    temp_upload_path = "#{dest_path}-#{SecureRandom.uuid}.tmp"
+    dest_backup_path = "#{dest_path}-#{SecureRandom.uuid}.bak"
 
     with_connection do |sftp|
       sftp.mkdir_p!(File.dirname(dest_path))

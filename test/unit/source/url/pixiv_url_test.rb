@@ -144,7 +144,7 @@ module Source::Tests::URL
                                page_url: "https://www.pixiv.net/artworks/44524589",)
 
         url_parser_should_work("https://i.pximg.net/img-master/img/2025/08/22/20/18/32/141762848-757de2f8c8f77f2f637b61e4c9f42ec4_p0_master1200.jpg",
-                                page_url: "https://www.pixiv.net/artworks/141762848",)
+                               page_url: "https://www.pixiv.net/artworks/141762848",)
       end
 
       context "for proxies" do

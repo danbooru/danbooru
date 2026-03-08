@@ -1,8 +1,8 @@
-require 'test_helper'
+require "test_helper"
 
 class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
   def default_search_order(items)
-    ->{ items.each { |val| val.reload }.sort_by(&:updated_at).reverse }
+    -> { items.each(&:reload).sort_by(&:updated_at).reverse }
   end
 
   context "The forum topics controller" do
@@ -61,7 +61,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render for atom feed" do
-        get forum_topic_path(@forum_topic), params: {:format => :atom}
+        get forum_topic_path(@forum_topic), params: {format: :atom}
         assert_response :success
       end
 
@@ -97,7 +97,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render for atom feed" do
-        get forum_topics_path, params: {:format => :atom}
+        get forum_topics_path, params: {format: :atom}
         assert_response :success
       end
 

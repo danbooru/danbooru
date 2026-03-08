@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UserUpgradeTest < ActiveSupport::TestCase
   context "UserUpgrade:" do

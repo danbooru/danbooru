@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
   context "The iqdb controller" do

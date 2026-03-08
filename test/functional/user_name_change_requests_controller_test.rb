@@ -152,7 +152,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         should "fail" do
           @another_user = create(:user)
           get_auth user_name_change_request_path(@change_request), @another_user
-          assert_response :forbidden
+          assert_response 403
         end
       end
     end

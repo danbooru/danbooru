@@ -2,7 +2,7 @@ require "test_helper"
 
 class TagTest < ActiveSupport::TestCase
   setup do
-    @builder = FactoryBot.create(:builder_user)
+    @builder = create(:builder_user)
     CurrentUser.user = @builder
   end
 
@@ -12,9 +12,9 @@ class TagTest < ActiveSupport::TestCase
 
   context "A tag category fetcher" do
     should "fetch for multiple tags" do
-      FactoryBot.create(:artist_tag, :name => "aaa")
-      FactoryBot.create(:copyright_tag, :name => "bbb")
-      categories = Tag.categories_for(%w(aaa bbb ccc))
+      create(:artist_tag, name: "aaa")
+      create(:copyright_tag, name: "bbb")
+      categories = Tag.categories_for(%w[aaa bbb ccc])
       assert_equal(Tag.categories.artist, categories["aaa"])
       assert_equal(Tag.categories.copyright, categories["bbb"])
       assert_equal(0, categories["ccc"])
@@ -56,18 +56,18 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(1, Tag.categories.value_for("artist"))
       assert_equal(1, Tag.categories.value_for("art"))
       assert_equal(5, Tag.categories.value_for("meta"))
-      assert_equal(nil, Tag.categories.value_for("unknown"))
+      assert_nil(Tag.categories.value_for("unknown"))
     end
   end
 
   context "A tag" do
     should "know its category name" do
-      @tag = FactoryBot.create(:artist_tag)
+      @tag = create(:artist_tag)
       assert_equal("Artist", @tag.category_name)
     end
 
     should "reset its category after updating" do
-      tag = FactoryBot.create(:artist_tag)
+      tag = create(:artist_tag)
       assert_equal(Tag.categories.artist, Cache.get("tag-category:#{Cache.hash(tag.name)}"))
 
       tag.update!(category: Tag.categories.copyright, updater: create(:user))
@@ -145,14 +145,14 @@ class TagTest < ActiveSupport::TestCase
 
   context "A tag" do
     should "be found when one exists" do
-      tag = FactoryBot.create(:tag)
+      tag = create(:tag)
       assert_difference("Tag.count", 0) do
         Tag.find_or_create_by_name(tag.name)
       end
     end
 
     should "change the type for an existing tag" do
-      tag = FactoryBot.create(:tag)
+      tag = create(:tag)
       assert_difference("Tag.count", 0) do
         assert_equal(Tag.categories.general, tag.category)
         Tag.find_or_create_by_name(tag.name, category: "artist", current_user: @builder)
@@ -162,14 +162,14 @@ class TagTest < ActiveSupport::TestCase
     end
 
     should "not change category when the tag is too large to be changed by a builder" do
-      tag = FactoryBot.create(:tag, post_count: 1001)
+      tag = create(:tag, post_count: 1001)
       Tag.find_or_create_by_name(tag.name, category: "artist", current_user: @builder)
 
       assert_equal(0, tag.reload.category)
     end
 
     should "not change category when the tag is too large to be changed by a member" do
-      tag = FactoryBot.create(:tag, post_count: 51)
+      tag = create(:tag, post_count: 51)
       Tag.find_or_create_by_name(tag.name, category: "artist", current_user: create(:member_user))
 
       assert_equal(0, tag.reload.category)
@@ -194,11 +194,11 @@ class TagTest < ActiveSupport::TestCase
     end
 
     should "update post tag counts when the category is changed" do
-      post = FactoryBot.create(:post, tag_string: "test")
+      post = create(:post, tag_string: "test")
       assert_equal(1, post.tag_count_general)
       assert_equal(0, post.tag_count_character)
 
-      tag = Tag.find_or_create_by_name("test", category: "char", current_user: @builder)
+      Tag.find_or_create_by_name("test", category: "char", current_user: @builder)
       perform_enqueued_jobs(only: UpdateTagCategoryPostCountsJob)
       post.reload
 
@@ -339,7 +339,7 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("café").for(:name).on(:create)
       should_not allow_value("東方").for(:name).on(:create)
       should_not allow_value("FAV:blah").for(:name).on(:create)
-      should_not allow_value("X"*171).for(:name).on(:create)
+      should_not allow_value("X" * 171).for(:name).on(:create)
 
       should_not allow_value("foo)").for(:name).on(:create)
       should_not allow_value("foo(").for(:name).on(:create)

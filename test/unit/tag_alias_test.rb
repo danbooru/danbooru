@@ -1,12 +1,12 @@
-require 'test_helper'
+require "test_helper"
 
 class TagAliasTest < ActiveSupport::TestCase
   context "A tag alias" do
     setup do
-      @admin = FactoryBot.create(:admin_user)
+      @admin = create(:admin_user)
 
       travel_to(1.month.ago) do
-        user = FactoryBot.create(:user)
+        user = create(:user)
         CurrentUser.user = user
       end
     end
@@ -17,20 +17,20 @@ class TagAliasTest < ActiveSupport::TestCase
 
     context "on validation" do
       subject do
-        FactoryBot.create(:tag, :name => "aaa")
-        FactoryBot.create(:tag, :name => "bbb")
-        FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "active")
+        create(:tag, name: "aaa")
+        create(:tag, name: "bbb")
+        create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "active")
       end
 
       should normalize_attribute(:antecedent_name).from(" FOO BAR ").to("foo_bar")
       should normalize_attribute(:consequent_name).from(" FOO BAR ").to("foo_bar")
 
-      should allow_value('active').for(:status)
-      should allow_value('deleted').for(:status)
+      should allow_value("active").for(:status)
+      should allow_value("deleted").for(:status)
 
-      should_not allow_value('ACTIVE').for(:status)
-      should_not allow_value('error').for(:status)
-      should_not allow_value('derp').for(:status)
+      should_not allow_value("ACTIVE").for(:status)
+      should_not allow_value("error").for(:status)
+      should_not allow_value("derp").for(:status)
 
       should allow_value(nil).for(:forum_topic_id)
       should_not allow_value(-1).for(:forum_topic_id).with_message("must exist", against: :forum_topic)
@@ -42,10 +42,10 @@ class TagAliasTest < ActiveSupport::TestCase
       should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
 
       should "not allow duplicate active aliases" do
-        ta1 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "active")
-        ta2 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
-        ta3 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
-        ta4 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
+        ta1 = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "active")
+        ta2 = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
+        ta3 = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
+        ta4 = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
         [ta1, ta2, ta3, ta4].each { |ta| assert(ta.valid?) }
 
         ta4.update(status: "active")
@@ -149,8 +149,8 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     should "update any affected posts when saved" do
-      post1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
-      post2 = FactoryBot.create(:post, :tag_string => "ccc ddd")
+      post1 = create(:post, tag_string: "aaa bbb")
+      post2 = create(:post, tag_string: "ccc ddd")
 
       TagAlias.approve!(antecedent_name: "aaa", consequent_name: "ccc", approver: @admin)
 
@@ -161,9 +161,10 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     should "not validate for transitive relations" do
-      ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
+      create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc")
+
       assert_difference("TagAlias.count", 0) do
-        ta2 = FactoryBot.build(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        ta2 = build(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
         ta2.save
         assert(ta2.errors.any?, "Tag alias should be invalid")
         assert_equal("bbb is already aliased to ccc", ta2.errors.full_messages.join)

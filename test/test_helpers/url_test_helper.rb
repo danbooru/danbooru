@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
+# A helper class to automate all parsing checks for external urls
 module UrlTestHelper
   extend ActiveSupport::Concern
-  # A helper class to automate all parsing checks for external urls
 
   class_methods do
     # Takes arbitrary input parameters, such as

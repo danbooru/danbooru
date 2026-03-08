@@ -10,7 +10,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
   context "for a bulk update request," do
     setup do
-      @admin = FactoryBot.create(:admin_user)
+      @admin = create(:admin_user)
       CurrentUser.user = @admin
     end
 
@@ -84,9 +84,9 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur1 = create_bur!("alias aaa -> bbb", @admin)
           @bur2 = create_bur!("alias bbb -> ccc", @admin)
 
-          assert_equal(false, TagAlias.where(antecedent_name: "aaa", consequent_name: "bbb", status: "active").exists?)
-          assert_equal(true, TagAlias.where(antecedent_name: "bbb", consequent_name: "ccc", status: "active").exists?)
-          assert_equal(true, TagAlias.where(antecedent_name: "aaa", consequent_name: "ccc", status: "active").exists?)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "aaa", consequent_name: "bbb", status: "active"))
+          assert_equal(true, TagAlias.exists?(antecedent_name: "bbb", consequent_name: "ccc", status: "active"))
+          assert_equal(true, TagAlias.exists?(antecedent_name: "aaa", consequent_name: "ccc", status: "active"))
         end
 
         should "move any active implications from the old tag to the new tag" do
@@ -1059,8 +1059,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         @bur = create_bur!(@script, @admin)
 
-        @ta = TagAlias.where(:antecedent_name => "foo", :consequent_name => "bar").first
-        @ti = TagImplication.where(:antecedent_name => "bar", :consequent_name => "baz").first
+        @ta = TagAlias.where(antecedent_name: "foo", consequent_name: "bar").first
+        @ti = TagImplication.where(antecedent_name: "bar", consequent_name: "baz").first
       end
 
       should "set the BUR approver" do

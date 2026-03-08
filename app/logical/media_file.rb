@@ -236,7 +236,7 @@ class MediaFile
   # @return [MediaFile, nil] a preview file, or nil if we can't generate a preview for this file type (e.g. Flash files)
   def preview(width, height, **options)
     preview!(width, height, **options)
-  rescue
+  rescue StandardError
     nil
   end
 
@@ -269,7 +269,7 @@ class MediaFile
       duration: duration,
       frame_count: frame_count,
       frame_rate: frame_rate,
-      metadata: metadata
+      metadata: metadata,
     }.stringify_keys
   end
 

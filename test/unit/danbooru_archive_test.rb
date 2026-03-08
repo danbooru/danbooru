@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class DanbooruArchiveTest < ActiveSupport::TestCase
   context "Danbooru::Archive" do
@@ -77,21 +77,21 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
 
       should "work with a .zip file" do
-        Danbooru::Archive.extract!("test/files/archive/ugoira.zip") do |dir, filenames|
+        Danbooru::Archive.extract!("test/files/archive/ugoira.zip") do |_dir, filenames|
           assert_equal(5, filenames.size)
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
         end
       end
 
       should "work with a .rar file" do
-        Danbooru::Archive.extract!("test/files/archive/ugoira.rar") do |dir, filenames|
+        Danbooru::Archive.extract!("test/files/archive/ugoira.rar") do |_dir, filenames|
           assert_equal(5, filenames.size)
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
         end
       end
 
       should "work with a .7z file" do
-        Danbooru::Archive.extract!("test/files/archive/ugoira.7z") do |dir, filenames|
+        Danbooru::Archive.extract!("test/files/archive/ugoira.7z") do |_dir, filenames|
           assert_equal(5, filenames.size)
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
         end
@@ -108,7 +108,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
     context "#exists? method" do
       should "work" do
         archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
-        assert_equal(true, archive.exists? { |entry, count| count > 4 })
+        assert_equal(true, archive.exists? { |_entry, count| count > 4 })
       end
     end
 
@@ -145,7 +145,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
     should "detect directory traversal attacks" do
       archive = Danbooru::Archive.open!("test/files/archive/zip-slip.zip")
 
-      assert_equal(true, archive.entries.any? { |e| e.directory_traversal? })
+      assert_equal(true, archive.entries.any?(&:directory_traversal?))
       assert_raises(Danbooru::Archive::Error) { archive.extract! }
     end
 
@@ -197,14 +197,14 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal(3, archive.file_count)
         assert_equal(
           ["subdir/test.png", "test.gif", "テスト.jpg"],
-          archive.entries.map(&:pathname).map { _1.force_encoding("UTF-8") }
+          archive.entries.map(&:pathname).map { it.force_encoding("UTF-8") },
         )
 
-        archive.extract! do |dir, filenames|
+        archive.extract! do |_dir, filenames|
           # Archived files md5 should match
           assert_equal(
             ["081a5c3b92d8980d1aadbd215bfac5b9", "1e2edf6bdbd971d8c3cc4da0f98f38ab", "ecef68c44edb8a0d6a3070b5f8e8ee76"],
-            filenames.map { MediaFile.md5 _1 }
+            filenames.map { MediaFile.md5 it },
           )
         end
 

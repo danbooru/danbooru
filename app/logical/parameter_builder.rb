@@ -8,7 +8,7 @@ class ParameterBuilder
 
   def self.get_only_hash(only_array, object, seen_objects = [])
     return {} if object.nil?
-    is_root = seen_objects.length == 0
+    is_root = seen_objects.empty?
     only_hash = {only: [], include: [], methods: []}
     available_includes = object.available_includes
     attributes, methods = object.api_attributes.partition { |attr| object.has_attribute?(attr) }
@@ -19,7 +19,7 @@ class ParameterBuilder
       match = item.match(/(\w+)\[(.+?)\]$/)
       item = (match || [])[1] || item
       item_sym = item.to_sym
-      was_seen = was_inclusion_seen(item, object.class, seen_objects)
+      was_seen = was_inclusion_seen?(item, object.class, seen_objects)
       if match && available_includes.include?(item_sym) && (!was_seen || is_root)
         item_object = object.send(item_sym)
         next if item_object.nil?
@@ -30,7 +30,7 @@ class ParameterBuilder
         end.reduce do |memo, item_hash|
           merge_only_hash(memo, item_hash)
         end
-        only_hash[:include] << Hash[item_sym, item_hash]
+        only_hash[:include] << ({ item_sym => item_hash })
       elsif available_includes.include?(item_sym) && (!was_seen || is_root)
         only_hash[:include] << item_sym
       elsif attributes.include?(item_sym)
@@ -53,7 +53,7 @@ class ParameterBuilder
   end
 
   def self.get_includes_array(only_array, model_name, seen_objects = [])
-    is_root = seen_objects.length == 0
+    is_root = seen_objects.empty?
     include_array = []
     model = Kernel.const_get(model_name)
     available_includes = model.available_includes
@@ -63,12 +63,12 @@ class ParameterBuilder
       match = item.match(/(\w+)\[(.+?)\]$/)
       item = (match || [])[1] || item
       item_sym = item.to_sym
-      was_seen = was_inclusion_seen(item, model, seen_objects)
+      was_seen = was_inclusion_seen?(item, model, seen_objects)
       if match && available_includes.include?(item_sym) && (!was_seen || is_root)
         item_array = split_only_string(match[2])
         model.associated_models(item).each do |m|
           item_array = get_includes_array(item_array, m, seen_objects.clone)
-          include_array << (item_array.empty? ? item_sym : Hash[item_sym, item_array])
+          include_array << (item_array.empty? ? item_sym : { item_sym => item_array })
         end
       elsif available_includes.include?(item_sym) && (!was_seen || is_root)
         include_array << item_sym
@@ -77,7 +77,7 @@ class ParameterBuilder
     include_array
   end
 
-  def self.was_inclusion_seen(inclusion, class_object, seen_objects)
+  def self.was_inclusion_seen?(inclusion, class_object, seen_objects)
     if class_object.reflections[inclusion]
       inclusion_class = class_object.reflections[inclusion].class_name
       max_seen = (class_object.multiple_includes.include?(inclusion.to_sym) ? 1 : 0)
@@ -111,7 +111,7 @@ class ParameterBuilder
   end
 
   def self.merge_only_hash(h1, h2)
-    h1.merge(h2) do |key, v1, v2|
+    h1.merge(h2) do |_key, v1, v2|
       if v1.is_a?(Hash) && v2.is_a?(Hash)
         merge_only_hash(v1, v2)
       elsif v1.is_a?(Array) && v2.is_a?(Array)

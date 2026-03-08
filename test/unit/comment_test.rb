@@ -4,14 +4,14 @@ class CommentTest < ActiveSupport::TestCase
   context "A comment" do
     context "that mentions a user" do
       setup do
-        @post = FactoryBot.create(:post)
+        @post = create(:post)
       end
 
       context "added in an edit" do
         should "dmail the added user" do
-          @user1 = FactoryBot.create(:user)
-          @user2 = FactoryBot.create(:user)
-          @comment = FactoryBot.create(:comment, :post_id => @post.id, :body => "@#{@user1.name}")
+          @user1 = create(:user)
+          @user2 = create(:user)
+          @comment = create(:comment, post_id: @post.id, body: "@#{@user1.name}")
 
           assert_no_difference("@user1.dmails.count") do
             assert_difference("@user2.dmails.count") do
@@ -24,32 +24,32 @@ class CommentTest < ActiveSupport::TestCase
 
       context "in a quote block" do
         setup do
-          @user2 = FactoryBot.create(:user, :created_at => 2.weeks.ago)
+          @user2 = create(:user, created_at: 2.weeks.ago)
         end
 
         should "not create a dmail" do
           assert_difference("Dmail.count", 0) do
-            FactoryBot.create(:comment, :post_id => @post.id, :body => "[quote]@#{@user2.name}[/quote]")
+            create(:comment, post_id: @post.id, body: "[quote]@#{@user2.name}[/quote]")
           end
 
           assert_difference("Dmail.count", 0) do
-            FactoryBot.create(:comment, :post_id => @post.id, :body => "[quote]@#{@user2.name}[/quote] blah [quote]@#{@user2.name}[/quote]")
+            create(:comment, post_id: @post.id, body: "[quote]@#{@user2.name}[/quote] blah [quote]@#{@user2.name}[/quote]")
           end
 
           assert_difference("Dmail.count", 0) do
-            FactoryBot.create(:comment, :post_id => @post.id, :body => "[quote][quote]@#{@user2.name}[/quote][/quote]")
+            create(:comment, post_id: @post.id, body: "[quote][quote]@#{@user2.name}[/quote][/quote]")
           end
 
           assert_difference("Dmail.count", 1) do
-            FactoryBot.create(:comment, :post_id => @post.id, :body => "[quote]@#{@user2.name}[/quote] @#{@user2.name}")
+            create(:comment, post_id: @post.id, body: "[quote]@#{@user2.name}[/quote] @#{@user2.name}")
           end
         end
       end
 
       context "outside a quote block" do
         setup do
-          @user2 = FactoryBot.create(:user)
-          @comment = FactoryBot.build(:comment, :post_id => @post.id, :body => "Hey @#{@user2.name} check this out!")
+          @user2 = create(:user)
+          @comment = build(:comment, post_id: @post.id, body: "Hey @#{@user2.name} check this out!")
         end
 
         should "create a dmail" do
@@ -72,8 +72,8 @@ class CommentTest < ActiveSupport::TestCase
     context "created by an unlimited user" do
       context "that is then deleted" do
         setup do
-          @post = FactoryBot.create(:post)
-          @comment = FactoryBot.create(:comment, :post_id => @post.id)
+          @post = create(:post)
+          @comment = create(:comment, post_id: @post.id)
           @comment.update(is_deleted: true)
           @post.reload
         end
@@ -84,59 +84,57 @@ class CommentTest < ActiveSupport::TestCase
       end
 
       should "not validate if the post does not exist" do
-        comment = FactoryBot.build(:comment, :post_id => -1)
+        comment = build(:comment, post_id: -1)
 
         assert_not(comment.valid?)
         assert_equal(["must exist"], comment.errors[:post])
       end
 
       should "not bump the parent post" do
-        post = FactoryBot.create(:post)
-        comment = FactoryBot.create(:comment, :do_not_bump_post => true, :post => post)
-        post.reload
-        assert_nil(post.last_comment_bumped_at)
+        post = create(:post)
+        create(:comment, do_not_bump_post: true, post: post)
+        assert_nil(post.reload.last_comment_bumped_at)
 
-        comment = FactoryBot.create(:comment, :post => post)
-        post.reload
-        assert_not_nil(post.last_comment_bumped_at)
+        create(:comment, post: post)
+        assert_not_nil(post.reload.last_comment_bumped_at)
       end
 
       should "not bump the post after exceeding the threshold" do
         Danbooru.config.stubs(:comment_threshold).returns(1)
-        p = FactoryBot.create(:post)
-        c1 = FactoryBot.create(:comment, :post => p)
+        p = create(:post)
+        c1 = create(:comment, post: p)
         travel(2.seconds) do
-          c2 = FactoryBot.create(:comment, :post => p)
+          create(:comment, post: p)
         end
         p.reload
         assert_equal(c1.created_at.to_s, p.last_comment_bumped_at.to_s)
       end
 
       should "always record the last_commented_at properly" do
-        post = FactoryBot.create(:post)
+        post = create(:post)
         Danbooru.config.stubs(:comment_threshold).returns(1)
 
-        c1 = FactoryBot.create(:comment, :do_not_bump_post => true, :post => post)
+        c1 = create(:comment, do_not_bump_post: true, post: post)
         post.reload
         assert_equal(c1.created_at.to_s, post.last_commented_at.to_s)
 
         travel(2.seconds) do
-          c2 = FactoryBot.create(:comment, :post => post)
+          c2 = create(:comment, post: post)
           post.reload
           assert_equal(c2.created_at.to_s, post.last_commented_at.to_s)
         end
       end
 
       should "be searchable" do
-        c1 = FactoryBot.create(:comment, :body => "aaa bbb ccc")
-        c2 = FactoryBot.create(:comment, :body => "aaa ddd")
-        c3 = FactoryBot.create(:comment, :body => "eee")
+        c1 = create(:comment, body: "aaa bbb ccc")
+        c2 = create(:comment, body: "aaa ddd")
+        c3 = create(:comment, body: "eee")
 
         assert_search_equals([c2, c1], body_matches: "aaa")
       end
 
       should "default to id_desc order when searched with no options specified" do
-        comms = FactoryBot.create_list(:comment, 3)
+        comms = create_list(:comment, 3)
 
         assert_search_equals([comms[2], comms[1], comms[0]])
       end
@@ -156,7 +154,7 @@ class CommentTest < ActiveSupport::TestCase
 
       context "that is quoted" do
         should "strip [quote] tags correctly" do
-          comment = FactoryBot.create(:comment, body: <<~EOS)
+          comment = create(:comment, body: <<~EOS)
             paragraph one
 
             [quote]

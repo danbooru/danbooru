@@ -6,8 +6,8 @@ module PoolArchiveTestHelper
   end
 
   class MockPoolSqsService
-    def send_message(msg, *options)
-      _, json = msg.split(/\n/)
+    def send_message(msg, *_options)
+      _, json = msg.split("\n")
       json = JSON.parse(json)
       prev = PoolVersion.where(pool_id: json["pool_id"]).order("id desc").first
       if merge?(prev, json)

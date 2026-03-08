@@ -2,6 +2,7 @@
 
 class Artist < ApplicationRecord
   extend Memoist
+
   class RevertError < StandardError; end
 
   attr_accessor :url_string_changed
@@ -124,14 +125,14 @@ class Artist < ApplicationRecord
 
     def create_new_version
       ArtistVersion.create(
-        :artist_id => id,
-        :name => name,
-        :updater_id => CurrentUser.id,
-        :urls => url_array,
-        :is_deleted => is_deleted,
-        :is_banned => is_banned,
-        :other_names => other_names,
-        :group_name => group_name
+        artist_id: id,
+        name: name,
+        updater_id: CurrentUser.id,
+        urls: url_array,
+        is_deleted: is_deleted,
+        is_banned: is_banned,
+        other_names: other_names,
+        group_name: group_name,
       )
     end
 
@@ -147,7 +148,7 @@ class Artist < ApplicationRecord
 
     def revert_to!(version)
       if id != version.artist_id
-        raise RevertError.new("You cannot revert to a previous version of another artist.")
+        raise RevertError, "You cannot revert to a previous version of another artist."
       end
 
       self.name = version.name
@@ -292,7 +293,7 @@ class Artist < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :other_names, :urls, :wiki_page, :tag_alias, :tag], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at is_deleted is_banned name group_name other_names urls wiki_page tag_alias tag], current_user: current_user)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])

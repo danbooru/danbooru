@@ -35,7 +35,7 @@ class ForumTopic < ApplicationRecord
   before_update :create_mod_action
   after_update :update_posts_on_deletion_or_undeletion
   after_update :update_original_post
-  after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
+  after_save(if: ->(topic) { topic.is_locked? && topic.saved_change_to_is_locked? }) do
     ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock, subject: self, user: updater)
   end
 
@@ -180,7 +180,7 @@ class ForumTopic < ApplicationRecord
   end
 
   def update_original_post
-    original_post&.update_columns(:updater_id => updater.id, :updated_at => Time.now)
+    original_post&.update_columns(updater_id: updater.id, updated_at: Time.zone.now)
   end
 
   def pretty_title

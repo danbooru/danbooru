@@ -78,6 +78,7 @@ class MediaAsset < ApplicationRecord
     include ActiveModel::Serializers::Xml
 
     attr_reader :media_asset, :type
+
     delegate :id, :md5, :file_key, :storage_service, :backup_storage_service, to: :media_asset
 
     def initialize(media_asset, type)
@@ -105,7 +106,7 @@ class MediaAsset < ApplicationRecord
 
     def open_file(&block)
       open_file!(&block)
-    rescue
+    rescue StandardError
       nil
     end
 
@@ -232,7 +233,7 @@ class MediaAsset < ApplicationRecord
       def exif_matches(string)
         # string = File:ColorComponents=3
         if string.include?("=")
-          key, value = string.split(/=/, 2)
+          key, value = string.split("=", 2)
           hash = { key => value }
           joins(:media_metadata).where_json_contains("media_metadata.metadata", hash)
         # string = File:ColorComponents
@@ -242,7 +243,7 @@ class MediaAsset < ApplicationRecord
       end
 
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :status, :md5, :pixel_hash, :file_ext, :file_size, :image_width, :image_height, :duration, :file_key, :is_public], current_user: current_user)
+        q = search_attributes(params, %i[id created_at updated_at status md5 pixel_hash file_ext file_size image_width image_height duration file_key is_public], current_user: current_user)
 
         if params[:metadata].present?
           q = q.joins(:media_metadata).merge(MediaMetadata.search({ metadata: params[:metadata] }, current_user))
@@ -254,10 +255,10 @@ class MediaAsset < ApplicationRecord
         end
 
         if params[:is_posted].to_s.truthy?
-          #q = q.where.associated(:post)
+          # q = q.where.associated(:post)
           q = q.where(Post.where("posts.md5 = media_assets.md5").arel.exists)
         elsif params[:is_posted].to_s.falsy?
-          #q = q.where.missing(:post)
+          # q = q.where.missing(:post)
           q = q.where.not(Post.where("posts.md5 = media_assets.md5").arel.exists)
         end
 
@@ -441,7 +442,7 @@ class MediaAsset < ApplicationRecord
         update!(status: :expunged)
         ModAction.log("expunged media asset ##{id} (md5=#{md5})", :media_asset_expunge, subject: self, user: current_user) if log
       end
-    rescue
+    rescue StandardError
       update!(status: :failed)
       raise
     end
@@ -453,7 +454,7 @@ class MediaAsset < ApplicationRecord
         update!(status: :deleted)
         ModAction.log("deleted media asset ##{id} (md5=#{md5})", :media_asset_delete, subject: self, user: current_user) if log
       end
-    rescue
+    rescue StandardError
       update!(status: :failed)
       raise
     end

@@ -12,11 +12,11 @@ class UserAction < ApplicationRecord
 
   def self.model_types
     %w[ArtistVersion ArtistCommentaryVersion Ban BulkUpdateRequest Comment
-    CommentVote Dmail FavoriteGroup ForumPost ForumPostVote ForumTopic
-    ModAction ModerationReport NoteVersion Post PostAppeal PostApproval
-    PostDisapproval PostFlag PostReplacement PostVote SavedSearch TagAlias
-    TagImplication TagVersion Upload User UserEvent UserFeedback UserUpgrade
-    UserNameChangeRequest WikiPageVersion]
+       CommentVote Dmail FavoriteGroup ForumPost ForumPostVote ForumTopic
+       ModAction ModerationReport NoteVersion Post PostAppeal PostApproval
+       PostDisapproval PostFlag PostReplacement PostVote SavedSearch TagAlias
+       TagImplication TagVersion Upload User UserEvent UserFeedback UserUpgrade
+       UserNameChangeRequest WikiPageVersion]
   end
 
   def self.for_user(user)
@@ -91,7 +91,7 @@ class UserAction < ApplicationRecord
     from("(#{sql}) user_actions")
   end
 
-  def self.visible(user)
+  def self.visible(_user)
     all
   end
 

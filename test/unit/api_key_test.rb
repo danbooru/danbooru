@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ApiKeyTest < ActiveSupport::TestCase
   def self.to_ips(ips)

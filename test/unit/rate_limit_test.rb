@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class RateLimitTest < ActiveSupport::TestCase
   context "RateLimit: " do
@@ -61,12 +61,12 @@ class RateLimitTest < ActiveSupport::TestCase
         assert_equal(true, limiter.limited?)
         assert_equal(-3, limiter.rate_limits.first.points)
 
-        travel 5.second
+        travel 5.seconds
         limiter = RateLimiter.new("write", ["users/1"], cost: 1, rate: 1, burst: 10)
         assert_equal(false, limiter.limited?)
         assert_equal(1, limiter.rate_limits.first.points)
 
-        travel 60.second
+        travel 60.seconds
         limiter = RateLimiter.new("write", ["users/1"], cost: 1, rate: 1, burst: 10)
         assert_equal(false, limiter.limited?)
         assert_equal(9, limiter.rate_limits.first.points)

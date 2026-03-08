@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UserEventsControllerTest < ActionDispatch::IntegrationTest
   context "The user events controller" do

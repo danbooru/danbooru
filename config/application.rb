@@ -64,7 +64,7 @@ module Danbooru
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w(assets tasks dtext_rb))
+    config.autoload_lib(ignore: %w[assets tasks dtext_rb])
 
     # Configuration for the application, engines, and railties goes here.
     #
@@ -74,8 +74,8 @@ module Danbooru
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers)
-    config.time_zone = 'Eastern Time (US & Canada)'
+    config.autoload_paths += %W[#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers]
+    config.time_zone = "Eastern Time (US & Canada)"
     config.active_model.i18n_customize_full_message = true
 
     # Hide sensitive model attributes and request params in exception messages

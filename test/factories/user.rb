@@ -3,7 +3,7 @@ FactoryBot.define do
     name { SecureRandom.uuid.first(20) }
     password {"password"}
     level {20}
-    last_logged_in_at {Time.now}
+    last_logged_in_at { Time.zone.now }
 
     factory(:banned_user) do
       transient { ban_duration {3} }
@@ -19,7 +19,7 @@ FactoryBot.define do
 
     User.level_hash.each do |level_name, level_value|
       # allows create(:moderator_user), create(:approver) etc
-      next if level_name == "Restricted"  # already defined above
+      next if level_name == "Restricted" # already defined above
 
       factory(level_name.downcase) do
         level {level_value}

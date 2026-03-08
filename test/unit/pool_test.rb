@@ -1,9 +1,9 @@
-require 'test_helper'
+require "test_helper"
 
 class PoolTest < ActiveSupport::TestCase
   setup do
     travel_to(1.month.ago) do
-      @user = FactoryBot.create(:user)
+      @user = create(:user)
       CurrentUser.user = @user
     end
   end
@@ -14,7 +14,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Searching pools" do
     should "find pools by name" do
-      @pool = FactoryBot.create(:pool, name: "Test Pool")
+      @pool = create(:pool, name: "Test Pool")
       @pool2 = create(:pool, name: "Yuru_Yuri_-_\\\\Akarin!!//")
 
       assert_equal(@pool.id, Pool.find_by_name("test pool").id)
@@ -67,8 +67,8 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Creating a pool" do
     setup do
-      @posts = FactoryBot.create_list(:post, 5)
-      @pool = FactoryBot.create(:pool, post_ids: @posts.map(&:id))
+      @posts = create_list(:post, 5)
+      @pool = create(:pool, post_ids: @posts.map(&:id))
     end
 
     should "initialize the post count" do
@@ -107,9 +107,9 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Updating a pool" do
     setup do
-      @pool = FactoryBot.create(:pool, category: "series")
-      @p1 = FactoryBot.create(:post)
-      @p2 = FactoryBot.create(:post)
+      @pool = create(:pool, category: "series")
+      @p1 = create(:post)
+      @p2 = create(:post)
     end
 
     context "by adding a new post" do
@@ -153,7 +153,7 @@ class PoolTest < ActiveSupport::TestCase
       context "to a deleted pool" do
         setup do
           # must be a builder to update deleted pools.
-          CurrentUser.user = FactoryBot.create(:builder_user)
+          CurrentUser.user = create(:builder_user)
 
           @pool.update_attribute(:is_deleted, true)
           @pool.post_ids += [@p2.id]
@@ -264,10 +264,10 @@ class PoolTest < ActiveSupport::TestCase
 
   context "An existing pool" do
     setup do
-      @pool = FactoryBot.create(:pool)
-      @p1 = FactoryBot.create(:post)
-      @p2 = FactoryBot.create(:post)
-      @p3 = FactoryBot.create(:post)
+      @pool = create(:pool)
+      @p1 = create(:post)
+      @p2 = create(:post)
+      @p3 = create(:post)
       @pool.add!(@p1)
       @pool.add!(@p2)
       @pool.add!(@p3)

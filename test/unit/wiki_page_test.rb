@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class WikiPageTest < ActiveSupport::TestCase
   teardown do
@@ -8,9 +8,9 @@ class WikiPageTest < ActiveSupport::TestCase
   context "A wiki page" do
     context "updated by a regular user" do
       setup do
-        @user = FactoryBot.create(:user)
+        @user = create(:user)
         CurrentUser.user = @user
-        @wiki_page = FactoryBot.create(:wiki_page, :title => "HOT POTATO", :other_names => "foo*bar baz")
+        @wiki_page = create(:wiki_page, title: "HOT POTATO", other_names: "foo*bar baz")
       end
 
       should "search by title" do
@@ -25,7 +25,7 @@ class WikiPageTest < ActiveSupport::TestCase
 
       should "create versions" do
         assert_difference("WikiPageVersion.count") do
-          @wiki_page = FactoryBot.create(:wiki_page, :title => "xxx")
+          @wiki_page = create(:wiki_page, title: "xxx")
         end
 
         assert_difference("WikiPageVersion.count") do
@@ -145,7 +145,7 @@ class WikiPageTest < ActiveSupport::TestCase
       should_not allow_value("café").for(:title).on(:create)
       should_not allow_value("東方").for(:title).on(:create)
       should_not allow_value("FAV:blah").for(:title).on(:create)
-      should_not allow_value("X"*171).for(:title).on(:create)
+      should_not allow_value("X" * 171).for(:title).on(:create)
     end
 
     context "during body validation" do

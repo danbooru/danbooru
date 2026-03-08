@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:bulk_update_request) do |f|
+  factory(:bulk_update_request) do
     user
     title {"xxx"}
     script {"create alias aaa -> bbb"}

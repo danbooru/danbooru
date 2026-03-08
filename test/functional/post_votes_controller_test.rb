@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostVotesControllerTest < ActionDispatch::IntegrationTest
   context "The post vote controller" do

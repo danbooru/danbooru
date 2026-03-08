@@ -1,7 +1,7 @@
-require 'test_helper'
+require "test_helper"
 
 class BulkUpdateRequestPrunerTest < ActiveSupport::TestCase
-  context '#warn_old' do
+  context "#warn_old" do
     should "update the forum topic for a bulk update request" do
       bur = create(:bulk_update_request, status: "pending", created_at: (BulkUpdateRequestPruner::EXPIRATION_PERIOD - 1.day).ago)
 
@@ -11,7 +11,7 @@ class BulkUpdateRequestPrunerTest < ActiveSupport::TestCase
     end
   end
 
-  context '#reject_expired' do
+  context "#reject_expired" do
     should "reject the bulk update request" do
       bur = create(:bulk_update_request, status: "pending", created_at: (BulkUpdateRequestPruner::EXPIRATION_PERIOD + 1.day).ago)
 

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ArtistCommentaryVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The artist commentary versions controller" do
@@ -8,8 +8,8 @@ class ArtistCommentaryVersionsControllerTest < ActionDispatch::IntegrationTest
       as(@user) do
         @commentary = create(:artist_commentary, post: build(:post, id: 999, tag_string: "hakurei_reimu", uploader: @user))
       end
-      as (@builder) { @commentary.update(original_title: "traslated") }
-      as (@user) { @commentary.update(original_title: "translated") }
+      as(@builder) { @commentary.update(original_title: "traslated") }
+      as(@user) { @commentary.update(original_title: "translated") }
     end
 
     context "index action" do

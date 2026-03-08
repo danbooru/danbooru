@@ -234,6 +234,19 @@ module Source::Tests::Extractor
       )
     end
 
+    context "An unlisted Pixiv artwork page URL" do
+      strategy_should_work(
+        "https://www.pixiv.net/en/artworks/unlisted/ntQchboUi1CsqMhDpo5j",
+        image_urls: [%r{\Ahttps://i\.pximg\.net/img-original/img/2021/06/01/00/45/05/90237981-\h{32}_p0\.jpg\z}],
+        page_url: "https://www.pixiv.net/artworks/unlisted/ntQchboUi1CsqMhDpo5j",
+        profile_url: "https://www.pixiv.net/users/44859333",
+        display_name: "33回転",
+        username: "user_xmfa7574",
+        published_at: Time.parse("2021-05-31T15:45:00.000000Z"),
+        updated_at: Time.parse("2021-05-31T15:45:00.000000Z"),
+      )
+    end
+
     context "A deleted pixiv post" do
       strategy_should_work(
         "https://i.pximg.net/img-original/img/2018/12/30/01/04/55/72373728_p0.png",

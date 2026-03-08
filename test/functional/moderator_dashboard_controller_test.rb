@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ModeratorDashboardControllerTest < ActionDispatch::IntegrationTest
   context "The moderator dashboard controller" do

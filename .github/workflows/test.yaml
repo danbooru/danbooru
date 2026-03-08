@@ -28,15 +28,15 @@ on:
         default: false
 
 defaults:
- run:
-   working-directory: /danbooru
+  run:
+    working-directory: /danbooru
 
 jobs:
   test:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     # Don't run the test suite multiple times for the same commit.
-    concurrency: 
+    concurrency:
       group: "test-${{ github.sha }}"
       cancel-in-progress: true
 

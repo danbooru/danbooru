@@ -4,7 +4,7 @@ options = {
   wait_timeout: false,
   wait_overtime: false,
   service_past_wait: false,
-  term_on_timeout: false
+  term_on_timeout: false,
 }
 
 Rack::Timeout::Logger.logger = Rails.logger.dup

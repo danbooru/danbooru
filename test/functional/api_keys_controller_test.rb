@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ApiKeysControllerTest < ActionDispatch::IntegrationTest
   context "An api keys controller" do

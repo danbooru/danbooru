@@ -3,38 +3,38 @@ require "test_helper"
 class ForumPostTest < ActiveSupport::TestCase
   context "A forum post" do
     setup do
-      @user = FactoryBot.create(:user)
-      @topic = FactoryBot.create(:forum_topic)
+      @user = create(:user)
+      @topic = create(:forum_topic)
     end
 
     context "that mentions a user" do
       context "in a quote block" do
         setup do
-          @user2 = FactoryBot.create(:user)
+          @user2 = create(:user)
         end
 
         should "not create a dmail" do
           assert_difference("Dmail.count", 0) do
-            FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote]")
+            create(:forum_post, topic_id: @topic.id, body: "[quote]@#{@user2.name}[/quote]")
           end
 
           assert_difference("Dmail.count", 0) do
-            FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote] blah [quote]@#{@user2.name}[/quote]")
+            create(:forum_post, topic_id: @topic.id, body: "[quote]@#{@user2.name}[/quote] blah [quote]@#{@user2.name}[/quote]")
           end
 
           assert_difference("Dmail.count", 0) do
-            FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "[quote][quote]@#{@user2.name}[/quote][/quote]")
+            create(:forum_post, topic_id: @topic.id, body: "[quote][quote]@#{@user2.name}[/quote][/quote]")
           end
 
           assert_difference("Dmail.count", 1) do
-            FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "[quote]@#{@user2.name}[/quote] @#{@user2.name}")
+            create(:forum_post, topic_id: @topic.id, body: "[quote]@#{@user2.name}[/quote] @#{@user2.name}")
           end
         end
       end
 
       context "outside a quote block" do
         setup do
-          @user2 = FactoryBot.create(:user)
+          @user2 = create(:user)
           @post = build(:forum_post, creator: @user, topic: @topic, body: <<~EOF)
             [quote]
               someone said:
@@ -63,7 +63,7 @@ class ForumPostTest < ActiveSupport::TestCase
 
       context "with a long message" do
         setup do
-          @user2 = FactoryBot.create(:user)
+          @user2 = create(:user)
           @post = build(:forum_post, creator: @user, topic: @topic, body: ("hello this is a long message\n\n" * 10) + "Hey @#{@user2.name} check this out!" + ("\n\nhello this is a long message" * 10))
         end
 
@@ -107,10 +107,10 @@ class ForumPostTest < ActiveSupport::TestCase
         Danbooru.config.stubs(:posts_per_page).returns(3)
         @posts = []
         9.times do
-          @posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+          @posts << create(:forum_post, topic_id: @topic.id, body: rand(100_000))
         end
         travel(2.seconds) do
-          @posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+          @posts << create(:forum_post, topic_id: @topic.id, body: rand(100_000))
         end
       end
 
@@ -142,16 +142,16 @@ class ForumPostTest < ActiveSupport::TestCase
     should "update the topic when created" do
       @original_topic_updated_at = @topic.updated_at
       travel(1.second) do
-        post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
+        create(:forum_post, topic_id: @topic.id)
       end
-      @topic.reload
-      assert_not_equal(@original_topic_updated_at.to_s, @topic.updated_at.to_s)
+
+      assert_not_equal(@original_topic_updated_at.to_s, @topic.reload.updated_at.to_s)
     end
 
     should "update the topic when updated only for the original post" do
       posts = []
       3.times do
-        posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
+        posts << create(:forum_post, topic_id: @topic.id, body: rand(100_000))
       end
 
       # updating the original post

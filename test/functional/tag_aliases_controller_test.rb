@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class TagAliasesControllerTest < ActionDispatch::IntegrationTest
   context "The tag aliases controller" do
@@ -9,7 +9,7 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @user = create(:builder_user, name: "sakuya")
-        as (@user) do
+        as(@user) do
           @forum_topic = create(:forum_topic, title: "Touhou BUR")
           @forum_post = create(:forum_post, topic: @forum_topic, body: "because")
         end

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
   context "The site credentials controller" do

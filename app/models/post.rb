@@ -227,7 +227,7 @@ class Post < ApplicationRecord
       is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
     end
 
-    alias has_large has_large?
+    alias_method :has_large, :has_large?
 
     def large_image_width
       if has_large?
@@ -269,7 +269,7 @@ class Post < ApplicationRecord
 
     # XXX
     def current_image_size
-      has_large? && CurrentUser.default_image_size == "large" ? "large" : "original"
+      (has_large? && CurrentUser.default_image_size == "large") ? "large" : "original"
     end
   end
 
@@ -415,7 +415,7 @@ class Post < ApplicationRecord
 
       new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
 
-      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f/MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
+      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
         errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
         throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
       end
@@ -597,7 +597,7 @@ class Post < ApplicationRecord
 
         end
       end
-    rescue
+    rescue StandardError
       # XXX Silently ignore errors so that the edit doesn't fail. We can't let
       # the edit fail because then it will create a new post version even if
       # the edit didn't go through.
@@ -790,7 +790,7 @@ class Post < ApplicationRecord
 
       parent.update_has_children_flag if parent.present?
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
-    rescue
+    rescue StandardError
       # XXX Silently ignore errors so that the edit doesn't fail. We can't let
       # the edit fail because then it will create a new post version even if
       # the edit didn't go through.
@@ -1359,7 +1359,7 @@ class Post < ApplicationRecord
       end
 
       def rating_matches(rating)
-        where(rating: rating.downcase.split(/,/).map(&:first))
+        where(rating: rating.downcase.split(",").map(&:first))
       end
 
       def source_matches(source, quoted = false)
@@ -1742,15 +1742,11 @@ class Post < ApplicationRecord
       def search(params, current_user)
         q = search_attributes(
           params,
-          [:id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
-          :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
-          :image_height, :tag_count, :has_children, :has_active_children,
-          :is_pending, :is_flagged, :is_deleted, :is_banned,
-          :last_comment_bumped_at, :last_commented_at, :last_noted_at,
-          :uploader, :approver, :parent,
-          :artist_commentary, :flags, :appeals, :notes, :comments, :children,
-          :approvals, :replacements, :media_metadata],
-          current_user: current_user
+          %i[id created_at updated_at rating source pixiv_id fav_count score up_score down_score md5 file_ext
+             file_size image_width image_height tag_count has_children has_active_children is_pending is_flagged is_deleted
+             is_banned last_comment_bumped_at last_commented_at last_noted_at uploader approver parent artist_commentary
+             flags appeals notes comments children approvals replacements media_metadata],
+          current_user: current_user,
         )
 
         if params[:tags].present?
@@ -1809,7 +1805,7 @@ class Post < ApplicationRecord
     def validate_no_parent_cycles
       return unless parent_id_changed?
 
-      if self.in?(ancestors)
+      if in?(ancestors)
         errors.add(:base, "Post cannot have itself as a parent")
         throw :abort # Abort to avoid additional error about parent-child chain being more than 4 levels deep
       end
@@ -1883,7 +1879,7 @@ class Post < ApplicationRecord
       end
 
       post_edit.invalid_added_tags.each do |tag|
-        tag.errors.messages.each do |_attribute, messages|
+        tag.errors.messages.each_value do |messages|
           warnings.add(:base, "Couldn't add tag: #{messages.join(';')}")
         end
       end
@@ -1948,7 +1944,7 @@ class Post < ApplicationRecord
   end
 
   def levelblocked?(user = CurrentUser.user)
-    #!user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
+    # !user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
     user.id != uploader_id && !user.is_gold? && tag_string.match?(RESTRICTED_TAGS_REGEX)
   end
 

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ArtistsControllerTest < ActionDispatch::IntegrationTest
   def assert_artist_found(expected_artist, source_url = nil)

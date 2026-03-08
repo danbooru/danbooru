@@ -5,7 +5,7 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
     get autocomplete_index_path(search: { query: query, type: type })
     assert_response :success
 
-    response.parsed_body.css("li").map { |html| html["data-autocomplete-value"] }
+    response.parsed_body.css("li").pluck("data-autocomplete-value")
   end
 
   def assert_autocomplete_equals(expected_value, query, type = "tag_query")
@@ -17,7 +17,7 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     results = response.parsed_body.css("li a").map do |html|
-      html.inner_html.strip.remove(/<\/?span>/).gsub(/<b>(.*?)<\/b>/) { $1.upcase }
+      html.inner_html.strip.remove(%r{</?span>}).gsub(%r{<b>(.*?)</b>}) { $1.upcase }
     end
 
     assert_equal(results, expected_results)

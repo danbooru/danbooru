@@ -52,7 +52,7 @@ class TwitterTransactionIdGenerator
     key = Base64.strict_encode64(key_bytes)
 
     time_delta = decoded_bytes[48..51].pack("c*").unpack1("L")
-    time = (time_delta * 1000 + 1682924400 * 1000) / 1000
+    time = ((time_delta * 1000) + (1_682_924_400 * 1000)) / 1000
 
     new(twitter_site_verification_key: key, time: time, xor_key: xor_key)
   end
@@ -70,8 +70,8 @@ class TwitterTransactionIdGenerator
   def transaction_id(path, method: "GET")
     return nil unless animation_key.present?
 
-    time_delta = ((time.to_f * 1000 - 1682924400 * 1000) / 1000).floor
-    time_delta_bytes = (0..3).map { |i| (time_delta >> (i * 8) & 0xFF) }
+    time_delta = (((time.to_f * 1000) - (1_682_924_400 * 1000)) / 1000).floor
+    time_delta_bytes = (0..3).map { |i| ((time_delta >> (i * 8)) & 0xFF) }
 
     # An easter egg from Twitter; "obfio" is the guy who originally reversed engineered this (see https://github.com/obfio, https://antibot.blog).
     keyword = "obfiowerehiring"
@@ -80,7 +80,7 @@ class TwitterTransactionIdGenerator
     bytes = [*key_bytes, *time_delta_bytes, *hash.bytes[0..15], 3]
     xor_bytes = [xor_key] + bytes.map { |byte| byte ^ xor_key }
 
-    Base64.strict_encode64(xor_bytes.pack("c*")).strip.gsub(/=/, "")
+    Base64.strict_encode64(xor_bytes.pack("c*")).strip.gsub("=", "")
   end
 
   # Below are internal methods used to calculate the transaction ID.
@@ -94,7 +94,7 @@ class TwitterTransactionIdGenerator
       "Referer": "https://x.com",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36",
       "X-Twitter-Active-User": "yes",
-      "X-Twitter-Client-Language": "en"
+      "X-Twitter-Client-Language": "en",
     }
 
     http.cache(1.minute).headers(headers).parsed_get("https://x.com")
@@ -135,7 +135,7 @@ class TwitterTransactionIdGenerator
     logo_frame = logo_frames[key_bytes[5].to_i % logo_frames.size] # The 6th byte of the verification key determines which of the four frames to use.
 
     # Convert the SVG coordinates to a matrix of integers.
-    logo_frame&.at("path:nth-child(2)")&.attr("d")&.slice(/C .*/)&.split(/C/).to_a.compact_blank.map { |item| item.scan(/\d+/).map(&:to_i) }
+    logo_frame&.at("path:nth-child(2)")&.attr("d")&.slice(/C .*/)&.split("C").to_a.compact_blank.map { |item| item.scan(/\d+/).map(&:to_i) }
   end
 
   # @return [Array<Integer>] A row taken from one of the frames of the X logo (chosen by a byte from the verification
@@ -151,13 +151,13 @@ class TwitterTransactionIdGenerator
     return [] unless frame_row.present?
 
     frame_row[7..].map.with_index do |item, i|
-      min = i % 2 == 1 ? -1.0 : 0.0
+      min = i.odd? ? -1.0 : 0.0
       scale(item.to_f, min, 1.0).round(2)
     end
   end
 
   def scale(value, min, max)
-    value * (max - min) / 255 + min
+    (value * (max - min) / 255) + min
   end
 
   # @return [Float, nil] A percentage from 0.0-1.0, determining how long to run the animation, based on a product of
@@ -187,13 +187,13 @@ class TwitterTransactionIdGenerator
     elsif frame_time >= 1.0
       if curves[2] < 1.0
         end_gradient = (curves[3] - 1.0) / (curves[2] - 1.0)
-      elsif curves[2] == 1.0 && self.curves[0] < 1.0
+      elsif curves[2] == 1.0 && curves[0] < 1.0
         end_gradient = (curves[1] - 1.0) / (curves[0] - 1.0)
       else
         end_gradient = 0.0
       end
 
-      return 1.0 + end_gradient * (frame_time - 1.0)
+      return 1.0 + (end_gradient * (frame_time - 1.0))
     end
 
     start = mid = 0.0
@@ -216,7 +216,7 @@ class TwitterTransactionIdGenerator
   end
 
   def calculate(a, b, m)
-    3.0 * a * (1 - m) * (1 - m) * m + 3.0 * b * (1 - m) * m * m + m * m * m
+    (3.0 * a * (1 - m) * (1 - m) * m) + (3.0 * b * (1 - m) * m * m) + (m * m * m)
   end
 
   # @return [Array<Float>, nil] An array of four floats (a RGBA color), based on a color transformation of the Twitter logo.
@@ -239,7 +239,7 @@ class TwitterTransactionIdGenerator
 
   def interpolate(from_list, to_list, f)
     from_list.zip(to_list).map do |from, to|
-      from * (1 - f) + to * f
+      (from * (1 - f)) + (to * f)
     end
   end
 

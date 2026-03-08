@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class IpBanTest < ActiveSupport::TestCase
   should "be able to ban a user" do

@@ -1,9 +1,9 @@
-require 'test_helper'
+require "test_helper"
 
 class AutocompleteServiceTest < ActiveSupport::TestCase
   def autocomplete(query, type, **options)
     results = AutocompleteService.new(query, type, **options).autocomplete_results
-    results.map { |r| r[:value] }
+    results.pluck(:value)
   end
 
   def assert_autocomplete_includes(expected_value, query, type, **options)
@@ -193,7 +193,7 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
       end
 
       should "ignore bogus tags" do
-        assert_autocomplete_equals([], "x"*200, :tag_query)
+        assert_autocomplete_equals([], "x" * 200, :tag_query)
         assert_autocomplete_equals([], "http://www.google.com", :tag_query)
       end
 

@@ -9,7 +9,7 @@
 # https://ruby-concurrency.github.io/concurrent-ruby/master/file.thread_pools.html
 module Concurrent
   # This is the default executor used by promises.
-  def self.new_io_executor(**options)
+  def self.new_io_executor(**_options)
     if Danbooru.config.max_concurrency.to_i <= 0
       return ImmediateExecutor.new
     end
@@ -26,7 +26,7 @@ module Concurrent
     )
   end
 
-  def self.new_fast_executor(**options)
+  def self.new_fast_executor(**_options)
     if Danbooru.config.max_concurrency.to_i <= 0
       return ImmediateExecutor.new
     end

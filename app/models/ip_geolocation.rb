@@ -6,12 +6,12 @@ class IpGeolocation < ApplicationRecord
   attribute :ip_addr, :ip_address
   attribute :network, :ip_address
 
-  def self.visible(user)
+  def self.visible(_user)
     all
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :ip_addr, :network, :asn, :is_proxy, :latitude, :longitude, :organization, :time_zone, :continent, :country, :region, :city, :carrier], current_user: current_user)
+    q = search_attributes(params, %i[id created_at updated_at ip_addr network asn is_proxy latitude longitude organization time_zone continent country region city carrier], current_user: current_user)
     q.apply_default_order(params)
   end
 

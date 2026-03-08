@@ -1,11 +1,11 @@
-require 'test_helper'
+require "test_helper"
 
 class UserFeedbackTest < ActiveSupport::TestCase
   context "A user's feedback" do
     should "create a dmail" do
-      user = FactoryBot.create(:user)
-      gold = FactoryBot.create(:gold_user)
-      member = FactoryBot.create(:user)
+      user = create(:user)
+      gold = create(:gold_user)
+      member = create(:user)
       dmail = <<~EOS.chomp
         @#{gold.name} created a "positive record":/user_feedbacks?search%5Buser_id%5D=#{user.id} for your account:
 

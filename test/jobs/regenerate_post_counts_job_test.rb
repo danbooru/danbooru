@@ -1,12 +1,12 @@
-require 'test_helper'
+require "test_helper"
 
 class RegeneratePostCountsJobTest < ActiveJob::TestCase
   context "RegeneratePostCountsJob" do
     should "regenerate all incorrect tag post counts" do
-      tag1 = create(:tag, name: "touhou", post_count: -10)
-      tag2 = create(:tag, name: "bkub", post_count: 10)
-      tag3 = create(:tag, name: "chen", post_count: 10)
-      post = create(:post, tag_string: "touhou bkub")
+      create(:tag, name: "touhou", post_count: -10)
+      create(:tag, name: "bkub", post_count: 10)
+      create(:tag, name: "chen", post_count: 10)
+      create(:post, tag_string: "touhou bkub")
 
       RegeneratePostCountsJob.perform_now
 

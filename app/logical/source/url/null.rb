@@ -3,7 +3,7 @@
 class Source::URL::Null < Source::URL
   attr_reader :work_id, :page_url, :profile_url
 
-  def self.match?(url)
+  def self.match?(_url)
     true
   end
 
@@ -121,7 +121,7 @@ class Source::URL::Null < Source::URL
       "Livedoor"
     in _, "lit.link"
       "Lit.link"
-    in _, ("kirbyscomicart.com"| "kirbyscomicartshop.com")
+    in _, ("kirbyscomicart.com" | "kirbyscomicartshop.com")
       "Kirby's Comic Art"
     in _, "kirumade.com"
       "Kiru Made"
@@ -406,7 +406,7 @@ class Source::URL::Null < Source::URL
     # https://drjvktq.miqlthdkffuu.hath.network/h/dce4b9677c8f769c12c8889e2581b989a3edd1bb-280532-642-802-png/keystamp=1683992100-6e1bddc318;fileindex=116114230;xres=org/1667196644017_fe0ug7p4.png
     in _, "hath.network", "h", _, params_string, _
       params = begin
-        params_string.split(";").map { |s| s.split("=", 2) }.to_h
+        params_string.split(";").to_h { |s| s.split("=", 2) }
       rescue StandardError
         {}
       end

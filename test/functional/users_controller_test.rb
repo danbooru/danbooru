@@ -105,15 +105,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "using includes" do
         setup do
-          as (@uploader) { @post = create(:post, tag_string: "touhou", uploader: @uploader, is_flagged: true) }
-          as (@user) do
+          as(@uploader) { @post = create(:post, tag_string: "touhou", uploader: @uploader, is_flagged: true) }
+          as(@user) do
             create(:note, post: @post)
             create(:artist_commentary, post: @post)
             create(:artist)
             create(:wiki_page)
             @forum = create(:forum_post, creator: @user, topic: build(:forum_topic, creator: @user))
           end
-          as (@other_user) do
+          as(@other_user) do
             @other_post = create(:post, rating: "e", uploader: @other_user)
             create(:post_appeal, creator: @other_user)
             create(:comment, creator: @other_user, post: @other_post)
@@ -121,7 +121,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
             create(:tag_alias, creator: @other_user)
             create(:tag_implication, creator: @other_user)
           end
-          as (@mod_user) do
+          as(@mod_user) do
             create(:post_approval, user: @mod_user, post: @post)
             create(:user_feedback, user: @other_user, creator: @mod_user)
             create(:ban, user: @other_user, banner: @mod_user)
@@ -285,9 +285,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth user_path(@user), @user, as: :json
 
         assert_response :success
-        assert_equal(false, response.parsed_body.has_key?("bcrypt_password_hash"))
-        assert_equal(false, response.parsed_body.has_key?("totp_secret"))
-        assert_equal(false, response.parsed_body.has_key?("backup_codes"))
+        assert_equal(false, response.parsed_body.key?("bcrypt_password_hash"))
+        assert_equal(false, response.parsed_body.key?("totp_secret"))
+        assert_equal(false, response.parsed_body.key?("backup_codes"))
       end
 
       should "show the last_ip_addr to mods" do
@@ -655,7 +655,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         should "mark users signing up from a partial banned IP as restricted" do
           self.remote_addr = @valid_ip
 
-          @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :partial)
+          @ip_ban = create(:ip_ban, ip_addr: remote_addr, category: :partial)
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
@@ -768,7 +768,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "update a user" do
-        put_auth user_path(@user), @user, params: {:user => {:favorite_tags => "xyz"}}
+        put_auth user_path(@user), @user, params: {user: {favorite_tags: "xyz"}}
 
         assert_redirected_to edit_user_path(@user)
         assert_equal("xyz", @user.reload.favorite_tags)
@@ -822,7 +822,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       context "for a banned user" do
         should "allow the user to edit their settings" do
           @user = create(:banned_user)
-          put_auth user_path(@user), @user, params: {:user => {:favorite_tags => "xyz"}}
+          put_auth user_path(@user), @user, params: {user: {favorite_tags: "xyz"}}
 
           assert_equal("xyz", @user.reload.favorite_tags)
         end

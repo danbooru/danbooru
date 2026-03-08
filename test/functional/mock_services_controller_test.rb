@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class MockServicesControllerTest < ActionDispatch::IntegrationTest
   context "The mock services controller" do

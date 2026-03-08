@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
   context "The post replacements controller" do
@@ -12,7 +12,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
               post_id: @post.id,
               post_replacement: {
                 replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg",
-                tags: "replaced -image_sample"
+                tags: "replaced -image_sample",
               }
             }
 

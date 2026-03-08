@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class DtextPreviewsControllerTest < ActionDispatch::IntegrationTest
   context "The dtext previews controller" do

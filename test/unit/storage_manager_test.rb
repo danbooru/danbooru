@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class StorageManagerTest < ActiveSupport::TestCase
   def tempfile(data, &block)
@@ -98,7 +98,7 @@ class StorageManagerTest < ActiveSupport::TestCase
 
       @storage_manager = StorageManager::Mirror.new([
         StorageManager::Local.new(base_dir: @temp_dir1, base_url: "/data"),
-        StorageManager::Local.new(base_dir: @temp_dir2, base_url: "/data")
+        StorageManager::Local.new(base_dir: @temp_dir2, base_url: "/data"),
       ])
     end
 

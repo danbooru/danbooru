@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class NewsUpdateTest < ActiveSupport::TestCase
   context "News updates:" do

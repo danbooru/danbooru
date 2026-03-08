@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PasswordsControllerTest < ActionDispatch::IntegrationTest
   context "The passwords controller" do

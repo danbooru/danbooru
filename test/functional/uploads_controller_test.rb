@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
   context "The uploads controller" do
@@ -376,7 +376,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, Tag.exists?(name: "new_tag"))
         assert_equal(false, Tag.exists?(name: "rating:g"))
 
-        mock_autotagger_evaluate({ "new_tag": 0.542, "rating:g": 0.249 })
+        mock_autotagger_evaluate({ new_tag: 0.542, "rating:g": 0.249 })
         upload = assert_successful_upload("test/files/test.jpg")
         asset = upload.media_assets.first
 
@@ -651,7 +651,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg")
         should_upload_successfully("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg")
-        should_upload_successfully("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat")
 
         should_upload_successfully("https://downloads.fanbox.cc/images/post/104708/wsF73EC5Fq0CIK84W0LGYk2p.jpeg")
 

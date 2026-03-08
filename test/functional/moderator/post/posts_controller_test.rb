@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Moderator
   module Post
@@ -32,7 +32,7 @@ module Moderator
               @parent = create(:post)
               @child = create(:post, parent: @parent)
             end
-            users = FactoryBot.create_list(:user, 2)
+            users = create_list(:user, 2)
             users.each do |u|
               Favorite.create!(post: @child, user: u)
               @child.reload

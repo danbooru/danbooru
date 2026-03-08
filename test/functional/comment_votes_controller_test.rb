@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class CommentVotesControllerTest < ActionDispatch::IntegrationTest
   context "A comment votes controller" do
@@ -14,7 +14,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @voter = create(:gold_user, name: "rumia")
-        @vote = as (@voter) { create(:comment_vote, comment: @comment, user: @voter) }
+        @vote = as(@voter) { create(:comment_vote, comment: @comment, user: @voter) }
         @negative_vote = create(:comment_vote, comment: @comment, score: -1)
         @unrelated_vote = create(:comment_vote)
       end

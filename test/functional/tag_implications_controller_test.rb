@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
   context "The tag implications controller" do
@@ -9,7 +9,7 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @user = create(:builder_user, name: "sakuya")
-        as (@user) do
+        as(@user) do
           @forum_topic = create(:forum_topic, title: "Weapon BUR")
           @forum_post = create(:forum_post, topic: @forum_topic, body: "because")
         end
@@ -53,7 +53,7 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "list all tag_implications (with search)" do
-        get tag_implications_path, params: {:search => {:antecedent_name => "aaa"}}
+        get tag_implications_path, params: {search: {antecedent_name: "aaa"}}
         assert_response :success
       end
     end

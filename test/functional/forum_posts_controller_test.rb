@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ForumPostsControllerTest < ActionDispatch::IntegrationTest
   context "The forum posts controller" do
@@ -166,7 +166,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
     context "new action" do
       should "render" do
-        get_auth new_forum_post_path, @user, params: {:topic_id => @forum_topic.id}
+        get_auth new_forum_post_path, @user, params: {topic_id: @forum_topic.id}
         assert_response :success
       end
 
@@ -181,7 +181,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a new forum post" do
         assert_difference("ForumPost.count", 1) do
-          post_auth forum_posts_path, @user, params: {:forum_post => {:body => "xaxaxa", :topic_id => @forum_topic.id}}
+          post_auth forum_posts_path, @user, params: {forum_post: {body: "xaxaxa", topic_id: @forum_topic.id}}
 
           assert_redirected_to(forum_topic_path(@forum_topic))
           assert_equal(@user, @forum_topic.forum_posts.last.creator)

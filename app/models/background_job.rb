@@ -32,7 +32,7 @@ class BackgroundJob < GoodJob::Job
       end
 
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :queue_name, :priority, :serialized_params, :scheduled_at, :performed_at, :finished_at, :error, :active_job_id, :concurrency_key, :cron_key, :cron_at, :executions_count, :job_class, :labels, :locked_at], current_user: current_user)
+        q = search_attributes(params, %i[id created_at updated_at queue_name priority serialized_params scheduled_at performed_at finished_at error active_job_id concurrency_key cron_key cron_at executions_count job_class labels locked_at], current_user: current_user)
 
         if params[:name].present?
           q = q.name_matches(params[:name])
@@ -44,17 +44,17 @@ class BackgroundJob < GoodJob::Job
 
         case params[:order]
         when "created_at"
-          q = q.order(created_at: :desc)
+          q.order(created_at: :desc)
         when "updated_at"
-          q = q.order(updated_at: :desc)
+          q.order(updated_at: :desc)
         when "scheduled_at"
-          q = q.order(scheduled_at: :desc)
+          q.order(scheduled_at: :desc)
         when "performed_at"
-          q = q.order(performed_at: :desc)
+          q.order(performed_at: :desc)
         when "finished_at"
-          q = q.order(finished_at: :desc)
+          q.order(finished_at: :desc)
         else
-          q = q.apply_default_order(params)
+          q.apply_default_order(params)
         end
       end
     end

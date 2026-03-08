@@ -21,18 +21,18 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
       context "with a respond_to_id" do
         should "not allow users to quote dmails belonging to unrelated users " do
-          get_auth new_dmail_path, @unrelated_user, params: {:respond_to_id => @dmail.id}
+          get_auth new_dmail_path, @unrelated_user, params: {respond_to_id: @dmail.id}
           assert_response 403
         end
 
         should "prefill the fields" do
-          get_auth new_dmail_path, @user, params: {:respond_to_id => @dmail.id}
+          get_auth new_dmail_path, @user, params: {respond_to_id: @dmail.id}
           assert_response :success
         end
 
         context "and a forward flag" do
           should "not populate the to field" do
-            get_auth new_dmail_path, @user, params: {:respond_to_id => @dmail.id, :forward => true}
+            get_auth new_dmail_path, @user, params: {respond_to_id: @dmail.id, forward: true}
             assert_response :success
           end
         end
@@ -99,7 +99,7 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not show dmails not owned by the current user when given an invalid key" do
-        get_auth dmail_path(@dmail, key: @dmail.key + "blah"), @unrelated_user
+        get_auth dmail_path(@dmail, key: "#{@dmail.key}blah"), @unrelated_user
         assert_response 403
       end
 
@@ -143,13 +143,13 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       setup do
-        @user_2 = create(:user)
+        @user2 = create(:user)
       end
 
       should "create two messages, one for the sender and one for the recipient" do
         assert_difference("Dmail.count", 2) do
-          dmail_attribs = {:to_id => @user_2.id, :title => "abc", :body => "abc"}
-          post_auth dmails_path, @user, params: {:dmail => dmail_attribs}
+          dmail_attribs = {to_id: @user2.id, title: "abc", body: "abc"}
+          post_auth dmails_path, @user, params: {dmail: dmail_attribs}
           assert_redirected_to dmail_path(Dmail.last)
         end
       end

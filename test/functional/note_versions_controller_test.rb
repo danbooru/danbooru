@@ -1,13 +1,13 @@
-require 'test_helper'
+require "test_helper"
 
 class NoteVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The note versions controller" do
     setup do
       @user = create(:user, id: 100)
-      @user_2 = create(:user, name: "cirno")
+      @user2 = create(:user, name: "cirno")
 
       as(@user) { @note = create(:note, id: 101) }
-      as(@user_2) { @note.update(body: "blah", is_active: false) }
+      as(@user2) { @note.update(body: "blah", is_active: false) }
       as(@user) { @note.update(body: "1 2 3", is_active: true) }
     end
 

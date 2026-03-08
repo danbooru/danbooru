@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
   context "The forum post votes controller" do
@@ -16,7 +16,7 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
       setup do
         @vote = create(:forum_post_vote, forum_post: @forum_post, creator: build(:user, name: "rumia"), score: 1)
         @negative_vote = create(:forum_post_vote, forum_post: @forum_post, score: -1)
-        @unrelated_vote = as (@user) { create(:forum_post_vote, score: 0) }
+        @unrelated_vote = as(@user) { create(:forum_post_vote, score: 0) }
       end
 
       should "render" do

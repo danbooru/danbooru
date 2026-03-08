@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ApproverPrunerTest < ActiveSupport::TestCase
   context "ApproverPruner" do

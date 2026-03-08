@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class AITagsControllerTest < ActionDispatch::IntegrationTest
   context "The AI tags controller" do

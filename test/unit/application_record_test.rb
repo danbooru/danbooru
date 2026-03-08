@@ -1,8 +1,8 @@
-require 'test_helper'
+require "test_helper"
 
 class ApplicationRecordTest < ActiveSupport::TestCase
   setup do
-    @tags = FactoryBot.create_list(:tag, 3, post_count: 1)
+    @tags = create_list(:tag, 3, post_count: 1)
   end
 
   context "ApplicationRecord#parallel_find_each" do
@@ -12,7 +12,7 @@ class ApplicationRecordTest < ActiveSupport::TestCase
         @user2 = create(:user)
 
         CurrentUser.scoped(@user1) do
-          Tag.parallel_find_each do |tag|
+          Tag.parallel_find_each do
             assert_equal(@user1, CurrentUser.user)
 
             CurrentUser.scoped(@user2) do

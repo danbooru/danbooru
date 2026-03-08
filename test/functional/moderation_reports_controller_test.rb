@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
   context "The moderation reports controller" do
@@ -21,7 +21,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render" do
-        get_auth new_moderation_report_path, @user, params: {:moderation_report => {:model_id => @comment.id, :model_type => "Comment"}}
+        get_auth new_moderation_report_path, @user, params: {moderation_report: {model_id: @comment.id, model_type: "Comment"}}
         assert_response :success
       end
 
@@ -93,7 +93,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a new moderation report on a comment" do
         assert_difference("ModerationReport.count", 1) do
-          post_auth moderation_reports_path, @user, params: {:format => "js", :moderation_report => {:model_id => @comment.id, :model_type => "Comment", :reason => "xxx"}}
+          post_auth moderation_reports_path, @user, params: {format: "js", moderation_report: {model_id: @comment.id, model_type: "Comment", reason: "xxx"}}
           assert_response :success
         end
       end
@@ -128,7 +128,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal("handled", report.reload.status)
         assert_equal(true, @user.dmails.received.exists?(from: User.system, title: "Thank you for reporting comment ##{@comment.id}"))
-        assert_equal(true, ModAction.moderation_report_handled.where(creator: @mod).exists?)
+        assert_equal(true, ModAction.moderation_report_handled.exists?(creator: @mod))
         assert_equal(report, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)
       end
@@ -140,7 +140,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal("rejected", report.reload.status)
         assert_equal(false, @user.dmails.received.exists?(from: User.system))
-        assert_equal(true, ModAction.moderation_report_rejected.where(creator: @mod).exists?)
+        assert_equal(true, ModAction.moderation_report_rejected.exists?(creator: @mod))
         assert_equal(report, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)
       end

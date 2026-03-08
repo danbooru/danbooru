@@ -14,7 +14,7 @@ class PostsController < ApplicationController
         format.html { redirect_to(@post) }
       end
     elsif params[:random].to_s.truthy?
-      query = "#{post_set.normalized_query.to_s} random:#{post_set.per_page}".strip
+      query = "#{post_set.normalized_query} random:#{post_set.per_page}".strip
       authorize Post
       redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol)
     else
@@ -157,7 +157,7 @@ class PostsController < ApplicationController
   end
 
   def log_search_count
-    DanbooruLogger.add_attributes("search", { count: post_set.post_count, })
+    DanbooruLogger.add_attributes("search", { count: post_set.post_count })
   end
 
   def respond_with_post_after_update(post)

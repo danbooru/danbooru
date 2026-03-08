@@ -1,10 +1,10 @@
-require 'test_helper'
+require "test_helper"
 
 class ForumTopicTest < ActiveSupport::TestCase
   context "A forum topic" do
     setup do
-      travel_to Time.now
-      @user = FactoryBot.create(:user)
+      freeze_time
+      @user = create(:user)
       @topic = create(:forum_topic, title: "xxx", creator: @user)
     end
 
@@ -19,7 +19,7 @@ class ForumTopicTest < ActiveSupport::TestCase
 
       context "with a previous visit" do
         setup do
-          FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.ago)
+          create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.ago)
         end
 
         should "update the visit" do

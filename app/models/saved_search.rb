@@ -80,7 +80,7 @@ class SavedSearch < ApplicationRecord
     class_methods do
       def normalize_labels(labels)
         # XXX should sort and uniq, but will break some use cases.
-        labels.map { |label| normalize_label(label) }.reject(&:blank?)
+        labels.map { |label| normalize_label(label) }.compact_blank
       end
 
       def normalize_label(label)

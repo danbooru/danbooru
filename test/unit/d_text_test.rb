@@ -95,7 +95,7 @@ class DTextTest < ActiveSupport::TestCase
         assert_match(/dtext-tag-does-not-exist/, format_text("[[no tag]]"))
         assert_match(/dtext-tag-empty/, format_text("[[empty tag]]"))
 
-        refute_match(/dtext-tag-does-not-exist/, format_text("[[help:nothing]]"))
+        assert_no_match(/dtext-tag-does-not-exist/, format_text("[[help:nothing]]"))
       end
 
       should "parse [ta:<id>], [ti:<id>], [bur:<id>] pseudo tags" do
@@ -128,17 +128,17 @@ class DTextTest < ActiveSupport::TestCase
       end
 
       should "link artist tags to the artist page instead of the wiki page" do
-        tag = create(:tag, name: "m&m", category: Tag.categories.artist)
-        artist = create(:artist, name: "m&m")
+        create(:tag, name: "m&m", category: Tag.categories.artist)
+        create(:artist, name: "m&m")
 
         assert_equal('<p><a class="dtext-link dtext-wiki-link tag-type-1" href="/artists/show_or_new?name=m%26m">m&amp;m</a></p>', format_text("[[m&m]]"))
       end
 
       should "not link general tags to artist pages" do
-        tag = create(:tag, name: "cat")
-        artist = create(:artist, name: "cat", is_deleted: true)
+        create(:tag, name: "cat")
+        create(:artist, name: "cat", is_deleted: true)
 
-        assert_match(%r!/wiki_pages/cat!, format_text("[[cat]]"))
+        assert_match(%r{/wiki_pages/cat}, format_text("[[cat]]"))
       end
     end
 

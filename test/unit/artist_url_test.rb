@@ -3,7 +3,7 @@ require "test_helper"
 class ArtistURLTest < ActiveSupport::TestCase
   context "An artist url" do
     setup do
-      CurrentUser.user = FactoryBot.create(:user)
+      CurrentUser.user = create(:user)
     end
 
     teardown do

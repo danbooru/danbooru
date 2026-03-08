@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UploadTest < ActiveSupport::TestCase
   def assert_tag_match(uploads, query)

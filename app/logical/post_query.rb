@@ -333,7 +333,7 @@ class PostQuery
 
     # The number of unique tags, wildcards, and metatags in the search, excluding metatags that don't count against the user's tag limit.
     def term_count
-      tag_names.size + wildcards.size + metatags.count { !_1.name.in?(UNLIMITED_METATAGS) }
+      tag_names.size + wildcards.size + metatags.count { !it.name.in?(UNLIMITED_METATAGS) }
     end
 
     # @return [Integer] The total number of terms in the query, including free metatags.

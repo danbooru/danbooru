@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PoolsControllerTest < ActionDispatch::IntegrationTest
   context "The pools controller" do
@@ -115,9 +115,9 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        @post_2 = as(@user) { create(:post) }
+        @post2 = as(@user) { create(:post) }
         @pool = as(@user) { create(:pool, post_ids: [@post.id]) }
-        as(@mod) { @pool.update!(post_ids: [@post.id, @post_2.id]) }
+        as(@mod) { @pool.update!(post_ids: [@post.id, @post2.id]) }
       end
 
       should "revert to a previous version" do
@@ -130,7 +130,7 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow reverting to a previous version of another pool" do
         @pool2 = as(@user) { create(:pool) }
-        put_auth revert_pool_path(@pool), @user, params: {:version_id => @pool2.versions.first.id }
+        put_auth revert_pool_path(@pool), @user, params: {version_id: @pool2.versions.first.id }
 
         assert_response 404
         assert_not_equal(@pool.reload.name, @pool2.name)

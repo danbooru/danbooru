@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostFlagsControllerTest < ActionDispatch::IntegrationTest
   context "The post flags controller" do
@@ -164,7 +164,6 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, @post.reload.is_flagged?)
         assert_equal(0, @post.flags.count)
       end
-
     end
 
     context "edit action" do
@@ -197,7 +196,7 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "return an error if the flag is too long" do
-        put_auth post_flag_path(@post_flag), @flagger, params: { post_flag: { reason: "x"*1000 }}
+        put_auth post_flag_path(@post_flag), @flagger, params: { post_flag: { reason: "x" * 1000 }}
 
         assert_response :success
         assert_equal("xxx", @post_flag.reload.reason)

@@ -100,7 +100,7 @@ module Danbooru
       #
       # @return [String] The string with every word capitalized.
       def startcase
-        self.gsub(/(?<![a-z'])([a-z]+)/i, &:capitalize)
+        gsub(/(?<![a-z'])([a-z]+)/i, &:capitalize)
       end
 
       # Parse a JSON string into a Ruby object.

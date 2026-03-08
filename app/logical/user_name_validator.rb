@@ -15,7 +15,7 @@ class UserNameValidator < ActiveModel::EachValidator
     "any", "none", # conflicts with `approver:any` search syntax
     "new", "deactivate", "custom_style", # conflicts with user routes (/users/new, /users/deactivate, /users/custom_style)
     "mod", "administrator", # mod impersonation
-    *User::Roles.map(&:to_s) # owner, admin, moderator, anonymous, banned, etc
+    *User::Roles.map(&:to_s), # owner, admin, moderator, anonymous, banned, etc
   ]
 
   def validate_each(rec, attr, name)

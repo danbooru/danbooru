@@ -7,6 +7,7 @@
 
 class TagSetPresenter
   extend Memoist
+
   attr_reader :tag_names
 
   # @param [Array<String>] a list of tags to present. Tags will be presented in
@@ -20,7 +21,7 @@ class TagSetPresenter
   def split_tag_list_text(category_list: TagCategory.categorized_list)
     category_list.map do |category|
       tags_for_category(category).map(&:name).join(" ")
-    end.reject(&:blank?).join(" \n")
+    end.compact_blank.join(" \n")
   end
 
   def humanized_essential_tag_string

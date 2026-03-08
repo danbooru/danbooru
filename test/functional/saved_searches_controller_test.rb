@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
   context "The saved searches controller" do

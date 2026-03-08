@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostTest < ActiveSupport::TestCase
   def self.assert_invalid_tag(tag_name)
@@ -14,7 +14,7 @@ class PostTest < ActiveSupport::TestCase
     super
 
     travel_to(2.weeks.ago) do
-      @user = FactoryBot.create(:user)
+      @user = create(:user)
     end
     CurrentUser.user = @user
   end
@@ -104,7 +104,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "decrement the user's note update count" do
-        FactoryBot.create(:note, post: @post)
+        create(:note, post: @post)
         assert_difference(["@post.uploader.reload.note_update_count"], -1) do
           @post.expunge!
         end
@@ -132,13 +132,13 @@ class PostTest < ActiveSupport::TestCase
       context "that belongs to a pool" do
         setup do
           # must be a builder to update deleted pools. must be >1 week old to remove posts from pools.
-          CurrentUser.user = FactoryBot.create(:builder_user, created_at: 1.month.ago)
+          CurrentUser.user = create(:builder_user, created_at: 1.month.ago)
 
           SqsService.any_instance.stubs(:send_message)
-          @pool = FactoryBot.create(:pool)
+          @pool = create(:pool)
           @pool.add!(@post)
 
-          @deleted_pool = FactoryBot.create(:pool)
+          @deleted_pool = create(:pool)
           @deleted_pool.add!(@post)
           @deleted_pool.update_columns(is_deleted: true)
 
@@ -157,7 +157,7 @@ class PostTest < ActiveSupport::TestCase
 
         should "destroy the record" do
           assert_equal([], @post.errors.full_messages)
-          assert_equal(0, Post.where("id = ?", @post.id).count)
+          assert_equal(false, Post.exists?(id: @post.id))
         end
       end
     end
@@ -165,7 +165,7 @@ class PostTest < ActiveSupport::TestCase
     context "Deleting a post" do
       context "that is pending" do
         setup do
-          @post = FactoryBot.create(:post, is_pending: true)
+          @post = create(:post, is_pending: true)
         end
 
         should "succeed" do
@@ -188,7 +188,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "toggle the is_deleted flag" do
-        post = FactoryBot.create(:post)
+        post = create(:post)
         assert_equal(false, post.is_deleted?)
         post.delete!("test")
         assert_equal(true, post.is_deleted?)
@@ -247,23 +247,23 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "update the has_children flag on the parent" do
-        p1 = FactoryBot.create(:post)
-        assert(!p1.has_children?, "Parent should not have any children")
-        c1 = FactoryBot.create(:post, :parent_id => p1.id)
-        p1.reload
-        assert(p1.has_children?, "Parent not updated after child was added")
+        p1 = create(:post)
+        assert_equal(false, p1.has_children?)
+
+        create(:post, parent: p1)
+        assert_equal(true, p1.reload.has_children?)
       end
 
       should "update the has_children flag on the old parent" do
-        p1 = FactoryBot.create(:post)
-        p2 = FactoryBot.create(:post)
-        c1 = FactoryBot.create(:post, :parent_id => p1.id)
+        p1 = create(:post)
+        p2 = create(:post)
+        c1 = create(:post, parent: p1)
         c1.parent_id = p2.id
         c1.save
         p1.reload
         p2.reload
-        assert(!p1.has_children?, "Old parent should not have a child")
-        assert(p2.has_children?, "New parent should have a child")
+        assert_equal(false, p1.has_children?)
+        assert_equal(true, p2.has_children?)
       end
 
       should "swap the parent and child when setting the parent to the child" do
@@ -293,7 +293,7 @@ class PostTest < ActiveSupport::TestCase
           c1 = create(:post_with_file, parent_id: p1.id)
           c1.expunge!
           p1.reload
-          assert(!p1.has_children?, "Parent should not have children")
+          assert_equal(false, p1.has_children?)
         end
       end
 
@@ -332,78 +332,76 @@ class PostTest < ActiveSupport::TestCase
     context "Deleting a post with" do
       context "a parent" do
         should "not reassign favorites to the parent by default" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
-          user = FactoryBot.create(:gold_user)
+          p1 = create(:post)
+          c1 = create(:post, parent: p1)
+          user = create(:gold_user)
           create(:favorite, post: c1, user: user)
           c1.delete!("test")
           p1.reload
-          assert(Favorite.exists?(:post_id => c1.id, :user_id => user.id))
-          assert(!Favorite.exists?(:post_id => p1.id, :user_id => user.id))
+          assert_equal(true, Favorite.exists?(post: c1, user: user))
+          assert_equal(false, Favorite.exists?(post: p1, user: user))
         end
 
         should "reassign favorites to the parent if specified" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
-          user = FactoryBot.create(:gold_user)
+          p1 = create(:post)
+          c1 = create(:post, parent: p1)
+          user = create(:gold_user)
           create(:favorite, post: c1, user: user)
-          c1.delete!("test", :move_favorites => true)
+          c1.delete!("test", move_favorites: true)
           p1.reload
-          assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id), "Child should not still have favorites")
-          assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id), "Parent should have favorites")
+          assert_equal(false, Favorite.exists?(post: c1, user: user))
+          assert_equal(true, Favorite.exists?(post: p1, user: user))
         end
 
         should "not update the parent's has_children flag" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
+          p1 = create(:post)
+          c1 = create(:post, parent: p1)
           c1.delete!("test")
           p1.reload
           assert(p1.has_children?, "Parent should have children")
         end
 
         should "clear the has_active_children flag when the 'move favorites' option is set" do
-          user = FactoryBot.create(:gold_user)
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
+          user = create(:gold_user)
+          p1 = create(:post)
+          c1 = create(:post, parent: p1)
           create(:favorite, post: c1, user: user)
 
           assert_equal(true, p1.reload.has_active_children?)
-          c1.delete!("test", :move_favorites => true)
+          c1.delete!("test", move_favorites: true)
           assert_equal(false, p1.reload.has_active_children?)
         end
       end
 
       context "one child" do
         should "not remove the has_children flag" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
+          p1 = create(:post)
+          create(:post, parent: p1)
+
           p1.delete!("test")
-          p1.reload
-          assert_equal(true, p1.has_children?)
+          assert_equal(true, p1.reload.has_children?)
         end
 
         should "not remove the parent of that child" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
+          p1 = create(:post)
+          c1 = create(:post, parent: p1)
+
           p1.delete!("test")
-          c1.reload
-          assert_not_nil(c1.parent)
+          assert_not_nil(c1.reload.parent)
         end
       end
 
       context "two or more children" do
         should "not reparent all children to the first child" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
-          c2 = FactoryBot.create(:post, :parent_id => p1.id)
-          c3 = FactoryBot.create(:post, :parent_id => p1.id)
+          p1 = create(:post)
+          c1 = create(:post, parent: p1)
+          c2 = create(:post, parent: p1)
+          c3 = create(:post, parent: p1)
+
           p1.delete!("test")
-          c1.reload
-          c2.reload
-          c3.reload
-          assert_equal(p1.id, c1.parent_id)
-          assert_equal(p1.id, c2.parent_id)
-          assert_equal(p1.id, c3.parent_id)
+          assert_equal(p1, c1.reload.parent)
+          assert_equal(p1, c2.reload.parent)
+          assert_equal(p1, c3.reload.parent)
         end
       end
     end
@@ -415,7 +413,7 @@ class PostTest < ActiveSupport::TestCase
         @post = create(:post, is_deleted: true)
         create(:post_appeal, post: @post)
 
-        assert(@post.is_deleted?, "Post should still be deleted")
+        assert(@post.is_deleted?)
         assert_equal(1, @post.appeals.count)
       end
     end
@@ -424,7 +422,7 @@ class PostTest < ActiveSupport::TestCase
   context "Tagging:" do
     context "A post" do
       setup do
-        @post = FactoryBot.create(:post)
+        @post = create(:post)
       end
 
       context "with a new tag" do
@@ -457,11 +455,11 @@ class PostTest < ActiveSupport::TestCase
 
       context "with an artist tag that is then changed to copyright" do
         setup do
-          CurrentUser.user = FactoryBot.create(:builder_user)
+          CurrentUser.user = create(:builder_user)
           @post = Post.find(@post.id)
-          @post.update(:tag_string => "art:abc")
+          @post.update(tag_string: "art:abc")
           @post = Post.find(@post.id)
-          @post.update(:tag_string => "copy:abc")
+          @post.update(tag_string: "copy:abc")
           @post.reload
         end
 
@@ -482,9 +480,9 @@ class PostTest < ActiveSupport::TestCase
 
       context "using a tag prefix on an aliased tag" do
         setup do
-          FactoryBot.create(:tag_alias, :antecedent_name => "abc", :consequent_name => "xyz")
+          create(:tag_alias, antecedent_name: "abc", consequent_name: "xyz")
           @post = Post.find(@post.id)
-          @post.update(:tag_string => "art:abc")
+          @post.update(tag_string: "art:abc")
           @post.reload
         end
 
@@ -546,7 +544,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "that already exists" do
           setup do
-            %W(___ ~foo _foo foo_ foo__bar foo*bar foo,bar foo\abar café 東方 new search).each do |tag|
+            %W[___ ~foo _foo foo_ foo__bar foo*bar foo,bar foo\abar café 東方 new search].each do |tag|
               build(:tag, name: tag).save(validate: false)
             end
           end
@@ -710,7 +708,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "for a wildcard implication" do
           setup do
-            @post = FactoryBot.create(:post, tag_string: "char:someone_(cosplay) test_school_uniform")
+            @post = create(:post, tag_string: "char:someone_(cosplay) test_school_uniform")
             @tags = @post.tag_array
           end
 
@@ -723,16 +721,16 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "create the tag" do
-            assert(Tag.where(name: "someone_(cosplay)").exists?, "expected 'someone_(cosplay)' tag to be created")
-            assert(Tag.where(name: "someone_(cosplay)", category: 4).exists?, "expected 'someone_(cosplay)' tag to be created as character")
-            assert(Tag.where(name: "someone", category: 4).exists?, "expected 'someone' tag to be created")
-            assert(Tag.where(name: "school_uniform", category: 0).exists?, "expected 'school_uniform' tag to be created")
+            assert(Tag.exists?(name: "someone_(cosplay)"), "expected 'someone_(cosplay)' tag to be created")
+            assert(Tag.exists?(name: "someone_(cosplay)", category: 4), "expected 'someone_(cosplay)' tag to be created as character")
+            assert(Tag.exists?(name: "someone", category: 4), "expected 'someone' tag to be created")
+            assert(Tag.exists?(name: "school_uniform", category: 0), "expected 'school_uniform' tag to be created")
           end
 
           should "apply aliases when the character tag is added" do
-            FactoryBot.create(:tag, name: "jim", category: Tag.categories.general)
-            FactoryBot.create(:tag, name: "james", category: Tag.categories.character)
-            FactoryBot.create(:tag_alias, antecedent_name: "jim", consequent_name: "james")
+            create(:tag, name: "jim", category: Tag.categories.general)
+            create(:tag, name: "james", category: Tag.categories.character)
+            create(:tag_alias, antecedent_name: "jim", consequent_name: "james")
 
             @post.add_tag("jim_(cosplay)")
             @post.save
@@ -745,9 +743,9 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "apply implications after the character tag is added" do
-            FactoryBot.create(:tag, name: "jimmy", category: Tag.categories.character)
-            FactoryBot.create(:tag, name: "jim", category: Tag.categories.character)
-            FactoryBot.create(:tag_implication, antecedent_name: "jimmy", consequent_name: "jim")
+            create(:tag, name: "jimmy", category: Tag.categories.character)
+            create(:tag, name: "jim", category: Tag.categories.character)
+            create(:tag_implication, antecedent_name: "jimmy", consequent_name: "jim")
             @post.add_tag("jimmy_(cosplay)")
             @post.save
 
@@ -757,7 +755,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "for a parent" do
           setup do
-            @parent = FactoryBot.create(:post)
+            @parent = create(:post)
           end
 
           should "update the parent relationships for both posts" do
@@ -769,7 +767,7 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not allow self-parenting" do
-            @post.update(:tag_string => "parent:#{@post.id}")
+            @post.update(tag_string: "parent:#{@post.id}")
             assert_equal(["Post cannot have itself as a parent"], @post.errors[:base])
           end
 
@@ -784,10 +782,10 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "clear the parent with parent:none" do
-            @post.update(:parent_id => @parent.id)
+            @post.update(parent_id: @parent.id)
             assert_equal(@parent.id, @post.parent_id)
 
-            @post.update(:tag_string => "parent:none")
+            @post.update(tag_string: "parent:none")
             assert_nil(@post.parent_id)
           end
 
@@ -800,10 +798,10 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "clear the parent with -parent:1234" do
-            @post.update(:parent_id => @parent.id)
+            @post.update(parent_id: @parent.id)
             assert_equal(@parent.id, @post.parent_id)
 
-            @post.update(:tag_string => "-parent:#{@parent.id}")
+            @post.update(tag_string: "-parent:#{@parent.id}")
             assert_nil(@post.parent_id)
           end
 
@@ -831,8 +829,8 @@ class PostTest < ActiveSupport::TestCase
 
         context "for a favgroup" do
           setup do
-            @favgroup = FactoryBot.create(:favorite_group, creator: @user)
-            @post = FactoryBot.create(:post, :tag_string => "aaa favgroup:#{@favgroup.id}")
+            @favgroup = create(:favorite_group, creator: @user)
+            @post = create(:post, tag_string: "aaa favgroup:#{@favgroup.id}")
           end
 
           should "add the post to the favgroup" do
@@ -841,7 +839,7 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "remove the post from the favgroup" do
-            @post.update(:tag_string => "-favgroup:#{@favgroup.id}")
+            @post.update(tag_string: "-favgroup:#{@favgroup.id}")
 
             assert_equal(0, @favgroup.reload.post_count)
             assert_equal(false, @favgroup.contains?(@post.id))
@@ -939,7 +937,7 @@ class PostTest < ActiveSupport::TestCase
             assert_equal("tagme", @post.tag_string)
             assert_equal("e_a", Pool.last.name)
 
-            @post.update!(tag_string: 'a newpool:f123\\')
+            @post.update!(tag_string: "a newpool:f123\\")
             assert_equal("a", @post.tag_string)
             assert_equal("f123\\", Pool.last.name)
           end
@@ -1194,7 +1192,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "for a source" do
           should "set the source with source:foo_bar_baz" do
-            @post.update(:tag_string => "source:foo_bar_baz")
+            @post.update(tag_string: "source:foo_bar_baz")
             assert_equal("foo_bar_baz", @post.source)
           end
 
@@ -1217,19 +1215,19 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should 'strip the source with source:"  foo bar baz  "' do
-            @post.update(:tag_string => 'source:"  foo bar baz  "')
+            @post.update(tag_string: 'source:"  foo bar baz  "')
             assert_equal("foo bar baz", @post.source)
           end
 
           should 'set the source with source:foo\u3000bar' do
-            @post.update(:tag_string => "source:foo\u3000bar")
+            @post.update(tag_string: "source:foo\u3000bar")
             assert_equal("foo", @post.source)
             assert_equal("bar non-web_source", @post.tag_string)
           end
 
           should "clear the source with source:none" do
-            @post.update(:source => "foobar")
-            @post.update(:tag_string => "source:none")
+            @post.update(source: "foobar")
+            @post.update(tag_string: "source:none")
             assert_equal("", @post.source)
           end
 
@@ -1239,20 +1237,20 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "set the pixiv id with source:https://img18.pixiv.net/img/evazion/14901720.png" do
-            @post.update(:tag_string => "source:https://img18.pixiv.net/img/evazion/14901720.png")
+            @post.update(tag_string: "source:https://img18.pixiv.net/img/evazion/14901720.png")
             assert_equal("https://img18.pixiv.net/img/evazion/14901720.png", @post.source)
-            assert_equal(14901720, @post.pixiv_id)
+            assert_equal(14_901_720, @post.pixiv_id)
           end
 
           should "validate the max source length" do
-            @post.update(source: "X"*1201)
+            @post.update(source: "X" * 1201)
 
             assert_equal(false, @post.valid?)
             assert_equal(["is too long (maximum is 1200 characters)"], @post.errors[:source])
           end
 
           should "validate the maximum number of tags" do
-            @post.update(tag_string: (1..Post::MAX_TAG_COUNT + 1).to_a.join(" "))
+            @post.update(tag_string: (1..(Post::MAX_TAG_COUNT + 1)).to_a.join(" "))
 
             assert_equal(false, @post.valid?)
             assert_equal(["Post cannot have more than #{Post::MAX_TAG_COUNT} tags"], @post.errors[:base])
@@ -1261,7 +1259,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "of" do
           setup do
-            @gold = FactoryBot.create(:gold_user)
+            @gold = create(:gold_user)
           end
 
           context "upvote:self or downvote:self" do
@@ -1285,16 +1283,16 @@ class PostTest < ActiveSupport::TestCase
 
             context "by a gold user" do
               should "upvote the post" do
-                CurrentUser.scoped(FactoryBot.create(:gold_user)) do
-                  @post.update(:tag_string => "tag1 tag2 upvote:self")
+                CurrentUser.scoped(create(:gold_user)) do
+                  @post.update(tag_string: "tag1 tag2 upvote:self")
                   assert_equal(false, @post.errors.any?)
                   assert_equal(1, @post.score)
                 end
               end
 
               should "downvote the post" do
-                CurrentUser.scoped(FactoryBot.create(:gold_user)) do
-                  @post.update(:tag_string => "tag1 tag2 downvote:self")
+                CurrentUser.scoped(create(:gold_user)) do
+                  @post.update(tag_string: "tag1 tag2 downvote:self")
                   assert_equal(false, @post.errors.any?)
                   assert_equal(-1, @post.score)
                 end
@@ -1565,11 +1563,11 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "have an array representation of its tags" do
-        post = FactoryBot.create(:post)
+        post = create(:post)
         post.reload
         post.tag_string = "aaa bbb"
-        assert_equal(%w(aaa bbb), post.tag_array)
-        assert_equal(%w(tag1 tag2), post.tag_array_was)
+        assert_equal(%w[aaa bbb], post.tag_array)
+        assert_equal(%w[tag1 tag2], post.tag_array_was)
       end
 
       context "with large dimensions" do
@@ -1601,7 +1599,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "with a .webm file extension" do
         setup do
-          FactoryBot.create(:tag_implication, antecedent_name: "video", consequent_name: "animated")
+          create(:tag_implication, antecedent_name: "video", consequent_name: "animated")
           @post.file_ext = "webm"
           @post.tag_string = ""
           @post.save
@@ -1643,9 +1641,9 @@ class PostTest < ActiveSupport::TestCase
           create(:tag, name: "little_red_riding_hood", category: Tag.categories.copyright)
           @post = create(:post, tag_string: "little_red_riding_hood_(cosplay)")
 
-          refute(@post.has_tag?("little_red_riding_hood"))
-          refute(@post.has_tag?("cosplay"))
-          assert(@post.warnings[:base].grep(/Couldn't add tag/).present?)
+          assert_equal(false, @post.has_tag?("little_red_riding_hood"))
+          assert_equal(false, @post.has_tag?("cosplay"))
+          assert_equal(true, @post.warnings[:base].grep(/Couldn't add tag/).present?)
           assert_match(/'little_red_riding_hood_\(cosplay\)' is not allowed because 'little_red_riding_hood' is not a character tag/, @post.warnings.full_messages.join)
         end
 
@@ -1716,7 +1714,7 @@ class PostTest < ActiveSupport::TestCase
 
         should "increment the updater's post_update_count" do
           PostVersion.sqs_service.stubs(:merge?).returns(false)
-          post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+          post = create(:post, tag_string: "aaa bbb ccc")
 
           # XXX in the test environment the update count gets bumped twice: and
           # once by Post#post_update_count, and once by the counter cache. in
@@ -1728,26 +1726,26 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "reset its tag array cache" do
-          post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
-          user = FactoryBot.create(:user)
-          assert_equal(%w(aaa bbb ccc), post.tag_array)
+          post = create(:post, tag_string: "aaa bbb ccc")
+          user = create(:user)
+          assert_equal(%w[aaa bbb ccc], post.tag_array)
           post.tag_string = "ddd eee fff"
           post.tag_string = "ddd eee fff"
           post.save
           assert_equal("ddd eee fff", post.tag_string)
-          assert_equal(%w(ddd eee fff), post.tag_array)
+          assert_equal(%w[ddd eee fff], post.tag_array)
         end
 
         should "create the actual tag records" do
           assert_difference("Tag.count", 3) do
-            post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+            create(:post, tag_string: "aaa bbb ccc")
           end
         end
 
         should "update the post counts of relevant tag records" do
-          post1 = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
-          post2 = FactoryBot.create(:post, :tag_string => "bbb ccc ddd")
-          post3 = FactoryBot.create(:post, :tag_string => "ccc ddd eee")
+          post1 = create(:post, tag_string: "aaa bbb ccc")
+          post2 = create(:post, tag_string: "bbb ccc ddd")
+          post3 = create(:post, tag_string: "ccc ddd eee")
           assert_equal(1, Tag.find_by_name("aaa").post_count)
           assert_equal(2, Tag.find_by_name("bbb").post_count)
           assert_equal(3, Tag.find_by_name("ccc").post_count)
@@ -1763,10 +1761,10 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "update its tag counts" do
-          artist_tag = FactoryBot.create(:artist_tag)
-          copyright_tag = FactoryBot.create(:copyright_tag)
-          general_tag = FactoryBot.create(:tag)
-          new_post = FactoryBot.create(:post, :tag_string => "#{artist_tag.name} #{copyright_tag.name} #{general_tag.name}")
+          artist_tag = create(:artist_tag)
+          copyright_tag = create(:copyright_tag)
+          general_tag = create(:tag)
+          new_post = create(:post, tag_string: "#{artist_tag.name} #{copyright_tag.name} #{general_tag.name}")
           assert_equal(1, new_post.tag_count_artist)
           assert_equal(1, new_post.tag_count_copyright)
           assert_equal(1, new_post.tag_count_general)
@@ -1783,7 +1781,7 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "merge any tag changes that were made after loading the initial set of tags part 1" do
-          post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+          post = create(:post, tag_string: "aaa bbb ccc")
 
           # user a adds <ddd>
           post_edited_by_user_a = Post.find(post.id)
@@ -1806,7 +1804,7 @@ class PostTest < ActiveSupport::TestCase
           # This is the same as part 1, only the order of operations is reversed.
           # The results should be the same.
 
-          post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+          post = create(:post, tag_string: "aaa bbb ccc")
 
           # user a removes <ccc> adds <eee>
           post_edited_by_user_a = Post.find(post.id)
@@ -1826,8 +1824,8 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "merge any parent, source, and rating changes that were made after loading the initial set" do
-          post = FactoryBot.create(:post, :parent => nil, :source => "", :rating => "q")
-          parent_post = FactoryBot.create(:post)
+          post = create(:post, parent: nil, source: "", rating: "q")
+          parent_post = create(:post)
 
           # user a changes rating to safe, adds parent
           post_edited_by_user_a = Post.find(post.id)
@@ -1859,7 +1857,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "that has been tagged with a metatag" do
         should "not include the metatag in its tag string" do
-          post = FactoryBot.create(:post)
+          post = create(:post)
           post.tag_string = "aaa pool:1234 pool:test rating:s fav:bob"
           post.save
           assert_equal("aaa", post.tag_string)
@@ -1885,7 +1883,7 @@ class PostTest < ActiveSupport::TestCase
         context "that is from pixiv" do
           should "save the pixiv id" do
             @post.update(source: "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png")
-            assert_equal(46304396, @post.pixiv_id)
+            assert_equal(46_304_396, @post.pixiv_id)
             @post.pixiv_id = nil
           end
         end
@@ -1921,7 +1919,7 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "warn when a tag removal failed due to implications or automatic tags" do
-          ti = FactoryBot.create(:tag_implication, antecedent_name: "cat", consequent_name: "animal")
+          create(:tag_implication, antecedent_name: "cat", consequent_name: "animal")
           @post.reload
           @post.update(old_tag_string: @post.tag_string, tag_string: "chen_(cosplay) char:chen cosplay cat animal")
           @post.warnings.clear
@@ -1932,7 +1930,7 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "warn when a post from a known source is missing an artist tag" do
-          post = FactoryBot.build(:post, source: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65985331")
+          post = build(:post, source: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65985331")
           post.save
           assert_match(/Artist tag is required/, post.warnings.full_messages.join)
         end
@@ -1942,7 +1940,7 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "warn when an upload doesn't have enough tags" do
-          post = FactoryBot.create(:post, tag_string: "tagme")
+          post = create(:post, tag_string: "tagme")
           assert_match(/Uploads must have at least \d+ general tags/, post.warnings.full_messages.join)
         end
       end
@@ -1951,7 +1949,7 @@ class PostTest < ActiveSupport::TestCase
 
   context "Updating:" do
     context "an existing post" do
-      setup { @post = FactoryBot.create(:post) }
+      setup { @post = create(:post) }
 
       should "call Tag.increment_post_counts with the correct params" do
         @post.reload
@@ -1961,13 +1959,13 @@ class PostTest < ActiveSupport::TestCase
     end
 
     context "A post" do
-      setup { @post = FactoryBot.create(:post) }
+      setup { @post = create(:post) }
       subject { @post }
 
       should "not allow values S, safe, derp" do
         ["S", "safe", "derp"].each do |rating|
           subject.rating = rating
-          assert(!subject.valid?)
+          assert(subject.invalid?)
         end
       end
 
@@ -1983,8 +1981,8 @@ class PostTest < ActiveSupport::TestCase
   context "Favorites:" do
     context "Removing a post from a user's favorites" do
       setup do
-        @user = FactoryBot.create(:contributor_user)
-        @post = FactoryBot.create(:post)
+        @user = create(:contributor_user)
+        @post = create(:post)
         create(:favorite, post: @post, user: @user)
         @user.reload
       end
@@ -2002,7 +2000,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "decrement the post's score for basic users" do
-        @member = FactoryBot.create(:user)
+        @member = create(:user)
 
         assert_difference("@post.reload.score", -1) do
           Favorite.destroy_by(post: @post, user: @user)
@@ -2010,7 +2008,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "not decrement the user's favorite_count if the user did not favorite the post" do
-        @post2 = FactoryBot.create(:post)
+        @post2 = create(:post)
         assert_no_difference("@user.favorite_count") do
           Favorite.destroy_by(post: @post2, user: @user)
         end
@@ -2019,8 +2017,8 @@ class PostTest < ActiveSupport::TestCase
 
     context "Adding a post to a user's favorites" do
       setup do
-        @user = FactoryBot.create(:contributor_user)
-        @post = FactoryBot.create(:post)
+        @user = create(:contributor_user)
+        @post = create(:post)
       end
 
       should "increment the user's favorite_count" do
@@ -2035,7 +2033,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "not increment the post's score for basic users" do
-        @member = FactoryBot.create(:user)
+        @member = create(:user)
         create(:favorite, post: @post, user: @member)
         assert_equal(0, @post.score)
       end
@@ -2043,11 +2041,11 @@ class PostTest < ActiveSupport::TestCase
 
     context "Moving favorites to a parent post" do
       setup do
-        @parent = FactoryBot.create(:post)
-        @child = FactoryBot.create(:post, parent: @parent)
+        @parent = create(:post)
+        @child = create(:post, parent: @parent)
 
-        @user1 = FactoryBot.create(:user, enable_private_favorites: true)
-        @gold1 = FactoryBot.create(:gold_user)
+        @user1 = create(:user, enable_private_favorites: true)
+        @gold1 = create(:gold_user)
 
         create(:favorite, post: @child, user: @user1)
         create(:favorite, post: @child, user: @gold1)
@@ -2068,8 +2066,8 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "create a vote for each user who can vote" do
-        assert(@parent.votes.where(user: @gold1).exists?)
-        assert(@parent.votes.where(user: @user1).exists?)
+        assert(@parent.votes.exists?(user: @gold1))
+        assert(@parent.votes.exists?(user: @user1))
         assert_equal(2, @parent.score)
       end
     end
@@ -2078,10 +2076,10 @@ class PostTest < ActiveSupport::TestCase
   context "Uploading:" do
     context "Uploading a post" do
       should "capture who uploaded the post" do
-        post = FactoryBot.create(:post)
-        user1 = FactoryBot.create(:user)
-        user2 = FactoryBot.create(:user)
-        user3 = FactoryBot.create(:user)
+        post = create(:post)
+        user1 = create(:user)
+        user2 = create(:user)
+        user3 = create(:user)
 
         post.uploader = user1
         assert_equal(user1.id, post.uploader_id)
@@ -2093,7 +2091,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "tag post counts" do
-        setup { @post = FactoryBot.build(:post) }
+        setup { @post = build(:post) }
 
         should "call Tag.increment_post_counts with the correct params" do
           Tag.expects(:increment_post_counts).once.with(["tag1", "tag2"])
@@ -2103,7 +2101,7 @@ class PostTest < ActiveSupport::TestCase
 
       should "increment the uploaders post_upload_count" do
         assert_difference(-> { CurrentUser.user.post_upload_count }) do
-          post = FactoryBot.create(:post, uploader: CurrentUser.user)
+          create(:post, uploader: CurrentUser.user)
           CurrentUser.user.reload
         end
       end

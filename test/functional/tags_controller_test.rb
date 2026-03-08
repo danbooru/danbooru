@@ -171,7 +171,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
       should "not change category when the tag is too large to be changed by a builder" do
         @tag = create(:tag, category: Tag.categories.general, post_count: 1001)
-        put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.artist}}
+        put_auth tag_path(@tag), @user, params: {tag: {category: Tag.categories.artist}}
 
         assert_response 403
         assert_equal(Tag.categories.general, @tag.reload.category)

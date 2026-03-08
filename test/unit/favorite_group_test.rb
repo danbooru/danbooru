@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class FavoriteGroupTest < ActiveSupport::TestCase
   def setup
@@ -53,7 +53,7 @@ class FavoriteGroupTest < ActiveSupport::TestCase
       post = create(:post)
 
       @fav_group.add(post)
-      assert(@fav_group.valid?)
+      assert_equal(true, @fav_group.valid?)
       assert_equal([post.id], @fav_group.reload.post_ids)
 
       @fav_group.add(post)
@@ -63,14 +63,14 @@ class FavoriteGroupTest < ActiveSupport::TestCase
       assert_equal([post.id], @fav_group.reload.post_ids)
 
       @fav_group.reload.update(post_ids: [post.id, post.id])
-      refute(@fav_group.valid?)
+      assert_equal(false, @fav_group.valid?)
       assert_equal([post.id], @fav_group.reload.post_ids)
     end
 
     should "not allow adding nonexistent posts" do
       @fav_group.update(post_ids: [0])
 
-      refute(@fav_group.valid?)
+      assert_equal(false, @fav_group.valid?)
       assert_equal([], @fav_group.reload.post_ids)
     end
   end

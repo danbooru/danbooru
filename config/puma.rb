@@ -25,9 +25,9 @@
 rails_env = ENV.fetch("RAILS_ENV", "development")
 
 # The server port or listening address. Default is http://0.0.0.0:3000.
-if ENV.has_key?("PUMA_PORT")
+if ENV.key?("PUMA_PORT")
   port ENV["PUMA_PORT"]
-elsif ENV.has_key?("PUMA_BIND")
+elsif ENV.key?("PUMA_BIND")
   bind ENV["PUMA_BIND"]
 else
   # low_latency=true means TCP_NODELAY
@@ -41,7 +41,7 @@ end
 # the application would be max `threads` * `workers`. Workers do not work on
 # JRuby or Windows (both of which do not support processes). The Postgres
 # connection limit may need to be raised for high `thread` * `worker` counts.
-if ENV.has_key?("PUMA_WORKERS")
+if ENV.key?("PUMA_WORKERS")
   workers ENV["PUMA_WORKERS"]
 elsif rails_env == "development"
   # Use single worker mode in development for easier debugging
@@ -113,14 +113,14 @@ activate_control_app ENV.fetch("PUMA_CONTROL_URL", "tcp://localhost:9293"), no_t
 # error, or if a middleware raises an error before or after the request is handled by the app.
 #
 # When RAILS_ENV is development, errors will be swallowed by the BetterErrors gem before they get to this point.
-lowlevel_error_handler do |exception, env|
+lowlevel_error_handler do |exception, _env|
   ApplicationMetrics[:puma_exceptions_total][exception: exception.class.name].increment
 
   backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
   message = <<~EOS
     An unexpected error has occurred.
 
-    Details: #{exception.class.to_s} exception raised.
+    Details: #{exception.class} exception raised.
 
     #{backtrace}
   EOS
@@ -130,10 +130,10 @@ rescue Exception => second_exception # This should never happen
   message = <<~EOS
     An unexpected error has occurred on the error page. Oh baby, a triple fault!
 
-    Details: #{exception.class.to_s} exception raised.
+    Details: #{exception.class} exception raised.
     #{exception.backtrace.join("\n")}
 
-    #{second_exception.class.to_s} exception raised.
+    #{second_exception.class} exception raised.
     #{second_exception.backtrace.join("\n")}
   EOS
 
@@ -143,7 +143,7 @@ end
 # https://github.com/schneems/puma_worker_killer
 # https://docs.gitlab.com/ee/administration/operations/puma.html#puma-worker-killer
 before_fork do
-  require 'puma_worker_killer'
+  require "puma_worker_killer"
 
   PumaWorkerKiller.rolling_restart_splay_seconds = 0.0..180.0 # 0 to 3 minutes in seconds
   PumaWorkerKiller.enable_rolling_restart ENV.fetch("PUMA_RESTART_INTERVAL", 2 * 60 * 60).to_i # every 2 hours by default

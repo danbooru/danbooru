@@ -157,7 +157,7 @@ class TagMover
       new_artist.other_names += old_artist.other_names
       new_artist.other_names += [old_artist.name]
       new_artist.group_name = old_artist.group_name unless new_artist.group_name.present?
-      new_artist.url_string += "\n" + old_artist.url_string
+      new_artist.url_string += "\n#{old_artist.url_string}"
       new_artist.is_deleted = false
       new_artist.is_banned = old_artist.is_banned || new_artist.is_banned
       new_artist.save!(validate: false)

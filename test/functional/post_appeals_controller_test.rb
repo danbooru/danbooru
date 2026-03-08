@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostAppealsControllerTest < ActionDispatch::IntegrationTest
   context "The post appeals controller" do
@@ -113,7 +113,7 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
       should "return an error if the appeal is too long" do
         @appealer = create(:user)
         @post_appeal = create(:post_appeal, creator: @appealer, reason: "xxx")
-        put_auth post_appeal_path(@post_appeal), @appealer, params: { post_appeal: { reason: "x"*1000 }}
+        put_auth post_appeal_path(@post_appeal), @appealer, params: { post_appeal: { reason: "x" * 1000 }}
 
         assert_response :success
         assert_equal("xxx", @post_appeal.reload.reason)

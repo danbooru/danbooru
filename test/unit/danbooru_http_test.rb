@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class DanbooruHttpTest < ActiveSupport::TestCase
   def httpbin_url(path = "")
@@ -34,7 +34,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "fail if the request takes too long to download" do
         # XXX should return status 597 instead
         assert_raises(HTTP::TimeoutError) do
-          response = Danbooru::Http.timeout(1).get(httpbin_url("drip?duration=10&numbytes=10")).flush
+          Danbooru::Http.timeout(1).get(httpbin_url("drip?duration=10&numbytes=10")).flush
         end
       end
 
@@ -292,13 +292,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
       should "fail if a download is too large" do
         assert_raises(Danbooru::Http::FileTooLargeError) do
-          response, file = Danbooru::Http.max_size(500).download_media(httpbin_url("bytes/1000"))
+          Danbooru::Http.max_size(500).download_media(httpbin_url("bytes/1000"))
         end
       end
 
       should "fail if a streaming download is too large" do
         assert_raises(Danbooru::Http::FileTooLargeError) do
-          response, file = Danbooru::Http.max_size(500).download_media(httpbin_url("stream-bytes/1000"))
+          Danbooru::Http.max_size(500).download_media(httpbin_url("stream-bytes/1000"))
         end
       end
     end

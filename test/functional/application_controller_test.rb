@@ -369,7 +369,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     end
 
     should "return nothing if the search[order]=custom param isn't accompanied by search[id]" do
-      tags = create_list(:tag, 2, post_count: 42)
+      create_list(:tag, 2, post_count: 42)
       get tags_path(search: { order: "custom" }), as: :json
 
       assert_response :success
@@ -377,7 +377,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     end
 
     should "return nothing if the search[order]=custom param isn't accompanied by a valid search[id]" do
-      tags = create_list(:tag, 2, post_count: 42)
+      create_list(:tag, 2, post_count: 42)
       get tags_path(search: { id: ">1", order: "custom" }), as: :json
 
       assert_response :success

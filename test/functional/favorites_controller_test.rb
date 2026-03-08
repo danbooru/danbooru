@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class FavoritesControllerTest < ActionDispatch::IntegrationTest
   context "The favorites controller" do

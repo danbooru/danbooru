@@ -31,7 +31,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])
+        mock_post_search_rankings(Time.zone.today, [["1girl", 100], ["original", 50]])
         create_list(:post, 2)
       end
 
@@ -219,7 +219,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             create(:wiki_page, title: "1girl")
           end
 
-          get posts_path, params: {:tags => "1girl solo"}
+          get posts_path, params: {tags: "1girl solo"}
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
         end
@@ -510,7 +510,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "show_seq action" do
       should "render" do
-        posts = FactoryBot.create_list(:post, 3)
+        posts = create_list(:post, 3)
 
         get show_seq_post_path(posts[1].id), params: { seq: "prev" }
         assert_redirected_to(posts[2])
@@ -541,7 +541,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "show action" do
       should "render" do
-        get post_path(@post), params: {:id => @post.id}
+        get post_path(@post), params: {id: @post.id}
         assert_response :success
       end
 
@@ -987,7 +987,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "redirect to the post on success" do
-        put_auth post_path(@post), @user, params: {:post => {:tag_string => "bbb"}}
+        put_auth post_path(@post), @user, params: {post: {tag_string: "bbb"}}
         assert_redirected_to post_path(@post)
 
         @post.reload
@@ -995,7 +995,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "ignore restricted params" do
-        put_auth post_path(@post), @user, params: {:post => {:last_noted_at => 1.minute.ago}}
+        put_auth post_path(@post), @user, params: {post: {last_noted_at: 1.minute.ago}}
         assert_nil(@post.reload.last_noted_at)
       end
 
@@ -1088,7 +1088,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         @version = @post.versions.first
         assert_equal("aaaa", @version.tags)
-        put_auth revert_post_path(@post), @user, params: {:version_id => @version.id}
+        put_auth revert_post_path(@post), @user, params: {version_id: @version.id}
         assert_redirected_to post_path(@post)
         @post.reload
         assert_equal("aaaa", @post.tag_string)
@@ -1097,7 +1097,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "not allow reverting to a previous version of another post" do
         @post2 = as(@user) { create(:post, uploader_id: @user.id, tag_string: "herp") }
 
-        put_auth revert_post_path(@post), @user, params: { :version_id => @post2.versions.first.id }
+        put_auth revert_post_path(@post), @user, params: { version_id: @post2.versions.first.id }
         @post.reload
         assert_not_equal(@post.tag_string, @post2.tag_string)
         assert_response :missing

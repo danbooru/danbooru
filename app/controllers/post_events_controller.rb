@@ -4,7 +4,7 @@ class PostEventsController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
-    if post_id = params[:post_id] || params.dig(:search, :post_id)
+    if (post_id = params[:post_id] || params.dig(:search, :post_id))
       @post = Post.find(post_id)
     end
 

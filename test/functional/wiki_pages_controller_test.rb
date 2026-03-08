@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class WikiPagesControllerTest < ActionDispatch::IntegrationTest
   context "The wiki pages controller" do
@@ -215,7 +215,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a wiki_page" do
         assert_difference("WikiPage.count", 1) do
-          post_auth wiki_pages_path, @user, params: {:wiki_page => {:title => "abc", :body => "abc"}}
+          post_auth wiki_pages_path, @user, params: {wiki_page: {title: "abc", body: "abc"}}
           assert_redirected_to(wiki_page_path(WikiPage.last))
         end
       end
@@ -231,7 +231,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "update a wiki_page" do
-        put_auth wiki_page_path(@wiki_page), @user, params: {:wiki_page => {:body => "xyz"}}
+        put_auth wiki_page_path(@wiki_page), @user, params: {wiki_page: {body: "xyz"}}
 
         assert_redirected_to wiki_page_path(@wiki_page)
         assert_equal("xyz", @wiki_page.reload.body)
@@ -300,18 +300,18 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       should "revert to a previous version" do
         version = @wiki_page.versions.first
         assert_equal("1", version.body)
-        put_auth revert_wiki_page_path(@wiki_page), @user, params: {:version_id => version.id}
+        put_auth revert_wiki_page_path(@wiki_page), @user, params: { version_id: version.id }
         @wiki_page.reload
         assert_equal("1", @wiki_page.body)
       end
 
       should "not allow reverting to a previous version of another wiki page" do
-        @wiki_page_2 = as(@user) { create(:wiki_page) }
+        @wiki_page2 = as(@user) { create(:wiki_page) }
 
-        put_auth revert_wiki_page_path(@wiki_page), @user, params: { :version_id => @wiki_page_2.versions.first.id }
+        put_auth revert_wiki_page_path(@wiki_page), @user, params: { version_id: @wiki_page2.versions.first.id }
         @wiki_page.reload
 
-        assert_not_equal(@wiki_page.body, @wiki_page_2.body)
+        assert_not_equal(@wiki_page.body, @wiki_page2.body)
         assert_response :missing
       end
     end

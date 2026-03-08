@@ -55,6 +55,6 @@ class PostDisapproval < ApplicationRecord
 
   def message=(message)
     message = nil if message.blank?
-    super(message)
+    super
   end
 end

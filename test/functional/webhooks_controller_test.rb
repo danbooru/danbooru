@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class WebhooksControllerTest < ActionDispatch::IntegrationTest
   mock_stripe!
@@ -15,7 +15,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
   # https://github.com/stripe-ruby-mock/stripe-ruby-mock/issues/467#issuecomment-634674913
   # https://stripe.com/docs/webhooks/signatures
   def generate_stripe_signature(event)
-    time = Time.now
+    time = Time.zone.now
     secret = Danbooru.config.stripe_webhook_secret
     signature = Stripe::Webhook::Signature.compute_signature(time, event.to_json, secret)
     Stripe::Webhook::Signature.generate_header(time, signature, scheme: Stripe::Webhook::Signature::EXPECTED_SCHEME)

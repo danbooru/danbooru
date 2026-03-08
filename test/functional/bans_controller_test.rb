@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class BansControllerTest < ActionDispatch::IntegrationTest
   context "A bans controller" do

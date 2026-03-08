@@ -7,6 +7,7 @@ class MediaAssetQuery
   METATAGS = %w[id md5 pixelhash width height duration mpixels ratio filesize filetype date age status is exif]
 
   attr_reader :search_string
+
   delegate :to_infix, :to_pretty_string, to: :ast
   alias_method :to_s, :to_infix
 

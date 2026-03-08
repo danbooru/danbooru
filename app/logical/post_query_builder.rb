@@ -102,7 +102,6 @@ class PostQueryBuilder
     relation
   end
 
-
   # Generate a SQL relation from a PostQuery.
   def build_relation(post_query, relation = Post.all)
     post_query.ast.visit do |node, *children|

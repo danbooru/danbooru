@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ArtistURLsControllerTest < ActionDispatch::IntegrationTest
   context "The artist urls controller" do

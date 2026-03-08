@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
   def assert_tag_match(posts, query, relation: Post.all, current_user: CurrentUser.user, tag_limit: nil, **options)
@@ -156,7 +156,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for an invalid metatag value" do
       should "return nothing" do
-        post = create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
+        create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
 
         assert_tag_match([], "score:foo")
         assert_tag_match([], "score:42x")
@@ -656,9 +656,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post3 = create(:post)
       post4 = create(:post)
 
-      artcomm1 = create(:artist_commentary, post: post1, translated_title: "azur lane")
-      artcomm2 = create(:artist_commentary, post: post2, translated_title: "", translated_description: "")
-      artcomm3 = create(:artist_commentary, post: post3, original_title: "", original_description: "", translated_title: "", translated_description: "")
+      create(:artist_commentary, post: post1, translated_title: "azur lane")
+      create(:artist_commentary, post: post2, translated_title: "", translated_description: "")
+      create(:artist_commentary, post: post3, original_title: "", original_description: "", translated_title: "", translated_description: "")
 
       assert_tag_match([post2, post1], "commentary:true")
       assert_tag_match([post4, post3], "commentary:false")
@@ -688,8 +688,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post1 = create(:post)
       post2 = create(:post)
 
-      comment1 = create(:comment, post: post1, body: "petting cats")
-      comment2 = create(:comment, post: post2, body: "walking dogs")
+      create(:comment, post: post1, body: "petting cats")
+      create(:comment, post: post2, body: "walking dogs")
 
       assert_tag_match([post1], "comment:petting")
       assert_tag_match([post1], "comment:pet")
@@ -710,8 +710,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post1 = create(:post)
       post2 = create(:post)
 
-      note1 = create(:note, post: post1, body: "petting cats")
-      note2 = create(:note, post: post2, body: "walking dogs")
+      create(:note, post: post1, body: "petting cats")
+      create(:note, post: post2, body: "walking dogs")
 
       assert_tag_match([post1], "note:petting")
       assert_tag_match([post1], "note:pet")
@@ -997,7 +997,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(all - [flagged], "-status:flagged")
       assert_tag_match(all - [appealed], "-status:appealed")
       assert_tag_match(all - [deleted, appealed], "-status:deleted")
-      assert_tag_match(all - [banned],  "-status:banned")
+      assert_tag_match(all - [banned], "-status:banned")
       assert_tag_match(all - [banned], "-status:active")
 
       assert_tag_match([], "status:garbage")
@@ -1383,7 +1383,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
           image_height: 100 * n * n,
           image_width: 100 * (3 - n) * n,
           tag_string: tags[n - 1],
-          media_asset: build(:media_asset, image_height: 100 * n * n, image_width: 100 * (3 - n) * n, file_size: 1.megabyte * n)
+          media_asset: build(:media_asset, image_height: 100 * n * n, image_width: 100 * (3 - n) * n, file_size: 1.megabyte * n),
         )
 
         u = create(:user, created_at: 2.weeks.ago)
@@ -1456,9 +1456,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       user = create(:gold_user)
 
       as(user) do
-        comment1 = create(:comment, creator: user, post: post1)
-        comment2 = create(:comment, creator: user, post: post2, do_not_bump_post: true)
-        comment3 = create(:comment, creator: user, post: post3)
+        create(:comment, creator: user, post: post1)
+        create(:comment, creator: user, post: post2, do_not_bump_post: true)
+        create(:comment, creator: user, post: post3)
       end
 
       assert_tag_match([post3, post1, post2], "order:comment_bumped")
@@ -1540,7 +1540,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "fail if the search exceeds the tag limit" do
-      post1 = create(:post, rating: "s")
+      create(:post, rating: "s")
 
       assert_raise(PostQuery::TagLimitError) do
         PostQuery.search("a b c user:bob fav:bob pool:disgustingly_adorable", tag_limit: 5)
@@ -1557,12 +1557,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "succeed for exclusive tag searches with no other tag" do
-      post1 = create(:post, rating: "s", tag_string: "aaa")
+      create(:post, rating: "s", tag_string: "aaa")
       assert_tag_match([], "-aaa")
     end
 
     should "succeed for exclusive tag searches combined with a metatag" do
-      post1 = create(:post, rating: "s", tag_string: "aaa")
+      create(:post, rating: "s", tag_string: "aaa")
       assert_tag_match([], "-aaa id:>0")
       assert_tag_match([], "-a* rating:s")
     end
@@ -1768,8 +1768,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         end
 
         should "not fail for a two tag search by a member" do
-          post1 = create(:post, tag_string: "aaa bbb rating:g")
-          post2 = create(:post, tag_string: "aaa bbb rating:e")
+          create(:post, tag_string: "aaa bbb rating:g")
+          create(:post, tag_string: "aaa bbb rating:e")
 
           assert_fast_count(1, "aaa bbb", { safe_mode: true })
         end

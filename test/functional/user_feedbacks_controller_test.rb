@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
   context "The user feedbacks controller" do
@@ -138,7 +138,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @user_feedback
           assert_equal("blah", @user_feedback.reload.body)
-          assert_match(/updated user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_match(%r{updated user feedback for "#{@user.name}":/users/#{@user.id}}, ModAction.last.description)
           assert_equal("user_feedback_update", ModAction.last.category)
           assert_equal(@user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
@@ -149,7 +149,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @user_feedback
           assert(@user_feedback.reload.is_deleted?)
-          assert_match(/deleted user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_match(%r{deleted user feedback for "#{@user.name}":/users/#{@user.id}}, ModAction.last.description)
           assert_equal("user_feedback_delete", ModAction.last.category)
           assert_equal(@user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
@@ -160,7 +160,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
           put_auth user_feedback_path(@user_feedback), @mod, params: { id: @user_feedback.id, user_feedback: { is_deleted: "true" }}
 
           assert_response 403
-          refute(@user_feedback.reload.is_deleted?)
+          assert_equal(false, @user_feedback.reload.is_deleted?)
         end
       end
     end

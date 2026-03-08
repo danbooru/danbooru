@@ -869,11 +869,11 @@ class User < ApplicationRecord
 
       q = search_attributes(
         params,
-        [:id, :created_at, :updated_at, :name, :level, :is_deleted, :post_upload_count, :post_update_count,
-         :note_update_count, :favorite_count, :posts, :note_versions, :artist_commentary_versions, :post_appeals,
-         :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_topics, :forum_posts,
-         :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter],
-        current_user: current_user
+        %i[id created_at updated_at name level is_deleted post_upload_count post_update_count
+           note_update_count favorite_count posts note_versions artist_commentary_versions post_appeals
+           post_approvals artist_versions comments wiki_page_versions feedback forum_topics forum_posts
+           forum_post_votes tag_aliases tag_implications bans inviter],
+        current_user: current_user,
       )
 
       if params[:name_matches].present?
@@ -935,7 +935,7 @@ class User < ApplicationRecord
     self.new_post_navigation_layout = true
   end
 
-  def dtext_shortlink(**options)
+  def dtext_shortlink(**_options)
     "<@#{name}>"
   end
 

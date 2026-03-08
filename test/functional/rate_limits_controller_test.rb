@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class RateLimitsControllerTest < ActionDispatch::IntegrationTest
   context "The rate limits controller" do

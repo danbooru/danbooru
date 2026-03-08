@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
   context "The post regenerations controller" do

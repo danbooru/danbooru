@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ModqueueControllerTest < ActionDispatch::IntegrationTest
   context "The modqueue controller" do

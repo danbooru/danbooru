@@ -1,11 +1,11 @@
-require 'test_helper'
+require "test_helper"
 
 class DeleteFavoritesJobTest < ActiveJob::TestCase
   context "DeleteFavoritesJob" do
     should "delete all favorites" do
       user = create(:user)
       posts = create_list(:post, 3)
-      favorites = posts.each { |post| Favorite.create!(post: post, user: user) }
+      posts.each { |post| create(:favorite, post: post, user: user) }
 
       assert_equal(3, user.favorite_count)
       assert_equal(3, user.favorites.count)

@@ -1,15 +1,15 @@
-require 'test_helper'
+require "test_helper"
 
 class RelatedTagQueryTest < ActiveSupport::TestCase
   setup do
-    user = FactoryBot.create(:user)
+    user = create(:user)
     CurrentUser.user = user
   end
 
   context "a related tag query without a category constraint" do
     setup do
-      @post_1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
-      @post_2 = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+      create(:post, tag_string: "aaa bbb")
+      create(:post, tag_string: "aaa bbb ccc")
     end
 
     context "for a tag that already exists" do
@@ -35,8 +35,8 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     context "for an aliased tag" do
       setup do
         create(:tag, name: "foo", post_count: 42)
-        @ta = FactoryBot.create(:tag_alias, antecedent_name: "xyz", consequent_name: "aaa")
-        @wp = FactoryBot.create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[does not exist]] blah")
+        @ta = create(:tag_alias, antecedent_name: "xyz", consequent_name: "aaa")
+        @wp = create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[does not exist]] blah")
         @query = RelatedTagQuery.new(query: "xyz")
       end
 
@@ -61,7 +61,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
     context "for a tag with a wiki page" do
       setup do
-        @wiki_page = FactoryBot.create(:wiki_page, :title => "aaa", :body => "[[bbb]] [[ccc]]")
+        @wiki_page = create(:wiki_page, title: "aaa", body: "[[bbb]] [[ccc]]")
         @query = RelatedTagQuery.new(query: "aaa")
       end
 
@@ -89,9 +89,9 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
   context "a related tag query with a category constraint" do
     setup do
-      @post_1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
-      @post_2 = FactoryBot.create(:post, :tag_string => "aaa art:ccc")
-      @post_3 = FactoryBot.create(:post, :tag_string => "aaa copy:ddd")
+      create(:post, tag_string: "aaa bbb")
+      create(:post, tag_string: "aaa art:ccc")
+      create(:post, tag_string: "aaa copy:ddd")
       @query = RelatedTagQuery.new(query: "aaa", categories: ["artist"])
     end
 
