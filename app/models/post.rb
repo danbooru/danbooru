@@ -62,7 +62,7 @@ class Post < ApplicationRecord
   validates :rating, inclusion: { in: RATINGS.keys, message: "must be #{RATINGS.keys.map(&:upcase).to_sentence(last_word_connector: ", or ")}" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
   validates :parent, presence: { message: "post does not exist" }, if: -> { parent_id.present? && parent_id_changed? }
-  before_save :parse_pixiv_id
+  before_save :parse_source_id
   before_save :added_tags_are_valid
   before_save :removed_tags_are_valid
   before_save :has_artist_tag
@@ -1167,6 +1167,8 @@ class Post < ApplicationRecord
           attribute_matches(value, :created_at, :date)
         when "age"
           attribute_matches(value, :created_at, :age)
+        when "site"
+          site_matches(value)
         when "pixiv", "pixiv_id"
           attribute_matches(value, :pixiv_id)
         when "tagcount"
@@ -1369,6 +1371,43 @@ class Post < ApplicationRecord
           where(source: "")
         else
           where_ilike(:source, source + "*")
+        end
+      end
+
+      def site_matches(value)
+        source_site, source_id = value.split("/", 2)
+
+        if source_id.present?
+          source_site_matches(source_site).source_id_matches(source_id)
+        else
+          source_site_matches(source_site)
+        end
+      end
+
+      def source_site_matches(site)
+        case site.to_s.downcase
+        when "any"
+          where.not(source_name: nil)
+        when "none"
+          where(source_name: nil)
+        else
+          where("source_name IS NOT NULL AND lower(source_name) = lower(?)", site)
+        end
+      end
+
+      def source_id_matches(value)
+        case value.to_s.downcase
+        when "any"
+          where.not(source_id: nil)
+        when "none"
+          where(source_id: nil)
+        else
+          begin
+            RangeParser.parse(value, :integer)
+            attribute_matches(value, :source_id_num)
+          rescue RangeParser::ParseError
+            where(source_id: value)
+          end
         end
       end
 
@@ -1697,6 +1736,17 @@ class Post < ApplicationRecord
         when "disapproved_asc"
           group(:id).left_outer_joins(:disapprovals).select("posts.*").select("MAX(post_disapprovals.created_at) AS disapproved_at").reorder("disapproved_at ASC, posts.id ASC")
 
+        when /\Asite\/(?<site>.+?)(?:_(?<direction>asc|desc))?\z/
+          site = $~[:site]
+          direction = ($~[:direction] || "desc").downcase.to_sym
+
+          reorder(
+            Arel::Nodes::Case.new.when(arel_table[:source_name].lower.eq(site.downcase)).then(0).else(1).asc,
+            arel_table[:source_id_num].send(direction).nulls_last,
+            arel_table[:source_id].send(direction).nulls_last,
+            arel_table[:id].send(direction)
+          )
+
         when "none"
           reorder(nil)
 
@@ -1753,6 +1803,10 @@ class Post < ApplicationRecord
           current_user: current_user
         )
 
+        if params[:site].present?
+          q = q.site_matches(params[:site])
+        end
+
         if params[:tags].present?
           q = q.where(id: user_tag_match(params[:tags], current_user).select(:id))
         end
@@ -1768,9 +1822,19 @@ class Post < ApplicationRecord
     end
   end
 
-  concerning :PixivMethods do
-    def parse_pixiv_id
+  concerning :SourceMethods do
+    def parse_source_id
+      self.source_name = nil
+      self.source_id = nil
+      self.source_id_num = nil
       self.pixiv_id = nil
+
+      return unless parsed_source&.recognized?
+
+      self.source_name = parsed_source.site_name
+      self.source_id = parsed_source.work_id
+      source_id_num = Integer(parsed_source.work_id, exception: false)
+      self.source_id_num = source_id_num if (0...1 << 63).cover?(source_id_num)
       self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
     end
   end

@@ -1558,11 +1558,14 @@ CREATE TABLE public.posts (
     parent_id integer,
     has_children boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
-    pixiv_id integer,
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
+    tag_count_meta integer DEFAULT 0 NOT NULL,
+    pixiv_id integer,
+    source_name character varying,
+    source_id character varying,
+    source_id_num bigint
 );
 
 
@@ -3342,7 +3345,6 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -5498,6 +5500,27 @@ CREATE INDEX index_posts_on_rating ON public.posts USING btree (rating) WHERE (r
 
 
 --
+-- Name: index_posts_on_source_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_source_name ON public.posts USING btree (lower((source_name)::text)) WHERE (source_name IS NOT NULL);
+
+
+--
+-- Name: index_posts_on_source_name_and_source_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_source_name_and_source_id ON public.posts USING btree (lower((source_name)::text), source_id) WHERE ((source_name IS NOT NULL) AND (source_id IS NOT NULL));
+
+
+--
+-- Name: index_posts_on_source_name_and_source_id_num; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_source_name_and_source_id_num ON public.posts USING btree (lower((source_name)::text), source_id_num) WHERE ((source_name IS NOT NULL) AND (source_id_num IS NOT NULL));
+
+
+--
 -- Name: index_posts_on_source_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7113,6 +7136,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260304000000'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),
