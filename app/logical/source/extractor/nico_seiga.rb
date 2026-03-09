@@ -126,7 +126,7 @@ module Source
 
         http.cookies(
           skip_fetish_warning: "1",
-          user_session: credentials[:user_session]
+          user_session: credentials[:user_session],
         ).headers(
           "User-Agent": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36",
         )

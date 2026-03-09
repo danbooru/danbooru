@@ -5,6 +5,7 @@
 # @see app/logical/payment_transaction/stripe.rb
 class PaymentTransaction
   attr_reader :user_upgrade
+
   delegate :recipient, :purchaser, :upgrade_type, :pending?, :transaction_id, to: :user_upgrade
 
   def initialize(user_upgrade)

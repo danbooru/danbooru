@@ -30,7 +30,7 @@ class BulkUpdateRequest < ApplicationRecord
   after_create :create_forum_topic
 
   scope :pending_first, -> { order(Arel.sql("(case status when 'processing' then 0 when 'pending' then 1 when 'approved' then 2 when 'rejected' then 3 when 'failed' then 4 else 5 end)")) }
-  scope :pending, -> {where(status: "pending")}
+  scope :pending, -> { where(status: "pending") }
   scope :approved, -> { where(status: "approved") }
   scope :rejected, -> { where(status: "rejected") }
   scope :processing, -> { where(status: "processing") }

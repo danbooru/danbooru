@@ -41,7 +41,7 @@ class ForumPostsController < ApplicationController
     @forum_post.save
 
     page = @forum_post.topic.last_page if @forum_post.topic.last_page > 1
-    respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page))
+    respond_with(@forum_post, location: forum_topic_path(@forum_post.topic, page: page))
   end
 
   def update
@@ -49,7 +49,7 @@ class ForumPostsController < ApplicationController
     @forum_post.update(updater: CurrentUser.user, **permitted_attributes(@forum_post))
 
     page = @forum_post.forum_topic_page if @forum_post.forum_topic_page > 1
-    respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page, :anchor => "forum_post_#{@forum_post.id}"))
+    respond_with(@forum_post, location: forum_topic_path(@forum_post.topic, page: page, anchor: "forum_post_#{@forum_post.id}"))
   end
 
   def destroy

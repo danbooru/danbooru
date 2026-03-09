@@ -49,9 +49,6 @@ Layout/LineLength:
 Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
 
-Layout/SpaceInsideBlockBraces:
-  Enabled: false
-
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
@@ -168,9 +165,6 @@ Style/FrozenStringLiteralComment:
 
 Style/GuardClause:
   MinBodyLength: 20
-
-Style/HashSyntax:
-  Enabled: false
 
 Style/IfUnlessModifier:
   Enabled: false

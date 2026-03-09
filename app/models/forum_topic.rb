@@ -118,7 +118,7 @@ class ForumTopic < ApplicationRecord
       if visit
         visit.update!(last_read_at: updated_at)
       else
-        ForumTopicVisit.create(:user_id => user.id, :forum_topic_id => id, :last_read_at => updated_at)
+        ForumTopicVisit.create(user_id: user.id, forum_topic_id: id, last_read_at: updated_at)
       end
 
       unread_topics = ForumTopic.visible(user).active.unread_by_user(user)

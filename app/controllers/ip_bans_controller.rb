@@ -26,7 +26,7 @@ class IpBansController < ApplicationController
   def create
     @ip_ban = authorize IpBan.new(creator: CurrentUser.user, **permitted_attributes(IpBan))
     @ip_ban.save
-    respond_with(@ip_ban, :location => ip_bans_path)
+    respond_with(@ip_ban, location: ip_bans_path)
   end
 
   def update

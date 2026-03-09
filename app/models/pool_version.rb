@@ -3,7 +3,7 @@
 class PoolVersion < ApplicationRecord
   dtext_attribute :description # defines :dtext_description
 
-  belongs_to :updater, :class_name => "User"
+  belongs_to :updater, class_name: "User"
   belongs_to :pool
 
   def self.enabled?

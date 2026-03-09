@@ -23,8 +23,8 @@ class AuthorizeNetClient
           merchantAuthentication: {
             name: login_id,
             transactionKey: transaction_key,
-          }
-        }
+          },
+        },
       )
     end
 
@@ -37,7 +37,7 @@ class AuthorizeNetClient
             transactionKey: transaction_key,
           },
           transId: transaction_id,
-        }
+        },
       )
     end
 
@@ -54,7 +54,7 @@ class AuthorizeNetClient
           hostedPaymentSettings: {
             setting: hosted_payment_settings(settings),
           },
-        }
+        },
       )
     end
 

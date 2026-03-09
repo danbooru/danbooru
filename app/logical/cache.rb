@@ -25,8 +25,7 @@ class Cache
       yield key
     end
 
-    keys_to_values_hash = sanitized_key_to_value_hash.transform_keys(&sanitized_key_to_key_hash)
-    keys_to_values_hash
+    sanitized_key_to_value_hash.transform_keys(&sanitized_key_to_key_hash)
   end
 
   # Get a value from the cache. If the value isn't in the cache, use the block

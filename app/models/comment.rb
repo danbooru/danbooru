@@ -24,7 +24,7 @@ class Comment < ApplicationRecord
     ModAction.log("updated #{comment.dtext_shortlink}", :comment_update, subject: self, user: comment.updater)
   end
 
-  after_save :update_last_commented_at_on_destroy, :if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted?}
+  after_save :update_last_commented_at_on_destroy, if: ->(rec) { rec.is_deleted? && rec.saved_change_to_is_deleted? }
   after_save(if: ->(comment) { comment.is_deleted? && comment.saved_change_to_is_deleted? && comment.updater != comment.creator }) do |comment|
     ModAction.log("deleted #{comment.dtext_shortlink}", :comment_delete, subject: self, user: comment.updater)
   end
@@ -34,7 +34,7 @@ class Comment < ApplicationRecord
 
   mentionable(
     message_field: :body,
-    title: ->(_user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
+    title: ->(_user_name) { "#{creator.name} mentioned you in a comment on post ##{post_id}" },
     body: lambda { |user_name|
       <<~EOF
         @#{creator.name} mentioned you in comment ##{id} on post ##{post_id}. This is an excerpt from the message:
@@ -100,25 +100,25 @@ class Comment < ApplicationRecord
   end
 
   def update_last_commented_at_on_create
-    Post.where(:id => post_id).update_all(:last_commented_at => created_at)
+    Post.where(id: post_id).update_all(last_commented_at: created_at)
     if Comment.where(post_id: post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post?
-      Post.where(:id => post_id).update_all(:last_comment_bumped_at => created_at)
+      Post.where(id: post_id).update_all(last_comment_bumped_at: created_at)
     end
   end
 
   def update_last_commented_at_on_destroy
     other_comments = Comment.where("post_id = ? and id <> ?", post_id, id).order(id: :desc)
     if other_comments.count == 0
-      Post.where(:id => post_id).update_all(:last_commented_at => nil)
+      Post.where(id: post_id).update_all(last_commented_at: nil)
     else
-      Post.where(:id => post_id).update_all(:last_commented_at => other_comments.first.created_at)
+      Post.where(id: post_id).update_all(last_commented_at: other_comments.first.created_at)
     end
 
     other_comments = other_comments.where("do_not_bump_post = FALSE")
     if other_comments.count == 0
-      Post.where(:id => post_id).update_all(:last_comment_bumped_at => nil)
+      Post.where(id: post_id).update_all(last_comment_bumped_at: nil)
     else
-      Post.where(:id => post_id).update_all(:last_comment_bumped_at => other_comments.first.created_at)
+      Post.where(id: post_id).update_all(last_comment_bumped_at: other_comments.first.created_at)
     end
   end
 

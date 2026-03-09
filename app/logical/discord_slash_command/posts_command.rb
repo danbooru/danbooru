@@ -11,13 +11,13 @@ class DiscordSlashCommand
       {
         name: "tags",
         description: "The tags to search",
-        type: ApplicationCommandOptionType::String
+        type: ApplicationCommandOptionType::String,
       },
       {
         name: "limit",
         description: "The number of posts to show (max 10)",
-        type: ApplicationCommandOptionType::Integer
-      }
+        type: ApplicationCommandOptionType::Integer,
+      },
     ]
 
     def call

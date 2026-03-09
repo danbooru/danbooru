@@ -63,7 +63,7 @@ def populate_posts(n, search: "is:sfw", batch_size: 200, timeout: 30.seconds)
           upload.upload_media_assets.first,
           tag_string: prepared_tag_string,
           source: danbooru_post["source"],
-          rating: danbooru_post["rating"]
+          rating: danbooru_post["rating"],
         )
         post.save
 

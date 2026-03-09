@@ -33,7 +33,7 @@ class PaymentTransaction::Stripe < PaymentTransaction
         country: country,
         is_gift: user_upgrade.is_gift?,
         level: user_upgrade.level,
-      }
+      },
     )
 
     user_upgrade.update!(payment_processor: :stripe, transaction_id: checkout_session.id)

@@ -334,6 +334,7 @@ class Sandbox
   # https://github.com/ffi/ffi/wiki
   module Linux
     extend FFI::Library
+
     ffi_lib FFI::Library::LIBC
 
     # Create a Ruby method that calls the given system call, and define a bang version that
@@ -350,7 +351,7 @@ class Sandbox
         end
       end
 
-      super(name, *args)
+      super
     end
 
     # https://www.kernel.org/doc/html/latest/userspace-api/no_new_privs.html

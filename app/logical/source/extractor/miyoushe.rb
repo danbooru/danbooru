@@ -9,7 +9,7 @@ class Source::Extractor::Miyoushe < Source::Extractor
       [parsed_url.to_s]
     elsif article[:vod_list].present?
       article[:vod_list].to_a.map do |video|
-        video[:resolutions]&.max_by { _1[:bitrate].to_i }&.dig(:url)
+        video[:resolutions]&.max_by { it[:bitrate].to_i }&.dig(:url)
       end
     else
       article[:image_list].to_a.pluck(:url)

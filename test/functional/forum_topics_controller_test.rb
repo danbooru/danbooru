@@ -93,7 +93,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       should "not list stickied topics first for JSON responses" do
         get forum_topics_path, params: {format: :json}
         forum_topics = JSON.parse(response.body)
-        assert_equal(default_search_order([@other_topic, @sticky_topic, @forum_topic]).call.map(&:id), forum_topics.map {|t| t["id"]})
+        assert_equal(default_search_order([@other_topic, @sticky_topic, @forum_topic]).call.map(&:id), forum_topics.map { |t| t["id"] })
       end
 
       should "render for atom feed" do

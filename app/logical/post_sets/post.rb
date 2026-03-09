@@ -13,6 +13,7 @@ module PostSets
     MAX_WILDCARD_TAGS = PostQueryBuilder::MAX_WILDCARD_TAGS
 
     attr_reader :current_user, :page, :format, :tag_string, :post_query, :normalized_query, :show_votes
+
     delegate :tag, to: :post_query
     alias_method :show_votes?, :show_votes
 
@@ -77,7 +78,7 @@ module PostSets
     end
 
     def has_explicit?
-      posts.any? {|x| x.rating == "e"}
+      posts.any? { |x| x.rating == "e" }
     end
 
     def hidden_posts
@@ -184,7 +185,7 @@ module PostSets
       # @param categories [Array<Integer>] the category order in which tags should be sorted by
       def sort_sidebar_tags(tags, categories = TagCategory.category_ids)
         tags.sort_by.with_index do |tag, i|
-          [categories.index(tag.category) || -1, (tag.category == TagCategory::GENERAL || tag.category == TagCategory::META ? i : -tag.post_count)]
+          [categories.index(tag.category) || -1, ((tag.category == TagCategory::GENERAL || tag.category == TagCategory::META) ? i : -tag.post_count)]
         end
       end
 
@@ -211,7 +212,7 @@ module PostSets
       end
 
       def saved_search_tags
-        searches = ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
+        searches = ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map { |x| "search:#{x}" }
         searches.take(MAX_SIDEBAR_TAGS).map do |search|
           Tag.new(name: search).freeze
         end

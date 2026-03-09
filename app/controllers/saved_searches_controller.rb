@@ -22,7 +22,7 @@ class SavedSearchesController < ApplicationController
   def update
     @saved_search = authorize SavedSearch.find(params[:id])
     @saved_search.update(permitted_attributes(@saved_search))
-    respond_with(@saved_search, :location => saved_searches_path)
+    respond_with(@saved_search, location: saved_searches_path)
   end
 
   def destroy

@@ -3,7 +3,7 @@
 class PostAppeal < ApplicationRecord
   dtext_attribute :reason, inline: true # defines :dtext_reason
 
-  belongs_to :creator, :class_name => "User"
+  belongs_to :creator, class_name: "User"
   belongs_to :post
 
   validates :reason, visible_string: { allow_empty: true }, length: { maximum: 140 }

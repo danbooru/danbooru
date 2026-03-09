@@ -4,7 +4,7 @@ class CreateMediaMetadata < ActiveRecord::Migration[6.1]
       t.timestamps null: false
 
       t.references :media_asset, null: false, index: { unique: true }
-      t.jsonb :metadata, null: false, default: '{}'
+      t.jsonb :metadata, null: false, default: "{}"
       t.index :metadata, using: "gin"
     end
 

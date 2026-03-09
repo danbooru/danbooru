@@ -23,10 +23,10 @@ class AutocompleteService
     filetype: MediaAsset::FILE_TYPES,
     commentary: %w[true false translated untranslated],
     disapproved: PostDisapproval::REASONS,
-    order: PostQueryBuilder::ORDER_METATAGS
+    order: PostQueryBuilder::ORDER_METATAGS,
   }
 
-  TAG_PREFIXES = TagCategory.mapping.keys.map { |prefix| prefix + ":" }
+  TAG_PREFIXES = TagCategory.mapping.keys.map { |prefix| "#{prefix}:" }
 
   attr_reader :query, :type, :limit, :current_user, :enabled
   alias_method :enabled?, :enabled
@@ -156,8 +156,8 @@ class AutocompleteService
       name = result[:antecedent] || result[:value]
       post_count = result[:post_count]
 
-      large = post_count > 100 ? 1 : 0
-      exact = name == string ? 1 : 0
+      large = (post_count > 100) ? 1 : 0
+      exact = (name == string) ? 1 : 0
       substr = name.include?(string) ? 1 : 0
 
       # If the search contains punctuation, rank exact matches first then substring matches. Otherwise, if it

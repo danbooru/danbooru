@@ -28,7 +28,7 @@ class DmailsController < ApplicationController
   def new
     if params[:respond_to_id]
       parent = authorize Dmail.find(params[:respond_to_id]), :show?
-      @dmail = parent.build_response(:forward => params[:forward])
+      @dmail = parent.build_response(forward: params[:forward])
     else
       @dmail = authorize Dmail.new(permitted_attributes(Dmail))
     end

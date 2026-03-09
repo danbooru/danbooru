@@ -99,7 +99,7 @@ class User < ApplicationRecord
   attribute :bit_prefs, default: 0
   attribute :is_deleted, default: false
 
-  has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
+  has_bit_flags BOOLEAN_ATTRIBUTES, field: "bit_prefs"
   enum :theme, { auto: 0, light: 50, dark: 100 }, suffix: true
 
   attr_reader :password
@@ -137,35 +137,35 @@ class User < ApplicationRecord
   has_many :comments, foreign_key: :creator_id
   has_many :comment_votes, dependent: :destroy
   has_many :wiki_page_versions, foreign_key: :updater_id
-  has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
+  has_many :feedback, class_name: "UserFeedback", dependent: :destroy
   has_many :forum_post_votes, dependent: :destroy, foreign_key: :creator_id
   has_many :forum_topic_visits, dependent: :destroy
   has_many :visited_forum_topics, through: :forum_topic_visits, source: :forum_topic
   has_many :moderation_reports, as: :model
   has_many :pool_versions, foreign_key: :updater_id
-  has_many :posts, :foreign_key => "uploader_id"
+  has_many :posts, foreign_key: "uploader_id"
   has_many :post_appeals, foreign_key: :creator_id
-  has_many :post_approvals, :dependent => :destroy
-  has_many :post_disapprovals, :dependent => :destroy
+  has_many :post_approvals, dependent: :destroy
+  has_many :post_disapprovals, dependent: :destroy
   has_many :post_events, class_name: "PostEvent", foreign_key: :creator_id
   has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
   has_many :post_versions, foreign_key: :updater_id
   has_many :post_reactions, -> { post }, class_name: "Reaction", foreign_key: :creator_id
-  has_many :bans, -> {order("bans.id desc")}
+  has_many :bans, -> { order("bans.id desc") }
   has_many :received_upgrades, class_name: "UserUpgrade", foreign_key: :recipient_id, dependent: :destroy
   has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
   has_many :user_events, dependent: :destroy
   has_one :active_ban, -> { active }, class_name: "Ban"
   has_one :email_address, dependent: :destroy
   has_many :api_keys, dependent: :destroy
-  has_many :note_versions, :foreign_key => "updater_id"
-  has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
+  has_many :note_versions, foreign_key: "updater_id"
+  has_many :dmails, -> { order("dmails.id desc") }, foreign_key: "owner_id"
   has_many :saved_searches
-  has_many :forum_topics, :foreign_key => "creator_id"
-  has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
-  has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}
-  has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
+  has_many :forum_topics, foreign_key: "creator_id"
+  has_many :forum_posts, -> { order("forum_posts.created_at, forum_posts.id") }, foreign_key: "creator_id"
+  has_many :user_name_change_requests, -> { order("user_name_change_requests.created_at desc") }
+  has_many :favorite_groups, -> { order(name: :asc) }, foreign_key: :creator_id
   has_many :favorites
   has_many :ip_bans, foreign_key: :creator_id
   has_many :tag_aliases, foreign_key: :creator_id

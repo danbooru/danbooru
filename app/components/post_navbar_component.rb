@@ -18,7 +18,7 @@ class PostNavbarComponent < ApplicationComponent
 
   def pools
     @pools ||= post.pools.undeleted.sort_by do |pool|
-      [pool == selected_pool ? 0 : 1, pool.is_series? ? 0 : 1, pool.name]
+      [(pool == selected_pool) ? 0 : 1, pool.is_series? ? 0 : 1, pool.name]
     end
   end
 
@@ -28,7 +28,7 @@ class PostNavbarComponent < ApplicationComponent
     favgroups = FavoriteGroup.visible(current_user).for_post(post.id)
     favgroups = favgroups.where(creator: current_user).or(favgroups.where(id: selected_favgroup))
     favgroups.sort_by do |favgroup|
-      [favgroup == selected_favgroup ? 0 : 1, favgroup.name]
+      [(favgroup == selected_favgroup) ? 0 : 1, favgroup.name]
     end
   end
 

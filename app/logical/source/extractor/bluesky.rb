@@ -117,12 +117,12 @@ class Source::Extractor::Bluesky < Source::Extractor
     text = artist_commentary_desc.dup.force_encoding("ASCII-8BIT")
 
     api_response&.dig("thread", "post", "record", "facets").to_a.reverse.each do |facet|
-      if (tag = facet["features"].to_a.find {|f| f["$type"] == "app.bsky.richtext.facet#tag"}).present?
+      if (tag = facet["features"].to_a.find { |f| f["$type"] == "app.bsky.richtext.facet#tag" }).present?
         tag_name = tag["tag"]
         byte_start = facet.dig("index", "byteStart")
         byte_end = facet.dig("index", "byteEnd")
         text[byte_start...byte_end] = %{<a href="https://bsky.app/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(tag_name))}">##{CGI.escapeHTML(tag_name)}</a>}.force_encoding("ASCII-8BIT")
-      elsif (mention = facet["features"].to_a.find {|f| f["$type"] == "app.bsky.richtext.facet#mention"}).present?
+      elsif (mention = facet["features"].to_a.find { |f| f["$type"] == "app.bsky.richtext.facet#mention" }).present?
         did = mention["did"]
         byte_start = facet.dig("index", "byteStart")
         byte_end = facet.dig("index", "byteEnd")

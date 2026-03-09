@@ -3,7 +3,7 @@
 class ModAction < ApplicationRecord
   dtext_attribute :description, inline: true # defines :dtext_description
 
-  belongs_to :creator, :class_name => "User"
+  belongs_to :creator, class_name: "User"
   belongs_to :subject, polymorphic: true, optional: true
 
   # ####DIVISIONS#####

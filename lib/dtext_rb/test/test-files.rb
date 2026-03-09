@@ -48,7 +48,7 @@ def test_file(filename, field = "body", dtext_field: "#{field}_dtext", **options
       print "." if (i % 10000).zero?
       json = JSON.parse(line)
       success = assert_equal(json["dtext"], DText.parse(json["text"], domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us], emoji_list: $emoji_list, **options), dtext: json["text"], model: model, id: json["id"])
-      failures += !success ? 1 : 0
+      failures += (!success) ? 1 : 0
     end
   end
 

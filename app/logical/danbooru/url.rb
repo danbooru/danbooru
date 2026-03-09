@@ -58,7 +58,7 @@ module Danbooru
       @url.path = @url.path.gsub(/[^[:graph:]]/) { |c| "%%%02X" % c.ord }
       @url.path = nil if @url.path == "/"
 
-      raise Error, "#{original_url} is not a #{schemes.map { "#{_1}://" }.to_sentence(two_words_connector: " or ", last_word_connector: ", or ")} URL" if !@url.normalized_scheme.in?(schemes)
+      raise Error, "#{original_url} is not a #{schemes.map { "#{it}://" }.to_sentence(two_words_connector: " or ", last_word_connector: ", or ")} URL" if !@url.normalized_scheme.in?(schemes)
       raise Error, "#{host} is not a valid hostname" if parsed_domain.nil? && ip_address.nil? && @url.normalized_scheme.in?(%w[http https])
     rescue Addressable::URI::InvalidURIError => e
       raise Error, e

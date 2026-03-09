@@ -58,7 +58,7 @@ class PostQuery
         @args = args
       else
         @args = args.deep_dup
-        @args.each { _1.parent = self }
+        @args.each { it.parent = self }
       end
     end
 
@@ -179,18 +179,18 @@ class PostQuery
 
           # DeMorgan's law: -(A and B) = -A or -B
           in [:not, [:and, *children]]
-            node(:or, *children.map { node(:not, _1) })
+            node(:or, *children.map { node(:not, it) })
 
           # DeMorgan's law: -(A or B) = -A and -B
           in [:not, [:or, *children]]
-            node(:and, *children.map { node(:not, _1) })
+            node(:and, *children.map { node(:not, it) })
 
           # Distributive law: A or (B and C) = (A or B) and (A or C)
           # (or A (and B C ...) ... = (and (or A B ...) (or A C ...) ...
           in [:or, *children] if children.any?(&:and?)
             ands, non_ands = children.partition(&:and?)
             first_and, rest = ands.first, ands[1..] + non_ands
-            node(:and, *first_and.children.map { node(:or, _1, *rest) })
+            node(:and, *first_and.children.map { node(:or, it, *rest) })
 
           else
             ast
@@ -213,11 +213,11 @@ class PostQuery
 
           # Associative law: (and (and A B) C) = (and A B C)
           in :and, *children
-            node(:and, *children.flat_map { _1.and? ? _1.children : _1 })
+            node(:and, *children.flat_map { it.and? ? it.children : it })
 
           # Associative law: (or (or A B) C) = (or A B C)
           in :or, *children
-            node(:or, *children.flat_map { _1.or? ? _1.children : _1 })
+            node(:or, *children.flat_map { it.or? ? it.children : it })
 
           else
             ast
@@ -280,9 +280,9 @@ class PostQuery
         in :opt, child
           child.term? ? "~#{child.to_infix}" : "~(#{child.to_infix})"
         in :and, *children
-          children.map { _1.children.many? ? "(#{_1.to_infix})" : _1.to_infix }.join(" ")
+          children.map { it.children.many? ? "(#{it.to_infix})" : it.to_infix }.join(" ")
         in :or, *children
-          children.map { _1.children.many? ? "(#{_1.to_infix})" : _1.to_infix }.join(" or ")
+          children.map { it.children.many? ? "(#{it.to_infix})" : it.to_infix }.join(" or ")
         end
       end
 
@@ -304,9 +304,9 @@ class PostQuery
         in :opt, child
           child.term? ? "~#{child.to_pretty_string}" : "~(#{child.to_pretty_string})"
         in :and, *children
-          children.map { _1.children.many? ? "(#{_1.to_pretty_string})" : _1.to_pretty_string }.to_sentence
+          children.map { it.children.many? ? "(#{it.to_pretty_string})" : it.to_pretty_string }.to_sentence
         in :or, *children
-          children.map { _1.children.many? ? "(#{_1.to_pretty_string})" : _1.to_pretty_string }.to_sentence(two_words_connector: " or ", last_word_connector: ", or ")
+          children.map { it.children.many? ? "(#{it.to_pretty_string})" : it.to_pretty_string }.to_sentence(two_words_connector: " or ", last_word_connector: ", or ")
         end
       end
 
@@ -326,7 +326,7 @@ class PostQuery
       def visit(&block)
         return enum_for(:visit) unless block_given?
 
-        results = children.map { _1.visit(&block) }
+        results = children.map { it.visit(&block) }
         yield self, *results
       end
 
@@ -342,7 +342,7 @@ class PostQuery
         ast = yield self
 
         if ast.children.any?
-          node(ast.type, *ast.children.map { _1.rewrite(&block) } )
+          node(ast.type, *ast.children.map { it.rewrite(&block) } )
         else
           ast
         end

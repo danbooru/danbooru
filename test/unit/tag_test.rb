@@ -23,7 +23,7 @@ class TagTest < ActiveSupport::TestCase
 
   context "A tag category mapping" do
     should "exist" do
-      assert_nothing_raised {Tag.categories}
+      assert_nothing_raised { Tag.categories }
     end
 
     should "have convenience methods for the four main categories" do

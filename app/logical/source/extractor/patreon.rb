@@ -43,7 +43,7 @@ class Source::Extractor::Patreon < Source::Extractor
   end
 
   def tags
-    api_response["included"].to_a.select { _1["type"] == "post_tag" }.pluck("attributes").pluck("value").map do |tag|
+    api_response["included"].to_a.select { it["type"] == "post_tag" }.pluck("attributes").pluck("value").map do |tag|
       [tag, "#{profile_url}/posts?filters[tag]=#{Danbooru::URL.escape(tag)}"]
     end
   end

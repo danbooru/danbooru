@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-#
+
 # This file contains all the configuration settings for Danbooru.
 #
 # Don't edit this file. Instead, to configure your Danbooru instance, copy this
@@ -252,17 +252,17 @@ module Danbooru
 
     # Maximum resolution (width * height) of an upload. Default: 441 megapixels (21000x21000 pixels).
     def max_image_resolution
-      21000 * 21000
+      21_000 * 21_000
     end
 
     # Maximum width of an upload.
     def max_image_width
-      40000
+      40_000
     end
 
     # Maximum height of an upload.
     def max_image_height
-      40000
+      40_000
     end
 
     # Maximum duration of an video in seconds.

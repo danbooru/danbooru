@@ -29,7 +29,7 @@ class Ban < ApplicationRecord
   after_save :update_user_on_save, if: :saved_change_to_duration?
 
   belongs_to :user
-  belongs_to :banner, :class_name => "User"
+  belongs_to :banner, class_name: "User"
 
   normalizes :reason, with: ->(reason) { reason.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
 

@@ -476,7 +476,7 @@ class ApplicationMetrics
 
     if puma_running?
       resp = Danbooru::Http.internal.timeout(1).get("http://localhost:9293/stats")
-      puma_stats = resp.code == 200 ? resp.parse.with_indifferent_access : {}
+      puma_stats = (resp.code == 200) ? resp.parse.with_indifferent_access : {}
 
       metrics.set({
         puma_started_at: Time.zone.parse(puma_stats[:started_at].to_s).to_i,

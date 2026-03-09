@@ -41,25 +41,25 @@ module Source
       end
 
       def page_url
-        channel = api_response.dig("boardSlug") || parsed_url.channel || parsed_referer&.channel || "breaking"
-        post_id = api_response.dig("id") || parsed_url.post_id || parsed_referer&.post_id
+        channel = api_response["boardSlug"] || parsed_url.channel || parsed_referer&.channel || "breaking"
+        post_id = api_response["id"] || parsed_url.post_id || parsed_referer&.post_id
         "https://arca.live/b/#{channel}/#{post_id}" if channel.present? && post_id.present?
       end
 
       def username
-        api_response.dig("nickname")
+        api_response["nickname"]
       end
 
       def artist_id
-        api_response.dig("publicId")
+        api_response["publicId"]
       end
 
       def artist_commentary_title
-        api_response.dig("title")
+        api_response["title"]
       end
 
       def artist_commentary_desc
-        api_response.dig("content")
+        api_response["content"]
       end
 
       def dtext_artist_commentary_desc

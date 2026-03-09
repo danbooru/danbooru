@@ -87,7 +87,7 @@ module Source::Tests::Extractor
     end
 
     context "Broken shorteners" do
-      setup { skip "t.ly and shorturl.at are broken (requires Cloudflare bypass)"}
+      setup { skip "t.ly and shorturl.at are broken (requires Cloudflare bypass)" }
       assert_redirects_to("http://t.ly/x8f4j", "https://docs.google.com/document/d/166zHw2WwtJufey71cDjfhL_1Vvga9AWbL4BtHMcJu9I/edit")
       assert_redirects_to("http://shorturl.at/uMS23", "https://drive.google.com/drive/folders/1NL1iwZb8o52ieGt-Tkt8AAZu79rqmekj?usp=sharing")
     end

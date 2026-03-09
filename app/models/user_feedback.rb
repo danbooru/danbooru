@@ -61,7 +61,7 @@ class UserFeedback < ApplicationRecord
       body += "\n\n---\n\nA negative feedback is a record on your account that you've engaged in negative or rule-breaking behavior. You can appeal this feedback if you think it's unfair by petitioning the mods and admins in the forum. Negative feedback generally doesn't affect your usability of the site, but serious or repeated infractions may lead to a ban."
     end
 
-    Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
+    Dmail.create_automated(to_id: user_id, title: "Your user record has been updated", body: body)
   end
 
   def create_mod_action

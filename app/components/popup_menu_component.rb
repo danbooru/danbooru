@@ -14,6 +14,7 @@ class PopupMenuComponent < ApplicationComponent
   # @param button_classes [String] A list of CSS classes for the button element.
   # @param button_html [Hash] Options for the button element.
   def initialize(hide_on_click: true, classes: nil, button_classes: "default-popup-menu-button", button_html: {})
+    super
     @hide_on_click = hide_on_click
     @classes = classes
     @button_classes = button_classes

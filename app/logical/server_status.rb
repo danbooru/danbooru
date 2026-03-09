@@ -59,7 +59,7 @@ class ServerStatus
       redis: {
         up: redis_up?,
         info: redis_info,
-      }
+      },
     }
   end
 
@@ -191,7 +191,7 @@ class ServerStatus
     def ffmpeg_version
       version = `ffmpeg -version`
       version[/ffmpeg version ([0-9.]+)/, 1]
-    rescue
+    rescue StandardError
       nil
     end
 
@@ -201,7 +201,7 @@ class ServerStatus
 
     def mkvmerge_version
       `mkvmerge --version`.chomp
-    rescue
+    rescue StandardError
       nil
     end
 
@@ -211,7 +211,7 @@ class ServerStatus
 
     def exiftool_version
       `exiftool -ver`.chomp
-    rescue
+    rescue StandardError
       nil
     end
 

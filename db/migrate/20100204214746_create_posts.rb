@@ -8,7 +8,7 @@ class CreatePosts < ActiveRecord::Migration[4.2]
       t.column :score, :integer, :null => false, :default => 0
       t.column :source, :string
       t.column :md5, :string, :null => false
-      t.column :rating, :character, :null => false, :default => 'q'
+      t.column :rating, :character, :null => false, :default => "q"
 
       # Statuses
       t.column :is_note_locked, :boolean, :null => false, :default => false

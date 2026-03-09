@@ -5,7 +5,7 @@ class ArtistURL < ApplicationRecord
 
   validates :url, presence: true, length: { maximum: 300, message: "'%{value}' is too long (maximum is 300 characters)" }, uniqueness: { scope: :artist_id }
   validate :validate_url_format
-  belongs_to :artist, :touch => true
+  belongs_to :artist, touch: true
 
   scope :active, -> { where(is_active: true) }
 

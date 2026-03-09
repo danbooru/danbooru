@@ -5,6 +5,7 @@
 # @see https://en.wikipedia.org/wiki/List_of_file_signatures
 class FileTypeDetector
   extend Memoist
+
   attr_reader :file
 
   # @param [File] The file to detect.

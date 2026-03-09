@@ -27,7 +27,7 @@ module Archive
     class << self
       module Extension
         def archive_write_set_format(archive, format)
-          super archive, format
+          super
 
           if format == FORMAT_ZIP
             archive_write_set_option archive, "zip", "compression", "store"
@@ -48,7 +48,7 @@ module Danbooru
     # @see https://www.freebsd.org/cgi/man.cgi?query=archive_write_disk&sektion=3&format=html
     DEFAULT_FLAGS =
       ::Archive::EXTRACT_NO_OVERWRITE |
-      #::Archive::EXTRACT_SECURE_NOABSOLUTEPATHS |
+      # ::Archive::EXTRACT_SECURE_NOABSOLUTEPATHS |
       ::Archive::EXTRACT_SECURE_SYMLINKS |
       ::Archive::EXTRACT_SECURE_NODOTDOT
 
@@ -75,9 +75,9 @@ module Danbooru
       else
         archive
       end
-    rescue => error
+    rescue StandardError => e
       archive&.close
-      raise Error, error
+      raise Error, e
     end
 
     # Open an archive, or return nil if the archive can't be opened. See `#open!` for details.
@@ -193,7 +193,7 @@ module Danbooru
             e.perm = 0644
             archive.write_header e
             File.open(pn) do |f|
-              until f.eof? do
+              until f.eof?
                 chunk = f.read ::Archive::C::DATA_BUFFER_SIZE
                 archive.write_data chunk
               end
@@ -230,7 +230,7 @@ module Danbooru
     end
 
     # Print the archive contents in `ls -l` format.
-    def ls(io = STDOUT)
+    def ls(io = $stdout)
       io.puts(entries.map(&:ls).join("\n"))
     end
   end
@@ -238,6 +238,7 @@ module Danbooru
   # An entry represents a single file in an archive.
   class Entry
     attr_reader :archive, :entry
+
     delegate :directory?, :file?, :close, :pathname, :pathname=, :size, :strmode, :uid, :gid, :mtime, to: :entry
 
     # @param entry [::Archive] The archive the entry belongs to.
@@ -282,15 +283,15 @@ module Danbooru
 
     # @return [String] The archive entry format ("RAR", "ZIP", etc).
     def format
-      ::Archive::C::archive_format_name(archive_ffi_ptr)
+      ::Archive::C.archive_format_name(archive_ffi_ptr)
     end
 
     # @return [Array<String>] The list of filters for the entry.
     def filters
-      count = ::Archive::C::archive_filter_count(archive_ffi_ptr)
+      count = ::Archive::C.archive_filter_count(archive_ffi_ptr)
 
       count.times.map do |n|
-        ::Archive::C::archive_filter_name(archive_ffi_ptr, n)
+        ::Archive::C.archive_filter_name(archive_ffi_ptr, n)
       end
     end
 

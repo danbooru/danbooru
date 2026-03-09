@@ -110,7 +110,7 @@ class Source::Extractor::Youtube < Source::Extractor
   memoize def community_post
     community_post_json.dig(
       "contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer",
-      "contents", 0, "itemSectionRenderer", "contents", 0, "backstagePostThreadRenderer", "post", "backstagePostRenderer"
+      "contents", 0, "itemSectionRenderer", "contents", 0, "backstagePostThreadRenderer", "post", "backstagePostRenderer",
     ) || {}
   end
 end

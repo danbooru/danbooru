@@ -6,6 +6,7 @@ class TimeSeriesComponent < ApplicationComponent
   attr_reader :dataframe, :x_axis, :y_axis, :mode
 
   def initialize(dataframe, x_axis:, mode: :table)
+    super
     @dataframe = dataframe
     @x_axis = x_axis
     @y_axis = columns.without(x_axis)
@@ -41,21 +42,21 @@ class TimeSeriesComponent < ApplicationComponent
         axisPointer: {
           type: "cross",
           label: {
-            backgroundColor: "#6a7985"
-          }
-        }
+            backgroundColor: "#6a7985",
+          },
+        },
       },
       toolbox: {
         feature: {
           dataView: {},
           restore: {},
-          saveAsImage: {}
-        }
+          saveAsImage: {},
+        },
       },
       grid: {
         left: "1%",
         right: "1%",
-        containLabel: true
+        containLabel: true,
       },
       legend: {
         data: y_axis,
@@ -72,16 +73,16 @@ class TimeSeriesComponent < ApplicationComponent
       toolbox: {
         feature: {
           dataZoom: {
-            yAxisIndex: "none"
+            yAxisIndex: "none",
           },
           magicType: {
             type: ["line", "bar"],
           },
-        }
+        },
       },
       dataZoom: [
         { type: "inside" },
-        { type: "slider" }
+        { type: "slider" },
       ],
       xAxis: { type: "time" },
       yAxis: [type: "value"] * y_axis.size,
@@ -92,12 +93,12 @@ class TimeSeriesComponent < ApplicationComponent
           areaStyle: {},
           stack: "all",
           emphasis: {
-            focus: "series"
+            focus: "series",
           },
           encode: {
             x: x_axis,
-            y: name
-          }
+            y: name,
+          },
         }
       end
     )
@@ -112,12 +113,12 @@ class TimeSeriesComponent < ApplicationComponent
           name: name,
           type: "bar",
           emphasis: {
-            focus: "series"
+            focus: "series",
           },
           encode: {
             x: name,
             y: x_axis,
-          }
+          },
         }
       end
     )

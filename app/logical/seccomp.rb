@@ -221,6 +221,7 @@ module Seccomp
   # https://github.com/seccomp/libseccomp
   module LibSeccomp
     extend FFI::Library
+
     ffi_lib "libseccomp"
 
     # https://github.com/seccomp/libseccomp/blob/main/include/seccomp.h.in#L121

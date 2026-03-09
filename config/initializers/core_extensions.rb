@@ -23,18 +23,16 @@ module Danbooru
       end
 
       def to_escaped_for_sql_like
-        string = self.gsub(/%|_|\*|\\\*|\\\\|\\/) do |str|
+        gsub(/%|_|\*|\\\*|\\\\|\\/) do |str|
           case str
-          when '%'    then '\%'
-          when '_'    then '\_'
-          when '*'    then '%'
-          when '\*'   then '*'
-          when '\\\\' then '\\\\'
-          when '\\'   then '\\\\'
+          when "%"    then '\%'
+          when "_"    then '\_'
+          when "*"    then "%"
+          when '\*'   then "*"
+          when "\\\\" then "\\\\"
+          when "\\"   then "\\\\"
           end
         end
-
-        string
       end
 
       # escape \ and * characters so that they're treated literally in LIKE searches.
@@ -43,7 +41,7 @@ module Danbooru
       end
 
       def to_escaped_for_tsquery_split
-        scan(/\S+/).map {|x| x.to_escaped_for_tsquery}.join(" & ")
+        scan(/\S+/).map(&:to_escaped_for_tsquery).join(" & ")
       end
 
       def to_escaped_for_tsquery
@@ -51,11 +49,11 @@ module Danbooru
       end
 
       def truthy?
-        self.match?(/\A(true|t|yes|y|on|1)\z/i)
+        match?(/\A(true|t|yes|y|on|1)\z/i)
       end
 
       def falsy?
-        self.match?(/\A(false|f|no|n|off|0)\z/i)
+        match?(/\A(false|f|no|n|off|0)\z/i)
       end
 
       # Do a case-insensitive wildcard match against `pattern`. The `*` character is treated as a wildcard, `\*` is

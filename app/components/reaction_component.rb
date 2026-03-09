@@ -6,6 +6,7 @@ class ReactionComponent < ApplicationComponent
   MAX_REACTIONS = 10
 
   attr_reader :model, :current_user
+
   delegate :add_reaction_icon, to: :helpers
 
   def initialize(model:, current_user:)

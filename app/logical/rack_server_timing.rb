@@ -28,7 +28,7 @@ class RackServerTiming
       # X-Request-Start: 1707872257.625, 1707872257.658
       # => request.queue_time_0: 33.0
       # => request.queue_time_1: 9.0
-      start_times = env["HTTP_X_REQUEST_START"].split(/, /).map(&:to_f)
+      start_times = env["HTTP_X_REQUEST_START"].split(", ").map(&:to_f)
       queue_times = start_times.reverse.map do |start_time|
         queue_time = current_time - start_time
         current_time = start_time

@@ -22,7 +22,7 @@ class WikiPage < ApplicationRecord
   validate :validate_rename
   validate :validate_other_names, if: :other_names_changed?
 
-  has_one :tag, :foreign_key => "name", :primary_key => "title"
+  has_one :tag, foreign_key: "name", primary_key: "title"
   has_one :artist, -> { active }, foreign_key: "name", primary_key: "title"
   has_many :versions, -> { order("wiki_page_versions.id ASC") }, class_name: "WikiPageVersion", dependent: :destroy
 

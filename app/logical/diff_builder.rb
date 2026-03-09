@@ -31,9 +31,9 @@ class DiffBuilder
         next
       end
 
-      newchange = hunk.max {|a, b| a.old_position <=> b.old_position}
+      newchange = hunk.max { |a, b| a.old_position <=> b.old_position }
       newstart = newchange.old_position
-      oldstart = hunk.min {|a, b| a.old_position <=> b.old_position}.old_position
+      oldstart = hunk.min { |a, b| a.old_position <=> b.old_position }.old_position
 
       if newchange.action == "+"
         output.insert(newstart, "</ins>")

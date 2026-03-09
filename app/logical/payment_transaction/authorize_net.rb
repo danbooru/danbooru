@@ -34,7 +34,9 @@ class PaymentTransaction::AuthorizeNet < PaymentTransaction
           showBankAccount: false,
         },
         customer: {
-          showEmail: true, requiredEmail: true, addPaymentProfile: false
+          showEmail: true,
+          requiredEmail: true,
+          addPaymentProfile: false,
         },
         billing_address: {
           show: true,
@@ -52,7 +54,7 @@ class PaymentTransaction::AuthorizeNet < PaymentTransaction
           cancelUrlText: "Cancel",
           showReceipt: true,
         },
-      }
+      },
     )
 
     [api_client.payment_page_url, response[:token]]
@@ -79,7 +81,7 @@ class PaymentTransaction::AuthorizeNet < PaymentTransaction
         payload = request.body.read
         actual_signature = request.headers["X-Anet-Signature"].to_s
         calculated_signature = "sha512=" + OpenSSL::HMAC.digest("sha512", Danbooru.config.authorize_net_signature_key, payload).unpack1("H*").upcase
-        raise InvalidWebhookError unless ActiveSupport::SecurityUtils::secure_compare(actual_signature, calculated_signature)
+        raise InvalidWebhookError unless ActiveSupport::SecurityUtils.secure_compare(actual_signature, calculated_signature)
 
         request
       end

@@ -6,7 +6,7 @@ class Note < ApplicationRecord
   attr_accessor :html_id
 
   belongs_to :post
-  has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
+  has_many :versions, -> { order("note_versions.id ASC") }, class_name: "NoteVersion", dependent: :destroy
   validates :x, presence: true
   validates :y, presence: true
   validates :width, presence: true
@@ -64,7 +64,7 @@ class Note < ApplicationRecord
     if merge_version?(updater.id)
       merge_version
     else
-      Note.where(:id => id).update_all("version = coalesce(version, 0) + 1")
+      Note.where(id: id).update_all("version = coalesce(version, 0) + 1")
       reload
       create_new_version(updater.id)
     end

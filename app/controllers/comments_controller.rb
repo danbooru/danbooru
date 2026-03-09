@@ -82,7 +82,7 @@ class CommentsController < ApplicationController
   def index_for_post
     @post = Post.find(params[:post_id])
     @comments = authorize @post.comments
-    render :action => "index_for_post"
+    render action: "index_for_post"
   end
 
   def index_by_post

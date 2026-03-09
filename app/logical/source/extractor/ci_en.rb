@@ -76,7 +76,7 @@ class Source::Extractor::CiEn < Source::Extractor
     # Same cookie works for both all-ages and R18 sites
     super.cookies(
       ci_en_session: credentials[:session_cookie],
-      accepted_rating: "r18g"
+      accepted_rating: "r18g",
     )
   end
 end

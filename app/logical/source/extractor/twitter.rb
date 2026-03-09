@@ -156,7 +156,7 @@ class Source::Extractor
         withCommunity: true,
         withQuickPromoteEligibilityTweetFields: true,
         withBirdwatchNotes: true,
-        withVoice: true
+        withVoice: true,
       }
 
       features = {

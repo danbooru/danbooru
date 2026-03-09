@@ -44,7 +44,7 @@ class DeviantArtApiClient
       mature_content: mature_content,
       ext_submission: ext_submission,
       ext_camera: ext_camera,
-      ext_stats: ext_stats
+      ext_stats: ext_stats,
     }
 
     request("deviation/metadata", **params)

@@ -96,9 +96,9 @@ module Danbooru
     # app/jobs/mail_delivery_job.rb
     config.action_mailer.delivery_job = "MailDeliveryJob"
 
-    logger           = ActiveSupport::Logger.new(STDERR)
+    logger           = ActiveSupport::Logger.new($stderr)
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
-    config.log_tags  = [->(req) {"PID:#{Process.pid}"}]
+    config.log_tags  = [->(_req) { "PID:#{Process.pid}" }]
     config.log_level = Danbooru.config.log_level
 
     config.action_controller.action_on_unpermitted_parameters = :raise

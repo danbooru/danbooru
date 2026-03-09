@@ -50,7 +50,7 @@ class Source::Extractor::Note < Source::Extractor
     case api_response["type"]
     when "ImageNote"
       # If there are multiple pictures and at least one has a caption, then include the images with the captions.
-      if api_response["pictures"]&.many? && api_response["pictures"].any? { _1["caption"].present? }
+      if api_response["pictures"]&.many? && api_response["pictures"].any? { it["caption"].present? }
         api_response["pictures"].to_a.map do |picture|
           <<~EOS.chomp
             "[image]":[#{picture["url"]}]

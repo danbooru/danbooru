@@ -24,7 +24,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
   context "The posts controller" do
     setup do
-      @user = travel_to(1.month.ago) {create(:user)}
+      @user = travel_to(1.month.ago) { create(:user) }
       @post = as(@user) { create(:post, tag_string: "aaaa") }
       Danbooru.config.stubs(:canonical_url).returns("http://www.example.com")
     end

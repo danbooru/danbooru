@@ -21,7 +21,7 @@ class PaymentTransaction::Shopify < PaymentTransaction
         payload = request.body.read
         actual_signature = request.headers["X-Shopify-Hmac-Sha256"].to_s
         calculated_signature = Base64.strict_encode64(OpenSSL::HMAC.digest("sha256", Danbooru.config.shopify_webhook_secret, payload))
-        raise InvalidWebhookError unless ActiveSupport::SecurityUtils::secure_compare(actual_signature, calculated_signature)
+        raise InvalidWebhookError unless ActiveSupport::SecurityUtils.secure_compare(actual_signature, calculated_signature)
 
         request
       end

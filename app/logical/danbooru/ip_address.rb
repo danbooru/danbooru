@@ -75,7 +75,7 @@ module Danbooru
 
     # "1.2.3.4/24" if the address is a subnet, "1.2.3.4" otherwise.
     def to_s
-      ip_address.size > 1 ? "#{network}/#{prefix}" : ip_address.to_s
+      (ip_address.size > 1) ? "#{network}/#{prefix}" : ip_address.to_s
     end
 
     def inspect

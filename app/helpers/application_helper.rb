@@ -12,7 +12,7 @@ module ApplicationHelper
   ]
 
   def listing_type(*fields, member_check: true, types: [:revert, :standard])
-    (fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?) ? types[0] : types[1])
+    ((fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?)) ? types[0] : types[1])
   end
 
   def diff_list_html(this_list, other_list, ul_class: ["diff-list"], li_class: [], show_unchanged: true)
@@ -38,7 +38,7 @@ module ApplicationHelper
     other = record.send(type)
 
     if other.blank?
-      return type == "previous" ? "New" : ""
+      return (type == "previous") ? "New" : ""
     end
 
     changed_fields = record.class.status_fields.select do |field, _status|
@@ -304,7 +304,7 @@ module ApplicationHelper
 
   def format_errors(errors)
     messages = errors.full_messages
-    messages = messages.map {|e| "* #{e}"} if messages.count > 1
+    messages = messages.map { |e| "* #{e}" } if messages.count > 1
     messages.join("\n")
   end
 
@@ -339,7 +339,7 @@ module ApplicationHelper
         **data_attributes_for(current_user, "current-user", USER_DATA_ATTRIBUTES),
         **data_attributes_for(cookies, "cookie", COOKIE_DATA_ATTRIBUTES),
         **extra_attributes,
-      }
+      },
     }
   end
 
@@ -356,7 +356,7 @@ module ApplicationHelper
   def data_attributes_for(record, prefix = "data", attributes = record.html_data_attributes)
     attributes.to_h do |attr|
       if attr.is_a?(Array)
-        name = attr.map {|sym| sym.to_s.dasherize.delete("?")}.join('-')
+        name = attr.map { |sym| sym.to_s.dasherize.delete("?") }.join("-")
         value = record
         attr.each do |sym|
           value = value.send(sym)

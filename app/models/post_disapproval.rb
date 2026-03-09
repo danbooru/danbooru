@@ -15,9 +15,9 @@ class PostDisapproval < ApplicationRecord
 
   scope :with_message, -> { where.not(message: nil) }
   scope :without_message, -> { where(message: nil) }
-  scope :breaks_rules, -> {where(:reason => "breaks_rules")}
-  scope :poor_quality, -> {where(:reason => "poor_quality")}
-  scope :disinterest, -> {where(:reason => "disinterest")}
+  scope :breaks_rules, -> { where(reason: "breaks_rules") }
+  scope :poor_quality, -> { where(reason: "poor_quality") }
+  scope :disinterest, -> { where(reason: "disinterest") }
 
   def self.prune!
     PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago).delete_all

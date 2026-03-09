@@ -86,7 +86,7 @@ class DiscordSlashCommand
         type: type,
         data: {
           content: content,
-          **options
+          **options,
         },
       }
     end

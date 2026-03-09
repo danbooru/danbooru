@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
   after_action :reset_current_user
   layout "default"
 
-  rescue_from Exception, :with => :rescue_exception
+  rescue_from Exception, with: :rescue_exception
 
   def self.rescue_with(*klasses, status: 500)
     rescue_from(*klasses) do |exception|

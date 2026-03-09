@@ -21,7 +21,7 @@ class Source::Extractor
 
     def tags
       tags = html_response&.css(".tags").to_a.map!(&:text).compact.uniq
-      tags.map {|tag| [tag, "https://www.furaffinity.net/search/@keywords #{tag}"] }
+      tags.map { |tag| [tag, "https://www.furaffinity.net/search/@keywords #{tag}"] }
     end
 
     def display_name

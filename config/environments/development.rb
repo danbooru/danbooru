@@ -24,7 +24,7 @@ Rails.application.configure do
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
-      "Cache-Control" => "public, max-age=#{2.days.to_i}"
+      "Cache-Control": "public, max-age=#{2.days.to_i}",
     }
   else
     config.action_controller.perform_caching = false
@@ -73,7 +73,7 @@ Rails.application.configure do
   BetterErrors::Middleware.allow_ip!(IPAddr.new("::/0"))
 
   # Log SQL queries at INFO level instead of DEBUG level.
-  config.active_record.logger = Logger.new(STDERR)
+  config.active_record.logger = Logger.new($stderr)
   def (config.active_record.logger).add(_level, message = nil, prog = nil)
     Rails.logger.add(Logger::Severity::INFO, message, prog)
   end

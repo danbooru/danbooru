@@ -18,7 +18,7 @@ class TagChangeNoticeComponent < ApplicationComponent
 
   def bur_links_for_topic(forum_topic:, burs:)
     if burs.length > 1
-      "topic ##{forum_topic.id}: \"#{forum_topic.title}\" (#{burs.map { |bur| link_to "forum ##{bur.forum_post.id}", bur.forum_post}.to_sentence})"
+      "topic ##{forum_topic.id}: \"#{forum_topic.title}\" (#{burs.map { |bur| link_to "forum ##{bur.forum_post.id}", bur.forum_post }.to_sentence})"
     else
       link_to "topic ##{forum_topic.id}: \"#{forum_topic.title}\"", burs.first.forum_post
     end

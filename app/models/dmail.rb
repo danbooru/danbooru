@@ -9,9 +9,9 @@ class Dmail < ApplicationRecord
   validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
   validates :body, visible_string: true, length: { maximum: 50_000 }, if: :body_changed?
 
-  belongs_to :owner, :class_name => "User"
-  belongs_to :to, :class_name => "User"
-  belongs_to :from, :class_name => "User"
+  belongs_to :owner, class_name: "User"
+  belongs_to :to, class_name: "User"
+  belongs_to :from, class_name: "User"
   has_many :moderation_reports, as: :model, dependent: :destroy
 
   before_create :autoreport_spam

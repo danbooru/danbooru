@@ -151,7 +151,7 @@ class MediaFile::Ugoira < MediaFile
       "Ugoira:FrameCount" => frame_delays.size,
       "Ugoira:FrameRate" => frame_rate,
       "Ugoira:FrameMimeType" => frame_mime_type.to_s,
-      "Ugoira:AnimationJsonFormat" => animation_json_format
+      "Ugoira:AnimationJsonFormat" => animation_json_format,
     )
   end
 

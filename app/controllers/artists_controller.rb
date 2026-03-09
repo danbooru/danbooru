@@ -31,13 +31,13 @@ class ArtistsController < ApplicationController
   def ban
     @artist = authorize Artist.find(params[:id])
     @artist.ban!(CurrentUser.user)
-    redirect_to(artist_path(@artist), :notice => "Artist was banned")
+    redirect_to(artist_path(@artist), notice: "Artist was banned")
   end
 
   def unban
     @artist = authorize Artist.find(params[:id])
     @artist.unban!(CurrentUser.user)
-    redirect_to(artist_path(@artist), :notice => "Artist was unbanned")
+    redirect_to(artist_path(@artist), notice: "Artist was unbanned")
   end
 
   def create
@@ -57,7 +57,7 @@ class ArtistsController < ApplicationController
   def destroy
     @artist = authorize Artist.find(params[:id])
     @artist.update(is_deleted: true)
-    redirect_to(artist_path(@artist), :notice => "Artist deleted")
+    redirect_to(artist_path(@artist), notice: "Artist deleted")
   end
 
   def revert

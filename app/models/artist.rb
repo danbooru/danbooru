@@ -27,9 +27,9 @@ class Artist < ApplicationRecord
   after_save :create_version
   after_save :clear_url_string_changed
 
-  has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
+  has_many :members, class_name: "Artist", foreign_key: "group_name", primary_key: "name"
   has_many :urls, dependent: :destroy, class_name: "ArtistURL", autosave: true
-  has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
+  has_many :versions, -> { order("artist_versions.id ASC") }, class_name: "ArtistVersion"
   has_many :mod_actions, as: :subject, dependent: :destroy
   has_one :wiki_page, -> { active }, foreign_key: "title", primary_key: "name"
   has_one :tag_alias, -> { active }, foreign_key: "antecedent_name", primary_key: "name"

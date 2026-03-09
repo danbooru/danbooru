@@ -37,8 +37,8 @@ module Mentionable
     users = users.without(CurrentUser.user)
 
     users.each do |user|
-      body  = self.instance_exec(user.name, &self.class.mentionable_option(:body))
-      title = self.instance_exec(user.name, &self.class.mentionable_option(:title))
+      body  = instance_exec(user.name, &self.class.mentionable_option(:body))
+      title = instance_exec(user.name, &self.class.mentionable_option(:title))
 
       Dmail.create_automated(to: user, title: title, body: body)
     end

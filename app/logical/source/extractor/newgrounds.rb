@@ -84,7 +84,7 @@ module Source
 
       def artist_commentary_desc
         return "" if page.nil?
-        page.dup.css("#author_comments").tap { _1.css("ul.itemlist").remove }.to_html
+        page.dup.css("#author_comments").tap { it.css("ul.itemlist").remove }.to_html
       end
 
       def dtext_artist_commentary_desc

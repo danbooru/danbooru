@@ -2,6 +2,6 @@ FactoryBot.define do
   factory :post_flag do
     creator
     post
-    reason {"xxx"}
+    reason { "xxx" }
   end
 end

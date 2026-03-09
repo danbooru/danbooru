@@ -90,7 +90,7 @@ class MediaFile::Image < MediaFile
   #   isn't animated or is corrupt. Note that libvips and ffmpeg may disagree on the duration.
   def vips_duration
     # XXX Browsers typically raise the frame time to 0.1s if it's less than or equal to 0.01s.
-    image.get("delay").map { |delay| delay <= 10 ? 100 : delay }.sum / 1000.0
+    image.get("delay").map { |delay| (delay <= 10) ? 100 : delay }.sum / 1000.0
   rescue Vips::Error
     nil
   end

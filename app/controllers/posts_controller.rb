@@ -114,7 +114,7 @@ class PostsController < ApplicationController
 
     if @post.errors.any?
       @error_message = @post.errors.full_messages.join("; ")
-      render :json => {:success => false, :reason => @error_message}.to_json, :status => 400
+      render json: { success: false, reason: @error_message }.to_json, status: 400
     else
       head 204
     end
@@ -175,7 +175,7 @@ class PostsController < ApplicationController
       end
 
       format.json do
-        render :json => post.to_json
+        render json: post.to_json
       end
     end
   end
