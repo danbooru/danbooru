@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UploadMediaAsset < ApplicationRecord
+  self.ignored_columns += [:user_id]
+
   extend Memoist
 
   attr_accessor :file
