@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 class UploadMediaAsset < ApplicationRecord
-  self.ignored_columns += [:user_id]
-
   extend Memoist
 
   attr_accessor :file
 
   belongs_to :upload
   belongs_to :media_asset, optional: true
+  belongs_to :user, optional: true, default: -> { upload.uploader }
   has_one :post, through: :media_asset
 
   after_create :async_process_upload!
