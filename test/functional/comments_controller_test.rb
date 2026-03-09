@@ -4,8 +4,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
   context "A comments controller" do
     setup do
       @mod = create(:moderator_user)
-      @user = create(:member_user, name: "cirno")
-      @post = create(:post, id: 100)
+      @user = create(:member_user)
+      @post = create(:post)
     end
 
     context "index action" do
@@ -60,55 +60,55 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         setup do
           @user_comment = create(:comment, created_at: 10.minutes.ago, updated_at: 3.minutes.ago, post: @post, score: 10, do_not_bump_post: true, creator: @user)
           @mod_comment = create(:comment, post: build(:post, tag_string: "touhou"), body: "blah", is_sticky: true, creator: @mod)
-          @deleted_comment = create(:comment, creator: create(:user, name: "deleted"), is_deleted: true, is_sticky: true, do_not_bump_post: true, score: 10, body: "blah")
+          @deleted_comment = create(:comment, creator: create(:user), is_deleted: true, is_sticky: true, do_not_bump_post: true, score: 10, body: "blah")
         end
 
         context "as a regular user" do
-          setup { CurrentUser.user = @user }
+          comments = respond_to_search.as_user { @user }
 
-          should respond_to_search(other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
-          should respond_to_search(body_matches: "blah").with { @mod_comment }
-          should respond_to_search(score: 10).with { @user_comment }
-          should respond_to_search(is_sticky: "true").with { @mod_comment }
-          should respond_to_search(is_deleted: "true").with { @deleted_comment }
-          should respond_to_search(do_not_bump_post: "true").with { @user_comment }
-          should respond_to_search(is_edited: "true").with { @user_comment }
-          should respond_to_search(is_edited: "false").with { [@deleted_comment, @mod_comment] }
-          should respond_to_search(creator_name: "deleted").with { [] }
+          should comments.with_params(group_by: "comment").with { [@deleted_comment, @mod_comment, @user_comment] }
+          should comments.search_params(body_matches: "blah").with { @mod_comment }
+          should comments.search_params(score: 10).with { @user_comment }
+          should comments.search_params(is_sticky: "true").with { @mod_comment }
+          should comments.search_params(is_deleted: "true").with { @deleted_comment }
+          should comments.search_params(do_not_bump_post: "true").with { @user_comment }
+          should comments.search_params(is_edited: "true").with { @user_comment }
+          should comments.search_params(is_edited: "false").with { [@deleted_comment, @mod_comment] }
+          should comments.search_params(creator_name: -> { @deleted_comment.creator.name }).with { [] }
         end
 
         context "as the creator of a deleted comment" do
-          setup { CurrentUser.user = @deleted_comment.creator }
+          comments = respond_to_search.as_user { @deleted_comment.creator }
 
-          should respond_to_search(other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
-          should respond_to_search(body_matches: "blah").with { @mod_comment }
-          should respond_to_search(score: 10).with { @user_comment }
-          should respond_to_search(is_sticky: "true").with { @mod_comment }
-          should respond_to_search(is_deleted: "true").with { @deleted_comment }
-          should respond_to_search(do_not_bump_post: "true").with { @user_comment }
-          should respond_to_search(is_edited: "true").with { @user_comment }
-          should respond_to_search(is_edited: "false").with { [@deleted_comment, @mod_comment] }
-          should respond_to_search(creator_name: "deleted").with { @deleted_comment }
+          should comments.with_params(group_by: "comment").with { [@deleted_comment, @mod_comment, @user_comment] }
+          should comments.search_params(body_matches: "blah").with { @mod_comment }
+          should comments.search_params(score: 10).with { @user_comment }
+          should comments.search_params(is_sticky: "true").with { @mod_comment }
+          should comments.search_params(is_deleted: "true").with { @deleted_comment }
+          should comments.search_params(do_not_bump_post: "true").with { @user_comment }
+          should comments.search_params(is_edited: "true").with { @user_comment }
+          should comments.search_params(is_edited: "false").with { [@deleted_comment, @mod_comment] }
+          should comments.search_params(creator_name: -> { @deleted_comment.creator.name }).with { @deleted_comment }
         end
 
         context "as a moderator" do
-          setup { CurrentUser.user = @mod }
+          comments = respond_to_search.as_user { @mod }
 
-          should respond_to_search(other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
-          should respond_to_search(body_matches: "blah").with { [@deleted_comment, @mod_comment] }
-          should respond_to_search(score: 10).with { [@deleted_comment, @user_comment] }
-          should respond_to_search(is_sticky: "true").with { [@deleted_comment, @mod_comment] }
-          should respond_to_search(is_deleted: "true").with { @deleted_comment }
-          should respond_to_search(do_not_bump_post: "true").with { [@deleted_comment, @user_comment] }
-          should respond_to_search(is_edited: "true").with { @user_comment }
-          should respond_to_search(is_edited: "false").with { [@deleted_comment, @mod_comment] }
-          should respond_to_search(creator_name: "deleted").with { @deleted_comment }
+          should comments.with_params(group_by: "comment").with { [@deleted_comment, @mod_comment, @user_comment] }
+          should comments.search_params(body_matches: "blah").with { [@deleted_comment, @mod_comment] }
+          should comments.search_params(score: 10).with { [@deleted_comment, @user_comment] }
+          should comments.search_params(is_sticky: "true").with { [@deleted_comment, @mod_comment] }
+          should comments.search_params(is_deleted: "true").with { @deleted_comment }
+          should comments.search_params(do_not_bump_post: "true").with { [@deleted_comment, @user_comment] }
+          should comments.search_params(is_edited: "true").with { @user_comment }
+          should comments.search_params(is_edited: "false").with { [@deleted_comment, @mod_comment] }
+          should comments.search_params(creator_name: -> { @deleted_comment.creator.name }).with { @deleted_comment }
         end
 
         context "using includes" do
-          should respond_to_search(post_id: 100).with { @user_comment }
+          should respond_to_search(post_id: -> { @post.id }).with { @user_comment }
           should respond_to_search(post_tags_match: "touhou").with { @mod_comment }
-          should respond_to_search(creator_name: "cirno").with { @user_comment }
+          should respond_to_search(creator_name: -> { @user.name }).with { @user_comment }
           should respond_to_search(creator: {level: User::Levels::MODERATOR}).with { @mod_comment }
         end
       end

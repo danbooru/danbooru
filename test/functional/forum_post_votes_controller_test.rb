@@ -3,7 +3,7 @@ require "test_helper"
 class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
   context "The forum post votes controller" do
     setup do
-      @user = create(:user, name: "cirno")
+      @user = create(:user)
       @other_user = create(:user)
 
       as(@user) do
@@ -14,7 +14,7 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @vote = create(:forum_post_vote, forum_post: @forum_post, creator: build(:user, name: "rumia"), score: 1)
+        @vote = create(:forum_post_vote, forum_post: @forum_post, creator: build(:user), score: 1)
         @negative_vote = create(:forum_post_vote, forum_post: @forum_post, score: -1)
         @unrelated_vote = as(@user) { create(:forum_post_vote, score: 0) }
       end
@@ -24,14 +24,12 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@unrelated_vote, @negative_vote, @vote] }
+      should respond_to_search.with { [@unrelated_vote, @negative_vote, @vote] }
       should respond_to_search(score: -1).with { @negative_vote }
 
-      context "using includes" do
-        should respond_to_search(creator_name: "rumia").with { @vote }
-        should respond_to_search(forum_post: {creator_name: "cirno"}).with { [@negative_vote, @vote] }
-        should respond_to_search(forum_post: {body_matches: "blah"}).with { [@negative_vote, @vote] }
-      end
+      should respond_to_search(creator_name: -> { @vote.creator.name }).with { @vote }
+      should respond_to_search(forum_post: { creator_name: -> { @user.name }}).with { [@negative_vote, @vote] }
+      should respond_to_search(forum_post: { body_matches: "blah" }).with { [@negative_vote, @vote] }
     end
 
     context "show action" do

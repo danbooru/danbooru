@@ -4,10 +4,10 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
   context "The post flags controller" do
     setup do
       @user = create(:user)
-      @flagger = create(:gold_user, id: 999, created_at: 2.weeks.ago)
-      @uploader = create(:mod_user, name: "chen", created_at: 2.weeks.ago)
-      @mod = create(:mod_user, name: "mod123")
-      @post = create(:post, id: 101, uploader: @uploader)
+      @flagger = create(:gold_user, created_at: 2.weeks.ago)
+      @uploader = create(:mod_user, created_at: 2.weeks.ago)
+      @mod = create(:mod_user)
+      @post = create(:post, uploader: @uploader)
       @post_flag = create(:post_flag, reason: "xxx", post: @post, creator: @flagger)
     end
 
@@ -74,56 +74,41 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "as a normal user" do
-        setup do
-          CurrentUser.user = @user
-        end
+        post_flags = respond_to_search.as_user { @user }
 
-        should respond_to_search({}).with { [@unrelated_flag, @other_flag, @post_flag] }
-        should respond_to_search(reason_matches: "poor quality").with { @unrelated_flag }
-        should respond_to_search(category: "normal").with { [@unrelated_flag, @other_flag, @post_flag] }
-        should respond_to_search(category: "deleted").with { [] }
+        should post_flags.search_params.with { [@unrelated_flag, @other_flag, @post_flag] }
+        should post_flags.search_params(reason_matches: "poor quality").with { @unrelated_flag }
+        should post_flags.search_params(category: "normal").with { [@unrelated_flag, @other_flag, @post_flag] }
+        should post_flags.search_params(category: "deleted").with { [] }
 
         context "using includes" do
-          should respond_to_search(post_id: 101).with { @post_flag }
-          should respond_to_search(post_tags_match: "touhou").with { @other_flag }
-          should respond_to_search(post: {uploader_name: "chen"}).with { @post_flag }
-          should respond_to_search(creator_id: 999).with { [] }
+          should post_flags.search_params(post_id: -> { @post.id }).with { @post_flag }
+          should post_flags.search_params(post_tags_match: "touhou").with { @other_flag }
+          should post_flags.search_params(post: { uploader_name: -> { @uploader.name }}).with { @post_flag }
+          should post_flags.search_params(creator_id: -> { @flagger.id }).with { [] }
         end
       end
 
       context "when the user is the uploader" do
-        setup do
-          CurrentUser.user = @uploader
-        end
-
-        should respond_to_search(creator_id: 999).with { [] }
+        should respond_to_search(creator_id: -> { @flagger.id }).as_user { @uploader }.with { [] }
       end
 
       context "when the user is a mod and not the uploader" do
-        setup do
-          CurrentUser.user = @mod
-        end
-
-        should respond_to_search(creator_id: 999).with { @post_flag }
+        should respond_to_search(creator_id: -> { @flagger.id }).as_user { @mod }.with { @post_flag }
       end
 
       context "when the user is a mod and flags their own upload" do
-        setup do
-          CurrentUser.user = @mod
-          @post_flag = create(:post_flag, creator: @mod, post: build(:post, uploader: @mod))
-        end
+        setup { @post_flag = create(:post_flag, creator: @mod, post: build(:post, uploader: @mod)) }
 
-        should respond_to_search(creator_name: "mod123").with { @post_flag }
+        should respond_to_search(creator_name: -> { @mod.name }).as_user { @mod }.with { @post_flag }
       end
 
       context "when the user is the flagger" do
-        setup do
-          CurrentUser.user = @flagger
-        end
+        post_flags = respond_to_search.as_user { @flagger }
 
-        should respond_to_search(creator_id: 999).with { @post_flag }
-        should respond_to_search(creator_id: 999, status: "pending").with { @post_flag }
-        should respond_to_search(creator_id: 999, status: PostFlag.statuses["pending"].to_s).with { @post_flag }
+        should post_flags.search_params(creator_id: -> { @flagger.id }).with { @post_flag }
+        should post_flags.search_params(creator_id: -> { @flagger.id }, status: "pending").with { @post_flag }
+        should post_flags.search_params(creator_id: -> { @flagger.id }, status: PostFlag.statuses["pending"].to_s).with { @post_flag }
       end
     end
 

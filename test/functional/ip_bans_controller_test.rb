@@ -3,8 +3,8 @@ require "test_helper"
 class IpBansControllerTest < ActionDispatch::IntegrationTest
   context "The ip bans controller" do
     setup do
-      @admin = create(:admin_user, name: "yukari")
-      @ip_ban = create(:ip_ban, ip_addr: "6.7.8.9")
+      @admin = create(:admin_user)
+      @ip_ban = create(:ip_ban)
     end
 
     context "new action" do
@@ -35,7 +35,6 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        CurrentUser.user = @admin
         @subnet_ban = create(:ip_ban, ip_addr: "2.0.0.0/24", creator: @admin)
         @other_ban = create(:ip_ban, ip_addr: "1.2.3.4", reason: "malware")
       end
@@ -50,14 +49,13 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@other_ban, @subnet_ban, @ip_ban] }
-      should respond_to_search(ip_addr: "6.7.8.9").with { @ip_ban }
-      should respond_to_search(reason_matches: "malware").with { @other_ban }
+      ip_bans = respond_to_search.as_user { @admin }
+      should ip_bans.search_params.with { [@other_ban, @subnet_ban, @ip_ban] }
+      should ip_bans.search_params(ip_addr: -> { @ip_ban.ip_addr }).with { @ip_ban }
+      should ip_bans.search_params(reason_matches: "malware").with { @other_ban }
 
-      context "using includes" do
-        should respond_to_search(creator_name: "yukari").with { @subnet_ban }
-        should respond_to_search(creator: {level: User::Levels::ADMIN}).with { @subnet_ban }
-      end
+      should ip_bans.search_params(creator_name: -> { @admin.name }).with { @subnet_ban }
+      should ip_bans.search_params(creator: { level: User::Levels::ADMIN }).with { @subnet_ban }
     end
 
     context "show action" do

@@ -3,8 +3,8 @@ require "test_helper"
 class PostAppealsControllerTest < ActionDispatch::IntegrationTest
   context "The post appeals controller" do
     setup do
-      @user = create(:user, name: "orin")
-      @post = create(:post, id: 101, is_deleted: true)
+      @user = create(:user)
+      @post = create(:post, is_deleted: true)
     end
 
     context "new action" do
@@ -37,14 +37,12 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@resolved_appeal, @unrelated_appeal, @post_appeal] }
+      should respond_to_search.with { [@resolved_appeal, @unrelated_appeal, @post_appeal] }
       should respond_to_search(reason_matches: "Good.").with { @unrelated_appeal }
 
-      context "using includes" do
-        should respond_to_search(post_id: 101).with { @post_appeal }
-        should respond_to_search(post: {is_deleted: "true"}).with { [@unrelated_appeal, @post_appeal] }
-        should respond_to_search(creator_name: "orin").with { @post_appeal }
-      end
+      should respond_to_search(post_id: -> { @post.id }).with { @post_appeal }
+      should respond_to_search(post: { is_deleted: "true" }).with { [@unrelated_appeal, @post_appeal] }
+      should respond_to_search(creator_name: -> { @user.name }).with { @post_appeal }
     end
 
     context "create action" do

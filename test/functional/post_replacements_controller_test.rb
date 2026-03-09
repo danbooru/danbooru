@@ -245,7 +245,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @admin = create(:admin_user)
-        @mod = create(:moderator_user, name: "yukari")
+        @mod = create(:moderator_user)
 
         @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"), replacement_file: Rack::Test::UploadedFile.new("test/files/test.png"))
         @admin_replacement = create(:post_replacement, creator: @admin, replacement_file: Rack::Test::UploadedFile.new("test/files/test.jpg"))
@@ -256,13 +256,10 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@admin_replacement, @post_replacement] }
-
-      context "using includes" do
-        should respond_to_search(post_tags_match: "touhou").with { @post_replacement }
-        should respond_to_search(creator: {level: User::Levels::ADMIN}).with { @admin_replacement }
-        should respond_to_search(creator_name: "yukari").with { @post_replacement }
-      end
+      should respond_to_search.with { [@admin_replacement, @post_replacement] }
+      should respond_to_search(post_tags_match: "touhou").with { @post_replacement }
+      should respond_to_search(creator: { level: User::Levels::ADMIN }).with { @admin_replacement }
+      should respond_to_search(creator_name: -> { @mod.name }).with { @post_replacement }
     end
 
     context "show action" do

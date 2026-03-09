@@ -48,7 +48,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
             assert_response :success
           end
 
-          should respond_to_search({}).with { [@empty, @axe, @weapon, @vocaloid, @wokada, @hatsune_miku, @miku, @tag] }
+          should respond_to_search.with { [@empty, @axe, @weapon, @vocaloid, @wokada, @hatsune_miku, @miku, @tag] }
           should respond_to_search(name_matches: "hatsune_miku").with { @hatsune_miku }
           should respond_to_search(name_normalize: "HATSUNE_MIKU  ").with { @hatsune_miku }
           should respond_to_search(name_or_alias_matches: "miku").with { [@hatsune_miku, @miku] }

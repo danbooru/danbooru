@@ -93,6 +93,7 @@ class ActionDispatch::IntegrationTest
   register_encoder :html, response_parser: ->(body) { Nokogiri.HTML5(body) }
 
   def login_as(user)
+    return if user.nil? || user.is_anonymous?
     current_user_id = request&.session&.dig(:user_id)
 
     if current_user_id == user.id

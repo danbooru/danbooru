@@ -8,7 +8,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @mod_user = create(:moderator_user, name: "yukari")
+        @mod_user = create(:moderator_user)
         @other_user = create(:contributor_user, inviter: @mod_user, created_at: 2.weeks.ago)
         @uploader = create(:user, created_at: 2.weeks.ago)
       end
@@ -99,9 +99,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should respond_to_search({}).with { [@uploader, @other_user, @mod_user, @user, User.system] }
+      should respond_to_search.with { [@uploader, @other_user, @mod_user, @user, User.system] }
       should respond_to_search(min_level: User::Levels::BUILDER).with { [@other_user, @mod_user, User.system] }
-      should respond_to_search(name_matches: "yukari").with { @mod_user }
+      should respond_to_search(name_matches: -> { @mod_user.name }).with { @mod_user }
 
       context "using includes" do
         setup do
@@ -144,8 +144,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(has_post_approvals: "true").with { @mod_user }
         should respond_to_search(has_posts: "true").with { [@uploader, @other_user] }
         should respond_to_search(posts_tags_match: "touhou").with { @uploader }
-        should respond_to_search(posts: {rating: "e"}).with { @other_user }
-        should respond_to_search(inviter: {name: "yukari"}).with { @other_user }
+        should respond_to_search(posts: { rating: "e" }).with { @other_user }
+        should respond_to_search(inviter: { name: -> { @mod_user.name } }).with { @other_user }
 
         context "a user with private forum posts" do
           setup do

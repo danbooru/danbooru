@@ -50,15 +50,15 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a search" do
         setup do
-          CurrentUser.user = @user
           @upload = create(:completed_source_upload, uploader: @user, source: "http://example.com/foobar")
         end
 
-        should respond_to_search({}).with { [@upload] }
-        should respond_to_search(source: "http://example.com/foobar").with { @upload }
-        should respond_to_search(status: "completed").with { @upload }
-        should respond_to_search(media_assets: { file_size: 1_000_000 }).with { @upload }
-        should respond_to_search(media_assets: { md5: "blah" }).with { [] }
+        uploads = respond_to_search.as_user { @user }
+        should uploads.with { [@upload] }
+        should uploads.search_params(source: "http://example.com/foobar").with { @upload }
+        should uploads.search_params(status: "completed").with { @upload }
+        should uploads.search_params(media_assets: { file_size: 1_000_000 }).with { @upload }
+        should uploads.search_params(media_assets: { md5: "blah" }).with { [] }
       end
     end
 

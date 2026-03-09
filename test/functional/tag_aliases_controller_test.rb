@@ -8,7 +8,7 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @user = create(:builder_user, name: "sakuya")
+        @user = create(:builder_user)
         as(@user) do
           @forum_topic = create(:forum_topic, title: "Touhou BUR")
           @forum_post = create(:forum_post, topic: @forum_topic, body: "because")
@@ -27,7 +27,7 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@unrelated_alias, @other_alias, @tag_alias] }
+      should respond_to_search.with { [@unrelated_alias, @other_alias, @tag_alias] }
       should respond_to_search(antecedent_name: "aaa").with { @tag_alias }
       should respond_to_search(consequent_name: "bbb").with { @tag_alias }
       should respond_to_search(status: "deleted").with { @other_alias }
@@ -43,7 +43,7 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(has_consequent_wiki: "true").with { @other_alias }
         should respond_to_search(forum_topic: {title_matches: "Touhou BUR"}).with { @other_alias }
         should respond_to_search(forum_post: {body: "because"}).with { @other_alias }
-        should respond_to_search(creator_name: "sakuya").with { @other_alias }
+        should respond_to_search(creator_name: -> { @user.name }).with { @other_alias }
         should respond_to_search(creator: {level: User::Levels::BUILDER}).with { @other_alias }
       end
     end

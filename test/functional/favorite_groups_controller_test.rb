@@ -9,7 +9,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @mod_favgroup = create(:favorite_group, name: "Beautiful Smile", creator: build(:moderator_user, name: "fumimi"))
+        @mod_favgroup = create(:favorite_group, name: "Beautiful Smile", creator: build(:moderator_user))
         @private_favgroup = create(:private_favorite_group)
       end
 
@@ -18,7 +18,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@mod_favgroup, @favgroup] }
+      should respond_to_search.with { [@mod_favgroup, @favgroup] }
       should respond_to_search(name_contains: "eautiful").with { @mod_favgroup }
       should respond_to_search(name_contains: "beautiful smile").with { @mod_favgroup }
       should respond_to_search(name_contains: "smiling beauty").with { [] }
@@ -26,18 +26,10 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(name_matches: "beautiful smile").with { @mod_favgroup }
       should respond_to_search(name_matches: "smiling beauty").with { @mod_favgroup }
 
-      context "using includes" do
-        should respond_to_search(creator_name: "fumimi").with { @mod_favgroup }
-        should respond_to_search(creator: {level: User::Levels::MEMBER}).with { @favgroup }
-      end
+      should respond_to_search(creator_name: -> { @mod_favgroup.creator.name }).with { @mod_favgroup }
+      should respond_to_search(creator: {level: User::Levels::MEMBER}).with { @favgroup }
 
-      context "for private favorite groups as the creator" do
-        setup do
-          CurrentUser.user = @private_favgroup.creator
-        end
-
-        should respond_to_search(is_public: "false").with { @private_favgroup }
-      end
+      should respond_to_search(is_public: "false").as_user { @private_favgroup.creator }.with { @private_favgroup }
     end
 
     context "show action" do

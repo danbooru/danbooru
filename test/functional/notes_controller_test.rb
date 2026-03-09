@@ -10,7 +10,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         as(@user) do
-          @post_note = create(:note, post: build(:post, id: 2001, tag_string: "touhou"))
+          @post_note = create(:note, post: build(:post, tag_string: "touhou"))
           @deleted_note = create(:note, is_active: false)
         end
       end
@@ -20,14 +20,12 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@deleted_note, @post_note, @note] }
+      should respond_to_search.with { [@deleted_note, @post_note, @note] }
       should respond_to_search(body_matches: "000").with { @note }
       should respond_to_search(is_active: "true").with { [@post_note, @note] }
 
-      context "using includes" do
-        should respond_to_search(post_id: 2001).with { @post_note }
-        should respond_to_search(post_tags_match: "touhou").with { @post_note }
-      end
+      should respond_to_search(post_id: -> { @post_note.post_id }).with { @post_note }
+      should respond_to_search(post_tags_match: "touhou").with { @post_note }
     end
 
     context "show action" do

@@ -4,12 +4,12 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
   context "The moderation reports controller" do
     setup do
       @user = create(:user, created_at: 2.weeks.ago)
-      @spammer = create(:user, id: 5678, name: "spammer", created_at: 2.weeks.ago)
+      @spammer = create(:user, created_at: 2.weeks.ago)
       @mod = create(:moderator_user, created_at: 2.weeks.ago)
 
       as(@spammer) do
         @dmail = create(:dmail, from: @spammer, owner: @user, to: @user)
-        @comment = create(:comment, id: 1234, creator: @spammer)
+        @comment = create(:comment, creator: @spammer)
         @forum_post = create(:forum_post, topic: build(:forum_topic), body: "xxx", creator: @spammer)
       end
     end
@@ -36,7 +36,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       setup do
         @comment_report = create(:moderation_report, model: @comment, creator: @user)
         @forum_report = create(:moderation_report, model: @forum_post, creator: @user)
-        @dmail_report = create(:moderation_report, reason: "spam", model: @dmail, creator: build(:builder_user, name: "daiyousei", created_at: 2.weeks.ago))
+        @dmail_report = create(:moderation_report, reason: "spam", model: @dmail, creator: build(:builder_user, created_at: 2.weeks.ago))
       end
 
       context "as a user" do
@@ -59,26 +59,21 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "as a moderator" do
-        setup do
-          CurrentUser.user = @mod
-        end
-
         should "render" do
           get_auth moderation_reports_path, @mod
           assert_response :success
         end
 
-        should respond_to_search({}).with { [@dmail_report, @forum_report, @comment_report] }
-        should respond_to_search(reason_matches: "spam").with { @dmail_report }
-        should respond_to_search(recipient_id: 5678).with { [@dmail_report, @forum_report, @comment_report] }
-        should respond_to_search(recipient_name: "spammer").with { [@dmail_report, @forum_report, @comment_report] }
+        modreports = respond_to_search.as_user { @mod }
+        should modreports.with { [@dmail_report, @forum_report, @comment_report] }
+        should modreports.search_params(reason_matches: "spam").with { @dmail_report }
+        should modreports.search_params(recipient_id: -> { @spammer.id }).with { [@dmail_report, @forum_report, @comment_report] }
+        should modreports.search_params(recipient_name: -> { @spammer.name }).with { [@dmail_report, @forum_report, @comment_report] }
 
-        context "using includes" do
-          should respond_to_search(model_id: 1234).with { @comment_report }
-          should respond_to_search(model_type: "ForumPost").with { @forum_report }
-          should respond_to_search(ForumPost: {body_matches: "xxx"}).with { @forum_report }
-          should respond_to_search(creator_name: "daiyousei").with { @dmail_report }
-        end
+        should modreports.search_params(model_id: -> { @comment.id }).with { @comment_report }
+        should modreports.search_params(model_type: "ForumPost").with { @forum_report }
+        should modreports.search_params(ForumPost: { body_matches: "xxx" }).with { @forum_report }
+        should modreports.search_params(creator_name: -> { @dmail_report.creator.name }).with { @dmail_report }
       end
     end
 

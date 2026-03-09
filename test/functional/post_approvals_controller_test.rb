@@ -3,7 +3,7 @@ require "test_helper"
 class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
   context "The post approvals controller" do
     setup do
-      @approver = create(:approver, name: "eiki")
+      @approver = create(:approver)
     end
 
     context "create action" do
@@ -61,7 +61,7 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @post = create(:post, tag_string: "touhou", is_pending: true, uploader: build(:user, name: "komachi", created_at: 2.weeks.ago))
+        @post = create(:post, tag_string: "touhou", is_pending: true, uploader: build(:user, created_at: 2.weeks.ago))
         @post_approval = create(:post_approval, post: @post)
         @user_approval = create(:post_approval, user: @approver)
         @unrelated_approval = create(:post_approval)
@@ -72,13 +72,10 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@unrelated_approval, @user_approval, @post_approval] }
-
-      context "using includes" do
-        should respond_to_search(user_name: "eiki").with { @user_approval }
-        should respond_to_search(post_tags_match: "touhou").with { @post_approval }
-        should respond_to_search(post: {uploader_name: "komachi"}).with { @post_approval }
-      end
+      should respond_to_search.with { [@unrelated_approval, @user_approval, @post_approval] }
+      should respond_to_search(user_name: -> { @approver.name }).with { @user_approval }
+      should respond_to_search(post_tags_match: "touhou").with { @post_approval }
+      should respond_to_search(post: { uploader_name: -> { @post.uploader.name } }).with { @post_approval }
     end
 
     context "show action" do

@@ -48,14 +48,14 @@ class ModActionsControllerTest < ActionDispatch::IntegrationTest
       context "searching" do
         setup do
           @mod_action = create(:mod_action, description: "blah")
-          @promote_action = create(:mod_action, category: "user_level_change", creator: create(:builder_user, name: "rumia"))
+          @promote_action = create(:mod_action, category: "user_level_change", creator: create(:builder_user))
         end
 
-        should respond_to_search({}).with { [@promote_action, @mod_action] }
+        should respond_to_search.with { [@promote_action, @mod_action] }
         should respond_to_search(category: ModAction.categories["user_level_change"].to_s).with { @promote_action }
         should respond_to_search(description_matches: "blah").with { @mod_action }
 
-        should respond_to_search(creator_name: "rumia").with { @promote_action }
+        should respond_to_search(creator_name: -> { @promote_action.creator.name }).with { @promote_action }
         should respond_to_search(creator: { level: User::Levels::BUILDER }).with { @promote_action }
       end
 

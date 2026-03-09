@@ -44,7 +44,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to wiki_pages_path(search: { title_normalize: "tagme" }, redirect: true)
       end
 
-      should respond_to_search({}).with { [@picasso, @miku, @vocaloid, @deleted, @tagme] }
+      should respond_to_search.with { [@picasso, @miku, @vocaloid, @deleted, @tagme] }
       should respond_to_search(title: "tagme").with { @tagme }
       should respond_to_search(title: "tagme", order: "post_count").with { @tagme }
       should respond_to_search(title_normalize: "TAGME  ").with { @tagme }
@@ -61,13 +61,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(has_embedded_media: "true").with { [@miku] }
       should respond_to_search(has_embedded_media: "false").with { [@picasso, @vocaloid, @deleted, @tagme] }
 
-      context "using includes" do
-        should respond_to_search(has_tag: "true").with { @miku }
-        should respond_to_search(tag: { category: Tag.categories.character }).with { @miku }
-        should respond_to_search(has_dtext_links: "true").with { @miku }
-        should respond_to_search(has_artist: "true").with { @picasso }
-        should respond_to_search(artist: {is_banned: "true"}).with { @picasso }
-      end
+      should respond_to_search(has_tag: "true").with { @miku }
+      should respond_to_search(tag: { category: Tag.categories.character }).with { @miku }
+      should respond_to_search(has_dtext_links: "true").with { @miku }
+      should respond_to_search(has_artist: "true").with { @picasso }
+      should respond_to_search(artist: { is_banned: "true" }).with { @picasso }
     end
 
     context "show action" do

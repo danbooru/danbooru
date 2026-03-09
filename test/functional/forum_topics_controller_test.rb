@@ -9,7 +9,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:user)
       @other_user = create(:user)
-      @mod = create(:moderator_user, name: "okuu")
+      @mod = create(:moderator_user)
 
       @forum_topic = create(:forum_topic, creator: @user, title: "my forum topic", original_post: build(:forum_post, creator: @user, topic: @forum_topic, body: "xxx"))
     end
@@ -92,8 +92,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
 
       should "not list stickied topics first for JSON responses" do
         get forum_topics_path, params: {format: :json}
-        forum_topics = JSON.parse(response.body)
-        assert_equal(default_search_order([@other_topic, @sticky_topic, @forum_topic]).call.map(&:id), forum_topics.map { |t| t["id"] })
+        assert_equal([@forum_topic, @other_topic, @sticky_topic].map(&:id), response.parsed_body.pluck(:id))
       end
 
       should "render for atom feed" do
@@ -138,54 +137,45 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
 
       context "with search conditions" do
         context "as a user" do
-          setup do
-            CurrentUser.user = @user
-          end
+          forum_topics = respond_to_search.as_user { @user }
 
-          should respond_to_search({}).with { default_search_order([@sticky_topic, @other_topic, @forum_topic]) }
-          should respond_to_search(order: "id").with { [@other_topic, @sticky_topic, @forum_topic] }
-          should respond_to_search(title_matches: "forum").with { @forum_topic }
-          should respond_to_search(title_matches: "bababa").with { [] }
-          should respond_to_search(is_sticky: "true").with { @sticky_topic }
-          should respond_to_search(category: "General").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(category: "general").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(category: "Tags").with { [] }
-          should respond_to_search(category_id: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(is_private: "true").with { [] }
-          should respond_to_search(is_private: "false").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(min_level: "None").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(min_level: "none").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(min_level: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(min_level: "Member").with { [] }
-          should respond_to_search(min_level: "Moderator").with { [] }
-          should respond_to_search(min_level_id: "<10").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params.with { [@sticky_topic, @other_topic, @forum_topic].reverse }
+          should forum_topics.search_params(order: "id").with { [@other_topic, @sticky_topic, @forum_topic] }
+          should forum_topics.search_params(title_matches: "forum").with { @forum_topic }
+          should forum_topics.search_params(title_matches: "bababa").with { [] }
+          should forum_topics.search_params(is_sticky: "true").with { @sticky_topic }
+          should forum_topics.search_params(category: "General").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(category: "general").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(category: "Tags").with { [] }
+          should forum_topics.search_params(category_id: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(is_private: "true").with { [] }
+          should forum_topics.search_params(is_private: "false").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(min_level: "None").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(min_level: "none").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(min_level: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(min_level: "Member").with { [] }
+          should forum_topics.search_params(min_level: "Moderator").with { [] }
+          should forum_topics.search_params(min_level_id: "<10").with { [@forum_topic, @other_topic, @sticky_topic] }
 
-          context "using includes" do
-            should respond_to_search(forum_posts: {body_matches: "xxx"}).with { @forum_topic }
-            should respond_to_search(has_bulk_update_requests: "true").with { @forum_topic }
-            should respond_to_search(has_tag_aliases: "true").with { @other_topic }
-            should respond_to_search(creator_name: "okuu").with { [] }
-          end
+          should forum_topics.search_params(forum_posts: { body_matches: "xxx" }).with { @forum_topic }
+          should forum_topics.search_params(has_bulk_update_requests: "true").with { @forum_topic }
+          should forum_topics.search_params(has_tag_aliases: "true").with { @other_topic }
+          should forum_topics.search_params(creator_name: -> { @mod.name }).with { [] }
         end
 
         context "as a moderator" do
-          setup do
-            CurrentUser.user = @mod
-          end
+          forum_topics = respond_to_search.as_user { @mod }
 
-          should respond_to_search({}).with { default_search_order([@sticky_topic, @other_topic, @mod_topic, @forum_topic]) }
-          should respond_to_search(is_private: "false").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(is_private: "true").with { [@mod_topic] }
-          should respond_to_search(min_level: "None").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(min_level: "Member").with { [] }
-          should respond_to_search(min_level: "Moderator").with { [@mod_topic] }
-          should respond_to_search(min_level: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
-          should respond_to_search(min_level: User::Levels::MODERATOR.to_s).with { [@mod_topic] }
-          should respond_to_search(min_level_id: ">0").with { [@mod_topic] }
-
-          context "using includes" do
-            should respond_to_search(creator_name: "okuu").with { [@mod_topic] }
-          end
+          should forum_topics.search_params.with { [@sticky_topic, @other_topic, @mod_topic, @forum_topic].reverse }
+          should forum_topics.search_params(is_private: "false").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(is_private: "true").with { [@mod_topic] }
+          should forum_topics.search_params(min_level: "None").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(min_level: "Member").with { [] }
+          should forum_topics.search_params(min_level: "Moderator").with { [@mod_topic] }
+          should forum_topics.search_params(min_level: "0").with { [@forum_topic, @other_topic, @sticky_topic] }
+          should forum_topics.search_params(min_level: User::Levels::MODERATOR.to_s).with { [@mod_topic] }
+          should forum_topics.search_params(min_level_id: ">0").with { [@mod_topic] }
+          should forum_topics.search_params(creator_name: -> { @mod.name }).with { [@mod_topic] }
         end
       end
 

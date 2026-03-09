@@ -173,7 +173,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           assert_artist_found("masao")
         end
 
-        should respond_to_search({}).with { [@banned, @deleted, @artgerm, @masao, @artist] }
+        should respond_to_search.with { [@banned, @deleted, @artgerm, @masao, @artist] }
         should respond_to_search(name: "masao").with { @masao }
         should respond_to_search(is_banned: "true").with { @banned }
         should respond_to_search(is_deleted: "true").with { @deleted }

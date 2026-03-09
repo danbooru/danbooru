@@ -3,17 +3,13 @@ require "test_helper"
 class CommentVotesControllerTest < ActionDispatch::IntegrationTest
   context "A comment votes controller" do
     setup do
-      CurrentUser.user = @user = create(:user, name: "cirno")
+      @user = create(:user)
       @comment = create(:comment, creator: @user)
-    end
-
-    teardown do
-      CurrentUser.user = nil
     end
 
     context "index action" do
       setup do
-        @voter = create(:gold_user, name: "rumia")
+        @voter = create(:gold_user)
         @vote = as(@voter) { create(:comment_vote, comment: @comment, user: @voter) }
         @negative_vote = create(:comment_vote, comment: @comment, score: -1)
         @unrelated_vote = create(:comment_vote)
@@ -26,34 +22,31 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render for a tooltip" do
-          get comment_votes_path(comment_id: @comment.id, variant: "tooltip")
+          get_auth comment_votes_path(comment_id: @comment.id, variant: "tooltip"), @user
           assert_response :success
           assert_select "#page", count: 0
           assert_select "#page-footer", count: 0
         end
 
-        should respond_to_search({}).with { [] }
+        should respond_to_search.with { [] }
       end
 
       context "as a moderator" do
-        setup do
-          CurrentUser.user = create(:mod_user)
-        end
-
         should "render for a tooltip" do
-          get comment_votes_path(comment_id: @comment.id, variant: "tooltip")
+          get_auth comment_votes_path(comment_id: @comment.id, variant: "tooltip"), create(:mod_user)
           assert_response :success
           assert_select "#page", count: 0
           assert_select "#page-footer", count: 0
         end
 
-        should respond_to_search({}).with { [@unrelated_vote, @negative_vote, @vote] }
-        should respond_to_search(score: -1).with { @negative_vote }
+        context "respond to search" do
+          comment_votes = respond_to_search.as_user { create(:moderator_user) }
+          should comment_votes.with { [@unrelated_vote, @negative_vote, @vote] }
+          should comment_votes.search_params(score: -1).with { @negative_vote }
 
-        context "using includes" do
-          should respond_to_search(comment: {creator_name: "cirno"}).with { [@negative_vote, @vote] }
-          should respond_to_search(user_name: "rumia").with { @vote }
-          should respond_to_search(user: {level: User::Levels::GOLD}).with { @vote }
+          should comment_votes.search_params(comment: { creator_name: -> { @user.name } }).with { [@negative_vote, @vote] }
+          should comment_votes.search_params(user_name: -> { @voter.name }).with { @vote }
+          should comment_votes.search_params(user: { level: User::Levels::GOLD }).with { @vote }
         end
       end
 

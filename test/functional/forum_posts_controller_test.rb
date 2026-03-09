@@ -3,9 +3,9 @@ require "test_helper"
 class ForumPostsControllerTest < ActionDispatch::IntegrationTest
   context "The forum posts controller" do
     setup do
-      @user = create(:user, id: 999)
+      @user = create(:user)
       @other_user = create(:user)
-      @mod = create(:moderator_user, name: "okuu")
+      @mod = create(:moderator_user)
       @forum_topic = as(@user) { create(:forum_topic, title: "my forum topic", creator: @user) }
       @forum_post = create(:forum_post, creator: @user, topic: @forum_topic, body: "alias xxx -> yyy")
     end
@@ -65,50 +65,35 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "as a user" do
-        setup do
-          CurrentUser.user = @user
-        end
-
         should "render" do
           get_auth comment_votes_path, @user
           assert_response :success
         end
 
-        should respond_to_search({}).with { [@bur_forum, @linked_forum, @forum_post] }
-        should respond_to_search(body_matches: "xxx").with { @forum_post }
-        should respond_to_search(body_matches: "bababa").with { [] }
-        should respond_to_search(is_deleted: "true").with { [] }
-        should respond_to_search(linked_to: "yyy").with { [@bur_forum, @linked_forum] }
+        forum_posts = respond_to_search.as_user { @user }
 
-        context "using includes" do
-          should respond_to_search(topic: {title_matches: "my forum topic"}).with { @forum_post }
-          should respond_to_search(topic: {category_id: 1}).with { @linked_forum }
-          should respond_to_search(has_bulk_update_request: "true").with { @bur_forum }
-          should respond_to_search(has_votes: "true").with { @forum_post }
-          should respond_to_search(has_dtext_links: "true").with { @linked_forum }
-          should respond_to_search(creator_id: 999).with { @forum_post }
-          should respond_to_search(creator: {name: "okuu"}).with { [] }
-        end
+        should forum_posts.search_params.with { [@bur_forum, @linked_forum, @forum_post] }
+        should forum_posts.search_params(body_matches: "xxx").with { @forum_post }
+        should forum_posts.search_params(body_matches: "bababa").with { [] }
+        should forum_posts.search_params(is_deleted: "true").with { [] }
+        should forum_posts.search_params(linked_to: "yyy").with { [@bur_forum, @linked_forum] }
+
+        should forum_posts.search_params(topic: { title_matches: "my forum topic" }).with { @forum_post }
+        should forum_posts.search_params(topic: { category_id: 1 }).with { @linked_forum }
+        should forum_posts.search_params(has_bulk_update_request: "true").with { @bur_forum }
+        should forum_posts.search_params(has_votes: "true").with { @forum_post }
+        should forum_posts.search_params(has_dtext_links: "true").with { @linked_forum }
+        should forum_posts.search_params(creator_id: -> { @user.id }).with { @forum_post }
+        should forum_posts.search_params(creator: { name: -> { @mod.name } }).with { [] }
       end
 
       context "as a moderator" do
-        setup do
-          CurrentUser.user = @mod
-        end
-
-        should respond_to_search({}).with { [@bur_forum, @unrelated_forum, @mod_forum, @linked_forum, @forum_post] }
-
-        context "using includes" do
-          should respond_to_search(creator: {name: "okuu"}).with { @mod_forum }
-        end
+        should respond_to_search.as_user { @mod }.with { [@bur_forum, @unrelated_forum, @mod_forum, @linked_forum, @forum_post] }
+        should respond_to_search.as_user { @mod }.search_params(creator: { name: -> { @mod.name } }).with { @mod_forum }
       end
 
       context "as an admin" do
-        setup do
-          CurrentUser.user = @admin
-        end
-
-        should respond_to_search({}).with { [@bur_forum, @unrelated_forum, @admin_forum, @mod_forum, @linked_forum, @forum_post] }
+        should respond_to_search.as_user { @admin }.with { [@bur_forum, @unrelated_forum, @admin_forum, @mod_forum, @linked_forum, @forum_post] }
       end
     end
 

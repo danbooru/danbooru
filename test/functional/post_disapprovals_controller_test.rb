@@ -3,8 +3,8 @@ require "test_helper"
 class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
   context "The post disapprovals controller" do
     setup do
-      @approver = create(:approver, name: "eiki")
-      @post = create(:post, tag_string: "touhou", is_pending: true, uploader: build(:user, name: "marisa", created_at: 2.weeks.ago))
+      @approver = create(:approver)
+      @post = create(:post, tag_string: "touhou", is_pending: true, uploader: build(:user, created_at: 2.weeks.ago))
     end
 
     context "create action" do
@@ -50,13 +50,13 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@unrelated_disapproval, @user_disapproval, @post_disapproval] }
+      should respond_to_search.with { [@unrelated_disapproval, @user_disapproval, @post_disapproval] }
       should respond_to_search(message: "bad").with { @unrelated_disapproval }
 
       context "using includes" do
         should respond_to_search(post_tags_match: "touhou").with { @post_disapproval }
-        should respond_to_search(post: {uploader_name: "marisa"}).with { @post_disapproval }
-        should respond_to_search(user_name: "eiki").with { [] }
+        should respond_to_search(post: { uploader_name: -> { @post.uploader.name } }).with { @post_disapproval }
+        should respond_to_search(user_name: -> { @approver.name }).with { [] }
       end
 
       should "allow mods to see disapprover names" do
@@ -72,17 +72,15 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "when a non-mod searches by disapprover name" do
-        should respond_to_search(user_name: "eiki").with { [] }
+        should respond_to_search(user_name: -> { @approver.name }).with { [] }
       end
 
       context "when a mod searches by disapprover name" do
-        setup { CurrentUser.user = create(:mod_user) }
-        should respond_to_search(user_name: "eiki").with { @user_disapproval }
+        should respond_to_search(user_name: -> { @approver.name }).as_user { create(:mod_user) }.with { @user_disapproval }
       end
 
       context "when a disapprover searches by their own name" do
-        setup { CurrentUser.user = @approver }
-        should respond_to_search(user_name: "eiki").with { @user_disapproval }
+        should respond_to_search(user_name: -> { @approver.name }).as_user { @approver }.with { @user_disapproval }
       end
     end
 
@@ -107,8 +105,8 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
     context "update action" do
       setup do
         @post = create(:post, is_pending: true)
-        @approver = create(:approver, name: "alice-san")
-        @another_approver = create(:approver, name: "bob-kun")
+        @approver = create(:approver)
+        @another_approver = create(:approver)
         @post_disapproval = create(:post_disapproval, post: @post, user: @approver, reason: "poor_quality")
       end
 
