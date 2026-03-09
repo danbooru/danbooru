@@ -2112,7 +2112,8 @@ CREATE TABLE public.upload_media_assets (
     status integer DEFAULT 0 NOT NULL,
     source_url character varying DEFAULT ''::character varying NOT NULL,
     error character varying,
-    page_url character varying
+    page_url character varying,
+    user_id integer
 );
 
 
@@ -3342,7 +3343,6 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -7113,6 +7113,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260309171518'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),
@@ -7457,4 +7458,3 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20100205162521'),
 ('20100204214746'),
 ('20100204211522');
-
