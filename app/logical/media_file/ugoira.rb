@@ -414,61 +414,68 @@ class MediaFile::Ugoira < MediaFile
       end
 
       frames_with_delays = frames.zip(frame_delays)
-      Dir.chdir(tmpdir.path) do
-        File.open("files.txt", "w+") do |file|
-          frames_with_delays.each do |frame, delay|
-            # https://ffmpeg.org/ffmpeg-formats.html#concat-1
-            # https://trac.ffmpeg.org/ticket/9210
-            # XXX The concat demuxer rounds frames to the nearest 40ms. To work around this, we multiply by 40 then use
-            # `-itsscale 0.025` to divide by 40 and get back the correct duration.
-            file.puts("file '#{File.basename(frame.file.path)}'")
-            file.puts("duration #{delay * 40}ms")
-          end
+      tmpdir_path = tmpdir.path
+      
+      files_txt_path = File.join(tmpdir_path, "files.txt")
+      File.open(files_txt_path, "w+") do |file|
+        frames_with_delays.each do |frame, delay|
+          # https://www.ffmpeg.org/ffmpeg-utils.html#Quoting-and-escaping
+          frame_path = frame.file.path.gsub("'", "'\\\\''")
+          # https://ffmpeg.org/ffmpeg-formats.html#concat-1
+          # https://trac.ffmpeg.org/ticket/9210
+          # XXX The concat demuxer rounds frames to the nearest 40ms. To work around this, we multiply by 40 then use
+          # `-itsscale 0.025` to divide by 40 and get back the correct duration.
+          file.puts("file '#{frame_path}'")
+          file.puts("duration #{delay * 40}ms")
         end
+      end
 
-        filters = "null"
+      filters = "null"
 
-        if width != self.width || height != self.height
-          # https://ffmpeg.org/ffmpeg-filters.html#scale
-          filters += ",scale='#{width}:#{height}:flags=lanczos'"
+      if width != self.width || height != self.height
+        # https://ffmpeg.org/ffmpeg-filters.html#scale
+        filters += ",scale='#{width}:#{height}:flags=lanczos'"
+      end
+
+      # h264/h265 with 4:2:0 subsampling requires the dimensions to be even. Pad to even dimensions by duplicating the edge pixels.
+      # XXX av1 has a minimum required size of 64x64
+      if (width.odd? || height.odd?) && codec.in?(%i[h264 h265 av1]) && pix_fmt.to_s.include?("420")
+        # https://ffmpeg.org/ffmpeg-filters.html#pad-1
+        # https://ffmpeg.org/ffmpeg-filters.html#fillborders
+        filters += ",pad='iw+mod(iw,2):ih+mod(ih,2)',fillborders='right=#{width % 2}:bottom=#{height % 2}:mode=smear'"
+      end
+
+      ffmpeg_command = %{ffmpeg -loglevel 99 -itsscale 0.025 -f concat -safe 0 -i #{files_txt_path.shellescape} -enc_time_base 1/1000 -video_track_timescale 1000 -fps_mode:v vfr -vf "#{filters}" #{codec_args} #{format_args} -pix_fmt #{pix_fmt} -threads #{threads} -an}
+
+      encoded_output_path = File.join(tmpdir_path, "out.#{format}")
+      if two_pass
+        raise "two-pass encoding is not supported for #{codec}" unless codec.in?(%i[vp8 vp9])
+
+        passlogfile_path = File.join(tmpdir_path, "ffmpeg2pass")
+        FFmpeg.shell!("#{ffmpeg_command} -pass 1 -passlogfile #{passlogfile_path.shellescape} -f null /dev/null")
+        FFmpeg.shell!("#{ffmpeg_command} -pass 2 -passlogfile #{passlogfile_path.shellescape} -y #{encoded_output_path.shellescape}")
+      else
+        FFmpeg.shell!("#{ffmpeg_command} -y #{encoded_output_path.shellescape}")
+      end
+
+      # XXX ffmpeg incorrectly sets the duration of the last frame to 40ms, so here we use mkvmerge to fix it.
+      timestamps_txt_path = File.join(tmpdir_path, "timestamps.txt")
+      File.open(timestamps_txt_path, "w+") do |timecodes|
+        # https://man.archlinux.org/man/mkvmerge.1.en#Timestamp_file_format_v2
+        timecodes.puts("# timestamp format v2")
+
+        frame_delays.size.succ.times do |i|
+          timecodes.puts(frame_delays[0...i].sum)
         end
+      end
 
-        # h264/h265 with 4:2:0 subsampling requires the dimensions to be even. Pad to even dimensions by duplicating the edge pixels.
-        # XXX av1 has a minimum required size of 64x64
-        if (width.odd? || height.odd?) && codec.in?(%i[h264 h265 av1]) && pix_fmt.to_s.include?("420")
-          # https://ffmpeg.org/ffmpeg-filters.html#pad-1
-          # https://ffmpeg.org/ffmpeg-filters.html#fillborders
-          filters += ",pad='iw+mod(iw,2):ih+mod(ih,2)',fillborders='right=#{width % 2}:bottom=#{height % 2}:mode=smear'"
-        end
-
-        ffmpeg_command = %{ffmpeg -loglevel 99 -itsscale 0.025 -f concat -i files.txt -enc_time_base 1/1000 -video_track_timescale 1000 -fps_mode:v vfr -vf "#{filters}" #{codec_args} #{format_args} -pix_fmt #{pix_fmt} -threads #{threads} -an}
-
-        if two_pass
-          raise "two-pass encoding is not supported for #{codec}" unless codec.in?(%i[vp8 vp9])
-
-          FFmpeg.shell!("#{ffmpeg_command} -pass 1 -f null /dev/null")
-          FFmpeg.shell!("#{ffmpeg_command} -pass 2 -y out.#{format}")
-        else
-          FFmpeg.shell!("#{ffmpeg_command} -y out.#{format}")
-        end
-
-        # XXX ffmpeg incorrectly sets the duration of the last frame to 40ms, so here we use mkvmerge to fix it.
-        File.open("timestamps.txt", "w+") do |timecodes|
-          # https://man.archlinux.org/man/mkvmerge.1.en#Timestamp_file_format_v2
-          timecodes.puts("# timestamp format v2")
-
-          frame_delays.size.succ.times do |i|
-            timecodes.puts(frame_delays[0...i].sum)
-          end
-        end
-
-        if format == :mp4
-          # mkvmerge can read .mp4 files, but it can only output .mkv files, so we have to convert the fixed .mkv back to .mp4
-          FFmpeg.shell!("mkvmerge --timestamps 0:timestamps.txt out.#{format} -o out-fixed.mkv")
-          FFmpeg.shell!("ffmpeg -i out-fixed.mkv -c copy #{format_args} -y #{output_file.path}")
-        else
-          FFmpeg.shell!("mkvmerge --timestamps 0:timestamps.txt out.#{format} -o #{output_file.path}")
-        end
+      if format == :mp4
+        # mkvmerge can read .mp4 files, but it can only output .mkv files, so we have to convert the fixed .mkv back to .mp4
+        fixed_output_path = File.join(tmpdir_path, "out-fixed.mkv")
+        FFmpeg.shell!("mkvmerge --timestamps 0:#{timestamps_txt_path.shellescape} #{encoded_output_path.shellescape} -o #{fixed_output_path.shellescape}")
+        FFmpeg.shell!("ffmpeg -i #{fixed_output_path.shellescape} -c copy #{format_args} -y #{output_file.path.shellescape}")
+      else
+        FFmpeg.shell!("mkvmerge --timestamps 0:#{timestamps_txt_path.shellescape} #{encoded_output_path.shellescape} -o #{output_file.path.shellescape}")
       end
 
       MediaFile.open(output_file)
