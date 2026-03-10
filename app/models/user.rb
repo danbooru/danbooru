@@ -680,10 +680,10 @@ class User < ApplicationRecord
       def tag_query_limit(level)
         if level >= User::Levels::MEMBER && Danbooru.config.is_promotion?
           Float::INFINITY
-        elsif level >= User::Levels::PLATINUM
+        elsif level >= User::Levels::GOLD
           Float::INFINITY
-        elsif level == User::Levels::GOLD
-          6
+        elsif level >= User::Levels::MEMBER
+          4
         else
           2
         end

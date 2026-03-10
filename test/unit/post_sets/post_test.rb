@@ -75,10 +75,10 @@ module PostSets
         end
       end
 
-      context "a set for the 'a b c' tag query" do
+      context "a set for the 'a b c d e' tag query" do
         context "for a non-gold user" do
           should "fail" do
-            @set = PostSets::Post.new("a b c", user: create(:user))
+            @set = PostSets::Post.new("a b c d e", user: create(:user))
 
             assert_raises(PostQuery::TagLimitError) do
               @set.posts
@@ -88,7 +88,7 @@ module PostSets
 
         context "for a gold user" do
           should "pass" do
-            @set = PostSets::Post.new("a b c", user: create(:gold_user))
+            @set = PostSets::Post.new("a b c d e", user: create(:gold_user))
 
             assert_nothing_raised do
               @set.posts
