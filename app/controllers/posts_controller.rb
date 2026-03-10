@@ -30,7 +30,7 @@ class PostsController < ApplicationController
 
   def show
     @post = authorize Post.eager_load(:uploader, :media_asset).find(params[:id])
-    raise PageRemovedError if request.format.html? && @post.banblocked?(CurrentUser.user)
+    raise PageRemovedError if request.format.html? && !request.variant.tooltip? && @post.banblocked?(CurrentUser.user)
 
     if request.format.html?
       include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
