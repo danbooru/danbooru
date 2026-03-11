@@ -2,6 +2,8 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class NewgroundsExtractorTest < ActiveSupport::ExtractorTestCase
+    setup { skip "Newgrounds credentials not configured" unless Source::Extractor::Newgrounds.enabled? }
+
     context "A newgrounds post url" do
       strategy_should_work(
         "https://www.newgrounds.com/art/view/hcnone/sephiroth",

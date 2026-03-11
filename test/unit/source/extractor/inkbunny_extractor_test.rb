@@ -2,6 +2,8 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class InkbunnyExtractorTest < ActiveSupport::ExtractorTestCase
+    setup { skip "Inkbunny credentials not configured" unless Source::Extractor::Inkbunny.enabled? }
+
     context "A submission url" do
       strategy_should_work(
         "https://inkbunny.net/s/2973731-p2-#pictop",

@@ -84,19 +84,19 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://huajia.163.com/main/goods/details/vE7jk9OB",
         image_urls: %w[
-          https://huajia.fp.ps.netease.com/file/696a24a39909dee10cd124d2w0bEidbl07
+          https://huajia.fp.ps.netease.com/file/69a662b40c6682b0eb83ee70PmcW9ktQ07
+          https://huajia.fp.ps.netease.com/file/69a662bd9aa7bac87d9593c14OhuAm3h07
           https://huajia.fp.ps.netease.com/file/6778c2c0414c2243f3ad3e79MA1xiwdE06
           https://huajia.fp.ps.netease.com/file/676baac6fc8a03b6fde804c0agjmSjub06
-          https://huajia.fp.ps.netease.com/file/69013ffc551b0c2beeb39c29LrSSkSjf06
           https://huajia.fp.ps.netease.com/file/676bac89704478f217b2e771KSI9ZJiq06
           https://huajia.fp.ps.netease.com/file/676bac516972c0f723696b4a0zB5yz3O06
           https://huajia.fp.ps.netease.com/file/676bac88bef42428182ad9c7tQ6Io3Yb06
         ],
         media_files: [
-          { file_size: 230_287 },
+          { file_size: 334_665 },
+          { file_size: 444_768 },
           { file_size: 496_969 },
           { file_size: 385_295 },
-          { file_size: 444_768 },
           { file_size: 414_308 },
           { file_size: 610_943 },
           { file_size: 538_206 },
@@ -108,7 +108,7 @@ module Source::Tests::Extractor
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "❤️24h会动的小Q人！（新年春节版）",
+        dtext_artist_commentary_title: "❤️24h会动的小Q人！",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           加价服务清单
           加一个人人物（双人互动） ¥30

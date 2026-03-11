@@ -3,6 +3,8 @@ require "test_helper"
 module Source::Tests::Extractor
   class GelbooruExtractorTest < ActiveSupport::ExtractorTestCase
     context "Gelbooru:" do
+      setup { skip "Gelbooru credentials not configured" unless Source::Extractor::Gelbooru.enabled? }
+
       context "A Gelbooru direct image url without a referer" do
         strategy_should_work(
           "https://img4.gelbooru.com/images/04/f2/04f2767c64593c3030ce74ecc2528704.jpg",

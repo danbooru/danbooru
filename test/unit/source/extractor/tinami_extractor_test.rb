@@ -3,6 +3,8 @@ require "test_helper"
 module Source::Tests::Extractor
   class TinamiExtractorTest < ActiveSupport::ExtractorTestCase
     context "A 'http://www.tinami.com/view/:id' post with one image" do
+      setup { skip "Tinami credentials required for this test" unless Source::Extractor::Tinami.enabled? }
+
       strategy_should_work(
         "http://www.tinami.com/view/1087268",
         image_urls: %w[https://img.tinami.com/illust2/img/49/6234fe552348b.jpg],
@@ -63,6 +65,8 @@ module Source::Tests::Extractor
     end
 
     context "A 'http://www.tinami.com/view/:id' post with multiple images (type two)" do
+      setup { skip "Tinami credentials required for this test" unless Source::Extractor::Tinami.enabled? }
+
       strategy_should_work(
         "http://www.tinami.com/view/1087270",
         image_urls: %w[

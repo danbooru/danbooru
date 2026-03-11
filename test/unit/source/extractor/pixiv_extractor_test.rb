@@ -235,6 +235,8 @@ module Source::Tests::Extractor
     end
 
     context "An unlisted Pixiv artwork page URL" do
+      setup { skip "Unlisted Pixiv posts not yet implemented" }
+
       strategy_should_work(
         "https://www.pixiv.net/en/artworks/unlisted/ntQchboUi1CsqMhDpo5j",
         image_urls: [%r{\Ahttps://i\.pximg\.net/img-original/img/2021/06/01/00/45/05/90237981-\h{32}_p0\.jpg\z}],

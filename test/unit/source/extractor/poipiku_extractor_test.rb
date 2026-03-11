@@ -2,6 +2,8 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class PoipikuExtractorTest < ActiveSupport::ExtractorTestCase
+    setup { skip "Poipiku credentials not configured" unless Source::Extractor::Poipiku.enabled? }
+
     context "A https://poipiku.com/:user_id/:post_id.html page url with a single image" do
       strategy_should_work(
         "https://poipiku.com/583/2867587.html",

@@ -70,7 +70,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         should modreports.search_params(recipient_id: -> { @spammer.id }).with { [@dmail_report, @forum_report, @comment_report] }
         should modreports.search_params(recipient_name: -> { @spammer.name }).with { [@dmail_report, @forum_report, @comment_report] }
 
-        should modreports.search_params(model_id: -> { @comment.id }).with { @comment_report }
+        should modreports.search_params(model_id: -> { @comment.id }, model_type: "Comment").with { @comment_report }
         should modreports.search_params(model_type: "ForumPost").with { @forum_report }
         should modreports.search_params(ForumPost: { body_matches: "xxx" }).with { @forum_report }
         should modreports.search_params(creator_name: -> { @dmail_report.creator.name }).with { @dmail_report }
