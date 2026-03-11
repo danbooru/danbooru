@@ -733,5 +733,30 @@ module Source::Tests::Extractor
         EOS
       )
     end
+
+    context "A tweet with cashtags" do
+      strategy_should_work(
+        "https://x.com/FilthyAlanAnima/status/1885757085742440642",
+        image_urls: %w[https://pbs.twimg.com/media/GiuNuRVbMAA6czB.jpg:orig],
+        media_files: [{ file_size: 126_509 }],
+        page_url: "https://x.com/FilthyAlanAnima/status/1885757085742440642",
+        profile_url: "https://x.com/FilthyAlanAnima",
+        profile_urls: %w[https://x.com/FilthyAlanAnima https://x.com/i/user/1509759385966325760],
+        display_name: "Filthy_Alan_Animate⏳",
+        username: "FilthyAlanAnima",
+        published_at: Time.parse("2025-02-01T18:28:19.000000Z"),
+        updated_at: nil,
+        tags: [
+          ["kronillust", "https://x.com/hashtag/kronillust"],
+          ["クロニーラ", "https://x.com/hashtag/クロニーラ"],
+          ["KRONII", "https://x.com/search?q=$KRONII"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "$KRONII":[https://x.com/search?q=$KRONII] market crash has hit her
+          "#kronillust":[https://x.com/hashtag/kronillust] "#クロニーラ":[https://x.com/hashtag/クロニーラ]
+        EOS
+      )
+    end
   end
 end

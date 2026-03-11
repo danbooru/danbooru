@@ -75,9 +75,15 @@ class Source::Extractor
     end
 
     def tags
-      graphql_tweet.dig(:legacy, :entities, :hashtags).to_a.map do |hashtag|
+      hashtags = graphql_tweet.dig(:legacy, :entities, :hashtags).to_a.map do |hashtag|
         [hashtag[:text], "https://x.com/hashtag/#{hashtag[:text]}"]
       end
+
+      cashtags = graphql_tweet.dig(:legacy, :entities, :symbols).to_a.map do |cashtag|
+        [cashtag[:text], "https://x.com/search?q=$#{cashtag[:text]}"]
+      end
+
+      hashtags + cashtags
     end
 
     def dtext_artist_commentary_desc
