@@ -92,6 +92,7 @@ group :test do
   gem "factory_bot"
   gem "mocha", require: "mocha/minitest"
   gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
   gem "minitest", "~> 5"
   gem "minitest-reporters", require: "minitest/reporters"
   gem "mock_redis"

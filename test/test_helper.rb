@@ -3,6 +3,7 @@ ENV["RAILS_ENV"] = "test"
 # Enable coverage only when COVERAGE is set or when running the whole test suite with `bin/rails test`, not when running individual test files.
 if ENV["COVERAGE"].present? || ARGV.empty?
   require "simplecov"
+  require "simplecov-cobertura"
 
   SimpleCov.start "rails" do
     add_group "Extractors", "app/logical/source"
@@ -13,6 +14,11 @@ if ENV["COVERAGE"].present? || ARGV.empty?
 
     enable_coverage :branch
     enable_coverage_for_eval
+
+    formatter SimpleCov::Formatter::MultiFormatter.new([
+      SimpleCov::Formatter::HTMLFormatter,      # tmp/coverage/index.html
+      SimpleCov::Formatter::CoberturaFormatter, # tmp/coverage/coverage.xml (used by codecov in .github/workflows/test.yaml)
+    ])
 
     coverage_dir "tmp/coverage"
   end
