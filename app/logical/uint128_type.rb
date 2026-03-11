@@ -2,6 +2,7 @@
 
 class Uint128Type < ActiveRecord::Type::Value
   def cast_value(value)
+    return if value.nil?
     case value
     in Integer
       value
@@ -11,6 +12,7 @@ class Uint128Type < ActiveRecord::Type::Value
   end
 
   def serialize(value)
+    return if value.nil?
     value.to_s(16).rjust(32, "0")
   end
 end
