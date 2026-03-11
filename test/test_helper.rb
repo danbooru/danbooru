@@ -1,6 +1,24 @@
 ENV["RAILS_ENV"] = "test"
 
-require "simplecov"
+# Enable coverage only when COVERAGE is set or when running the whole test suite with `bin/rails test`, not when running individual test files.
+if ENV["COVERAGE"].present? || ARGV.empty?
+  require "simplecov"
+
+  SimpleCov.start "rails" do
+    add_group "Libraries", ["app/logical", "lib"]
+    add_group "Presenters", "app/presenters"
+    add_group "Policies", "app/policies"
+    enable_coverage :branch
+    coverage_dir "tmp/coverage"
+
+    # https://github.com/codecov/codecov-ruby#submit-only-in-ci-example
+    if ENV["CODECOV_TOKEN"]
+      require "codecov"
+      SimpleCov.formatter = SimpleCov::Formatter::Codecov
+    end
+  end
+end
+
 require_relative "../config/environment"
 require "rails/test_help"
 
@@ -44,12 +62,16 @@ class ActiveSupport::TestCase
     parallelize_setup do |worker|
       Rails.application.load_seed
 
-      SimpleCov.command_name "#{SimpleCov.command_name}-#{worker}"
+      if defined?(SimpleCov)
+        SimpleCov.command_name "#{SimpleCov.command_name}-#{worker}"
+      end
     end
   end
 
   parallelize_teardown do
-    SimpleCov.result
+    if defined?(SimpleCov)
+      SimpleCov.result
+    end
   end
 
   setup do

@@ -53,6 +53,7 @@ jobs:
       RUBYOPT: -W0 # silence ruby warnings
       VIPS_WARNING: 0 # silence libvips warnings
 
+      COVERAGE: "1"
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
