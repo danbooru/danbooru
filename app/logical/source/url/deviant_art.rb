@@ -75,6 +75,7 @@ module Source
       in _, "deviantart.com", ("deviation" | "view"), work_id
         @work_id = work_id.to_i
 
+      # https://www.deviantart.com/apollo11v/art/Darth-Vindican-s-lightsaber-Star-Wars-Commission-1222436457#image-8
       # https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408
       # https://www.deviantart.com/noizave/art/685436408
       in _, "deviantart.com", username, "art", /^(?:([a-z0-9_-]+)-)?(\d+)$/i

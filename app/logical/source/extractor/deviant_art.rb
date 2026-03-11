@@ -8,7 +8,7 @@ module Source
       end
 
       def image_urls
-        [image_url].compact
+        [image_url, *additional_image_urls].compact.uniq
       end
 
       def image_url
@@ -30,22 +30,35 @@ module Source
       end
 
       # Get the best possible sample URL based on the width/height restrictions in the sample token.
-      def sample_image_url
-        base_url = deviation.dig("media", "baseUri")
-
+      memoize def sample_image_url
         if subscribers_only? || premium_only?
           nil
-        elsif base_url.present? && sample_token.present?
-          # https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/654817c0-5ba7-4591-9fd7-badae289cf88/d2wq7wl-b7f18546-753e-4d53-8051-ddb1879776c2.jpg/v1/fit/w_700,h_543,q_70,strp/pkmn_king_and_queen_by_mikotoazure_d2wq7wl-375w-2x.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTQzIiwicGF0aCI6IlwvZlwvNjU0ODE3YzAtNWJhNy00NTkxLTlmZDctYmFkYWUyODljZjg4XC9kMndxN3dsLWI3ZjE4NTQ2LTc1M2UtNGQ1My04MDUxLWRkYjE4Nzk3NzZjMi5qcGciLCJ3aWR0aCI6Ijw9NzAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.5YNpOk20V15EU44A7t_q_rQ_azwfLbsC32-hYgho39E
-          # => https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/654817c0-5ba7-4591-9fd7-badae289cf88/d2wq7wl-b7f18546-753e-4d53-8051-ddb1879776c2.jpg/v1/fill/w_700,h_543/pkmn_king_and_queen_by_mikotoazure_d2wq7wl.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTQzIiwicGF0aCI6IlwvZlwvNjU0ODE3YzAtNWJhNy00NTkxLTlmZDctYmFkYWUyODljZjg4XC9kMndxN3dsLWI3ZjE4NTQ2LTc1M2UtNGQ1My04MDUxLWRkYjE4Nzk3NzZjMi5qcGciLCJ3aWR0aCI6Ijw9NzAwIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.5YNpOk20V15EU44A7t_q_rQ_azwfLbsC32-hYgho39E
-          pretty_name = deviation.dig("media", "prettyName")
-          v1_path = deviation.dig("media", "types").pick("c").gsub(/<prettyName>[^.]*/, pretty_name)
-          url = "#{base_url}#{v1_path}?token=#{sample_token}"
-
-          Source::URL::DeviantArt.parse(url)&.full_image_url
+        elsif deviation["media"].present?
+          best_image_url_for(deviation["media"])
         elsif api_deviation.dig("content", "src").present? # for sta.sh posts
           url = api_deviation.dig("content", "src")
           Source::URL::DeviantArt.parse(url)&.full_image_url
+        end
+      end
+
+      memoize def additional_image_urls
+        deviation_extended["additionalMedia"].to_a.filter_map do |media|
+          best_image_url_for(media["media"])
+        end
+      end
+
+      def best_image_url_for(media)
+        sample_token = media["token"].to_a.first
+        full_token = media["token"].to_a.second
+        base_url = media["baseUri"]
+
+        if base_url.present? && full_token.present?
+          Source::URL::DeviantArt.parse("#{base_url}?token=#{full_token}")&.full_image_url
+        elsif base_url.present? && sample_token.present?
+          v1_path = media["types"].to_a.pick("c").gsub(/<prettyName>[^.]*/, media["prettyName"])
+          Source::URL::DeviantArt.parse("#{base_url}#{v1_path}?token=#{sample_token}")&.full_image_url
+        else
+          base_url
         end
       end
 

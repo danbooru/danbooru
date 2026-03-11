@@ -29,6 +29,60 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A multi-image deviantart post" do
+      strategy_should_work(
+        "https://www.deviantart.com/apollo11v/art/Darth-Vindican-s-lightsaber-Star-Wars-Commission-1222436457#image-8",
+        image_urls: [
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-027b6096-e45a-4017-8a36-1a4a5ab4cf34\.png\?token=.+&filename=darth_vindican_s_lightsaber__star_wars_commission__by_apollo11v_dk7t209\.png},
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-ed9fac8d-c33f-443b-94ed-a5cf86d78575\.png\?token=},
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-4f29d5ff-ae31-45f9-b424-7a0994360db4\.png\?token=},
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-9fd4d537-b7d9-4be3-827f-258bc0b17767\.png\?token=},
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-c1b4a6fd-76be-438b-bb89-b3a1e5e3cfc6\.png\?token=},
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-c0e49678-982a-4af3-9788-dd3f06e8eeb6\.png\?token=},
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-bd0d174d-7e56-4284-a2eb-37035c50d15e\.png\?token=},
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-f1fa1f5c-e2be-43f0-9ce1-f17988d07357\.png\?token=},
+        ],
+        media_files: [
+          { file_size: 6_606_104 },
+          { file_size: 6_454_715 },
+          { file_size: 7_107_457 },
+          { file_size: 7_437_676 },
+          { file_size: 7_178_687 },
+          { file_size: 7_361_981 },
+          { file_size: 7_852_011 },
+          { file_size: 8_214_343 },
+        ],
+        page_url: "https://www.deviantart.com/apollo11v/art/Darth-Vindican-s-lightsaber-Star-Wars-Commission-1222436457",
+        profile_urls: %w[https://www.deviantart.com/apollo11v],
+        display_name: "Apollo11v",
+        username: "apollo11v",
+        published_at: Time.parse("2025-07-25T22:52:36.000000Z"),
+        updated_at: nil,
+        tags: [
+          ["scifi", "https://www.deviantart.com/tag/scifi"],
+          ["render", "https://www.deviantart.com/tag/render"],
+          ["starwars", "https://www.deviantart.com/tag/starwars"],
+          ["weapon", "https://www.deviantart.com/tag/weapon"],
+          ["blender", "https://www.deviantart.com/tag/blender"],
+          ["3d", "https://www.deviantart.com/tag/3d"],
+          ["3dmodel", "https://www.deviantart.com/tag/3dmodel"],
+          ["3dmodeling", "https://www.deviantart.com/tag/3dmodeling"],
+          ["commission", "https://www.deviantart.com/tag/commission"],
+          ["lightsaber", "https://www.deviantart.com/tag/lightsaber"],
+          ["oldrepublic", "https://www.deviantart.com/tag/oldrepublic"],
+          ["prop", "https://www.deviantart.com/tag/prop"],
+          ["lightsaberstarwars", "https://www.deviantart.com/tag/lightsaberstarwars"],
+          ["swtor", "https://www.deviantart.com/tag/swtor"],
+        ],
+        dtext_artist_commentary_title: "Darth Vindican`s lightsaber (Star Wars,Commission)",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Another prop from the Star Wars universe I made recently, this time Darth Vindican's lightsaber from the same SWTOR cinematic.
+
+          Made in Blender and Substance Painter
+        EOS
+      )
+    end
+
     context "An old deviantart image for a deleted post" do
       strategy_should_work(
         "https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png",
