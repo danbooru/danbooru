@@ -326,7 +326,7 @@ module Source
     end
 
     def secondary_url?
-      profile_url? && username.present?
+      profile_url? && user_id.blank?
     end
 
     def parsed_date

@@ -202,7 +202,7 @@ class Source::URL::Twitter < Source::URL
   end
 
   def secondary_url?
-    profile_url? && user_id.present?
+    profile_url? && username.blank?
   end
 
   def parsed_date

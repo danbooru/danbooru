@@ -120,7 +120,7 @@ class Source::URL::Fantia < Source::URL
   end
 
   def secondary_url?
-    profile_url? && username.present?
+    profile_url? && fanclub_id.blank?
   end
 
   def work_id

@@ -71,6 +71,6 @@ class Source::URL::Bluesky < Source::URL
   end
 
   def secondary_url?
-    profile_url? && user_did.present?
+    profile_url? && user_handle.blank?
   end
 end

@@ -84,4 +84,8 @@ class Source::URL::Opensea < Source::URL
       "https://opensea.io/#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && username.blank?
+  end
 end

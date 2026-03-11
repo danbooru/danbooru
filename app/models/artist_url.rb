@@ -77,7 +77,7 @@ class ArtistURL < ApplicationRecord
   # A secondary URL is an artist URL that we don't normally want to display,
   # usually because it's redundant with the primary profile URL.
   def secondary_url?
-    parsed_url&.secondary_url?(url)
+    parsed_url&.secondary_url?
   end
 
   # The sort order of sites in artist URL lists.

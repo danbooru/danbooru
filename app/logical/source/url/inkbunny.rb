@@ -48,6 +48,6 @@ class Source::URL::Inkbunny < Source::URL
   end
 
   def secondary_url?
-    profile_url? && user_id.present?
+    profile_url? && username.blank?
   end
 end

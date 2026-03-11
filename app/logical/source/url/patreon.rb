@@ -100,4 +100,8 @@ class Source::URL::Patreon < Source::URL
       "https://www.patreon.com/user?u=#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && username.blank?
+  end
 end

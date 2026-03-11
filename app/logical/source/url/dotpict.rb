@@ -63,4 +63,8 @@ class Source::URL::Dotpict < Source::URL
       "https://dotpict.net/@#{username}"
     end
   end
+
+  def secondary_url?
+    profile_url? && user_id.blank?
+  end
 end

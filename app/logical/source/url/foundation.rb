@@ -89,6 +89,10 @@ class Source::URL::Foundation < Source::URL
     end
   end
 
+  def secondary_url?
+    profile_url? && username.blank?
+  end
+
   def page_url
     if token_id.present? && work_id.present?
       "https://foundation.app/mint/eth/#{token_id}/#{work_id}"
