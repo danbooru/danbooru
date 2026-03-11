@@ -644,6 +644,30 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "a banned post" do
+        setup do
+          @post.update!(is_banned: true)
+        end
+
+        should "return 451 for html" do
+          get_auth post_path(@post), @user
+
+          assert_response 451
+        end
+
+        should "render for tooltip" do
+          get_auth post_path(@post, variant: "tooltip", preview: "true"), @user
+
+          assert_response :success
+        end
+
+        should "render for json" do
+          get_auth post_path(@post), @user, as: :json
+
+          assert_response :success
+        end
+      end
+
       context "a deleted post uploaded by an admin" do
         should "be approvable by the same admin" do
           admin = create(:admin_user)

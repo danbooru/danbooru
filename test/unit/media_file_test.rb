@@ -526,6 +526,13 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     context "Conversion of a ugoira" do
+      should "not fail when converting two ugoiras concurrently" do
+        a = Thread.new { MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip").convert }
+        b = Thread.new { MediaFile.open("test/files/ugoira/ugoira-100260240-png-danbooru.zip").convert }
+
+        assert_nothing_raised { [a, b].each(&:value) }
+      end
+
       context "with odd dimensions" do
         setup do
           @frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
