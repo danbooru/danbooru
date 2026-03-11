@@ -7,10 +7,13 @@ module Source::Tests::Extractor
     end
 
     context "A deviantart post" do
+      # XXX Grabs the sample instead of the full image because free accounts are limited to 10 downloads per week.
       strategy_should_work(
         "https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484",
-        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/11a24395-0f24-446d-ae73-a9f812e79e55/d70rm0s-e5b6b5e6-5795-44bb-a0ba-27b5c2349be7\.jpg\?token=}],
-        media_files: [{ file_size: 877_987, width: 1620, height: 1380 }],
+        # image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/11a24395-0f24-446d-ae73-a9f812e79e55/d70rm0s-e5b6b5e6-5795-44bb-a0ba-27b5c2349be7\.jpg\?token=}],
+        # media_files: [{ file_size: 877_987, width: 1620, height: 1380 }],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/11a24395-0f24-446d-ae73-a9f812e79e55/d70rm0s-e5b6b5e6-5795-44bb-a0ba-27b5c2349be7.jpg"],
+        media_files: [{ file_size: 247_144, width: 1620, height: 1380 }],
         page_url: "https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484",
         display_name: "aeror404",
         username: "aeror404",
@@ -38,15 +41,15 @@ module Source::Tests::Extractor
         published_at: nil,
         updated_at: nil,
         tags: [],
-        artist_commentary_title: nil, # XXX use filename?
-        artist_commentary_desc: nil,
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 
     context "An old downloadable deviantart image" do
       strategy_should_work(
         "https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7\.jpg\?token=.+&filename=legend_of_galactic_heroes_by_hideyoshi_daihpha\.jpg}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7\.jpg\?token=}],
         media_files: [{ file_size: 906_621, width: 1600, height: 1044 }],
         page_url: "https://www.deviantart.com/hideyoshi/art/Legend-of-Galactic-Heroes-635721022",
         display_name: "Hideyoshi",
@@ -63,7 +66,7 @@ module Source::Tests::Extractor
     context "A deviantart post without a downloadable or /intermediary/ image" do
       strategy_should_work(
         "https://www.deviantart.com/gregmks/art/Rhino-Castle-811778248",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/8c03bd02-63bf-407e-9c3e-c3fd21ab4bd5/ddfb83s-64c3b1fd-a554-498c-87dd-7ce83721a3d0\.jpg\?token=.+&filename=rhino_castle_by_gregmks_ddfb83s\.jpg}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/8c03bd02-63bf-407e-9c3e-c3fd21ab4bd5/ddfb83s-64c3b1fd-a554-498c-87dd-7ce83721a3d0\.jpg\?token=}],
         media_files: [{ size: 662_982, width: 1200, height: 1500 }],
         page_url: "https://www.deviantart.com/gregmks/art/Rhino-Castle-811778248",
         display_name: "gregmks",
@@ -80,8 +83,9 @@ module Source::Tests::Extractor
     context "A downloadable deviantart origin-orig image" do
       strategy_should_work(
         "http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png",
-        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png\?token=}],
-        media_files: [{ file_size: 3_619, width: 1152, height: 648 }],
+        # image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png\?token=}],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9.png"],
+        media_files: [{ file_size: 6_700, width: 1152, height: 648 }],
         page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408",
         display_name: "noizave",
         username: "noizave",
@@ -119,8 +123,9 @@ module Source::Tests::Extractor
     context "A img00.deviantart.net sample" do
       strategy_should_work(
         "https://img00.deviantart.net/a233/i/2017/160/5/1/test_post_please_ignore_by_noizave-dbc3a48.png",
-        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png\?token=}],
-        media_files: [{ file_size: 3_619, width: 1152, height: 648 }],
+        # image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png\?token=}],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9.png"],
+        media_files: [{ file_size: 6_700, width: 1152, height: 648 }],
         page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408",
         published_at: nil,
         updated_at: nil,
@@ -130,7 +135,7 @@ module Source::Tests::Extractor
     context "A th00.deviantart.net/*/PRE/* thumbnail" do
       strategy_should_work(
         "http://th00.deviantart.net/fs71/PRE/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/d8995973-0b32-4a7d-8cd8-d847d083689a/d797tit-1eac22e0-38b6-4eae-adcb-1b72843fd62a\.png\?token=.+&filename=goruto_by_xyelkiltrox_d797tit\.png}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/d8995973-0b32-4a7d-8cd8-d847d083689a/d797tit-1eac22e0-38b6-4eae-adcb-1b72843fd62a\.png\?token=}],
         media_files: [{ file_size: 3_391_584, width: 2078, height: 3201 }],
         page_url: "https://www.deviantart.com/xyelkiltrox/art/Goruto-438744629",
         display_name: "XYelkiltroX",
@@ -187,7 +192,8 @@ module Source::Tests::Extractor
     context "A deviantart page with download enabled" do
       strategy_should_work(
         "https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781",
-        image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/a6289ca5-2205-4118-af55-c6934fba0930/dct67m5-51e8db38-9167-4f5c-931d-561ea4d3810d\.jpg}],
+        # image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/a6289ca5-2205-4118-af55-c6934fba0930/dct67m5-51e8db38-9167-4f5c-931d-561ea4d3810d\.jpg}],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/a6289ca5-2205-4118-af55-c6934fba0930/dct67m5-51e8db38-9167-4f5c-931d-561ea4d3810d.jpg"],
         media_files: [{ file_size: 1_402_017, width: 1920, height: 1080 }],
         page_url: "https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781",
         display_name: "Len1",
@@ -202,7 +208,7 @@ module Source::Tests::Extractor
     context "A *.deviantart.net/*/:title_by_:artist.jpg image with an artist name containing underscores" do
       strategy_should_work(
         "https://orig00.deviantart.net/4274/f/2010/230/8/a/pkmn_king_and_queen_by_mikoto_chan.jpg",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/654817c0-5ba7-4591-9fd7-badae289cf88/d2wq7wl-b7f18546-753e-4d53-8051-ddb1879776c2\.jpg\?token=.+&filename=pkmn_king_and_queen_by_mikotoazure_d2wq7wl\.jpg}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/654817c0-5ba7-4591-9fd7-badae289cf88/d2wq7wl-b7f18546-753e-4d53-8051-ddb1879776c2\.jpg\?token=}],
         media_files: [{ size: 401_175, width: 700, height: 543 }],
         page_url: "https://www.deviantart.com/mikotoazure/art/PKMN-King-and-Queen-175903365",
         display_name: "MikotoAzure",
@@ -228,7 +234,7 @@ module Source::Tests::Extractor
     context "A *.deviantart.net/*/:hash.jpg image without referer" do
       strategy_should_work(
         "http://pre06.deviantart.net/8497/th/pre/f/2009/173/c/c/cc9686111dcffffffb5fcfaf0cf069fb.jpg",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4\.jpg\?token=.+&filename=silverhawks_quicksilver_by_edsfox_d23jbr4\.jpg}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4\.jpg\?token=}],
         media_files: [{ file_size: 390_108, width: 791, height: 1_024 }],
         page_url: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896",
         display_name: "edsfox",
@@ -269,7 +275,7 @@ module Source::Tests::Extractor
     context "A images-wixmp-.* /intermediary/ sample" do
       strategy_should_work(
         "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4\.jpg\?token=.+&filename=silverhawks_quicksilver_by_edsfox_d23jbr4\.jpg}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4\.jpg\?token=}],
         media_files: [{ file_size: 390_108, width: 791, height: 1_024 }],
         page_url: "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896",
         display_name: "edsfox",
@@ -284,7 +290,7 @@ module Source::Tests::Extractor
     context "A api-da.wixmp.com sample" do
       strategy_should_work(
         "https://api-da.wixmp.com/_api/download/file?downloadToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTU5MDkwMTUzMywiaWF0IjoxNTkwOTAwOTIzLCJqdGkiOiI1ZWQzMzhjNWQ5YjI0Iiwib2JqIjpudWxsLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdLCJwYXlsb2FkIjp7InBhdGgiOiJcL2ZcL2U0NmE0OGViLTNkMGItNDQ5ZS05MGRjLTBhMWIzMWNiMTM2MVwvZGQzcDF4OS1mYjQ3YmM4Zi02NTNlLTQyYTItYmI0ZC1hZmFmOWZjMmI3ODEuanBnIn19.-zo8E2eDmkmDNCK-sMabBajkaGtVYJ2Q20iVrUtt05Q",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/e46a48eb-3d0b-449e-90dc-0a1b31cb1361/dd3p1x9-fb47bc8f-653e-42a2-bb4d-afaf9fc2b781\.jpg\?token=.+&filename=ten_miles_of_cherry_blossoms_by_akizero1510_dd3p1x9\.jpg}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/e46a48eb-3d0b-449e-90dc-0a1b31cb1361/dd3p1x9-fb47bc8f-653e-42a2-bb4d-afaf9fc2b781\.jpg\?token=}],
         media_files: [{ size: 1_289_162, width: 1415, height: 1000 }],
         page_url: "https://www.deviantart.com/akizero1510/art/Ten-miles-of-cherry-blossoms-792268029",
         display_name: "AkiZero1510",
@@ -356,8 +362,9 @@ module Source::Tests::Extractor
     context "A login-only deviantart post" do
       strategy_should_work(
         "http://noizave.deviantart.com/art/hidden-work-685458369",
-        image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3r29-10c99118-5cfe-4402-ad55-7b57e7c0ca43\.png}],
-        media_files: [{ file_size: 3_619, width: 1152, height: 648 }],
+        # image_urls: [%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3r29-10c99118-5cfe-4402-ad55-7b57e7c0ca43\.png}],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3r29-10c99118-5cfe-4402-ad55-7b57e7c0ca43.png"],
+        media_files: [{ file_size: 6_700, width: 1152, height: 648 }],
         page_url: "https://www.deviantart.com/noizave/art/hidden-work-685458369",
         display_name: "noizave",
         username: "noizave",
@@ -554,7 +561,8 @@ module Source::Tests::Extractor
     context "An artistname.deviantart.com page url" do
       strategy_should_work(
         "http://noizave.deviantart.com/art/test-post-please-ignore-685436408",
-        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png\?token=}],
+        # image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png\?token=}],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9.png"],
         page_url: "https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408",
         display_name: "noizave",
         username: "noizave",
@@ -567,10 +575,13 @@ module Source::Tests::Extractor
     end
 
     context "A deviantart page for a Flash file" do
+      # XXX Grabs the sample instead of the full image because free accounts are limited to 10 downloads per week.
       strategy_should_work(
         "https://www.deviantart.com/midorynn/art/NieR-Automata-Anime-703917761",
-        image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/e1d5122b-6fee-44df-8b8f-e6e8daa3396d/dbn3ef5-9e051a71-251d-4e0f-b5f1-3beb5e6a8667\.swf\?token=}],
-        media_files: [{ size: 4_243_457, width: 700, height: 300 }],
+        # image_urls: [%r{https://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/e1d5122b-6fee-44df-8b8f-e6e8daa3396d/dbn3ef5-9e051a71-251d-4e0f-b5f1-3beb5e6a8667\.swf\?token=}],
+        # media_files: [{ size: 4_243_457, width: 700, height: 300, file_ext: "sfw" }],
+        image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/i/e1d5122b-6fee-44df-8b8f-e6e8daa3396d/dbn3ef5-7209bad9-2119-4969-952f-37d6f75cd767.gif"],
+        media_files: [{ size: 552_522, width: 150, height: 64, file_ext: :gif }],
         display_name: "midorynn",
         username: "midorynn",
         profile_url: "https://www.deviantart.com/midorynn",
@@ -584,7 +595,33 @@ module Source::Tests::Extractor
     context "An AI-generated DeviantArt post" do
       strategy_should_work(
         "https://www.deviantart.com/izzyrozenberg/art/Makima-looks-back-1-1027063213",
-        tags: %w[anime animegirl cartoon cuteanimegirl drama fanart manga nude oilpainting redhead makimachainsawman makima_chainsaw_man eyesbeautiful makima ai-generated],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/e785a455-56dc-4fbf-8a60-1ed3e6d6dadb/dgzhj1p-7f46a74d-703d-484a-9cf9-65e372810270\.png\?token=.+&filename=makima_looks_back__1_by_izzyrozenberg_dgzhj1p\.png}],
+        media_files: [{ file_size: 2_696_188 }],
+        page_url: "https://www.deviantart.com/izzyrozenberg/art/Makima-looks-back-1-1027063213",
+        profile_urls: %w[https://www.deviantart.com/izzyrozenberg],
+        display_name: "IzzyRozenberg",
+        username: "izzyrozenberg",
+        published_at: Time.parse("2024-03-02T23:37:27.000000Z"),
+        updated_at: nil,
+        tags: [
+          ["anime", "https://www.deviantart.com/tag/anime"],
+          ["animegirl", "https://www.deviantart.com/tag/animegirl"],
+          ["cartoon", "https://www.deviantart.com/tag/cartoon"],
+          ["cuteanimegirl", "https://www.deviantart.com/tag/cuteanimegirl"],
+          ["drama", "https://www.deviantart.com/tag/drama"],
+          ["fanart", "https://www.deviantart.com/tag/fanart"],
+          ["manga", "https://www.deviantart.com/tag/manga"],
+          ["nude", "https://www.deviantart.com/tag/nude"],
+          ["oilpainting", "https://www.deviantart.com/tag/oilpainting"],
+          ["redhead", "https://www.deviantart.com/tag/redhead"],
+          ["makimachainsawman", "https://www.deviantart.com/tag/makimachainsawman"],
+          ["makima_chainsaw_man", "https://www.deviantart.com/tag/makima_chainsaw_man"],
+          ["eyesbeautiful", "https://www.deviantart.com/tag/eyesbeautiful"],
+          ["makima", "https://www.deviantart.com/tag/makima"],
+          ["ai-generated", "https://www.deviantart.com/tag/ai"],
+        ],
+        dtext_artist_commentary_title: "Makima looks back #1",
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -638,7 +675,7 @@ module Source::Tests::Extractor
     context "A DeviantPost with a commentary created using the WYSIWYG text editor" do
       strategy_should_work(
         "https://www.deviantart.com/noizave/art/1-Image-No-Contribution-1048220942",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dhc30ge-d2c07e30-3914-479d-8098-72ad01dc1209\.jpg\?token=.+&filename=_1_image_no_contribution_by_noizave_dhc30ge\.jpg}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dhc30ge-d2c07e30-3914-479d-8098-72ad01dc1209\.jpg\?token=}],
         media_files: [{ file_size: 213_868 }],
         page_url: "https://www.deviantart.com/noizave/art/1-Image-No-Contribution-1048220942",
         profile_url: "https://www.deviantart.com/noizave",
@@ -689,7 +726,7 @@ module Source::Tests::Extractor
       context "A https://sta.sh/:id url" do
         strategy_should_work(
           "https://sta.sh/0wxs31o7nn2",
-          image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6\.png\?token=.+&filename=a_pepe_by_noizave_dcmga0s\.png}],
+          image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6\.png\?token=}],
           media_files: [{ size: 106_741, width: 750, height: 730 }],
           page_url: "https://sta.sh/0wxs31o7nn2",
           display_name: "noizave",
@@ -706,7 +743,7 @@ module Source::Tests::Extractor
       context "A https://orig00.deviantart.net/* image url with a https://sta.sh/:id referer" do
         strategy_should_work(
           "https://orig00.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png",
-          image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6\.png\?token=.+&filename=a_pepe_by_noizave_dcmga0s\.png}],
+          image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dcmga0s-a345a815-2436-4ab5-8941-492011e1bff6\.png\?token=}],
           media_files: [{ size: 106_741, width: 750, height: 730 }],
           referer: "https://sta.sh/0wxs31o7nn2",
           page_url: "https://sta.sh/0wxs31o7nn2",

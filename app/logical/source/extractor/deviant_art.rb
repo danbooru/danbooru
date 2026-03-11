@@ -50,7 +50,7 @@ module Source
       end
 
       # Get the download image URL if the work is downloadable.
-      def download_url
+      memoize def download_url
         # Some deviations have a download token in the metadata. This is better than the download URL from the API
         # because it doesn't require an extra API call and it never expires.
         if download_token.present? && deviation.dig("media", "baseUri").present?
@@ -132,8 +132,12 @@ module Source
       def published_at
         if parsed_url.image_url?
           nil
+        # https://www.deviantart.com/gregmks/art/Rhino-Castle-811778248 (2016-09-21T13:23:04-0000)
         elsif deviation["publishedTime"]
-          Time.iso8601(deviation["publishedTime"]).utc
+          Time.parse(deviation["publishedTime"]).utc rescue nil
+        # https://www.deviantart.com/hideyoshi/art/Legend-of-Galactic-Heroes-635721022 (1567357565 = 2019-09-01T17:06:05.000Z)
+        elsif deviation["published_time"]
+          Time.at(deviation["published_time"].to_i, in: "UTC")
         end
       end
 
@@ -272,8 +276,9 @@ module Source
         return {} if page.nil?
 
         script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
-        json = script[/window.__INITIAL_STATE__ = JSON.parse\("(.*)"\);/, 1]
-        json.to_s.gsub('\\"', '"').gsub("\\\\", "\\").parse_json || {}
+        encoded_json = script[/window\.__INITIAL_STATE__ = JSON\.parse\(("(?:\\.|[^"\\])*")\);/m, 1]
+        decoded_json = encoded_json.to_s.gsub("\\'", "'").parse_json
+        decoded_json.to_s.parse_json || {}
       end
 
       memoize def api_client
