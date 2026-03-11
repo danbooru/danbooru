@@ -97,5 +97,4 @@ group :test do
   gem "mock_redis"
   gem "capybara"
   gem "selenium-webdriver"
-  gem "codecov", require: false
 end

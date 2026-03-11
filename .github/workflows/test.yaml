@@ -33,6 +33,7 @@ defaults:
 
 jobs:
   test:
+    timeout-minutes: 60
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     # Don't run the test suite multiple times for the same commit.
@@ -54,10 +55,9 @@ jobs:
       VIPS_WARNING: 0 # silence libvips warnings
 
       COVERAGE: "1"
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
-      DANBOORU_SECRET_KEY_BASE: 1234
+      DANBOORU_SECRET_KEY_BASE: fake-test-key
       DANBOORU_AWS_SQS_ENABLED: false
       DANBOORU_SKIP_EXTRACTOR_TESTS: true
       DANBOORU_PIXIV_PHPSESSID: ${{ secrets.DANBOORU_PIXIV_PHPSESSID }}
@@ -79,15 +79,6 @@ jobs:
       DANBOORU_RAKISMET_URL: ${{ secrets.DANBOORU_RAKISMET_URL }}
       DANBOORU_IP_REGISTRY_API_KEY: ${{ secrets.DANBOORU_IP_REGISTRY_API_KEY }}
       DANBOORU_GOOGLE_CLOUD_CREDENTIALS: ${{ secrets.DANBOORU_GOOGLE_CLOUD_CREDENTIALS }}
-      DANBOORU_STRIPE_SECRET_KEY: ${{ secrets.DANBOORU_STRIPE_SECRET_KEY }}
-      DANBOORU_STRIPE_PUBLISHABLE_KEY: ${{ secrets.DANBOORU_STRIPE_PUBLISHABLE_KEY }}
-      DANBOORU_STRIPE_WEBHOOK_SECRET: ${{ secrets.DANBOORU_STRIPE_WEBHOOK_SECRET }}
-      DANBOORU_STRIPE_GOLD_USD_PRICE_ID: ${{ secrets.DANBOORU_STRIPE_GOLD_USD_PRICE_ID }}
-      DANBOORU_STRIPE_GOLD_EUR_PRICE_ID: ${{ secrets.DANBOORU_STRIPE_GOLD_EUR_PRICE_ID }}
-      DANBOORU_STRIPE_PLATINUM_USD_PRICE_ID: ${{ secrets.DANBOORU_STRIPE_PLATINUM_USD_PRICE_ID }}
-      DANBOORU_STRIPE_PLATINUM_EUR_PRICE_ID: ${{ secrets.DANBOORU_STRIPE_PLATINUM_EUR_PRICE_ID }}
-      DANBOORU_STRIPE_GOLD_TO_PLATINUM_USD_PRICE_ID: ${{ secrets.DANBOORU_STRIPE_GOLD_TO_PLATINUM_USD_PRICE_ID }}
-      DANBOORU_STRIPE_GOLD_TO_PLATINUM_EUR_PRICE_ID: ${{ secrets.DANBOORU_STRIPE_GOLD_TO_PLATINUM_EUR_PRICE_ID }}
 
     services:
       postgres:
@@ -115,12 +106,22 @@ jobs:
       run: |
         bin/rails test
 
+    # https://github.com/marketplace/actions/codecov
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      if: always()
+      with:
+        directory: /tmp/coverage
+        verbose: true
+
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       if: always()
       with:
         name: test-results
+        include-hidden-files: true
         path: |
+          /tmp/coverage
           /tmp/html-test-results/index.html
           /tmp/junit-test-results/TEST-*.xml
 

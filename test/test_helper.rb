@@ -5,17 +5,16 @@ if ENV["COVERAGE"].present? || ARGV.empty?
   require "simplecov"
 
   SimpleCov.start "rails" do
+    add_group "Extractors", "app/logical/source"
     add_group "Libraries", ["app/logical", "lib"]
-    add_group "Presenters", "app/presenters"
+    add_group "Components", "app/components"
     add_group "Policies", "app/policies"
-    enable_coverage :branch
-    coverage_dir "tmp/coverage"
+    add_group "Views", "app/views"
 
-    # https://github.com/codecov/codecov-ruby#submit-only-in-ci-example
-    if ENV["CODECOV_TOKEN"]
-      require "codecov"
-      SimpleCov.formatter = SimpleCov::Formatter::Codecov
-    end
+    enable_coverage :branch
+    enable_coverage_for_eval
+
+    coverage_dir "tmp/coverage"
   end
 end
 
