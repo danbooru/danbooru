@@ -25,6 +25,18 @@ class CommentSectionComponentTest < ViewComponent::TestCase
         end
       end
 
+      context "for a logged-in user" do
+        should "show the comment form link" do
+          user = create(:user)
+
+          render_comment_section(@post, current_user: user)
+
+          assert_css("div.comments-for-post")
+          assert_css("article.comment", count: 7)
+          assert_css("a.expand-comment-response", text: "Leave a comment")
+        end
+      end
+
       context "with a comment limit" do
         context "higher than the actual number of comments" do
           should "render" do
@@ -44,6 +56,18 @@ class CommentSectionComponentTest < ViewComponent::TestCase
             assert_css("a.show-all-comments-link", text: "Show 1 more comment")
           end
         end
+      end
+    end
+
+    context "for a comment section without comments" do
+      should "render an empty message" do
+        post = create(:post)
+
+        render_comment_section(post, current_user: User.anonymous)
+
+        assert_css("div.comments-for-post")
+        assert_css("p", text: "There are no comments.")
+        assert_no_css("article.comment")
       end
     end
   end
