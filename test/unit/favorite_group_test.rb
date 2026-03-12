@@ -1,7 +1,7 @@
 require "test_helper"
 
 class FavoriteGroupTest < ActiveSupport::TestCase
-  def setup
+  setup do
     @fav_group = create(:favorite_group)
   end
 

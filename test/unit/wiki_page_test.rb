@@ -1,22 +1,15 @@
 require "test_helper"
 
 class WikiPageTest < ActiveSupport::TestCase
-  teardown do
-    CurrentUser.user = nil
-  end
-
   context "A wiki page" do
     context "updated by a regular user" do
       setup do
         @user = create(:user)
-        CurrentUser.user = @user
-        @wiki_page = create(:wiki_page, title: "HOT POTATO", other_names: "foo*bar baz")
+        @wiki_page = as(@user) { create(:wiki_page, title: "HOT POTATO", other_names: "foo*bar baz") }
       end
 
       should "search by title" do
-        matches = WikiPage.titled("hot potato")
-        assert_equal(1, matches.count)
-        assert_equal("hot_potato", matches.first.title)
+        assert_equal([@wiki_page], WikiPage.titled("hot potato"))
       end
 
       should "search other names with wildcards" do
@@ -25,68 +18,64 @@ class WikiPageTest < ActiveSupport::TestCase
 
       should "create versions" do
         assert_difference("WikiPageVersion.count") do
-          @wiki_page = create(:wiki_page, title: "xxx")
+          @wiki_page = as(@user) { create(:wiki_page, title: "xxx") }
         end
 
         assert_difference("WikiPageVersion.count") do
-          @wiki_page.title = "yyy"
           travel(1.day) do
-            @wiki_page.save
+            as(@user) { @wiki_page.update!(title: "yyy") }
           end
         end
       end
 
       should "revert to a prior version" do
-        @wiki_page.title = "yyy"
         travel(1.day) do
-          @wiki_page.save
+          as(@user) { @wiki_page.update!(title: "yyy") }
         end
-        version = WikiPageVersion.first
-        @wiki_page.revert_to!(version)
-        @wiki_page.reload
-        assert_equal("hot_potato", @wiki_page.title)
+
+        as(@user) { @wiki_page.revert_to!(@wiki_page.versions.first) }
+
+        assert_equal("hot_potato", @wiki_page.reload.title)
       end
 
       should "update its dtext links" do
-        @wiki_page.update!(body: "[[long hair]]")
+        as(@user) { @wiki_page.update!(body: "[[long hair]]") }
         assert_equal(1, @wiki_page.dtext_links.size)
         assert_equal("wiki_link", @wiki_page.dtext_links.first.link_type)
         assert_equal("long_hair", @wiki_page.dtext_links.first.link_target)
 
-        @wiki_page.update!(body: "http://www.google.com")
+        as(@user) { @wiki_page.update!(body: "http://www.google.com") }
         assert_equal(1, @wiki_page.dtext_links.size)
         assert_equal("external_link", @wiki_page.dtext_links.first.link_type)
         assert_equal("http://www.google.com", @wiki_page.dtext_links.first.link_target)
 
-        @wiki_page.update!(body: "!post #1\n!asset #2")
+        as(@user) { @wiki_page.update!(body: "!post #1\n!asset #2") }
         assert_equal(2, @wiki_page.dtext_links.size)
         assert_equal("embedded_post", @wiki_page.dtext_links.embedded_post.first.link_type)
         assert_equal("1", @wiki_page.dtext_links.embedded_post.first.link_target)
         assert_equal("embedded_media_asset", @wiki_page.dtext_links.embedded_media_asset.first.link_type)
         assert_equal("2", @wiki_page.dtext_links.embedded_media_asset.first.link_target)
 
-        @wiki_page.update!(body: "* !post #3\n* !asset #4")
+        as(@user) { @wiki_page.update!(body: "* !post #3\n* !asset #4") }
         assert_equal(2, @wiki_page.dtext_links.size)
         assert_equal("embedded_post", @wiki_page.dtext_links.embedded_post.first.link_type)
         assert_equal("3", @wiki_page.dtext_links.embedded_post.first.link_target)
         assert_equal("embedded_media_asset", @wiki_page.dtext_links.embedded_media_asset.first.link_type)
         assert_equal("4", @wiki_page.dtext_links.embedded_media_asset.first.link_target)
 
-        @wiki_page.update!(body: "nothing")
+        as(@user) { @wiki_page.update!(body: "nothing") }
         assert_equal(0, @wiki_page.dtext_links.size)
       end
     end
 
-    context "the wiki body" do
-      should "be normalized to NFC" do
+    context "during body normalization" do
+      context "normalize the body to NFC" do
         # \u00E9: é; \u0301: acute accent
-        @wiki = create(:wiki_page, body: "Poke\u0301mon")
-        assert_equal("Pok\u00E9mon", @wiki.body)
+        should normalize_attribute(:body).from("Poke\u0301mon").to("Pok\u00E9mon")
       end
 
-      should "normalize line endings and trim spaces" do
-        @wiki = create(:wiki_page, body: " foo\nbar\n")
-        assert_equal("foo\r\nbar", @wiki.body)
+      context "normalizing line endings and trim spaces" do
+        should normalize_attribute(:body).from(" foo\nbar\n").to("foo\r\nbar")
       end
     end
 

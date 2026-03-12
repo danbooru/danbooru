@@ -1,7 +1,7 @@
 require "test_helper"
 
 class ReportbooruServiceTest < ActiveSupport::TestCase
-  def setup
+  setup do
     @service = ReportbooruService.new(reportbooru_server: "http://localhost:1234")
     @post = create(:post)
     @date = Date.parse("2000-01-01")

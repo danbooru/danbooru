@@ -10,9 +10,7 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
-  def setup
-    super
-
+  setup do
     travel_to(2.weeks.ago) do
       @user = create(:user)
     end
@@ -20,8 +18,6 @@ class PostTest < ActiveSupport::TestCase
   end
 
   def teardown
-    super
-
     CurrentUser.user = nil
   end
 
@@ -1279,7 +1275,7 @@ class PostTest < ActiveSupport::TestCase
 
             context "by a gold user" do
               should "upvote the post" do
-                CurrentUser.scoped(create(:gold_user)) do
+                as(create(:gold_user)) do
                   @post.update(tag_string: "tag1 tag2 upvote:self")
                   assert_equal(false, @post.errors.any?)
                   assert_equal(1, @post.score)
@@ -1287,7 +1283,7 @@ class PostTest < ActiveSupport::TestCase
               end
 
               should "downvote the post" do
-                CurrentUser.scoped(create(:gold_user)) do
+                as(create(:gold_user)) do
                   @post.update(tag_string: "tag1 tag2 downvote:self")
                   assert_equal(false, @post.errors.any?)
                   assert_equal(-1, @post.score)

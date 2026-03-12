@@ -1,17 +1,10 @@
 require "test_helper"
 
 class SavedSearchTest < ActiveSupport::TestCase
-  def setup
-    super
+  setup do
     @user = create(:user)
-    CurrentUser.user = @user
     @mock_redis = MockRedis.new
     SavedSearch.stubs(:redis).returns(@mock_redis)
-  end
-
-  def teardown
-    super
-    CurrentUser.user = nil
   end
 
   context ".labels_for" do

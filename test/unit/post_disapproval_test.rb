@@ -4,11 +4,6 @@ class PostDisapprovalTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
       @alice = create(:moderator_user)
-      CurrentUser.user = @alice
-    end
-
-    teardown do
-      CurrentUser.user = nil
     end
 
     context "a post disapproval" do

@@ -5,12 +5,7 @@ class BanTest < ActiveSupport::TestCase
     context "deleting user data" do
       setup do
         @banner = create(:moderator_user)
-        CurrentUser.user = @banner
         @bannee = create(:user)
-      end
-
-      teardown do
-        CurrentUser.user = nil
       end
 
       should "delete the user's pending posts" do

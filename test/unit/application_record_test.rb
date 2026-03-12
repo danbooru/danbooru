@@ -11,11 +11,11 @@ class ApplicationRecordTest < ActiveSupport::TestCase
         @user1 = create(:user)
         @user2 = create(:user)
 
-        CurrentUser.scoped(@user1) do
+        as(@user1) do
           Tag.parallel_find_each do
             assert_equal(@user1, CurrentUser.user)
 
-            CurrentUser.scoped(@user2) do
+            as(@user2) do
               assert_equal(@user2, CurrentUser.user)
             end
 

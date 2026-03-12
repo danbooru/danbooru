@@ -1,11 +1,6 @@
 require "test_helper"
 
 class RelatedTagQueryTest < ActiveSupport::TestCase
-  setup do
-    user = create(:user)
-    CurrentUser.user = user
-  end
-
   context "a related tag query without a category constraint" do
     setup do
       create(:post, tag_string: "aaa bbb")

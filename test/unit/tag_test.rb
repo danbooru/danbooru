@@ -1,15 +1,6 @@
 require "test_helper"
 
 class TagTest < ActiveSupport::TestCase
-  setup do
-    @builder = create(:builder_user)
-    CurrentUser.user = @builder
-  end
-
-  teardown do
-    CurrentUser.user = nil
-  end
-
   context "A tag category fetcher" do
     should "fetch for multiple tags" do
       create(:artist_tag, name: "aaa")
@@ -153,17 +144,17 @@ class TagTest < ActiveSupport::TestCase
 
     should "change the type for an existing tag" do
       tag = create(:tag)
+
       assert_difference("Tag.count", 0) do
         assert_equal(Tag.categories.general, tag.category)
-        Tag.find_or_create_by_name(tag.name, category: "artist", current_user: @builder)
-        tag.reload
-        assert_equal(Tag.categories.artist, tag.category)
+        Tag.find_or_create_by_name(tag.name, category: "artist", current_user: create(:builder_user))
+        assert_equal(Tag.categories.artist, tag.reload.category)
       end
     end
 
     should "not change category when the tag is too large to be changed by a builder" do
       tag = create(:tag, post_count: 1001)
-      Tag.find_or_create_by_name(tag.name, category: "artist", current_user: @builder)
+      Tag.find_or_create_by_name(tag.name, category: "artist", current_user: create(:builder_user))
 
       assert_equal(0, tag.reload.category)
     end
@@ -198,7 +189,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(1, post.tag_count_general)
       assert_equal(0, post.tag_count_character)
 
-      Tag.find_or_create_by_name("test", category: "char", current_user: @builder)
+      Tag.find_or_create_by_name("test", category: "char", current_user: create(:builder_user))
       perform_enqueued_jobs(only: UpdateTagCategoryPostCountsJob)
       post.reload
 
@@ -226,7 +217,7 @@ class TagTest < ActiveSupport::TestCase
 
     should "be created with the type when one doesn't exist" do
       assert_difference("Tag.count", 1) do
-        tag = Tag.find_or_create_by_name("hoge", category: "artist", current_user: @builder)
+        tag = Tag.find_or_create_by_name("hoge", category: "artist", current_user: create(:builder_user))
         assert_equal("hoge", tag.name)
         assert_equal(Tag.categories.artist, tag.category)
         assert_equal(0, tag.versions.count)

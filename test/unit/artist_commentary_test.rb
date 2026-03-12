@@ -1,15 +1,6 @@
 require "test_helper"
 
 class ArtistCommentaryTest < ActiveSupport::TestCase
-  setup do
-    user = create(:user)
-    CurrentUser.user = user
-  end
-
-  teardown do
-    CurrentUser.user = nil
-  end
-
   should "A post should not have more than one commentary" do
     post = create(:post)
 
@@ -53,70 +44,66 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
 
     context "when updated" do
       setup do
-        @artcomm = create(:artist_commentary)
-        @artcomm.reload
+        @user = create(:user)
+        @artcomm = as(@user) { create(:artist_commentary).reload }
       end
 
       should "add tags if requested" do
-        @artcomm.update(translated_title: "bar", commentary_tags: "commentary")
-        assert(@artcomm.post.reload.has_tag?("commentary"))
-        @artcomm.update(commentary_tags: "partial_commentary")
-        assert_not(@artcomm.post.reload.has_tag?("commentary"))
-        assert(@artcomm.post.has_tag?("partial_commentary"))
+        as(@user) { @artcomm.update(translated_title: "bar", commentary_tags: "commentary") }
+        assert_equal(true, @artcomm.post.reload.has_tag?("commentary"))
+
+        as(@user) { @artcomm.update(commentary_tags: "partial_commentary") }
+        assert_equal(false, @artcomm.post.reload.has_tag?("commentary"))
+        assert_equal(true, @artcomm.post.has_tag?("partial_commentary"))
       end
 
       should "remove tags if requested" do
         @artcomm.post.update!(tag_string: "partial_commentary commentary")
-        @artcomm.update!(commentary_tags: "none")
+        as(@user) { @artcomm.update!(commentary_tags: "none") }
+
         assert_not(@artcomm.post.reload.has_tag?("commentary"))
         assert_not(@artcomm.post.has_tag?("partial_commentary"))
       end
 
       should "not add unrelated tags" do
-        @artcomm.update(commentary_tags: "foo")
+        as(@user) { @artcomm.update(commentary_tags: "foo") }
         assert_not(@artcomm.post.reload.has_tag?("foo"))
       end
 
       should "not create new version if nothing changed" do
-        @artcomm.save
+        as(@user) { @artcomm.save }
         assert_equal(1, @artcomm.versions.size)
       end
 
       should "create a new version if outside merge window" do
         travel(2.hours) do
-          @artcomm.update(original_title: "bar")
+          as(@user) { @artcomm.update!(original_title: "bar") }
 
-          assert_equal(2, @artcomm.versions.size)
+          assert_equal(2, @artcomm.reload.versions.size)
           assert_equal("bar", @artcomm.versions.last.original_title)
         end
       end
 
       should "merge with the previous version if inside merge window" do
-        @artcomm.update(original_title: "bar")
-        @artcomm.reload
+        as(@user) { @artcomm.update!(original_title: "bar") }
 
-        assert_equal(1, @artcomm.versions.size)
+        assert_equal(1, @artcomm.reload.versions.size)
         assert_equal("bar", @artcomm.versions.last.original_title)
       end
 
-      should "trim whitespace from all fields" do
-        # \u00A0 - nonbreaking space.
-        @artcomm.update(
-          original_title: "  foo\u00A0\t\n",
-          original_description: " foo\u00A0\t\n",
-          translated_title: "  foo\u00A0\t\n",
-          translated_description: "  foo\u00A0\n",
-        )
+      context "during normalization" do
+        subject { build(:artist_commentary) }
 
-        assert_equal("foo", @artcomm.original_title)
-        assert_equal("foo", @artcomm.original_description)
-        assert_equal("foo", @artcomm.translated_title)
-        assert_equal("foo", @artcomm.translated_description)
+        # \u00A0 - nonbreaking space.
+        should normalize_attribute(:original_title).from("  foo\u00A0\t\n").to("foo")
+        should normalize_attribute(:original_description).from("  foo\u00A0\t\n").to("foo")
+        should normalize_attribute(:translated_title).from("  foo\u00A0\t\n").to("foo")
+        should normalize_attribute(:translated_description).from("  foo\u00A0\t\n").to("foo")
       end
     end
 
     context "during validation" do
-      subject { create(:artist_commentary, post: create(:post)) }
+      subject { build(:artist_commentary) }
 
       should_not allow_value("x" * 700).for(:original_title)
       should_not allow_value("x" * 700).for(:translated_title)

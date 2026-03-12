@@ -2,14 +2,6 @@ require "test_helper"
 
 class ArtistURLTest < ActiveSupport::TestCase
   context "An artist url" do
-    setup do
-      CurrentUser.user = create(:user)
-    end
-
-    teardown do
-      CurrentUser.user = nil
-    end
-
     should "allow urls to be marked as inactive" do
       url = create(:artist_url, url: "http://monet.com", is_active: false)
       assert_equal("http://monet.com", url.url)

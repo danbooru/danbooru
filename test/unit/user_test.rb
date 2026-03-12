@@ -17,11 +17,6 @@ class UserTest < ActiveSupport::TestCase
   context "A user" do
     setup do
       @user = create(:user)
-      CurrentUser.user = @user
-    end
-
-    teardown do
-      CurrentUser.user = nil
     end
 
     context "promoting a user" do
@@ -287,42 +282,15 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    context "ip address" do
-      setup do
+    context "when serializing to JSON/XML" do
+      should "not include private information in the JSON or XML representations" do
         @user = create(:user)
-      end
 
-      context "in the json representation" do
-        should "not appear" do
-          assert(@user.to_json !~ /addr/)
-        end
-      end
-
-      context "in the xml representation" do
-        should "not appear" do
-          assert(@user.to_xml !~ /addr/)
-        end
-      end
-    end
-
-    context "password" do
-      context "in the json representation" do
-        setup do
-          @user = create(:user)
-        end
-
-        should "not appear" do
-          assert(@user.to_json !~ /password/)
-        end
-      end
-
-      context "in the xml representation" do
-        setup do
-          @user = create(:user)
-        end
-
-        should "not appear" do
-          assert(@user.to_xml !~ /password/)
+        as(@user) do
+          assert_no_match(/addr/, @user.to_json)
+          assert_no_match(/password/, @user.to_json)
+          assert_no_match(/addr/, @user.to_xml)
+          assert_no_match(/password/, @user.to_xml)
         end
       end
     end

@@ -1302,7 +1302,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for a upvote:<user>, downvote:<user> metatag" do
-      CurrentUser.scoped(create(:mod_user)) do
+      as(create(:mod_user)) do
         upvoted   = create(:post, tag_string: "upvote:self")
         downvoted = create(:post, tag_string: "downvote:self")
 

@@ -113,7 +113,7 @@ class PostApprovalTest < ActiveSupport::TestCase
 
     context "#search method" do
       should "work" do
-        CurrentUser.scoped(@approver) do
+        as(@approver) do
           @post.update!(tag_string: "touhou")
           @approval = create(:post_approval, post: @post, user: @approver)
 

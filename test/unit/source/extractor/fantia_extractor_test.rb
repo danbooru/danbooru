@@ -2,7 +2,7 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class FantiaExtractorTest < ActiveSupport::ExtractorTestCase
-    def setup
+    setup do
       skip "session_id cookie not set" unless Source::Extractor::Fantia.enabled?
     end
 

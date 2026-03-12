@@ -2,7 +2,7 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class CiEnExtractorTest < ActiveSupport::ExtractorTestCase
-    def setup
+    setup do
       skip "ci_en_session cookie not set" unless Source::Extractor::CiEn.enabled?
     end
 
