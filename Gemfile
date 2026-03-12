@@ -16,7 +16,6 @@ gem "dtext_rb", require: "dtext"
 # gem 'dtext_rb', path: "lib/dtext_rb", require: "dtext"
 gem "memoist"
 gem "daemons"
-gem "oauth2"
 gem "bootsnap", require: false
 gem "addressable"
 gem "rakismet"

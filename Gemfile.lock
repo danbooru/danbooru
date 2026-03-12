@@ -251,8 +251,6 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    hashie (5.1.0)
-      logger
     heapy (0.2.0)
       thor
     hsluv (1.0.2)
@@ -323,8 +321,6 @@ GEM
       redis (~> 5)
     msgpack (1.8.0)
     multi_json (1.19.1)
-    multi_xml (0.8.1)
-      bigdecimal (>= 3.1, < 5)
     mutex_m (0.3.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
@@ -347,14 +343,6 @@ GEM
     nokogiri (1.19.1-x86_64-linux-gnu)
       racc (~> 1.4)
     numo-narray (0.9.2.1)
-    oauth2 (2.0.18)
-      faraday (>= 0.17.3, < 4.0)
-      jwt (>= 1.0, < 4.0)
-      logger (~> 1.2)
-      multi_xml (~> 0.5)
-      rack (>= 1.2, < 4)
-      snaky_hash (~> 2.0, >= 2.0.3)
-      version_gem (~> 1.1, >= 1.1.9)
     optimist (3.2.1)
     os (1.1.4)
     ostruct (0.6.3)
@@ -545,9 +533,6 @@ GEM
       simplecov (~> 0.19)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
-    snaky_hash (2.0.3)
-      hashie (>= 0.1.0, < 6)
-      version_gem (>= 1.1.8, < 3)
     stackprof (0.2.28)
     stringio (3.2.0)
     stripe (18.4.1)
@@ -565,7 +550,6 @@ GEM
     unicode-emoji (4.2.0)
     uri (1.1.1)
     useragent (0.16.11)
-    version_gem (1.1.9)
     view_component (4.5.0)
       actionview (>= 7.1.0)
       activesupport (>= 7.1.0)
@@ -631,7 +615,6 @@ DEPENDENCIES
   mock_redis
   net-sftp
   nokogiri
-  oauth2
   pg
   pry-rails
   public_suffix
