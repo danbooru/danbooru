@@ -22,16 +22,16 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://fxraffinity.net/view/1234",
-                             page_url: "https://www.furaffinity.net/view/1234",)
+                             page_url: "https://www.furaffinity.net/view/1234")
 
       url_parser_should_work("https://fxfuraffinity.net/view/1234",
-                             page_url: "https://www.furaffinity.net/view/1234",)
+                             page_url: "https://www.furaffinity.net/view/1234")
 
       url_parser_should_work("https://vxfuraffinity.net/view/1234",
-                             page_url: "https://www.furaffinity.net/view/1234",)
+                             page_url: "https://www.furaffinity.net/view/1234")
 
       url_parser_should_work("https://xfuraffinity.net/view/1234",
-                             page_url: "https://www.furaffinity.net/view/1234",)
+                             page_url: "https://www.furaffinity.net/view/1234")
     end
   end
 end

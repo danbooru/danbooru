@@ -27,21 +27,21 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://xfolio.jp/en/portfolio/ben1shoga/works/237599",
-                             page_url: "https://xfolio.jp/portfolio/ben1shoga/works/237599",)
+                             page_url: "https://xfolio.jp/portfolio/ben1shoga/works/237599")
 
       url_parser_should_work("https://xfolio.jp/en/portfolio/ben1shoga",
-                             profile_url: "https://xfolio.jp/portfolio/ben1shoga",)
+                             profile_url: "https://xfolio.jp/portfolio/ben1shoga")
 
       url_parser_should_work("https://xfolio.jp/portfolio/ben1shoga/works",
-                             profile_url: "https://xfolio.jp/portfolio/ben1shoga",)
+                             profile_url: "https://xfolio.jp/portfolio/ben1shoga")
 
       url_parser_should_work("https://xfolio.jp/en/portfolio/ben1shoga/works",
-                             profile_url: "https://xfolio.jp/portfolio/ben1shoga",)
+                             profile_url: "https://xfolio.jp/portfolio/ben1shoga")
 
       url_parser_should_work("https://xfolio.jp/portfolio/ben1shoga", username: "ben1shoga")
       url_parser_should_work("https://xfolio.jp/portfolio/ben1shoga/works/237599",
                              username: "ben1shoga",
-                             work_id: "237599",)
+                             work_id: "237599")
     end
   end
 end

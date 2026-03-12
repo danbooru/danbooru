@@ -75,7 +75,7 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search.with { [@unrelated_approval, @user_approval, @post_approval] }
       should respond_to_search(user_name: -> { @approver.name }).with { @user_approval }
       should respond_to_search(post_tags_match: "touhou").with { @post_approval }
-      should respond_to_search(post: { uploader_name: -> { @post.uploader.name } }).with { @post_approval }
+      should respond_to_search(post: { uploader_name: -> { @post.uploader.name }}).with { @post_approval }
     end
 
     context "show action" do

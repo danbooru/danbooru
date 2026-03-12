@@ -21,7 +21,7 @@ module Source::Tests::URL
     end
     context "when extracting attributes" do
       url_parser_should_work("https://static1.e926.net/data/6d/1a/6d1a6090ea82c2524212499797e7e53a.png",
-                             page_url: "https://e621.net/posts?md5=6d1a6090ea82c2524212499797e7e53a",)
+                             page_url: "https://e621.net/posts?md5=6d1a6090ea82c2524212499797e7e53a")
     end
   end
 end

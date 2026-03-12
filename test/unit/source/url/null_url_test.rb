@@ -154,173 +154,173 @@ module Source::Tests::URL
 
     context "For karabako links" do
       url_parser_should_work("http://www.karabako.net/images/karabako_38835.jpg",
-                             page_url: "http://www.karabako.net/post/view/38835",)
+                             page_url: "http://www.karabako.net/post/view/38835")
     end
 
     context "For twipple links" do
       url_parser_should_work("http://p.twpl.jp/show/orig/mI2c3",
-                             page_url: "http://p.twipple.jp/mI2c3",)
+                             page_url: "http://p.twipple.jp/mI2c3")
     end
 
     context "For sankaku links" do
       url_parser_should_work("http://cs.sankakucomplex.com/data/sample/c2/d7/sample-c2d7270b84ac81326384d4eadd4d4746.jpg?2738848",
-                             page_url: "https://chan.sankakucomplex.com/post/show?md5=c2d7270b84ac81326384d4eadd4d4746",)
+                             page_url: "https://chan.sankakucomplex.com/post/show?md5=c2d7270b84ac81326384d4eadd4d4746")
     end
 
     context "For minitokyo links" do
       url_parser_should_work("http://static.minitokyo.net/downloads/27/13/365677.jpg?433592448,Minitokyo.Eien.no.Aselia.Scans_365677.jpg",
-                             page_url: "http://gallery.minitokyo.net/view/365677",)
+                             page_url: "http://gallery.minitokyo.net/view/365677")
 
       url_parser_should_work("http://static.minitokyo.net/downloads/14/33/199164.jpg?928244019",
-                             page_url: "http://gallery.minitokyo.net/view/199164",)
+                             page_url: "http://gallery.minitokyo.net/view/199164")
     end
 
     context "For e-shuushuu links" do
       url_parser_should_work("http://e-shuushuu.net/images/2014-07-22-662472.png",
-                             page_url: "https://e-shuushuu.net/image/662472",)
+                             page_url: "https://e-shuushuu.net/image/662472")
     end
 
     context "For nijigen-daiaru links" do
       url_parser_should_work("http://jpg.nijigen-daiaru.com/19909/029.jpg",
-                             page_url: "http://nijigen-daiaru.com/book.php?idb=19909",)
+                             page_url: "http://nijigen-daiaru.com/book.php?idb=19909")
     end
 
     context "For doujinantena links" do
       url_parser_should_work("http://sozai.doujinantena.com/contents_jpg/d6c39f09d435e32c221e4ef866eceba4/015.jpg",
-                             page_url: "http://doujinantena.com/page.php?id=d6c39f09d435e32c221e4ef866eceba4",)
+                             page_url: "http://doujinantena.com/page.php?id=d6c39f09d435e32c221e4ef866eceba4")
     end
 
     context "For paheal.net links" do
       url_parser_should_work("http://rule34-data-010.paheal.net/_images/854806addcd3b1246424e7cea49afe31/852405%20-%20Darkstalkers%20Felicia.jpg",
-                             page_url: "https://rule34.paheal.net/post/view/852405",)
+                             page_url: "https://rule34.paheal.net/post/view/852405")
     end
 
     context "For shimmie.katawa-shoujo.com links" do
       url_parser_should_work("http://shimmie.katawa-shoujo.com/image/2740.png",
-                             page_url: "https://shimmie.katawa-shoujo.com/post/view/2740",)
+                             page_url: "https://shimmie.katawa-shoujo.com/post/view/2740")
     end
 
     context "For diarypro links" do
       url_parser_should_work("http://nekomataya.net/diarypro/data/upfile/216-1.jpg",
-                             page_url: "http://nekomataya.net/diarypro/diary.cgi?no=216",)
+                             page_url: "http://nekomataya.net/diarypro/diary.cgi?no=216")
 
       url_parser_should_work("http://akimbo.sakura.ne.jp/diarypro/diary.cgi?mode=image&upfile=716-3.jpg",
-                             page_url: "http://akimbo.sakura.ne.jp/diarypro/diary.cgi?no=716",)
+                             page_url: "http://akimbo.sakura.ne.jp/diarypro/diary.cgi?no=716")
     end
 
     context "For minus.com links" do
       url_parser_should_work("http://i1.minus.com/ibb0DuE2Ds0yE6.jpg",
-                             page_url: "http://minus.com/i/bb0DuE2Ds0yE6",)
+                             page_url: "http://minus.com/i/bb0DuE2Ds0yE6")
     end
 
     context "For photozou links" do
       url_parser_should_work("http://kura3.photozou.jp/pub/794/1481794/photo/161537258_org.v1364829097.jpg",
-                             page_url: "https://photozou.jp/photo/show/1481794/161537258",)
+                             page_url: "https://photozou.jp/photo/show/1481794/161537258")
       url_parser_should_work("http://art59.photozou.jp/pub/212/1986212/photo/118493247_org.v1534644005.jpg",
-                             page_url: "https://photozou.jp/photo/show/1986212/118493247",)
+                             page_url: "https://photozou.jp/photo/show/1986212/118493247")
     end
 
     context "For toranoana links" do
       url_parser_should_work("http://img.toranoana.jp/popup_img/04/0030/09/76/040030097695-2p.jpg",
-                             page_url: "https://ec.toranoana.jp/tora_r/ec/item/040030097695",)
+                             page_url: "https://ec.toranoana.jp/tora_r/ec/item/040030097695")
       url_parser_should_work("https://ecdnimg.toranoana.jp/ec/img/04/0030/65/34/040030653417-6p.jpg",
-                             page_url: "https://ec.toranoana.jp/tora_r/ec/item/040030653417",)
+                             page_url: "https://ec.toranoana.jp/tora_r/ec/item/040030653417")
     end
 
     context "For hitomi.la links" do
       url_parser_should_work("https://aa.hitomi.la/galleries/883451/t_rena1g.png",
-                             page_url: "https://hitomi.la/galleries/883451.html",)
+                             page_url: "https://hitomi.la/galleries/883451.html")
       url_parser_should_work("https://la.hitomi.la/galleries/1054851/001_main_image.jpg",
-                             page_url: "https://hitomi.la/reader/1054851.html#1",)
+                             page_url: "https://hitomi.la/reader/1054851.html#1")
     end
 
     context "For imgbb links" do
       url_parser_should_work("https://meliach.imgbb.com",
-                             profile_url: "https://meliach.imgbb.com",)
+                             profile_url: "https://meliach.imgbb.com")
 
       url_parser_should_work("https://meliach.imgbb.com/albums",
-                             profile_url: "https://meliach.imgbb.com",)
+                             profile_url: "https://meliach.imgbb.com")
     end
 
     context "For tiktok links" do
       url_parser_should_work("https://www.tiktok.com/@ajmarekart?_t=ZM-8wmxRtoZXjq&_r=1",
-                             profile_url: "https://www.tiktok.com/@ajmarekart",)
+                             profile_url: "https://www.tiktok.com/@ajmarekart")
 
       url_parser_should_work("https://www.tiktok.com/@lenn0n__?",
-                             profile_url: "https://www.tiktok.com/@lenn0n__",)
+                             profile_url: "https://www.tiktok.com/@lenn0n__")
 
       url_parser_should_work("https://www.tiktok.com/@h.panda_12",
-                             profile_url: "https://www.tiktok.com/@h.panda_12",)
+                             profile_url: "https://www.tiktok.com/@h.panda_12")
     end
 
     context "For about.me links" do
       url_parser_should_work("http://about.me/rig22",
-                             profile_url: "https://about.me/rig22",)
+                             profile_url: "https://about.me/rig22")
     end
 
     context "For ameblo.jp links" do
       url_parser_should_work("http://marilyn77.ameblo.jp/",
-                             profile_url: "https://ameblo.jp/marilyn77",)
+                             profile_url: "https://ameblo.jp/marilyn77")
 
       url_parser_should_work("https://ameblo.jp/g8set55679",
-                             profile_url: "https://ameblo.jp/g8set55679",)
+                             profile_url: "https://ameblo.jp/g8set55679")
 
       url_parser_should_work("http://ameblo.jp/hanauta-os/entry-11860045489.html",
-                             profile_url: "https://ameblo.jp/hanauta-os",)
+                             profile_url: "https://ameblo.jp/hanauta-os")
 
       url_parser_should_work("http://stat.ameba.jp/user_images/20130802/21/moment1849/38/bd/p",
-                             profile_url: "https://ameblo.jp/moment1849",)
+                             profile_url: "https://ameblo.jp/moment1849")
 
       url_parser_should_work("https://profile.ameba.jp/ameba/kbnr32rbfs",
-                             profile_url: "https://ameblo.jp/kbnr32rbfs",)
+                             profile_url: "https://ameblo.jp/kbnr32rbfs")
     end
 
     context "For anidb.net links" do
       url_parser_should_work("https://anidb.net/creator/65313",
-                             profile_url: "https://anidb.net/creator/65313",)
+                             profile_url: "https://anidb.net/creator/65313")
 
       url_parser_should_work("https://anidb.net/perl-bin/animedb.pl?show=creator&creatorid=3903",
-                             profile_url: "https://anidb.net/creator/3903",)
+                             profile_url: "https://anidb.net/creator/3903")
     end
 
     context "For baidu.com links" do
       url_parser_should_work("http://hi.baidu.com/new/mocaorz",
-                             profile_url: "http://hi.baidu.com/mocaorz",)
+                             profile_url: "http://hi.baidu.com/mocaorz")
 
       url_parser_should_work("http://hi.baidu.com/longbb1127/home",
-                             profile_url: "http://hi.baidu.com/longbb1127",)
+                             profile_url: "http://hi.baidu.com/longbb1127")
     end
 
     context "For flickr.com links" do
       url_parser_should_work("https://www.flickr.com/people/shirasaki408/",
-                             profile_url: "https://www.flickr.com/people/shirasaki408",)
+                             profile_url: "https://www.flickr.com/people/shirasaki408")
 
       url_parser_should_work("https://www.flickr.com/photos/shirasaki408/49398982266/",
-                             profile_url: "https://www.flickr.com/people/shirasaki408",)
+                             profile_url: "https://www.flickr.com/people/shirasaki408")
 
       url_parser_should_work("https://www.flickr.com/photos/hizna/sets/72157629448846789/",
-                             profile_url: "https://www.flickr.com/people/hizna",)
+                             profile_url: "https://www.flickr.com/people/hizna")
     end
 
     context "For linktr.ee links" do
       url_parser_should_work("https://linktr.ee/cxlinray",
-                             profile_url: "https://linktr.ee/cxlinray",)
+                             profile_url: "https://linktr.ee/cxlinray")
     end
 
     context "For twpl.jp profile links" do
       url_parser_should_work("http://twpl.jp/swacoro",
-                             profile_url: "https://twpf.jp/swacoro",)
+                             profile_url: "https://twpf.jp/swacoro")
     end
 
     context "For yfrog.com links" do
       url_parser_should_work("http://yfrog.com/gyi1smoj",
-                             page_url: "http://yfrog.com/gyi1smoj",)
+                             page_url: "http://yfrog.com/gyi1smoj")
 
       url_parser_should_work("http://twitter.yfrog.com/z/oe3umiifj",
-                             page_url: "http://yfrog.com/oe3umiifj",)
+                             page_url: "http://yfrog.com/oe3umiifj")
 
       url_parser_should_work("http://yfrog.com/user/0128sinonome/photos",
-                             profile_url: "http://yfrog.com/user/0128sinonome/photos",)
+                             profile_url: "http://yfrog.com/user/0128sinonome/photos")
     end
 
     context "For e-hentai links" do

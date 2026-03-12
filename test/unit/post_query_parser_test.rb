@@ -223,7 +223,7 @@ class PostQueryParserTest < ActiveSupport::TestCase
        "skirt\u0085tail", "skirt\u00a0tail", "skirt\u1680tail", "skirt\u2000tail", "skirt\u2001tail", "skirt\u2002tail",
        "skirt\u2003tail", "skirt\u2004tail", "skirt\u2005tail", "skirt\u2006tail", "skirt\u2007tail", "skirt\u2008tail",
        "skirt\u2009tail", "skirt\u200atail", "skirt\u2028tail", "skirt\u2029tail", "skirt\u202ftail", "skirt\u205ftail",
-       "skirt\u3000tail",].each do |search|
+       "skirt\u3000tail"].each do |search|
         assert_parse_equals("(and skirt tail)", search)
       end
     end

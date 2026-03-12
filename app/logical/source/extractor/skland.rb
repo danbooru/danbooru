@@ -168,7 +168,7 @@ class Source::Extractor::Skland < Source::Extractor
         os: "web",
         encode: 5,
         compress: 2,
-      },)
+      })
 
       raw_device_id = response&.dig(:detail, :deviceId)
       "B#{raw_device_id}" if raw_device_id.present?

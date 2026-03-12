@@ -122,7 +122,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def url=(url)
-    super(url)
+    super
     @parsed_url = Source::URL.parse(url)
   end
 

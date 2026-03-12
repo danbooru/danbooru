@@ -27,7 +27,7 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "list all versions that match the search criteria" do
-        get pool_versions_path, params: {search: {updater_id: @user2.id}}
+        get pool_versions_path, params: { search: { updater_id: @user2.id }}
         assert_response :success
         assert_select "#pool-version-#{@versions[0].id}", false
         assert_select "#pool-version-#{@versions[1].id}"

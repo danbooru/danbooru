@@ -44,7 +44,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
           should comment_votes.with { [@unrelated_vote, @negative_vote, @vote] }
           should comment_votes.search_params(score: -1).with { @negative_vote }
 
-          should comment_votes.search_params(comment: { creator_name: -> { @user.name } }).with { [@negative_vote, @vote] }
+          should comment_votes.search_params(comment: { creator_name: -> { @user.name }}).with { [@negative_vote, @vote] }
           should comment_votes.search_params(user_name: -> { @voter.name }).with { @vote }
           should comment_votes.search_params(user: { level: User::Levels::GOLD }).with { @vote }
         end

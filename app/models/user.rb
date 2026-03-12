@@ -119,7 +119,7 @@ class User < ApplicationRecord
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
   validates :password, confirmation: { message: "Passwords don't match" }
   validates :comment_threshold, inclusion: { in: (-100..5) }
-  validates :level, inclusion: { in: User::Levels.constants.map { |c| User::Levels.const_get(c) } }, if: :level_changed?
+  validates :level, inclusion: { in: User::Levels.constants.map { |c| User::Levels.const_get(c) }}, if: :level_changed?
   validates :level, exclusion: { in: [User::Levels::ANONYMOUS] }, if: :level_changed?
   validate :validate_enable_private_favorites, on: :update
   validate :validate_blacklisted_tags, if: :blacklisted_tags_changed?
@@ -379,7 +379,7 @@ class User < ApplicationRecord
       shared_session_ids = UserEvent.shared_session_ids_for(self).includes(:user)
       shared_ip_addresses = UserEvent.shared_ip_addresses_for(self).includes(:user, :ip_geolocation)
       events = (shared_session_ids + shared_ip_addresses).take(limit)
-      accounts = { session_ids: {}, ip_addresses: {}, ip_geolocations: {} }
+      accounts = { session_ids: {}, ip_addresses: {}, ip_geolocations: {}}
 
       events.each do |event|
         next if event.user.in?(accounts[:session_ids].values.flatten) || event.user.in?(accounts[:ip_addresses].values.flatten)

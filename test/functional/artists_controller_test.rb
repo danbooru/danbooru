@@ -193,7 +193,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(has_tag: "false").with { [@banned, @deleted, @artgerm, @artist] }
           should respond_to_search(has_urls: "true").with { [@artgerm, @masao] }
           should respond_to_search(has_urls: "false").with { [@banned, @deleted, @artist] }
-          should respond_to_search(urls: {url: "https://www.pixiv.net/users/32777"}).with { @masao }
+          should respond_to_search(urls: { url: "https://www.pixiv.net/users/32777" }).with { @masao }
         end
       end
     end
@@ -227,7 +227,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "undelete an artist" do
-        put_auth artist_path(@artist.id), create(:builder_user), params: {artist: {is_deleted: false}}
+        put_auth artist_path(@artist.id), create(:builder_user), params: { artist: { is_deleted: false }}
         assert_redirected_to(artist_path(@artist.id))
         assert_equal(false, @artist.reload.is_deleted)
       end
@@ -249,7 +249,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           travel(2.hours) { @artist.update(name: "abc") }
         end
         version = @artist.versions.first
-        put_auth revert_artist_path(@artist.id), @user, params: {version_id: version.id}
+        put_auth revert_artist_path(@artist.id), @user, params: { version_id: version.id }
 
         assert_redirected_to @artist
         assert_equal("xyz", @artist.reload.name)
@@ -257,7 +257,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow reverting to a previous version of another artist" do
         @artist2 = as(@user) { create(:artist) }
-        put_auth artist_path(@artist.id), @user, params: {version_id: @artist2.versions.first.id}
+        put_auth artist_path(@artist.id), @user, params: { version_id: @artist2.versions.first.id }
         assert_redirected_to(artist_path(@artist.id))
         assert_not_equal(@artist.reload.name, @artist2.name)
       end

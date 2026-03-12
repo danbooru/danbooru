@@ -27,28 +27,28 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://files.yande.re/image/b66909b940e8d77accab7c9b25aa4dc3/yande.re%20377828.png",
-                             page_url: "https://yande.re/post/show/377828",)
+                             page_url: "https://yande.re/post/show/377828")
 
       url_parser_should_work("https://files.yande.re/image/2a5d1d688f565cb08a69ecf4e35017ab/yande.re%20349790%20breast_hold%20kurashima_tomoyasu%20mahouka_koukou_no_rettousei%20naked%20nipples.jpg",
-                             page_url: "https://yande.re/post/show/349790",)
+                             page_url: "https://yande.re/post/show/349790")
 
       url_parser_should_work("https://files.yande.re/image/e4c2ba38de88ff1640aaebff84c84e81/469784.jpg",
-                             page_url: "https://yande.re/post/show/469784",)
+                             page_url: "https://yande.re/post/show/469784")
 
       url_parser_should_work("https://yande.re/image/b4b1d11facd1700544554e4805d47bb6/.png",
-                             page_url: "https://yande.re/post/show?md5=b4b1d11facd1700544554e4805d47bb6",)
+                             page_url: "https://yande.re/post/show?md5=b4b1d11facd1700544554e4805d47bb6")
 
       url_parser_should_work("https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg",
-                             page_url: "https://yande.re/post/show?md5=22577d2344fe694cf47f80563031b3cd",)
+                             page_url: "https://yande.re/post/show?md5=22577d2344fe694cf47f80563031b3cd")
 
       url_parser_should_work("https://konachan.com/image/5d633771614e4bf5c17df19a0f0f333f/Konachan.com%20-%20270807%20black_hair%20bokuden%20clouds%20grass%20landscape%20long_hair%20original%20phone%20rope%20scenic%20seifuku%20skirt%20sky%20summer%20torii%20tree.jpg",
-                             page_url: "https://konachan.com/post/show/270807",)
+                             page_url: "https://konachan.com/post/show/270807")
 
       url_parser_should_work("https://konachan.com/sample/e2e2994bae738ff52fff7f4f50b069d5/Konachan.com%20-%20270803%20sample.jpg",
-                             page_url: "https://konachan.com/post/show/270803",)
+                             page_url: "https://konachan.com/post/show/270803")
 
       url_parser_should_work("https://konachan.com/image/99a3c4f10c327d54486259a74173fc0b.jpg",
-                             page_url: "https://konachan.com/post/show?md5=99a3c4f10c327d54486259a74173fc0b",)
+                             page_url: "https://konachan.com/post/show?md5=99a3c4f10c327d54486259a74173fc0b")
     end
   end
 end

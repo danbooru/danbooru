@@ -216,7 +216,7 @@ module Source
     #
     # @return [MediaFile] the downloaded file
     def download_file!(download_url)
-      response, file = http_downloader.download_media(download_url)
+      _response, file = http_downloader.download_media(download_url)
       file
     end
 

@@ -53,7 +53,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
           @totp = TOTP.new
 
-          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code } }
+          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
 
           assert_redirected_to user_backup_codes_path(@user, url: settings_path)
           assert_equal(true, @user.reload.totp.present?)
@@ -66,7 +66,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
           @totp = TOTP.new
 
-          put_auth user_totp_path(user_id: @user), create(:user), params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code } }
+          put_auth user_totp_path(user_id: @user), create(:user), params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
 
           assert_response 403
           assert_equal(false, @user.reload.totp.present?)
@@ -94,7 +94,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
           @totp = TOTP.new
 
-          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: "invalid" } }
+          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: "invalid" }}
 
           assert_response :success
           assert_equal(false, @user.reload.totp.present?)

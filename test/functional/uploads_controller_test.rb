@@ -145,7 +145,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail if given an unsupported filetype" do
         file = Rack::Test::UploadedFile.new("test/files/ugoira/animation.json")
-        post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file } }}
+        post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }}}
 
         assert_response 201
         assert_equal("File is not an image or video", Upload.last.error)

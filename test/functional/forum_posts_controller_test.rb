@@ -84,12 +84,12 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         should forum_posts.search_params(has_votes: "true").with { @forum_post }
         should forum_posts.search_params(has_dtext_links: "true").with { @linked_forum }
         should forum_posts.search_params(creator_id: -> { @user.id }).with { @forum_post }
-        should forum_posts.search_params(creator: { name: -> { @mod.name } }).with { [] }
+        should forum_posts.search_params(creator: { name: -> { @mod.name }}).with { [] }
       end
 
       context "as a moderator" do
         should respond_to_search.as_user { @mod }.with { [@bur_forum, @unrelated_forum, @mod_forum, @linked_forum, @forum_post] }
-        should respond_to_search.as_user { @mod }.search_params(creator: { name: -> { @mod.name } }).with { @mod_forum }
+        should respond_to_search.as_user { @mod }.search_params(creator: { name: -> { @mod.name }}).with { @mod_forum }
       end
 
       context "as an admin" do
@@ -151,7 +151,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
     context "new action" do
       should "render" do
-        get_auth new_forum_post_path, @user, params: {topic_id: @forum_topic.id}
+        get_auth new_forum_post_path, @user, params: { topic_id: @forum_topic.id }
         assert_response :success
       end
 
@@ -166,7 +166,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a new forum post" do
         assert_difference("ForumPost.count", 1) do
-          post_auth forum_posts_path, @user, params: {forum_post: {body: "xaxaxa", topic_id: @forum_topic.id}}
+          post_auth forum_posts_path, @user, params: { forum_post: { body: "xaxaxa", topic_id: @forum_topic.id }}
 
           assert_redirected_to(forum_topic_path(@forum_topic))
           assert_equal(@user, @forum_topic.forum_posts.last.creator)

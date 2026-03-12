@@ -32,13 +32,13 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://www.patreon.com/profile/creators?u=7422057",
-                             profile_url: "https://www.patreon.com/user?u=7422057",)
+                             profile_url: "https://www.patreon.com/user?u=7422057")
 
       url_parser_should_work("https://www.patreon.com/c/yaisirdrawz",
-                             profile_url: "https://www.patreon.com/yaisirdrawz",)
+                             profile_url: "https://www.patreon.com/yaisirdrawz")
 
       url_parser_should_work("https://www.patreon.com/cw/iwanokenta",
-                             profile_url: "https://www.patreon.com/iwanokenta",)
+                             profile_url: "https://www.patreon.com/iwanokenta")
     end
   end
 end

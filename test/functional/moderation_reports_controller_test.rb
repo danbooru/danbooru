@@ -21,7 +21,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render" do
-        get_auth new_moderation_report_path, @user, params: {moderation_report: {model_id: @comment.id, model_type: "Comment"}}
+        get_auth new_moderation_report_path, @user, params: { moderation_report: { model_id: @comment.id, model_type: "Comment" }}
         assert_response :success
       end
 
@@ -88,7 +88,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a new moderation report on a comment" do
         assert_difference("ModerationReport.count", 1) do
-          post_auth moderation_reports_path, @user, params: {format: "js", moderation_report: {model_id: @comment.id, model_type: "Comment", reason: "xxx"}}
+          post_auth moderation_reports_path, @user, params: { format: "js", moderation_report: { model_id: @comment.id, model_type: "Comment", reason: "xxx" }}
           assert_response :success
         end
       end

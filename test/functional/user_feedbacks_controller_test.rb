@@ -11,7 +11,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
 
     context "new action" do
       should "render" do
-        get_auth new_user_feedback_path, @critic, params: { user_feedback: { user_id: @user.id } }
+        get_auth new_user_feedback_path, @critic, params: { user_feedback: { user_id: @user.id }}
         assert_response :success
       end
     end

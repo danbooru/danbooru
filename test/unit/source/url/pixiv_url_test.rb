@@ -129,56 +129,56 @@ module Source::Tests::URL
     context "when extracting attributes" do
       context "for normal images" do
         url_parser_should_work("http://i2.pixiv.net/img12/img/zenze/39749565.png",
-                               page_url: "https://www.pixiv.net/artworks/39749565",)
+                               page_url: "https://www.pixiv.net/artworks/39749565")
 
         url_parser_should_work("http://i1.pixiv.net/img53/img/themare/39735353_big_p1.jpg",
-                               page_url: "https://www.pixiv.net/artworks/39735353",)
+                               page_url: "https://www.pixiv.net/artworks/39735353")
 
         url_parser_should_work("http://i1.pixiv.net/c/150x150/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg",
-                               page_url: "https://www.pixiv.net/artworks/14901720",)
+                               page_url: "https://www.pixiv.net/artworks/14901720")
 
         url_parser_should_work("http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png",
-                               page_url: "https://www.pixiv.net/artworks/14901720",)
+                               page_url: "https://www.pixiv.net/artworks/14901720")
 
         url_parser_should_work("http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip",
-                               page_url: "https://www.pixiv.net/artworks/44524589",)
+                               page_url: "https://www.pixiv.net/artworks/44524589")
 
         url_parser_should_work("https://i.pximg.net/img-master/img/2025/08/22/20/18/32/141762848-757de2f8c8f77f2f637b61e4c9f42ec4_p0_master1200.jpg",
-                               page_url: "https://www.pixiv.net/artworks/141762848",)
+                               page_url: "https://www.pixiv.net/artworks/141762848")
       end
 
       context "for proxies" do
         url_parser_should_work("http://phixiv.net/artworks/18557054",
-                               page_url: "https://www.pixiv.net/artworks/18557054",)
+                               page_url: "https://www.pixiv.net/artworks/18557054")
       end
 
       context "for novel images" do
         url_parser_should_work("https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg",
-                               page_url: "https://www.pixiv.net/novel/series/9593812",)
+                               page_url: "https://www.pixiv.net/novel/series/9593812")
 
         url_parser_should_work("https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg",
-                               page_url: "https://www.pixiv.net/novel/series/9593812",)
+                               page_url: "https://www.pixiv.net/novel/series/9593812")
 
         url_parser_should_work("https://embed.pixiv.net/novel.php?id=18588585&mdate=20221102100423",
-                               page_url: "https://www.pixiv.net/novel/show.php?id=18588585",)
+                               page_url: "https://www.pixiv.net/novel/show.php?id=18588585")
 
         url_parser_should_work("https://i.pximg.net/c/600x600/novel-cover-master/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4_master1200.jpg",
-                               page_url: "https://www.pixiv.net/novel/show.php?id=18588585",)
+                               page_url: "https://www.pixiv.net/novel/show.php?id=18588585")
 
         url_parser_should_work("https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.jpg",
-                               page_url: "https://www.pixiv.net/novel/show.php?id=18588585",)
+                               page_url: "https://www.pixiv.net/novel/show.php?id=18588585")
 
         url_parser_should_work("https://i.pximg.net/c/1200x1200/novel-cover-master/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5_master1200.jpg",
-                               page_url: nil,)
+                               page_url: nil)
 
         url_parser_should_work("https://i.pximg.net/novel-cover-original/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5.jpg",
-                               page_url: nil,)
+                               page_url: nil)
 
         url_parser_should_work("https://i.pximg.net/novel-cover-original/img/2018/04/02/19/38/29/9434677_6ab6c651d5568ff39e2ba6ab45edaf28.jpg",
-                               page_url: "https://www.pixiv.net/novel/show.php?id=9434677",)
+                               page_url: "https://www.pixiv.net/novel/show.php?id=9434677")
 
         url_parser_should_work("http://i1.pixiv.net/novel-cover-original/img/2016/11/11/20/11/46/7463785_0e2446dc1671dd3a4937dfaee39c227f.jpg",
-                               page_url: "https://www.pixiv.net/novel/show.php?id=7463785",)
+                               page_url: "https://www.pixiv.net/novel/show.php?id=7463785")
       end
     end
   end

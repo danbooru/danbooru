@@ -11,7 +11,7 @@ class ForumPostVote < ApplicationRecord
   scope :up, -> { where(score: 1) }
   scope :down, -> { where(score: -1) }
 
-  def self.visible(user)
+  def self.visible(_user)
     all
   end
 

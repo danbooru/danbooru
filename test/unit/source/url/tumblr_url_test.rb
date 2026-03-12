@@ -55,24 +55,24 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://octrain1020.tumblr.com/post/190713122589",
-                             page_url: "https://octrain1020.tumblr.com/post/190713122589",)
+                             page_url: "https://octrain1020.tumblr.com/post/190713122589")
 
       url_parser_should_work("https://octrain1020.tumblr.com/image/190713122589",
-                             page_url: "https://octrain1020.tumblr.com/post/190713122589",)
+                             page_url: "https://octrain1020.tumblr.com/post/190713122589")
 
       url_parser_should_work("https://octrain1020.tumblr.com/image/190713122589#asd",
-                             page_url: "https://octrain1020.tumblr.com/post/190713122589",)
+                             page_url: "https://octrain1020.tumblr.com/post/190713122589")
 
       url_parser_should_work("https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false",
-                             page_url: "https://superboin.tumblr.com/post/141169066579",)
+                             page_url: "https://superboin.tumblr.com/post/141169066579")
 
       url_parser_should_work("https://at.tumblr.com/pizza-and-ramen/118684413624/uqndb20nkyob",
-                             page_url: "https://pizza-and-ramen.tumblr.com/post/118684413624",)
+                             page_url: "https://pizza-and-ramen.tumblr.com/post/118684413624")
 
       url_parser_should_work("https://octrain1020.tumblr.com/", page_url: nil, blog_name: "octrain1020")
 
       url_parser_should_work("https://at.tumblr.com/cyanideqpoison/u2czj612ttzq",
-                             profile_url: "https://cyanideqpoison.tumblr.com",)
+                             profile_url: "https://cyanideqpoison.tumblr.com")
     end
   end
 end

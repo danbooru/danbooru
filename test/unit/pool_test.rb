@@ -119,7 +119,7 @@ class PoolTest < ActiveSupport::TestCase
 
       context "by #attributes=" do
         setup do
-          @pool.attributes = {post_ids: [@p1.id, @p2.id]}
+          @pool.attributes = { post_ids: [@p1.id, @p2.id] }
           @pool.save
         end
 

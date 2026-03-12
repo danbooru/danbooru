@@ -31,16 +31,16 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181",
-                             page_url: "https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic",)
+                             page_url: "https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic")
 
       url_parser_should_work("https://art.ngfiles.com/medium_views/5225000/5225108_220662_nanobutts_untitled-5225108.4a602f9525d0d55d8add3dcfb1485507.webp?f1700595860",
-                             page_url: nil,)
+                             page_url: nil)
 
       url_parser_should_work("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg",
-                             page_url: "https://www.newgrounds.com/art/view/natthelich/pandora",)
+                             page_url: "https://www.newgrounds.com/art/view/natthelich/pandora")
 
       url_parser_should_work("https://art.ngfiles.com/images/1543000/1543982_natthelich_pandora-2.jpg?f1607971817",
-                             page_url: "https://www.newgrounds.com/art/view/natthelich/pandora-2",)
+                             page_url: "https://www.newgrounds.com/art/view/natthelich/pandora-2")
     end
   end
 end

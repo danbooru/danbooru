@@ -153,7 +153,7 @@ class Sandbox
   # Wait on a subprocess to exit. Raise an error if it is killed because it called an
   # unauthorized syscall blocked by the seccomp filter.
   def waitpid!(pid)
-    pid, status = Process.wait2(pid)
+    _pid, status = Process.wait2(pid)
 
     if status.signaled? && Signal.signame(status.termsig) == "SYS"
       raise Error, "Command failed: called unauthorized syscall (see dmesg for details)"
@@ -357,7 +357,7 @@ class Sandbox
     # https://www.kernel.org/doc/html/latest/userspace-api/no_new_privs.html
     # https://github.com/torvalds/linux/blob/master/include/uapi/linux/prctl.h
     enum :prctl_command, [
-      :set_no_new_privs, 38
+      :set_no_new_privs, 38,
     ]
 
     # https://github.com/torvalds/linux/blob/master/include/uapi/linux/sched.h
@@ -388,7 +388,7 @@ class Sandbox
 
     # https://github.com/torvalds/linux/blob/master/include/linux/fs.h#L1425
     bitmask :umount_flags, [
-      :detach, 1 # 0x2
+      :detach, 1, # 0x2
     ]
 
     # prctl - operations on a process or thread

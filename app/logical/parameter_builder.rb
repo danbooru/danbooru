@@ -9,7 +9,7 @@ class ParameterBuilder
   def self.get_only_hash(only_array, object, seen_objects = [])
     return {} if object.nil?
     is_root = seen_objects.empty?
-    only_hash = {only: [], include: [], methods: []}
+    only_hash = { only: [], include: [], methods: [] }
     available_includes = object.available_includes
     attributes, methods = object.api_attributes.partition { |attr| object.has_attribute?(attr) }
     methods -= available_includes

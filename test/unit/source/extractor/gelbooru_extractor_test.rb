@@ -123,7 +123,7 @@ module Source::Tests::Extractor
       context "A Gelbooru post without credentials configured" do
         strategy_should_work(
           "https://gelbooru.com/index.php?page=post&s=view&id=7798121",
-          options: { credentials: { blah: "" } },
+          options: { credentials: { blah: "" }},
           image_urls: [],
           page_url: "https://gelbooru.com/index.php?page=post&s=view&id=7798121",
           profile_urls: [],

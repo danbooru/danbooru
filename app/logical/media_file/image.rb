@@ -50,7 +50,7 @@ class MediaFile::Image < MediaFile
     # return video.error if is_animated? && video.error.present?
 
     nil
-  rescue Vips::Error => e
+  rescue Vips::Error
     # XXX Vips has a single global error buffer that is shared between threads and that isn't cleared between operations.
     # We can't reliably use `e.message` here because it may pick up errors from other threads, or from previous
     # operations in the same thread.

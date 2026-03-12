@@ -145,7 +145,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(has_posts: "true").with { [@uploader, @other_user] }
         should respond_to_search(posts_tags_match: "touhou").with { @uploader }
         should respond_to_search(posts: { rating: "e" }).with { @other_user }
-        should respond_to_search(inviter: { name: -> { @mod_user.name } }).with { @other_user }
+        should respond_to_search(inviter: { name: -> { @mod_user.name }}).with { @other_user }
 
         context "a user with private forum posts" do
           setup do
@@ -326,7 +326,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "strip '?' from attributes" do
-        get_auth user_path(@user), @user, params: {format: :xml}
+        get_auth user_path(@user), @user, params: { format: :xml }
         xml = Hash.from_xml(response.body)
 
         assert_response :success
@@ -552,7 +552,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not create a user with an undeliverable email address" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "nobody@nothing.donmai.us" } } }
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "nobody@nothing.donmai.us" }}}
 
           assert_response :success
           assert_nil(session[:user_id])
@@ -604,7 +604,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         should "not create a user if the captcha response is missing" do
           assert_no_difference(["User.count"]) do
-            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" } }
+            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
             assert_response 401
           end
@@ -768,7 +768,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "update a user" do
-        put_auth user_path(@user), @user, params: {user: {favorite_tags: "xyz"}}
+        put_auth user_path(@user), @user, params: { user: { favorite_tags: "xyz" }}
 
         assert_redirected_to edit_user_path(@user)
         assert_equal("xyz", @user.reload.favorite_tags)
@@ -822,7 +822,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       context "for a banned user" do
         should "allow the user to edit their settings" do
           @user = create(:banned_user)
-          put_auth user_path(@user), @user, params: {user: {favorite_tags: "xyz"}}
+          put_auth user_path(@user), @user, params: { user: { favorite_tags: "xyz" }}
 
           assert_equal("xyz", @user.reload.favorite_tags)
         end

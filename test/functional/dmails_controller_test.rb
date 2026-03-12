@@ -17,18 +17,18 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
       context "with a respond_to_id" do
         should "not allow users to quote dmails belonging to unrelated users " do
-          get_auth new_dmail_path, @unrelated_user, params: {respond_to_id: @dmail.id}
+          get_auth new_dmail_path, @unrelated_user, params: { respond_to_id: @dmail.id }
           assert_response 403
         end
 
         should "prefill the fields" do
-          get_auth new_dmail_path, @user, params: {respond_to_id: @dmail.id}
+          get_auth new_dmail_path, @user, params: { respond_to_id: @dmail.id }
           assert_response :success
         end
 
         context "and a forward flag" do
           should "not populate the to field" do
-            get_auth new_dmail_path, @user, params: {respond_to_id: @dmail.id, forward: true}
+            get_auth new_dmail_path, @user, params: { respond_to_id: @dmail.id, forward: true }
             assert_response :success
           end
         end
@@ -144,8 +144,8 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
       should "create two messages, one for the sender and one for the recipient" do
         assert_difference("Dmail.count", 2) do
-          dmail_attribs = {to_id: @user2.id, title: "abc", body: "abc"}
-          post_auth dmails_path, @user, params: {dmail: dmail_attribs}
+          dmail_attribs = { to_id: @user2.id, title: "abc", body: "abc" }
+          post_auth dmails_path, @user, params: { dmail: dmail_attribs }
           assert_redirected_to dmail_path(Dmail.last)
         end
       end
@@ -174,14 +174,14 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "allow deletion if the dmail is owned by the current user" do
-        put_auth dmail_path(@dmail), @user, params: { dmail: { is_deleted: true } }
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_deleted: true }}
 
         assert_redirected_to dmail_path(@dmail)
         assert_equal(true, @dmail.reload.is_deleted)
       end
 
       should "not allow deletion if the dmail is not owned by the current user" do
-        put_auth dmail_path(@dmail), @unrelated_user, params: { dmail: { is_deleted: true } }
+        put_auth dmail_path(@dmail), @unrelated_user, params: { dmail: { is_deleted: true }}
 
         assert_response 403
         assert_equal(false, @dmail.reload.is_deleted)
@@ -195,11 +195,11 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "update user's unread_dmail_count when marking dmails as read or unread" do
-        put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: true } }
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: true }}
         assert_equal(true, @dmail.reload.is_read)
         assert_equal(1, @user.reload.unread_dmail_count)
 
-        put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: false } }
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: false }}
         assert_equal(false, @dmail.reload.is_read)
         assert_equal(2, @user.reload.unread_dmail_count)
       end

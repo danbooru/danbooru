@@ -20,15 +20,15 @@ class DtextLinksControllerTest < ActionDispatch::IntegrationTest
     end
 
     should respond_to_search.with { @pool.dtext_links + @forum.dtext_links + @wiki.dtext_links }
-    should respond_to_search(ForumPost: { topic: { min_level: 40 } }).with { [] }
-    should respond_to_search(ForumPost: { topic: { min_level: 40 } }).as_user { create(:moderator_user) }.with { @secret_forum.dtext_links }
+    should respond_to_search(ForumPost: { topic: { min_level: 40 }}).with { [] }
+    should respond_to_search(ForumPost: { topic: { min_level: 40 }}).as_user { create(:moderator_user) }.with { @secret_forum.dtext_links }
 
     should respond_to_search(model_type: "WikiPage").with { @wiki.dtext_links }
     should respond_to_search(model_type: "ForumPost").with { @forum.dtext_links }
     should respond_to_search(model_type: "Pool").with { @pool.dtext_links }
     should respond_to_search(has_linked_tag: "true").with { @wiki.dtext_links }
     should respond_to_search(has_linked_wiki: "true").with { @pool.dtext_links + @forum.dtext_links }
-    should respond_to_search(ForumPost: {topic: {title_matches: "blah"}}).with { @forum.dtext_links }
-    should respond_to_search(ForumPost: {topic: {title_matches: "nah"}}).with { [] }
+    should respond_to_search(ForumPost: { topic: { title_matches: "blah" }}).with { @forum.dtext_links }
+    should respond_to_search(ForumPost: { topic: { title_matches: "nah" }}).with { [] }
   end
 end

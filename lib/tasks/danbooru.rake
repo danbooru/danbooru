@@ -49,7 +49,7 @@ namespace :danbooru do
         # Setting `file` updates the metadata if it's different.
         asset.file = media_file
         asset.media_metadata.file = media_file
-        asset.post.assign_attributes(image_width: asset.image_width, image_height: asset.image_height, file_ext: asset.file_ext, file_size: asset.file_size) if asset.post.present?
+        asset.post&.assign_attributes(image_width: asset.image_width, image_height: asset.image_height, file_ext: asset.file_ext, file_size: asset.file_size)
 
         old = asset.media_metadata.metadata_was.to_h
         new = asset.media_metadata.metadata.to_h
@@ -108,7 +108,7 @@ namespace :danbooru do
 
     # Usage: bin/rails danbooru:images:populate_metadata
     task populate_metadata: :environment do
-      sm = StorageManager::Local.new(base_url: "/", base_dir: ENV.fetch("DIR", Rails.root.join("public/data")))
+      StorageManager::Local.new(base_url: "/", base_dir: ENV.fetch("DIR", Rails.public_path.join("data")))
 
       MediaMetadata.joins(:media_asset).where(metadata: {}).find_each do |metadata|
         asset = metadata.media_asset

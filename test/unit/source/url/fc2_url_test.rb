@@ -40,19 +40,19 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("http://diary.fc2.com/user/kazuharoom/img/2020_1/29.jpg",
-                             page_url: "http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom?Y=2020&M=1&D=29",)
+                             page_url: "http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom?Y=2020&M=1&D=29")
 
       url_parser_should_work("http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom/?Y=2012&M=10&D=22",
-                             profile_url: "http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom",)
+                             profile_url: "http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom")
 
       url_parser_should_work("http://toritokaizoku.web.fc2.com/tori.html",
-                             profile_url: "http://toritokaizoku.web.fc2.com/tori.html",)
+                             profile_url: "http://toritokaizoku.web.fc2.com/tori.html")
 
       url_parser_should_work("http://xkilikox.fc2web.com/image/haguruma.html",
-                             profile_url: "http://xkilikox.fc2web.com/image/haguruma.html",)
+                             profile_url: "http://xkilikox.fc2web.com/image/haguruma.html")
 
       url_parser_should_work("http://xkilikox.fc2web.com/image/haguruma00.jpg",
-                             profile_url: "http://xkilikox.fc2web.com",)
+                             profile_url: "http://xkilikox.fc2web.com")
     end
   end
 end

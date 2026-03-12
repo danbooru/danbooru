@@ -219,7 +219,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             create(:wiki_page, title: "1girl")
           end
 
-          get posts_path, params: {tags: "1girl solo"}
+          get posts_path, params: { tags: "1girl solo" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
         end
@@ -542,7 +542,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "show action" do
       should "render" do
-        get post_path(@post), params: {id: @post.id}
+        get post_path(@post), params: { id: @post.id }
         assert_response :success
       end
 
@@ -1012,7 +1012,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "redirect to the post on success" do
-        put_auth post_path(@post), @user, params: {post: {tag_string: "bbb"}}
+        put_auth post_path(@post), @user, params: { post: { tag_string: "bbb" }}
         assert_redirected_to post_path(@post)
 
         @post.reload
@@ -1020,7 +1020,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "ignore restricted params" do
-        put_auth post_path(@post), @user, params: {post: {last_noted_at: 1.minute.ago}}
+        put_auth post_path(@post), @user, params: { post: { last_noted_at: 1.minute.ago }}
         assert_nil(@post.reload.last_noted_at)
       end
 
@@ -1051,7 +1051,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "delete the post" do
-        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" }}
 
         assert_redirected_to @post
         assert_equal(true, @post.reload.is_deleted?)
@@ -1060,7 +1060,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       should "delete the post if the post is currently flagged" do
         create(:post_flag, post: @post, reason: "blah")
-        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" }}
 
         assert_redirected_to @post
         assert_equal(true, @post.reload.is_deleted?)
@@ -1071,7 +1071,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       should "delete the post even if the deleter has flagged the post previously" do
         create(:post_flag, post: @post, creator: @approver, created_at: 7.days.ago, status: "rejected", reason: "blah")
-        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" }}
 
         assert_redirected_to @post
         assert_equal(true, @post.reload.is_deleted?)
@@ -1113,7 +1113,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         @version = @post.versions.first
         assert_equal("aaaa", @version.tags)
-        put_auth revert_post_path(@post), @user, params: {version_id: @version.id}
+        put_auth revert_post_path(@post), @user, params: { version_id: @version.id }
         assert_redirected_to post_path(@post)
         @post.reload
         assert_equal("aaaa", @post.tag_string)

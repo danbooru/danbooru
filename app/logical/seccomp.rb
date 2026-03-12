@@ -360,7 +360,7 @@ module Seccomp
         yield self
       end
 
-      pid, status = Process.wait2(pid)
+      _pid, status = Process.wait2(pid)
       if status.signaled? && Signal.signame(status.termsig) == "SYS"
         raise Error, "Subprocess called unauthorized syscall (see dmesg for details)"
       end

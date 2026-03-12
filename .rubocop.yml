@@ -1,5 +1,3 @@
-# Some of these settings are overridden in test/.rubocop.yml
-#
 # https://docs.rubocop.org/rubocop/latest/configuration.html
 # https://docs.rubocop.org/rubocop-factory_bot/latest/cops_factorybot.html
 #
@@ -16,6 +14,7 @@ AllCops:
   NewCops: enable
   ActiveSupportExtensionsEnabled: true
   StringLiteralsFrozenByDefault: true
+  SuggestExtensions: false
   Exclude:
     - "node_modules/**/*"
     - "public/**/*"
@@ -50,7 +49,11 @@ Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
 
 Layout/SpaceInsideHashLiteralBraces:
-  Enabled: false
+  EnforcedStyle: compact
+
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "**/test/**/*"
 
 Lint/DuplicateBranch:
   Enabled: false
@@ -58,37 +61,41 @@ Lint/DuplicateBranch:
 Lint/SymbolConversion:
   EnforcedStyle: consistent
 
+Lint/UselessAssignment:
+  Exclude:
+    - "**/test/**/*"
+
 Metrics/AbcSize:
   Enabled: false
 
 Metrics/BlockLength:
-  Max: 50
-  AllowedMethods:
-    - concerning
-    - context
-    - should
+  Max: 400
+  Exclude:
+    - "**/test/**/*"
 
 Metrics/BlockNesting:
   CountBlocks: false
   Max: 4
 
 Metrics/ClassLength:
-  Max: 500
+  Max: 750
+  Exclude:
+    - "**/test/**/*"
 
 Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/MethodLength:
-  Max: 100
+  Max: 250
 
 Metrics/ModuleLength:
-  Max: 500
+  Max: 400
 
 Metrics/ParameterLists:
   Max: 6
 
 Metrics/PerceivedComplexity:
-  Max: 20
+  Max: 100
 
 Lint/InheritException:
   EnforcedStyle: standard_error
@@ -214,7 +221,7 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
-  Enabled: false
+  EnforcedStyle: double_quotes
 
 Style/SymbolArray:
   MinSize: 10
@@ -227,13 +234,13 @@ Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
 
 Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: consistent_comma
+  EnforcedStyleForMultiline: diff_comma
 
 Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: consistent_comma
+  EnforcedStyleForMultiline: diff_comma
 
 Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: consistent_comma
+  EnforcedStyleForMultiline: diff_comma
 
 Style/WordArray:
   MinSize: 10

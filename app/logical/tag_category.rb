@@ -90,7 +90,7 @@ module TagCategory
       ARTIST    => [COPYRIGHT, CHARACTER, GENERAL],
       CHARACTER => [COPYRIGHT, CHARACTER, GENERAL],
       COPYRIGHT => [COPYRIGHT, CHARACTER, GENERAL],
-      META      => [META, GENERAL]
+      META      => [META, GENERAL],
     }
   end
 

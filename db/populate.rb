@@ -105,12 +105,12 @@ def populate_notes(n)
   n.times do
     user = User.order("random()").first
     post = Post.order("random()").first
-    x = rand(post.image_width).clamp(0..post.image_width - 100)
-    y = rand(post.image_height).clamp(0..post.image_height - 100)
+    x = rand(post.image_width).clamp(0..(post.image_width - 100))
+    y = rand(post.image_height).clamp(0..(post.image_height - 100))
     w = rand(post.image_width - x).clamp(100..post.image_width)
     h = rand(post.image_height - y).clamp(100..post.image_height)
 
-    note = Note.create(post: post, x: x, y: y, width: w, height: h, body: Faker::Lorem.paragraph)
+    note = Note.create(post: post, user: user, x: x, y: y, width: w, height: h, body: Faker::Lorem.paragraph)
 
     Rails.logger.info "Created note ##{note.id}"
   end

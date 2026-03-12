@@ -85,7 +85,7 @@ class TimeSeriesComponent < ApplicationComponent
         { type: "slider" },
       ],
       xAxis: { type: "time" },
-      yAxis: [type: "value"] * y_axis.size,
+      yAxis: [{ type: "value" }] * y_axis.size,
       series: y_axis.map do |name|
         {
           name: name,
@@ -100,14 +100,14 @@ class TimeSeriesComponent < ApplicationComponent
             y: name,
           },
         }
-      end
+      end,
     )
   end
 
   def horizontal_bar_chart
     base_options.deep_merge(
       xAxis: { type: "value" },
-      yAxis: [type: "category", inverse: true] * y_axis.size,
+      yAxis: [{ type: "category", inverse: true }] * y_axis.size,
       series: y_axis.map do |name|
         {
           name: name,
@@ -120,7 +120,7 @@ class TimeSeriesComponent < ApplicationComponent
             y: x_axis,
           },
         }
-      end
+      end,
     )
   end
 end

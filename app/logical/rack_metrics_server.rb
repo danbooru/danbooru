@@ -32,7 +32,7 @@ class RackMetricsServer
       [200, {}, []]
     when "/metrics", "/metrics/instance"
       metrics = ApplicationMetrics.update_process_metrics.to_prom
-      [200, {"Content-Type" => "text/plain"}, [metrics]]
+      [200, { "Content-Type" => "text/plain" }, [metrics]]
     else
       [404, {}, []]
     end

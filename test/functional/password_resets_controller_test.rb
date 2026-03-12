@@ -18,7 +18,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "redirect to the profile page for a logged-in user" do
-        post_auth password_reset_path, create(:user), params: { user: { name: "foobar@gmail.com" } }
+        post_auth password_reset_path, create(:user), params: { user: { name: "foobar@gmail.com" }}
 
         assert_redirected_to profile_path
         assert_equal("Already logged in", flash[:notice])
@@ -27,7 +27,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
       context "for an account identified by an email address" do
         should "send a password reset email if the account exists and has a verified email address" do
           @user = create(:user, email_address: create(:email_address, address: "Foo.Bar+nospam@Googlemail.com", is_verified: true))
-          post password_reset_path, params: { user: { name: "foobar@gmail.com" } }
+          post password_reset_path, params: { user: { name: "foobar@gmail.com" }}
 
           assert_redirected_to password_reset_path
           assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
@@ -38,7 +38,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "send a password reset email if the account exists and has an unverified email address" do
           @user = create(:user, email_address: create(:email_address, address: "Foo.Bar+nospam@Googlemail.com", is_verified: false))
-          post password_reset_path, params: { user: { name: "foobar@gmail.com" } }
+          post password_reset_path, params: { user: { name: "foobar@gmail.com" }}
 
           assert_redirected_to password_reset_path
           assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
@@ -48,7 +48,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not send an email if an account with the email doesn't exist" do
-          post password_reset_path, params: { user: { name: "foobar@gmail.com" } }
+          post password_reset_path, params: { user: { name: "foobar@gmail.com" }}
 
           assert_redirected_to password_reset_path
           assert_no_enqueued_emails
@@ -59,7 +59,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
       context "for an account identified by a username" do
         should "send a password reset email if the account exists and has a verified email address" do
           @user = create(:user, email_address: create(:email_address, address: "Foo.Bar+nospam@Googlemail.com", is_verified: true))
-          post password_reset_path, params: { user: { name: @user.name } }
+          post password_reset_path, params: { user: { name: @user.name }}
 
           assert_redirected_to password_reset_path
           assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
@@ -70,7 +70,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "send a password reset email if the account exists and has an unverified email address" do
           @user = create(:user, email_address: create(:email_address, address: "Foo.Bar+nospam@Googlemail.com", is_verified: false))
-          post password_reset_path, params: { user: { name: @user.name } }
+          post password_reset_path, params: { user: { name: @user.name }}
 
           assert_redirected_to password_reset_path
           assert_equal(true, @user.user_events.password_reset_request.exists?(login_session_id: nil))
@@ -81,7 +81,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "not send an email if the user doesn't have an email address" do
           @user = create(:user)
-          post password_reset_path, params: { user: { name: @user.name } }
+          post password_reset_path, params: { user: { name: @user.name }}
 
           assert_redirected_to password_reset_path
           assert_no_enqueued_emails
@@ -89,7 +89,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not send an email if the user does not exist" do
-          post password_reset_path, params: { user: { name: "qoi23oti" } }
+          post password_reset_path, params: { user: { name: "qoi23oti" }}
 
           assert_redirected_to password_reset_path
           assert_no_enqueued_emails

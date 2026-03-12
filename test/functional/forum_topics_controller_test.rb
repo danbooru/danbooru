@@ -55,13 +55,13 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not record a topic visit for non-html requests" do
-        get_auth forum_topic_path(@forum_topic), @user, params: {format: :json}
+        get_auth forum_topic_path(@forum_topic), @user, params: { format: :json }
         @user.reload
         assert_equal(Time.zone.parse("1960-01-01"), @user.last_forum_read_at)
       end
 
       should "render for atom feed" do
-        get forum_topic_path(@forum_topic), params: {format: :atom}
+        get forum_topic_path(@forum_topic), params: { format: :atom }
         assert_response :success
       end
 
@@ -91,12 +91,12 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not list stickied topics first for JSON responses" do
-        get forum_topics_path, params: {format: :json}
+        get forum_topics_path, params: { format: :json }
         assert_equal([@forum_topic, @other_topic, @sticky_topic].map(&:id), response.parsed_body.pluck(:id))
       end
 
       should "render for atom feed" do
-        get forum_topics_path, params: {format: :atom}
+        get forum_topics_path, params: { format: :atom }
         assert_response :success
       end
 

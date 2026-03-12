@@ -34,12 +34,12 @@ class ArtistVersion < ApplicationRecord
   extend SearchMethods
 
   def previous
-    @previous ||= ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").limit(1).to_a
+    @previous ||= ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order(created_at: :desc).limit(1).to_a
     @previous.first
   end
 
   def current
-    @previous ||= ArtistVersion.where(artist_id: artist_id).order("created_at desc").limit(1).to_a
+    @previous ||= ArtistVersion.where(artist_id: artist_id).order(created_at: :desc).limit(1).to_a
     @previous.first
   end
 

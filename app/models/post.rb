@@ -1880,7 +1880,7 @@ class Post < ApplicationRecord
 
       post_edit.invalid_added_tags.each do |tag|
         tag.errors.messages.each_value do |messages|
-          warnings.add(:base, "Couldn't add tag: #{messages.join(';')}")
+          warnings.add(:base, "Couldn't add tag: #{messages.join(";")}")
         end
       end
 

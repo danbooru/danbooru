@@ -29,7 +29,7 @@ class NoteVersionsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(note_id: -> { @note.id }).with { @versions.reverse }
       should respond_to_search(note_id: 0).with { [] }
       should respond_to_search(updater_id: -> { @user.id }).with { [@versions[2], @versions[0]] }
-      should respond_to_search(updater: { name: -> { @user2.name } }).with { @versions[1] }
+      should respond_to_search(updater: { name: -> { @user2.name }}).with { @versions[1] }
     end
 
     context "show action" do

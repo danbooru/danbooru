@@ -162,7 +162,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         should "succeed for non-GET requests without a CSRF token" do
           assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
             basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
-            put user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }, params: { user: { enable_safe_mode: "true" } }, as: :json
+            put user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }, params: { user: { enable_safe_mode: "true" }}, as: :json
             assert_response :success
           end
         end
@@ -283,11 +283,11 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           token = css_select("form input[name=authenticity_token]").first["value"]
 
           # login
-          post session_path, params: { authenticity_token: token, session: { name: @user.name, password: "password" } }
+          post session_path, params: { authenticity_token: token, session: { name: @user.name, password: "password" }}
           assert_redirected_to root_path
 
           # try to submit a form with cookies but without the csrf token
-          put user_path(@user), headers: { HTTP_COOKIE: headers["Set-Cookie"] }, params: { user: { enable_safe_mode: "true" } }
+          put user_path(@user), headers: { HTTP_COOKIE: headers["Set-Cookie"] }, params: { user: { enable_safe_mode: "true" }}
           assert_response 403
           assert_equal("Error: Can't verify CSRF token authenticity.", css_select("p").first.content)
           assert_equal(false, @user.reload.enable_safe_mode)
@@ -342,7 +342,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         create(:rate_limit, action: "posts:update", key: user.cache_key, limited: true)
 
-        put_auth post_path(post), user, params: { post: { rating: "e" } }
+        put_auth post_path(post), user, params: { post: { rating: "e" }}
 
         assert_response 429
         assert_equal("s", post.reload.rating)

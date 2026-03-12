@@ -96,12 +96,12 @@ class PoolVersion < ApplicationRecord
   end
 
   def previous
-    @previous ||= PoolVersion.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
+    @previous ||= PoolVersion.where("pool_id = ? and version < ?", pool_id, version).order(version: :desc).limit(1).to_a
     @previous.first
   end
 
   def current
-    @current ||= PoolVersion.where(pool_id: pool_id).order("version desc").limit(1).to_a
+    @current ||= PoolVersion.where(pool_id: pool_id).order(version: :desc).limit(1).to_a
     @current.first
   end
 

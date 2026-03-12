@@ -35,16 +35,16 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(consequent_name_matches: " blonde hair ").with { @unrelated_alias }
 
       context "using includes" do
-        should respond_to_search(antecedent_tag: {post_count: 1000}).with { @other_alias }
-        should respond_to_search(consequent_tag: {category: Tag.categories.copyright}).with { @other_alias }
+        should respond_to_search(antecedent_tag: { post_count: 1000 }).with { @other_alias }
+        should respond_to_search(consequent_tag: { category: Tag.categories.copyright }).with { @other_alias }
         should respond_to_search(has_antecedent_tag: "true").with { @other_alias }
         should respond_to_search(has_consequent_tag: "false").with { [@unrelated_alias, @tag_alias] }
-        should respond_to_search(antecedent_wiki: {body_matches: "zun project"}).with { @other_alias }
+        should respond_to_search(antecedent_wiki: { body_matches: "zun project" }).with { @other_alias }
         should respond_to_search(has_consequent_wiki: "true").with { @other_alias }
-        should respond_to_search(forum_topic: {title_matches: "Touhou BUR"}).with { @other_alias }
-        should respond_to_search(forum_post: {body: "because"}).with { @other_alias }
+        should respond_to_search(forum_topic: { title_matches: "Touhou BUR" }).with { @other_alias }
+        should respond_to_search(forum_post: { body: "because" }).with { @other_alias }
         should respond_to_search(creator_name: -> { @user.name }).with { @other_alias }
-        should respond_to_search(creator: {level: User::Levels::BUILDER}).with { @other_alias }
+        should respond_to_search(creator: { level: User::Levels::BUILDER }).with { @other_alias }
       end
     end
 

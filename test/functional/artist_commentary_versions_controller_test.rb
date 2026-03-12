@@ -32,7 +32,7 @@ class ArtistCommentaryVersionsControllerTest < ActionDispatch::IntegrationTest
 
       should respond_to_search(post_id: -> { @commentary.post_id }).with { @versions.reverse }
       should respond_to_search(post_tags_match: "hakurei_reimu").with { @versions.reverse }
-      should respond_to_search(post: { uploader: { level: User::Levels::BUILDER } }).with { @other_commentary.versions }
+      should respond_to_search(post: { uploader: { level: User::Levels::BUILDER }}).with { @other_commentary.versions }
       should respond_to_search(updater_id: -> { @user.id }).with { [@versions[2], @versions[0]] }
       should respond_to_search(updater: { level: User::Levels::BUILDER }).with { [@other_versions[0], @versions[1]] }
     end

@@ -59,7 +59,7 @@ class MediaAsset < ApplicationRecord
     failed: 500,
   }
 
-  validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }, if: :md5_changed?
+  validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) }}, if: :md5_changed?
   validates :file_ext, inclusion: { in: FILE_TYPES, message: "File is not an image or video" }
   validates :file_key, length: { is: FILE_KEY_LENGTH }, uniqueness: true, if: :file_key_changed?
   validates :file_size, comparison: { greater_than: 0 }, if: :file_size_changed?
@@ -409,7 +409,7 @@ class MediaAsset < ApplicationRecord
     def regenerate_files!(original_file)
       distribute_files!(original_file, variants: variants.without(original))
       purge_cached_urls!
-      post.update_iqdb if post.present?
+      post&.update_iqdb
     end
 
     # Purge all image URLs from Cloudflare.

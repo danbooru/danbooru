@@ -17,7 +17,7 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a new ip ban" do
         assert_difference("IpBan.count", 1) do
-          post_auth ip_bans_path, @admin, params: {ip_ban: {ip_addr: "1.2.3.4", reason: "xyz"}}
+          post_auth ip_bans_path, @admin, params: { ip_ban: { ip_addr: "1.2.3.4", reason: "xyz" }}
 
           assert_response :redirect
         end

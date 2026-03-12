@@ -32,7 +32,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "update the password when given a valid old password" do
-        put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde" } }
+        put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde" }}
 
         assert_redirected_to @user
         assert_equal(false, @user.reload.authenticate_password("12345"))
@@ -42,7 +42,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow users to change the password of other users" do
         @owner = create(:owner_user)
-        put_auth user_password_path(@user), @owner, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde" } }
+        put_auth user_password_path(@user), @owner, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde" }}
 
         assert_response 403
         assert_equal(@user, @user.reload.authenticate_password("12345"))
@@ -51,7 +51,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not update the password when given an invalid old password" do
-        put_auth user_password_path(@user), @user, params: { user: { current_password: "3qoirjqe", password: "abcde", password_confirmation: "abcde" } }
+        put_auth user_password_path(@user), @user, params: { user: { current_password: "3qoirjqe", password: "abcde", password_confirmation: "abcde" }}
 
         assert_response :success
         assert_equal(@user, @user.reload.authenticate_password("12345"))
@@ -61,7 +61,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not update the password when password confirmation fails for the new password" do
-        put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "qerogijqe" } }
+        put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "qerogijqe" }}
 
         assert_response :success
         assert_equal(@user, @user.reload.authenticate_password("12345"))
@@ -75,7 +75,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "change the user's password when the verification code is correct" do
-          put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde", verification_code: @user.totp.code } }
+          put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde", verification_code: @user.totp.code }}
 
           assert_redirected_to @user
           assert_equal(true, @user.reload.authenticate_password("abcde").present?)
@@ -84,7 +84,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
 
         should "not change the user's password when given a backup code" do
           backup_code = @user.backup_codes.first
-          put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde", verification_code: backup_code } }
+          put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde", verification_code: backup_code }}
 
           assert_response :success
           assert_equal(true, @user.reload.authenticate_password("12345").present?)
@@ -94,7 +94,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when the verification code is incorrect" do
-          put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde", verification_code: "wrong" } }
+          put_auth user_password_path(@user), @user, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde", verification_code: "wrong" }}
 
           assert_response :success
           assert_equal(true, @user.reload.authenticate_password("12345").present?)

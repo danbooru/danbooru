@@ -43,16 +43,16 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime",
-                             page_url: "https://www.weibo.com/3150932560/H4cFbeKKA",)
+                             page_url: "https://www.weibo.com/3150932560/H4cFbeKKA")
 
       url_parser_should_work("https://photo.weibo.com/2125874520/wbphotos/large/mid/4242129997905387/pid/7eb64558ly1friyzhj44lj20dw2qxe81",
-                             page_url: "https://m.weibo.cn/detail/4242129997905387",)
+                             page_url: "https://m.weibo.cn/detail/4242129997905387")
 
       url_parser_should_work("https://m.weibo.cn/status/4173757483008088?luicode=20000061&lfid=4170879204256635",
-                             page_url: "https://m.weibo.cn/status/4173757483008088",)
+                             page_url: "https://m.weibo.cn/status/4173757483008088")
 
       url_parser_should_work("https://tw.weibo.com/SEINEN/4098035921690224",
-                             page_url: "https://m.weibo.cn/detail/4098035921690224",)
+                             page_url: "https://m.weibo.cn/detail/4098035921690224")
     end
   end
 end

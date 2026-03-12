@@ -29,13 +29,13 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png",
-                             page_url: "https://nijie.info/view.php?id=218856",)
+                             page_url: "https://nijie.info/view.php?id=218856")
 
       url_parser_should_work("https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png",
-                             page_url: "https://nijie.info/view.php?id=287736",)
+                             page_url: "https://nijie.info/view.php?id=287736")
 
       url_parser_should_work("http://pic02.nijie.info/nijie_picture/diff/main/0_23473_141_20120913002158.jpg",
-                             page_url: nil,)
+                             page_url: nil)
     end
   end
 end

@@ -213,7 +213,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a wiki_page" do
         assert_difference("WikiPage.count", 1) do
-          post_auth wiki_pages_path, @user, params: {wiki_page: {title: "abc", body: "abc"}}
+          post_auth wiki_pages_path, @user, params: { wiki_page: { title: "abc", body: "abc" }}
           assert_redirected_to(wiki_page_path(WikiPage.last))
         end
       end
@@ -229,7 +229,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "update a wiki_page" do
-        put_auth wiki_page_path(@wiki_page), @user, params: {wiki_page: {body: "xyz"}}
+        put_auth wiki_page_path(@wiki_page), @user, params: { wiki_page: { body: "xyz" }}
 
         assert_redirected_to wiki_page_path(@wiki_page)
         assert_equal("xyz", @wiki_page.reload.body)

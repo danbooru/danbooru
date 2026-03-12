@@ -11,7 +11,7 @@ module PostArchiveTestHelper
       json = JSON.parse(json)
       json.delete("created_at")
       json["version"] = 1 + PostVersion.where(post_id: json["post_id"]).count
-      prev = PostVersion.where(post_id: json["post_id"]).order("id desc").first
+      prev = PostVersion.where(post_id: json["post_id"]).order(id: :desc).first
       if prev
         json["added_tags"] = json["tags"].scan(/\S+/) - prev.tags.scan(/\S+/)
         json["removed_tags"] = prev.tags.scan(/\S+/) - json["tags"].scan(/\S+/)

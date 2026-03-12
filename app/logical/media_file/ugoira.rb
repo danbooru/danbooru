@@ -207,7 +207,7 @@ class MediaFile::Ugoira < MediaFile
       frames.map(&:with_indifferent_access)
     in { frames: Array => frames }
       frames.map(&:with_indifferent_access)
-    in { ugokuIllustData: { frames: Array => frames } }
+    in { ugokuIllustData: { frames: Array => frames }}
       frames.map(&:with_indifferent_access)
     else
       []
@@ -227,7 +227,7 @@ class MediaFile::Ugoira < MediaFile
     in { frames: Array } if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
       "PixivUtil2"
     # { "ugokuIllustData": { "frames": [{ "file": "000001.jpg", "delay": 100 }] } }
-    in { ugokuIllustData: { frames: Array } } if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
+    in { ugokuIllustData: { frames: Array }} if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
       "PixivToolkit"
     # No animation.json file
     in nil

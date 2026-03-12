@@ -31,17 +31,17 @@ module Source::Tests::URL
       url_parser_should_work("https://pawoo.net/@evazion/19451018/",
                              page_url: "https://pawoo.net/@evazion/19451018",
                              username: "evazion",
-                             work_id: "19451018",)
+                             work_id: "19451018")
 
       url_parser_should_work("https://pawoo.net/web/statuses/19451018/favorites",
                              page_url: "https://pawoo.net/web/statuses/19451018",
                              username: nil,
-                             work_id: "19451018",)
+                             work_id: "19451018")
 
       url_parser_should_work("https://baraag.net/@bardbot/105732813175612920/",
                              page_url: "https://baraag.net/@bardbot/105732813175612920",
                              username: "bardbot",
-                             work_id: "105732813175612920",)
+                             work_id: "105732813175612920")
 
       url_parser_should_work("https://pawoo.net/@evazion/media", username: "evazion", page_url: nil)
       url_parser_should_work("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png", page_url: nil)

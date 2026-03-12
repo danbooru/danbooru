@@ -49,33 +49,33 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
     context "#update" do
       should "allow admins to update other people's requests" do
-        put_auth bulk_update_request_path(@bulk_update_request.id), create(:admin_user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), create(:admin_user), params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_redirected_to bulk_update_request_path(@bulk_update_request)
         assert_equal("create alias zzz -> 222", @bulk_update_request.reload.script)
       end
 
       should "not allow builders to update other people's requests" do
-        put_auth bulk_update_request_path(@bulk_update_request.id), create(:builder_user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), create(:builder_user), params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_response 403
         assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
       end
 
       should "not allow members to update other people's requests" do
-        put_auth bulk_update_request_path(@bulk_update_request.id), create(:user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), create(:user), params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_response 403
         assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
       end
 
       should "allow users to update their own request when it has <5 votes" do
         4.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
-        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_redirected_to bulk_update_request_path(@bulk_update_request)
         assert_equal("create alias zzz -> 222", @bulk_update_request.reload.script)
       end
 
       should "not allow users to update their own request when it has 5 votes or more" do
         5.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
-        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_response 403
         assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
       end
@@ -114,9 +114,9 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
       context "using includes" do
         should respond_to_search(forum_topic_id: -> { @forum_topic.id }).with { @bulk_update_request }
-        should respond_to_search(forum_topic: {category_id: 0}).with { @bulk_update_request }
+        should respond_to_search(forum_topic: { category_id: 0 }).with { @bulk_update_request }
         should respond_to_search(user_id: -> { @user.id }).with { @bulk_update_request }
-        should respond_to_search(user: {level: User::Levels::BUILDER}).with { @other_bur }
+        should respond_to_search(user: { level: User::Levels::BUILDER }).with { @other_bur }
         should respond_to_search(has_approver: "true").with { @approved_bur }
         should respond_to_search(has_approver: "false").with { [@rejected_bur, @other_bur, @bulk_update_request] }
       end

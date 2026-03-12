@@ -45,7 +45,8 @@ module Danbooru
       end
 
       def to_escaped_for_tsquery
-        "'#{gsub(/\0/, '').gsub(/'/, '\0\0').gsub(/\\/, '\0\0\0\0')}'"
+        # bad backslash escape; WikiPage.other_names_match('\\(^o^)/')
+        "'#{gsub(/\0/, "").gsub("'", '\0\0').gsub("\\", '\0\0\0\0')}'"
       end
 
       def truthy?

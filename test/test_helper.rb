@@ -129,10 +129,10 @@ class ActionDispatch::IntegrationTest
       delete session_path # logout
     end
 
-    post session_path, params: { session: { name: user.name, password: user.password } }
+    post session_path, params: { session: { name: user.name, password: user.password }}
 
     if user.totp.present?
-      post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: :verify_totp), code: user.totp.code } }
+      post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: :verify_totp), code: user.totp.code }}
     end
   end
 

@@ -28,7 +28,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     context "#update" do
       context "when a moderator is promoting a basic member" do
         should "allow promoting the user to gold" do
-          put_auth admin_user_path(@user), @mod, params: {user: {level: "30"}}
+          put_auth admin_user_path(@user), @mod, params: { user: { level: "30" }}
 
           assert_redirected_to(edit_admin_user_path(@user))
           assert_equal(30, @user.reload.level)
@@ -42,7 +42,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
         context "when promoting the user to an admin" do
           should "fail" do
-            put_auth admin_user_path(@user), @mod, params: {user: {level: "50"}}
+            put_auth admin_user_path(@user), @mod, params: { user: { level: "50" }}
 
             assert_response(403)
             assert_equal(20, @user.reload.level)
@@ -67,7 +67,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "when a moderator is demoting an admin" do
         should "fail" do
-          put_auth admin_user_path(@admin), @mod, params: {user: {level: "30"}}
+          put_auth admin_user_path(@admin), @mod, params: { user: { level: "30" }}
 
           assert_response(403)
           assert_equal(50, @admin.reload.level)
@@ -79,7 +79,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "when a non-moderator is trying to promote another user" do
         should "fail" do
-          put_auth admin_user_path(@user), create(:approver_user), params: { user: { level: "30" } }
+          put_auth admin_user_path(@user), create(:approver_user), params: { user: { level: "30" }}
 
           assert_response(403)
           assert_equal(20, @user.reload.level)

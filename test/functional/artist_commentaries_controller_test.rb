@@ -29,7 +29,7 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
 
       should respond_to_search(post_id: -> { @commentary.post_id }).with { @commentary }
       should respond_to_search(post_tags_match: "hakurei_reimu").with { @commentary }
-      should respond_to_search(post: { uploader_name: -> { @user.name } }).with { @commentary }
+      should respond_to_search(post: { uploader_name: -> { @user.name }}).with { @commentary }
     end
 
     context "show action" do

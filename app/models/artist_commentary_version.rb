@@ -17,12 +17,12 @@ class ArtistCommentaryVersion < ApplicationRecord
   end
 
   def previous
-    @previous ||= ArtistCommentaryVersion.where("post_id = ? and updated_at < ?", post_id, updated_at).order("updated_at desc").limit(1).to_a
+    @previous ||= ArtistCommentaryVersion.where("post_id = ? and updated_at < ?", post_id, updated_at).order(updated_at: :desc).limit(1).to_a
     @previous.first
   end
 
   def current
-    @current ||= ArtistCommentaryVersion.where(post_id: post_id).order("updated_at desc").limit(1).to_a
+    @current ||= ArtistCommentaryVersion.where(post_id: post_id).order(updated_at: :desc).limit(1).to_a
     @current.first
   end
 

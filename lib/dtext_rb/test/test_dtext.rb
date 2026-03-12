@@ -1973,7 +1973,7 @@ class DTextTest < Minitest::Test
       "Ten Desires", "Touhou (PC-98)", "Touhou Bougetsushou", "Touhou Gouyoku Ibun", "Touhou Hisoutensoku", "Touhou Sangetsusei",
       "Trojan Green Asteroid", "Turbo Byakuren", "Unconnected Marketeers", "Undefined Fantastic Object", "Urban Legend in Limbo",
       "Violet Detector", "Wild and Horned Hermit", "Wily Beast and Weakest Creature", "Yousei Daisensou", "ZUN (artist)", "danmaku",
-      "gameplay mechanics", "grimoire_of_marisa", "grimoire_of_usami", "lotus eaters", "parody"
+      "gameplay mechanics", "grimoire_of_marisa", "grimoire_of_usami", "lotus eaters", "parody",
     ]
 
     assert_wiki_pages(touhou_tags, File.read("test/files/touhou-wiki.txt"))

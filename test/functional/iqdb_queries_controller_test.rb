@@ -74,7 +74,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           post_auth iqdb_queries_path(format: :json), @user, params: { search: { file: file }}
 
           assert_response :success
-          assert_equal([{ post_id: @post.id, score: 95.0, post: as(@user) { @post.as_json } }.with_indifferent_access], response.parsed_body)
+          assert_equal([{ post_id: @post.id, score: 95.0, post: as(@user) { @post.as_json }}.with_indifferent_access], response.parsed_body)
         end
       end
     end

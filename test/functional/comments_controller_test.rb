@@ -109,7 +109,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(post_id: -> { @post.id }).with { @user_comment }
           should respond_to_search(post_tags_match: "touhou").with { @mod_comment }
           should respond_to_search(creator_name: -> { @user.name }).with { @user_comment }
-          should respond_to_search(creator: {level: User::Levels::MODERATOR}).with { @mod_comment }
+          should respond_to_search(creator: { level: User::Levels::MODERATOR }).with { @mod_comment }
         end
       end
 
@@ -190,7 +190,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
       context "when updating another user's comment" do
         should "succeed if updater is a moderator" do
-          put_auth comment_path(@comment.id), @mod, params: {comment: {body: "abc"}}, xhr: true
+          put_auth comment_path(@comment.id), @mod, params: { comment: { body: "abc" }}, xhr: true
 
           assert_response :success
           assert_equal("abc", @comment.reload.body)
@@ -219,7 +219,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
       context "when stickying a comment" do
         should "succeed if updater is a moderator" do
-          put_auth comment_path(@comment.id), @mod, params: {comment: {is_sticky: true}}, xhr: true
+          put_auth comment_path(@comment.id), @mod, params: { comment: { is_sticky: true }}, xhr: true
 
           assert_response :success
           assert_equal(true, @comment.reload.is_sticky)
@@ -299,7 +299,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a comment" do
         assert_difference("Comment.count", 1) do
-          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" } }
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" }}
         end
         comment = Comment.last
         assert_redirected_to post_path(comment.post)
@@ -307,7 +307,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow commenting on nonexistent posts" do
         assert_difference("Comment.count", 0) do
-          post_auth comments_path, @user, params: { comment: { post_id: -1, body: "blah" } }
+          post_auth comments_path, @user, params: { comment: { post_id: -1, body: "blah" }}
         end
         assert_redirected_to comments_path
       end

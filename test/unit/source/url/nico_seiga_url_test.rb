@@ -65,13 +65,13 @@ module Source::Tests::URL
 
     context "when extracting attributes" do
       url_parser_should_work("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663",
-                             page_url: "https://seiga.nicovideo.jp/seiga/im4937663",)
+                             page_url: "https://seiga.nicovideo.jp/seiga/im4937663")
 
       url_parser_should_work("https://seiga.nicovideo.jp/watch/mg316708",
-                             page_url: "https://manga.nicovideo.jp/watch/mg316708",)
+                             page_url: "https://manga.nicovideo.jp/watch/mg316708")
 
       url_parser_should_work("https://sp.manga.nicovideo.jp/watch/mg316708",
-                             page_url: "https://manga.nicovideo.jp/watch/mg316708",)
+                             page_url: "https://manga.nicovideo.jp/watch/mg316708")
     end
   end
 end

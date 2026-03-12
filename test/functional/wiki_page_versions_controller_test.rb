@@ -30,7 +30,7 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(wiki_page_id: 0).with { [] }
         should respond_to_search(updater_id: -> { @user.id }).with { [@versions[2], @versions[0]] }
         should respond_to_search(updater_name: -> { @builder.name }).with { @versions[1] }
-        should respond_to_search(updater: {level: User::Levels::BUILDER}).with { @versions[1] }
+        should respond_to_search(updater: { level: User::Levels::BUILDER }).with { @versions[1] }
       end
     end
 

@@ -55,7 +55,7 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
 
       context "using includes" do
         should respond_to_search(post_tags_match: "touhou").with { @post_disapproval }
-        should respond_to_search(post: { uploader_name: -> { @post.uploader.name } }).with { @post_disapproval }
+        should respond_to_search(post: { uploader_name: -> { @post.uploader.name }}).with { @post_disapproval }
         should respond_to_search(user_name: -> { @approver.name }).with { [] }
       end
 
@@ -111,14 +111,14 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "allow editing of disapprovals" do
-        put_auth post_disapproval_path(@post_disapproval), @approver, params: {post_disapproval: {reason: "breaks_rules"}}
+        put_auth post_disapproval_path(@post_disapproval), @approver, params: { post_disapproval: { reason: "breaks_rules" }}
 
         assert_redirected_to(@post)
         assert_equal("breaks_rules", @post_disapproval.reload.reason)
       end
 
       should "not allow editing by another user" do
-        put_auth post_disapproval_path(@post_disapproval), @another_approver, params: {post_disapproval: {reason: "disinterest"}}
+        put_auth post_disapproval_path(@post_disapproval), @another_approver, params: { post_disapproval: { reason: "disinterest" }}
 
         assert_response 403
         assert_equal("poor_quality", @post_disapproval.reload.reason)

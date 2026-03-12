@@ -12,12 +12,12 @@ class NoteVersion < ApplicationRecord
   end
 
   def previous
-    @previous ||= NoteVersion.where("note_id = ? and version < ?", note_id, version).order("updated_at desc").limit(1).to_a
+    @previous ||= NoteVersion.where("note_id = ? and version < ?", note_id, version).order(updated_at: :desc).limit(1).to_a
     @previous.first
   end
 
   def current
-    @current ||= NoteVersion.where(note_id: note_id).order("updated_at desc").limit(1).to_a
+    @current ||= NoteVersion.where(note_id: note_id).order(updated_at: :desc).limit(1).to_a
     @current.first
   end
 
