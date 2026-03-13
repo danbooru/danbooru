@@ -58,7 +58,23 @@ class MediaFile::Image < MediaFile
   end
 
   def metadata
-    super.merge({ "Vips:Error" => error }.compact_blank)
+    metadata = super.merge({ "Vips:Error" => error }.compact_blank)
+
+    if file_ext == :jpg
+      jpg_metadata = ExifTool.new(file).metadata(options: %q(-G1 -JPEGDigest -JPEGQualityEstimate))
+      metadata = metadata.merge(jpg_metadata)
+    end
+
+    if file_ext == :webp && !is_animated?
+      webp_metadata = ExifTool.new(file).metadata(options: "-G5")
+      if webp_metadata.key?("RIFF-VP8L:ImageWidth")
+        metadata["WebP:Format"] = "VP8L"
+      elsif webp_metadata.key?("RIFF-VP8Bitstream:ImageWidth")
+        metadata["WebP:Format"] = "VP8"
+      end
+    end
+
+    metadata
   end
 
   def duration
