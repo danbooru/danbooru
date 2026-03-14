@@ -628,6 +628,41 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[2], posts[0]], "-flags:1")
     end
 
+    should "return posts for the approval_count:<N> metatag" do
+      posts = create_list(:post, 3, is_pending: true)
+      create(:post_approval, post: posts[0])
+      create(:post_flag, post: posts[0])
+      create(:post_approval, post: posts[0])
+      create(:post_approval, post: posts[1])
+
+      assert_tag_match([posts[0]], "approval_count:2")
+      assert_tag_match([posts[1]], "approval_count:1")
+      assert_tag_match([posts[1], posts[0]], "approval_count:>0")
+
+      assert_tag_match([posts[0]], "approvals:2")
+      assert_tag_match([posts[1]], "approvals:1")
+      assert_tag_match([posts[1], posts[0]], "approvals:>0")
+
+      assert_tag_match([posts[2]], "-approvals:>0")
+    end
+
+    should "return posts for the disapproval_count:<N> metatag" do
+      posts = create_list(:post, 3, is_pending: true)
+      create(:post_disapproval, post: posts[0])
+      create(:post_disapproval, post: posts[0])
+      create(:post_disapproval, post: posts[1])
+
+      assert_tag_match([posts[0]], "disapproval_count:2")
+      assert_tag_match([posts[1]], "disapproval_count:1")
+      assert_tag_match([posts[1], posts[0]], "disapproval_count:>0")
+
+      assert_tag_match([posts[0]], "disapprovals:2")
+      assert_tag_match([posts[1]], "disapprovals:1")
+      assert_tag_match([posts[1], posts[0]], "disapprovals:>0")
+
+      assert_tag_match([posts[2]], "-disapprovals:>0")
+    end
+
     should "return posts for the commentaryupdater:<name> metatag" do
       user1 = create(:user)
       user2 = create(:user)

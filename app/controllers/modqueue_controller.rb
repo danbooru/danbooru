@@ -8,10 +8,14 @@ class ModqueueController < ApplicationController
     authorize :modqueue
     @mode = params.fetch(:mode, "gallery")
     @limit = params.fetch(:limit, CurrentUser.user.per_page).to_i.clamp(0, PostSets::Post::MAX_PER_PAGE)
+    @order = params.dig(:search, :order) || "disapprovals_asc"
+    @tags = params.dig(:search, :tags)
 
     @posts = Post.includes(:appeals, :vote_by_current_user, :uploader, :media_asset, disapprovals: [:user], flags: [:creator])
     @posts = @posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :unseen))
-    @posts = @posts.paginated_search(params, limit: @limit, count_pages: true, defaults: { order: "modqueue" })
+    @posts = @posts.user_tag_match(@tags, CurrentUser.user) if @tags.present?
+    @posts = @posts.user_tag_match("order:#{@order}", CurrentUser.user)
+    @posts = @posts.paginate(params[:page], limit: @limit)
     @modqueue_posts = @posts.distinct.except(:select, :group, :order, :offset, :limit)
 
     @pending_post_count = @modqueue_posts.select(&:is_pending?).count
