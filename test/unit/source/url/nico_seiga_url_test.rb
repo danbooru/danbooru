@@ -54,6 +54,17 @@ module Source::Tests::URL
         "http://game.nicovideo.jp/atsumaru/users/7757217",
       )
 
+      should be_secondary_url(
+        "https://www.nicovideo.jp/user/4572975",
+        "https://dic.nicovideo.jp/u/11141663",
+      )
+
+      should_not be_secondary_url(
+        "https://seiga.nicovideo.jp/user/illust/456831",
+        "https://commons.nicovideo.jp/user/696839",
+        "https://3d.nicovideo.jp/users/109584",
+      )
+
       should_not be_profile_url(
         "https://seiga.nicovideo.jp",
       )

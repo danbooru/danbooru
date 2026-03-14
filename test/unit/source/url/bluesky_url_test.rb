@@ -19,6 +19,15 @@ module Source::Tests::URL
         "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w",
         "https://ixy.bsky.social",
       )
+
+      should be_secondary_url(
+        "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w",
+      )
+
+      should_not be_secondary_url(
+        "https://bsky.app/profile/ixy.bsky.social",
+        "https://ixy.bsky.social",
+      )
     end
   end
 end

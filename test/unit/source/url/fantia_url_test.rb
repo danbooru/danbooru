@@ -32,6 +32,15 @@ module Source::Tests::URL
         "https://job.fantia.jp/fanclubs/5734",
       )
 
+      should be_secondary_url(
+        "https://fantia.jp/asanagi",
+      )
+
+      should_not be_secondary_url(
+        "https://fantia.jp/fanclubs/64496",
+        "https://job.fantia.jp/fanclubs/5734",
+      )
+
       should_not be_image_sample(
         "https://c.fantia.jp/uploads/post/file/1070093/16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg",
         "https://cc.fantia.jp/uploads/post_content_photo/file/7087182/7f04ff3c-1f08-450f-bd98-796c290fc2d1.jpg?Key-Pair-Id=APKAIOCKYZS7WKBB6G7A&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jYy5mYW50aWEuanAvdXBsb2Fkcy9wb3N0X2NvbnRlbnRfcGhvdG8vZmlsZS83MDg3MTgyLzdmMDRmZjNjLTFmMDgtNDUwZi1iZDk4LTc5NmMyOTBmYzJkMS5qcGciLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3MjQzNTIwMTJ9fX1dfQ__&Signature=otcg8CwBlSDM2DPeEop1OEbgvmnjChV6gR0SgleEDxh3eb49f36KZ33RdKgN8eb9X8Mk9Oyd1MwLk0fsXd7aACUmEDxIrZnipU1Xmlkz-fhobW3QKtvTk1XXWcMxEhmnv-XQzUXG9SwM1vrqMsE17eh5R14aTiUYfPNIrq~UvmusWas-orDBDKAEyNrg1U3DujL75-4Tq4y73Enpyxa5w51fLYN8D2QTx9nJwrsQvJOircpjPvEs1Pg1K~qJLzHdBxCwoWT0QqgMfmamuW0z~5p1AUnnul9v9vXZxT2j1lUzNEwLrX2ZTUni3JyMjp7wDC2mUWkZvTfsQP~572LrRA__",

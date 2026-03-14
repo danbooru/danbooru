@@ -51,6 +51,18 @@ module Source::Tests::URL
         "https://p.tl/m/9202877",
       )
 
+      should be_secondary_url(
+        "https://www.pixiv.net/stacc/noizave",
+        "http://www.pixiv.me/noizave",
+        "https://pixiv.cc/zerousagi/",
+      )
+
+      should_not be_secondary_url(
+        "https://www.pixiv.net/member.php?id=339253",
+        "https://www.pixiv.net/users/9202877",
+        "https://p.tl/m/9202877",
+      )
+
       should_not be_image_sample(
         "https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png",
         "https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip?original",

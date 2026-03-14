@@ -29,6 +29,16 @@ module Source::Tests::URL
         "https://fanbox.cc",
       )
 
+      should be_secondary_url(
+        "https://www.pixiv.net/fanbox/creator/1566167",
+        "https://www.pixiv.net/fanbox/member.php?user_id=3410642",
+      )
+
+      should_not be_secondary_url(
+        "https://omu001.fanbox.cc",
+        "https://www.fanbox.cc/@tsukiori",
+      )
+
       should parse_url(
         "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg",
       ).into(

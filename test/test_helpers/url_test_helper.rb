@@ -54,6 +54,9 @@ module UrlTestHelper
 
     # @return [ParseUrlMatcher] A matcher that asserts that all the given URLs are bad links.
     def be_bad_link(*urls) = parse_url(*urls).as(:bad_link?)
+
+    # @return [ParseUrlMatcher] A matcher that asserts that all the given URLs are secondary profile URLs.
+    def be_secondary_url(*urls) = parse_url(*urls).as(:secondary_url?)
   end
 
   class ParseUrlMatcher

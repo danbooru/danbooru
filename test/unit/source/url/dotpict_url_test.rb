@@ -21,6 +21,16 @@ module Source::Tests::URL
         "https://jumpanaatta.dotpict.net",
         "https://www.dotpict.net",
       )
+
+      should be_secondary_url(
+        "https://dotpict.net/@your_moms_house",
+        "https://jumpanaatta.dotpict.net",
+        "https://www.dotpict.net",
+      )
+
+      should_not be_secondary_url(
+        "https://dotpict.net/users/2011866",
+      )
     end
   end
 end

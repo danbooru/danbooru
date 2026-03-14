@@ -17,6 +17,14 @@ module Source::Tests::URL
         "https://inkbunny.net/user.php?user_id=152800",
       )
 
+      should be_secondary_url(
+        "https://inkbunny.net/user.php?user_id=152800",
+      )
+
+      should_not be_secondary_url(
+        "https://inkbunny.net/DAGASI",
+      )
+
       should_not be_profile_url(
         "https://inkbunny.net/index.php",
         "https://inkbunny.net/user.php",

@@ -22,6 +22,15 @@ module Source::Tests::URL
         "http://gengar563.lofter.com",
         "https://www.lofter.com/mentionredirect.do?blogId=1278105311",
       )
+
+      should be_secondary_url(
+        "https://www.lofter.com/mentionredirect.do?blogId=1278105311",
+      )
+
+      should_not be_secondary_url(
+        "https://www.lofter.com/front/blog/home-page/noshiqian",
+        "http://gengar563.lofter.com",
+      )
     end
   end
 end
