@@ -203,6 +203,12 @@ module Source
       self.class.name.demodulize.titleize
     end
 
+    # The external work ID that this URL points to.
+    #
+    # @return [String, nil]
+    def work_id
+    end
+
     # True if the URL is from a recognized site. False if the URL is from an unrecognized site.
     #
     # @return [Boolean]

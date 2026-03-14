@@ -1558,11 +1558,15 @@ CREATE TABLE public.posts (
     parent_id integer,
     has_children boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
-    pixiv_id integer,
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL
+    tag_count_meta integer DEFAULT 0 NOT NULL,
+    pixiv_id integer,
+    source_name character varying,
+    source_kind character varying,
+    source_id character varying,
+    source_id_num uuid
 );
 
 
@@ -3342,7 +3346,6 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -7113,6 +7116,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260304000000'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),
