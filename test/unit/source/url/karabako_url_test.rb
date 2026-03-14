@@ -2,9 +2,8 @@ require "test_helper"
 
 module Source::Tests::URL
   class KarabakoUrlTest < ActiveSupport::TestCase
-    context "when extracting attributes" do
-      url_parser_should_work(
-        "http://www.karabako.net/images/karabako_38835.jpg",
+    context "Karabako URLs" do
+      should parse_url("http://www.karabako.net/images/karabako_38835.jpg").into(
         page_url: "http://www.karabako.net/post/view/38835",
       )
     end

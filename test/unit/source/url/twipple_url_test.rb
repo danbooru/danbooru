@@ -2,14 +2,13 @@ require "test_helper"
 
 module Source::Tests::URL
   class TwippleUrlTest < ActiveSupport::TestCase
-    context "when parsing" do
-      should_identify_url_types(
-        page_urls: [
-          "http://p.twpl.jp/show/orig/mI2c3",
-        ],
-        profile_urls: [
-          "http://twpl.jp/swacoro",
-        ],
+    context "Twipple URLs" do
+      should be_page_url(
+        "http://p.twpl.jp/show/orig/mI2c3",
+      )
+
+      should be_profile_url(
+        "http://twpl.jp/swacoro",
       )
     end
   end

@@ -20,6 +20,7 @@ class Source::URL::Ameba < Source::URL
       @username = username
 
     # http://stat.ameba.jp/user_images/20130802/21/moment1849/38/bd/p
+    # http://stat.ameba.jp/user_images/20140618/04/hanauta-os/d9/9d/j/o0480069212976538309.jpg?caw=1125
     # http://stat001.ameba.jp/user_images/20100212/15/weekend00/74/31/j/
     in /^stat\d*$/, "ameba.jp", "user_images", date, _, username, *_rest
       @date = date
@@ -29,6 +30,8 @@ class Source::URL::Ameba < Source::URL
     in "profile", "ameba.jp", "ameba", username
       @username = username
 
+    # https://ameblo.jp/hanauta-os/image-11879922697-12976538309.html
+    # https://stat.profile.ameba.jp/profile_images/20180310/23/2f/aY/g/o01400140p_1520691270256_dymla.gif (https://ameblo.jp/hanauta-os/entry-11860045489.html)
     else
       nil
     end
