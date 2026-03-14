@@ -75,6 +75,17 @@ module Source::Tests::URL
         "https://fxtwitter.com/i/user/889592953",
       )
 
+      should be_secondary_url(
+        "https://twitter.com/intent/user?user_id=1485229827984531457",
+        "https://twitter.com/i/user/889592953",
+        "https://x.com/i/user/889592953",
+      )
+
+      should_not be_secondary_url(
+        "https://x.com/irt_5433",
+        "https://twitter.com/intent/user?screen_name=ryuudog_NFT",
+      )
+
       should_not be_image_sample(
         "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig",
         "https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=orig",

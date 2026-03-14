@@ -26,6 +26,17 @@ module Source::Tests::URL
         "https://baraag.net/web/accounts/107862785324786980",
       )
 
+      should be_secondary_url(
+        "https://pawoo.net/web/accounts/47806",
+        "https://baraag.net/web/accounts/107862785324786980",
+      )
+
+      should_not be_secondary_url(
+        "https://pawoo.net/@evazion",
+        "https://pawoo.net/users/esoraneko",
+        "https://baraag.net/@danbooru",
+      )
+
       should parse_url("https://pawoo.net/@evazion/19451018/").into(
         page_url: "https://pawoo.net/@evazion/19451018",
         username: "evazion",

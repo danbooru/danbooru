@@ -106,4 +106,8 @@ class Source::URL::Mastodon < Source::URL
       "https://#{domain}/web/accounts/#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && username.blank?
+  end
 end

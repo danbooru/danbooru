@@ -30,6 +30,14 @@ module Source::Tests::URL
         "https://misskey.io/users/9bpemdns40",
       )
 
+      should be_secondary_url(
+        "https://misskey.io/users/9bpemdns40",
+      )
+
+      should_not be_secondary_url(
+        "https://misskey.io/@ixy194",
+      )
+
       should_not be_image_url(
         "https://media.misskeyusercontent.com",
       )

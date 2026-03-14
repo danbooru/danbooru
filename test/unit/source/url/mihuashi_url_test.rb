@@ -31,6 +31,14 @@ module Source::Tests::URL
         "https://www.mihuashi.com/users/spirtie",
       )
 
+      should be_secondary_url(
+        "https://www.mihuashi.com/users/spirtie",
+      )
+
+      should_not be_secondary_url(
+        "https://www.mihuashi.com/profiles/29105",
+      )
+
       context "when extracting attributes" do
         should parse_url("https://www.mihuashi.com/character-card/4dc65278776db4741a897d7445f48a6b57ce251c/project").into(
           page_url: "https://www.mihuashi.com/character-card/4dc65278776db4741a897d7445f48a6b57ce251c",

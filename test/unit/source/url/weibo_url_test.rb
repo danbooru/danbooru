@@ -33,6 +33,18 @@ module Source::Tests::URL
         "https://www.weibo.com/n/小小男爵不要坑",
       )
 
+      should be_secondary_url(
+        "https://www.weibo.com/endlessnsmt",
+        "https://www.weibo.com/4ubergine/photos",
+        "https://www.weibo.com/p/1005055399876326",
+        "https://www.weibo.com/n/小小男爵不要坑",
+      )
+
+      should_not be_secondary_url(
+        "https://www.weibo.com/u/5501756072",
+        "https://www.weibo.com/5501756072",
+      )
+
       should_not be_profile_url(
         "https://weibo.com/u/",
         "https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com",

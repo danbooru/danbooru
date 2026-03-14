@@ -68,4 +68,8 @@ class Source::URL::Instagram < Source::URL
       "https://www.instagram.com/uid/#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && username.blank?
+  end
 end

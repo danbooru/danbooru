@@ -118,11 +118,15 @@ module Source
       end
 
       def profile_url
-        if username.present?
-          "https://www.mihuashi.com/users/#{Danbooru::URL.escape(username)}"
-        elsif user_id.present?
+        if user_id.present?
           "https://www.mihuashi.com/profiles/#{user_id}"
+        elsif username.present?
+          "https://www.mihuashi.com/users/#{Danbooru::URL.escape(username)}"
         end
+      end
+
+      def secondary_url?
+        profile_url? && user_id.blank?
       end
 
       def parsed_date

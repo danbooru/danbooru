@@ -29,6 +29,17 @@ module Source::Tests::URL
         "https://www.patreon.com/cw/iwanokenta",
       )
 
+      should be_secondary_url(
+        "https://www.patreon.com/bePatron?u=4045578",
+        "https://www.patreon.com/user?u=5993691",
+        "https://www.patreon.com/api/user/4045578",
+      )
+
+      should_not be_secondary_url(
+        "https://www.patreon.com/1041uuu",
+        "https://www.patreon.com/cw/iwanokenta",
+      )
+
       should parse_url("https://www.patreon.com/profile/creators?u=7422057").into(
         profile_url: "https://www.patreon.com/user?u=7422057",
       )

@@ -22,6 +22,16 @@ module Source::Tests::URL
         "https://instagr.am/Zurasuta",
         "https://www.instagram.com/uid/25025320",
       )
+
+      should be_secondary_url(
+        "https://www.instagram.com/uid/25025320",
+      )
+
+      should_not be_secondary_url(
+        "https://www.instagram.com/itomugi/",
+        "https://www.instagram.com/stories/itomugi/",
+        "https://instagr.am/Zurasuta",
+      )
     end
   end
 end

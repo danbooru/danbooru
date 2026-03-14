@@ -20,6 +20,15 @@ module Source::Tests::URL
         "https://opensea.io/accounts/0xff605910dc69999dca1fe2fa289a43cc2d51f0fc",
         "https://opensea.io/tororotororo",
       )
+
+      should be_secondary_url(
+        "https://opensea.io/0x7C01A933e8761DDf96C2322c772FbD2527ded439",
+        "https://opensea.io/accounts/0xff605910dc69999dca1fe2fa289a43cc2d51f0fc",
+      )
+
+      should_not be_secondary_url(
+        "https://opensea.io/tororotororo",
+      )
     end
   end
 end

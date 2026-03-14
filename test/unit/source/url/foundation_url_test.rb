@@ -23,6 +23,14 @@ module Source::Tests::URL
         "https://foundation.app/@mochiiimo",
         "https://foundation.app/0x7E2ef75C0C09b2fc6BCd1C68B6D409720CcD58d2",
       )
+
+      should be_secondary_url(
+        "https://foundation.app/0x7E2ef75C0C09b2fc6BCd1C68B6D409720CcD58d2",
+      )
+
+      should_not be_secondary_url(
+        "https://foundation.app/@mochiiimo",
+      )
     end
   end
 end

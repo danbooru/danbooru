@@ -91,6 +91,10 @@ class Source::URL::Facebook < Source::URL
     end
   end
 
+  def secondary_url?
+    profile_url? && username.blank?
+  end
+
   # XXX Remove this after all page URL formats are handled
   def bad_source?
     nil

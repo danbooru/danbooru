@@ -74,4 +74,8 @@ class Source::URL::Lofter < Source::URL
       "https://www.lofter.com/mentionredirect.do?blogId=#{user_id}"
     end
   end
+
+  def secondary_url?
+    profile_url? && username.blank?
+  end
 end

@@ -117,6 +117,10 @@ class Source::URL::Weibo < Source::URL
     end
   end
 
+  def secondary_url?
+    profile_url? && artist_short_id.blank?
+  end
+
   def illust_id
     illust_long_id || illust_base62_id
   end

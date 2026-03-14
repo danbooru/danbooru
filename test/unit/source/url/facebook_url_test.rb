@@ -20,6 +20,15 @@ module Source::Tests::URL
         "https://fb.com/sinyu.tang.9",
       )
 
+      should be_secondary_url(
+        "https://www.facebook.com/profile.php?id=100007366415557",
+      )
+
+      should_not be_secondary_url(
+        "https://www.facebook.com/sinyu.tang.9",
+        "https://fb.com/sinyu.tang.9",
+      )
+
       should_not be_bad_source(
         "https://www.facebook.com/groups/AnatomyandAction/permalink/2647641035431143/?mibextid=Nif5oz",
       )
