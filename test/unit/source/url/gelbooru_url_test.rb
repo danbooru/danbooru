@@ -133,6 +133,32 @@ module Source::Tests::URL
       should parse_url("https://rule34.xxx/index.php?page=dapi&s=post&q=index&id=6961597&json=1").into(
         page_url: "https://rule34.xxx/index.php?page=post&s=view&id=6961597",
       )
+
+      should parse_url("https://gelbooru.com/index.php?page=dapi&s=post&q=index&id=7798045&json=1").into(
+        api_url: "https://gelbooru.com/index.php?page=dapi&s=post&q=index&tags=id:7798045",
+        site_name: "Gelbooru",
+      )
+
+      should parse_url("https://safebooru.org//samples/4016/sample_ffc6c5705d31422ddbaa7478deb560c985d2ee71.jpg?4196970").into(
+        site_name: "Safebooru",
+      )
+
+      should parse_url("https://tbib.org/index.php?page=dapi&s=post&q=index&id=11387341&json=1").into(
+        site_name: "TBIB",
+      )
+
+      should parse_url("https://api-cdn-mp4.rule34.xxx/images/4330/2f85040320f64c0e42128a8b8f6071ce.mp4").into(
+        api_url: "https://rule34.xxx/index.php?page=dapi&s=post&q=index&tags=md5:2f85040320f64c0e42128a8b8f6071ce",
+        site_name: "Rule34.xxx",
+      )
+
+      should parse_url("https://gelbooru.com//images/ee/5c/ee5c9a69db9602c95debdb9b98fb3e3e.jpeg").into(
+        full_image_url: "https://gelbooru.com//images/ee/5c/ee5c9a69db9602c95debdb9b98fb3e3e.jpeg",
+      )
+
+      should parse_url("https://tbib.org//images/10754/afadcf830778bd1c9bf94899ace2c889d6bf2903.png").into(
+        full_image_url: "https://tbib.org//images/10754/afadcf830778bd1c9bf94899ace2c889d6bf2903.png",
+      )
     end
   end
 end

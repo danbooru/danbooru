@@ -16,6 +16,7 @@ module Source::Tests::URL
         "https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg",
         "https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg",
         "https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg",
+        "https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small",
       )
 
       should be_image_sample(
@@ -135,6 +136,39 @@ module Source::Tests::URL
 
       should parse_url("https://xcancel.com/BOW999/status/1261877313349640194").into(
         page_url: "https://x.com/BOW999/status/1261877313349640194",
+      )
+
+      should parse_url("https://x.com/intent/favorite?tweet_id=2020838133525520807").into(
+        page_url: "https://x.com/i/web/status/2020838133525520807",
+      )
+
+      should parse_url("https://x.com/intent/retweet?tweet_id=2020838133525520807").into(
+        page_url: "https://x.com/i/web/status/2020838133525520807",
+      )
+
+      should parse_url("https://video.twimg.com/tweet_video/E_8lAMJUYAIyenr.mp4").into(
+        parsed_date: Time.utc(2021, 8, 12, 8, 49, 57, 781_000),
+      )
+
+      should parse_url("https://video.twimg.com/ext_tw_video/1496554514312269828/pu/vid/960x720/wiC1XIw8QehhL5JL.mp4?tag=12").into(
+        parsed_date: Time.utc(2022, 2, 23, 18, 36, 15, 507_000),
+      )
+
+      should parse_url("https://video.twimg.com/amplify_video/1215590775364259840/vid/1280x720/wE6Ngd7-JPw5vCZP.mp4?tag=13").into(
+        parsed_date: Time.utc(2020, 1, 10, 11, 6, 40, 88_000),
+      )
+
+      should parse_url("https://si0.twimg.com/profile_background_images/378800000179574457/3UC-Xcnj.jpeg").into(
+        parsed_date: Time.utc(2013, 9, 14, 8, 38, 52, 463_000),
+      )
+
+      should parse_url("https://pbs-0.twimg.com/media/C9xkZf7UMAEbsf7.jpg").into(
+        parsed_date: Time.utc(2017, 4, 19, 12, 10, 4, 604_000),
+      )
+
+      should parse_url("https://a2.twimg.com/profile_images/1210943186/KABABABABA.jpg").into(
+        page_url: nil,
+        profile_url: nil,
       )
     end
   end

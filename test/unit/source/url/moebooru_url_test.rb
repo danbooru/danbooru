@@ -54,6 +54,23 @@ module Source::Tests::URL
       should parse_url("https://konachan.com/image/99a3c4f10c327d54486259a74173fc0b.jpg").into(
         page_url: "https://konachan.com/post/show?md5=99a3c4f10c327d54486259a74173fc0b",
       )
+
+      should parse_url("https://assets.yande.re/data/preview/7e/cf/7ecfdead705d7b956b26b1d37b98d089.jpg").into(
+        page_url: "https://yande.re/post/show?md5=7ecfdead705d7b956b26b1d37b98d089",
+      )
+
+      should parse_url("https://files.yande.re/sample/fb27a7ea6c48b2ef76fe915e378b9098.jpg").into(
+        original_file_ext: nil,
+      )
+
+      should parse_url("https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg").into(
+        original_file_ext: "png",
+        site_name: "Yande.re",
+      )
+
+      should parse_url("https://konachan.com/sample/e2e2994bae738ff52fff7f4f50b069d5/Konachan.com%20-%20270803%20sample.jpg").into(
+        site_name: "Konachan",
+      )
     end
   end
 end

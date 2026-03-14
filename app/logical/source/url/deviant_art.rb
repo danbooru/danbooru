@@ -183,8 +183,6 @@ module Source
       header, payload = token.split(".").take(2).map { |data| Base64.decode64(data).parse_json }
 
       { header: header, payload: payload }.with_indifferent_access
-    rescue JSON::ParserError
-      {}
     end
 
     # Returns the path, width, and height permissions parsed from the JWT token:

@@ -174,6 +174,66 @@ module Source::Tests::URL
           page_url: "https://www.pixiv.net/novel/show.php?id=7463785",
         )
       end
+
+      context "for helper methods" do
+        should parse_url("https://i.pximg.net/user-profile/img/2014/12/18/10/31/23/8733472_7dc7310db6cc37163af145d04499e411_170.jpg").into(
+          parsed_date: Time.utc(2014, 12, 18, 1, 31, 23),
+        )
+
+        should parse_url("https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg").into(
+          parsed_date: Time.utc(2015, 10, 24, 23, 45, 27),
+        )
+
+        should parse_url("https://i.pximg.net/imgaz/2024/07/31/19/27/09/contest_ogp_813.png").into(
+          image_type: "imgaz",
+          parsed_date: Time.utc(2024, 7, 31, 10, 27, 9),
+        )
+
+        should parse_url("https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.png").into(
+          work_id: "120834265",
+          ugoira_frame: 0,
+          is_ugoira?: true,
+          ugoira_zip_url: "https://i.pximg.net/img-zip-ugoira/img/2024/07/24/08/46/41/120834265_ugoira1920x1080.zip?original",
+          ugoira_frame_url: "https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.png",
+          full_image_url: "https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.png",
+          candidate_full_image_urls: [
+            "https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.jpg",
+            "https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.png",
+            "https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.gif",
+          ],
+        )
+
+        should parse_url("https://i.pximg.net/img-zip-ugoira/img/2024/07/24/08/46/41/120834265_ugoira1920x1080.zip?original").into(
+          work_id: "120834265",
+          is_ugoira?: true,
+          image_sample?: false,
+          full_image_url: "https://i.pximg.net/img-zip-ugoira/img/2024/07/24/08/46/41/120834265_ugoira1920x1080.zip?original",
+        )
+
+        should parse_url("https://i.pximg.net/c/250x250_80_a2/img-master/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0_square1200.jpg").into(
+          candidate_full_image_urls: [
+            "https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg",
+            "https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.png",
+            "https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.gif",
+          ],
+        )
+
+        should parse_url("https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg").into(
+          candidate_full_image_urls: [
+            "https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.jpg",
+            "https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png",
+            "https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.gif",
+          ],
+        )
+
+        should parse_url("https://i.pximg.net/c/600x600/novel-cover-master/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4_master1200.jpg").into(
+          candidate_full_image_urls: [
+            "https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.jpg",
+            "https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.png",
+            "https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.gif",
+          ],
+        )
+      end
     end
   end
 end

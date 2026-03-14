@@ -34,7 +34,7 @@ module Source
       # profile icons
       # https://booth.pximg.net/c/128x128/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314_base_resized.jpg (sample)
       # https://booth.pximg.net/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314.png (full)
-      in _, _, *, "users", user_id, "icon_image", /^([\h-])+_base_resized/
+      in _, _, *, "users", user_id, "icon_image", /^[\h-]+/
         @user_id = user_id
         @full_image_url = to_s if basename.exclude?("_base_resized.jpg")
 
@@ -73,14 +73,14 @@ module Source
     def candidate_full_image_urls
       return [] unless image_url? && full_image_url.nil?
 
-      %w[png jpg jpeg].map do |ext|
+      %w[png jpg jpeg].filter_map do |ext|
         full_filename = filename.delete_suffix("_base_resized")
 
         if user_uuid && work_id.present?
           "https://#{host}/#{user_uuid}/i/#{work_id}/#{full_filename}.#{ext}"
         elsif user_uuid.present?
           "https://#{host}/#{user_uuid}/#{full_filename}.#{ext}"
-        elsif user_id
+        elsif user_id.present?
           "https://#{host}/users/#{user_id}/icon_image/#{full_filename}.#{ext}"
         end
       end

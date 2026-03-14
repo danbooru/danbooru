@@ -38,6 +38,22 @@ module Source::Tests::URL
         page_url: "https://www.artstation.com/artwork/ghost-in-the-shell-fandom",
         username: nil,
       )
+
+      should parse_url("https://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236").into(
+        full_image_url: "https://cdn.artstation.com/p/assets/images/images/005/804/224/original/titapa-khemakavat-sa-dui-srevere.jpg?1493887236",
+      )
+
+      should parse_url("https://cdnb.artstation.com/p/assets/images/images/014/410/217/smaller_square/bart-osz-bartosz1812041.jpg").into(
+        full_image_url: "https://cdn.artstation.com/p/assets/images/images/014/410/217/original/bart-osz-bartosz1812041.jpg",
+      )
+
+      should parse_url("https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4").into(
+        full_image_url: "https://cdn-animation.artstation.com/p/video_sources/000/466/622/workout.mp4",
+      )
+
+      should parse_url("https://artstation.com/artist/sa-dui").into(
+        profile_url: "https://www.artstation.com/sa-dui",
+      )
     end
   end
 end

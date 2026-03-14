@@ -34,6 +34,30 @@ module Source::Tests::URL
         "https://ko-fi.com/T6T41FDFF/gallery/?action=gallery",
         "https://ko-fi-live.azurewebsites.net/gyngerwombatart",
       )
+
+      should parse_url("https://storage.ko-fi.com/cdn/useruploads/post/6132206b-945b-42e9-8326-b4de510bb1da_ilustraci%C3%B3n9_2.png").into(
+        full_image_url: "https://storage.ko-fi.com/cdn/useruploads/display/6132206b-945b-42e9-8326-b4de510bb1da_ilustración9_2.png",
+      )
+
+      should parse_url("https://ko-fi.com/post/Hooligans-Update-3-May-30th-2024-S6S0YPT5K").into(
+        page_url: "https://ko-fi.com/post/Hooligans-Update-3-May-30th-2024-S6S0YPT5K",
+      )
+
+      should parse_url("https://ko-fi.com/album/Original-Artworks-Q5Q2JPOWH").into(
+        page_url: "https://ko-fi.com/album/Original-Artworks-Q5Q2JPOWH",
+      )
+
+      should parse_url("https://ko-fi.com/Gallery/LockedGalleryItem?id=IV7V6XDSRU#checkoutModal").into(
+        page_url: "https://ko-fi.com/i/IV7V6XDSRU",
+      )
+
+      should parse_url("https://ko-fi.com/thom_sketching/commissions?commissionAlias=780f9a88f9&openCommissionsMenu=True#buyShopCommissionModal").into(
+        page_url: "https://ko-fi.com/c/780f9a88f9",
+      )
+
+      should parse_url("https://ko-fi.com/T6T41FDFF/gallery/?action=gallery").into(
+        profile_url: "https://ko-fi.com/T6T41FDFF",
+      )
     end
   end
 end
