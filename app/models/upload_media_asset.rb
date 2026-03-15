@@ -7,6 +7,7 @@ class UploadMediaAsset < ApplicationRecord
 
   belongs_to :upload
   belongs_to :media_asset, optional: true
+  belongs_to :user, default: -> { upload.uploader }
   has_one :post, through: :media_asset
 
   after_create :async_process_upload!
@@ -33,7 +34,7 @@ class UploadMediaAsset < ApplicationRecord
     elsif user.is_anonymous?
       none
     else
-      where(upload: user.uploads)
+      where(user: user)
     end
   end
 

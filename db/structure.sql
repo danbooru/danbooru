@@ -10,6 +10,20 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: btree_gin; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS btree_gin WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION btree_gin; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION btree_gin IS 'support for indexing common datatypes in GIN';
+
+
+--
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -2112,7 +2126,8 @@ CREATE TABLE public.upload_media_assets (
     status integer DEFAULT 0 NOT NULL,
     source_url character varying DEFAULT ''::character varying NOT NULL,
     error character varying,
-    page_url character varying
+    page_url character varying,
+    user_id integer NOT NULL
 );
 
 
@@ -3342,7 +3357,6 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -5947,6 +5961,20 @@ CREATE INDEX index_upload_media_assets_on_upload_id ON public.upload_media_asset
 
 
 --
+-- Name: index_upload_media_assets_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_user_id ON public.upload_media_assets USING btree (user_id);
+
+
+--
+-- Name: index_upload_media_assets_on_user_id_and_source_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_user_id_and_source_url ON public.upload_media_assets USING gin (user_id, source_url public.gin_trgm_ops);
+
+
+--
 -- Name: index_uploads_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5968,20 +5996,6 @@ CREATE INDEX index_uploads_on_media_asset_count ON public.uploads USING btree (m
 
 
 --
--- Name: index_uploads_on_referer_url; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_uploads_on_referer_url ON public.uploads USING btree (referer_url);
-
-
---
--- Name: index_uploads_on_source; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_uploads_on_source ON public.uploads USING btree (source);
-
-
---
 -- Name: index_uploads_on_uploader_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5993,6 +6007,20 @@ CREATE INDEX index_uploads_on_uploader_id ON public.uploads USING btree (uploade
 --
 
 CREATE INDEX index_uploads_on_uploader_id_and_created_at_and_id ON public.uploads USING btree (uploader_id, created_at, id);
+
+
+--
+-- Name: index_uploads_on_uploader_id_and_referer_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_uploader_id_and_referer_url ON public.uploads USING gin (uploader_id, referer_url public.gin_trgm_ops);
+
+
+--
+-- Name: index_uploads_on_uploader_id_and_source; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_uploader_id_and_source ON public.uploads USING gin (uploader_id, source public.gin_trgm_ops);
 
 
 --
@@ -7003,6 +7031,14 @@ ALTER TABLE ONLY public.upgrade_codes
 
 
 --
+-- Name: upload_media_assets fk_rails_d61d4a2ba9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upload_media_assets
+    ADD CONSTRAINT fk_rails_d61d4a2ba9 FOREIGN KEY (user_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: tag_implications fk_rails_dba2c19f93; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -7113,6 +7149,8 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260309181625'),
+('20260309171518'),
 ('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),
@@ -7457,4 +7495,3 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20100205162521'),
 ('20100204214746'),
 ('20100204211522');
-
