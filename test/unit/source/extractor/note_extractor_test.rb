@@ -57,6 +57,8 @@ module Source::Tests::Extractor
         ],
         dtext_artist_commentary_title: "NSR250R MC21",
         dtext_artist_commentary_desc: <<~EOS.chomp,
+          "[image]":[https://assets.st-note.com/img/1623726537463-B8LOZ1JZUS.png]
+
           ＜ご依頼品＞オーナー様 Twitter：@potatohedron 様
         EOS
       )

@@ -818,13 +818,13 @@ module Source::Tests::Extractor
           [/quote]
 
           [quote]
-          "mlarayoukai":[https://mlarayoukai.tumblr.com/post/705514137627852800] answered:
+          "mlarayoukai-archive":[https://mlarayoukai-archive.tumblr.com/post/705514137627852800] answered:
 
           Get answered. Idiot
           [/quote]
 
           [quote]
-          "mlarayoukai":[https://mlarayoukai.tumblr.com/post/705515061923479553]:
+          "mlarayoukai-archive":[https://mlarayoukai-archive.tumblr.com/post/705515061923479553]:
 
           "[image]":[https://64.media.tumblr.com/7f86ced76c3bdb3d1f7e37b94300a0f8/8a2f1b95cb77a442-0c/s640x960/b61020fc02ca7d336ef607d9e92b9640664bcf75.jpg]
 
