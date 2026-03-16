@@ -74,8 +74,11 @@ module Source
         @date = [year, month, day, hour, min, sec]
 
       # https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg
+      # https://i.pximg.net/c/1920x960_80_a2_g5/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg
       in *, "background", "img", year, month, day, hour, min, sec, _ if image_url?
+        @image_type = "background"
         @date = [year, month, day, hour, min, sec]
+        parse_filename
 
       # https://i.pximg.net/imgaz/upload/20240417/163474511.jpg
       # https://i.pximg.net/imgaz/upload/20240809/962537205.jpg
@@ -192,7 +195,7 @@ module Source
       # https://i.pximg.net/c/600x600/novel-cover-master/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4_master1200.jpg (sample image; ci = cover image)
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.jpg (full image)
       # https://i.pximg.net/novel-cover-original/img/2018/04/02/19/38/29/9434677_6ab6c651d5568ff39e2ba6ab45edaf28.jpg (assumed novel cover image)
-      in /^(ci)?\d+$/ => novel_id, /^\h{32}$/, *rest
+      in /^(ci)?\d+$/ => novel_id, /^\h{32}$/, *rest if image_type.in?(%w[novel-cover-original novel-cover-master])
         @novel_id = novel_id.delete_prefix("ci")
 
       # https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg (sample image; sci = series cover image)
@@ -204,6 +207,10 @@ module Source
       # https://i.pximg.net/novel-cover-original/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5.jpg (full image; tei = text embedded image, image embedded in novel text)
       in /^tei\d+$/ => novel_embedded_image_id, /^\h{32}$/, *rest
         @novel_embedded_image_id = novel_embedded_image_id.delete_prefix("tei")
+
+      # https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg
+      in /^\d+$/ => user_id, /^\h{32}$/, *rest if image_type == "background"
+        @user_id = user_id
 
       # https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.png
       in /^\d+$/ => work_id, /^ugoira(\d+)$/
@@ -266,7 +273,8 @@ module Source
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.jpg
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg
       # https://i.pximg.net/novel-cover-original/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5.jpg
-      elsif image_url? && image_type.in?(%w[img-original novel-cover-original]) && date.present?
+      # https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg
+      elsif image_url? && image_type.in?(%w[img-original novel-cover-original background]) && date.present?
         "https://i.pximg.net/#{image_type}/img/#{date.join("/")}/#{basename}"
       end
     end
@@ -313,10 +321,17 @@ module Source
     end
 
     def image_sample?
-      image_url? && !(
-        image_type.in?(%w[img-original novel-cover-original imgaz]) ||
-        (ugoira_zip_url? && to_s == ugoira_zip_url)
-      )
+      image_url? && !full_image_url?
+    end
+
+    def full_image_url?
+      image_type.in?(%w[img-original novel-cover-original imgaz]) ||
+        (ugoira_zip_url? && to_s == ugoira_zip_url) ||
+        (image_type == "background" && to_s == full_image_url)
+    end
+
+    def bad_link?
+      image_url? && page_url.nil? && profile_url.nil?
     end
 
     def page_url

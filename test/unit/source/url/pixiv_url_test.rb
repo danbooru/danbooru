@@ -16,6 +16,7 @@ module Source::Tests::URL
       )
 
       should be_image_sample(
+        "https://i.pximg.net/c/1920x960_80_a2_g5/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg",
         "https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg",
         "https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira600x600.zip",
         "https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip",
@@ -69,10 +70,16 @@ module Source::Tests::URL
         "https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png",
         "https://www.pixiv.net/artworks/46324488",
         "https://i.pximg.net/imgaz/upload/20240417/163474511.jpg",
+        "https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg",
       )
 
       should be_bad_source(
         "https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com",
+      )
+
+      should_not be_bad_link(
+        "https://i.pximg.net/c/1920x960_80_a2_g5/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg",
+        "https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg",
       )
     end
 
@@ -198,6 +205,12 @@ module Source::Tests::URL
 
         should parse_url("https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg").into(
           parsed_date: Time.utc(2015, 10, 24, 23, 45, 27),
+        )
+
+        should parse_url("https://i.pximg.net/c/1920x960_80_a2_g5/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg").into(
+          user_id: "16699330",
+          profile_url: "https://www.pixiv.net/users/16699330",
+          full_image_url: "https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg",
         )
 
         should parse_url("https://i.pximg.net/imgaz/2024/07/31/19/27/09/contest_ogp_813.png").into(

@@ -555,6 +555,23 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A background sample image URL" do
+      strategy_should_work(
+        "https://i.pximg.net/c/1920x960_80_a2_g5/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg",
+        image_urls: %w[https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg],
+        media_files: [{ file_size: 1_657_731 }],
+        page_url: nil,
+        profile_urls: %w[https://www.pixiv.net/users/16699330],
+        display_name: nil,
+        username: nil,
+        published_at: Time.parse("2024-11-08T04:57:28.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
     context "A background image URL" do
       strategy_should_work(
         "https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg",
