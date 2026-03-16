@@ -54,7 +54,9 @@ module Source
       return url if url.is_a?(Source::URL)
 
       url = Danbooru::URL.parse!(url)
-      subclass = url_subclasses.find { |c| c.match?(url) } || Source::URL::Null
+      subclass = Source::Site.find_by_domain(url.domain).find { |site| site.url_class.match?(url) }&.url_class
+      subclass = url_subclasses.find { |subclass| subclass.match?(url) } if subclass.nil?
+      subclass = Source::URL::Null if subclass.nil?
       subclass.new(url)
     end
 
