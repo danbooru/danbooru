@@ -11,6 +11,8 @@ class Source::URL::Xiaohongshu < Source::URL
     credential :web_session_cookie, help: %{Your Xiaohongshu `web_session` cookie.}
   end
 
+  extractors { [Source::Extractor::Xiaohongshu, Source::Extractor::URLShortener] }
+
   attr_reader :user_id, :post_id, :full_image_url, :xsec_token, :redirect_id
 
   def self.match?(url)

@@ -25,6 +25,8 @@ class Source::URL::Twitter < Source::URL
     credential :csrf_token, help: %{Your Twitter `ct0` cookie.}
   end
 
+  extractors { [Source::Extractor::Twitter, Source::Extractor::URLShortener] }
+
   attr_reader :status_id, :username, :user_id, :full_image_url, :base10_snowflake_id, :base64_snowflake_id, :timestamp, :redirect_id
 
   def self.match?(url)

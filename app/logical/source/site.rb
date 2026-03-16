@@ -8,8 +8,6 @@
 # Sites have a name, a URL (used to link to the site's homepage), a list of domains (used to match domains to sites), a
 # stable numeric ID (used to store site IDs in the database), an internal name (used to generate the numeric ID, so that
 # it stays the same in case the site's name ever changes), and a list of options and credentials.
-#
-# Source::Site::SITES contains the master list of sites, after all URL parsers have been loaded.
 module Source
   class Site
     # @return [Hash<Symbol, OptionDefinition>] A mapping of option names to definitions. The definition describes the option's type, default value, help string, etc.
@@ -66,6 +64,11 @@ module Source
       self.options = {}.with_indifferent_access
 
       instance_eval(&block) if block_given?
+    end
+
+    # @return [Array<Source::Extractor>] The list of extractors that can be used by this site.
+    def extractors
+      url_class.extractors
     end
 
     # @return [Integer] A stable 32-bit numeric ID for this site.

@@ -18,6 +18,8 @@ class Source::URL::Nijie < Source::URL
     credential :password, help: %{Your nijie password}
   end
 
+  extractors { [Source::Extractor::Nijie, Source::Extractor::URLShortener] }
+
   attr_reader :work_id, :user_id, :redirect_url
 
   def self.match?(url)

@@ -11,6 +11,8 @@
 class Source::URL::Weibo < Source::URL
   site "Weibo", url: "https://www.weibo.com", domains: %w[weibo.com weibo.cn sinaimg.cn weibocdn.com t.cn]
 
+  extractors { [Source::Extractor::Weibo, Source::Extractor::URLShortener] }
+
   RESERVED_USERNAMES = %w[u n p profile sinaurl status detail]
 
   attr_reader :full_image_url, :artist_short_id, :artist_long_id, :illust_long_id, :illust_base62_id, :display_name, :username, :redirect_url, :redirect_id

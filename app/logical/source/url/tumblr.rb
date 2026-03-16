@@ -8,6 +8,8 @@ class Source::URL::Tumblr < Source::URL
     credential :consumer_key, help: %{Your Tumblr consumer key. Register a new application at https://www.tumblr.com/oauth/register then copy your consumer key from https://www.tumblr.com/oauth/apps.}
   end
 
+  extractors { [Source::Extractor::Tumblr, Source::Extractor::URLShortener] }
+
   IMAGE_SIZES = %w[1280 720 640 540 500h 500 400 250 100]
   RESERVED_NAMES = %w[about app blog dashboard developers explore jobs login logo policy press register security tagged tips]
 

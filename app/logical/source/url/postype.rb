@@ -8,6 +8,8 @@ class Source::URL::Postype < Source::URL
     credential :session_cookie, help: %{Your Postype `PSE3` cookie. Go to your settings and enable 'Viewing adult content by foreigners' to see all content.}
   end
 
+  extractors { [Source::Extractor::Postype, Source::Extractor::URLShortener] }
+
   RESERVED_SUBDOMAINS = %w[about blog c3 i www]
 
   attr_reader :full_image_url, :post_id, :series_id, :blogname, :username, :redirect_id

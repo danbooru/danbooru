@@ -8,6 +8,8 @@
 class Source::URL::Google < Source::URL
   site "Google", url: "https://www.google.com", domains: %w[ggpht.com googleusercontent.com forms.gle goo.gl]
 
+  extractors { [Source::Extractor::Google, Source::Extractor::URLShortener] }
+
   attr_reader :full_image_url
 
   def self.match?(url)

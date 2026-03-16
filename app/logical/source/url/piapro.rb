@@ -4,6 +4,8 @@
 class Source::URL::Piapro < Source::URL
   site "Piapro.jp", url: "https://piapro.jp"
 
+  extractors { [Source::Extractor::Piapro, Source::Extractor::URLShortener] }
+
   RESERVED_USERNAMES = %w[
     3dm a about_us bookmark characters content content_list_recommend dm download faq follow help illust intro inquiry jump
     license logout mailto music my_page official_collabo privacypolicy product r t text timg user user_agreement user_mod

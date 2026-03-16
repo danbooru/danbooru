@@ -24,6 +24,8 @@ module Source
       credential :client_secret, help: %{Your DeviantArt client secret. Go to https://www.deviantart.com/developers/ to create a new application.}
     end
 
+    extractors { [Source::Extractor::DeviantArt, Source::Extractor::URLShortener] }
+
     RESERVED_SUBDOMAINS = %w[www]
     RESERVED_USERNAMES = %w[art deviation download users stash view view.php view-full.php]
 

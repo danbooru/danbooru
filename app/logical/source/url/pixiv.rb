@@ -9,6 +9,8 @@ module Source
       credential :phpsessid, help: %{Your Pixiv `PHPSESSID` cookie.}
     end
 
+    extractors { [Source::Extractor::Pixiv, Source::Extractor::URLShortener] }
+
     attr_reader :work_id, :image_hash, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame, :redirect_url
 
     def self.match?(url)

@@ -4,6 +4,8 @@
 class Source::URL::Miyoushe < Source::URL
   site "Miyoushe", url: "https://www.miyoushe.com", domains: %w[mihoyo.com miyoushe.com hoyolab.com hoyo.link]
 
+  extractors { [Source::Extractor::Miyoushe, Source::Extractor::URLShortener] }
+
   attr_reader :user_id, :subsite, :article_id, :full_image_url, :redirect_id
 
   def self.match?(url)

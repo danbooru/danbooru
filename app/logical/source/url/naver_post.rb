@@ -4,6 +4,8 @@
 class Source::URL::NaverPost < Source::URL
   site "Naver Post", url: "https://post.naver.com", domains: %w[naver.com naver.net naver.me pstatic.net]
 
+  extractors { [Source::Extractor::URLShortener] }
+
   RESERVED_USERNAMES = %w[author contents my viewer]
 
   attr_reader :username, :user_id, :post_id, :full_image_url, :redirect_id

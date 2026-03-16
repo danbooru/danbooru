@@ -10,6 +10,10 @@ module Source
         credential :session_cookie, help: %{Your Reddit `reddit_session` cookie.}
       end
 
+      extractors do
+        [Source::Extractor::Reddit, Source::Extractor::RedditComment]
+      end
+
       attr_reader :subreddit, :work_id, :comment_id, :share_id, :title, :username, :full_image_url
 
       def self.match?(url)

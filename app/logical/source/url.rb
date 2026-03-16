@@ -18,6 +18,8 @@
 # * page_url
 # * profile_url
 # * source_site (if the class supports more than one site)
+# * extractor_class (if the class has multiple possible extractors)
+# * self.extractors (if the class has multiple possible extractors)
 #
 # Source::URL is a subclass of Danbooru::URL, so it inherits some common utility methods
 # from there.
@@ -44,6 +46,25 @@ module Source
     def self.site(name, **options, &block)
       self.sites ||= []
       self.sites << Site.new(name: name, url_class: self, **options, &block)
+    end
+
+    # A macro that defines the list of extractors used by an URL class, if the class can use multiple extractors. Usage:
+    #
+    #   extractors { [Source::Extractor::Reddit, Source::Extractor::RedditComment] }
+    #
+    # Most sites only have one extractor, which has the same name as the URL class (e.g. Source::URL::Pixiv ->
+    # Source::Extractor::Pixiv). For sites like Reddit or Ko-fi, which have multiple extractors for different URLs, this
+    # is used to set the list of all possible extractors used by a site.
+    #
+    # When called with a block, this sets the list of extractors. When not called with a block, it returns them.
+    #
+    # @return [Array<Source::Extractor>] The extractor classes used by this URL class.
+    def self.extractors(&block)
+      if block_given?
+        define_singleton_method(:extractors, &block) # redefine this method to return the list of extractors
+      else
+        ["Source::Extractor::#{name.demodulize}".safe_constantize].compact
+      end
     end
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
@@ -83,10 +104,10 @@ module Source
       Source::URL.descendants.excluding(Source::URL::Null)
     end
 
-    # Return the extractor class to use for this URL. By default, it's the Source::Extractor subclass with the same name
-    # as this Source::URL subclass. Subclasses can override this to provide a different extractor.
+    # @return [Source::Extractor, nil] The extractor class to use for this URL. By default, it's the Source::Extractor subclass
+    #   with the same name as this Source::URL subclass. Subclasses can override this to use different extractors for different URLs.
     def extractor_class
-      "Source::Extractor::#{self.class.name.demodulize}".safe_constantize
+      self.class.extractors.sole if self.class.extractors.one?
     end
 
     # Return the extractor corresponding to this URL.

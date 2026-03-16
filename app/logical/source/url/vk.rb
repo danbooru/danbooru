@@ -3,6 +3,8 @@
 class Source::URL::Vk < Source::URL
   site "Vk", url: "https://vk.com", domains: %w[vk.com vk.cc vk.me vk.ru vk.team vk.company vkontakte.ru mvk.com userapi.com]
 
+  extractors { [Source::Extractor::Vk, Source::Extractor::URLShortener] }
+
   RESERVED_USERNAMES = %w[about audio away.php blog clips games groups feed jobs join legal login mobile products technology services terms video]
   PAGE_TYPES = %w[album albums audio audios clip club doc event id market page photo post product public topic uslugi video videos wall wpt]
   ID_REGEX = /^(#{Regexp.union(PAGE_TYPES)})(-?\d+)(?:_(\d+))?/ # wall-111670353_64474

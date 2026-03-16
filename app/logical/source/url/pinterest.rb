@@ -3,6 +3,8 @@
 class Source::URL::Pinterest < Source::URL
   site "Pinterest", url: "https://www.pinterest.com", domains: %w[pinterest.com pinterest.jp pinimg.com pin.it]
 
+  extractors { [Source::Extractor::Pinterest, Source::Extractor::URLShortener] }
+
   RESERVED_NAMES = %w[docs ideas pin resource shopping today videos _]
 
   attr_reader :pin_id, :username, :full_image_url, :candidate_full_image_urls, :redirect_id

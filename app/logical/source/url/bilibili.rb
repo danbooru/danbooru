@@ -11,6 +11,8 @@ module Source
     class Bilibili < Source::URL
       site "Bilibili", url: "https://www.bilibili.com", domains: %w[bilibili.com biliimg.com hdslb.com bili2233.cn b23.tv]
 
+      extractors { [Source::Extractor::Bilibili, Source::Extractor::URLShortener] }
+
       attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id, :redirect_id
 
       def self.match?(url)

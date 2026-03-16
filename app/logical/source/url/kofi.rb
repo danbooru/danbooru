@@ -4,6 +4,10 @@
 class Source::URL::Kofi < Source::URL
   site "Ko-fi", url: "https://ko-fi.com", domains: %w[ko-fi.com msecnd.net azurewebsites.net]
 
+  extractors do
+    [Source::Extractor::KofiGalleryItem, Source::Extractor::KofiShopItem, Source::Extractor::KofiCommission, Source::Extractor::KofiPost, Source::Extractor::Kofi]
+  end
+
   RESERVED_USERNAMES = %w[c i s about account album cdn commissions discord explore gallery gold memberships post privacy shop terms]
 
   attr_reader :full_image_url, :username, :user_id, :gallery_item_id, :shop_item_id, :commission_id, :post_id, :album_id, :slug
