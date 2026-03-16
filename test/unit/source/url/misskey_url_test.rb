@@ -79,6 +79,10 @@ module Source::Tests::URL
       )
     end
 
+    should parse_url("https://media.misskeyusercontent.com/io/thumbnail-e9f307e4-3fad-435f-91b6-3768d688491d.webp").into(site_name: "Misskey.io")
+    should parse_url("https://media.misskeyusercontent.jp/io/dfca7bd4-c073-4ea0-991f-313ab3a77847.png").into(site_name: "Misskey.io")
     should parse_url("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp").into(site_name: "Misskey.io")
+    should parse_url("https://files.misskey.art//webpublic-94d9354f-ddba-406b-b878-4ce02ccfa505.webp").into(site_name: "Misskey.art")
+    should parse_url("https://file.misskey.design/post/webpublic-ac7072e9-812f-460b-ad24-1f303a62f0b4.webp").into(site_name: "Misskey.design")
   end
 end

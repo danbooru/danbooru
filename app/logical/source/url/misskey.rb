@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class Source::URL::Misskey < Source::URL
-  site "Misskey", url: "https://misskey-hub.net", domains: %w[misskey.io misskey.art misskey.design misskeyusercontent.com misskeyusercontent.jp]
+  site "Misskey", url: "https://misskey-hub.net"
+  site "Misskey.io", url: "https://misskey.io", domains: %w[misskey.io misskeyusercontent.com misskeyusercontent.jp arkjp.net]
+  site "Misskey.art", url: "https://misskey.art"
+  site "Misskey.design", url: "https://misskey.design"
 
   attr_reader :username, :user_id, :note_id, :play_id
 
@@ -51,15 +54,6 @@ class Source::URL::Misskey < Source::URL
     # https://proxy.misskeyusercontent.com/image.webp?url=https%3A%2F%2Fimg.pawoo.net%2Fmedia_attachments%2Ffiles%2F111%2F232%2F575%2F490%2F284%2F147%2Foriginal%2F9aaf0c71a41b5647.jpeg | https://misskey.io/notes/9ktdpaq840
     # https://mk.yopo.work/files/webpublic-dcab49b3-4ad3-4455-aea0-28aa81ecca48
     super || basename&.match?(/\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/)
-  end
-
-  def site_name
-    case domain
-    in "arkjp.net" | "misskeyusercontent.com" | "misskeyusercontent.jp"
-      "Misskey.io"
-    else
-      domain.capitalize
-    end
   end
 
   def image_sample?

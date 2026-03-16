@@ -6,7 +6,7 @@
       <label id="source-label" class="w-full text-center mb-1 block !font-normal">Paste URL here</label>
       <%= f.input :source, label: false, as: :string, placeholder: "Paste a pixiv link, tweet, etc", input_html: { value: url, class: "text-center bg:card" }, wrapper_html: { class: "px-4 text-center !m-0" } %>
       <span class="hint text-muted text-xs text-center w-full block mt-1">
-        <%= link_to_wiki "See here", "help:bookmarklet_notice" %> for a list of supported sites.
+        <%= link_to "See here", bookmarklet_path %> for a list of supported sites.
       </span>
       <%= f.input :referer_url, as: :hidden, input_html: { value: referer_url } %>
       <%= f.submit "Upload", class: "button-primary text-center mx-auto hidden", "data-disable-with": false %>

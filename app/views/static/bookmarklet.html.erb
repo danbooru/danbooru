@@ -1,15 +1,56 @@
 <% page_title "Upload Bookmarklet" %>
+<%= render "uploads/secondary_links" %>
 
 <div id="c-static">
   <div id="a-bookmarklet">
-    <h1>Bookmarklet</h1>
+    <div class="card fixed-width-container p-4 mx-auto prose">
+      <p class="text-center">
+        <% bookmarklet = "javascript:void(location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer))" %>
+        <%= link_to "Post to #{Danbooru.config.app_name}", bookmarklet, class: "text-xl font-bold text-center button-outline-primary", "x-data": "{}", "x-on:click.prevent": "Danbooru.Notice.info('Drag this link to your bookmarks toolbar.')" %>
+      </p>
 
-    <p>
-      <%= link_to "Post to #{Danbooru.config.app_name}", "javascript:void(location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer))" %>
-    </p>
+      <p class="fineprint text-center">Drag this link to your bookmarks toolbar</p>
 
-    <div class="prose">
-      <%= WikiPage.find_by_title("help:bookmarklet_notice")&.dtext_body&.format_text %>
+      <p>The bookmarklet lets you upload images to <%= Danbooru.config.app_name %> in a single click.</p>
+
+      <p>To install it:</p>
+
+      <ul>
+        <li>Drag the "Post to <%= Danbooru.config.app_name %>" link above to your bookmarks toolbar (beneath the address bar).</li>
+        <li>If the bookmarks toolbar isn't visible, press Ctrl+Shift+B to show it, or enable the "Show bookmarks bar" option in the "Bookmarks" menu.</li>
+        <li>That's it!</li>
+      </ul>
+
+      <p>To use it:</p>
+
+      <ul>
+        <li>Click the "Post to <%= Danbooru.config.app_name %>" link in your toolbar when viewing a post or image.</li>
+        <li>You can use it on the image itself, or on the page containing the image.</li>
+        <li>It works on any of the sites below.</li>
+      </ul>
+
+      <h4>Supported sites</h4>
+
+      <div class="columns-5xs space-y-1">
+        <% sites = Source::Site.sites.select { |site| site.extractors.present? } %>
+        <% sites = sites.reject { |site| site.extractors == [Source::Extractor::URLShortener] } %>
+        <% sites = sites.sort_by { |site| site.name.downcase } %>
+
+        <% sites.each do |site| %>
+          <div>
+            <%= external_link_to site.url.to_s, class: "inline-flex items-center gap-2 chip-primary" do %>
+              <%= external_site_icon site.name, class: "h-4" %>
+              <%= site.name %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <h4>External links</h4>
+
+      <ul>
+        <li><a href="https://support.mozilla.org/en-US/kb/bookmarklets-perform-common-web-page-tasks">Mozilla Support: Use bookmarklets to quickly perform common web page tasks</a></li>
+      </ul>
     </div>
   </div>
 </div>

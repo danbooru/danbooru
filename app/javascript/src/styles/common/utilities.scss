@@ -391,6 +391,8 @@ $spacer: 0.25rem; /* 4px */
 .col-span-10 { grid-column: span 10 / span 10; }
 .col-span-12 { grid-column: span 12 / span 12; }
 
+.columns-5xs { columns: 48 * $spacer; }
+
 .z-0 { z-index: 0; }
 .z-10 { z-index: 10; }
 .z-20 { z-index: 20; }
