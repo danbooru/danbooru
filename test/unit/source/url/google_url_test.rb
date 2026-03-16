@@ -12,6 +12,12 @@ module Source::Tests::URL
         "http://lh5.ggpht.com/-ykP8cKuqOfU/UKEOptJJvoI/AAAAAAAAMAY/Kp7qo5A50E8/d/",
       )
 
+      should_not be_image_url(
+        "https://photos.app.goo.gl/eHfTwV866X4Vf7Zt5",
+        "https://images.app.goo.gl/5uBga7TuPKHxyyR1A",
+        "https://forms.gle/CK6UER39rK5qKnnT8",
+      )
+
       should parse_url("https://lh3.googleusercontent.com/C6yBYozE1sXc9o_jsrh29_AYQ6ffCKO-fpooQ5nwuu7FSgQvdGtfSbcJVBUGSDi1VXE9TqYT2g=s0?imgmax=s0").into(
         full_image_url: "https://lh3.googleusercontent.com/C6yBYozE1sXc9o_jsrh29_AYQ6ffCKO-fpooQ5nwuu7FSgQvdGtfSbcJVBUGSDi1VXE9TqYT2g=d",
       )

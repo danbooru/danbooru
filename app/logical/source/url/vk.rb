@@ -3,15 +3,14 @@
 class Source::URL::Vk < Source::URL
   site "Vk", url: "https://vk.com", domains: %w[vk.com vk.cc vk.me vk.ru vk.team vk.company vkontakte.ru mvk.com userapi.com]
 
-  RESERVED_USERNAMES = %w[about audio blog clips games groups feed jobs join legal login mobile products technology services terms video]
+  RESERVED_USERNAMES = %w[about audio away.php blog clips games groups feed jobs join legal login mobile products technology services terms video]
   PAGE_TYPES = %w[album albums audio audios clip club doc event id market page photo post product public topic uslugi video videos wall wpt]
   ID_REGEX = /^(#{Regexp.union(PAGE_TYPES)})(-?\d+)(?:_(\d+))?/ # wall-111670353_64474
 
-  attr_reader :full_image_url, :username, :page_type, :id, :owner_id, :item_id, :parent_id, :parent_owner_id, :parent_item_id, :article_slug, :doc_hash
+  attr_reader :full_image_url, :username, :page_type, :id, :owner_id, :item_id, :parent_id, :parent_owner_id, :parent_item_id, :article_slug, :doc_hash, :redirect_url
 
   def self.match?(url)
-    # https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com (handled in Source::URL::URLShortener)
-    url.domain.in?(%w[vk.com vk.cc vk.me vk.ru vk.team vk.company vkontakte.ru mvk.com userapi.com]) && !Source::URL::URLShortener.match?(url)
+    url.domain.in?(%w[vk.com vk.cc vk.me vk.ru vk.team vk.company vkontakte.ru mvk.com userapi.com])
   end
 
   def parse
@@ -38,6 +37,10 @@ class Source::URL::Vk < Source::URL
     # https://psv4.userapi.com/c235131/u495199190/docs/d59/b94c28ecfbf7/Strakh_Pakhnet_Lyubovyu.png?extra=mZ9zdTdOqm0QPKfsJ8msJr5XMKqxvfSiQNZHBjCceMvuMmxeJiE_bTi12ZXc66HkriH02LKY4aq7tQQh-suMtdtaNYXUNe49sgrS8m3M02eUnwjXzATQ3oHWqB0iuPqfMcmj3uQqmjwsNlc (full)
     in /^(sun|psv)/, "userapi.com", *rest
       @full_image_url = "https://pp.userapi.com#{path}"
+
+    # https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com
+    in _, "vk.com", "away.php"
+      @redirect_url = params[:to]
 
     # The `z` param opens the page in an overlay over the current page.
     # https://vk.com/sgips?z=album-111670353_227001377
@@ -122,6 +125,10 @@ class Source::URL::Vk < Source::URL
     else
       nil
     end
+  end
+
+  def extractor_class
+    redirect_url.present? ? Source::Extractor::URLShortener : Source::Extractor::Vk
   end
 
   def parse_id(id)

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 class Source::URL::Pinterest < Source::URL
-  site "Pinterest", url: "https://www.pinterest.com", domains: %w[pinterest.com pinterest.jp pinimg.com]
+  site "Pinterest", url: "https://www.pinterest.com", domains: %w[pinterest.com pinterest.jp pinimg.com pin.it]
 
   RESERVED_NAMES = %w[docs ideas pin resource shopping today videos _]
 
-  attr_reader :pin_id, :username, :full_image_url, :candidate_full_image_urls
+  attr_reader :pin_id, :username, :full_image_url, :candidate_full_image_urls, :redirect_id
 
   def self.match?(url)
-    url.domain == "pinimg.com" || url.sld == "pinterest" # matches pinterest.com, pinterest.jp, etc
+    url.domain.in?(%w[pinterest.com pinterest.jp pinimg.com pin.it]) || url.sld == "pinterest" # matches pinterest.info, pinterest.co.uk, etc
   end
 
   def parse
@@ -36,11 +36,19 @@ class Source::URL::Pinterest < Source::URL
     in _, "pinterest", _, username, *rest unless username.in?(RESERVED_NAMES) || subdomain == "api"
       @username = username
 
+    # https://pin.it/4A1N0Rd5W
+    in _, "pin", "it", redirect_id
+      @redirect_id = redirect_id
+
     # https://www.pinterest.com/ideas/people/935950727927/
     # https://api.pinterest.com/url_shortener/4A1N0Rd5W/redirect/
     else
       nil
     end
+  end
+
+  def extractor_class
+    redirect_id.present? ? Source::Extractor::URLShortener : Source::Extractor::Pinterest
   end
 
   def image_url?

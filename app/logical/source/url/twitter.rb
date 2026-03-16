@@ -11,7 +11,7 @@ class Source::URL::Twitter < Source::URL
 
   # fxtwitter.com, etc are from https://github.com/FixTweet/FxTwitter, a proxy for better embedding
   # nitter.net, xcancel etc are from https://github.com/zedeus/nitter, a privacy-focused frontend
-  DOMAINS = %w[twitter.com twimg.com x.com] + %w[fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com nitter.net xcancel.com]
+  DOMAINS = %w[twitter.com twimg.com x.com t.co] + %w[fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com nitter.net xcancel.com]
   HOSTS = %w[nitter.poast.org nitter.privacydev.net]
 
   # Unix time in milliseconds that must be added to the snowflake ID's timestamp.
@@ -25,12 +25,11 @@ class Source::URL::Twitter < Source::URL
     credential :csrf_token, help: %{Your Twitter `ct0` cookie.}
   end
 
-  attr_reader :status_id, :username, :user_id, :full_image_url, :base10_snowflake_id, :base64_snowflake_id, :timestamp
+  attr_reader :status_id, :username, :user_id, :full_image_url, :base10_snowflake_id, :base64_snowflake_id, :timestamp, :redirect_id
 
   def self.match?(url)
     # https://o.twimg.com URLs are handled by Source::URL::TwitPic.
-    # https://pic.twitter.com and https://t.co URLs are handled by Source::URL::URLShortener.
-    (url.domain.in?(DOMAINS) || url.host.in?(HOSTS)) && !Source::URL::TwitPic.match?(url) && !Source::URL::URLShortener.match?(url)
+    (url.domain.in?(DOMAINS) || url.host.in?(HOSTS)) && !Source::URL::TwitPic.match?(url)
   end
 
   def parse
@@ -163,12 +162,25 @@ class Source::URL::Twitter < Source::URL
     # https://x.com/motty08111213
     # https://x.com/motty08111213/likes
     # https://x.com/@eemapso
-    in _, _, username, *rest unless username.in?(RESERVED_USERNAMES)
+    in _, _, username, *rest unless username.in?(RESERVED_USERNAMES) || subdomain == "pic" || domain == "t.co"
       @username = username.delete_prefix("@")
+
+    # https://pic.twitter.com/Dxn7CuVErW
+    # https://pic.x.com/Dxn7CuVErW
+    in "pic", ("twitter.com" | "x.com"), id
+      @redirect_id = id
+
+    # https://t.co/Dxn7CuVErW
+    in _, "t.co", id
+      @redirect_id = id
 
     else
       nil
     end
+  end
+
+  def extractor_class
+    redirect_id.present? ? Source::Extractor::URLShortener : Source::Extractor::Twitter
   end
 
   def profile_banner?

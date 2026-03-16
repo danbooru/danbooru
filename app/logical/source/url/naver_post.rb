@@ -2,14 +2,14 @@
 
 # @see https://post.naver.com
 class Source::URL::NaverPost < Source::URL
-  site "Naver Post", url: "https://post.naver.com", domains: %w[naver.com naver.net pstatic.net]
+  site "Naver Post", url: "https://post.naver.com", domains: %w[naver.com naver.net naver.me pstatic.net]
 
   RESERVED_USERNAMES = %w[author contents my viewer]
 
-  attr_reader :username, :user_id, :post_id, :full_image_url
+  attr_reader :username, :user_id, :post_id, :full_image_url, :redirect_id
 
   def self.match?(url)
-    url.host.in?(%w[post.naver.com m.post.naver.com post-phinf.pstatic.net post.phinf.naver.net])
+    url.host.in?(%w[post.naver.com m.post.naver.com post-phinf.pstatic.net post.phinf.naver.net naver.me])
   end
 
   def parse
@@ -49,10 +49,18 @@ class Source::URL::NaverPost < Source::URL
     in _, "naver.com", username, *rest unless username.in?(RESERVED_USERNAMES) || username.match?(/\.(nhn|naver)$/)
       @username = username
 
+    # https://naver.me/FABhCw8Z
+    in _, "naver.me", redirect_id
+      @redirect_id = redirect_id
+
     # https://blog.kakaocdn.net/dn/cJSXhs/btqHBRGLYvT/uJXMz48vCSKHMWs4aN8ytK/img.jpg
     else
       nil
     end
+  end
+
+  def extractor_class
+    redirect_id.present? ? Source::Extractor::URLShortener : nil
   end
 
   def mobile_page_url

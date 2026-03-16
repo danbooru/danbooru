@@ -2,16 +2,16 @@
 
 # @see Source::Extractor::Miyoushe
 class Source::URL::Miyoushe < Source::URL
-  site "Miyoushe", url: "https://www.miyoushe.com", domains: %w[mihoyo.com miyoushe.com hoyolab.com]
+  site "Miyoushe", url: "https://www.miyoushe.com", domains: %w[mihoyo.com miyoushe.com hoyolab.com hoyo.link]
 
-  attr_reader :user_id, :subsite, :article_id, :full_image_url
+  attr_reader :user_id, :subsite, :article_id, :full_image_url, :redirect_id
 
   def self.match?(url)
-    url.domain.in?(%w[mihoyo.com miyoushe.com hoyolab.com])
+    url.domain.in?(%w[mihoyo.com miyoushe.com hoyolab.com hoyo.link])
   end
 
   def site_name
-    (domain == "hoyolab.com") ? "Hoyolab" : "Miyoushe"
+    domain.in?(%w[hoyolab.com hoyo.link]) ? "Hoyolab" : "Miyoushe"
   end
 
   def parse
@@ -78,6 +78,11 @@ class Source::URL::Miyoushe < Source::URL
       @article_id = url.try(:article_id)
       @user_id = url.try(:user_id)
 
+    # https://hoyo.link/80GCFBAL?q=25tufAgwB8N
+    # https://hoyo.link/aifgFBAL
+    in _, "hoyo.link", redirect_id
+      @redirect_id = redirect_id
+
     # https://wiki.hoyolab.com/pc/hsr/entry/805
     # https://bbs.mihoyo.com/sr/wiki/content/2083/detail
     # https://act.mihoyo.com/puzzle/hkrpg/pz_stKK3ccUXV/index.html
@@ -87,6 +92,11 @@ class Source::URL::Miyoushe < Source::URL
     else
       nil
     end
+  end
+
+  def extractor_class
+    # https://hoyo.link/aifgFBAL
+    redirect_id.present? ? Source::Extractor::URLShortener : Source::Extractor::Miyoushe
   end
 
   def image_url?

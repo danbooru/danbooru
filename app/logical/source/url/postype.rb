@@ -3,17 +3,17 @@
 class Source::URL::Postype < Source::URL
   site "Postype" do
     url "https://www.postype.com"
-    domains %w[postype.com cloudfront.net]
+    domains %w[postype.com posty.pe cloudfront.net]
 
     credential :session_cookie, help: %{Your Postype `PSE3` cookie. Go to your settings and enable 'Viewing adult content by foreigners' to see all content.}
   end
 
   RESERVED_SUBDOMAINS = %w[about blog c3 i www]
 
-  attr_reader :full_image_url, :post_id, :series_id, :blogname, :username
+  attr_reader :full_image_url, :post_id, :series_id, :blogname, :username, :redirect_id
 
   def self.match?(url)
-    url.domain == "postype.com" || url.host.in?(%w[d2ufj6gm1gtdrc.cloudfront.net d3mcojo3jv0dbr.cloudfront.net d33pksfia2a94m.cloudfront.net])
+    url.domain.in?(%w[postype.com posty.pe]) || url.host.in?(%w[d2ufj6gm1gtdrc.cloudfront.net d3mcojo3jv0dbr.cloudfront.net d33pksfia2a94m.cloudfront.net])
   end
 
   def parse
@@ -67,10 +67,19 @@ class Source::URL::Postype < Source::URL
     in _, "postype.com", "profile", username, *rest
       @username = username.delete_prefix("@")
 
+    # https://posty.pe/343rpc
+    in _, "posty.pe", redirect_id
+      @redirect_id = redirect_id
+
     # https://d33pksfia2a94m.cloudfront.net/assets/img/brand/favicon.png
     else
       nil
     end
+  end
+
+  def extractor_class
+    # https://posty.pe/343rpc
+    redirect_id.present? ? Source::Extractor::URLShortener : Source::Extractor::Postype
   end
 
   def image_url?

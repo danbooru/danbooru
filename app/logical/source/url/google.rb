@@ -6,12 +6,26 @@
 # @see Source::URL::Youtube
 # @see Source::Extractor::Google
 class Source::URL::Google < Source::URL
-  site "Google", url: "https://www.google.com", domains: %w[ggpht.com googleusercontent.com]
+  site "Google", url: "https://www.google.com", domains: %w[ggpht.com googleusercontent.com forms.gle goo.gl]
 
   attr_reader :full_image_url
 
   def self.match?(url)
-    [url.subdomain, url.domain] in /lh/, ("ggpht.com" | "googleusercontent.com")
+    case [url.subdomain, url.domain]
+    # https://lh3.googleusercontent.com/qAhRBhfciCcosUoYHPJr5WtNYSJ81vpSqcQwbQitZtsR3mB2aCUj7J5LvhJOCfWn-CWqiLB18SyTr1VJvm_HI7B72opIAMZiZvg=s0 (sample)
+    # https://play-lh.googleusercontent.com/n8xsLUPjbQnT4q0DgZtLmx3LMe8kRFh1j0cpANE5QQM75ukQJIpHaa6R7W6mwP6pNBw=s0
+    # http://lh3.ggpht.com/_0qYlQ9JkXnE/Ryz9b1yXRDI/AAAAAAAAAu4/Iv0WPaT7uWY/016.jpg
+    in /lh/, ("ggpht.com" | "googleusercontent.com")
+      true
+
+    # https://photos.app.goo.gl/eHfTwV866X4Vf7Zt5 (Google Photos share link)
+    # https://forms.gle/CK6UER39rK5qKnnT8
+    in _, "goo.gl" | "forms.gle"
+      true
+
+    else
+      false
+    end
   end
 
   def parse
@@ -40,12 +54,21 @@ class Source::URL::Google < Source::URL
       file = rest[1]
       @full_image_url = "https://#{host}/#{dir1}/#{dir2}/#{dir3}/#{dir4}/d/#{file}"
 
+    # https://photos.app.goo.gl/eHfTwV866X4Vf7Zt5 (Google Photos share link)
+    # https://forms.gle/CK6UER39rK5qKnnT8
+    in _, "goo.gl" | "forms.gle", _id
+      nil
+
     else
       nil
     end
   end
 
+  def extractor_class
+    domain.in?(%w[forms.gle goo.gl]) ? Source::Extractor::URLShortener : Source::Extractor::Google
+  end
+
   def image_url?
-    true
+    full_image_url.present?
   end
 end

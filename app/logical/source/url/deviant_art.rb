@@ -25,15 +25,13 @@ module Source
     end
 
     RESERVED_SUBDOMAINS = %w[www]
+    RESERVED_USERNAMES = %w[art deviation download users stash view view.php view-full.php]
 
-    attr_reader :username, :work_id, :stash_id, :title, :file, :jwt
+    attr_reader :username, :work_id, :stash_id, :title, :file, :jwt, :redirect_url
 
     def self.match?(url)
       case [url.subdomain, url.domain]
-      # https://www.deviantart.com/users/outgoing?https://www.google.com (handled in Source::URL::URLShortener)
-      in _, "deviantart.com" unless Source::URL::URLShortener.match?(url)
-        true
-      in _, "artworkfolio.com" | "daportfolio.com" | "deviantart.net" | "fav.me" | "sta.sh"
+      in _, "deviantart.com" | "artworkfolio.com" | "daportfolio.com" | "deviantart.net" | "fav.me" | "sta.sh"
         true
       in ("images-wixmp-ed30a86b8c4ca887773594c2" | "wixmp-ed30a86b8c4ca887773594c2" | "api-da" | "img-deviantart"), "wixmp.com"
         true
@@ -109,7 +107,7 @@ module Source
       # https://www.deviantart.com/noizave
       # https://deviantart.com/noizave
       # https://www.deviantart.com/nlpsllp/gallery
-      in _, "deviantart.com", username, *rest
+      in _, "deviantart.com", username, *rest unless username.in?(RESERVED_USERNAMES)
         @username = username
 
       # https://noizave.deviantart.com
@@ -134,6 +132,10 @@ module Source
       # https://sta.sh/zip/21leo8mz87ue
       in _, "sta.sh", "zip", stash_id
         @stash_id = stash_id
+
+      # https://www.deviantart.com/users/outgoing?https://www.google.com
+      in _, "deviantart.com", "users", "outgoing"
+        @redirect_url = query
 
       else
         nil
@@ -183,6 +185,11 @@ module Source
         @file = filename
 
       end
+    end
+
+    def extractor_class
+      # https://www.deviantart.com/users/outgoing?https://www.google.com
+      redirect_url.present? ? Source::Extractor::URLShortener : Source::Extractor::DeviantArt
     end
 
     def parse_jwt(token)

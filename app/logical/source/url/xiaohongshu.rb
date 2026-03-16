@@ -4,17 +4,17 @@
 class Source::URL::Xiaohongshu < Source::URL
   site "Xiaohongshu" do
     url "https://www.xiaohongshu.com"
-    domains %w[xiaohongshu.com xhscdn.com]
+    domains %w[xiaohongshu.com xhscdn.com xhslink.com]
 
     credential :session_cookie, help: %{Your Xiaohongshu `gid` cookie.}
     credential :webid_cookie, help: %{Your Xiaohongshu `webId` cookie.}
     credential :web_session_cookie, help: %{Your Xiaohongshu `web_session` cookie.}
   end
 
-  attr_reader :user_id, :post_id, :full_image_url, :xsec_token
+  attr_reader :user_id, :post_id, :full_image_url, :xsec_token, :redirect_id
 
   def self.match?(url)
-    url.domain.in?(%w[xiaohongshu.com xhscdn.com])
+    url.domain.in?(%w[xiaohongshu.com xhscdn.com xhslink.com])
   end
 
   def parse
@@ -61,14 +61,23 @@ class Source::URL::Xiaohongshu < Source::URL
     in _, "xiaohongshu.com", "user", "profile", user_id
       @user_id = user_id
 
+    # https://xhslink.com/WNd9gI
+    # https://xhslink.com/o/3y3uwYYeyHn
+    # https://xhslink.com/a/jqL6B32eU0F7，复制本条信息，打开
+    in _, "xhslink.com", *_subdirs, redirect_id
+      @redirect_id = redirect_id
+
     # http://sns-video-bd.xhscdn.com/stream/110/258/01e62cb7e42033da010370018f1eb04fee_258.mp4 (video sample)
     # https://sns-video-al.xhscdn.com/pre_post/1040g2t03123bm2b13q6g5o56b7k085i9gkig2ho (video full)
     # https://sns-avatar-qc.xhscdn.com/avatar/1040g2jo30s5tg4ugig605ohki5uk137o34ug2fo (profile picture)
     # https://picasso-static.xiaohongshu.com/fe-platform/81cedd016ad9d8bef38b2cd0c1e725454df53598.png (emoji)
-    # http://xhslink.com/WNd9gI
     else
       nil
     end
+  end
+
+  def extractor_class
+    redirect_id.present? ? Source::Extractor::URLShortener : Source::Extractor::Xiaohongshu
   end
 
   def image_url?

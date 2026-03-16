@@ -9,7 +9,7 @@ module Source
       credential :phpsessid, help: %{Your Pixiv `PHPSESSID` cookie.}
     end
 
-    attr_reader :work_id, :image_hash, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame
+    attr_reader :work_id, :image_hash, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame, :redirect_url
 
     def self.match?(url)
       url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net]) &&
@@ -17,8 +17,7 @@ module Source
         !Source::URL::PixivSketch.match?(url) &&  # https://sketch.pixiv.net/items/5835314698645024323
         !Source::URL::PixivComic.match?(url) &&   # https://comic.pixiv.net/works/10137
         !Source::URL::PixivFactory.match?(url) && # https://factory.pixiv.net/palette/collections/imys_tachie#image-13760863
-        !Source::URL::Booth.match?(url) &&        # https://booth.pximg.net/b242a7bd-0747-48c4-891d-9e8552edd5d7/i/3746752/52dbee27-7ad2-4048-9c1d-827eee36625c.jpg
-        !Source::URL::URLShortener.match?(url)    # https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com
+        !Source::URL::Booth.match?(url)           # https://booth.pximg.net/b242a7bd-0747-48c4-891d-9e8552edd5d7/i/3746752/52dbee27-7ad2-4048-9c1d-827eee36625c.jpg
     end
 
     def parse
@@ -156,6 +155,10 @@ module Source
       # http://p.tl/m/755548
       in _, "p.tl", "m", user_id
         @user_id = user_id
+
+      # https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com
+      in _, "pixiv.net", "jump.php"
+        @redirect_url = query
 
       # http://p.tl/dcYB/ (dead; Pixiv's URL shortening service, closed in 2017)
       else
@@ -339,6 +342,10 @@ module Source
     def parsed_date
       # Dates in image URLs are in JST (UTC+9)
       Time.new(*date, "+09:00").utc if date.present?
+    end
+
+    def extractor_class
+      redirect_url.present? ? Source::Extractor::URLShortener : Source::Extractor::Pixiv
     end
   end
 end

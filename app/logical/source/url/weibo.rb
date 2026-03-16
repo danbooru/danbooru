@@ -9,15 +9,14 @@
 # http://blog.sina.com.cn/u/1299088063
 
 class Source::URL::Weibo < Source::URL
-  site "Weibo", url: "https://www.weibo.com", domains: %w[weibo.com weibo.cn sinaimg.cn weibocdn.com]
+  site "Weibo", url: "https://www.weibo.com", domains: %w[weibo.com weibo.cn sinaimg.cn weibocdn.com t.cn]
 
   RESERVED_USERNAMES = %w[u n p profile sinaurl status detail]
 
-  attr_reader :full_image_url, :artist_short_id, :artist_long_id, :illust_long_id, :illust_base62_id, :display_name, :username
+  attr_reader :full_image_url, :artist_short_id, :artist_long_id, :illust_long_id, :illust_base62_id, :display_name, :username, :redirect_url, :redirect_id
 
   def self.match?(url)
-    # https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com (handled in Source::URL::URLShortener)
-    url.domain.in?(%w[weibo.com weibo.cn sinaimg.cn weibocdn.com]) && !Source::URL::URLShortener.match?(url)
+    url.domain.in?(%w[weibo.com weibo.cn sinaimg.cn weibocdn.com t.cn])
   end
 
   def parse
@@ -72,32 +71,40 @@ class Source::URL::Weibo < Source::URL
     # https://www.weibo.com/u/5957640693/home?wvr=5
     # https://m.weibo.cn/profile/5501756072
     # https://m.weibo.cn/u/5501756072
-    in _, _, ("u" | "profile"), /^\d+$/ => artist_short_id, *rest
+    in _, ("weibo.com" | "weibo.cn"), ("u" | "profile"), /^\d+$/ => artist_short_id, *rest
       @artist_short_id = artist_short_id
 
     # https://www.weibo.com/p/1005055399876326 (short id: https://www.weibo.com/u/5399876326; username: https://www.weibo.com/chengziyou666)
     # https://www.weibo.com/p/1005055399876326/home?from=page_100505&mod=TAB&is_hot=1
     # https://www.weibo.cn/p/1005055399876326
     # https://m.weibo.com/p/1005055399876326
-    in _, _, "p", /^\d+$/ => artist_long_id, *rest
+    in _, ("weibo.com" | "weibo.cn"), "p", /^\d+$/ => artist_long_id, *rest
       @artist_long_id = artist_long_id
 
     # https://www.weibo.com/5501756072
     # https://www.weibo.cn/5501756072
     # https://weibo.com/1843267214/profile
-    in _, _, /^\d+$/ => artist_short_id, *rest
+    in _, ("weibo.com" | "weibo.cn"), /^\d+$/ => artist_short_id, *rest
       @artist_short_id = artist_short_id
 
     # https://weibo.com/n/肆巳4
     # https://www.weibo.com/n/小小男爵不要坑
-    in _, _, "n", display_name, *rest
+    in _, ("weibo.com" | "weibo.cn"), "n", display_name, *rest
       @display_name = display_name
 
     # https://www.weibo.com/endlessnsmt (short id: https://www.weibo.com/u/1879370780)
     # https://www.weibo.cn/endlessnsmt
     # https://www.weibo.com/lvxiuzi0/home
-    in _, _, /^\w+$/ => username, *rest unless username.in?(RESERVED_USERNAMES)
+    in _, ("weibo.com" | "weibo.cn"), /^\w+$/ => username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
+
+    # https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com
+    in _, ("weibo.com" | "weibo.cn"), "sinaurl"
+      @redirect_url = params[:u]
+
+    # https://t.cn/A6pONxY1
+    in _, "t.cn", redirect_id
+      @redirect_id = redirect_id
 
     # https://weibo.com/tv/show/1034:4914351942074379?from=old_pc_videoshow
     # https://video.weibo.com/show?fid=1034:4914351942074379
@@ -105,6 +112,12 @@ class Source::URL::Weibo < Source::URL
     else
       nil
     end
+  end
+
+  def extractor_class
+    # https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com
+    # https://t.cn/A6pONxY1
+    (redirect_url.present? || redirect_id.present?) ? Source::Extractor::URLShortener : Source::Extractor::Weibo
   end
 
   def profile_url

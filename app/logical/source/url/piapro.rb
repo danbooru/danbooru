@@ -5,15 +5,14 @@ class Source::URL::Piapro < Source::URL
   site "Piapro", url: "https://piapro.jp"
 
   RESERVED_USERNAMES = %w[
-    3dm a about_us bookmark characters content content_list_recommend dm download faq follow help illust intro inquiry
+    3dm a about_us bookmark characters content content_list_recommend dm download faq follow help illust intro inquiry jump
     license logout mailto music my_page official_collabo privacypolicy product r t text timg user user_agreement user_mod
   ]
 
-  attr_reader :username, :post_id, :content_id, :full_image_url
+  attr_reader :username, :post_id, :content_id, :full_image_url, :redirect_url
 
   def self.match?(url)
-    # https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com (handled in Source::URL::URLShortener)
-    url.domain == "piapro.jp" && !Source::URL::URLShortener.match?(url)
+    url.domain == "piapro.jp"
   end
 
   def site_name
@@ -58,6 +57,10 @@ class Source::URL::Piapro < Source::URL
     in _, "piapro.jp", username, *rest unless username.in?(RESERVED_USERNAMES) || image_url?
       @username = username
 
+    # https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com
+    in _, "piapro.jp", "jump"
+      @redirect_url = params[:url]
+
     # https://cdn.piapro.jp/icon_u/626/1485626_20230224204244_0072.jpg (profile picture)
     # http://piapro.jp/download/?id=5u2scvk5lp74f1ec&view=content_file&sub_id=1
     # http://c1.piapro.jp/timg/ezjs3xrmu0nof2mc_20120629224737_0500_0500.jpg
@@ -66,6 +69,11 @@ class Source::URL::Piapro < Source::URL
     else
       nil
     end
+  end
+
+  def extractor_class
+    # https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com
+    redirect_url.present? ? Source::Extractor::URLShortener : Source::Extractor::Piapro
   end
 
   def page_url

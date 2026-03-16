@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
 class Source::URL::Tumblr < Source::URL
-  site "Tumblr", url: "https://www.tumblr.com" do
+  site "Tumblr" do
+    url "https://www.tumblr.com"
+    domains %w[tumblr.com tmblr.co]
+
     credential :consumer_key, help: %{Your Tumblr consumer key. Register a new application at https://www.tumblr.com/oauth/register then copy your consumer key from https://www.tumblr.com/oauth/apps.}
   end
 
   IMAGE_SIZES = %w[1280 720 640 540 500h 500 400 250 100]
   RESERVED_NAMES = %w[about app blog dashboard developers explore jobs login logo policy press register security tagged tips]
 
-  attr_reader :work_id, :blog_name, :full_image_url, :candidate_full_image_urls
+  attr_reader :work_id, :blog_name, :full_image_url, :candidate_full_image_urls, :redirect_id
 
   def self.match?(url)
-    url.domain.in?(%w[tumblr.com])
+    url.domain.in?(%w[tumblr.com tmblr.co])
   end
 
   def parse
@@ -105,10 +108,19 @@ class Source::URL::Tumblr < Source::URL
     in _, "tumblr.com", *rest unless image_url? || subdomain == "www"
       @blog_name = subdomain
 
+    # https://tmblr.co/ZdPV4t2OHwdv5
+    in _, "tmblr.co", redirect_id
+      @redirect_id = redirect_id
+
     # https://static.tumblr.com/923d3a1b85bdabcb6276ea921911497f/w3ze2u2/mdHpc3im5/tumblr_static_cd6gq50ia8oc8s04kcok44gkc.jpg (page: https://eierschecke-gp.tumblr.com)
     else
       nil
     end
+  end
+
+  def extractor_class
+    # https://tmblr.co/ZdPV4t2OHwdv5
+    redirect_id.present? ? Source::Extractor::URLShortener : Source::Extractor::Tumblr
   end
 
   def image_url?
