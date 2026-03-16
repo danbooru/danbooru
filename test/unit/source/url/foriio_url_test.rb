@@ -22,5 +22,7 @@ module Source::Tests::URL
         "https://www.foriio.com/comori22/categories/Illustration",
       )
     end
+
+    should parse_url("https://foriio.imgix.net/store/46d77f4f772f191d04c9360180cc907d.jpg?ixlib=rb-4.1.0&w=2184&auto=compress&s=a9a14e871e2f6dbdc28f87c915e8684f").into(site_name: "Foriio")
   end
 end

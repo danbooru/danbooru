@@ -96,13 +96,6 @@ class Source::URL::Moebooru < Source::URL
     end
   end
 
-  def site_name
-    case domain
-    when "yande.re" then "Yande.re"
-    when "konachan.com" then "Konachan"
-    end
-  end
-
   def image_url?
     @image_url.present?
   end

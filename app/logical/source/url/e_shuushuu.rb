@@ -9,10 +9,6 @@ class Source::URL::EShuushuu < Source::URL
     url.domain == "e-shuushuu.net"
   end
 
-  def site_name
-    "E-Shuushuu"
-  end
-
   def parse
     case [subdomain, domain, *path_segments]
     # https://e-shuushuu.net/images/2017-07-19-915628.jpeg

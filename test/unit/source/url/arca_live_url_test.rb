@@ -19,5 +19,7 @@ module Source::Tests::URL
 
       should parse_url("https://arca.live/u/@%EC%9C%BE%ED%8C%8C").into(username: "윾파")
     end
+
+    should parse_url("https://ac.namu.la/20221211sac/5ea7fbca5e49ec16beb099fc6fc991690d37552e599b1de8462533908346241e.png").into(site_name: "Arca.live")
   end
 end

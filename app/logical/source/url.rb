@@ -97,18 +97,20 @@ module Source
       extractor_class&.new(self, **)
     end
 
-    # @return [Source::Site, nil] The site this URL belongs to. This should be overridden to return the right site if
-    #   the URL class handles multiple sites.
+    # @return [Source::Site, nil] The site this URL belongs to. May be overridden if the URL class handles multiple
+    # sites. By default, if there are multiple sites it chooses the site with the same domain.
     def source_site
-      self.class.sites.sole if self.class.sites.one?
+      if self.class.sites.one?
+        self.class.sites.sole
+      else
+        sites = Source::Site.find_by_domain(domain)
+        sites.sole if sites.one?
+      end
     end
 
-    # The name of the site this URL belongs to.
-    #
-    # @return [String]
+    # @return [String, nil] # The name of the site this URL belongs to.
     def site_name
-      # "Source::URL::NicoSeiga" => "Nico Seiga"
-      self.class.name.demodulize.titleize
+      source_site&.name
     end
 
     # True if the URL is from a recognized site. False if the URL is from an unrecognized site.

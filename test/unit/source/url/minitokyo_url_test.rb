@@ -11,5 +11,7 @@ module Source::Tests::URL
         page_url: "http://gallery.minitokyo.net/view/199164",
       )
     end
+
+    should parse_url("http://static.minitokyo.net/downloads/27/13/365677.jpg?433592448").into(site_name: "Minitokyo")
   end
 end

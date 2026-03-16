@@ -7,5 +7,7 @@ module Source::Tests::URL
         page_url: "https://chan.sankakucomplex.com/post/show?md5=c2d7270b84ac81326384d4eadd4d4746",
       )
     end
+
+    should parse_url("http://cs.sankakucomplex.com/data/sample/c2/d7/sample-c2d7270b84ac81326384d4eadd4d4746.jpg?2738848").into(site_name: "Sankaku Complex")
   end
 end

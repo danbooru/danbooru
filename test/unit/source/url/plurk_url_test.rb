@@ -28,5 +28,7 @@ module Source::Tests::URL
         "https://www.plurk.com/search?q=blah",
       )
     end
+
+    should parse_url("https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg").into(site_name: "Plurk")
   end
 end

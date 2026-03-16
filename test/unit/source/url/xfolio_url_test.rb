@@ -47,5 +47,7 @@ module Source::Tests::URL
         work_id: "237599",
       )
     end
+
+    should parse_url("https://xfolio.jp/user_asset.php?id=1128032&work_id=237599&work_image_id=1128032&type=work_image").into(site_name: "Xfolio")
   end
 end

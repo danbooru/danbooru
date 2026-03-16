@@ -81,5 +81,7 @@ module Source::Tests::URL
         full_image_url: "https://bsyimgv2.pandapaint.net/v2/pd_cover/public/1749455200182.png",
       )
     end
+
+    should parse_url("https://bsyimg.pandapaint.net/v2/work_cover/user/13649297/1714634091547.jpg").into(site_name: "Huashijie")
   end
 end

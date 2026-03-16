@@ -30,5 +30,7 @@ module Source::Tests::URL
         "https://opensea.io/tororotororo",
       )
     end
+
+    should parse_url("https://i.seadn.io/s/raw/files/473d8a4978c86ede320b8372dfe2a8b3.png?auto=format&dpr=1&w=384").into(site_name: "OpenSea")
   end
 end

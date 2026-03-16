@@ -28,6 +28,10 @@ module Source::Tests::URL
         "https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com",
       )
 
+      should be_bad_source(
+        "https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com",
+      )
+
       should parse_url("https://cdn.piapro.jp/thumb_i/w2/w22xmltnyzcsrqxu_20240303200945_0250_0250.png").into(
         page_url: "https://piapro.jp/content/w22xmltnyzcsrqxu",
       )
@@ -48,5 +52,7 @@ module Source::Tests::URL
         profile_url: "https://piapro.jp/sakira",
       )
     end
+
+    should parse_url("https://cdn.piapro.jp/thumb_i/w2/w22xmltnyzcsrqxu_20240303200945_0250_0250.png").into(site_name: "Piapro.jp")
   end
 end

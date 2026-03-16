@@ -17,5 +17,7 @@ module Source::Tests::URL
         "https://sketch.pixiv.net/@user_ejkv8372",
       )
     end
+
+    should parse_url("https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg").into(site_name: "Pixiv Sketch")
   end
 end

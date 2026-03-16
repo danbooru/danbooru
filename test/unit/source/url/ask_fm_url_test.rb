@@ -9,5 +9,7 @@ module Source::Tests::URL
         "http://ask.fm/cyoooooon/best",
       )
     end
+
+    should parse_url("https://ask.fm/kiminaho").into(site_name: "Ask.fm")
   end
 end

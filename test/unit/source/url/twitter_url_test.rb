@@ -113,6 +113,12 @@ module Source::Tests::URL
         "https://twitter.com/merry_bongbong/header_photo",
       )
 
+      should be_bad_source(
+        "https://t.co/Dxn7CuVErW",
+        "https://pic.twitter.com/Dxn7CuVErW",
+        "https://pic.x.com/Dxn7CuVErW",
+      )
+
       should parse_url("https://twitter.com/i/status/1261877313349640194").into(username: nil)
       should parse_url("https://twitter.com/i/web/status/1261877313349640194").into(username: nil)
       should parse_url("https://t.co/Dxn7CuVErW").into(username: nil)
@@ -182,5 +188,7 @@ module Source::Tests::URL
         profile_url: nil,
       )
     end
+
+    should parse_url("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg").into(site_name: "Twitter")
   end
 end

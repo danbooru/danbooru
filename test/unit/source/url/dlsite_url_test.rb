@@ -136,5 +136,7 @@ module Source::Tests::URL
         profile_url: "https://www.dlsite.com/books/author/=/author_id/AJ010452",
       )
     end
+
+    should parse_url("https://img.dlsite.jp/modpub/images2/work/doujin/RJ01183000/RJ01182574_img_main.jpg").into(site_name: "DLsite")
   end
 end

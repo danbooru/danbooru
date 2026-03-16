@@ -73,5 +73,7 @@ module Source::Tests::URL
         profile_url: "https://www.facebook.com/sinyu.tang.9",
       )
     end
+
+    should parse_url("https://scontent-sin1-1.xx.fbcdn.net/hphotos-xtp1/t31.0-8/11254493_576443445841777_7716273903390212288_o.jpg").into(site_name: "Facebook")
   end
 end

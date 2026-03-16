@@ -57,5 +57,7 @@ module Source::Tests::URL
         profile_url: "http://xkilikox.fc2web.com",
       )
     end
+
+    should parse_url("http://onidocoro.blog14.fc2.com/file/20071003061150.png").into(site_name: "FC2")
   end
 end

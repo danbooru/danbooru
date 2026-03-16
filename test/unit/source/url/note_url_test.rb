@@ -42,5 +42,7 @@ module Source::Tests::URL
         full_image_url: "https://d2l930y2yx77uc.cloudfront.net/production/uploads/images/17105324/c647f6629bcfe2638e23924d96a7aae4.jpeg",
       )
     end
+
+    should parse_url("https://assets.st-note.com/img/1623726537463-B8LOZ1JZUS.png?width=2000&height=2000&fit=bounds&format=jpg&quality=85").into(site_name: "Note")
   end
 end

@@ -2,7 +2,7 @@
 
 # @see Source::Extractor::Kofi
 class Source::URL::Kofi < Source::URL
-  site "Kofi", url: "https://ko-fi.com", domains: %w[ko-fi.com msecnd.net azurewebsites.net]
+  site "Ko-fi", url: "https://ko-fi.com", domains: %w[ko-fi.com msecnd.net azurewebsites.net]
 
   RESERVED_USERNAMES = %w[c i s about account album cdn commissions discord explore gallery gold memberships post privacy shop terms]
 
@@ -76,10 +76,6 @@ class Source::URL::Kofi < Source::URL
     else
       nil
     end
-  end
-
-  def site_name
-    "Ko-fi"
   end
 
   def extractor_class

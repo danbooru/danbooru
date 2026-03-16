@@ -33,5 +33,7 @@ module Source::Tests::URL
         "https://instagr.am/Zurasuta",
       )
     end
+
+    should parse_url("https://scontent-lga3-1.cdninstagram.com/v/t51.2885-15/sh0.08/e35/s640x640/202831473_394388808595845_6890631933098833028_n.jpg?_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=109&_nc_ohc=Fcle68OyC80AX8VTGxs&edm=AABBvjUBAAAA&ccb=7-4&oh=00_AT_DYX0zhyNR9vo6ZFKfXjzEWqwFLLfEd3qcpAds5KIvnA&oe=6216DDB5&_nc_sid=83d603").into(site_name: "Instagram")
   end
 end

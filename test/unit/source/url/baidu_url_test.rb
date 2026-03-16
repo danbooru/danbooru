@@ -8,5 +8,7 @@ module Source::Tests::URL
         "http://hi.baidu.com/longbb1127/home",
       )
     end
+
+    should parse_url("http://hi.baidu.com/new/mocaorz").into(site_name: "Baidu")
   end
 end

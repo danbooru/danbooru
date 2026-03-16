@@ -52,5 +52,7 @@ module Source::Tests::URL
         "https://fantia.jp/posts/2533616/album_image?query=YsSkcpdnlam4JOy5dGHafbrSgfCZoMUmfrWD1XEouNkfO9Qk%2BC5Arv7ovxaiIo%2FEeJe5TI9mWDodDBp%2BzIIh70HJ6c0sWH8wMCc%2FM6IhDIKpxE%2BM1Zc1--Ol9M7yLd5TswwnZ5--wZ7u4P1tCVaAoL5ymFfA5Q%3D%3D",
       )
     end
+
+    should parse_url("https://c.fantia.jp/uploads/post/file/1070093/16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg").into(site_name: "Fantia")
   end
 end

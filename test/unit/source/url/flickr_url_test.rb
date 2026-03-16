@@ -9,5 +9,7 @@ module Source::Tests::URL
         "https://www.flickr.com/photos/hizna/sets/72157629448846789/",
       )
     end
+
+    should parse_url("https://www.flickr.com/people/shirasaki408/").into(site_name: "Flickr")
   end
 end

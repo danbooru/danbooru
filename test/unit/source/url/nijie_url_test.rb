@@ -26,6 +26,10 @@ module Source::Tests::URL
         "https://nijie.info/members_illust.php?id=236014",
       )
 
+      should be_bad_source(
+        "https://nijie.info/jump.php?https%3A%2F%2Fwww.google.com",
+      )
+
       should parse_url("https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png").into(
         page_url: "https://nijie.info/view.php?id=218856",
       )
@@ -38,5 +42,7 @@ module Source::Tests::URL
         page_url: nil,
       )
     end
+
+    should parse_url("https://pic04.nijie.info/omata/4829_20161128012012.png").into(site_name: "Nijie")
   end
 end

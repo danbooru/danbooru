@@ -19,10 +19,6 @@ class Source::URL::AnimeNewsNetwork < Source::URL
     end
   end
 
-  def site_name
-    "Anime News Network"
-  end
-
   def profile_url
     "https://www.animenewsnetwork.com/encyclopedia/people.php?id=#{user_id}" if user_id.present?
   end

@@ -17,5 +17,7 @@ module Source::Tests::URL
         "https://picdig.net/ema/portfolio",
       )
     end
+
+    should parse_url("https://picdig.net/images/e2fc48ae-7391-44a3-993a-ce093f797510/45057c9b-2709-4c1f-b00c-d9b44898db98/2021/11/7954f986-e471-4d41-9d06-16a1a695b42d.png").into(site_name: "Picdig")
   end
 end

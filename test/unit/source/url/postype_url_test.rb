@@ -24,6 +24,12 @@ module Source::Tests::URL
         "https://www.postype.com/@fruitsnoir",
         "https://www.postype.com/@fruitsnoir/post",
       )
+
+      should be_bad_source(
+        "https://posty.pe/343rpc",
+      )
     end
+
+    should parse_url("https://d3mcojo3jv0dbr.cloudfront.net/2021/03/19/20/57/7e8c74bfe4a77f6a037ed8b02194955c.webp?w=240&h=180&q=65").into(site_name: "Postype")
   end
 end

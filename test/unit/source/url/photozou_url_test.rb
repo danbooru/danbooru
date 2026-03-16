@@ -11,5 +11,7 @@ module Source::Tests::URL
         page_url: "https://photozou.jp/photo/show/1986212/118493247",
       )
     end
+
+    should parse_url("http://kura3.photozou.jp/pub/794/1481794/photo/161537258_org.v1364829097.jpg").into(site_name: "Photozou")
   end
 end

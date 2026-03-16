@@ -86,5 +86,7 @@ module Source::Tests::URL
         creator_id: "11019",
       )
     end
+
+    should parse_url("https://media.ci-en.jp/private/attachment/creator/00011019/62a643d6423c18ec1be16826d687cefb47d8304de928a07c6389f8188dfe6710/image-800.jpg?px-time=1700517240&px-hash=eb626eafb7e5733c96fb0891188848dac10cb84c").into(site_name: "Ci-En")
   end
 end

@@ -7,5 +7,7 @@ module Source::Tests::URL
         page_url: "https://shimmie.katawa-shoujo.com/post/view/2740",
       )
     end
+
+    should parse_url("http://shimmie.katawa-shoujo.com/image/2740.png").into(site_name: "Mishimmie")
   end
 end

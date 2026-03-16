@@ -11,5 +11,7 @@ module Source::Tests::URL
         page_url: "https://ec.toranoana.jp/tora_r/ec/item/040030653417",
       )
     end
+
+    should parse_url("http://img.toranoana.jp/popup_img/04/0030/09/76/040030097695-2p.jpg").into(site_name: "Toranoana")
   end
 end

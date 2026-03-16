@@ -17,5 +17,7 @@ module Source::Tests::URL
         profile_url: "https://marshmallow-qa.com/horyu999",
       )
     end
+
+    should parse_url("https://marshmallow-qa.com/horyu999").into(site_name: "Marshmallow")
   end
 end

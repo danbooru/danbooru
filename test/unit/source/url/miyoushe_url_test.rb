@@ -28,6 +28,13 @@ module Source::Tests::URL
         "https://m.miyoushe.com/bh3/#/accountCenter/0?id=275785895",
         "https://www.hoyolab.com/accountCenter/postList?id=58551199",
       )
+
+      should be_bad_source(
+        "https://hoyo.link/80GCFBAL?q=25tufAgwB8N",
+        "https://hoyo.link/aifgFBAL",
+      )
     end
+
+    should parse_url("https://upload-bbs.miyoushe.com/upload/2022/09/14/73731802/2e25565bd6fa86d86b581e151e9778ac_8107601733815763725.jpg").into(site_name: "Miyoushe")
   end
 end

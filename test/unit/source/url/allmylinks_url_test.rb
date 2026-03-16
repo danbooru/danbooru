@@ -7,5 +7,7 @@ module Source::Tests::URL
 
       should parse_url("https://allmylinks.com/hieumayart").into(profile_url: "https://allmylinks.com/hieumayart")
     end
+
+    should parse_url("https://allmylinks.com/hieumayart").into(site_name: "AllMyLinks")
   end
 end

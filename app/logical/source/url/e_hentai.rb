@@ -29,10 +29,6 @@ class Source::URL::EHentai < Source::URL
     end
   end
 
-  def site_name
-    "E-Hentai"
-  end
-
   def image_sample?
     image_sample
   end

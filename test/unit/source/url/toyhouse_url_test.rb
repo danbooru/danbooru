@@ -37,5 +37,7 @@ module Source::Tests::URL
         "https://toyhou.se/427Deer",
       )
     end
+
+    should parse_url("https://f2.toyhou.se/file/f2-toyhou-se/thumbnails/58037599_Ov5.png").into(site_name: "Toyhouse")
   end
 end

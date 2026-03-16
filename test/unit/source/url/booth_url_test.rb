@@ -73,5 +73,7 @@ module Source::Tests::URL
         candidate_full_image_urls: [],
       )
     end
+
+    should parse_url("https://booth.pximg.net/8bb9e4e3-d171-4027-88df-84480480f79d/i/2864768/00cdfef0-e8d5-454b-8554-4885a7e4827d_base_resized.jpg").into(site_name: "Booth")
   end
 end

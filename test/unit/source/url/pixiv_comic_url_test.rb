@@ -55,5 +55,7 @@ module Source::Tests::URL
         page_url: "https://comic.pixiv.net/novel/viewer/stories/11588",
       )
     end
+
+    should parse_url("https://comic.pixiv.net/magazines/317").into(site_name: "Pixiv Comic")
   end
 end

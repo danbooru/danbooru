@@ -8,5 +8,7 @@ module Source::Tests::URL
         "https://anidb.net/perl-bin/animedb.pl?show=creator&creatorid=3903",
       )
     end
+
+    should parse_url("https://anidb.net/creator/65313").into(site_name: "AniDB")
   end
 end

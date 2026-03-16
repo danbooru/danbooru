@@ -21,5 +21,7 @@ module Source::Tests::URL
         "https://danbooru.donmai.us/users/1.json",
       )
     end
+
+    should parse_url("https://cdn.donmai.us/sample/8d/81/__sonetto_reverse_1999_drawn_by_beishang_yutou__sample-8d819da4871c3ca39f428999df8220ce.jpg").into(site_name: "Danbooru")
   end
 end

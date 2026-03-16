@@ -32,5 +32,7 @@ module Source::Tests::URL
         "https://dotpict.net/users/2011866",
       )
     end
+
+    should parse_url("https://img.dotpicko.net/thumbnail_work/2023/06/09/20/57/thumb_e45a20d18dbca13bb52ae7f01eaf2de4db1054886d358bea0f36acfb7c1ce667.png").into(site_name: "Dotpict")
   end
 end

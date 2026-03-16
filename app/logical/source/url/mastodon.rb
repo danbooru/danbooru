@@ -88,13 +88,6 @@ class Source::URL::Mastodon < Source::URL
     end
   end
 
-  def site_name
-    case domain
-    when "pawoo.net" then "Pawoo"
-    when "baraag.net" then "Baraag"
-    end
-  end
-
   def image_url?
     full_image_url.present?
   end

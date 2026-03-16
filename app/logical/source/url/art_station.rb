@@ -12,10 +12,6 @@ class Source::URL::ArtStation < Source::URL
     url.domain == "artstation.com"
   end
 
-  def site_name
-    "ArtStation"
-  end
-
   def parse
     case [host, *path_segments]
 

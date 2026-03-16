@@ -163,5 +163,7 @@ module Source::Tests::URL
         assert_not(Source::URL.parse("https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg").bad_link?)
       end
     end
+
+    should parse_url("https://foo.com.").into(site_name: "Foo")
   end
 end

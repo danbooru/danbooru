@@ -21,10 +21,6 @@ class Source::URL::AskFm < Source::URL
     end
   end
 
-  def site_name
-    "Ask.fm"
-  end
-
   def profile_url
     "https://ask.fm/#{username}" if username.present?
   end

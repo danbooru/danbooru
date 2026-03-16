@@ -38,5 +38,7 @@ module Source::Tests::URL
       should parse_url("https://inkbunny.net/DAGASI").into(username: "DAGASI", user_id: nil)
       should parse_url("https://inkbunny.net/user.php?user_id=152800").into(username: nil, user_id: 152_800)
     end
+
+    should parse_url("https://nl.ib.metapix.net/files/preview/4816/4816665_DAGASI_1890.12.jpg").into(site_name: "Inkbunny")
   end
 end

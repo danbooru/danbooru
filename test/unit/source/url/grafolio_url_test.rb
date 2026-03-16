@@ -20,5 +20,7 @@ module Source::Tests::URL
         "https://grafolio.ogq.me/profile/리니/like",
       )
     end
+
+    should parse_url("https://files.grafolio.ogq.me/preview/v1/content/real/566beece588b3/IMAGE/4718c558-2de0-442f-bbd8-54428c4fae7c.jpg?type=THUMBNAIL").into(site_name: "Grafolio")
   end
 end

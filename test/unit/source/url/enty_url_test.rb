@@ -20,5 +20,7 @@ module Source::Tests::URL
         "https://enty.jp/kouyoumatsunaga?active_tab=posts#2",
       )
     end
+
+    should parse_url("https://img01.enty.jp/uploads/post/thumbnail/141598/post_show_b6c7d85c-b63c-4950-9152-e4bf30678022.png").into(site_name: "Enty")
   end
 end

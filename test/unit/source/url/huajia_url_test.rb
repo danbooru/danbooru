@@ -21,5 +21,7 @@ module Source::Tests::URL
         "https://huajia.163.com/main/profile/08nqxj4r?type=Works",
       )
     end
+
+    should parse_url("https://huajia.fp.ps.netease.com/file/664ae65bd56ea97215dc3e25JM5jBQGB05").into(site_name: "Huajia")
   end
 end

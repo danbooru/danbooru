@@ -59,15 +59,6 @@ class Source::URL::URLShortener < Source::URL
     end
   end
 
-  def source_site
-    sites = Source::Site.find_by_domain(domain)
-    sites.sole if sites.one?
-  end
-
-  def site_name
-    source_site&.name
-  end
-
   def parse
   end
 end

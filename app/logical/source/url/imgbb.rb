@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Imgbb < Source::URL
-  site "Imgbb", url: "https://imgbb.com"
+  site "ImgBB", url: "https://imgbb.com"
 
   attr_reader :username
 
@@ -18,10 +18,6 @@ class Source::URL::Imgbb < Source::URL
     else
       nil
     end
-  end
-
-  def site_name
-    "ImgBB"
   end
 
   def profile_url

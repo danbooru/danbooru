@@ -29,5 +29,7 @@ module Source::Tests::URL
       should parse_url("https://discord.com/invite/danbooru").into(profile_url: "https://discord.gg/danbooru")
       should parse_url("https://discordapp.com/invite/danbooru").into(profile_url: "https://discord.gg/danbooru")
     end
+
+    should parse_url("https://cdn.discordapp.com/attachments/310653236870643712/1233785107135856711/image.png?ex=662e5b6c&is=662d09ec&hm=6528c2b6fc5d10a06049af2ec8e8daa3280baa6e5fbd8e42d8d00f8df3c25fe4&").into(site_name: "Discord")
   end
 end

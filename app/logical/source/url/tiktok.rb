@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::Tiktok < Source::URL
-  site "Tiktok", url: "https://www.tiktok.com"
+  site "TikTok", url: "https://www.tiktok.com"
 
   attr_reader :username
 
@@ -19,10 +19,6 @@ class Source::URL::Tiktok < Source::URL
     else
       nil
     end
-  end
-
-  def site_name
-    "TikTok"
   end
 
   def profile_url

@@ -12,5 +12,7 @@ module Source::Tests::URL
         profile_url: "https://linktr.ee/cxlinray",
       )
     end
+
+    should parse_url("https://linktr.ee/cxlinray").into(site_name: "Linktree")
   end
 end

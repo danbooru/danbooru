@@ -32,5 +32,7 @@ module Source::Tests::URL
         "https://foundation.app/@mochiiimo",
       )
     end
+
+    should parse_url("https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png").into(site_name: "Foundation")
   end
 end

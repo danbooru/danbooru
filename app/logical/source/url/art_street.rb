@@ -11,10 +11,6 @@ class Source::URL::ArtStreet < Source::URL
     url.domain == "medibang.com" || url.host.in?(%w[dthezntil550i.cloudfront.net dqmk835cy5zzx.cloudfront.net])
   end
 
-  def site_name
-    "ArtStreet"
-  end
-
   def parse
     case [subdomain, domain, *path_segments]
 

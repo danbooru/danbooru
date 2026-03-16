@@ -7,5 +7,7 @@ module Source::Tests::URL
         page_url: "http://doujinantena.com/page.php?id=d6c39f09d435e32c221e4ef866eceba4",
       )
     end
+
+    should parse_url("http://sozai.doujinantena.com/contents_jpg/d6c39f09d435e32c221e4ef866eceba4/015.jpg").into(site_name: "Doujinantena")
   end
 end

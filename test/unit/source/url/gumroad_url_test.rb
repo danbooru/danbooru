@@ -38,5 +38,7 @@ module Source::Tests::URL
         page_url: nil,
       )
     end
+
+    should parse_url("https://public-files.gumroad.com/zc2289rdv8fx905pgaikh40fsle2").into(site_name: "Gumroad")
   end
 end

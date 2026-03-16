@@ -45,5 +45,7 @@ module Source::Tests::URL
         watermarked?: false,
       )
     end
+
+    should parse_url("https://skeb.imgix.net/requests/229088_2?bg=%23fff&auto=format&w=800&s=9cac8b76c0838f2df4f19ebc41c1ae0a").into(site_name: "Skeb")
   end
 end

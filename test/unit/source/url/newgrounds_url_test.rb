@@ -42,5 +42,7 @@ module Source::Tests::URL
         page_url: "https://www.newgrounds.com/art/view/natthelich/pandora-2",
       )
     end
+
+    should parse_url("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg").into(site_name: "Newgrounds")
   end
 end

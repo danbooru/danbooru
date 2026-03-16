@@ -20,5 +20,7 @@ module Source::Tests::URL
         "https://otonokj.crd.co",
       )
     end
+
+    should parse_url("https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5").into(site_name: "Carrd")
   end
 end

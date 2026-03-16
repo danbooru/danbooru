@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
 class Source::URL::Bcy < Source::URL
-  site "Bcy", url: "https://bcy.net", domains: %w[bcy.net bcyimg.com]
+  site "BCY", url: "https://bcy.net", domains: %w[bcy.net bcyimg.com]
 
   attr_reader :drawer_id, :date, :page_url, :profile_url, :full_image_url
 
   def self.match?(url)
     url.domain.in?(%w[bcy.net bcyimg.com])
-  end
-
-  def site_name
-    "BCY"
   end
 
   def parse

@@ -35,6 +35,12 @@ module Source::Tests::URL
         "https://www.pinterest.com/ideas/people/935950727927/",
         "https://api.pinterest.com/url_shortener/4A1N0Rd5W/redirect/",
       )
+
+      should be_bad_source(
+        "https://pin.it/4A1N0Rd5W",
+      )
     end
+
+    should parse_url("https://i.pinimg.com/736x/a7/7c/67/a77c67f95a4fec64de7969e98f29cf3b.jpg").into(site_name: "Pinterest")
   end
 end

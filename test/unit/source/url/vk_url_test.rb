@@ -29,6 +29,12 @@ module Source::Tests::URL
         "https://vk.com/@sgips",
         "https://vk.com/id194141788",
       )
+
+      should be_bad_source(
+        "https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com",
+      )
     end
+
+    should parse_url("https://sun9-69.userapi.com/impg/VJBWV0vYZJLRhFBkQxaVtVo9_givXP6BycJJow/RBoOQ0nHMNc.jpg?size=1200x1600&quality=96&sign=73e562b2f74629cba714f7a348d0e815&type=album").into(site_name: "Vk")
   end
 end

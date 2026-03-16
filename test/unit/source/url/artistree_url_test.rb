@@ -23,5 +23,7 @@ module Source::Tests::URL
         "https://artistree.io/crestfallen163#d2ca3306-0a5d-426e-925a-191593e6cfe1",
       )
     end
+
+    should parse_url("https://dwxo6p939as9l.cloudfront.net/seraexecfia/Anime").into(site_name: "Artistree")
   end
 end

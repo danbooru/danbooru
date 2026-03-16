@@ -32,5 +32,7 @@ module Source::Tests::URL
       should parse_url("https://i.imgur.com/kJ2FLm.jpeg").into(image_id: "kJ2FL")
       should parse_url("https://i.imgur.com/kJ2FL_d.jpeg").into(image_id: "kJ2FL")
     end
+
+    should parse_url("https://i.imgur.com/c7EXjJu.jpeg").into(site_name: "Imgur")
   end
 end

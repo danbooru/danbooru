@@ -24,5 +24,7 @@ module Source::Tests::URL
       should parse_url("https://s4.zerochan.net/600/24/13/90674.jpg").into(work_id: "90674")
       should parse_url("https://static.zerochan.net/Lancer.(Fate.stay.night).full.2600383.jpg").into(work_id: "2600383")
     end
+
+    should parse_url("https://s4.zerochan.net/600/24/13/90674.jpg").into(site_name: "Zerochan")
   end
 end

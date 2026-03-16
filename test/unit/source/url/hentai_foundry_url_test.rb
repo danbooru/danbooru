@@ -27,5 +27,7 @@ module Source::Tests::URL
         "http://hentai-foundry.com/profile-sawao.php",
       )
     end
+
+    should parse_url("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png").into(site_name: "Hentai Foundry")
   end
 end

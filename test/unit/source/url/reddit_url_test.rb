@@ -34,5 +34,7 @@ module Source::Tests::URL
         "https://www.reddit.com/u/Valshier",
       )
     end
+
+    should parse_url("https://i.redd.it/p5utgk06ryq81.png").into(site_name: "Reddit")
   end
 end

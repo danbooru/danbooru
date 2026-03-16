@@ -83,5 +83,7 @@ module Source::Tests::URL
         )
       end
     end
+
+    should parse_url("https://image-assets.mihuashi.com/permanent/29105|-2024/05/29/16/FuE-9jWo-aPKXOq2KP2ZsR5Nxnqa.jpg").into(site_name: "Mihuashi")
   end
 end

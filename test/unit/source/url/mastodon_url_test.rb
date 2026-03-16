@@ -59,5 +59,7 @@ module Source::Tests::URL
       should parse_url("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png").into(page_url: nil)
       should parse_url("https://media.baraag.net/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png").into(page_url: nil)
     end
+
+    should parse_url("https://img.pawoo.net/media_attachments/files/001/297/997/small/c4272a09570757c2.png").into(site_name: "Pawoo")
   end
 end

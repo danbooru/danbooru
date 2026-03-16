@@ -9,10 +9,6 @@ class Source::URL::DcInside < Source::URL
     url.domain.in?(%w[dcinside.co.kr dcinside.com])
   end
 
-  def site_name
-    "DC Inside"
-  end
-
   def parse
     case [subdomain, domain, *path_segments]
 

@@ -11,5 +11,7 @@ module Source::Tests::URL
         page_url: "https://hitomi.la/reader/1054851.html#1",
       )
     end
+
+    should parse_url("https://aa.hitomi.la/galleries/883451/t_rena1g.png").into(site_name: "Hitomi")
   end
 end

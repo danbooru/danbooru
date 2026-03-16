@@ -19,10 +19,6 @@ class Source::URL::Allmylinks < Source::URL
     end
   end
 
-  def site_name
-    "AllMyLinks"
-  end
-
   def profile_url
     "https://allmylinks.com/#{username}" if username.present?
   end

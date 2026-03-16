@@ -18,5 +18,7 @@ module Source::Tests::URL
         "https://bcy.net/u/1617969s",
       )
     end
+
+    should parse_url("https://img5.bcyimg.com/drawer/103785/post/178q3/88fdb790392d11e7b58d17da09c22716.jpg/w650").into(site_name: "BCY")
   end
 end

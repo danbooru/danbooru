@@ -17,5 +17,7 @@ module Source::Tests::URL
         "https://privatter.net/u/GLK_Sier",
       )
     end
+
+    should parse_url("https://d2pqhom6oey9wx.cloudfront.net/img_original/6501563076473624f29c22.png").into(site_name: "Privatter")
   end
 end

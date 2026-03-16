@@ -59,5 +59,7 @@ module Source::Tests::URL
         profile_url: "https://ko-fi.com/T6T41FDFF",
       )
     end
+
+    should parse_url("https://storage.ko-fi.com/cdn/useruploads/post/6132206b-945b-42e9-8326-b4de510bb1da_ilustraci%C3%B3n9_2.png").into(site_name: "Ko-fi")
   end
 end

@@ -98,5 +98,7 @@ module Source::Tests::URL
         page_url: "https://hero.fandom.com/wiki/File:Yukiko_Amagi_(BlazBlue_Cross_Tag_Battle,_Character_Select_Artwork).png",
       )
     end
+
+    should parse_url("https://vignette.wikia.nocookie.net/valkyriecrusade/images/c/c5/Crimson_Hatsune_H.png/revision/latest?cb=20180702031954").into(site_name: "Fandom")
   end
 end

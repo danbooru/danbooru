@@ -41,10 +41,6 @@ class Source::URL::Danbooru2 < Source::URL
     end
   end
 
-  def site_name
-    "Danbooru"
-  end
-
   def candidate_full_image_urls
     %w[jpg png gif mp4 webm webp avif zip swf].map { |ext| full_image_url_for(ext) }
   end

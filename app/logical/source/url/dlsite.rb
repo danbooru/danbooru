@@ -10,10 +10,6 @@ class Source::URL::Dlsite < Source::URL
     url.domain.in?(%w[dlsite.com dlsite.net dlsite.jp]) && url.host != "ci-en.dlsite.com"
   end
 
-  def site_name
-    "DLSite"
-  end
-
   def parse
     case [subdomain, domain, *path_segments]
 

@@ -23,5 +23,7 @@ module Source::Tests::URL
         "https://medibang.com/viewer/f72107281839259430002176282/",
       )
     end
+
+    should parse_url("https://dthezntil550i.cloudfront.net/4b/latest/4b2112261505098280008769655/1280_960/d5b22a94-4864-45d5-96e7-cbca9e0043f4.png").into(site_name: "ArtStreet")
   end
 end

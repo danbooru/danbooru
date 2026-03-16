@@ -13,10 +13,6 @@ class Source::URL::Rule34DotUs < Source::URL
     url.domain.in?(%w[rule34.us])
   end
 
-  def site_name
-    "Rule34.us"
-  end
-
   def parse
     case [domain, *path_segments]
 

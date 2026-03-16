@@ -2,7 +2,7 @@
 
 # @see Source::Extractor::Piapro
 class Source::URL::Piapro < Source::URL
-  site "Piapro", url: "https://piapro.jp"
+  site "Piapro.jp", url: "https://piapro.jp"
 
   RESERVED_USERNAMES = %w[
     3dm a about_us bookmark characters content content_list_recommend dm download faq follow help illust intro inquiry jump
@@ -13,10 +13,6 @@ class Source::URL::Piapro < Source::URL
 
   def self.match?(url)
     url.domain == "piapro.jp"
-  end
-
-  def site_name
-    "Piapro.jp"
   end
 
   def parse

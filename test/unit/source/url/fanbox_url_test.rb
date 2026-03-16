@@ -53,5 +53,7 @@ module Source::Tests::URL
       should parse_url("https://fanbox.cc/@omu001/posts/39714").into(username: "omu001", work_id: "39714")
       should parse_url("https://omu001.fanbox.cc/posts/39714").into(username: "omu001", work_id: "39714")
     end
+
+    should parse_url("https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg").into(site_name: "Fanbox")
   end
 end

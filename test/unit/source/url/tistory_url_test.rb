@@ -24,5 +24,7 @@ module Source::Tests::URL
         "https://primemeeting.tistory.com/m",
       )
     end
+
+    should parse_url("https://t1.daumcdn.net/cfile/tistory/99A3CF4B5C2AFDF806").into(site_name: "Kakao")
   end
 end

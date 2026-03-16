@@ -9,10 +9,6 @@ class Source::URL::AboutMe < Source::URL
     url.domain == "about.me"
   end
 
-  def site_name
-    "About.me"
-  end
-
   def parse
     case [subdomain, domain, *path_segments]
 

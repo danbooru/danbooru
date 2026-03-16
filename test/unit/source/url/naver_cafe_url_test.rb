@@ -38,5 +38,7 @@ module Source::Tests::URL
         "https://cafe.naver.com/common/storyphoto/viewer.html?src=https%3A%2F%2Fcafeptthumb-phinf.pstatic.net%2FMjAyMzA3MDZfMzIg%2FMDAxNjg4NjM3NzcyNDg3.CrtekTl5XiXEJCFy9532vabMKo0CaWwryTMM0Up77Jgg.8ppf2Q3uiVWUlIP6jckYwYSe5Ys-erSsd7yf8XoHECIg.PNG%2F%25EC%259C%25A0%25EC%259A%25B0%25EC%25B9%25B4_%25EC%2597%2585%25EB%25A1%259C%25EB%2593%259C%25EC%259A%25A9.png",
       )
     end
+
+    should parse_url("https://cafeptthumb-phinf.pstatic.net/MjAyMDA3MDZfMTM0/MDAxNTk0MDA2Mjk0MTcw.JA_GkVUpYytyzximdxyl9Y7wtMoBHkPn2p7S3dLLAzYg.XQfw46B7G2ae5nhw7xc3wkWZgYUS9Debf_XIlsED1jgg.PNG/1.png?type=w800").into(site_name: "Naver Cafe")
   end
 end

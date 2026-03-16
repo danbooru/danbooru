@@ -32,5 +32,7 @@ module Source::Tests::URL
         "http://gengar563.lofter.com",
       )
     end
+
+    should parse_url("https://imglf3.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJSzFCWFlnUWgzb01DcUdpT1lreG5yQjJVMkhGS09HNGR3PT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0").into(site_name: "Lofter")
   end
 end

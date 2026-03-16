@@ -55,5 +55,7 @@ module Source::Tests::URL
         profile_url: "https://www.artstation.com/sa-dui",
       )
     end
+
+    should parse_url("http://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236").into(site_name: "ArtStation")
   end
 end

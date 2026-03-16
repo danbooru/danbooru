@@ -27,5 +27,7 @@ module Source::Tests::URL
         "http://temp.emotionflow.com/7289/",
       )
     end
+
+    should parse_url("https://galleria-img.emotionflow.com/user_img9/40775/i660870_869.jpeg").into(site_name: "Galleria")
   end
 end

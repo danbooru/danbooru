@@ -9,10 +9,6 @@ class Source::URL::Fc2 < Source::URL
     url.domain.in?(%w[fc2.com fc2web.com fc2blog.net fc2blog.us])
   end
 
-  def site_name
-    "FC2"
-  end
-
   def parse
     case [*host.split("."), *path_segments]
 

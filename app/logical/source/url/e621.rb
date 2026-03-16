@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Source::URL::E621 < Source::URL
-  site "E621", url: "https://e621.net", domains: %w[e621.net e926.net]
+  site "e621", url: "https://e621.net", domains: %w[e621.net e926.net]
 
   attr_reader :user_id, :post_id, :md5, :full_image_url
 
@@ -41,10 +41,6 @@ class Source::URL::E621 < Source::URL
     else
       nil
     end
-  end
-
-  def site_name
-    "e621"
   end
 
   def image_url?

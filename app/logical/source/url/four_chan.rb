@@ -11,10 +11,6 @@ class Source::URL::FourChan < Source::URL
     url.domain.in?(%w[4cdn.org 4chan.org 4channel.org])
   end
 
-  def site_name
-    "4chan"
-  end
-
   def parse
     case [subdomain, domain, *path_segments]
 

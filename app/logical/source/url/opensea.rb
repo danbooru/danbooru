@@ -2,7 +2,7 @@
 
 # @see Source::Extractor::Opensea
 class Source::URL::Opensea < Source::URL
-  site "Opensea", url: "https://opensea.io", domains: %w[opensea.io openseauserdata.com seadn.io]
+  site "OpenSea", url: "https://opensea.io", domains: %w[opensea.io openseauserdata.com seadn.io]
 
   RESERVED_USERNAMES = %w[about account activity assets blog careers category collection drops learn partners privacy studio tos rankings]
 
@@ -10,10 +10,6 @@ class Source::URL::Opensea < Source::URL
 
   def self.match?(url)
     url.domain.in?(%w[opensea.io openseauserdata.com seadn.io])
-  end
-
-  def site_name
-    "OpenSea"
   end
 
   def parse

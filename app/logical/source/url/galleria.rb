@@ -9,10 +9,6 @@ class Source::URL::Galleria < Source::URL
     url.domain == "emotionflow.com"
   end
 
-  def site_name
-    "Galleria"
-  end
-
   def parse
     case [subdomain, domain, *path_segments]
 

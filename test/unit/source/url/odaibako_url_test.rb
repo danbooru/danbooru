@@ -22,5 +22,7 @@ module Source::Tests::URL
         profile_url: "https://odaibako.net/u/aaaaaariko",
       )
     end
+
+    should parse_url("https://ccs.odaibako.net/w=1600/post_images/aaaaaariko/c126b4961cea4a1c9ae016e224db2a62.jpeg.webp").into(site_name: "Odaibako")
   end
 end

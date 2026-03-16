@@ -8,5 +8,7 @@ module Source::Tests::URL
         "https://meliach.imgbb.com/albums",
       )
     end
+
+    should parse_url("https://meliach.imgbb.com").into(site_name: "ImgBB")
   end
 end

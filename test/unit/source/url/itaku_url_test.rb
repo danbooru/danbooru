@@ -24,5 +24,7 @@ module Source::Tests::URL
         "https://itaku.ee/profile/advosart/gallery",
       )
     end
+
+    should parse_url("https://itaku.ee/api/media_2/profile_pics/profile_pics/pfp9_kI67Jq5_oyZ4mO8/sm.jpg").into(site_name: "Itaku")
   end
 end

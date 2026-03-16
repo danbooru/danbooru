@@ -7,5 +7,7 @@ module Source::Tests::URL
         page_url: "http://nijigen-daiaru.com/book.php?idb=19909",
       )
     end
+
+    should parse_url("http://jpg.nijigen-daiaru.com/19909/029.jpg").into(site_name: "Nijigen Daiaru")
   end
 end

@@ -24,10 +24,6 @@ class Source::URL::SankakuComplex < Source::URL
     end
   end
 
-  def site_name
-    "Sankaku Complex"
-  end
-
   def page_url
     "https://chan.sankakucomplex.com/post/show?md5=#{md5}" if md5.present?
   end

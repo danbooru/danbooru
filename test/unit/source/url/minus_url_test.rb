@@ -7,5 +7,7 @@ module Source::Tests::URL
         page_url: "http://minus.com/i/bb0DuE2Ds0yE6",
       )
     end
+
+    should parse_url("http://i1.minus.com/ibb0DuE2Ds0yE6.jpg").into(site_name: "Minus")
   end
 end

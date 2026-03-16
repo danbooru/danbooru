@@ -70,6 +70,10 @@ module Source::Tests::URL
         "https://www.pixiv.net/artworks/46324488",
         "https://i.pximg.net/imgaz/upload/20240417/163474511.jpg",
       )
+
+      should be_bad_source(
+        "https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com",
+      )
     end
 
     context "when extracting attributes" do
@@ -247,5 +251,7 @@ module Source::Tests::URL
         )
       end
     end
+
+    should parse_url("https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png").into(site_name: "Pixiv")
   end
 end

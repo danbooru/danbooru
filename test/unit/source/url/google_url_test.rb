@@ -30,5 +30,7 @@ module Source::Tests::URL
         full_image_url: "https://lh5.ggpht.com/-ykP8cKuqOfU/UKEOptJJvoI/AAAAAAAAMAY/Kp7qo5A50E8/d/",
       )
     end
+
+    should parse_url("https://lh3.googleusercontent.com/qAhRBhfciCcosUoYHPJr5WtNYSJ81vpSqcQwbQitZtsR3mB2aCUj7J5LvhJOCfWn-CWqiLB18SyTr1VJvm_HI7B72opIAMZiZvg=s400").into(site_name: "Google")
   end
 end

@@ -15,5 +15,7 @@ module Source::Tests::URL
         "https://factory.pixiv.net/palette/collections/imys_tachie",
       )
     end
+
+    should parse_url("https://factory.pixiv.net/files/uploads/i/conceptual_drawing/3a6f3742-03b6-4968-9599-20dc2c0e1172/canvas_f2605b12ed.png").into(site_name: "Pixiv Factory")
   end
 end

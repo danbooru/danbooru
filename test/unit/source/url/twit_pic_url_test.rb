@@ -29,5 +29,7 @@ module Source::Tests::URL
         page_url: "https://twitpic.com/dtnuru",
       )
     end
+
+    should parse_url("https://twitpic.com/show/large/carwkf.jpg").into(site_name: "TwitPic")
   end
 end

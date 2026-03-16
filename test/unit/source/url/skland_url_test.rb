@@ -20,5 +20,7 @@ module Source::Tests::URL
         "https://www.skland.com/profile?id=4040407836824",
       )
     end
+
+    should parse_url("https://bbs.hycdn.cn/image/2024/04/29/576904/1dc98f0a6780ddcbc107d77bfdba673f.webp").into(site_name: "Skland")
   end
 end

@@ -22,5 +22,7 @@ module Source::Tests::URL
         profile_url: "https://cohost.org/Karuu",
       )
     end
+
+    should parse_url("https://staging.cohostcdn.org/attachment/e70670fc-591b-4f66-b4e9-75938adaa1dd/245_evil_nigiri.png?width=675&auto=webp&dpr=1").into(site_name: "Cohost")
   end
 end

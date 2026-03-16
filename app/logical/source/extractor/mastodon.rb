@@ -4,12 +4,7 @@
 # @see https://docs.joinmastodon.org/api
 class Source::Extractor
   class Mastodon < Source::Extractor
-    def domain
-      case site_name
-      when "Pawoo" then "pawoo.net"
-      when "Baraag" then "baraag.net"
-      end
-    end
+    delegate :domain, to: :parsed_url
 
     def image_urls
       if parsed_url.image_url?

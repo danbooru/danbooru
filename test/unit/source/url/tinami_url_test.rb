@@ -22,5 +22,7 @@ module Source::Tests::URL
         "http://www.tinami.com/profile/1182",
       )
     end
+
+    should parse_url("https://img.tinami.com/illust/img/287/497c8a9dc60e6.jpg").into(site_name: "Tinami")
   end
 end

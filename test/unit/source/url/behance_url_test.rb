@@ -24,5 +24,7 @@ module Source::Tests::URL
         page_url: "https://www.behance.net/gallery/97612065/Title",
       )
     end
+
+    should parse_url("https://mir-s3-cdn-cf.behance.net/project_modules/1400/ea4c7e97612065.5ec92bae8dc45.jpg").into(site_name: "Behance")
   end
 end

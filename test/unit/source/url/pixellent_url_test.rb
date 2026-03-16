@@ -16,5 +16,7 @@ module Source::Tests::URL
         "https://pixellent.me/@shina",
       )
     end
+
+    should parse_url("https://firebasestorage.googleapis.com/v0/b/pixellent.appspot.com/o/users%2FUbwtLvQnfEcV4d4IhAFztXXghR03%2Fposts%2Fs89Uq4Zwq8CVHQhpQ26B%2Fimages%2Fthumbnail-full.jpg?alt=media").into(site_name: "Pixellent")
   end
 end

@@ -11,5 +11,7 @@ module Source::Tests::URL
         "http://twpl.jp/swacoro",
       )
     end
+
+    should parse_url("http://p.twpl.jp/show/orig/mI2c3").into(site_name: "Twipple")
   end
 end

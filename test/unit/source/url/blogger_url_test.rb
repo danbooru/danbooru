@@ -28,5 +28,7 @@ module Source::Tests::URL
         "http://vincentmcart.blogspot.com.es",
       )
     end
+
+    should parse_url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6Jup0xZMWnmN6anXS4vy2nxF7FO6zX-gzBg_4vnj-7ZNFBLPhDHE82PcD9AK98LwgSjzg4qilH5VDMzOj2KDA7eH-KBTMonuTkhihMzxCT3R5qcx_8pBqbtf45ohyiXoQxfFtByFG57dF/s1600/tali-litho.jpg").into(site_name: "Blogger")
   end
 end

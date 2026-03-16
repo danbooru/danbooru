@@ -36,6 +36,10 @@ module Source::Tests::URL
         "https://www.deviantart.com",
       )
 
+      should be_bad_source(
+        "https://www.deviantart.com/users/outgoing?https://www.google.com",
+      )
+
       should parse_url("http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg").into(
         page_url: "https://www.deviantart.com/mar11co/art/You-Are-Already-Dead-408921710",
       )
@@ -131,5 +135,7 @@ module Source::Tests::URL
         assert_equal("https://www.deviantart.com/deviation/438744629", url.page_url_from_redirect(http))
       end
     end
+
+    should parse_url("http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg").into(site_name: "Deviant Art")
   end
 end

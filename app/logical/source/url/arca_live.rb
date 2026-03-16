@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
 class Source::URL::ArcaLive < Source::URL
-  site "Arca Live", url: "https://arca.live", domains: %w[arca.live namu.la]
+  site "Arca.live", url: "https://arca.live", domains: %w[arca.live namu.la]
 
   attr_reader :full_image_url, :channel, :post_id, :username, :user_id
 
   def self.match?(url)
     url.domain.in?(%w[arca.live namu.la])
-  end
-
-  def site_name
-    "Arca.live"
   end
 
   def parse

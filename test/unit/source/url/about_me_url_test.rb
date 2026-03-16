@@ -20,5 +20,7 @@ class Source::URL::AboutMeTest < ActiveSupport::TestCase
     should parse_url("https://about.me/cdn-cgi/image/q=40,dpr=2,f=auto,fit=contain,w=1200,h=1799.9100044997751/https://assets.about.me/background/users/u/dot/n/u.no_1471830904_68.jpg").into(
       profile_url: "https://about.me/u.no",
     )
+
+    should parse_url("https://about.me/cdn-cgi/image/q=40").into(site_name: "About.me")
   end
 end

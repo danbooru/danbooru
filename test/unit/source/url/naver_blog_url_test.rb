@@ -21,5 +21,7 @@ module Source::Tests::URL
         "https://mirun2.blog.me",
       )
     end
+
+    should parse_url("https://blog.naver.com/kkid9624/223421884109").into(site_name: "Naver Blog")
   end
 end

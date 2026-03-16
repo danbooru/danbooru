@@ -35,5 +35,7 @@ module Source::Tests::URL
         page_url: "https://www.furaffinity.net/view/1234",
       )
     end
+
+    should parse_url("https://d.furaffinity.net/art/iwbitu/1650222955/1650222955.iwbitu_yubi.jpg").into(site_name: "Furaffinity")
   end
 end

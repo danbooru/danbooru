@@ -54,10 +54,6 @@ class Source::URL::CiEn < Source::URL
     end
   end
 
-  def site_name
-    "Ci-En"
-  end
-
   def image_url?
     host == "media.ci-en.jp"
   end

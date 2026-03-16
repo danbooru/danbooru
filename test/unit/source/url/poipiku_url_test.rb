@@ -27,5 +27,7 @@ module Source::Tests::URL
         "https://poipiku.com/6849873",
       )
     end
+
+    should parse_url("https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg?Expires=XXX&Signature=XXX&Key-Pair-Id=XXX").into(site_name: "Poipiku")
   end
 end

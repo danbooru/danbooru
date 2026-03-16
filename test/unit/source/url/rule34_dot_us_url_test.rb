@@ -42,5 +42,7 @@ module Source::Tests::URL
         page_url: "https://rule34.us/hotlink.php?hash=236690fd962fa394edf9894450261dac",
       )
     end
+
+    should parse_url("https://img2.rule34.us/images/23/66/236690fd962fa394edf9894450261dac.png").into(site_name: "Rule34.us")
   end
 end

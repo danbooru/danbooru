@@ -29,5 +29,7 @@ module Source::Tests::URL
         "https://ixy.bsky.social",
       )
     end
+
+    should parse_url("https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg").into(site_name: "Bluesky")
   end
 end

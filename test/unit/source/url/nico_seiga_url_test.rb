@@ -81,5 +81,7 @@ module Source::Tests::URL
         page_url: "https://manga.nicovideo.jp/watch/mg316708",
       )
     end
+
+    should parse_url("http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf").into(site_name: "Nico Seiga")
   end
 end

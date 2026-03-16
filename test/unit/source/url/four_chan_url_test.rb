@@ -23,5 +23,7 @@ module Source::Tests::URL
         "http://zip.4chan.org/jp/res/3598845.html",
       )
     end
+
+    should parse_url("https://i.4cdn.org/vt/1668729957824814.webm").into(site_name: "4chan")
   end
 end

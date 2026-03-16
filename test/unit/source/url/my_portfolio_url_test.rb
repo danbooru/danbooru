@@ -22,5 +22,7 @@ module Source::Tests::URL
         "https://sekigahara023.myportfolio.com/",
       )
     end
+
+    should parse_url("https://cdn.myportfolio.com/86bfb012-1d8f-427f-bbbb-287c3b8c0057/2a0c99c7-d94d-4812-87b4-1690d7a13983_car_202x158.png?h=e698f363e29b0f60d61181c64016a99a").into(site_name: "Adobe Portfolio")
   end
 end

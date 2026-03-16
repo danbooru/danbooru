@@ -16,6 +16,12 @@ module Source::Tests::URL
         "https://post.naver.com/my/followerList.naver?followNo=6072169&navigationType=push",
         "https://post.naver.com/dltkdrlf92",
       )
+
+      should be_bad_source(
+        "https://naver.me/FABhCw8Z",
+      )
     end
+
+    should parse_url("https://m.post.naver.com/viewer/postView.naver?volumeNo=33304944&memberNo=7662880").into(site_name: "Naver Post")
   end
 end

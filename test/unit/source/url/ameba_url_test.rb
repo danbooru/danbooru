@@ -37,5 +37,7 @@ module Source::Tests::URL
         profile_url: "https://ameblo.jp/kbnr32rbfs",
       )
     end
+
+    should parse_url("http://marilyn77.ameblo.jp/").into(site_name: "Ameba")
   end
 end

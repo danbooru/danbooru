@@ -78,5 +78,7 @@ module Source::Tests::URL
         username: nil,
       )
     end
+
+    should parse_url("https://s3.arkjp.net/misskey/thumbnail-10c4379a-b999-4148-9d32-7bb6f22453bf.webp").into(site_name: "Misskey.io")
   end
 end

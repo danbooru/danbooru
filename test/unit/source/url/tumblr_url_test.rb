@@ -51,6 +51,10 @@ module Source::Tests::URL
         "https://25.media.tumblr.com/91719d337b218681abc48cdc24e",
       )
 
+      should be_bad_source(
+        "https://tmblr.co/ZdPV4t2OHwdv5",
+      )
+
       should parse_url("https://octrain1020.tumblr.com/post/190713122589").into(
         page_url: "https://octrain1020.tumblr.com/post/190713122589",
       )
@@ -80,5 +84,7 @@ module Source::Tests::URL
         profile_url: "https://cyanideqpoison.tumblr.com",
       )
     end
+
+    should parse_url("http://data.tumblr.com/07e7bba538046b2b586433976290ee1f/tumblr_o3gg44HcOg1r9pi29o1_raw.jpg").into(site_name: "Tumblr")
   end
 end

@@ -22,5 +22,7 @@ module Source::Tests::URL
         "https://redgifs.com/users/LazyProcrastinator/collections",
       )
     end
+
+    should parse_url("https://thumbs44.redgifs.com/ThunderousVerifiableScoter-mobile.jpg?expires=1715806200&signature=v2:b774b57f548f8171862b560d007f05b383530e7f167dde99e81b605f158131a5&for=198.54.135&hash=7011125643").into(site_name: "Redgifs")
   end
 end

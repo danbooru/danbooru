@@ -19,10 +19,6 @@ class Source::URL::Mishimmie < Source::URL
     end
   end
 
-  def site_name
-    "Mishmmie"
-  end
-
   def page_url
     "https://shimmie.katawa-shoujo.com/post/view/#{work_id}" if work_id.present?
   end

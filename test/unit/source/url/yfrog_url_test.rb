@@ -15,5 +15,7 @@ module Source::Tests::URL
         profile_url: "http://yfrog.com/user/0128sinonome/photos",
       )
     end
+
+    should parse_url("http://yfrog.com/gyi1smoj").into(site_name: "Yfrog")
   end
 end

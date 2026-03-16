@@ -32,6 +32,11 @@ module Source::Tests::URL
         "https://live.bilibili.com/10049889?from=search&seid=8525275464641122982",
       )
 
+      should be_bad_source(
+        "https://bili2233.cn/h5v55co",
+        "https://b23.tv/h5v55co",
+      )
+
       should parse_url("https://www.bilibili.com/p/h5/8773541").into(page_url: "https://h.bilibili.com/8773541")
       should parse_url("https://m.bilibili.com/dynamic/612214375070704555").into(page_url: "https://www.bilibili.com/opus/612214375070704555")
       should parse_url("https://t.bilibili.com/612214375070704555").into(page_url: "https://www.bilibili.com/opus/612214375070704555")
@@ -63,5 +68,7 @@ module Source::Tests::URL
         full_image_url: "https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png",
       )
     end
+
+    should parse_url("https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg").into(site_name: "Bilibili")
   end
 end

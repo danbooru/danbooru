@@ -50,6 +50,11 @@ module Source::Tests::URL
         "https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com",
       )
 
+      should be_bad_source(
+        "https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com",
+        "https://t.cn/A6pONxY1",
+      )
+
       should parse_url("https://www.weibo.com/3150932560/H4cFbeKKA?from=page_1005053150932560_profile&wvr=6&mod=weibotime").into(
         page_url: "https://www.weibo.com/3150932560/H4cFbeKKA",
       )
@@ -66,5 +71,7 @@ module Source::Tests::URL
         page_url: "https://m.weibo.cn/detail/4098035921690224",
       )
     end
+
+    should parse_url("http://ww1.sinaimg.cn/large/69917555gw1f6ggdghk28j20c87lbhdt.jpg").into(site_name: "Weibo")
   end
 end
