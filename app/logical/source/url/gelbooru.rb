@@ -2,6 +2,15 @@
 
 # This covers all Gelbooru-based sites.
 class Source::URL::Gelbooru < Source::URL
+  site "Gelbooru", url: "https://gelbooru.com" do
+    credential :user_id, help: %{Your Gelbooru user ID.}
+    credential :api_key, help: %{Your Gelbooru API key. Go to https://gelbooru.com/index.php?page=account&s=options to find your API key.}
+  end
+
+  site "Safebooru", url: "https://safebooru.org"
+  site "TBIB", url: "https://tbib.org"
+  site "Rule34.xxx", url: "https://rule34.xxx"
+
   attr_reader :post_id, :md5, :image_type, :full_image_url
 
   def self.match?(url)

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::EHentai < Source::URL
+  site "E-Hentai", url: "https://e-hentai.org", domains: %w[e-hentai.org exhentai.org hath.network]
+
   attr_reader :image_params, :image_sample
 
   def self.match?(url)

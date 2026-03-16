@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Fanbox < Source::URL
+  site "Fanbox", url: "https://www.fanbox.cc", domains: %w[fanbox.cc pixiv.net pximg.net]
+
   RESERVED_SUBDOMAINS = %w[www downloads]
 
   attr_reader :username, :user_id, :work_id

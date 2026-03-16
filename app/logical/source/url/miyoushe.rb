@@ -2,6 +2,8 @@
 
 # @see Source::Extractor::Miyoushe
 class Source::URL::Miyoushe < Source::URL
+  site "Miyoushe", url: "https://www.miyoushe.com", domains: %w[mihoyo.com miyoushe.com hoyolab.com]
+
   attr_reader :user_id, :subsite, :article_id, :full_image_url
 
   def self.match?(url)

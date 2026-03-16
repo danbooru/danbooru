@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Ameba < Source::URL
+  site "Ameba", url: "https://ameba.jp", domains: %w[ameblo.jp ameba.jp]
+
   attr_reader :username
 
   def self.match?(url)

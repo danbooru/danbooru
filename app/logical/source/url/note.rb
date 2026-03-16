@@ -10,6 +10,8 @@
 # @see https://note.com/topic/noteprolist (list of custom domains)
 # @see Source::Extractor::Note
 class Source::URL::Note < Source::URL
+  site "Note", url: "https://note.com", domains: %w[note.com note.mu st-note.com cloudfront.net amazonaws.com]
+
   RESERVED_USERNAMES = %w[hashtag intent login magazine signup terms topic users]
 
   attr_reader :username, :post_id, :full_image_url

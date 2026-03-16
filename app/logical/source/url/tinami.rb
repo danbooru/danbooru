@@ -9,6 +9,13 @@
 # http://www.tinami.com/today/artworks/t071127_147092.jpg
 
 class Source::URL::Tinami < Source::URL
+  site "Tinami" do
+    url "https://www.tinami.com"
+    domains %w[tinami.com tinami.jp]
+
+    credential :session_id, help: %{Your Tinami `Tinami2SESSID` cookie.}
+  end
+
   attr_reader :user_id, :profile_id, :work_id
 
   def self.match?(url)

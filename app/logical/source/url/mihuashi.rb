@@ -3,6 +3,8 @@
 module Source
   class URL
     class Mihuashi < Source::URL
+      site "Mihuashi", url: "https://www.mihuashi.com"
+
       attr_reader :username, :user_id, :work_id, :stall_id, :project_id, :character_id, :a_work_id, :a_work_activity, :a_work_type, :full_image_url, :date, :zone
 
       def self.match?(url)

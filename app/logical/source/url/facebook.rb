@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Facebook < Source::URL
+  site "Facebook", url: "https://www.facebook.com", domains: %w[facebook.com fb.com fbcdn.net akamaihd.net]
+
   RESERVED_USERNAMES = %w[business friends help gaming groups marketplace people policies privacy reel watch permalink.php story.php]
 
   attr_reader :post_id, :photo_id, :reel_id, :user_id, :username

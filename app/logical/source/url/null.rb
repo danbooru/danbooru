@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Null < Source::URL
+  site "Null"
+
   attr_reader :work_id, :page_url, :profile_url
 
   def self.match?(_url)

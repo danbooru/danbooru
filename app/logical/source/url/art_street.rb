@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Source::URL::ArtStreet < Source::URL
+  site "ArtStreet", url: "https://medibang.com", domains: %w[medibang.com cloudfront.net] do
+    credential :session_cookie, help: "Your 'MSID' cookie. Go to your profile settings and set your age to 18+ to view R-18 works."
+  end
+
   attr_reader :picture_id, :book_id, :full_image_url, :author_id, :user_id
 
   def self.match?(url)

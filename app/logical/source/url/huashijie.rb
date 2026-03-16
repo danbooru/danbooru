@@ -3,6 +3,14 @@
 module Source
   class URL
     class Huashijie < Source::URL
+      site "Huashijie" do
+        url "https://www.huashijie.art"
+        domains %w[huashijie.art pandapaint.net]
+
+        credential :user_id, help: %{Your Huashijie `userId` cookie.}
+        credential :api_key, help: %{Your Huashijie `token` cookie.}
+      end
+
       attr_reader :user_id, :work_id, :product_id, :full_image_url
 
       def self.match?(url)

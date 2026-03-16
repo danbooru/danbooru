@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Privatter < Source::URL
+  site "Privatter", url: "https://privatter.net", domains: %w[privatter.net cloudfront.net]
+
   attr_reader :filename, :post_id, :username, :blog_id
 
   def self.match?(url)

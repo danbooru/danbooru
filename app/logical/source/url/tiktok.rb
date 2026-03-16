@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Tiktok < Source::URL
+  site "Tiktok", url: "https://www.tiktok.com"
+
   attr_reader :username
 
   def self.match?(url)

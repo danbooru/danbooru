@@ -10,6 +10,8 @@
 # @see https://portfolio.adobe.com
 # @see Source::Extractor::MyPortfolio
 class Source::URL::MyPortfolio < Source::URL
+  site "My Portfolio", url: "https://portfolio.adobe.com", domains: %w[myportfolio.com]
+
   RESERVED_USERNAMES = %w[cdn www]
 
   attr_reader :username, :artist_uuid, :image_uuid, :image_size, :page_title

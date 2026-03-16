@@ -3,6 +3,8 @@
 # Web Diary Professional is an old CGI script used by multiple sites as a self-hosted blogging system.
 # https://www.web-liberty.net/download/diarypro/index.html
 class Source::URL::DiaryPro < Source::URL
+  site "Diary Pro", url: "https://www.web-liberty.net/download/diarypro/index.html"
+
   attr_reader :work_id, :base_url
 
   def self.match?(url)

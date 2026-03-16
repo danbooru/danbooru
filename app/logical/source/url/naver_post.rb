@@ -2,6 +2,8 @@
 
 # @see https://post.naver.com
 class Source::URL::NaverPost < Source::URL
+  site "Naver Post", url: "https://post.naver.com", domains: %w[naver.com naver.net pstatic.net]
+
   RESERVED_USERNAMES = %w[author contents my viewer]
 
   attr_reader :username, :user_id, :post_id, :full_image_url

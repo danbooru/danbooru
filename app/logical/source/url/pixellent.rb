@@ -2,6 +2,8 @@
 
 # Defunct site. https://web.archive.org/web/20250227042011/https://pixellent.me/
 class Source::URL::Pixellent < Source::URL
+  site "Pixellent", url: "https://pixellent.me", domains: %w[pixellent.me googleapis.com]
+
   attr_reader :full_image_url, :username, :user_id, :post_id
 
   def self.match?(url)

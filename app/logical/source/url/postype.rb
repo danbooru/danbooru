@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 class Source::URL::Postype < Source::URL
+  site "Postype" do
+    url "https://www.postype.com"
+    domains %w[postype.com cloudfront.net]
+
+    credential :session_cookie, help: %{Your Postype `PSE3` cookie. Go to your settings and enable 'Viewing adult content by foreigners' to see all content.}
+  end
+
   RESERVED_SUBDOMAINS = %w[about blog c3 i www]
 
   attr_reader :full_image_url, :post_id, :series_id, :blogname, :username

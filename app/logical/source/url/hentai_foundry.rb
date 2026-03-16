@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::HentaiFoundry < Source::URL
+  site "Hentai Foundry", url: "https://www.hentai-foundry.com"
+
   attr_reader :username, :work_id, :file
 
   def self.match?(url)

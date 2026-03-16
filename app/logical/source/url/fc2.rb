@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Fc2 < Source::URL
+  site "FC2", url: "https://fc2.com", domains: %w[fc2.com fc2web.com fc2blog.net fc2blog.us]
+
   attr_reader :username, :subsite, :blog_entry, :album_filename, :candidate_full_image_url, :candidate_page_urls
 
   def self.match?(url)

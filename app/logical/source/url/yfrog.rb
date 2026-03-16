@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Yfrog < Source::URL
+  site "Yfrog", url: "http://yfrog.com"
+
   attr_reader :post_id, :username
 
   def self.match?(url)

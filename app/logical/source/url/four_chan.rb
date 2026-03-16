@@ -3,6 +3,8 @@
 # @see https://github.com/4chan/4chan-API
 # @see https://github.com/4chan/4chan-API/blob/master/pages/User_images_and_static_content.md
 class Source::URL::FourChan < Source::URL
+  site "4chan", url: "https://4chan.org", domains: %w[4cdn.org 4chan.org 4channel.org]
+
   attr_reader :board, :thread_id, :post_id, :image_type, :image_id, :full_image_url
 
   def self.match?(url)

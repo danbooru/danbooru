@@ -10,6 +10,14 @@
 # * https://pic04.nijie.info/omata/4829_20161128012012.png (page: http://nijie.info/view_popup.php?id=33224#diff_3)
 
 class Source::URL::Nijie < Source::URL
+  site "Nijie" do
+    url "https://nijie.info"
+    domains %w[nijie.net nijie.info]
+
+    credential :login, help: %{Your Nijie login}
+    credential :password, help: %{Your nijie password}
+  end
+
   attr_reader :work_id, :user_id
 
   def self.match?(url)

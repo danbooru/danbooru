@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Discord < Source::URL
+  site "Discord", url: "https://discord.com", domains: %w[discord.gg discord.com discordapp.com discordapp.net]
+
   attr_reader :server_name, :server_id, :channel_id, :message_id
 
   def self.match?(url)

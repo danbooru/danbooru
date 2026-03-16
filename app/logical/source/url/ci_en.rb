@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Source::URL::CiEn < Source::URL
+  site "Ci-En", url: "https://ci-en.net", domains: %w[ci-en.jp ci-en.net dlsite.com] do
+    credential :session_cookie, help: %{Your Ci-En `ci_en_session` cookie.}
+  end
+
   attr_reader :creator_id, :article_id, :image_type
 
   def self.match?(url)

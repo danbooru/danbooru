@@ -6,6 +6,13 @@
 # * https://uploads.ungrounded.net/225000/225625_colormedressup.swf?1111143751 (flash file)
 
 class Source::URL::Newgrounds < Source::URL
+  site "Newgrounds" do
+    url "https://www.newgrounds.com"
+    domains %w[newgrounds.com ngfiles.com ungrounded.net]
+
+    credential :ng_remember, help: %{Your Newgrounds `ng_remember` cookie.}
+  end
+
   attr_reader :username, :work_id, :work_title, :project_id, :image_id, :video_id, :image_hash, :full_image_url, :candidate_full_image_urls
 
   def self.match?(url)

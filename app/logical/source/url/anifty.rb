@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Anifty < Source::URL
+  site "Anifty", url: "https://anifty.jp", domains: %w[anifty.jp imgix.net googleapis.com]
+
   attr_reader :username, :artist_hash, :work_id, :file, :work_type
 
   def self.match?(url)

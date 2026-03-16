@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Doujinantena < Source::URL
+  site "Doujinantena", url: "http://doujinantena.com", domains: %w[doujinantena.com]
+
   attr_reader :md5
 
   def self.match?(url)

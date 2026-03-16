@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::AboutMe < Source::URL
+  site "About.me", url: "https://about.me"
+
   attr_reader :username, :full_image_url
 
   def self.match?(url)

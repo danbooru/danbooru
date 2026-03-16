@@ -4,6 +4,8 @@
 # @see https://blog.naver.com
 # @see https://raw.githubusercontent.com/qsniyg/maxurl/master/src/userscript.ts#:~:text=pstatic.net
 class Source::URL::NaverBlog < Source::URL
+  site "Naver Blog", url: "https://blog.naver.com", domains: %w[naver.com naver.net pstatic.net blog.me]
+
   RESERVED_USERNAMES = %w[guestbook memo mylog prologue]
 
   attr_reader :username, :post_id, :full_image_url

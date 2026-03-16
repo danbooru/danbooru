@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Anidb < Source::URL
+  site "AniDB", url: "https://anidb.net"
+
   attr_reader :user_id
 
   def self.match?(url)

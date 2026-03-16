@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::ArtStation < Source::URL
+  site "ArtStation", url: "https://www.artstation.com"
+
   RESERVED_SUBDOMAINS = %w[www cdn cdna cdnb]
   RESERVED_USERNAMES = %w[about blogs challenges guides jobs learning marketplace prints schools search studios subscribe]
 

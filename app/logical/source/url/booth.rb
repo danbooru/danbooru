@@ -5,6 +5,8 @@
 
 module Source
   class URL::Booth < Source::URL
+    site "Booth", url: "https://booth.pm", domains: %w[booth.pm pximg.net]
+
     RESERVED_SUBDOMAINS = ["www", "s", "s2", "asset", "accounts", nil]
 
     attr_reader :work_id, :user_id, :user_uuid, :username, :full_image_url

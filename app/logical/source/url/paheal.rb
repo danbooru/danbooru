@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Paheal < Source::URL
+  site "Paheal", url: "https://rule34.paheal.net"
+
   attr_reader :md5, :work_id
 
   def self.match?(url)

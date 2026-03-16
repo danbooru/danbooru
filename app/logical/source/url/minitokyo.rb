@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Minitokyo < Source::URL
+  site "Minitokyo", url: "http://www.minitokyo.net"
+
   attr_reader :work_id
 
   def self.match?(url)

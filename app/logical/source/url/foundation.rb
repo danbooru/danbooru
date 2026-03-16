@@ -9,6 +9,8 @@
 # * https://foundation.app/collection/kgfgen
 
 class Source::URL::Foundation < Source::URL
+  site "Foundation", url: "https://foundation.app", domains: %w[foundation.app imgix.net cloudfront.net]
+
   attr_reader :username, :user_id, :token_id, :work_id, :slug, :hash, :collection
 
   IMAGE_HOSTS = %w[assets.foundation.app f8n-ipfs-production.imgix.net f8n-production-collection-assets.imgix.net d2ybmb80bbm9ts.cloudfront.net]

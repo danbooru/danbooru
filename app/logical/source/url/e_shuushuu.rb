@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::EShuushuu < Source::URL
+  site "E-Shuushuu", url: "https://e-shuushuu.net", domains: %w[e-shuushuu.net]
+
   attr_reader :work_id
 
   def self.match?(url)

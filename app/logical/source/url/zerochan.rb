@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class Source::URL::Zerochan < Source::URL
+  site "Zerochan", url: "https://www.zerochan.net" do
+    credential :user_id, help: %{Your Zerochan `z_id` cookie.}
+    credential :session_cookie, help: %{Your Zerochan `z_hash` cookie.}
+  end
+
   attr_reader :full_image_url, :title, :size, :work_id, :filetype
 
   def self.match?(url)

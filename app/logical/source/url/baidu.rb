@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Baidu < Source::URL
+  site "Baidu", url: "https://hi.baidu.com"
+
   attr_reader :username
 
   def self.match?(url)

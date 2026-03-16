@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::AskFm < Source::URL
+  site "Ask.fm", url: "https://ask.fm"
+
   attr_reader :username
 
   def self.match?(url)

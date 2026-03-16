@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Bluesky < Source::URL
+  site "Bluesky", url: "https://bsky.app", domains: %w[bsky.app bsky.social bsky.network]
+
   attr_reader :user_did, :user_handle, :post_id
 
   def self.match?(url)

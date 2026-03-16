@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 class Source::URL::Furaffinity < Source::URL
+  site "Furaffinity" do
+    url "https://www.furaffinity.net"
+    domains %w[furaffinity.net fxraffinity.net fxfuraffinity.net vxfuraffinity.net xfuraffinity.net]
+
+    credential :cookie_a, help: %{Your Furaffinity `cookie_a` cookie. Warning: logging out of Furaffinity will invalidate these cookies.}
+    credential :cookie_b, help: %{Your Furaffinity `cookie_b` cookie. Warning: logging out of Furaffinity will invalidate these cookies.}
+  end
+
   attr_reader :work_id, :username, :filename
 
   def self.match?(url)

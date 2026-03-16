@@ -3,6 +3,13 @@
 module Source
   class URL
     class Reddit < Source::URL
+      site "Reddit" do
+        url "https://www.reddit.com"
+        domains %w[reddit.com redd.it redditmedia.com]
+
+        credential :session_cookie, help: %{Your Reddit `reddit_session` cookie.}
+      end
+
       attr_reader :subreddit, :work_id, :comment_id, :share_id, :title, :username, :full_image_url
 
       def self.match?(url)

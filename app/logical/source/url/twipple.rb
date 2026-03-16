@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Twipple < Source::URL
+  site "Twipple", url: "https://twpf.jp", domains: %w[twpl.jp twipple.jp]
+
   attr_reader :work_id, :username
 
   def self.match?(url)

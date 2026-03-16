@@ -2,6 +2,15 @@
 
 # @see Source::Extractor::Xiaohongshu
 class Source::URL::Xiaohongshu < Source::URL
+  site "Xiaohongshu" do
+    url "https://www.xiaohongshu.com"
+    domains %w[xiaohongshu.com xhscdn.com]
+
+    credential :session_cookie, help: %{Your Xiaohongshu `gid` cookie.}
+    credential :webid_cookie, help: %{Your Xiaohongshu `webId` cookie.}
+    credential :web_session_cookie, help: %{Your Xiaohongshu `web_session` cookie.}
+  end
+
   attr_reader :user_id, :post_id, :full_image_url, :xsec_token
 
   def self.match?(url)

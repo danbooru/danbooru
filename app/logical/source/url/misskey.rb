@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Misskey < Source::URL
+  site "Misskey", url: "https://misskey-hub.net", domains: %w[misskey.io misskey.art misskey.design misskeyusercontent.com misskeyusercontent.jp]
+
   attr_reader :username, :user_id, :note_id, :play_id
 
   def self.match?(url)

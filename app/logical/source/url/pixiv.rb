@@ -2,6 +2,13 @@
 
 module Source
   class URL::Pixiv < Source::URL
+    site "Pixiv" do
+      url "https://www.pixiv.net"
+      domains %w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net]
+
+      credential :phpsessid, help: %{Your Pixiv `PHPSESSID` cookie.}
+    end
+
     attr_reader :work_id, :image_hash, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame
 
     def self.match?(url)

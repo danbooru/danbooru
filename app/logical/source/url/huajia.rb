@@ -3,6 +3,8 @@
 module Source
   class URL
     class Huajia < Source::URL
+      site "Huajia", url: "https://huajia.163.com", domains: %w[163.com netease.com]
+
       attr_reader :user_id, :work_id, :goods_id, :commission_id, :cs_id, :full_image_url
 
       def self.match?(url)

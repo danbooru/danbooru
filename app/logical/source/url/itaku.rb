@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Itaku < Source::URL
+  site "Itaku", url: "https://itaku.ee"
+
   RESERVED_USERNAMES = %w[about help home tags]
 
   attr_reader :username, :image_id, :post_id, :file_id, :candidate_full_image_urls, :full_image_url

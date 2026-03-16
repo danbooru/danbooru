@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Patreon < Source::URL
+  site "Patreon", url: "https://www.patreon.com", domains: %w[patreon.com patreonusercontent.com]
+
   RESERVED_USERNAMES = %w[api bePatron c card-teaser-image collection checkout file home join
                           login m messages notifications policy posts profile search settings user]
 

@@ -2,6 +2,8 @@
 
 # The class is called `Danbooru2` instead of `Danbooru` to avoid ambiguity with the top-level `Danbooru` class.
 class Source::URL::Danbooru2 < Source::URL
+  site "Danbooru", url: "https://danbooru.donmai.us", domains: %w[donmai.us donmai.moe]
+
   attr_reader :user_id, :post_id, :md5, :image_url, :full_image_url
 
   def self.match?(url)

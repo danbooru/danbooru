@@ -2,6 +2,8 @@
 
 # @see Source::Extractor::URLShortener
 class Source::URL::URLShortener < Source::URL
+  site "URL Shortener"
+
   attr_reader :redirect_url
 
   def self.match?(url)

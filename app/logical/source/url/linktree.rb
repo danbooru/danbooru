@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Linktree < Source::URL
+  site "Linktree", url: "https://linktr.ee"
+
   attr_reader :username
 
   def self.match?(url)

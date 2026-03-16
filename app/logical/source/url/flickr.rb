@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Flickr < Source::URL
+  site "Flickr", url: "https://www.flickr.com", domains: %w[flickr.com staticflickr.com]
+
   attr_reader :username
 
   def self.match?(url)

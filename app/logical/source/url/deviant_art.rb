@@ -16,6 +16,14 @@
 
 module Source
   class URL::DeviantArt < Source::URL
+    site "Deviant Art" do
+      url "https://www.deviantart.com"
+      domains %w[deviantart.com deviantart.net fav.me sta.sh artworkfolio.com daportfolio.com wixmp.com]
+
+      credential :client_id, help: %{Your DeviantArt client ID. Go to https://www.deviantart.com/developers/ to create a new application.}
+      credential :client_secret, help: %{Your DeviantArt client secret. Go to https://www.deviantart.com/developers/ to create a new application.}
+    end
+
     RESERVED_SUBDOMAINS = %w[www]
 
     attr_reader :username, :work_id, :stash_id, :title, :file, :jwt

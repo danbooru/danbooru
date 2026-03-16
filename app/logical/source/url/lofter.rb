@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Lofter < Source::URL
+  site "Lofter", url: "https://www.lofter.com", domains: %w[lofter.com 127.net lf127.net 126.net]
+
   RESERVED_USERNAMES = %w[i uls www]
 
   attr_reader :username, :user_id, :work_id, :full_image_url

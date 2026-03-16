@@ -4,6 +4,8 @@ class Source::URL::Carrd < Source::URL
   DOMAINS = %w[carrd.co crd.co]
   RESERVED_SUBDOMAINS = [nil, "www"]
 
+  site "Carrd", url: "https://carrd.co", domains: DOMAINS
+
   attr_reader :username, :page_id, :full_image_url, :candidate_full_image_urls
 
   def self.match?(url)

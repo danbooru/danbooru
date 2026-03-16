@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Mishimmie < Source::URL
+  site "Mishimmie", url: "https://shimmie.katawa-shoujo.com"
+
   attr_reader :work_id
 
   def self.match?(url)

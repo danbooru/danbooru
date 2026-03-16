@@ -22,6 +22,8 @@
 # * http://twitpic.com/photos/Type10TK (dead)
 
 class Source::URL::TwitPic < Source::URL
+  site "TwitPic", url: "https://twitpic.com", domains: %w[twitpic.com twimg.com cloudfront.net]
+
   attr_reader :base36_id, :username
 
   def self.match?(url)

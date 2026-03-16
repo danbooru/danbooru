@@ -2,6 +2,8 @@
 
 # @see Source::URL::CiEn
 class Source::URL::Dlsite < Source::URL
+  site "DLsite", url: "https://www.dlsite.com", domains: %w[dlsite.com dlsite.net dlsite.jp]
+
   attr_reader :category, :work_type, :product_id, :maker_id, :author_id
 
   def self.match?(url)

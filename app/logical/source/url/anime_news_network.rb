@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::AnimeNewsNetwork < Source::URL
+  site "Anime News Network", url: "https://www.animenewsnetwork.com", domains: %w[animenewsnetwork.com animenewsnetwork.cc]
+
   attr_reader :user_id
 
   def self.match?(url)

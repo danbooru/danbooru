@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::DcInside < Source::URL
+  site "DC Inside", url: "https://www.dcinside.com", domains: %w[dcinside.co.kr dcinside.com]
+
   attr_reader :full_image_url, :board_name, :post_id, :user_name
 
   def self.match?(url)

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Gumroad < Source::URL
+  site "Gumroad", url: "https://gumroad.com", domains: %w[gumroad.com gum.co]
+
   RESERVED_USERNAMES = %w[www public-files assets static-2 app discover features pricing university blog login signup terms privacy]
 
   attr_reader :username, :product_id, :post_id, :image_id, :short_id

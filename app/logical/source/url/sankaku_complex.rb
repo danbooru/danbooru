@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::SankakuComplex < Source::URL
+  site "Sankaku Complex", url: "https://chan.sankakucomplex.com"
+
   attr_reader :md5
 
   def self.match?(url)

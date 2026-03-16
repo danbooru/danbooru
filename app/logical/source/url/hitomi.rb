@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Hitomi < Source::URL
+  site "Hitomi", url: "https://hitomi.la"
+
   attr_reader :gallery_id, :image_id
 
   def self.match?(url)

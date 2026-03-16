@@ -8,6 +8,7 @@
 #
 # To add a new site, create a subclass of Source::URL and implement `#match?` to define
 # which URLs belong to the site, and `#parse` to parse and extract information from the URL.
+# Use `site` to define which site(s) are supported by the class.
 #
 # The following methods should be implemented by subclasses:
 #
@@ -16,6 +17,7 @@
 # * image_url?
 # * page_url
 # * profile_url
+# * source_site (if the class supports more than one site)
 #
 # Source::URL is a subclass of Danbooru::URL, so it inherits some common utility methods
 # from there.
@@ -29,6 +31,21 @@
 # @see Danbooru::URL
 module Source
   class URL < Danbooru::URL
+    # @return [Array<Source::Site>] The list of sites handled by this class.
+    class_attribute :sites
+
+    # True if all URL subclasses have been loaded and don't need to be loaded again.
+    class_attribute :subclasses_loaded, default: false
+
+    # The autoloader used to load Source::URL subclasses.
+    class_attribute :autoloader, default: Zeitwerk::Loader
+
+    # A macro that defines a new site with the given name and options.
+    def self.site(name, **options, &block)
+      self.sites ||= []
+      self.sites << Site.new(name: name, url_class: self, **options, &block)
+    end
+
     SUBCLASSES = [
       Source::URL::Pixiv,
       Source::URL::Twitter,
@@ -193,6 +210,12 @@ module Source
     # @return [Source::Extractor, nil] The extractor for this URL, or nil if one doesn't exist.
     def extractor(**)
       extractor_class&.new(self, **)
+    end
+
+    # @return [Source::Site, nil] The site this URL belongs to. This should be overridden to return the right site if
+    #   the URL class handles multiple sites.
+    def source_site
+      self.class.sites.sole if self.class.sites.one?
     end
 
     # The name of the site this URL belongs to.

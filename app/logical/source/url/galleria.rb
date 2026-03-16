@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Galleria < Source::URL
+  site "Galleria", url: "https://galleria.emotionflow.com", domains: %w[emotionflow.com]
+
   attr_reader :user_id, :post_id, :full_image_url
 
   def self.match?(url)

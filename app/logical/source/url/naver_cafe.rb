@@ -3,6 +3,8 @@
 # @see https://cafe.naver.com
 # @see https://raw.githubusercontent.com/qsniyg/maxurl/master/src/userscript.ts#:~:text=pstatic.net
 class Source::URL::NaverCafe < Source::URL
+  site "Naver Cafe", url: "https://cafe.naver.com", domains: %w[naver.com naver.net pstatic.net]
+
   attr_reader :full_image_url, :club_name, :club_id, :article_id, :member_id
 
   def self.match?(url)

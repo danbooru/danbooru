@@ -6,6 +6,8 @@
 # https://instagram.fgyn2-1.fna.fbcdn.net/v/t51.2885-15/260126945_125485689990401_3753783352853967169_n.webp?stp=dst-jpg_e35_s750x750_sh0.08&_nc_ht=instagram.fgyn2-1.fna.fbcdn.net&_nc_cat=105&_nc_ohc=7njl7WM7D1cAX_oe4xv&tn=ZvUMUWKqovKgvpX-&edm=AABBvjUBAAAA&ccb=7-4&ig_cache_key=Mjc2NTM3ODUzMDE2MTA4OTMyNw==.2-ccb7-4&oh=00_AT9T3WAiFaHEf1labFFZiXHjy-8nacOA13AWl6hDEPz_EQ&oe=6230B686&_nc_sid=83d603
 
 class Source::URL::Instagram < Source::URL
+  site "Instagram", url: "https://www.instagram.com", domains: %w[instagram.com instagr.am cdninstagram.com]
+
   attr_reader :username, :user_id, :work_id
 
   def self.match?(url)

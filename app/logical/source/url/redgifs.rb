@@ -2,6 +2,8 @@
 
 # @see Source::Extractor::Redgifs
 class Source::URL::Redgifs < Source::URL
+  site "Redgifs", url: "https://www.redgifs.com"
+
   attr_reader :gif_id, :username, :file_url
 
   def self.match?(url)

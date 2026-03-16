@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Enty < Source::URL
+  site "Enty", url: "https://enty.jp", domains: %w[enty.jp amazonaws.com]
+
   RESERVED_NAMES = %w[blogs en messages posts products ranking search series service_navigations signout titles users]
 
   attr_reader :work_id, :image_id, :username, :user_id, :file

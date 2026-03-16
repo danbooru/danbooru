@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Skeb < Source::URL
+  site "Skeb", url: "https://skeb.jp", domains: %w[skeb.jp imgix.net amazonaws.com]
+
   RESERVED_USERNAMES = %w[works users about terms creator client company]
 
   attr_reader :username, :illust_id, :work_id, :image_id, :image_uuid

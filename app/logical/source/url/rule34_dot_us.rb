@@ -5,6 +5,8 @@
 #
 # @see Source::URL::Gelbooru
 class Source::URL::Rule34DotUs < Source::URL
+  site "Rule34.us", url: "https://rule34.us"
+
   attr_reader :post_id, :md5, :image_type, :full_image_url
 
   def self.match?(url)

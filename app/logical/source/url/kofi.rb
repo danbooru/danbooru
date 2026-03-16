@@ -2,6 +2,8 @@
 
 # @see Source::Extractor::Kofi
 class Source::URL::Kofi < Source::URL
+  site "Kofi", url: "https://ko-fi.com", domains: %w[ko-fi.com msecnd.net azurewebsites.net]
+
   RESERVED_USERNAMES = %w[c i s about account album cdn commissions discord explore gallery gold memberships post privacy shop terms]
 
   attr_reader :full_image_url, :username, :user_id, :gallery_item_id, :shop_item_id, :commission_id, :post_id, :album_id, :slug

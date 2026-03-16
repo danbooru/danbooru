@@ -9,6 +9,8 @@
 module Source
   class URL
     class Bilibili < Source::URL
+      site "Bilibili", url: "https://www.bilibili.com", domains: %w[bilibili.com biliimg.com hdslb.com]
+
       attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id
 
       def self.match?(url)

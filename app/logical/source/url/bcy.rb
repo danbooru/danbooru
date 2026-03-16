@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Bcy < Source::URL
+  site "Bcy", url: "https://bcy.net", domains: %w[bcy.net bcyimg.com]
+
   attr_reader :drawer_id, :date, :page_url, :profile_url, :full_image_url
 
   def self.match?(url)

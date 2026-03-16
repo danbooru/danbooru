@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 class Source::URL::Inkbunny < Source::URL
+  site "Inkbunny" do
+    url "https://inkbunny.net"
+    domains %w[inkbunny.net metapix.net]
+
+    credential :username, help: %{Your Inkbunny username.}
+    credential :password, help: %{Your Inkbunny password. Go to https://inkbunny.net/account.php and enable API access, then go to https://inkbunny.net/userrate.php and enable all ratings.}
+  end
+
   attr_reader :username, :user_id, :submission_id
 
   def self.match?(url)

@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Source::URL::Tumblr < Source::URL
+  site "Tumblr", url: "https://www.tumblr.com" do
+    credential :consumer_key, help: %{Your Tumblr consumer key. Register a new application at https://www.tumblr.com/oauth/register then copy your consumer key from https://www.tumblr.com/oauth/apps.}
+  end
+
   IMAGE_SIZES = %w[1280 720 640 540 500h 500 400 250 100]
   RESERVED_NAMES = %w[about app blog dashboard developers explore jobs login logo policy press register security tagged tips]
 

@@ -11,22 +11,26 @@ class Source::URL::Twitter < Source::URL
 
   # fxtwitter.com, etc are from https://github.com/FixTweet/FxTwitter, a proxy for better embedding
   # nitter.net, xcancel etc are from https://github.com/zedeus/nitter, a privacy-focused frontend
-  TWITTER_PROXY_DOMAINS = %w[fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com nitter.net xcancel.com]
-  TWITTER_PROXY_HOSTS = %w[nitter.poast.org nitter.privacydev.net]
+  DOMAINS = %w[twitter.com twimg.com x.com] + %w[fxtwitter.com vxtwitter.com twittpr.com fixvx.com fixupx.com nitter.net xcancel.com]
+  HOSTS = %w[nitter.poast.org nitter.privacydev.net]
 
   # Unix time in milliseconds that must be added to the snowflake ID's timestamp.
   TWITTER_EPOCH = 1_288_834_974_657 # 2010-11-04T01:42:54.657000Z
+
+  site "Twitter" do
+    url "https://x.com"
+    domains DOMAINS + %w[poast.org privacydev.net]
+
+    credential :auth_token, help: %{Your Twitter `auth_token` cookie.}
+    credential :csrf_token, help: %{Your Twitter `ct0` cookie.}
+  end
 
   attr_reader :status_id, :username, :user_id, :full_image_url, :base10_snowflake_id, :base64_snowflake_id, :timestamp
 
   def self.match?(url)
     # https://o.twimg.com URLs are handled by Source::URL::TwitPic.
     # https://pic.twitter.com and https://t.co URLs are handled by Source::URL::URLShortener.
-    (url.domain.in?(%w[twitter.com twimg.com x.com]) && !url.host.in?(%w[o.twimg.com pic.twitter.com pic.x.com])) || is_twitter_proxy?(url)
-  end
-
-  def self.is_twitter_proxy?(url)
-    url.domain.in?(TWITTER_PROXY_DOMAINS) || url.host.in?(TWITTER_PROXY_HOSTS)
+    (url.domain.in?(DOMAINS) || url.host.in?(HOSTS)) && !Source::URL::TwitPic.match?(url) && !Source::URL::URLShortener.match?(url)
   end
 
   def parse
