@@ -46,129 +46,6 @@ module Source
       self.sites << Site.new(name: name, url_class: self, **options, &block)
     end
 
-    SUBCLASSES = [
-      Source::URL::Pixiv,
-      Source::URL::Twitter,
-      Source::URL::ArtStation,
-      Source::URL::Booth,
-      Source::URL::DeviantArt,
-      Source::URL::Fanbox,
-      Source::URL::Fandom,
-      Source::URL::Fantia,
-      Source::URL::Fc2,
-      Source::URL::Foundation,
-      Source::URL::Gelbooru,
-      Source::URL::HentaiFoundry,
-      Source::URL::Instagram,
-      Source::URL::Lofter,
-      Source::URL::Mastodon,
-      Source::URL::Moebooru,
-      Source::URL::NicoSeiga,
-      Source::URL::Nijie,
-      Source::URL::Newgrounds,
-      Source::URL::PixivSketch,
-      Source::URL::Plurk,
-      Source::URL::Reddit,
-      Source::URL::Skeb,
-      Source::URL::Tinami,
-      Source::URL::Tumblr,
-      Source::URL::TwitPic,
-      Source::URL::Weibo,
-      Source::URL::Anifty,
-      Source::URL::Furaffinity,
-      Source::URL::Bilibili,
-      Source::URL::Rule34DotUs,
-      Source::URL::FourChan,
-      Source::URL::Picdig,
-      Source::URL::Enty,
-      Source::URL::ArcaLive,
-      Source::URL::Imgur,
-      Source::URL::Zerochan,
-      Source::URL::Poipiku,
-      Source::URL::AboutMe,
-      Source::URL::ArtStreet,
-      Source::URL::Gumroad,
-      Source::URL::Misskey,
-      Source::URL::Xfolio,
-      Source::URL::CiEn,
-      Source::URL::Inkbunny,
-      Source::URL::E621,
-      Source::URL::Bluesky,
-      Source::URL::Danbooru2,
-      Source::URL::Pinterest,
-      Source::URL::Foriio,
-      Source::URL::Itaku,
-      Source::URL::Postype,
-      Source::URL::Artistree,
-      Source::URL::Galleria,
-      Source::URL::Dotpict,
-      Source::URL::Discord,
-      Source::URL::Opensea,
-      Source::URL::Behance,
-      Source::URL::Cohost,
-      Source::URL::Piapro,
-      Source::URL::MyPortfolio,
-      Source::URL::Note,
-      Source::URL::PixivComic,
-      Source::URL::NaverBlog,
-      Source::URL::NaverCafe,
-      Source::URL::NaverPost,
-      Source::URL::Xiaohongshu,
-      Source::URL::Patreon,
-      Source::URL::Blogger,
-      Source::URL::Vk,
-      Source::URL::Google,
-      Source::URL::Youtube,
-      Source::URL::Bcy,
-      Source::URL::URLShortener,
-      Source::URL::Redgifs,
-      Source::URL::Carrd,
-      Source::URL::Toyhouse,
-      Source::URL::Skland,
-      Source::URL::Miyoushe,
-      Source::URL::Grafolio,
-      Source::URL::Kakao,
-      Source::URL::Tistory,
-      Source::URL::Kofi,
-      Source::URL::Allmylinks,
-      Source::URL::Ameba,
-      Source::URL::Anidb,
-      Source::URL::AnimeNewsNetwork,
-      Source::URL::AskFm,
-      Source::URL::Baidu,
-      Source::URL::DiaryPro,
-      Source::URL::Doujinantena,
-      Source::URL::EHentai,
-      Source::URL::EShuushuu,
-      Source::URL::Flickr,
-      Source::URL::Hitomi,
-      Source::URL::Imgbb,
-      Source::URL::Karabako,
-      Source::URL::Linktree,
-      Source::URL::Mishimmie,
-      Source::URL::Minitokyo,
-      Source::URL::Minus,
-      Source::URL::NijigenDaiaru,
-      Source::URL::Paheal,
-      Source::URL::Photozou,
-      Source::URL::SankakuComplex,
-      Source::URL::Tiktok,
-      Source::URL::Toranoana,
-      Source::URL::Twipple,
-      Source::URL::Yfrog,
-      Source::URL::PixivFactory,
-      Source::URL::Pixellent,
-      Source::URL::Odaibako,
-      Source::URL::Facebook,
-      Source::URL::DcInside,
-      Source::URL::Marshmallow,
-      Source::URL::Huashijie,
-      Source::URL::Mihuashi,
-      Source::URL::Privatter,
-      Source::URL::Huajia,
-      Source::URL::Dlsite,
-    ]
-
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
     #
     # @param url [String, Danbooru::URL]
@@ -177,7 +54,7 @@ module Source
       return url if url.is_a?(Source::URL)
 
       url = Danbooru::URL.parse!(url)
-      subclass = SUBCLASSES.find { |c| c.match?(url) } || Source::URL::Null
+      subclass = url_subclasses.find { |c| c.match?(url) } || Source::URL::Null
       subclass.new(url)
     end
 
@@ -196,6 +73,12 @@ module Source
     # @param url [Danbooru::URL] The source URL.
     def self.match?(url)
       raise NotImplementedError
+    end
+
+    # @return [Array<Source::URL>] The set of Source::URL subclasses. Loaded lazily on demand.
+    def self.url_subclasses
+      self.subclasses_loaded ||= autoloader&.eager_load_namespace(Source::URL).present?
+      Source::URL.descendants.excluding(Source::URL::Null)
     end
 
     # Return the extractor class to use for this URL. By default, it's the Source::Extractor subclass with the same name
