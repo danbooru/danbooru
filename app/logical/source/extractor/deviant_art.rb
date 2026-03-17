@@ -55,8 +55,12 @@ module Source
         if base_url.present? && full_token.present?
           Source::URL::DeviantArt.parse("#{base_url}?token=#{full_token}")&.full_image_url
         elsif base_url.present? && sample_token.present?
-          v1_path = media["types"].to_a.pick("c").gsub(/<prettyName>[^.]*/, media["prettyName"])
-          Source::URL::DeviantArt.parse("#{base_url}#{v1_path}?token=#{sample_token}")&.full_image_url
+          types = media["types"].to_a
+          best_type = types.find { |type| type["t"] == "fullview" } || types.max_by { |type| type["w"].to_i * type["h"].to_i }
+          v1_path = best_type.to_h["c"]&.gsub("<prettyName>", media["prettyName"])
+          sample_url = "#{base_url}#{v1_path}?token=#{sample_token}"
+
+          Source::URL::DeviantArt.parse(sample_url)&.full_image_url
         else
           base_url
         end
@@ -262,7 +266,8 @@ module Source
       end
 
       memoize def page
-        http.cache(1.minute).parsed_get(page_url_from_image_url, follow: { max_hops: 1 })
+        auth_http = http.cookies(auth: credentials[:auth], auth_secure: credentials[:auth_secure], userinfo: credentials[:userinfo])
+        auth_http.cache(1.minute).parsed_get(page_url_from_image_url, follow: { max_hops: 1 })
       end
 
       memoize def uuid

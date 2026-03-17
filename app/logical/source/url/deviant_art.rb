@@ -22,6 +22,9 @@ module Source
 
       credential :client_id, help: %{Your DeviantArt client ID. Go to https://www.deviantart.com/developers/ to create a new application.}
       credential :client_secret, help: %{Your DeviantArt client secret. Go to https://www.deviantart.com/developers/ to create a new application.}
+      credential :auth, help: %{Your DeviantArt `auth` cookie.}
+      credential :auth_secure, help: %{Your DeviantArt `auth_secure` cookie.}
+      credential :userinfo, help: %{Your DeviantArt `userinfo` cookie.}
     end
 
     extractors { [Source::Extractor::DeviantArt, Source::Extractor::URLShortener] }

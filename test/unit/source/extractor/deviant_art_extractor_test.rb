@@ -223,7 +223,7 @@ module Source::Tests::Extractor
     context "A deviantart page with download disabled for a huge file" do
       strategy_should_work(
         "https://www.deviantart.com/anatofinnstark/art/The-Blade-of-Miquella-914166242",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/3d079e1f-386b-4bd0-84fc-cce9913fbc0c/df49r6q-b19fcb03-8c2e-4638-8c12-98d443c7ee33\.jpg/v1/fill/w_900,h_507/the_blade_of_miquella_by_anatofinnstark_df49r6q\.jpg\?token=}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/3d079e1f-386b-4bd0-84fc-cce9913fbc0c/df49r6q-b19fcb03-8c2e-4638-8c12-98d443c7ee33\.jpg/v1/fill/w_900,h_507/the_blade_of_miquella_by_anatofinnstark_df49r6q-fullview\.jpg\?token=}],
         media_files: [{ file_size: 155_461, width: 900, height: 507 }],
         page_url: "https://www.deviantart.com/anatofinnstark/art/The-Blade-of-Miquella-914166242",
         display_name: "AnatoFinnstark",
@@ -240,6 +240,31 @@ module Source::Tests::Extractor
           Common print : "www.redbubble.com/fr/shop/ap/1…":[https://www.redbubble.com/fr/shop/ap/109026235?ref=studio-promote]
           Displate : "displate.com/anatofinnstark/el…":[https://displate.com/anatofinnstark/eldensouls?art=5eec73f09ab12]
         EOS
+      )
+    end
+
+    context "A deviantart page with a blurred sample URL" do
+      strategy_should_work(
+        "https://www.deviantart.com/snack20/art/Ophelia-and-Hannah-Commission-1209125284",
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/9db3eda4-8fde-4d93-b89b-e3ae7a54d795/djzvr1g-78e3c8b6-7ee2-4d3c-88ca-6843749dfacc\.jpg/v1/fill/w_1280,h_1600/ophelia_and_hannah___commission_by_snack20_djzvr1g-fullview\.jpg\?token=}],
+        media_files: [{ file_size: 402_216 }],
+        page_url: "https://www.deviantart.com/snack20/art/Ophelia-and-Hannah-Commission-1209125284",
+        profile_urls: %w[https://www.deviantart.com/snack20],
+        display_name: "snack20",
+        username: "snack20",
+        published_at: Time.parse("2025-06-21T02:34:14.000000Z"),
+        updated_at: nil,
+        tags: [
+          ["anime", "https://www.deviantart.com/tag/anime"],
+          ["commission", "https://www.deviantart.com/tag/commission"],
+          ["cute", "https://www.deviantart.com/tag/cute"],
+          ["latex", "https://www.deviantart.com/tag/latex"],
+          ["oc", "https://www.deviantart.com/tag/oc"],
+          ["shiny", "https://www.deviantart.com/tag/shiny"],
+          ["suit", "https://www.deviantart.com/tag/suit"],
+        ],
+        dtext_artist_commentary_title: "Ophelia and Hannah | Commission",
+        dtext_artist_commentary_desc: "They're trying on some suits!",
       )
     end
 

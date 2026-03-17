@@ -486,6 +486,21 @@ module Danbooru
       nil
     end
 
+    # Your DeviantArt `auth` cookie.
+    def deviantart_auth_cookie
+      nil
+    end
+
+    # Your DeviantArt `auth_secure` cookie.
+    def deviantart_auth_secure_cookie
+      nil
+    end
+
+    # Your DeviantArt `userinfo` cookie.
+    def deviantart_userinfo_cookie
+      nil
+    end
+
     # http://tinysubversions.com/notes/mastodon-bot/
     def pawoo_access_token
       nil

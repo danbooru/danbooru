@@ -35,8 +35,8 @@ class SiteCredential < ApplicationRecord
     {
       id: 800,
       name: "Deviant Art",
-      default_credential: { client_id: Danbooru.config.deviantart_client_id, client_secret: Danbooru.config.deviantart_client_secret },
-      help: %{Your "DeviantArt":https://www.deviantart.com client ID and client secret. Go to https://www.deviantart.com/developers/ to create a new application.},
+      default_credential: { client_id: Danbooru.config.deviantart_client_id, client_secret: Danbooru.config.deviantart_client_secret, auth: Danbooru.config.deviantart_auth_cookie, auth_secure: Danbooru.config.deviantart_auth_secure_cookie, userinfo: Danbooru.config.deviantart_userinfo_cookie },
+      help: %{Your "DeviantArt":https://www.deviantart.com 'client_id' and 'cilent_secret' from https://www.deviantart.com/developers/, and your 'auth', 'auth_secure', and 'userinfo' cookies.},
     }, {
       id: 900,
       name: "Fantia",
