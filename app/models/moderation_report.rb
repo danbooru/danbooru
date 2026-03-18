@@ -11,6 +11,8 @@ class ModerationReport < ApplicationRecord
   belongs_to :creator, class_name: "User"
   has_many :mod_actions, as: :subject, dependent: :destroy
 
+  normalizes :reason, with: ->(reason) { reason.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   before_validation(on: :create) { model.lock! }
   validates :reason, visible_string: true
   validates :model_type, inclusion: { in: MODEL_TYPES }

@@ -7,6 +7,8 @@ class Note < ApplicationRecord
 
   belongs_to :post
   has_many :versions, -> { order("note_versions.id ASC") }, class_name: "NoteVersion", dependent: :destroy
+  normalizes :body, with: ->(body) { body.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   validates :x, presence: true
   validates :y, presence: true
   validates :width, presence: true

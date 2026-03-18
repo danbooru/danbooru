@@ -76,7 +76,7 @@ module Danbooru
       # Normalize horizontal and vertical whitespace characters, and strip zero-width space characters.
       #
       # https://en.wikipedia.org/wiki/Whitespace_character
-      def normalize_whitespace(eol: "\r\n")
+      def normalize_whitespace(eol: "\n")
         strip_zwsp.normalize_spaces.normalize_eol(eol)
       end
 
@@ -90,8 +90,8 @@ module Danbooru
         gsub(/\p{Zs}|\t/, " ")
       end
 
-      # Normalize various line ending characters to CRLF.
-      def normalize_eol(eol = "\r\n")
+      # Normalize various line ending characters to LF.
+      def normalize_eol(eol = "\n")
         gsub(/\r?\n|\r|\v|\f|\u0085|\u2028|\u2029/, eol)
       end
 

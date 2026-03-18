@@ -6,6 +6,8 @@ class Dmail < ApplicationRecord
   # defines :dtext_body
   dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
 
+  normalizes :title, :body, with: ->(text) { text.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
   validates :body, visible_string: true, length: { maximum: 50_000 }, if: :body_changed?
 

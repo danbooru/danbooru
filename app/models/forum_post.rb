@@ -20,6 +20,8 @@ class ForumPost < ApplicationRecord
   has_one :tag_implication
   has_one :bulk_update_request
 
+  normalizes :body, with: ->(body) { body.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   validates :body, visible_string: true, length: { maximum: 200_000 }, if: :body_changed?
   validate :validate_deletion_of_original_post
   validate :validate_undeletion_of_post
