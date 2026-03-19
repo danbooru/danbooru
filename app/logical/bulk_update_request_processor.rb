@@ -377,7 +377,13 @@ class BulkUpdateRequestProcessor
       "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
 
     when :mass_update
-      "mass update {{#{args[0]}}} -> {{#{args[1]}}}"
+      lhs = PostQuery.normalize(args[0], apply_aliases: false)
+      rhs = PostQuery.normalize(args[1], apply_aliases: false)
+
+      lhs_link = lhs.is_simple_tag? ? "[[#{args[0]}]]" : "{{#{args[0]}}}"
+      rhs_link = rhs.is_simple_tag? ? "[[#{args[1]}]]" : "{{#{args[1]}}}"
+
+      "mass update #{lhs_link} -> #{rhs_link}"
 
     when :nuke
       if PostQuery.normalize(args[0]).is_simple_tag?

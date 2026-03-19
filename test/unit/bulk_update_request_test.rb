@@ -521,6 +521,19 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't mass update {{(foo}} -> {{bar}} (the search {{(foo}} has a syntax error)"], @bur.errors.full_messages)
         end
+
+        should "render simple tags as wiki links in dtext" do
+          @bur = build(:bulk_update_request, script: "mass update bunny_ears -> rabbit_ears")
+          create(:tag_alias, consequent_name: "bunny_ears", antecedent_name: "rabbit_ears")
+
+          assert_equal("mass update [[bunny_ears]] -> [[rabbit_ears]]", @bur.processor.to_dtext)
+        end
+
+        should "render complex queries as search links in dtext" do
+          @bur = build(:bulk_update_request, script: "mass update source:imageboard -> source:Imageboard")
+
+          assert_equal("mass update {{source:imageboard}} -> {{source:Imageboard}}", @bur.processor.to_dtext)
+        end
       end
 
       context "the rename command" do

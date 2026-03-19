@@ -1792,5 +1792,25 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_equal(0, PostQuery.new("comm:#{@user.name}").fast_count)
       end
     end
+
+    context "PostQuery#normalize" do
+      should "apply aliases by default when normalizing queries" do
+        create(:tag_alias, antecedent_name: "bunny_ears", consequent_name: "rabbit_ears")
+
+        assert_equal("rabbit_ears", PostQuery.normalize("bunny_ears").to_s)
+      end
+
+      should "allow aliases to be skipped when normalizing queries" do
+        create(:tag_alias, antecedent_name: "bunny_ears", consequent_name: "rabbit_ears")
+
+        assert_equal("bunny_ears", PostQuery.normalize("bunny_ears", apply_aliases: false).to_s)
+      end
+
+      should "normalize complex queries" do
+        post_query = PostQuery.normalize(" ~bunny_ears  ~source:imageboard ")
+
+        assert_equal("bunny_ears or source:imageboard", post_query.to_s)
+      end
+    end
   end
 end

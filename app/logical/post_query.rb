@@ -26,17 +26,22 @@ class PostQuery
   alias_method :safe_mode?, :safe_mode
   alias_method :to_s, :to_infix
 
-  # Return a new PostQuery with aliases replaced.
-  def self.normalize(search, ...)
+  # @param search [String] The search string.
+  # @param apply_aliases [Boolean] Whether aliased tags should be resolved.
+  # @return [PostQuery] A new PostQuery for the search.
+  def self.normalize(search, apply_aliases: true, **options)
     search = search.to_s.strip
 
     # Optimize zero tag and single tag searches
     if search.blank?
-      PostQuery.new(AST.all, ...)
+      PostQuery.new(AST.all, **options)
     elsif search.match?(%r{\A[a-zA-Z0-9][a-zA-Z0-9();/+!?&'._~-]*\z}) && !search.downcase.in?(["and", "or"])
-      PostQuery.new(AST.tag(search), ...).replace_aliases
+      post_query = PostQuery.new(AST.tag(search), **options)
+      apply_aliases ? post_query.replace_aliases : post_query
     else
-      PostQuery.new(search, ...).replace_aliases.rewrite_opts.trim
+      post_query = PostQuery.new(search, **options)
+      post_query = post_query.replace_aliases if apply_aliases
+      post_query.rewrite_opts.trim
     end
   end
 
