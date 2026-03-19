@@ -1,5 +1,6 @@
 class AddSourceIndicesToUploadMediaAssets < ActiveRecord::Migration[8.0]
   include MigrationHelpers
+
   disable_ddl_transaction!
 
   def change
@@ -25,5 +26,16 @@ class AddSourceIndicesToUploadMediaAssets < ActiveRecord::Migration[8.0]
         execute "DROP INDEX index_upload_media_assets_on_user_id_and_source_url"
       end
     end
+  rescue StandardError
+    warn ""
+    warn "-" * 40
+    warn ""
+    warn "Manual steps are needed to complete this migration."
+    warn "Run `bin/rails dbconsole -p < script/fixes/141_populate_upload_media_assets_user.sql`, then re-run `bin/rails db:migrate`."
+    warn ""
+    warn "-" * 40
+    warn ""
+
+    raise
   end
 end
