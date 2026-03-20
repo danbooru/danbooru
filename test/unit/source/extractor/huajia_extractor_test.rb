@@ -84,7 +84,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://huajia.163.com/main/goods/details/vE7jk9OB",
         image_urls: %w[
-          https://huajia.fp.ps.netease.com/file/69a662b40c6682b0eb83ee70PmcW9ktQ07
+          https://huajia.fp.ps.netease.com/file/69bb7abde5fa8e66539a7f3dD8EhqrKa07
           https://huajia.fp.ps.netease.com/file/69a662bd9aa7bac87d9593c14OhuAm3h07
           https://huajia.fp.ps.netease.com/file/6778c2c0414c2243f3ad3e79MA1xiwdE06
           https://huajia.fp.ps.netease.com/file/676baac6fc8a03b6fde804c0agjmSjub06
@@ -93,7 +93,7 @@ module Source::Tests::Extractor
           https://huajia.fp.ps.netease.com/file/676bac88bef42428182ad9c7tQ6Io3Yb06
         ],
         media_files: [
-          { file_size: 334_665 },
+          { file_size: 347_062 },
           { file_size: 444_768 },
           { file_size: 496_969 },
           { file_size: 385_295 },

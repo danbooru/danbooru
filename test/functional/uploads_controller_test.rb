@@ -465,7 +465,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal(5, upload.media_asset_count)
           assert_equal(5, upload.upload_media_assets.size)
-          assert_equal("file://ugoira.zip/000000.jpg", upload.upload_media_assets[0].source_url)
+          assert_equal(5.times.map { |n| "file://ugoira.zip/00000#{n}.jpg" }, upload.upload_media_assets.order(:id).map(&:source_url))
         end
 
         should "upload the files in filename order" do

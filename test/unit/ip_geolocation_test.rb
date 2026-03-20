@@ -47,7 +47,7 @@ class IpGeolocationTest < ActiveSupport::TestCase
         assert_equal("FR", @ip.country)
         # assert_equal("FR-OCC", @ip.region)
         # assert_equal("Argenteuil", @ip.city)
-        assert_nil(@ip.carrier)
+        assert_equal("Free", @ip.carrier)
       end
 
       should "work for a mobile IP" do

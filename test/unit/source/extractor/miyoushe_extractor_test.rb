@@ -152,13 +152,15 @@ module Source::Tests::Extractor
             ["镇×偃月叩晓", "https://www.miyoushe.com/sr/topicDetail/2295"],
             ["V8.7时岁叩晓", "https://www.miyoushe.com/sr/topicDetail/2296"],
           ],
-          dtext_artist_commentary_title: "新年快乐~",
+          dtext_artist_commentary_title: "【V8.7同人图】新年快乐~",
           dtext_artist_commentary_desc: <<~EOS.chomp,
             还得是画这种让我身心愉悦鸭！
 
             鸭鸭：💡
 
             提前祝各位新年快乐~
+
+            UID:33031356
           EOS
         )
       end

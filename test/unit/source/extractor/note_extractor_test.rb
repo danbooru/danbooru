@@ -89,7 +89,13 @@ module Source::Tests::Extractor
           ["Skeb", "https://note.com/hashtag/Skeb"],
         ],
         dtext_artist_commentary_title: "ドゥーちゃん設定画",
-        dtext_artist_commentary_desc: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "[image]":[https://assets.st-note.com/img/1644650226241-bzIA1lJqZ5.jpg]
+
+          "[image]":[https://assets.st-note.com/img/1644650226235-KvbOotyDxw.jpg]
+
+          "[image]":[https://assets.st-note.com/img/1644650226282-CHFfsrvUqu.jpg]
+        EOS
       )
     end
 

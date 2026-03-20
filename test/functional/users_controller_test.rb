@@ -3,7 +3,7 @@ require "test_helper"
 class UsersControllerTest < ActionDispatch::IntegrationTest
   context "The users controller" do
     setup do
-      @user = create(:user, name: "bob")
+      @user = create(:user)
     end
 
     context "index action" do

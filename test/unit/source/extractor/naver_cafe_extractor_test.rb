@@ -164,7 +164,7 @@ module Source::Tests::Extractor
 
           감사합니담 :D !
 
-          [b][출처][/b] "섀댄 그려봤습니다 (던파카페 -던카(던전앤파이터 커뮤니티 &아트스킨 &아이템거래))":[http://cafe.naver.com/dfither/10843674] |[b]작성자[/b] "Chyan":[http://cafe.naver.com/dfither.cafe?iframe_url=/CafeMemberNetworkView.nhn%3Fm=view%26memberid=qleleldhcks]
+          [b][출처][/b] "섀댄 그려봤습니다 (던파카페 -던카(던전앤파이터 커뮤니티 &아트스킨 &아이템거래))":[http://cafe.naver.com/dfither/10843674] |[b]작성자[/b] "Chyan":[http://cafe.naver.com/dfither.cafe?iframe_url=/CafeMemberNetworkView.nhn%3Fm=view%26memberid=qlel****]
 
           [b]<던전앤파이터 아트게시판 공지>[/b]
 

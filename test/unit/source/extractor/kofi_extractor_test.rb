@@ -77,43 +77,26 @@ module Source::Tests::Extractor
 
     context "A commission page" do
       strategy_should_work(
-        "https://ko-fi.com/c/840131e57b",
+        "https://ko-fi.com/c/661ac8fb64",
         image_urls: %w[
-          https://storage.ko-fi.com/cdn/useruploads/display/ef2548c2-557c-43e1-b41d-60fe3fc1afd1_polytrixval.png
-          https://storage.ko-fi.com/cdn/useruploads/display/f25dfbd2-6c60-494f-8b17-d9d64695b271_aleepy.png
-          https://storage.ko-fi.com/cdn/useruploads/display/6226ed79-6f11-4852-a125-2fc4ed13f2df_woody2.png
-          https://storage.ko-fi.com/cdn/useruploads/display/116f8a7c-10b0-4d1d-a1b0-158ccaa7a631_untitled_artwork45.png
-          https://storage.ko-fi.com/cdn/useruploads/display/e46558c9-4abd-4d02-a6f4-f7a1f4bc7798_redmira.png
-          https://storage.ko-fi.com/cdn/useruploads/display/080c7788-3a91-475d-8388-05f350c6f86d_griddlehark_cuddle.png
-          https://storage.ko-fi.com/cdn/useruploads/display/da38655c-8abd-41da-ac40-c2c4ac2c1815_dowutin.png
-          https://storage.ko-fi.com/cdn/useruploads/display/21524372-9e3d-49ab-9a8d-a80de5c91f9d_gid.png
-          https://storage.ko-fi.com/cdn/useruploads/display/9454bbc0-e4f9-40a0-bd13-4535139399d5_tis_but_a_flesh_wound.png
+          https://storage.ko-fi.com/cdn/useruploads/display/a6828a74-902b-4710-95db-19054e650a06_sketchsheet.png
+          https://storage.ko-fi.com/cdn/useruploads/display/4c04530f-e9a8-4bc2-a1f8-bea3239a7c68_040.png
+          https://storage.ko-fi.com/cdn/useruploads/display/41fca99f-82de-43a2-b0a9-d5b695a4adce_043.png
         ],
         media_files: [
-          { file_size: 908_017 },
-          { file_size: 358_442 },
-          { file_size: 310_050 },
-          { file_size: 369_178 },
-          { file_size: 965_921 },
-          { file_size: 629_853 },
-          { file_size: 323_672 },
-          { file_size: 336_695 },
-          { file_size: 525_601 },
+          { file_size: 236_658 },
+          { file_size: 213_675 },
+          { file_size: 260_235 },
         ],
-        page_url: "https://ko-fi.com/c/840131e57b",
-        profile_url: "https://ko-fi.com/gyngerwombatart",
-        profile_urls: %w[https://ko-fi.com/gyngerwombatart https://ko-fi.com/D1D61UZW1U],
-        display_name: "GyngerWombat",
-        username: "gyngerwombatart",
+        page_url: "https://ko-fi.com/c/661ac8fb64",
+        profile_urls: %w[https://ko-fi.com/ashytown https://ko-fi.com/A0A7NRL1W],
+        display_name: "AshyTown",
+        username: "ashytown",
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "[Full Render] Full Body",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          A fully rendered full body of up to three characters of your choice! NSFW content is allowed, but no Dead Dove content.
-
-          B&W by default, but color can be added on.
-        EOS
+        dtext_artist_commentary_title: "Sketches",
+        dtext_artist_commentary_desc: "A sketch of your choice. Can either be Half to Full body",
       )
     end
 
