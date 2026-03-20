@@ -40,27 +40,34 @@ module Source::Tests::Extractor
     context "A foundation image url" do
       strategy_should_work(
         "https://f8n-ipfs-production.imgix.net/QmPhpz6E9TFRpvdVTviM8Hy9o9rxrnPW5Ywj471NnSNkpi/nft.jpg",
-        image_urls: ["https://f8n-ipfs-production.imgix.net/QmPhpz6E9TFRpvdVTviM8Hy9o9rxrnPW5Ywj471NnSNkpi/nft.jpg"],
+        image_urls: %w[https://f8n-ipfs-production.imgix.net/QmPhpz6E9TFRpvdVTviM8Hy9o9rxrnPW5Ywj471NnSNkpi/nft.jpg],
         media_files: [{ file_size: 13_908_349 }],
         page_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 
     context "A foundation gif" do
       strategy_should_work(
         "https://foundation.app/@patch_oxxo/shine/1",
-        image_urls: ["https://f8n-ipfs-production.imgix.net/QmWQpt9opcue5F7Q2vTT5P5jPYo1xHhEs7RDxgXzWFHcfK/nft.gif"],
+        image_urls: %w[https://f8n-production-collection-assets.imgix.net/0xcef77277219F5d47cc5247D77caa8717E0B99cdd/1/QmWQpt9opcue5F7Q2vTT5P5jPYo1xHhEs7RDxgXzWFHcfK/nft.gif],
         media_files: [{ file_size: 52_352_138 }],
         page_url: "https://foundation.app/mint/eth/0xcef77277219F5d47cc5247D77caa8717E0B99cdd/1",
-        profile_url: "https://foundation.app/@patch_oxxo",
         profile_urls: %w[https://foundation.app/@patch_oxxo https://foundation.app/0x707063a10B41Ba676c5Ab8fcA13BF26BE8B4F49a],
         display_name: "Patch",
         username: "patch_oxxo",
-        other_names: %w[Patch patch_oxxo],
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
         dtext_artist_commentary_title: "Prologue",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          I don't like crowded trains, so I go to school a little early in the morning. That day, I closed my eyes for a moment, feeling the noise of the morning, but then I realized that I couldn't hear anything around me.
-        EOS
+        dtext_artist_commentary_desc: "I don't like crowded trains, so I go to school a little early in the morning. That day, I closed my eyes for a moment, feeling the noise of the morning, but then I realized that I couldn't hear anything around me.",
       )
     end
 
@@ -86,16 +93,38 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A work with an image URL under a subdir" do
+      strategy_should_work(
+        "https://foundation.app/mint/eth/0xA56aA69B9bb03c9db627f5483eAbf92dbF39dcDC/11",
+        image_urls: %w[https://f8n-production-collection-assets.imgix.net/1/0xA56aA69B9bb03c9db627f5483eAbf92dbF39dcDC/11/nft.jpg],
+        media_files: [{ file_size: 17_760_287 }],
+        page_url: "https://foundation.app/mint/eth/0xA56aA69B9bb03c9db627f5483eAbf92dbF39dcDC/11",
+        profile_urls: %w[https://foundation.app/@0xx1a https://foundation.app/0xb7ADE4E9c2023Ea68e7a2F1A0f62C16423Ba19F6],
+        display_name: "xiA",
+        username: "0xx1a",
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "psychedelic hues of a synthetic mind",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          echoes of lost dreams hum in electric twilight.
+          Created: Sun 16 Feb, 3:41 AM (2025)
+        EOS
+      )
+    end
+
     context "A f8n-production-collection-assets.imgix.net URL" do
       strategy_should_work(
         "https://f8n-production-collection-assets.imgix.net/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/128711/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png?q=80&auto=format%2Ccompress&cs=srgb&h=640",
+        image_urls: %w[https://f8n-production-collection-assets.imgix.net/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/128711/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png],
+        media_files: [{ file_size: 14_146_973 }],
         page_url: "https://foundation.app/mint/eth/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/128711",
-        image_urls: ["https://f8n-ipfs-production.imgix.net/QmcBfbeCMSxqYB3L1owPAxFencFx3jLzCPFx6xUBxgSCkH/nft.png"],
-        profile_url: "https://foundation.app/@mochiiimo",
-        profile_urls: ["https://foundation.app/0x7E2ef75C0C09b2fc6BCd1C68B6D409720CcD58d2", "https://foundation.app/@mochiiimo"],
+        profile_urls: %w[https://foundation.app/@mochiiimo https://foundation.app/0x7E2ef75C0C09b2fc6BCd1C68B6D409720CcD58d2],
         display_name: "Mochii",
         username: "mochiiimo",
-        other_names: %w[Mochii mochiiimo],
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
         dtext_artist_commentary_title: "Lazy evening",
         dtext_artist_commentary_desc: "A quiet evening, chilling by the sunlight after a long and busy day..",
       )
@@ -104,14 +133,15 @@ module Source::Tests::Extractor
     context "A foundation post with a video hosted on imgix" do
       strategy_should_work(
         "https://foundation.app/@huwari/~/109433",
+        image_urls: %w[https://video.prod.foundation.app/ko/Ts/QmPXiZg6JkmJnJy1LmDzqqYACzEaXudELiaJ8i5iwbkoTs/nft.mp4],
+        media_files: [{ file_size: 16_947_572 }],
         page_url: "https://foundation.app/mint/eth/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/109433",
-        image_urls: ["https://f8n-ipfs-production.imgix.net/QmPXiZg6JkmJnJy1LmDzqqYACzEaXudELiaJ8i5iwbkoTs/nft.mp4"],
-        media_files: [{ file_size: 11_265_862 }],
+        profile_urls: %w[https://foundation.app/@huwari https://foundation.app/0xaa2f2eDE4D502F59b3706d2E2dA873C8A00A3d4d],
         display_name: "ふわり",
         username: "huwari",
-        other_names: %w[ふわり huwari],
-        profile_url: "https://foundation.app/@huwari",
-        profile_urls: ["https://foundation.app/@huwari", "https://foundation.app/0xaa2f2eDE4D502F59b3706d2E2dA873C8A00A3d4d"],
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
         dtext_artist_commentary_title: "scarf",
         dtext_artist_commentary_desc: "A girl wearing a scarf.",
       )
@@ -120,20 +150,43 @@ module Source::Tests::Extractor
     context "A foundation post with a video hosted on foundation" do
       strategy_should_work(
         "https://foundation.app/@mcbess/ladies/4",
-        image_urls: ["https://assets.foundation.app/0x21Afa9aB02B6Fb7cb483ff3667c39eCdd6D9Ea73/4/nft.mp4"],
+        image_urls: %w[https://video.prod.foundation.app/0x21Afa9aB02B6Fb7cb483ff3667c39eCdd6D9Ea73/4/nft.mp4],
+        media_files: [{ file_size: 22_541_983 }],
         page_url: "https://foundation.app/mint/eth/0x21Afa9aB02B6Fb7cb483ff3667c39eCdd6D9Ea73/4",
+        profile_urls: %w[https://foundation.app/@mcbess https://foundation.app/0x6562245Fe84ff8f719E5ad7Eb6427082543EB8A6],
         display_name: "mcbess",
         username: "mcbess",
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "Bass",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          n˚4 of the Ladies collection.
+          Hand drawn animation frame by frame.
+        EOS
       )
     end
 
     context "A foundation post with a video hosted on cloudfront" do
       strategy_should_work(
         "https://foundation.app/@nixeu/foundation/109126",
-        image_urls: ["https://f8n-ipfs-production.imgix.net/QmXiCEoBLcpfvpEwAEanLXe3Tjr5ykYJFzCVfpzDDQzdBD/nft.mp4"],
+        image_urls: %w[https://video.prod.foundation.app/zd/BD/QmXiCEoBLcpfvpEwAEanLXe3Tjr5ykYJFzCVfpzDDQzdBD/nft.mp4],
+        media_files: [{ file_size: 35_098_679 }],
         page_url: "https://foundation.app/mint/eth/0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405/109126",
+        profile_urls: %w[https://foundation.app/@nixeu https://foundation.app/0xb18e4d1255C1b481c3B381A5347e12C325B9E52b],
         display_name: "NIXEU",
         username: "nixeu",
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "N I G H T F A L L",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          ⋗ Unique version.
+          ⋗ Motion version 40s [ Dusk to Night ]
+          ⋗ Collector will get the JPG 8k pixel Dusk version
+
+          If the bid reach 10ETH, the final collector will receive a transfer of the N I G H T version.
+        EOS
       )
     end
 

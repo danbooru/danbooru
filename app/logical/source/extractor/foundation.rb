@@ -9,7 +9,8 @@ module Source
           [parsed_url.full_image_url]
         elsif nft.dig("media", "url").present?
           url = nft.dig("media", "url")
-          [Source::URL.parse(url).full_image_url].compact
+          full_image_url = Source::URL.parse(url).try(:full_image_url)
+          [full_image_url || url].compact
         else
           []
         end
