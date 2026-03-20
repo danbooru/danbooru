@@ -18,7 +18,7 @@ class SessionLoader
   def initialize(request)
     @request = request
     @session = request.session
-    @ip_address = Danbooru::IpAddress.new(request.remote_ip)
+    @ip_address = Danbooru::IpAddress.parse(request.remote_ip)
     @params = request.query_parameters
   end
 

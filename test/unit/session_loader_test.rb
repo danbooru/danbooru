@@ -44,6 +44,14 @@ class SessionLoaderTest < ActiveSupport::TestCase
 
         assert_equal(true, CurrentUser.safe_mode?)
       end
+
+      should "not raise if the request has no remote ip" do
+        @request.stubs(:remote_ip).returns(nil)
+
+        assert_nothing_raised do
+          SessionLoader.new(@request).load
+        end
+      end
     end
   end
 end

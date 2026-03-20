@@ -2,6 +2,15 @@ require "test_helper"
 
 class ApplicationControllerTest < ActionDispatch::IntegrationTest
   context "The application controller" do
+    should "handle a rack request without a remote ip" do
+      env = Rack::MockRequest.env_for("/", "HTTP_HOST" => "test.host")
+      env.delete("REMOTE_ADDR")
+
+      status, = Rails.application.call(env)
+
+      assert_equal(200, status)
+    end
+
     should "return 406 Not Acceptable for a bad file extension" do
       get posts_path, params: { format: :jpg }
       assert_response 406
