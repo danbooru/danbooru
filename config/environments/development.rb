@@ -79,6 +79,29 @@ Rails.application.configure do
   end
 
   # https://bigbinary.com/blog/rails-6-adds-guard-against-dns-rebinding-attacks
-  # hxxps://github.com/rails/rails/pull/33145
-  config.hosts += [".ngrok.io", ".ngrok.app", ".ngrok.dev", ".ngrok-free.app", ".ngrok-free.dev", ".app.github.dev", ".nip.io", ".localhost", ".local", Danbooru::URL.parse!(Danbooru.config.canonical_url).host]
+  # https://guides.rubyonrails.org/configuring.html#actiondispatch-hostauthorization
+  #
+  # For security reasons, requests to dev instances are only allowed from trusted domain names. Allowing untrusted
+  # domain names would open the door to remote code execution via DNS rebinding attacks.
+
+  # `ngrok http 3000` - https://ngrok.com/docs/getting-started
+  config.hosts += [".ngrok.io", ".ngrok.app", ".ngrok.dev", ".ngrok-free.app", ".ngrok-free.dev"]
+
+  # `gh codespace create -r danbooru/danbooru` - https://docs.github.com/en/codespaces
+  config.hosts += [".app.github.dev"]
+
+  # `cloudflared tunnel --url http://localhost:3000` - https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/
+  config.hosts += [".trycloudflare.com"]
+
+  # `devtunnel host -p 3000` - https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started
+  config.hosts += [/.*\.devtunnels\.ms$/]
+
+  # http://127-0-0-1.sslip.io:3000 - https://sslip.io
+  config.hosts += [/.*\.sslip\.io/i]
+
+  # https://en.wikipedia.org/wiki/.local
+  config.hosts += [".local", Danbooru::URL.parse!(Danbooru.config.canonical_url).host]
+
+  # Allow requests sent with no `Host:` header (for `bundle exec derailed exec perf:ips`)
+  config.hosts += [nil]
 end
