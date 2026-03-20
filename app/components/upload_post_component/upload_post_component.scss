@@ -1,0 +1,68 @@
+.upload-container {
+  --edit-container-width: 480;
+
+  .media-asset-component-fit-height {
+    position: sticky;
+  }
+
+  // "Auto" docks to the bottom on tall-ish screens and to the right on wide screens. XXX We use aspect ratio >=4:3
+  // instead of >=1:1 to avoid the layout switching when the on-screen keyboard is opened in Firefox on Android.
+  &[data-dock="auto"] {
+    .upload-divider {
+      display: none;
+    }
+
+    @media (aspect-ratio >= 4/3) {
+      grid-template-columns: 1fr max-content calc(var(--edit-container-width) * 1px);
+
+      .upload-divider {
+        display: block;
+      }
+    }
+  }
+
+  &[data-dock="bottom"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content;
+    gap: 0.25rem;
+
+    .upload-divider {
+      display: none;
+    }
+  }
+
+  &[data-dock="right"] {
+    grid-template-columns: 1fr max-content calc(var(--edit-container-width) * 1px);
+  }
+
+  &[data-dock="left"] {
+    grid-template-columns: calc(var(--edit-container-width) * 1px) max-content 1fr;
+
+    // XXX The z-index is a hack to make the docking popup menu show up above the image container in Firefox.
+    .upload-edit-container  { order: 1; z-index: 1; }
+    .upload-divider         { order: 2; }
+    .upload-image-container { order: 3; }
+  }
+}
+
+.upload-divider {
+  touch-action: none;
+  background: linear-gradient(currentcolor, currentcolor) no-repeat center/1px 100%;
+  color: var(--divider-border-color);
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--divider-border-hover-color);
+    }
+  }
+
+  &.dragging {
+    color: var(--link-color);
+  }
+}
+
+.upload-edit-container {
+  input, textarea {
+    max-width: 100%;
+  }
+}

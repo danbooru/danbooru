@@ -8,10 +8,15 @@
   <% elsif upload_media_asset.failed? %>
     <p>Error: <%= upload_media_asset.error %>.</p>
   <% else %>
-    <%= tag.div class: "upload-container h-full",
-                "x-data": "{ dock: $persist('#{j dock_position}').as('upload_edit_panel_dock').using(Danbooru.Cookie) }",
-                "x-bind:data-dock": "dock",
+    <%= tag.div class: "upload-container grid gap-2 h-full",
+                "x-data": "{ upload: new Danbooru.Upload($el) }",
+                "x-init": "upload.initialize()",
+                "x-bind:data-dock": "upload.dock",
+                "x-bind:data-edit-container-width": "upload.editContainerWidth",
                 "data-dock": dock_position,
+                "data-edit-container-width": upload_edit_container_width,
+                "data-media-asset-id": media_asset.id,
+                "x-bind:style": "`--edit-container-width: ${upload.editContainerWidth};`",
                 style: ("--edit-container-width: #{upload_edit_container_width};" if upload_edit_container_width.present?) do %>
       <div class="upload-image-container z-10">
         <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: current_user, outer_classes: "h-full top-0", inner_classes: "mx-auto", dynamic_height: false, scroll_on_zoom: true) do |component| %>
@@ -259,25 +264,25 @@
             <% t.menu_item(id: "docking-menu-tab") do %>
               <% render PopupMenuComponent.new(button_classes: "inactive-link") do |menu| %>
                 <% menu.with_item do %>
-                  <%= link_to "javascript:void(0)", "x-on:click": "dock = 'auto'", id: "dock-auto-link", title: "Rotate your screen to change layout" do %>
+                  <%= link_to "javascript:void(0)", "x-on:click": "upload.dock = 'auto'", id: "dock-auto-link", title: "Rotate your screen to change layout", "x-bind:class": "{ 'font-bold': upload.dock === 'auto' }" do %>
                     <%= rotate_icon %> Automatic
                   <% end %>
                 <% end %>
 
                 <% menu.with_item do %>
-                  <%= link_to "javascript:void(0)", "x-on:click": "dock = 'right'", id: "dock-right-link", "data-shortcut": "shift+r" do %>
+                  <%= link_to "javascript:void(0)", "x-on:click": "upload.dock = 'right'", id: "dock-right-link", "data-shortcut": "shift+r", "x-bind:class": "{ 'font-bold': upload.dock === 'right' }"  do %>
                     <%= dock_right_icon %> Dock to Right
                   <% end %>
                 <% end %>
 
                 <% menu.with_item do %>
-                  <%= link_to "javascript:void(0)", "x-on:click": "dock = 'bottom'", id: "dock-bottom-link", "data-shortcut": "shift+b" do %>
+                  <%= link_to "javascript:void(0)", "x-on:click": "upload.dock = 'bottom'", id: "dock-bottom-link", "data-shortcut": "shift+b", "x-bind:class": "{ 'font-bold': upload.dock === 'bottom' }" do %>
                     <%= dock_bottom_icon %> Dock to Bottom
                   <% end %>
                 <% end %>
 
                 <% menu.with_item do %>
-                  <%= link_to "javascript:void(0)", "x-on:click": "dock = 'left'", id: "dock-left-link", "data-shortcut": "shift+l" do %>
+                  <%= link_to "javascript:void(0)", "x-on:click": "upload.dock = 'left'", id: "dock-left-link", "data-shortcut": "shift+l", "x-bind:class": "{ 'font-bold': upload.dock === 'left' }" do %>
                     <%= dock_left_icon %> Dock to Left
                   <% end %>
                 <% end %>

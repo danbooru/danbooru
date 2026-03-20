@@ -100,10 +100,11 @@ Post.open_edit_dialog = function() {
   $("#comments").hide();
   $("#post-sections li").removeClass("active");
   $("#post-edit-link").parent("li").addClass("active");
+
   $(".upload-container").css("display", "block");
+  $(".upload-container .docking-menu-tab").hide();
 
   var $tag_string = $("#post_tag_string");
-  $("body.c-uploads .docking-menu-tab, body.c-upload-media-assets .docking-menu-tab").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
   $("#form").appendTo(dialog);
@@ -159,10 +160,10 @@ Post.open_edit_dialog = function() {
 Post.close_edit_dialog = function(e, ui) {
   $("#form").appendTo($("#c-posts #edit, .upload-edit-container"));
   $(".upload-container").css("display", "");
+  $(".upload-container .docking-menu-tab").show();
   $("#edit-dialog").remove();
   var $tag_string = $("#post_tag_string");
   $("div.input").has($tag_string).prevAll().show();
-  $("body.c-uploads .docking-menu-tab, body.c-upload-media-assets .docking-menu-tab").show();
   $tag_string.css({"resize": "", "width": ""});
   $(document).trigger("danbooru:close-post-edit-dialog");
 }

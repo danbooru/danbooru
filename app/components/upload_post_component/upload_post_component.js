@@ -1,0 +1,1 @@
+../../javascript/src/javascripts/upload_post_component.js

@@ -1,17 +1,17 @@
 export default class Draggable {
-  constructor(selector) {
-    this.selector = selector;
+  constructor(element) {
+    this.element = element instanceof jQuery ? element.get(0) : element;
     this.initialize();
   }
 
   initialize() {
-    $(document).on("pointerdown.danbooru", this.selector, (startEvent) => {
+    $(this.element).on("pointerdown.danbooru", (startEvent) => {
       if (startEvent.button !== 0 || !startEvent.originalEvent.isPrimary) {
         return; // Ignore right-clicks and multi-touch gestures.
       }
 
       let active = true;
-      let target = startEvent.target;
+      let target = this.element;
       let pointerId = startEvent.pointerId;
       let namespace = `drag-${pointerId}`;
 
