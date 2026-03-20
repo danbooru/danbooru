@@ -406,7 +406,10 @@ class Post < ApplicationRecord
         self.rating = rating_before_last_save || rating_was
       end
 
-      @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
+      # Serialize concurrent edits so overlapping saves don't read stale tags.
+      current_tag_string = self.class.lock.where(id: id).pick(:tag_string) || tag_string_before_last_save || tag_string_was
+
+      @post_edit = PostEdit.new(self, current_tag_string, old_tag_string || current_tag_string, tag_string)
     end
 
     # XXX should be a `validate` hook instead of `before_validation` hook
