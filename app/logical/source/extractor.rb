@@ -368,7 +368,7 @@ module Source
     end
 
     def related_posts(limit = 5)
-      Post.system_tag_match(related_posts_search_query).paginate(1, limit: limit)
+      Post.system_tag_match(related_posts_search_query).paginate(1, limit: limit, page_limit: limit)
     end
 
     # A hash containing the results of any API calls made by the extractor. For debugging purposes only.
