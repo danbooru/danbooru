@@ -10,6 +10,9 @@
   <% upload = upload_media_asset.upload %>
   <% media_asset = upload_media_asset.media_asset %>
   <% source = upload_media_asset.source_extractor %>
+  <% source_site = upload_media_asset.parsed_canonical_url&.source_site %>
+  <% source_site_wiki = "help:#{source_site.name.to_s.downcase.gsub(/[^a-z0-9._]+/, "_").squeeze("_")}" if source_site.present? %>
+  <% duplicates = Post.joins(:media_asset).where("media_assets.pixel_hash": media_asset.pixel_hash).load %>
 
   <%= tag.div class: "upload-container h-full",
               "x-data": "{ dock: $persist('#{j JSON.parse(cookies.fetch(:upload_edit_panel_dock, "auto".to_json))}').as('upload_edit_panel_dock').using(Danbooru.Cookie) }",
@@ -87,26 +90,25 @@
                 <% end %>
               </span>
 
-              <div class="inline-block">
+              <div class="upload-warning-badges inline-block">
                 <% if upload_media_asset.file_upload? %>
                   <%= external_link_to "https://saucenao.com/search.php?url=#{Danbooru::URL.escape(media_asset.original.file_url)}", "No Source", target: "_blank", class: "upload-no-source-warning button-danger button-xs" %>
                 <% elsif upload_media_asset.bad_link? %>
-                  <%= link_to "Bad Source", wiki_page_path("bad_link"), class: "upload-source-warning button-danger button-xs" %>
+                  <%= link_to_wiki "Bad Source", "bad_link", classes: "upload-bad-source-warning button-danger button-xs" %>
                 <% end %>
 
                 <% if upload_media_asset.image_sample? %>
-                  <%= link_to "Image Sample", wiki_page_path("image_sample"), class: "upload-sample-warning button-danger button-xs" %>
+                  <%= link_to_wiki "Image Sample", "image_sample", classes: "upload-sample-warning button-danger button-xs" %>
                 <% end %>
 
                 <% if media_asset.is_ai_generated? %>
-                  <%= link_to "AI-Generated", wiki_page_path("ai-generated"), class: "upload-ai-warning button-danger button-xs" %>
+                  <%= link_to_wiki "AI-Generated", "ai-generated", classes: "upload-ai-warning button-danger button-xs" %>
                 <% end %>
 
-                <% duplicates = Post.joins(:media_asset).where("media_assets.pixel_hash": media_asset.pixel_hash).load %>
                 <% if duplicates.size == 1 %>
                   <%= link_to "Pixel-Perfect Duplicate", duplicates.first, class: "upload-pixel-perfect-duplicate-warning button-danger button-xs" %>
                 <% elsif duplicates.size > 1 %>
-                  <a class="upload-duplicate-warning button-danger button-xs" href="javascript:$('a.tab.similar-tab').get(0).click()">Pixel-Perfect Duplicate</a>
+                  <a class="upload-pixel-perfect-duplicate-warning button-danger button-xs" href="javascript:$('a.tab.similar-tab').get(0).click()">Pixel-Perfect Duplicate</a>
                 <% else %>
                   <a class="upload-duplicate-warning button-danger button-xs hidden" href="javascript:$('a.tab.similar-tab').get(0).click()">Duplicate</a>
                 <% end %>
@@ -158,6 +160,51 @@
                   <p class="fineprint my-4">Read the <%= link_to_wiki "upload rules", "help:upload_rules" %> before uploading.</p>
                 <% end %>
               </div>
+
+              <% if upload_media_asset.file_upload? || upload_media_asset.image_sample? || upload_media_asset.bad_link? || media_asset.is_ai_generated? || duplicates.present? %>
+                <div class="upload-warning-details space-y-2 mb-4">
+                  <% if upload_media_asset.file_upload? %>
+                    <div class="upload-no-source-warning flex items-center gap-2 text-xs chip-yellow text-warning">
+                      <%= exclamation_icon(class: "h-4") %>
+                      <span>If possible, upload the link to where you found the file instead (<%= link_to_wiki "help", "non-web_source" %>).</span>
+                    </div>
+                  <% elsif upload_media_asset.image_sample? %>
+                    <div class="upload-sample-warning flex items-center gap-2 text-xs chip-red text-error">
+                      <%= exclamation_icon(class: "h-4") %>
+                      <span>Upload the full image instead (<%= link_to_wiki "help", (source_site_wiki.presence || "image_sample") %>).</span>
+                    </div>
+                  <% end %>
+
+                  <% if upload_media_asset.bad_link? %>
+                    <div class="upload-bad-source-warning flex items-center gap-2 text-xs chip-red text-error">
+                      <%= exclamation_icon(class: "h-4") %>
+                      <span>Upload the page containing the image, not the image itself (<%= link_to_wiki "help", (source_site_wiki.presence || "bad_source") %>).</span>
+                    </div>
+                  <% end %>
+
+                  <% if media_asset.is_ai_generated? %>
+                    <div class="upload-ai-warning flex items-center gap-2 text-xs chip-red text-error">
+                      <%= exclamation_icon(class: "h-4") %>
+                      <span>AI-generated images are against the rules (<%= link_to_wiki "help", "help:upload_rules" %>).</span>
+                    </div>
+                  <% end %>
+
+                  <% if duplicates.size >= 1 %>
+                    <div class="upload-pixel-perfect-duplicate-warning flex items-center gap-2 text-xs chip-red text-error">
+                      <%= exclamation_icon(class: "h-4") %>
+                      <span>
+                        <% if duplicates.size == 1 %>
+                          Exact duplicate of <%= link_to duplicates.first.dtext_shortlink, duplicates.first %>
+                        <% elsif duplicates.size > 1%>
+                          Exact duplicate of <%= link_to pluralize(duplicates.size, "other post"), posts_path(tags: "id:#{duplicates.pluck(:id).join(",")}") %>
+                        <% end %>
+
+                        (<%= link_to_wiki "help", "pixel-perfect_duplicate" %>).
+                      </span>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
 
               <%= render "related_tags/container", media_asset: media_asset %>
             </div>

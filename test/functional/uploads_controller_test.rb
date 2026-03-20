@@ -120,6 +120,59 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "#post_rating_s[checked]"
       end
+
+      should "show a non-web source warning for file uploads" do
+        upload = create(:completed_file_upload, uploader: @user)
+
+        get_auth upload_path(upload), @user
+
+        assert_response :success
+        assert_select ".upload-warning-badges .upload-no-source-warning"
+        assert_select ".upload-warning-details .upload-no-source-warning"
+      end
+
+      should "show an image sample warning for image samples" do
+        upload = create(:completed_source_upload, uploader: @user, upload_media_assets: [build(:upload_media_asset, source_url: "https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg", status: "active")])
+
+        get_auth upload_path(upload), @user
+
+        assert_response :success
+        assert_select ".upload-warning-badges .upload-sample-warning"
+        assert_select ".upload-warning-details .upload-sample-warning"
+        assert_select ".upload-warning-details .upload-sample-warning a[href=?]", wiki_page_path("help:pixiv")
+      end
+
+      should "show a bad source warning for bad source uploads" do
+        upload = create(:completed_source_upload, uploader: @user, upload_media_assets: [build(:upload_media_asset, source_url: "https://pbs.twimg.com/media/FQjQA1mVgAMcHLv.jpg:orig", status: "active")])
+
+        get_auth upload_path(upload), @user
+
+        assert_response :success
+        assert_select ".upload-warning-badges .upload-bad-source-warning"
+        assert_select ".upload-warning-details .upload-bad-source-warning"
+        assert_select ".upload-warning-details .upload-bad-source-warning a[href=?]", wiki_page_path("help:twitter")
+      end
+
+      should "show an ai-generated warning for ai-generated files" do
+        media_asset = build(:media_asset, file_ext: "png", media_metadata: build(:media_metadata, metadata: { "PNG:Software" => "NovelAI" }))
+        upload = create(:completed_file_upload, uploader: @user, upload_media_assets: [build(:upload_media_asset, media_asset: media_asset, source_url: "file://test.png", status: "active")])
+
+        get_auth upload_path(upload), @user
+
+        assert_response :success
+        assert_select ".upload-warning-badges .upload-ai-warning"
+        assert_select ".upload-warning-details .upload-ai-warning"
+      end
+
+      should "show a duplicate warning for pixel-perfect duplicates" do
+        upload = create(:completed_source_upload, uploader: @user)
+        create(:post, media_asset: build(:media_asset, pixel_hash: upload.media_assets.first.pixel_hash))
+
+        get_auth upload_path(upload), @user
+
+        assert_select ".upload-warning-badges .upload-pixel-perfect-duplicate-warning"
+        assert_select ".upload-warning-details .upload-pixel-perfect-duplicate-warning"
+      end
     end
 
     context "create action" do
