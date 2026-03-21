@@ -168,6 +168,12 @@ class Source::Extractor::URLShortener < Source::Extractor
       url = response.headers["Location"] if response.status.code.in?(200..399)
       url unless url == "http://weibo.com/sorry"
 
+    # https://vt.tiktok.com/ZSa9V7ert/
+    # https://www.tiktok.com/t/ZSa9V7ert/
+    in "tiktok.com", *, id
+      url = http.redirect_url(https_url)&.to_s
+      url unless url == "https://www.tiktok.com/?_r=1"
+
     # curl -I https://t.co/Dxn7CuVErW
     # curl -I https://pic.twitter.com/Dxn7CuVErW
     # curl -I https://pic.x.com/Dxn7CuVErW
