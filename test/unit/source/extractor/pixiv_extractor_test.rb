@@ -234,6 +234,35 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A hashed-filename ugoira URL" do
+      strategy_should_work(
+        "https://www.pixiv.net/en/artworks/142520613",
+        image_urls: %w[https://i.pximg.net/img-zip-ugoira/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira1920x1080.zip?original],
+        media_files: [{ file_size: 11_689_271, width: 720, height: 1280 }],
+        # media_files: [{ file_size: 17_320_728 , width: 608, height: 1080 }],
+        page_url: "https://www.pixiv.net/artworks/142520613",
+        profile_urls: %w[https://www.pixiv.net/users/1851972 https://www.pixiv.net/stacc/t-tumekiri],
+        display_name: "ｔつめきり",
+        username: "t-tumekiri",
+        published_at: Time.parse("2026-03-20T05:30:00.000000Z"),
+        updated_at: Time.parse("2026-03-20T05:30:00.000000Z"),
+        tags: [
+          ["うごイラ", "https://www.pixiv.net/tags/うごイラ/artworks"],
+          ["ウマ娘プリティーダービー", "https://www.pixiv.net/tags/ウマ娘プリティーダービー/artworks"],
+          ["スイープトウショウ(ウマ娘)", "https://www.pixiv.net/tags/スイープトウショウ(ウマ娘)/artworks"],
+          ["水着ウマ娘", "https://www.pixiv.net/tags/水着ウマ娘/artworks"],
+          ["コイカツ!", "https://www.pixiv.net/tags/コイカツ!/artworks"],
+        ],
+        dtext_artist_commentary_title: "スイープさんが水着でダンスを披露するだけのうごイラですわ",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          スイープさんが水着でダンスを披露するだけのうごイラですわ
+          健康的で微笑ましいうごイラですわ
+          ※下記のシーンをお借りしましたわ、Thanksですわ！
+          [b]pixiv #142277713 "»":[/posts?tags=pixiv%3A142277713][/b]
+        EOS
+      )
+    end
+
     context "An unlisted Pixiv artwork page URL" do
       setup { skip "Unlisted Pixiv posts not yet implemented" }
 

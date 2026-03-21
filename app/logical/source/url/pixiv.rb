@@ -27,6 +27,7 @@ module Source
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
       # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
       # https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip
+      # https://i.pximg.net/img-zip-ugoira/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira600x600.zip
       # https://i.pximg.net/img-original/img/2019/05/27/17/59/33/74932152_ugoira0.jpg
       # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
       # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg
@@ -217,6 +218,15 @@ module Source
         @work_id = work_id
         @ugoira_frame = $1.to_i
 
+      # https://i.pximg.net/img-original/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira0.jpg
+      in /^\d+-\h{32}$/ => id_hash, /^ugoira(\d+)$/
+        @work_id, @image_hash = id_hash.split("-")
+        @ugoira_frame = $1.to_i
+
+      # https://i.pximg.net/img-zip-ugoira/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira600x600.zip
+      in /^\d+-\h{32}$/ => id_hash, /^ugoira/
+        @work_id, @image_hash = id_hash.split("-")
+
       # https://i.pximg.net/c/240x240/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg
       # http://i2.pixiv.net/img18/img/evazion/14901720.png
       # http://i2.pixiv.net/img18/img/evazion/14901720_m.png
@@ -313,7 +323,11 @@ module Source
     end
 
     def ugoira_zip_url
-      "https://i.pximg.net/img-zip-ugoira/img/#{date.join("/")}/#{work_id}_ugoira1920x1080.zip?original" if is_ugoira?
+      if is_ugoira? && work_id.present? && image_hash.present?
+        "https://i.pximg.net/img-zip-ugoira/img/#{date.join("/")}/#{work_id}-#{image_hash}_ugoira1920x1080.zip?original"
+      elsif is_ugoira? && work_id.present?
+        "https://i.pximg.net/img-zip-ugoira/img/#{date.join("/")}/#{work_id}_ugoira1920x1080.zip?original"
+      end
     end
 
     def ugoira_frame_url(n = 0, ext = file_ext)
