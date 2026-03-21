@@ -32,11 +32,27 @@ class UploadPostComponent < ApplicationComponent
     WikiPage.find_by_title("help:upload_notice")&.updated_at.to_i > current_user.posts.maximum(:created_at).to_i
   end
 
-  # @return [String, nil] The title of the wiki page for the site corresponding to the source URL ("help:pixiv", etc).
-  memoize def source_site_wiki
-    title = source_site&.name.to_s.downcase.gsub(/[^a-z0-9._]+/, "_").squeeze("_")
+  # @return [String, nil] The name of the site, normalized to tag form.
+  memoize def site_name
+    source_site&.name&.downcase&.tr(" ", "_")
+  end
 
-    "help:#{title}" if source_site.present?
+  # @return [String] The name of the `bad_<site>_link` wiki, or `bad_link` if it doesn't exist.
+  memoize def bad_link_wiki_name
+    if site_name.present? && WikiPage.undeleted.exists?(title: "bad_#{site_name}_link")
+      "bad_#{site_name}_link"
+    else
+      "bad_link"
+    end
+  end
+
+  # @return [String] The name of the `<site>_sample` wiki, or `image_sample` if it doesn't exist.
+  memoize def image_sample_wiki_name
+    if site_name.present? && WikiPage.undeleted.exists?(title: "#{site_name}_sample")
+      "#{site_name}_sample"
+    else
+      "image_sample"
+    end
   end
 
   # @return [String] The position of the edit panel: "auto", "right", "bottom", "left"

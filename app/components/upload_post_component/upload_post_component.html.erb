@@ -93,11 +93,11 @@
                   <% if upload_media_asset.file_upload? %>
                     <%= external_link_to "https://saucenao.com/search.php?url=#{Danbooru::URL.escape(media_asset.original.file_url)}", "No Source", target: "_blank", class: "upload-no-source-warning button-danger button-xs" %>
                   <% elsif upload_media_asset.bad_link? %>
-                    <%= link_to_wiki "Bad Source", "bad_link", classes: "upload-bad-source-warning button-danger button-xs" %>
+                    <%= link_to_wiki "Bad Source", bad_link_wiki_name, classes: "upload-bad-source-warning button-danger button-xs" %>
                   <% end %>
 
                   <% if upload_media_asset.image_sample? %>
-                    <%= link_to_wiki "Image Sample", "image_sample", classes: "upload-sample-warning button-danger button-xs" %>
+                    <%= link_to_wiki "Image Sample", image_sample_wiki_name, classes: "upload-sample-warning button-danger button-xs" %>
                   <% end %>
 
                   <% if media_asset.is_ai_generated? %>
@@ -169,14 +169,14 @@
                     <% elsif upload_media_asset.image_sample? %>
                       <div class="upload-sample-warning flex items-center gap-2 text-xs chip-red text-error">
                         <%= exclamation_icon(class: "h-4") %>
-                        <span>Upload the full image instead (<%= link_to_wiki "help", (source_site_wiki.presence || "image_sample") %>).</span>
+                        <span>Upload the full image instead (<%= link_to_wiki "help", image_sample_wiki_name %>).</span>
                       </div>
                     <% end %>
 
                     <% if upload_media_asset.bad_link? %>
                       <div class="upload-bad-source-warning flex items-center gap-2 text-xs chip-red text-error">
                         <%= exclamation_icon(class: "h-4") %>
-                        <span>Upload the page containing the image, not the image itself (<%= link_to_wiki "help", (source_site_wiki.presence || "bad_source") %>).</span>
+                        <span>Upload the page containing the image, not the image itself (<%= link_to_wiki "help", bad_link_wiki_name %>).</span>
                       </div>
                     <% end %>
 

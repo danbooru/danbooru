@@ -36,23 +36,25 @@ class UploadPostComponentTest < ViewComponent::TestCase
     end
 
     should "show an image sample warning for image samples" do
+      create(:wiki_page, title: "pixiv_sample")
       upload = create(:completed_source_upload, upload_media_assets: [build(:upload_media_asset, source_url: "https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg", status: "active")])
 
       render_upload_post_component(upload.upload_media_assets.first)
 
       assert_css(".upload-warning-badges .upload-sample-warning")
       assert_css(".upload-warning-details .upload-sample-warning")
-      assert_css(".upload-warning-details .upload-sample-warning a[href='#{wiki_page_path("help:pixiv")}']")
+      assert_css(".upload-warning-details .upload-sample-warning a[href='#{wiki_page_path("pixiv_sample")}']")
     end
 
     should "show a bad source warning for bad source uploads" do
+      create(:wiki_page, title: "bad_twitter_link")
       upload = create(:completed_source_upload, upload_media_assets: [build(:upload_media_asset, source_url: "https://pbs.twimg.com/media/FQjQA1mVgAMcHLv.jpg:orig", status: "active")])
 
       render_upload_post_component(upload.upload_media_assets.first)
 
       assert_css(".upload-warning-badges .upload-bad-source-warning")
       assert_css(".upload-warning-details .upload-bad-source-warning")
-      assert_css(".upload-warning-details .upload-bad-source-warning a[href='#{wiki_page_path("help:twitter")}']")
+      assert_css(".upload-warning-details .upload-bad-source-warning a[href='#{wiki_page_path("bad_twitter_link")}']")
     end
 
     should "show an ai-generated warning for ai-generated files" do
