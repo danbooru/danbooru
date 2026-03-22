@@ -102,6 +102,9 @@ Rails.application.configure do
   # https://en.wikipedia.org/wiki/.local
   config.hosts += [".local", Danbooru::URL.parse!(Danbooru.config.canonical_url).host]
 
+  # Allow dotless hosts - `danbooru:3000`, etc
+  config.hosts += [/[^.]+/]
+
   # Allow requests sent with no `Host:` header (for `bundle exec derailed exec perf:ips`)
   config.hosts += [nil]
 end

@@ -1,9 +1,10 @@
-$("#iqdb-similar").html("<%= j render "iqdb_queries/matches" %>").show();
+<% similar_images_component = SimilarImagesComponent.new(matches: @matches, current_user: CurrentUser.user, low_similarity: search_params[:similarity]&.to_f, high_similarity: search_params[:high_similarity]&.to_f) %>
+$("#iqdb-similar").html("<%= j render similar_images_component %>").show();
 
-<% if @high_similarity_matches.size > 0 %>
-  $(".upload-container .tab.similar-tab").html("Similar <%= j tag.span(@high_similarity_matches.size, class: "rounded-full mx-1 px-2 text-sm text-center text-inverse bg:primary-color") %>")
+<% if similar_images_component.high_similarity_matches.size > 0 %>
+  $(".upload-container .tab.similar-tab").html("Similar <%= j tag.span(similar_images_component.high_similarity_matches.size, class: "rounded-full mx-1 px-2 text-sm text-center text-inverse bg:primary-color") %>")
 <% end %>
 
-<% if @matches.any? { |match| match["score"] >= IqdbClient::DUPLICATE_THRESHOLD } %>
+<% if similar_images_component.duplicates.any? %>
   $(".upload-duplicate-warning").removeClass("hidden");
 <% end %>

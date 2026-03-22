@@ -2,7 +2,7 @@ import AlpineCookieStorage from "./alpine_cookie_storage";
 import Draggable from "./draggable";
 import { clamp } from "./utility";
 
-export default class Upload {
+export default class UploadPostComponent {
   IQDB_LIMIT = 5;
   IQDB_MIN_SIMILARITY = 50;
   IQDB_HIGH_SIMILARITY = 70;

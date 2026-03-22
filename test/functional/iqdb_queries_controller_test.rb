@@ -10,7 +10,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       context "with a url parameter" do
         should "use the URL as-is for an image URL" do
-          mock_iqdb_matches([post_id: @post.id, score: 95.0])
+          mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
 
           get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "https://cdn.donmai.us/720x720/f2/f4/f2f4c401ebe3e181fbfe7da56b0b2220.webp" }
 
@@ -19,7 +19,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "download the image for a non-image URL" do
-          mock_iqdb_matches([post_id: @post.id, score: 95.0])
+          mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
 
           get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "https://danbooru.donmai.us/posts/7000000" }
 

@@ -9,7 +9,7 @@
     <p>Error: <%= upload_media_asset.error %>.</p>
   <% else %>
     <%= tag.div class: "upload-container grid gap-2 h-full",
-                "x-data": "{ upload: new Danbooru.Upload($el) }",
+                "x-data": "{ upload: new Danbooru.UploadPostComponent($el) }",
                 "x-init": "upload.initialize()",
                 "x-bind:data-dock": "upload.dock",
                 "x-bind:data-edit-container-width": "upload.editContainerWidth",
