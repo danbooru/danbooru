@@ -63,16 +63,18 @@
           </td>
         </tr>
 
-        <tr class="source-data-updated-at">
-          <th>Updated</th>
-          <td>
-            <% if @source.updated_at.blank? %>
-              <em>None</em>
-            <% else %>
-              <%= helpers.compact_time(@source.updated_at) %>
-            <% end %>
-          </td>
-        </tr>
+        <% if @source.updated_at != @source.published_at %>
+          <tr class="source-data-updated-at">
+            <th>Updated</th>
+            <td>
+              <% if @source.updated_at.blank? %>
+                <em>None</em>
+              <% else %>
+                <%= helpers.compact_time(@source.updated_at) %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   <% end %>
