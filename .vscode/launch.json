@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "rdbg",
+      "name": "Debug Rails server",
+      "request": "attach",
+      "debugPort": "danbooru:12345",
+      "localfs": true
+    },
+    {
+      "type": "rdbg",
+      "name": "Debug job worker",
+      "request": "attach",
+      "debugPort": "jobs:12345",
+      "localfs": true
+    },
+    {
+      "type": "rdbg",
+      "name": "Debug cron worker",
+      "request": "attach",
+      "debugPort": "cron:12345",
+      "localfs": true
+    }
+  ]
+}

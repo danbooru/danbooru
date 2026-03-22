@@ -23,13 +23,46 @@
 
 name: devbooru
 
+# Required to have working post and pool versions
 x-sqs-env: &sqs-env
-  # Required to have working post and pool versions
   DANBOORU_AWS_SQS_REGION: us-east-1
   DANBOORU_AWS_ACCESS_KEY_ID: dummy
   DANBOORU_AWS_SECRET_ACCESS_KEY: dummy
   DANBOORU_AWS_SQS_ARCHIVES_URL: http://sqs:9324/000000000000/danbooru.fifo
   DANBOORU_AWS_SQS_HOST: http://sqs:9324
+
+# Enable debugger on port 12345. https://github.com/ruby/debug?tab=readme-ov-file#configuration
+x-debug-env: &debug-env
+  RUBY_DEBUG_OPEN: "true"
+  RUBY_DEBUG_NONSTOP: "true"
+  RUBY_DEBUG_HOST: 0.0.0.0
+  RUBY_DEBUG_PORT: 12345
+
+x-base-env: &base-env
+  <<: *sqs-env
+
+  DANBOORU_APP_NAME: "Devbooru"
+
+  # The public URL of your site. You can set this if you have a domain name for your site.
+  DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
+
+  # This is insecure because it lets anyone login to your development instance. This is okay
+  # because giving others access is insecure anyway.
+  DANBOORU_SECRET_KEY_BASE: "insecure"
+
+  RAILS_ENV: ${RAILS_ENV:-development}
+  DATABASE_URL: postgresql://postgres?pool=100
+  DANBOORU_REDIS_URL: redis://redis:6379
+  DANBOORU_IQDB_URL: http://iqdb:5588
+  DANBOORU_IMAGE_STORAGE_PATH: /images
+  SHAKAPACKER_DEV_SERVER_HOST: webpack
+  GOOD_JOB_EXECUTION_MODE: external
+
+  DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
+
+  # To enable the autotagger service, uncomment this line AND the autotagger service further below.
+  # It is disabled by default because it significantly slows down the creation of codespaces.
+  # DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
 
 x-base-template: &base-template
   # Use the latest development image from master, instead of the production image. The development
@@ -46,29 +79,7 @@ x-base-template: &base-template
   entrypoint: ["tini", "-g", "bin/danbooru-dev-entrypoint", "--"]
 
   environment:
-    <<: *sqs-env
-
-    DANBOORU_APP_NAME: "Devbooru"
-
-    # The public URL of your site. You can set this if you have a domain name for your site.
-    DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
-
-    # This is insecure because it lets anyone login to your development instance. This is okay
-    # because giving others access is insecure anyway.
-    DANBOORU_SECRET_KEY_BASE: "insecure"
-
-    RAILS_ENV: ${RAILS_ENV:-development}
-    DATABASE_URL: postgresql://postgres?pool=100
-    DANBOORU_REDIS_URL: redis://redis:6379
-    DANBOORU_IQDB_URL: http://iqdb:5588
-    DANBOORU_IMAGE_STORAGE_PATH: /images
-    SHAKAPACKER_DEV_SERVER_HOST: webpack
-
-    DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
-
-    # To enable the autotagger service, uncomment this line AND the autotagger service further below.
-    # It is disabled by default because it significantly slows down the creation of codespaces.
-    # DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
+    <<: *base-env
 
   tmpfs:
     - "/danbooru/tmp:uid=1000,gid=1000"
@@ -94,6 +105,8 @@ services:
     depends_on:
       migrations:
         condition: service_completed_successfully
+    environment:
+      <<: [*base-env, *debug-env]
     command: ["bin/rails", "server", "-b", "0.0.0.0"]
 
   cron:
@@ -101,6 +114,8 @@ services:
     depends_on:
       migrations:
         condition: service_completed_successfully
+    environment:
+      <<: [*base-env, *debug-env]
     command: ["bin/rails", "danbooru:cron"]
 
   jobs:
@@ -108,6 +123,8 @@ services:
     depends_on:
       migrations:
         condition: service_completed_successfully
+    environment:
+      <<: [*base-env, *debug-env]
     command: ["bin/good_job", "start"]
 
   devcontainer:
