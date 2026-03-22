@@ -147,8 +147,6 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "receipt action" do
-      mock_stripe!
-
       setup do
         @user_upgrade = create(:gift_gold_upgrade, status: "complete")
         @user_upgrade.create_checkout!
@@ -209,8 +207,6 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "refund action" do
-      mock_stripe!
-
       context "for a self upgrade" do
         context "to Gold" do
           should_eventually "refund the upgrade" do
@@ -254,8 +250,6 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
-      mock_stripe!
-
       context "for a self upgrade" do
         context "to Gold" do
           should "create a pending upgrade" do

@@ -298,7 +298,6 @@ Rails.application.routes.draw do
   resources :site_credentials, except: [:edit]
   resources :webhooks do
     post :receive, on: :collection
-    post :authorize_net, on: :collection
   end
   resources :wiki_pages, id: /.+?(?=\.json|\.xml|\.html)|.+/ do
     put :revert, on: :member

@@ -535,7 +535,6 @@ GEM
     simplecov_json_formatter (0.1.4)
     stackprof (0.2.28)
     stringio (3.2.0)
-    stripe (18.4.1)
     thor (1.5.0)
     timeout (0.6.1)
     trailblazer-option (0.1.2)
@@ -651,7 +650,6 @@ DEPENDENCIES
   simplecov
   simplecov-cobertura
   stackprof
-  stripe
   tzinfo-data
   useragent
   view_component

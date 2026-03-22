@@ -167,8 +167,6 @@ class UserUpgradeTest < ActiveSupport::TestCase
     end
 
     context "the #receipt_url method" do
-      mock_stripe!
-
       context "a pending upgrade" do
         should "not have a receipt" do
           skip unless UserUpgrade.enabled?
