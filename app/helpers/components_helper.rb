@@ -71,13 +71,6 @@ module ComponentsHelper
     render CategorizedTagListComponent.new(tags: post.tags, **options)
   end
 
-  # The <link rel="next"> / <link rel="prev"> links in the <meta> element of the <head>.
-  def render_meta_links(records)
-    render MetaLinksComponent.new(records: records, params: params)
-  rescue ActiveRecord::StatementInvalid
-    # Swallow any exceptions when loading records so that the page load doesn't fail.
-  end
-
   def render_tag_change_notice(tag:, current_user:)
     render TagChangeNoticeComponent.new(tag: tag, current_user: current_user)
   end
