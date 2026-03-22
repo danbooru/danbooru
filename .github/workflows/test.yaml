@@ -46,7 +46,7 @@ jobs:
 
     container:
       image: ghcr.io/danbooru/danbooru:development-${{ github.sha }}
-      options: --user root
+      options: --user root -v /var/run/docker.sock:/var/run/docker.sock
 
     env:
       HOME: /root
