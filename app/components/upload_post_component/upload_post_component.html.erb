@@ -14,10 +14,10 @@
                 "x-bind:data-dock": "upload.dock",
                 "x-bind:data-edit-container-width": "upload.editContainerWidth",
                 "data-dock": dock_position,
-                "data-edit-container-width": upload_edit_container_width,
+                "data-edit-container-width": edit_container_width,
                 "data-media-asset-id": media_asset.id,
                 "x-bind:style": "`--edit-container-width: ${upload.editContainerWidth};`",
-                style: ("--edit-container-width: #{upload_edit_container_width};" if upload_edit_container_width.present?) do %>
+                style: "--edit-container-width: #{edit_container_width};" do %>
       <div class="upload-image-container z-10">
         <%= render MediaAssetComponent.new(media_asset: media_asset, current_user: current_user, outer_classes: "h-full top-0", inner_classes: "mx-auto", dynamic_height: false, scroll_on_zoom: true) do |component| %>
           <% component.with_footer do %>

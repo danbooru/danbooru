@@ -1,4 +1,4 @@
-import Cookie from "./cookie";
+import AlpineCookieStorage from "./alpine_cookie_storage";
 import Draggable from "./draggable";
 import { clamp } from "./utility";
 
@@ -14,8 +14,8 @@ export default class Upload {
     this.$divider = this.$container.find(".upload-divider");
     this.$editContainer = this.$container.find(".upload-edit-container");
     this.mediaAssetId = this.$container.data("media-asset-id");
-    this.editContainerWidth = Alpine.$persist(this.$container.data("edit-container-width")).as("upload_edit_container_width").using(Cookie);
-    this.dock = Alpine.$persist(this.$container.data("dock")).as("upload_edit_panel_dock").using(Cookie);
+    this.editContainerWidth = Alpine.$persist(this.$container.data("edit-container-width")).as("upload_edit_container_width").using(AlpineCookieStorage);
+    this.dock = Alpine.$persist(this.$container.data("dock")).as("upload_edit_panel_dock").using(AlpineCookieStorage);
     this.draggable = new Draggable(this.$divider);
   }
 

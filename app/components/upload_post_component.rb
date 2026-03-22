@@ -3,16 +3,20 @@
 class UploadPostComponent < ApplicationComponent
   extend Memoist
 
+  DEFAULT_EDIT_CONTAINER_WIDTH = 480
+  MIN_EDIT_CONTAINER_WIDTH = 180
+
   delegate :edit_form_for, :embed_wiki, :exclamation_icon, :help_tooltip, :link_to_media_asset, :link_to_wiki, :render_source_data, to: :helpers
 
-  attr_reader :upload_media_asset, :post, :current_user, :upload_edit_panel_dock, :upload_edit_container_width, :upload, :media_asset, :source, :source_site
+  attr_reader :upload_media_asset, :post, :current_user, :dock_position, :edit_container_width, :upload, :media_asset, :source, :source_site
 
   def initialize(upload_media_asset:, post:, current_user:, upload_edit_panel_dock: nil, upload_edit_container_width: nil)
     @upload_media_asset = upload_media_asset
     @post = post
     @current_user = current_user
-    @upload_edit_panel_dock = upload_edit_panel_dock
-    @upload_edit_container_width = upload_edit_container_width
+    @dock_position = Danbooru::JSON.parse(upload_edit_panel_dock)
+    @dock_position = "auto" if !dock_position.in?(%w[auto left right bottom])
+    @edit_container_width = Integer(upload_edit_container_width, exception: false)&.clamp(MIN_EDIT_CONTAINER_WIDTH..) || DEFAULT_EDIT_CONTAINER_WIDTH
 
     @upload = upload_media_asset.upload
     @media_asset = upload_media_asset.media_asset
@@ -53,11 +57,6 @@ class UploadPostComponent < ApplicationComponent
     else
       "image_sample"
     end
-  end
-
-  # @return [String] The position of the edit panel: "auto", "right", "bottom", "left"
-  memoize def dock_position
-    Danbooru::JSON.parse(upload_edit_panel_dock).presence || "auto"
   end
 
   # @return [Array<Post>] The list of pixel-perfect duplicates.
