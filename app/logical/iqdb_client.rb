@@ -67,10 +67,17 @@ class IqdbClient
     def process_results(matches)
       posts = Post.includes(:media_asset).where(id: matches.pluck("post_id")).index_by(&:id)
 
-      matches = matches.map do |match|
+      matches = matches.filter_map do |match|
         post = posts[match["post_id"]]
-        match.with_indifferent_access.merge(post: post) if post
-      end.compact
+
+        # IQDB returns relatively high scores for bad matches, with most results in the 50%-70% range being false
+        # positives and results above 70% or so being potential matches. This uses a power curve to lower scores such
+        # that a score of 70% becomes 50%, so that >50% is considered a potential match.
+        score = 100 * ((match["score"] / 100.0)**2)
+
+        next if post.nil?
+        { **match, score: score, post: post }.compact.with_indifferent_access
+      end
 
       matches.sort_by { |match| -match["score"] }
     end

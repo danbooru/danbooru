@@ -4,9 +4,9 @@
 class SimilarImagesComponent < ApplicationComponent
   extend Memoist
 
-  LOW_SIMILARITY_THRESHOLD = 50.0
-  HIGH_SIMILARITY_THRESHOLD = 70.0
-  DUPLICATE_THRESHOLD = 92.0
+  LOW_SIMILARITY_THRESHOLD = 0.0
+  HIGH_SIMILARITY_THRESHOLD = 40.0
+  DUPLICATE_THRESHOLD = 85.0
 
   attr_reader :matches, :current_user, :low_similarity, :high_similarity
 

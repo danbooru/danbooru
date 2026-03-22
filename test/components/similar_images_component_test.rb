@@ -27,7 +27,7 @@ class SimilarImagesComponentTest < ViewComponent::TestCase
       should "render the posts" do
         post1 = create(:post)
         post2 = create(:post)
-        render_inline(SimilarImagesComponent.new(matches: [{ post: post1, score: 55 }, { post: post2, score: 60 }], current_user: User.anonymous))
+        render_inline(SimilarImagesComponent.new(matches: [{ post: post1, score: 10 }, { post: post2, score: 30 }], current_user: User.anonymous))
 
         assert_css(".post-gallery article", count: 2)
         assert_text("No similar posts found.")
@@ -39,7 +39,7 @@ class SimilarImagesComponentTest < ViewComponent::TestCase
       should "render both matches and show the low similarity toggle" do
         high_post = create(:post)
         low_post  = create(:post)
-        matches = [{ post: high_post, score: 85 }, { post: low_post, score: 55 }]
+        matches = [{ post: high_post, score: 85 }, { post: low_post, score: 10 }]
 
         render_inline(SimilarImagesComponent.new(matches: matches, current_user: User.anonymous))
 
@@ -52,7 +52,7 @@ class SimilarImagesComponentTest < ViewComponent::TestCase
     context "with matches below the low similarity threshold" do
       should "not render those matches" do
         post = create(:post)
-        render_inline(SimilarImagesComponent.new(matches: [{ post: post, score: 30 }], current_user: User.anonymous))
+        render_inline(SimilarImagesComponent.new(matches: [{ post: post, score: -1 }], current_user: User.anonymous))
 
         assert_text("No similar posts found.")
         assert_css(".post-gallery article", count: 0)

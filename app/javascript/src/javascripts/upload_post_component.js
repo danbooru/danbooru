@@ -4,8 +4,8 @@ import { clamp } from "./utility";
 
 export default class UploadPostComponent {
   IQDB_LIMIT = 5;
-  IQDB_MIN_SIMILARITY = 50;
-  IQDB_HIGH_SIMILARITY = 70;
+  IQDB_MIN_SIMILARITY = 25;
+  IQDB_HIGH_SIMILARITY = 50;
   MIN_EDIT_CONTAINER_WIDTH = 180;
 
   constructor(container) {
