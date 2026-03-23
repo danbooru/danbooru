@@ -30,7 +30,7 @@ module Source::Tests::Extractor
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
         image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original"],
         media_files: [
-          { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
+          { file_size: 33_197, width: 80, height: 82, frame_delays: [125] * 2, pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245", error: nil },
         ],
         page_url: "https://www.pixiv.net/artworks/62247364",
         profile_url: "https://www.pixiv.net/users/22252953",
@@ -59,7 +59,7 @@ module Source::Tests::Extractor
         "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
         image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original"],
         media_files: [
-          { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
+          { file_size: 33_197, width: 80, height: 82, frame_delays: [125] * 2, pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245", error: nil },
         ],
         page_url: "https://www.pixiv.net/artworks/62247364",
         profile_url: "https://www.pixiv.net/users/22252953",
@@ -238,7 +238,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.pixiv.net/en/artworks/142520613",
         image_urls: %w[https://i.pximg.net/img-zip-ugoira/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira1920x1080.zip?original],
-        media_files: [{ file_size: 11_689_271, width: 720, height: 1280 }],
+        media_files: [{ file_size: 11_689_271, width: 720, height: 1280, frame_delays: [32] * 115, pixel_hash: "3b77ebb7c1e7ca13bb9a3610cc518c9e", md5: "77e7756cb6ddd50efc5ae3d441a306c9", error: nil }],
         # media_files: [{ file_size: 17_320_728 , width: 608, height: 1080 }],
         page_url: "https://www.pixiv.net/artworks/142520613",
         profile_urls: %w[https://www.pixiv.net/users/1851972 https://www.pixiv.net/stacc/t-tumekiri],

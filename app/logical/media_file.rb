@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "zip" # rubyzip
+
 # A MediaFile represents an image, video, or flash file. It contains methods for
 # detecting the file type, for generating a preview image, for getting metadata,
 # and for resizing images.

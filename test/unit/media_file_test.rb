@@ -1,4 +1,5 @@
 require "test_helper"
+require "zip"
 
 class MediaFileTest < ActiveSupport::TestCase
   context "#dimensions" do
@@ -521,6 +522,24 @@ class MediaFileTest < ActiveSupport::TestCase
           assert_equal("gallery-dl", ugoira.animation_json_format)
 
           ugoira.close
+        end
+      end
+    end
+
+    context "that is a ZIP64 file" do
+      should "be rejected" do
+        Danbooru::Tempfile.create(["danbooru-ugoira-zip64-", ".zip"]) do |file|
+          Zip::File.open(file.path, create: true, compression_level: 0) do |zip|
+            %w[000000.jpg 000001.jpg].each do |name|
+              entry = Zip::Entry.new(zip, name)
+              entry.extra.create(:zip64)
+              zip.add(entry, "test/files/test.jpg")
+            end
+          end
+
+          MediaFile::Ugoira.open(file.path, frame_delays: [100, 100]) do |ugoira|
+            assert_equal("zip64 format is not supported", ugoira.error)
+          end
         end
       end
     end

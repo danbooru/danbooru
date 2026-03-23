@@ -501,7 +501,7 @@ GEM
       ffi (~> 1.12)
       logger
     ruby2_keywords (0.0.5)
-    rubyzip (2.4.1)
+    rubyzip (3.2.2)
     sanitize (7.0.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.16.8)
@@ -651,7 +651,7 @@ DEPENDENCIES
   rubocop-rails
   ruby-lsp-shoulda-context
   ruby-vips
-  rubyzip (~> 2.4)
+  rubyzip
   sanitize
   scenic
   selenium-webdriver

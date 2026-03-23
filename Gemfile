@@ -62,7 +62,7 @@ gem "rotp"
 gem "rqrcode"
 gem "kramdown"
 gem "abbrev"
-gem "rubyzip", "~> 2.4", require: "zip"
+gem "rubyzip", require: false
 gem "webrick"
 gem "useragent"
 gem "dotenv-rails", require: false # This is loaded in application.rb

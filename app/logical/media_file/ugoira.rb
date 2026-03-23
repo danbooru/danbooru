@@ -79,6 +79,7 @@ class MediaFile::Ugoira < MediaFile
         end
       end
 
+      return "zip64 format is not supported" if entry.zip64?
       return "file '#{entry.name}' cannot have comments" if entry.comment_size > 0
       return "file '#{entry.name}' cannot have extra fields (fields: #{entry.extra.keys.join(", ")})" if entry.extra_size > 0
       return "file '#{entry.name}' cannot be compressed" if entry.compression_method != Zip::Entry::STORED
@@ -120,6 +121,7 @@ class MediaFile::Ugoira < MediaFile
     return "must have at least two frames" if frames.size < 2
     return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
     return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
+    return "zip64 format is not supported" if zip.instance_variable_get(:@cdir).instance_variable_get(:@version_needed_for_extract) == Zip::VERSION_NEEDED_TO_EXTRACT_ZIP64 # XXX hack
 
     nil
   ensure
@@ -273,7 +275,7 @@ class MediaFile::Ugoira < MediaFile
   # @param mtime [Time] The timestamp to set on the files in the zip file.
   # @param data [Hash] Extra data to include in the animation.json file.
   # @return [MediaFile] The new ugoira.
-  def self.create(frames, frame_delays:, mtime: Time.new(1980, 1, 1), data: {})
+  def self.create(frames, frame_delays:, mtime: Time.utc(1980, 1, 1), data: {})
     new(frames, frame_delays:).create_copy(data:, mtime:)
   end
 
@@ -283,7 +285,7 @@ class MediaFile::Ugoira < MediaFile
   # @param mtime [Time] The timestamp to set on the files in the zip file.
   # @param data [Hash] Extra data to include in the animation.json file.
   # @return [MediaFile] The new ugoira.
-  def create_copy(file: Danbooru::Tempfile.new(%w[danbooru-ugoira- .zip]), mtime: Time.new(1980, 1, 1), data: {})
+  def create_copy(file: Danbooru::Tempfile.new(%w[danbooru-ugoira- .zip]), mtime: Time.utc(1980, 1, 1), data: {})
     ziptime = Zip::DOSTime.new(mtime.year, mtime.month, mtime.day, mtime.hour, mtime.min, mtime.sec)
 
     animation_meta = {
@@ -299,7 +301,7 @@ class MediaFile::Ugoira < MediaFile
     # XXX Use rubyzip because libarchive adds some things to the zip that we don't want (extra UniversalTime fields for
     # timestamps and CRCs after the file data).
     Danbooru::Tempfile.create do |animation_json_file|
-      Zip::File.open(file, create: true) do |zip|
+      Zip::File.open(file, create: true, suppress_extra_fields: true) do |zip|
         entries = frames.map.with_index do |frame, n|
           [Zip::Entry.new(zip, "#{"%06d" % n}.#{frame.file_ext}"), frame]
         end
@@ -415,7 +417,7 @@ class MediaFile::Ugoira < MediaFile
 
       frames_with_delays = frames.zip(frame_delays)
       tmpdir_path = tmpdir.path
-      
+
       files_txt_path = File.join(tmpdir_path, "files.txt")
       File.open(files_txt_path, "w+") do |file|
         frames_with_delays.each do |frame, delay|
