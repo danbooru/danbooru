@@ -67,7 +67,14 @@ Rails.application.configure do
 
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
-  config.file_watcher = ActiveSupport::EventedFileUpdateChecker unless Danbooru.config.debug_mode
+  #
+  # In clustered Puma worker mode (`PUMA_WORKERS>0`), listen can fail to start
+  # in forked workers (`Listen::Error::NotStarted`), so use the polling watcher.
+  if ENV.fetch("PUMA_WORKERS", "0").to_i <= 0
+    config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+  else
+    config.file_watcher = ActiveSupport::FileUpdateChecker
+  end
 
   BetterErrors::Middleware.allow_ip!(IPAddr.new("0.0.0.0/0"))
   BetterErrors::Middleware.allow_ip!(IPAddr.new("::/0"))

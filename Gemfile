@@ -24,7 +24,7 @@ gem "rake"
 gem "redis"
 gem "builder"
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
-gem "puma", "~> 6.6"
+gem "puma"
 gem "scenic"
 gem "ipaddress_2"
 gem "http"

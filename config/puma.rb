@@ -9,6 +9,9 @@
 # * PUMA_WORKERS
 # * PUMA_MIN_THREADS
 # * PUMA_MAX_THREADS
+# * PUMA_CHECK_INTERVAL
+# * PUMA_MAX_KEEP_ALIVE
+# * PUMA_PERSISTENT_TIMEOUT
 # * PUMA_WORKER_TIMEOUT
 # * PUMA_PIDFILE
 # * PUMA_CONTROL_URL
@@ -48,8 +51,7 @@ elsif rails_env == "development"
   workers 0
 else
   # Default to one worker process per CPU core in production
-  require "concurrent-ruby"
-  workers Concurrent.available_processor_count.to_i.clamp(1..)
+  workers :auto
 end
 
 # The number of threads per worker to use. The `threads` method
@@ -70,9 +72,11 @@ worker_timeout ENV.fetch("PUMA_WORKER_TIMEOUT", 60)
 # Default: once per second.
 worker_check_interval ENV.fetch("PUMA_CHECK_INTERVAL", 1).to_i
 
-# The number of seconds to wait for another request within a persistent (keep
-# alive) session.
-persistent_timeout 20
+# The maximum number of requests to process in a keep alive connection before closing it.
+max_keep_alive ENV.fetch("PUMA_MAX_KEEP_ALIVE", 1000).to_i
+
+# The number of seconds to wait for another request within a persistent (keep alive) session.
+persistent_timeout ENV.fetch("PUMA_PERSISTENT_TIMEOUT", 65).to_i
 
 # The number of seconds to wait until we get the first data for the request
 first_data_timeout 30
@@ -82,14 +86,6 @@ environment rails_env
 
 # The `pidfile` that Puma will use.
 pidfile ENV.fetch("PUMA_PIDFILE", "tmp/pids/server.pid")
-
-# Use the `preload_app!` method when specifying a `workers` number.
-# This directive tells Puma to first boot the application and load code
-# before forking the application. This takes advantage of Copy On Write
-# process behavior so workers use less memory.
-if rails_env != "development"
-  preload_app!
-end
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
@@ -150,13 +146,13 @@ before_fork do
 end
 
 # This is called in the master process right before a worker is started.
-on_worker_fork do |worker_id|
+before_worker_fork do |worker_id|
   ApplicationMetrics[:puma_restarts_total][worker: worker_id].increment
 end
 
 # This is called every time a worker process starts or restarts. It's not called in single mode (when workers == 0)
 # when there are no child worker processes.
-on_worker_boot do |worker_id|
+before_worker_boot do |worker_id|
   # Starts a background thread that serves process metrics on a Unix domain socket under tmp/.
   require_relative "../app/logical/application_metrics"
   ApplicationMetrics.puma_worker_id = worker_id.to_s
