@@ -60,11 +60,7 @@ class StorageManagerTest < ActiveSupport::TestCase
         .with_exposed_ports("22/tcp")
         .with_wait_for(:tcp_port, "22")
 
-      begin
-        @sftp_container.start
-      rescue Testcontainers::ConnectionError => e
-        skip "Docker not available: #{e.message}"
-      end
+      @sftp_container.start
 
       @storage_manager = StorageManager::SFTP.new(@sftp_container.host, base_dir: "/upload", ssh_options: {
         port: @sftp_container.mapped_port(22),
@@ -73,11 +69,15 @@ class StorageManagerTest < ActiveSupport::TestCase
         verify_host_key: :never,
         auth_methods: %w[password],
       })
+    rescue Testcontainers::Error => e
+      skip "Docker not available: #{e.message}"
     end
 
     teardown do
       @sftp_container&.stop
       @sftp_container&.remove
+    rescue Testcontainers::Error
+      nil
     end
 
     context "#store method" do

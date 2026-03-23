@@ -108,7 +108,7 @@ module Source::Tests::Extractor
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "❤️24h会动的小Q人！",
+        dtext_artist_commentary_title: "❤️72h会动的小Q人！",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           加价服务清单
           加一个人人物（双人互动） ¥30

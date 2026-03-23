@@ -9,10 +9,11 @@ class UpgradeCodesController < ApplicationController
   end
 
   def redeem
+    authorize UpgradeCode
   end
 
   def upgrade
-    @upgrade_code = UpgradeCode.redeem!(code: params.dig(:upgrade_code, :code), redeemer: CurrentUser.user)
+    @upgrade_code = authorize(UpgradeCode).redeem!(code: params.dig(:upgrade_code, :code), redeemer: CurrentUser.user)
 
     respond_with(@upgrade_code, location: @upgrade_code.user_upgrade)
   end

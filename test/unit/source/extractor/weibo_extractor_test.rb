@@ -172,7 +172,7 @@ module Source::Tests::Extractor
         page_url: "https://www.weibo.com/2427303621/MxojLlLgQ",
         profile_url: "https://www.weibo.com/u/2427303621",
         profile_urls: %w[https://www.weibo.com/u/2427303621],
-        display_name: "痞影人科莱昂",
+        display_name: "科技宅科莱昂",
         username: nil,
         published_at: Time.parse("2023-03-15T07:52:01.000000Z"),
         updated_at: nil,
