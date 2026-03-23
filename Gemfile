@@ -7,7 +7,7 @@ gem "pg"
 gem "simple_form"
 gem "sanitize"
 gem "ruby-vips"
-gem "diff-lcs", "~> 1.6", require: "diff/lcs/array"
+gem "diff-lcs", require: false
 gem "bcrypt", require: "bcrypt"
 gem "aws-sdk-sqs", "~> 1"
 gem "responders"

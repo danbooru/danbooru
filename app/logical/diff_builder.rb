@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "diff/lcs/array" # diff-lcs gem
+
 # Builds an HTML diff between two pieces of text.
 class DiffBuilder
   attr_reader :this_text, :that_text, :pattern
