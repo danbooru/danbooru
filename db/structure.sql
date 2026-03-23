@@ -4490,10 +4490,10 @@ CREATE UNIQUE INDEX index_good_job_settings_on_key ON public.good_job_settings U
 
 
 --
--- Name: index_good_jobs_jobs_on_finished_at; Type: INDEX; Schema: public; Owner: -
+-- Name: index_good_jobs_jobs_on_finished_at_only; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_good_jobs_jobs_on_finished_at ON public.good_jobs USING btree (finished_at) WHERE ((retried_good_job_id IS NULL) AND (finished_at IS NOT NULL));
+CREATE INDEX index_good_jobs_jobs_on_finished_at_only ON public.good_jobs USING btree (finished_at) WHERE (finished_at IS NOT NULL);
 
 
 --
@@ -4550,6 +4550,13 @@ CREATE INDEX index_good_jobs_on_cron_key_and_created_at_cond ON public.good_jobs
 --
 
 CREATE UNIQUE INDEX index_good_jobs_on_cron_key_and_cron_at_cond ON public.good_jobs USING btree (cron_key, cron_at) WHERE (cron_key IS NOT NULL);
+
+
+--
+-- Name: index_good_jobs_on_job_class; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_job_class ON public.good_jobs USING btree (job_class);
 
 
 --
@@ -7149,6 +7156,9 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260323172054'),
+('20260323172053'),
+('20260323172052'),
 ('20260309181625'),
 ('20260309171518'),
 ('20250720155738'),
