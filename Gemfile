@@ -2,7 +2,7 @@ source "https://rubygems.org/"
 
 ruby "~> 3.4.5"
 
-gem "rails", "~> 8.0"
+gem "rails"
 gem "pg"
 gem "simple_form"
 gem "sanitize"
@@ -66,6 +66,7 @@ gem "rubyzip", "~> 2.4", require: "zip"
 gem "webrick"
 gem "useragent"
 gem "dotenv-rails", require: false # This is loaded in application.rb
+gem "benchmark"
 
 group :development do
   gem "rubocop", require: false
