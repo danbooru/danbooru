@@ -865,6 +865,16 @@ class PostTest < ActiveSupport::TestCase
 
             assert_equal([], @pool.reload.post_ids)
           end
+
+          should "remove the post from all pools with pool:none" do
+            @pool1 = create(:pool, post_ids: [@post.id])
+            @pool2 = create(:pool, post_ids: [@post.id])
+
+            @post.update(tag_string: "aaa pool:none")
+
+            assert_equal([], @pool1.reload.post_ids)
+            assert_equal([], @pool2.reload.post_ids)
+          end
         end
 
         context "for the newpool: metatag" do

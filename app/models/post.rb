@@ -522,6 +522,9 @@ class Post < ApplicationRecord
           pool = Pool.find_by_id(pool_id)
           pool&.add!(self)
 
+        in "pool", "none"
+          remove_from_all_pools
+
         in "pool", name
           pool = Pool.find_by_name(name)
           pool&.add!(self)
