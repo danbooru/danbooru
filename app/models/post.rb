@@ -1080,6 +1080,12 @@ class Post < ApplicationRecord
         relation
       end
 
+      def with_disapproval_stats
+        relation = left_outer_joins(:disapprovals).group(:id).select("posts.*")
+        relation = relation.select("COUNT(post_disapprovals.id) AS disapproval_count")
+        relation
+      end
+
       def with_replacement_stats
         relation = left_outer_joins(:replacements).group(:id).select("posts.*")
         relation = relation.select("COUNT(post_replacements.id) AS replacement_count")
