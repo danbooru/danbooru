@@ -39,7 +39,7 @@ class Blacklist {
       this.collapsed = value;
     }
 
-    this.visibleRules.forEach(rule => rule.enabled = Boolean(value));
+    this.visibleRules.forEach(rule => { rule.enabled = Boolean(value) });
     this.posts.forEach(post => post.update());
   }
 
@@ -62,7 +62,7 @@ class Blacklist {
   }
 
   set blurImages(value) {
-    this.rules.forEach(rule => rule.hideMethod = Boolean(value) ? "blur" : "hide");
+    this.rules.forEach(rule => { rule.hideMethod = Boolean(value) ? "blur" : "hide"; });
   }
 
   get collapsed() {

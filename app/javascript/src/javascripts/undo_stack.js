@@ -30,7 +30,7 @@ class UndoStack {
     this.updateCurrent();
     while (this.undoItems.length > 0) {
       let item = this.undoItems.pop();
-      if (item.value == this.currentItem.value) {
+      if (item.value === this.currentItem.value) {
         continue;
       }
       this.redoItems.push(this.currentItem);
@@ -87,10 +87,10 @@ class UndoStack {
       let target = e.target;
       let event = e.originalEvent;
 
-      if (event.inputType == "historyUndo") {
+      if (event.inputType === "historyUndo") {
         target.undoStack.undo();
         e.preventDefault();
-      } else if (event.inputType == "historyRedo") {
+      } else if (event.inputType === "historyRedo") {
         target.undoStack.redo();
         e.preventDefault();
       } else {

@@ -1,5 +1,3 @@
-import Utility from "./utility";
-
 class ForumPostComponent {
   static initialize() {
     if ($("#c-forum-topics #a-show, #c-forum-posts #a-show").length) {

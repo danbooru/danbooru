@@ -1,6 +1,6 @@
 import CurrentUser from './current_user'
 import Utility from './utility'
-import { delay, isMobile, isTouchscreen }  from './utility'
+import { delay, isMobile } from './utility'
 import Notice from './notice'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'

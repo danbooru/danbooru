@@ -85,7 +85,7 @@ export default class VideoPlayer {
 
     // Autoplay unless blacklisted. Ignore autoplay errors due to browser restrictions.
     if (this.autoplay && this.$container.closest(".blacklisted-active").length === 0) {
-      this.play().catch(() => {});
+      this.play().catch(() => null);
     }
   }
 
@@ -110,7 +110,6 @@ export default class VideoPlayer {
       // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play#exceptions
       if (error instanceof DOMException && error.name === "NotSupportedError") {
         this._error = "Your browser doesn't support this video format.";
-        return;
       }
     }
   }
@@ -221,6 +220,8 @@ export default class VideoPlayer {
        (["m", "ArrowDown", "ArrowUp"].includes(event.key) && this.hasSound)) {
       return false;
     }
+
+    return true;
   }
 
   // Pauses the video while the user is tabbed out.

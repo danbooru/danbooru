@@ -23,7 +23,7 @@ export default class VideoRenderer {
 
   pause() {
     if (this.video.paused) {
-      return;
+      return null;
     }
 
     return new Promise((resolve) => {

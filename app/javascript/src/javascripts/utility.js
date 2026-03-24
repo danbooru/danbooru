@@ -189,6 +189,8 @@ export function uploadError(upload) {
   // The upload failed with a validation error (normally an invalid URL or too many queued assets)
   } else if (upload.errors) {
     return errorFromResponse(upload);
+  } else {
+    return null;
   }
 }
 

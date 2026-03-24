@@ -385,7 +385,7 @@ export default class DTextEditor {
 
   // @returns {Object} - The autocompletion type and context for the current word, if it's autocompleteable, or nothing if the word can't be autocompleted.
   get autocompletionQuery() {
-    let match;
+    let match = null;
     let prefix = "";
     let suffix = "";
     let fullPrefix = "";

@@ -1,4 +1,4 @@
-import { clamp, isBeforeInputEventAvailable }  from './utility'
+import { clamp, isBeforeInputEventAvailable } from './utility'
 import UndoStack from './undo_stack';
 import Utility from './utility';
 
@@ -88,12 +88,12 @@ Autocomplete.initialize_tag_autocomplete = function() {
       let target = e.target;
       let event = e.originalEvent;
 
-      if (event.inputType == "deleteWordBackward" || event.inputType == "deleteWordForward") {
+      if (event.inputType === "deleteWordBackward" || event.inputType === "deleteWordForward") {
         // Ctrl+Backspace or Ctrl+Delete were pressed. Delete an entire tag before/after the caret.
         let caret = target.selectionStart;
         var before_caret_text = target.value.substring(0, caret);
         var after_caret_text = target.value.substring(caret);
-        if (event.inputType == "deleteWordBackward") {
+        if (event.inputType === "deleteWordBackward") {
           before_caret_text = before_caret_text.replace(Autocomplete.PREV_WORD_REGEXP, function(match) {
             if (!match.startsWith(" ") && match.endsWith(" ")) {
               // Add an extra space after the caret when deleting the final word in a tag.
@@ -101,7 +101,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
             }
             return "";
           });
-        } else if (event.inputType == "deleteWordForward") {
+        } else if (event.inputType === "deleteWordForward") {
           after_caret_text = after_caret_text.replace(Autocomplete.NEXT_WORD_REGEXP, function(match) {
             if (!match.startsWith(" ") && match.endsWith(" ")) {
               // Add an extra space after the caret when deleting the final word in a tag.

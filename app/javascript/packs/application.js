@@ -115,5 +115,5 @@ window.Danbooru = Danbooru;
 Alpine.plugin(morph);
 Alpine.plugin(persist)
 
-$(document).on("alpine:initialized", () => Alpine._initialized = true);
+$(document).on("alpine:initialized", () => { Alpine._initialized = true; });
 $(() => Alpine.start());
