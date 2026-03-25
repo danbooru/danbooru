@@ -52,7 +52,7 @@ class StorageManagerTest < ActiveSupport::TestCase
   context "StorageManager::SFTP" do
     setup do
       # Work around testcontainers producing `'IO#read': closed stream` warnings when it tries to detect the host's gateway IP.
-      ENV["TC_HOST"] = `ip -4 route show default`.split[2]
+      ENV["TC_HOST"] = `ip -4 route show default`.split[2] unless ENV["CI"].present?
 
       @sftp_container =
         Testcontainers::DockerContainer.new("atmoz/sftp")
@@ -130,7 +130,7 @@ class StorageManagerTest < ActiveSupport::TestCase
         assert_equal("original", file.read)
         file.close
       ensure
-        StorageManager::SFTP::SFTPConnection.define_singleton_method(:open, real_open)
+        StorageManager::SFTP::SFTPConnection.define_singleton_method(:open, real_open) if defined?(real_open) && real_open
       end
 
       should "create parent directories if they don't already exist" do
