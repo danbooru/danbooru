@@ -290,18 +290,27 @@ Autocomplete.on_tab = function(event) {
   var autocomplete = $(input).autocomplete("instance");
   var $autocomplete_menu = autocomplete.menu.element;
 
-  if (!$autocomplete_menu.is(":visible")) {
+  if ($autocomplete_menu.is(":visible")) {
+    if ($autocomplete_menu.has(".ui-state-active").length === 0) {
+      autocomplete.menu.next();
+      autocomplete.menu.select();
+      autocomplete.close();
+    }
+
+    event.preventDefault();
     return;
   }
 
-  if ($autocomplete_menu.has(".ui-state-active").length === 0) {
-    autocomplete.menu.next();
-    autocomplete.menu.select();
-    autocomplete.close();
-  }
+  // If the caret is in the middle of a tag, prevent tab from moving focus
+  // out of the field. This avoids accidentally tabbing away when autocomplete
+  // is still loading.
+  let caret = input.selectionStart;
+  let term_before_caret = input.value.substring(0, caret).match(/\S*$/)[0];
+  let term_after_caret = input.value.substring(caret).match(/^\S*/)[0];
 
-  // Prevent the tab key from moving focus to the next element.
-  event.preventDefault();
+  if (term_before_caret.length > 0 || term_after_caret.length > 0) {
+    event.preventDefault();
+  }
 };
 
 Autocomplete.render_item = function(list, item) {
