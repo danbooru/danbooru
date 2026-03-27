@@ -13,7 +13,7 @@ Shortcuts.initialize = function() {
 }
 
 // Bind keyboard shortcuts to links that have a `data-shortcut="..."` attribute. If multiple links have the
-// same shortcut, then only the first link will be triggered by the shortcut.
+// same shortcut, then the first link that matches its condition will be triggered by the shortcut.
 //
 // Add `data-shortcut-when="$selector"`, where `selector` is any valid jQuery selector, to make the shortcut
 // active only when the link matches the selector. For example, `data-shortcut-when=":visible"` makes the
@@ -30,17 +30,22 @@ Shortcuts.initialize_data_shortcuts = function() {
     $(element).attr("title", title);
 
     Utility.keydown(keys, namespace, event => {
-      const e = $(`[data-shortcut="${keys}"]`).get(0);
-      const condition = $(e).attr("data-shortcut-when") || "*";
+      const elements = $(`[data-shortcut="${keys}"]`);
 
-      if ($(e).is(condition)) {
-        if ($(e).is('input[type="text"], textarea')) {
-          $(e).focus().selectEnd();
-        } else {
-          e.click();
+      for (let i = 0; i < elements.length; i++) {
+        const e = elements.get(i);
+        const condition = $(e).attr("data-shortcut-when") || "*";
+
+        if ($(e).is(condition)) {
+          if ($(e).is('input[type="text"], textarea')) {
+            $(e).focus().selectEnd();
+          } else {
+            e.click();
+          }
+
+          event.preventDefault();
+          break;
         }
-
-        event.preventDefault();
       }
     });
   });
