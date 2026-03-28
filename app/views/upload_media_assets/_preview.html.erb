@@ -15,5 +15,12 @@
         <%= link_to "post ##{upload_media_asset.post.id}", upload_media_asset.post %>
       <% end %>
     </div>
+    <div class="text-center text-xs h-4">
+      <% if upload_media_asset.is_hidden? %>
+        <%= link_to "Unhide", upload_media_asset_path(upload_media_asset), method: :put, remote: true, "data-params": "upload_media_asset[is_hidden]=false" %>
+      <% else %>
+        <%= link_to "Hide", upload_media_asset_path(upload_media_asset), method: :put, remote: true, "data-params": "upload_media_asset[is_hidden]=true" %>
+      <% end %>
+    </div>
   <% end %>
 <% end %>
