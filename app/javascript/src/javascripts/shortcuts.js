@@ -110,7 +110,17 @@ Shortcuts.hide_tooltips = function() {
 }
 
 Shortcuts.keyboard_shortcuts = function() {
-  window.location.href = "/static/keyboard_shortcuts";
+  $.get("/static/keyboard_shortcuts", function(html) {
+    let content = $(html).find("#a-keyboard-shortcuts");
+    $("<div>").append(content.children()).dialog({
+      title: "Keyboard Shortcuts",
+      width: 800,
+      modal: true,
+      close: function() {
+        $(this).dialog("destroy");
+      },
+    });
+  });
 }
 
 $(document).ready(function() {
