@@ -6,7 +6,7 @@ let Shortcuts = {};
 Shortcuts.initialize = function() {
   Utility.keydown("s", "scroll_down", Shortcuts.nav_scroll_down);
   Utility.keydown("w", "scroll_up", Shortcuts.nav_scroll_up);
-  Utility.keydown("ctrl+return", "submit_form", Shortcuts.submit_form, 'input[type="text"], textarea');
+  Utility.keydown("ctrl+return meta+return", "submit_form", Shortcuts.submit_form, 'input[type="text"], textarea');
   Utility.keydown("esc", "hide_tooltips", Shortcuts.hide_tooltips);
 
   Shortcuts.initialize_data_shortcuts();
