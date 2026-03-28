@@ -8,6 +8,7 @@ Shortcuts.initialize = function() {
   Utility.keydown("w", "scroll_up", Shortcuts.nav_scroll_up);
   Utility.keydown("ctrl+return meta+return", "submit_form", Shortcuts.submit_form, 'input[type="text"], textarea');
   Utility.keydown("esc", "hide_tooltips", Shortcuts.hide_tooltips);
+  Utility.keydown("shift+/", "keyboard_shortcuts", Shortcuts.keyboard_shortcuts);
 
   Shortcuts.initialize_data_shortcuts();
 }
@@ -66,6 +67,10 @@ Shortcuts.nav_scroll_up = function() {
 
 Shortcuts.hide_tooltips = function() {
   hideAll({ duration: 0 });
+}
+
+Shortcuts.keyboard_shortcuts = function() {
+  window.location.href = "/static/keyboard_shortcuts";
 }
 
 $(document).ready(function() {
