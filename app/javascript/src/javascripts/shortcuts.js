@@ -10,8 +10,48 @@ Shortcuts.initialize = function() {
   Utility.keydown("esc", "hide_tooltips", Shortcuts.hide_tooltips);
   Utility.keydown("shift+/", "keyboard_shortcuts", Shortcuts.keyboard_shortcuts);
 
+  Shortcuts.initialize_nav_shortcuts();
   Shortcuts.initialize_data_shortcuts();
 }
+
+Shortcuts.NAV_KEYS = {
+  p: "nav-posts",
+  c: "nav-comments",
+  n: "nav-notes",
+  a: "nav-artists",
+  t: "nav-tags",
+  l: "nav-pools",
+  w: "nav-wiki",
+  f: "nav-forum",
+  m: "nav-my-account",
+};
+
+Shortcuts.initialize_nav_shortcuts = function() {
+  let gPressed = false;
+  let timer = null;
+
+  $(document).on("keydown.danbooru.nav_prefix", function(event) {
+    if ($(event.target).is('input, textarea, select')) return;
+
+    if (!gPressed) {
+      if (event.key === "g" && !event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey) {
+        gPressed = true;
+        timer = setTimeout(() => { gPressed = false; }, 1000);
+        event.preventDefault();
+      }
+    } else {
+      gPressed = false;
+      clearTimeout(timer);
+
+      const id = Shortcuts.NAV_KEYS[event.key];
+      if (id) {
+        const link = document.getElementById(id);
+        if (link) link.click();
+        event.preventDefault();
+      }
+    }
+  });
+};
 
 // Bind keyboard shortcuts to links that have a `data-shortcut="..."` attribute. If multiple links have the
 // same shortcut, then the first link that matches its condition will be triggered by the shortcut.
