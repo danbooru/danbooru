@@ -296,21 +296,9 @@ Autocomplete.on_tab = function(event) {
       autocomplete.menu.select();
       autocomplete.close();
     }
-
-    event.preventDefault();
-    return;
   }
 
-  // If the caret is in the middle of a tag, prevent tab from moving focus
-  // out of the field. This avoids accidentally tabbing away when autocomplete
-  // is still loading.
-  let caret = input.selectionStart;
-  let term_before_caret = input.value.substring(0, caret).match(/\S*$/)[0];
-  let term_after_caret = input.value.substring(caret).match(/^\S*/)[0];
-
-  if (term_before_caret.length > 0 || term_after_caret.length > 0) {
-    event.preventDefault();
-  }
+  event.preventDefault();
 };
 
 Autocomplete.render_item = function(list, item) {
