@@ -1,5 +1,4 @@
 const js = require("@eslint/js");
-const babelParser = require("@babel/eslint-parser");
 const globals = require("globals");
 const ignoreErb = require("eslint-plugin-ignore-erb");
 const { browser, es2017 } = globals;
@@ -27,12 +26,8 @@ module.exports = [
   {
     files: ["**/*.js", "**/*.js.erb"],
     languageOptions: {
-      parser: babelParser,
-      ecmaVersion: 2017,
+      ecmaVersion: "latest",
       sourceType: "module",
-      parserOptions: {
-        requireConfigFile: true,
-      },
       globals: {
         ...normalizeGlobals(browser, es2017),
         $: "readonly",

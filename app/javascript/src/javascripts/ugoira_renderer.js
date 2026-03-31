@@ -139,7 +139,7 @@ export class UgoiraLoader {
 
     // Read a group of files from N to N+count from the zip file. There is a 40 byte header between each file in the zip file.
     let frameGroupOffset = frames[n].fileOffset;
-    let frameGroupSize = frameGroup.reduce((sum, frame) => sum + frame.fileSize, 0) + 40 * (count - 1);
+    let frameGroupSize = frameGroup.reduce((sum, frame) => sum + frame.fileSize, 0) + (40 * (count - 1));
     let frameGroupData = await this.read(frameGroupOffset, frameGroupSize);
     let images = [];
 
@@ -183,10 +183,12 @@ export class UgoiraLoader {
 
     for (let frame = 0; frame < frames.length; frame += framesPerChunk * chunks) {
       let promises = Array.from({ length: chunks }).map((_, chunk) => {
-        let chunkStart = frame + framesPerChunk * chunk;
+        let chunkStart = frame + (framesPerChunk * chunk);
 
         if (chunkStart < frames.length) {
           return this.loadFrames(chunkStart, framesPerChunk, loadFrameCallback);
+        } else {
+          return null;
         }
       });
 
@@ -287,7 +289,7 @@ export default class UgoiraRenderer {
     let now = this.now();
     let elapsedTime = now - (this._previousTime ?? now);
 
-    this.currentTime = (this.currentTime + elapsedTime * this.playbackRate) % this.duration;
+    this.currentTime = (this.currentTime + (elapsedTime * this.playbackRate)) % this.duration;
     this._previousTime = now;
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
   }

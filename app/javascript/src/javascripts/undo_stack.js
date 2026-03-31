@@ -1,5 +1,5 @@
 import Utility from './utility';
-import { isBeforeInputEventAvailable }  from './utility'
+import { isBeforeInputEventAvailable } from './utility'
 
 class UndoItem {
   constructor(element, action) {
