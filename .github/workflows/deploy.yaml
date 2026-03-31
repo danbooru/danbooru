@@ -38,7 +38,7 @@ jobs:
     steps:
       # https://github.com/marketplace/actions/kubectl-tool-installer
       - name: Install Kubectl
-        uses: Azure/setup-kubectl@v4.0.1
+        uses: Azure/setup-kubectl@v5
 
       - name: Configure Kubectl
         run: |

@@ -109,7 +109,7 @@ jobs:
 
     # https://github.com/marketplace/actions/codecov
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       if: ${{ !cancelled() }}
       with:
         root_dir: /danbooru
@@ -121,7 +121,7 @@ jobs:
     # https://docs.codecov.com/docs/test-analytics
     - name: Upload test results to Codecov
       if: ${{ !cancelled() }}
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         root_dir: /danbooru
         working-directory: /danbooru
@@ -130,7 +130,7 @@ jobs:
         verbose: true
 
     - name: Upload test results to Github
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       if: ${{ !cancelled() }}
       with:
         name: test-results
