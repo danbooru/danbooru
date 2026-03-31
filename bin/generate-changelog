@@ -6,15 +6,13 @@ require "net/http"
 require "json"
 require "open3"
 
-# Generate a changelog between two commits. Parses `git log` and optionally uses `copilot` to summarize the changes.
+# Generate a changelog between two commits.
 class ChangelogGenerator
   def initialize
     @options = {
       repo: `git config --get remote.origin.url`.strip.split(":").last.delete_suffix(".git"), # Name of the Github repo, e.g. danbooru/danbooru
       commits: "origin/production..master", # The range of commits to include in the changelog
       format: "dtext",  # Output format ("dtext", "html", or "markdown")
-      model: "auto",    # The model to use for summarization (passed to `copilot --model`)
-      summarize: false, # Whether to summarize the changelog with Copilot
       verbose: false,   # Whether to print the commands being run
     }
   end
@@ -35,11 +33,9 @@ class ChangelogGenerator
       end
 
       parser.on("-v", "--verbose", "Show the commands being run")
-      parser.on("-c", "--commits=RANGE", "Commit range to include in the changelog, in 'from..to' format (default: #{@options[:commits]}")
+      parser.on("-c", "--commits=RANGE", "Commit range to include in the changelog, in 'from..to' format. Default: #{@options[:commits]}")
       parser.on("-f", "--format=FORMAT", %w[html dtext markdown], "Output format (HTML, DText, Markdown). Default: #{@options[:format]}")
       parser.on("-r", "--repo=OWNER/NAME", "Name of the GitHub repository (default: #{@options[:repo]})")
-      parser.on("-s", "--summarize", "Summarize the changelog with Copilot (default: #{@options[:summarize]})")
-      parser.on("-m", "--model=MODEL", "Model to use for summarization (default: #{@options[:model]}; see `copilot --help` for models)")
 
       parser.parse!(argv, into: @options)
 
@@ -57,11 +53,7 @@ class ChangelogGenerator
     commit_url = "https://github.com/#{@options[:repo]}/commit"
     compare_url = "https://github.com/#{@options[:repo]}/compare/#{@options[:commits]}"
 
-    if @options[:summarize]
-      changes, fixes = summarize_changelog
-    else
-      changes, fixes = ["Added a feature."], ["Fixed a bug."]
-    end
+    changes, fixes = ["Added a feature."], ["Fixed a bug."]
 
     ERB.new(<<~'EOS', trim_mode: "-").result(binding).gsub(/\n\n+/, "\n\n")
       h4. <%= Time.now.strftime("%Y-%m-%d") %>
@@ -134,47 +126,6 @@ class ChangelogGenerator
       title = title.gsub(/#\d+/, "issue \\0")
       { sha: sha.strip, title: title.strip, author: author.strip }
     end
-  end
-
-  # @return [Array<String>, Array<String>] An array of changes and an array of fixes.
-  def summarize_changelog
-    raise "GitHub CLI not found. Install it with `sudo apt-get install gh`." unless system("gh --version > /dev/null")
-    raise "Copilot CLI not found. Install it with `sudo npm install -g @github/copilot`." unless system("which copilot > /dev/null") && !`copilot version > /dev/null < /dev/null`.match?(/Cannot find GitHub Copilot/)
-    raise "GitHub Copilot CLI is not authenticated. Run `gh auth login` to authenticate." unless system("gh auth status > /dev/null 2>&1")
-
-    prompt = ERB.new(<<~EOS, trim_mode: "-").result(binding)
-      Write release notes for the commits below.
-
-      Return only valid JSON with this exact schema:
-
-      {
-        "changes": ["..."],
-        "fixes": ["..."]
-      }
-
-      Requirements:
-
-      - Put user-visible features/enhancements under "changes".
-      - Put bug fixes/regressions under "fixes".
-      - Keep each item to one sentence.
-      - Don't include internal changes that aren't user-visible.
-      - Read each commit along with any linked issues or pull requests to understand the changes.
-      - Return only JSON and nothing else. Do not return Markdown. Do not wrap the JSON in a code fence.
-
-      Commits:
-
-      <%- commits.each do |commit| -%>
-      - <%= commit[:sha] %>: <%= commit[:title].chomp(".") %> (<%= commit[:author] %>)
-      <%- end -%>
-    EOS
-
-    model = %W[--model #{@options[:model]}] if @options[:model] != "auto"
-    response = shell(["copilot", *model.to_a, "--silent", "--prompt", prompt])
-    payload = JSON.parse(response)
-
-    [payload["changes"], payload["fixes"]]
-  rescue JSON::ParserError
-    raise "Invalid response from Copilot: #{response}"
   end
 
   # @param args [Array<String>] The command and its arguments.
