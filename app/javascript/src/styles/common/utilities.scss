@@ -66,7 +66,7 @@ $spacer: 0.25rem; /* 4px */
 .scrollbar-stable { scrollbar-gutter: stable; }
 
 .break-all { word-break: break-all; overflow-wrap: anywhere; }
-.break-words { word-break: break-word !important; overflow-wrap: anywhere; }
+.break-words { overflow-wrap: anywhere !important; }
 .whitespace-nowrap { white-space: nowrap; }
 .whitespace-pre { white-space: pre; }
 .whitespace-pre-wrap { white-space: pre-wrap; }
@@ -280,6 +280,7 @@ $spacer: 0.25rem; /* 4px */
 .h-10   { height: 10 * $spacer; }
 .h-12   { height: 12 * $spacer; }
 .h-16   { height: 16 * $spacer; }
+
 // round() is to avoid inconsistent subpixel rounding that causes off-by-1px layout issues in responsive elements.
 // https: //css-tip.com/pixel-rounding/
 .h-full { height: 100%; height: round(100%, 1px); }

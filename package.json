@@ -54,9 +54,9 @@
     "@webpack-cli/serve": "^3.0.1",
     "eslint": "^9.28.0",
     "eslint-plugin-ignore-erb": "^0.1.1",
-    "stylelint": "^16.20.0",
-    "stylelint-config-standard": "^38.0.0",
-    "stylelint-config-standard-scss": "^15.0.1",
+    "stylelint": "^17.6.0",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "webpack-dev-server": "^5.2.2"
   },
   "scripts": {

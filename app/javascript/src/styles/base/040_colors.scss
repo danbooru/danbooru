@@ -101,7 +101,7 @@ html {
   --white: #ffffff;
   --black: #000000;
 
-  --shadow-lg: 0 10px 15px -3px rgba(0 0 0 / 10%), 0 4px 6px -2px rgba(0 0 0 / 5%);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
 }
 
 html, body[data-current-user-theme="light"] {
@@ -198,10 +198,10 @@ html, body[data-current-user-theme="light"] {
   --preview-deleted-color: var(--grey-9);
   --preview-has-children-color: var(--green-3);
   --preview-has-parent-color: var(--yellow-3);
-  --preview-selected-color: rgba(0 0 0 / 15%);
+  --preview-selected-color: rgb(0 0 0 / 15%);
 
   --preview-icon-color: var(--inverse-text-color);
-  --preview-icon-background: rgba(0 0 0 / 70%);
+  --preview-icon-background: rgb(0 0 0 / 70%);
 
   --media-asset-placeholder-background-color: var(--grey-1);
 
@@ -474,7 +474,7 @@ html, body[data-current-user-theme="light"] {
   --preview-deleted-color: var(--grey-3);
   --preview-has-children-color: var(--green-3);
   --preview-has-parent-color: var(--orange-3);
-  --preview-selected-color: rgba(255 255 255 / 25%);
+  --preview-selected-color: rgb(255 255 255 / 25%);
 
   --media-asset-placeholder-background-color: var(--grey-8);
 

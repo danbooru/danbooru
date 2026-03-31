@@ -8,6 +8,11 @@ rules:
   no-descending-specificity: null
   selector-class-pattern: "[a-z_-]+"
   selector-id-pattern: "[a-z_-]+"
+  selector-type-no-unknown:
+    - true
+    - ignoreTypes:
+        - emoji
+        - media-gallery
   scss/dollar-variable-pattern: "[a-z_-]+"
   scss/operator-no-unspaced: null
   scss/comment-no-empty: null
