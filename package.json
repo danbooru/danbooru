@@ -39,7 +39,7 @@
     "postcss-preset-env": "^10.2.0",
     "sass": "^1.89.1",
     "sass-loader": "^16.0.5",
-    "shakapacker": "^8.0.0",
+    "shakapacker": "^9.7.0",
     "terser-webpack-plugin": "^5.3.14",
     "tippy.js": "^6.3.7",
     "twemoji-colr-font": "^15.0.3",
