@@ -26,8 +26,7 @@ class MediaFile::Image < MediaFile
   def is_supported?
     case file_ext
     when :avif
-      # XXX Mirrored AVIFs should be unsupported too, but we currently can't detect the mirrored flag using exiftool or ffprobe.
-      !metadata.is_rotated? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.is_animated_avif?
+      !metadata.is_rotated? && !metadata.is_mirrored? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.has_auxiliary_image? && !metadata.is_animated_avif?
     when :webp
       !is_animated?
     else

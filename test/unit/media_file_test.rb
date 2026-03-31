@@ -1003,13 +1003,7 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(false, MediaFile.open("test/files/avif/sequence-with-pitm.avif").is_supported?)
       assert_equal(false, MediaFile.open("test/files/avif/sequence-without-pitm.avif").is_supported?)
       assert_equal(false, MediaFile.open("test/files/avif/star-8bpc.avif").is_supported?)
-
       assert_equal(false, MediaFile.open("test/files/avif/alpha_video.avif").is_supported?)
-    end
-
-    should "detect unsupported AVIF files" do
-      skip "These should be unsupported, but aren't."
-
       assert_equal(false, MediaFile.open("test/files/avif/plum-blossom-small.profile0.8bpc.yuv420.alpha-full.avif").is_supported?)
       assert_equal(false, MediaFile.open("test/files/avif/kimono.mirror-horizontal.avif").is_supported?)
     end

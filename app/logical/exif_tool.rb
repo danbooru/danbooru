@@ -104,6 +104,16 @@ class ExifTool
       file_ext == :avif && metadata["QuickTime:CleanAperture"].present?
     end
 
+    # AVIF files can be mirrored with the "imir" transform.
+    def is_mirrored?
+      file_ext == :avif && metadata["QuickTime:Mirroring"].present?
+    end
+
+    # AVIF files can contain an auxiliary image (for example, an alpha image).
+    def has_auxiliary_image?
+      file_ext == :avif && metadata["QuickTime:AuxiliaryImageType"].present?
+    end
+
     # AVIF files can be a collection of smaller images combined in a grid to
     # form a larger image. This is done to reduce memory usage during encoding.
     #
