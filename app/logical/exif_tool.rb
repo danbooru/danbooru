@@ -109,7 +109,7 @@ class ExifTool
     #
     # https://0xc0000054.github.io/pdn-avif/using-image-grids.html
     def is_grid_image?
-      file_ext == :avif && metadata["Meta:MetaImageSize"].present?
+      file_ext == :avif && metadata["Meta:PrimaryItemReference"].to_i > 1 && !is_animated_avif?
     end
 
     # Some animations technically have a finite loop count, but loop for hundreds
