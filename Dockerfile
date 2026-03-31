@@ -24,9 +24,9 @@ ARG RUBY_MAJOR_VERSION="3.4"
 ARG MOZJPEG_VERSION="4.1.5"
 ARG VIPS_VERSION="8.14.2"
 ARG FFMPEG_VERSION="7.1.1"
-ARG EXIFTOOL_VERSION="13.30"
-ARG OPENRESTY_VERSION="1.27.1.2"
-ARG NODE_VERSION="22.16.0"
+ARG EXIFTOOL_VERSION="13.50"
+ARG OPENRESTY_VERSION="1.29.2.3"
+ARG NODE_VERSION="24.14.1"
 ARG UBUNTU_VERSION="24.04"
 
 
@@ -282,8 +282,8 @@ WORKDIR /danbooru
 COPY --link package.json package-lock.json ./
 
 RUN <<EOS
-  mkdir -p node_modules public/packs
-  chown danbooru:danbooru /danbooru node_modules public/packs
+  mkdir -p node_modules public/packs public/packs-dev
+  chown danbooru:danbooru /danbooru node_modules public/packs public/packs-dev
 EOS
 
 USER danbooru
