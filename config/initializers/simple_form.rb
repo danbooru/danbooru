@@ -63,6 +63,21 @@ SimpleForm.setup do |config|
     b.use :full_error, wrap_with: { tag: :span, class: :error }
   end
 
+  # Places the <label> above text-like inputs and applies a max width to the <input>.
+  config.wrappers "stacked-text-input", class: "input stacked-input", hint_class: "field_with_hint", error_class: "field_with_errors" do |b|
+    b.use :html5
+    b.use :placeholder
+    b.optional :maxlength
+    b.optional :minlength
+    b.optional :pattern
+    b.optional :min_max
+    b.optional :readonly
+    b.use :label
+    b.use :input, class: "w-full max-w-360px"
+    b.use :hint, wrap_with: { tag: :span, class: "hint fineprint" }
+    b.use :full_error, wrap_with: { tag: :span, class: :error }
+  end
+
   # Places the label above the toggle switch and hint.
   config.wrappers "stacked-toggle-switch", class: "input stacked-input stacked-toggle-switch", hint_class: "field_with_hint", error_class: "field_with_errors" do |b|
     b.use :html5
@@ -170,6 +185,11 @@ SimpleForm.setup do |config|
   # type as key and the wrapper that will be used for all inputs with specified type.
   config.wrapper_mappings = {
     boolean: "inline-toggle-switch",
+    string: "stacked-text-input",
+    email: "stacked-text-input",
+    password: "stacked-text-input",
+    url: "stacked-text-input",
+    file: "stacked-text-input",
   }
 
   # Namespaces where SimpleForm should look for custom input classes that

@@ -66,3 +66,9 @@
     max-width: 100%;
   }
 }
+
+#edit-dialog {
+  .upload-form {
+    position: static;
+  }
+}
