@@ -1,9 +1,21 @@
 ENV["RAILS_ENV"] = "test"
 
 # Enable coverage only when COVERAGE is set or when running the whole test suite with `bin/rails test`, not when running individual test files.
-if ENV["COVERAGE"].present? || ARGV.empty?
+if ENV["COVERAGE"].present?
   require "simplecov"
   require "simplecov-cobertura"
+
+  # Silence `coverage data provided by Coverage exceeds number of lines` warnings in .erb files, which occur because ERB
+  # eval coverage can include synthetic wrapper lines that exceed source line count.
+  module SimpleCov
+    module SourceFileErbWarningPatch
+      def coverage_exceeding_source_warn
+        super unless filename.end_with?(".erb")
+      end
+    end
+  end
+
+  SimpleCov::SourceFile.prepend(SimpleCov::SourceFileErbWarningPatch)
 
   SimpleCov.start "rails" do
     add_group "Extractors", "app/logical/source"
