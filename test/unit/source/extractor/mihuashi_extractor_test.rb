@@ -267,7 +267,6 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.mihuashi.com/profiles/109517 https://www.mihuashi.com/users/破嗝嗝],
         display_name: nil,
         username: "破嗝嗝",
-        other_names: %w[破嗝嗝 Og-pogg],
         published_at: Time.parse("2024-03-26T08:34:14.000000Z"),
         updated_at: nil,
         tags: [

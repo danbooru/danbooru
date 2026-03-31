@@ -61,9 +61,7 @@ module Source::Tests::Extractor
           ["日記", "https://comic.pixiv.net/tags/日記"],
         ],
         dtext_artist_commentary_title: "今日もとなりへ猫詣で!",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。"にゃんにゃんコミックス、発売中!!":[https://comic.pixiv.net/store/products/1236533]
-        EOS
+        dtext_artist_commentary_desc: "片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。",
       )
     end
 
@@ -147,9 +145,7 @@ module Source::Tests::Extractor
           ["日記", "https://comic.pixiv.net/tags/日記"],
         ],
         dtext_artist_commentary_title: "今日もとなりへ猫詣で!",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。"にゃんにゃんコミックス、発売中!!":[https://comic.pixiv.net/store/products/1236533]
-        EOS
+        dtext_artist_commentary_desc: "片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。",
       )
     end
 

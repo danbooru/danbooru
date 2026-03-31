@@ -59,9 +59,9 @@ module Source::Tests::Extractor
         image_urls: %w[https://i.pinimg.com/originals/f3/5a/ba/f35abaea99aa637650b1c395656c18a4.jpg],
         media_files: [{ file_size: 44_003 }],
         page_url: "https://www.pinterest.com/pin/668292032234493917/",
-        profile_urls: [],
-        display_name: nil,
-        username: nil,
+        profile_urls: %w[https://www.pinterest.com/straydogshowl/],
+        display_name: "Stray",
+        username: "straydogshowl",
         published_at: Time.parse("2024-04-10T05:34:29.000000Z"),
         updated_at: nil,
         tags: [],
@@ -83,7 +83,7 @@ module Source::Tests::Extractor
         published_at: Time.parse("2019-04-30T05:44:44.000000Z"),
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "Twitter. It's what's happening.",
+        dtext_artist_commentary_title: "X. It’s what’s happening",
         dtext_artist_commentary_desc: "From breaking news and entertainment to sports and politics, get the full story with all the live commentary.",
       )
     end

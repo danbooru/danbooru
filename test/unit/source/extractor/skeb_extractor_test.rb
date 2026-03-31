@@ -88,7 +88,7 @@ module Source::Tests::Extractor
           https://si.imgix.net/5189de71/uploads/origins/b7fd6358-aed9-4b35-be4d-2f86b8773836?bg=%23fff&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&auto=format&fm=webp&w=800&s=468fa4953b31b9ba03285d7391106d06
         ],
         media_files: [
-          { file_size: 118_951 },
+          { file_size: 118_854 },
           { file_size: 120_870 },
         ],
         page_url: "https://skeb.jp/@63ntm/works/9",
@@ -119,7 +119,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://skeb.jp/@goma_feet/works/1",
         image_urls: %w[https://si.imgix.net/74d299ef/uploads/origins/78ca23dc-a053-4ebe-894f-d5a06e228af8?bg=%23fff&auto=format&fm=webp&w=800&s=0f091c291e3eeaa8ffe4e35a314b153e],
-        media_files: [{ file_size: 102_068 }],
+        media_files: [{ file_size: 102_020 }],
         page_url: "https://skeb.jp/@goma_feet/works/1",
         profile_urls: %w[https://skeb.jp/@goma_feet],
         display_name: "ごましお",
