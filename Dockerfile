@@ -27,7 +27,8 @@ ARG FFMPEG_VERSION="7.1.1"
 ARG EXIFTOOL_VERSION="13.50"
 ARG OPENRESTY_VERSION="1.29.2.3"
 ARG NODE_VERSION="24.14.1"
-ARG UBUNTU_VERSION="24.04"
+ARG UBUNTU_VERSION="noble-20260217@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7072feef0c"
+ARG UBUNTU_SNAPSHOT="20260401T000000Z"
 
 
 # The base layer for everything.
@@ -35,6 +36,7 @@ FROM ubuntu:$UBUNTU_VERSION AS base
 SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"]
 
 ARG RUBY_MAJOR_VERSION
+ARG UBUNTU_SNAPSHOT
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV LANG=C.UTF-8
 ENV GEM_HOME=/home/danbooru/bundle
@@ -49,12 +51,22 @@ RUN <<EOS
     Dpkg::Options {
       "--force-confnew";
       "--force-confdef";
+      "--log=/dev/null";
     }
+
+    Dir::Log::History "/dev/null";
+    Dir::Log::Terminal "/dev/null";
 EOF
 
-  apt-get update
-  apt-get install -y --no-install-recommends \
-    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
+  apt-get install --update -y --no-install-recommends ca-certificates
+
+  cat > /etc/apt/apt.conf.d/50snapshot <<EOF
+    APT::Snapshot "$UBUNTU_SNAPSHOT";
+EOF
+
+  rm -rf /var/lib/apt/lists/*
+  apt-get install --update -y --no-install-recommends \
+    postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0t64 liblcms2-2 libpng16-16 libexpat1 \
     libglib2.0-0 libgif7 libexif12 libheif1 libx264-164 libx265-199 libsvtav1enc1d1 libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
     libreadline8t64 libarchive-zip-perl tini busybox less ncdu curl
@@ -63,6 +75,7 @@ EOF
   apt-get autoremove -y
   rm -rf /etc/gnutls/config /var/{lib,cache,log} /usr/share/{doc,info}/* /usr/local/*
   mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
+  ln -sf /dev/null /var/log/alternatives.log
 
   busybox --install -s
 EOS
