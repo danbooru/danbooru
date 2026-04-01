@@ -233,10 +233,17 @@ EOS
 # Install NodeJS. Output is in /usr/local.
 FROM build-base AS build-node
 ARG NODE_VERSION
+ARG TARGETARCH
 RUN <<EOS
   apt-get install -y --no-install-recommends xz-utils
 
-  curl -L https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | tar --strip-components=1 -xJvf -
+  case "$TARGETARCH" in
+    amd64) NODE_ARCH="x64" ;;
+    arm64) NODE_ARCH="arm64" ;;
+    *) echo "Unsupported architecture: $TARGETARCH" >&2; exit 1 ;;
+  esac
+
+  curl -L "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" | tar --strip-components=1 -xJvf -
 
   cp -rdv ./bin /usr/local
   cp -rdv ./lib /usr/local
