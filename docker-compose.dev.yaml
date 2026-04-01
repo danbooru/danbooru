@@ -37,6 +37,7 @@ x-debug-env: &debug-env
   RUBY_DEBUG_NONSTOP: "true"
   RUBY_DEBUG_HOST: 0.0.0.0
   RUBY_DEBUG_PORT: 12345
+  RUBY_DEBUG_PORT_RANGE: 16
 
 x-base-env: &base-env
   <<: *sqs-env
