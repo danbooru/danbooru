@@ -2,6 +2,13 @@
   <div id="a-index">
     <h1>Name Change Requests</h1>
 
+    <%= search_form_for(user_name_change_requests_path) do |f| %>
+      <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
+      <%= f.input :old_name, label: "Old Name", input_html: { value: params[:search][:old_name] } %>
+      <%= f.input :new_name, label: "New Name", input_html: { value: params[:search][:new_name] } %>
+      <%= f.submit "Search" %>
+    <% end %>
+
     <%= table_for @change_requests, width: "100%" do |t| %>
       <% t.column "User" do |change_request| %>
         <%= link_to_user change_request.user %>
