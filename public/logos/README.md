@@ -8,15 +8,14 @@ with spaces and special characters replaced by hyphens (e.g. `Anime News Network
 
 The site name is derived automatically from the website's URL, so that e.g. `https://www.pixiv.net` becomes `Pixiv`,
 which matches `pixiv-logo.png`. If the site name doesn't match the logo filename automatically, update `site_name` in
-`app/logical/source/url/null.rb` to match.
+[app/logical/source/url/null.rb](../../app/logical/source/url/null.rb) to match.
 
 Logos should have a transparent background, and should be legible over both a light and dark background.
 
-`external_site_icon` in app/helpers/icon_helper.rb is the method used to display these icons.
+`external_site_icon` in [app/helpers/icon_helper.rb](../../app/helpers/icon_helper.rb) is the method used to display these icons.
 
 # See also
 
-* `site_name` in app/logical/source/url.rb (Where default site names are generated)
-* `site_name` in app/logical/source/url/null.rb (Where custom site names for miscellaneous sites are generated)
-* `external_site_icon` in app/helpers/external_site_icon.rb
-* /static/components (visual list of all site logos)
+* `site_name` in [app/logical/source/url/null.rb](../../app/logical/source/url/null.rb) (where custom site names for miscellaneous sites are generated)
+* `external_site_icon` in [app/helpers/icon_helper.rb](../../app/helpers/icon_helper.rb)
+* http://localhost:3000/static/components (visual list of all site logos)

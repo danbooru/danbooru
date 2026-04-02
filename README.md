@@ -50,10 +50,9 @@ Alternatively, you may use the [Manual Installation Guide](https://github.com/da
 
 For help, ask in the [#technical](https://discord.com/channels/310432830138089472/310846683376517121) channel on the [Danbooru Discord](https://discord.gg/danbooru), or in the [discussions area](https://github.com/danbooru/danbooru/discussions) on Github.
 
-## Services
+## Dependencies
 
-Danbooru depends on a couple of cloud services and several microservices to
-implement certain features.
+Danbooru depends on a couple of cloud services and several microservices to implement certain features.
 
 ### Amazon Web Services
 
@@ -63,9 +62,7 @@ The Docker Compose files in this repository come with a preconfigured archives s
 
 ### Google APIs
 
-The following features require a Google Cloud account:
-
-* BigQuery database export
+There is an optional background job that exports a copy of all public API data to BigQuery. This requires a Google Cloud account.
 
 ### IQDB Service
 
@@ -82,3 +79,7 @@ The following features are delegated to the [Reportbooru service](https://github
 ### Recommender Service
 
 Post recommendations require the [Recommender service](https://github.com/danbooru/recommender).
+
+## Development
+
+See [docs/README.md](docs/README.md) for information on the project structure, development workflow, and how to contribute.
