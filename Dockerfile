@@ -17,8 +17,8 @@
 # See https://github.com/danbooru/danbooru/wiki/Docker-Guide for more details.
 
 # You must also update .ruby-version and the Gemfile when updating the Ruby version.
-ARG RUBY_VERSION="3.4.5"
-ARG RUBY_MAJOR_VERSION="3.4"
+ARG RUBY_VERSION="4.0.2"
+ARG RUBY_MAJOR_VERSION="4.0"
 
 # Update .tool-versions too when updating these.
 ARG MOZJPEG_VERSION="4.1.5"
