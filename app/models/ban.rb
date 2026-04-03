@@ -31,7 +31,6 @@ class Ban < ApplicationRecord
   belongs_to :user
   belongs_to :banner, class_name: "User"
 
-  normalizes :reason, with: ->(reason) { reason.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   before_validation { user&.lock! }
   validates :duration, presence: true

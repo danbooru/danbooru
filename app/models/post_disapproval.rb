@@ -8,6 +8,9 @@ class PostDisapproval < ApplicationRecord
 
   belongs_to :post
   belongs_to :user
+
+  normalizes :message, with: ->(message) { message.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   validates :user, uniqueness: { scope: :post, message: "have already hidden this post" }
   validates :reason, inclusion: { in: REASONS }
   validates :message, visible_string: { allow_empty: true }, length: { maximum: 140 }

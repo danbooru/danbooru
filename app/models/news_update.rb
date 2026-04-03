@@ -10,7 +10,7 @@ class NewsUpdate < ApplicationRecord
 
   scope :active, -> { undeleted.where("created_at + duration >= ?", Time.zone.now) }
 
-  normalizes :message, with: ->(message) { message.to_s.normalize_whitespace.unicode_normalize(:nfc).strip }
+
   validate :validate_duration, if: :duration_changed?
   validate :validate_active, on: :create
   validates :message, presence: true, length: { maximum: 280 }, if: :message_changed?

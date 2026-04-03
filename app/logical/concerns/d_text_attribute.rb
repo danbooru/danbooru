@@ -57,6 +57,9 @@ module DTextAttribute
         memoize "dtext_#{name}_was"                  # memoize :dtext_body_was
 
         prepended do
+          # normalizes :body, with: ->(value) { value.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+          normalizes name, with: ->(value) { value.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
           if media_embeds.present? && method_defined?(:"#{name}_changed?")
             # validates :body, media_embed: { ... }, if: :body_changed?
             validates name, media_embed: media_embeds, if: :"#{name}_changed?"

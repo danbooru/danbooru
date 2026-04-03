@@ -17,7 +17,6 @@ class ArtistCommentary < ApplicationRecord
   dtext_attribute :original_description, disable_mentions: true
   dtext_attribute :translated_description, disable_mentions: true
 
-  normalizes :original_title, :translated_title, :original_description, :translated_description, with: ->(string) { string.to_s.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "") }
 
   validates :post_id, uniqueness: true
   validates :original_title, length: { maximum: 600 }, if: :original_title_changed?

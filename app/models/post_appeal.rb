@@ -6,6 +6,8 @@ class PostAppeal < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to :post
 
+  normalizes :reason, with: ->(reason) { reason.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   validates :reason, visible_string: { allow_empty: true }, length: { maximum: 140 }
   validate :validate_post_is_appealable, on: :create
   validate :validate_creator_is_not_limited, on: :create

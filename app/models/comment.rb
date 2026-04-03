@@ -14,6 +14,8 @@ class Comment < ApplicationRecord
   has_many :active_votes, -> { active }, class_name: "CommentVote"
   has_many :mod_actions, as: :subject, dependent: :destroy
 
+  normalizes :body, with: ->(body) { body.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
   validate :validate_body, if: :body_changed?
 

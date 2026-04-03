@@ -564,7 +564,7 @@ class DText
   # @param text [String] The DText input.
   # @return [String] The normalized DText output.
   def self.normalize_whitespace(text)
-    text.to_s.normalize_whitespace(eol: "\n").gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").squeeze(" ").strip
+    text.to_s.normalize_whitespace.gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").squeeze(" ").strip
   end
 
   # Convert HTML to DText.
@@ -607,7 +607,7 @@ class DText
     children.map do |element|
       case element.name
       in "text"
-        escape(element.content, allowed_shortlinks:).normalize_whitespace(eol: "\n").gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
+        escape(element.content, allowed_shortlinks:).normalize_whitespace.gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
       in "br" if element.ancestors.any? { |e| e.name.in?(%w[a h1 h2 h3 h4 h5 h6]) }
         " "
       in "br" if element.ancestors.any? { |e| e.name == "li" } && element.next.present?
