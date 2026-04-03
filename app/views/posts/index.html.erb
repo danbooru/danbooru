@@ -112,6 +112,9 @@
     <% if @post_set.artist.present? && @post_set.artist.is_banned? && !CurrentUser.user.is_approver? %>
       <p>This page has been removed because of a takedown request.</p>
     <% elsif @post_set.artist.present? %>
+      <% if policy(@post_set.artist).update? %>
+        <%= link_to "", edit_artist_path(@post_set.artist), "data-shortcut": "e", style: "display: none;" %>
+      <% end %>
       <%= render "artists/summary", artist: @post_set.artist %>
     <% elsif @post_set.tag&.artist? %>
       <p>There is no artist entry yet for the artist <%= link_to @post_set.tag.name, new_artist_path(artist: { name: @post_set.tag.name }), rel: "nofollow" %>. <%= link_to "Create new artist entry", new_artist_path(artist: { name: @post_set.tag.name }), rel: "nofollow" %>.</p>
@@ -119,6 +122,9 @@
       <%= render "tag_relationships/alias_and_implication_list", tag: @post_set.tag %>
     <% elsif @post_set.wiki_page.present? %>
       <% @post_set.wiki_page.tap do |wiki_page| %>
+        <% if policy(wiki_page).edit? %>
+          <%= link_to "", edit_wiki_page_path(wiki_page.id), "data-shortcut": "e", style: "display: none;" %>
+        <% end %>
         <div class="prose">
           <% if wiki_page.other_names.present? %>
             <%= wiki_page_other_names_list(wiki_page) %>
@@ -140,6 +146,9 @@
       <% end %>
     <% elsif @post_set.pool.present? %>
       <% @post_set.pool.tap do |pool| %>
+        <% if policy(pool).update? %>
+          <%= link_to "", edit_pool_path(pool), "data-shortcut": "e", style: "display: none;" %>
+        <% end %>
         <h2>
           <%= pool.pretty_category %>:
           <%= link_to pool.pretty_name, pool_path(pool), :class => "pool-category-#{pool.category}" %>
@@ -157,6 +166,9 @@
         </p>
       <% end %>
     <% elsif @post_set.favgroup.present? %>
+      <% if policy(@post_set.favgroup).update? %>
+        <%= link_to "", edit_favorite_group_path(@post_set.favgroup), "data-shortcut": "e", style: "display: none;" %>
+      <% end %>
       <h2>
         Favorite Group:
         <%= link_to @post_set.favgroup.pretty_name, favorite_group_path(@post_set.favgroup) %>
