@@ -34,6 +34,14 @@ module Source
         user["name"]
       end
 
+      def published_at
+        if parsed_url.image_url?
+          nil
+        elsif work.present?
+          Time.at(work.dig("work", "add_time")).utc
+        end
+      end
+
       def artist_commentary_title
         if goods.present?
           goods["name"]
