@@ -290,17 +290,14 @@ Autocomplete.on_tab = function(event) {
   var autocomplete = $(input).autocomplete("instance");
   var $autocomplete_menu = autocomplete.menu.element;
 
-  if (!$autocomplete_menu.is(":visible")) {
-    return;
+  if ($autocomplete_menu.is(":visible")) {
+    if ($autocomplete_menu.has(".ui-state-active").length === 0) {
+      autocomplete.menu.next();
+      autocomplete.menu.select();
+      autocomplete.close();
+    }
   }
 
-  if ($autocomplete_menu.has(".ui-state-active").length === 0) {
-    autocomplete.menu.next();
-    autocomplete.menu.select();
-    autocomplete.close();
-  }
-
-  // Prevent the tab key from moving focus to the next element.
   event.preventDefault();
 };
 
