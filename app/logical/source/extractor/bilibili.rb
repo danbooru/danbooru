@@ -60,6 +60,28 @@ module Source
         end
       end
 
+      def published_at
+        if article_json.present?
+          pub_ts = article_json.dig("modules", "module_author", "pub_ts")
+        elsif post_json.present?
+          pub_ts = post_json.dig("modules", "module_author", "pub_ts")
+        end
+        Time.at(pub_ts).utc if pub_ts
+      end
+
+      def updated_at
+        if article_json.present?
+          pub_time = article_json.dig("modules", "module_author", "pub_time")
+        elsif post_json.present?
+          pub_time = post_json.dig("modules", "module_author", "pub_time")
+        end
+        if pub_time&.start_with?("编辑于")
+          # The input string is in CST.
+          time = Time.strptime(pub_time, "编辑于 %Y年%m月%d日 %H:%M")
+          Time.new(time.year, time.month, time.day, time.hour, time.min, 0, "+08:00").utc
+        end
+      end
+
       def artist_commentary_title
         # Is modules.module_dynamic.title supported in t.bilibili.com/:id works?
         article_json.dig("modules", "module_title", "text") || post_json.dig("modules", "module_dynamic", "title") || post_json.dig("modules", "module_dynamic", "major", "opus", "title")

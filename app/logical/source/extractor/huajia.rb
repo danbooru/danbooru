@@ -35,11 +35,7 @@ module Source
       end
 
       def published_at
-        if parsed_url.image_url?
-          nil
-        elsif work.present?
-          Time.at(work.dig("work", "add_time")).utc
-        end
+        Time.at(work.dig("work", "add_time")).utc if work.present?
       end
 
       def artist_commentary_title
