@@ -51,7 +51,7 @@ class ForumPostTest < ActiveSupport::TestCase
           end
 
           dmail = Dmail.last
-          assert_equal(<<~EOS, dmail.body)
+          assert_equal(<<~EOS.strip, dmail.body)
             @#{@user.name} mentioned you in forum ##{@post.id} ("#{@topic.title}":[/forum_topics/#{@topic.id}?page=1]). This is an excerpt from the message:
 
             [quote]
@@ -73,7 +73,7 @@ class ForumPostTest < ActiveSupport::TestCase
           end
 
           dmail = Dmail.last
-          assert_equal(<<~EOS, dmail.body)
+          assert_equal(<<~EOS.strip, dmail.body)
             @#{@user.name} mentioned you in forum ##{@post.id} ("#{@topic.title}":[/forum_topics/#{@topic.id}?page=1]). This is an excerpt from the message:
 
             [quote]
@@ -204,6 +204,14 @@ class ForumPostTest < ActiveSupport::TestCase
 
         assert_includes(forum_post.errors[:body], "can't include NSFW images")
       end
+    end
+
+    context "during normalization" do
+      should normalize_attribute(:body).from(" ").to("")
+      should normalize_attribute(:body).from("  \u200B  ").to("")
+      should normalize_attribute(:body).from(" foo ").to("foo")
+      should normalize_attribute(:body).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:body).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
     end
   end
 end

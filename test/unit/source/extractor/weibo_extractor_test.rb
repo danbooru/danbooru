@@ -146,62 +146,36 @@ module Source::Tests::Extractor
 
     context "A Weibo post with images and videos" do
       strategy_should_work(
-        "https://weibo.com/2427303621/MxojLlLgQ",
+        "https://www.weibo.com/7730797357/QwMGajLGz",
         image_urls: [
-          %r{https://f.video.weibocdn.com/o0/6UFmijY5lx083Tat3dUY010412005WK80E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
-          "https://wx2.sinaimg.cn/large/90adb6c5ly1hc0l7kfkooj20zk44gb29.jpg",
-          %r{https://f.video.weibocdn.com/o0/o1opApPDlx083Tauz3te01041200aOTe0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
-          "https://wx3.sinaimg.cn/large/90adb6c5ly1hc0l85w0aaj214072qnpe.jpg",
-          %r{https://f.video.weibocdn.com/o0/8JvVQ4I5lx083TatVmHK010412006WqC0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
-          "https://wx3.sinaimg.cn/large/90adb6c5ly1hc0l83x05ij21402s01kx.jpg",
-          %r{https://f.video.weibocdn.com/o0/OyGhsHWNlx083TauIlJu01041200m8h90E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
-          %r{https://f.video.weibocdn.com/o0/rYbzvUcjlx083TatZhji01041200arLc0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
-          %r{https://f.video.weibocdn.com/o0/Xq5qKYgVlx083TawknVK01041200O1lT0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
+          %r{https://f.video.weibocdn.com/u0/Sz1k1Kd5gx08wblzDeSs01041200pI7I0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
+          "https://wx4.sinaimg.cn/large/008rbDxXgy1ibc2dalzz2j31z4140kjl.jpg",
         ],
         media_files: [
-          { file_size: 1_417_452 },
-          { file_size: 1_371_134 },
-          { file_size: 2_578_904 },
-          { file_size: 2_808_379 },
-          { file_size: 1_654_570 },
-          { file_size: 1_130_906 },
-          { file_size: 5_275_031 },
-          { file_size: 2_489_994 },
-          { file_size: 11_921_601 },
+          { file_size: 6_127_814 },
+          { file_size: 1_622_702 },
         ],
-        page_url: "https://www.weibo.com/2427303621/MxojLlLgQ",
-        profile_url: "https://www.weibo.com/u/2427303621",
-        profile_urls: %w[https://www.weibo.com/u/2427303621],
-        display_name: "科技宅科莱昂",
+        page_url: "https://www.weibo.com/7730797357/QwMGajLGz",
+        profile_url: "https://www.weibo.com/u/7730797357",
+        profile_urls: %w[https://www.weibo.com/u/7730797357],
+        display_name: "鸣潮",
         username: nil,
-        published_at: Time.parse("2023-03-15T07:52:01.000000Z"),
+        published_at: Time.parse("2026-03-19T03:00:02.000000Z"),
         updated_at: nil,
-        tags: [],
+        tags: [
+          ["鸣潮3.2版本", "https://s.weibo.com/weibo?q=%23鸣潮3.2版本%23"],
+          ["鸣潮西格莉卡", "https://s.weibo.com/weibo?q=%23鸣潮西格莉卡%23"],
+        ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          诚邀首页欣赏艺术，美到要我命🆘🤯"[舔屏]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/da/201810_tian_mobile.png]
+          "鸣潮":[https://weibo.com/p/100808805d326c8383e31ed5f47088acce6b77] "#鸣潮3.2版本#":[https://s.weibo.com/weibo?q=%23鸣潮3.2版本%23] "#鸣潮西格莉卡#":[https://s.weibo.com/weibo?q=%23鸣潮西格莉卡%23]
+          “语义落下的时候，符文就会亮起来。”
 
-          "[舔屏]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/da/201810_tian_mobile.png]
-
-          "[舔屏]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/da/201810_tian_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
-
-          "[awsl]":[https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal/8b/moren_awsl_mobile.png]
+          《鸣潮》3.2版本「于影中启明的决心」已开启！
+          ——————————————————
+          关注"@鸣潮":[https://www.weibo.com/n/鸣潮] 并转发本条内容，我们会抽取10位漂泊者送出「鸣潮共鸣者主题PV定格亚克力立牌（随机款）」*1，截止至3月26日20:00。
+          ——————————————————
+          下载游戏："网页链接":[https://mc.kurogames.com] "抽奖详情":[https://lottery.media.weibo.com/lottery/h5/history/list?mid=5278136224711539]
         EOS
       )
     end

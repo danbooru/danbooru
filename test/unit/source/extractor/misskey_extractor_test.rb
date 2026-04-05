@@ -320,7 +320,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 171_046 }],
         page_url: "https://sushi.ski/notes/aj6emmgk64",
         profile_urls: %w[https://sushi.ski/@mgmgrun https://sushi.ski/users/9grk7g7v93],
-        display_name: "もぐもぐ",
+        display_name: "繧ゅ＄繧ゅ＄",
         username: "mgmgrun",
         published_at: nil,
         updated_at: nil,

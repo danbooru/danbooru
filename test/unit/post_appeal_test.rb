@@ -62,9 +62,14 @@ class PostAppealTest < ActiveSupport::TestCase
         subject { build(:post_appeal) }
 
         should allow_value("").for(:reason)
+      end
 
-        should_not allow_value(" ").for(:reason)
-        should_not allow_value("\u200B").for(:reason)
+      context "normalization" do
+        should normalize_attribute(:reason).from(" ").to("")
+        should normalize_attribute(:reason).from("  \u200B  ").to("")
+        should normalize_attribute(:reason).from(" foo ").to("foo")
+        should normalize_attribute(:reason).from("foo\tbar").to("foo bar")
+        should normalize_attribute(:reason).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
       end
     end
   end

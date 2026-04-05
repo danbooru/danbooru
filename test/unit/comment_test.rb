@@ -58,7 +58,7 @@ class CommentTest < ActiveSupport::TestCase
           end
 
           dmail = Dmail.last
-          assert_equal(<<~EOS, dmail.body)
+          assert_equal(<<~EOS.strip, dmail.body)
             @#{@comment.creator.name} mentioned you in comment ##{@comment.id} on post ##{@comment.post_id}. This is an excerpt from the message:
 
             [quote]
@@ -184,8 +184,6 @@ class CommentTest < ActiveSupport::TestCase
       subject { build(:comment) }
 
       should_not allow_value("").for(:body)
-      should_not allow_value(" ").for(:body)
-      should_not allow_value("\u200B").for(:body)
       should_not allow_value((["!post #1"] * 10).join("\n")).for(:body)
 
       should "not allow NSFW media embeds" do
@@ -194,6 +192,14 @@ class CommentTest < ActiveSupport::TestCase
 
         assert_includes(comment.errors[:body], "can't include a explicit image on a general post")
       end
+    end
+
+    context "during normalization" do
+      should normalize_attribute(:body).from(" ").to("")
+      should normalize_attribute(:body).from("  \u200B  ").to("")
+      should normalize_attribute(:body).from(" foo ").to("foo")
+      should normalize_attribute(:body).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:body).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
     end
   end
 end

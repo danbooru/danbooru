@@ -25,7 +25,7 @@ module Source::Tests::Extractor
         ],
         artist_name: "Yupa",
         tag_name: "yupa",
-        tags: ["cub", "cum", "cum in pussy", "cum inside", "cumming", "female", "fox", "furry", "girl", "nude", "pussy", "underwear"],
+        tags: ["cub", "cum", "cum in pussy", "cum inside", "cumming", "disembodied penis", "female", "fox", "furry", "girl", "kemololi", "loli", "nude", "pussy", "underwear"],
         dtext_artist_commentary_desc: <<~EOS.chomp,
           commission work for "shadowkami":[https://inkbunny.net/shadowkami]
 
