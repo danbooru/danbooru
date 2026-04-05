@@ -126,6 +126,10 @@ RelatedTag.current_tags = function() {
 }
 
 RelatedTag.toggle_tag = function(e) {
+  if (e.type === "click" && (e.ctrlKey || e.metaKey || e.shiftKey)) {
+    return;
+  }
+
   var $field = $("#post_tag_string");
   var tag = $(e.target).closest("li").find("a").attr("data-tag-name");
 

@@ -13,13 +13,13 @@ class AutocompleteComponent < ApplicationComponent
   def link_to_result(result, &block)
     case result.type
     when "user", "mention"
-      link_to user_path(result.id), class: "user-#{result.level} flex-grow-1", "@click.prevent": "", &block
+      link_to user_path(result.id), class: "user-#{result.level} flex-grow-1", &block
     when "pool"
-      link_to pool_path(result.id), class: "pool-category-#{result.category} flex-grow-1", "@click.prevent": "", &block
+      link_to pool_path(result.id), class: "pool-category-#{result.category} flex-grow-1", &block
     when "emoji"
-      link_to "javascript:void(0)", class: "tag-type-#{Tag.categories.general} flex-grow-1", "@click.prevent": "", &block
+      link_to "javascript:void(0)", class: "tag-type-#{Tag.categories.general} flex-grow-1", &block
     else
-      link_to posts_path(tags: result.value), class: "tag-type-#{result.category} flex-grow-1", "@click.prevent": "", &block
+      link_to posts_path(tags: result.value), class: "tag-type-#{result.category} flex-grow-1", &block
     end
   end
 

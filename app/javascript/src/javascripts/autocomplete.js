@@ -64,7 +64,11 @@ export default class Autocomplete {
   initializeFieldAutocomplete() {
     this.$element.autocomplete({
       select: (event, ui) => {
-        this.insertCompletion(ui.item.value);
+        if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
+          this.insertCompletion(ui.item.value);
+          event.preventDefault();
+        }
+
         return false;
       },
       source: async (request, respond) => {
@@ -77,7 +81,11 @@ export default class Autocomplete {
   initializeTagAutocomplete() {
     this.$element.autocomplete({
       select: (event, ui) => {
-        this.insertCompletion(ui.item.value);
+        if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
+          this.insertCompletion(ui.item.value);
+          event.preventDefault();
+        }
+
         return false;
       },
       source: async (req, resp) => {
