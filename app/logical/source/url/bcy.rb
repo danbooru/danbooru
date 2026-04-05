@@ -1,16 +1,20 @@
 # frozen_string_literal: true
 
 class Source::URL::Bcy < Source::URL
-  site "BCY", url: "https://bcy.net", domains: %w[bcy.net bcyimg.com]
+  site "BCY", url: "https://bcy.net", domains: %w[bcy.net bcyimg.com pstatp.com]
 
-  attr_reader :drawer_id, :date, :page_url, :profile_url, :full_image_url
+  attr_reader :user_id, :drawer_id, :date, :page_url, :full_image_url
 
   def self.match?(url)
-    url.domain.in?(%w[bcy.net bcyimg.com])
+    url.domain.in?(%w[bcy.net bcyimg.com]) || url.host == "img-bcy-qn.pstatp.com"
   end
 
   def parse
     case [subdomain, domain, *path_segments]
+
+    # https://img-bcy-qn.pstatp.com/user/3026810/item/c0r0r/9639565bfd064e078f79cb74f0f88cbb.jpg
+    in "img-bcy-qn", "pstatp.com", "user", user_id, "item", _item_id, file
+      @user_id = user_id
 
     # https://img5.bcyimg.com/drawer/103785/post/178q3/88fdb790392d11e7b58d17da09c22716.jpg/w650
     # https://img9.bcyimg.com/drawer/32360/post/178vu/46229ec06e8111e79558c1b725ebc9e6.jpg
@@ -21,7 +25,7 @@ class Source::URL::Bcy < Source::URL
 
     # https://bcy.net/u/1617969
     in _, "bcy.net", "u", user_id
-      @profile_url = "https://bcy.net/u/#{user_id}"
+      @user_id = user_id
 
     # https://bcy.net/illust/detail/1918/754976
     in _, "bcy.net", "illust", "detail", drawer_id, work_id
@@ -37,7 +41,11 @@ class Source::URL::Bcy < Source::URL
     end
   end
 
+  def profile_url
+    "https://bcy.net/u/#{user_id}" if user_id.present?
+  end
+
   def image_url?
-    domain == "bcyimg.com"
+    domain.in?(%w[bcyimg.com pstatp.com])
   end
 end

@@ -7,6 +7,7 @@ module Source::Tests::URL
         "https://img5.bcyimg.com/drawer/103785/post/178q3/88fdb790392d11e7b58d17da09c22716.jpg/w650",
         "https://img9.bcyimg.com/drawer/32360/post/178vu/46229ec06e8111e79558c1b725ebc9e6.jpg",
         "https://p3-bcy.bcyimg.com/banciyuan/4aad9c6849ca46da86532cdef8b12e42~tplv-banciyuan-obj.image",
+        "https://img-bcy-qn.pstatp.com/user/3026810/item/c0r0r/9639565bfd064e078f79cb74f0f88cbb.jpg",
       )
 
       should be_page_url(
@@ -17,8 +18,19 @@ module Source::Tests::URL
       should be_profile_url(
         "https://bcy.net/u/1617969s",
       )
+
+      should be_bad_link(
+        "https://img5.bcyimg.com/drawer/103785/post/178q3/88fdb790392d11e7b58d17da09c22716.jpg/w650",
+        "https://img9.bcyimg.com/drawer/32360/post/178vu/46229ec06e8111e79558c1b725ebc9e6.jpg",
+        "https://p3-bcy.bcyimg.com/banciyuan/4aad9c6849ca46da86532cdef8b12e42~tplv-banciyuan-obj.image",
+        "https://img-bcy-qn.pstatp.com/user/3026810/item/c0r0r/9639565bfd064e078f79cb74f0f88cbb.jpg",
+      )
     end
 
     should parse_url("https://img5.bcyimg.com/drawer/103785/post/178q3/88fdb790392d11e7b58d17da09c22716.jpg/w650").into(site_name: "BCY")
+
+    should parse_url("https://img-bcy-qn.pstatp.com/user/3026810/item/c0r0r/9639565bfd064e078f79cb74f0f88cbb.jpg").into(
+      profile_url: "https://bcy.net/u/3026810",
+    )
   end
 end
