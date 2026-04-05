@@ -33,7 +33,12 @@ module ExtractorTestHelper
           media_files.zip(files).each do |expected_file_attributes, actual_file|
             expected_file_attributes.each do |attribute, expected_value|
               actual_value = actual_file.send(attribute)
-              assert_equal(expected_value, actual_value, "expected #{attribute} to be #{expected_value}; got #{actual_value}")
+
+              if expected_value.nil?
+                assert_nil(actual_value, "expected #{attribute} to be nil; got #{actual_value}")
+              else
+                assert_equal(expected_value, actual_value, "expected #{attribute} to be #{expected_value}; got #{actual_value}")
+              end
             end
           end
         end
