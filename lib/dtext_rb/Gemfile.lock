@@ -7,19 +7,32 @@ GEM
   remote: https://rubygems.org/
   specs:
     benchmark-ips (2.14.0)
-    cgi (0.5.0)
-    minitest (5.25.5)
-    rake (13.3.0)
+    cgi (0.5.1)
+    drb (2.2.3)
+    minitest (6.0.3)
+      drb (~> 2.0)
+      prism (~> 1.5)
+    prism (1.9.0)
+    rake (13.3.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   benchmark-ips (~> 2.10)
-  cgi (~> 0.3)
+  cgi (~> 0.5)
   dtext_rb!
-  minitest (~> 5.15)
+  minitest (~> 6)
   rake (~> 13)
 
+CHECKSUMS
+  benchmark-ips (2.14.0) sha256=b72bc8a65d525d5906f8cd94270dccf73452ee3257a32b89fbd6684d3e8a9b1d
+  cgi (0.5.1) sha256=e93fcafc69b8a934fe1e6146121fa35430efa8b4a4047c4893764067036f18e9
+  drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
+  dtext_rb (1.13.0)
+  minitest (6.0.3) sha256=88ac8a1de36c00692420e7cb3cc11a0773bbcb126aee1c249f320160a7d11411
+  prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
+  rake (13.3.1) sha256=8c9e89d09f66a26a01264e7e3480ec0607f0c497a861ef16063604b1b08eb19c
+
 BUNDLED WITH
-   2.5.5
+  4.0.9

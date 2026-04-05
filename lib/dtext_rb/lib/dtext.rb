@@ -1,8 +1,26 @@
 # frozen_string_literal: true
 
-require "dtext/dtext"
 require "dtext/version"
 require "dtext/ruby"
+
+# Load the C extension from the locally compiled lib/dtext/dtext.so if it exists, or from the installed gem's
+# installation directory if it doesn't exist.
+begin
+  require "dtext/dtext"
+rescue LoadError
+  require "rbconfig"
+
+  extension_name = "dtext.#{RbConfig::CONFIG.fetch("DLEXT")}"
+  extension_paths = Gem.path.flat_map do |gem_path|
+    [
+      File.join(gem_path, "gems", "dtext_rb-#{DText::VERSION}", "lib", "dtext", extension_name),
+      File.join(gem_path, "extensions", Gem::Platform.local.to_s, Gem.extension_api_version, "dtext_rb-#{DText::VERSION}", "dtext", extension_name),
+    ]
+  end
+
+  extension_path = extension_paths.find { |path| File.exist?(path) }
+  require extension_path
+end
 
 begin
   require "zeitwerk"
