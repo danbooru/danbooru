@@ -446,13 +446,13 @@ export default class DTextEditor {
     let query = this.autocompletionQuery;
 
     if (query.type === "tag") {
-      return await Autocomplete.autocomplete_source(query.term, "tag");
+      return await Autocomplete.autocompleteSource(query.term, "tag");
     } else if (query.type === "tag_query") {
-      return await Autocomplete.autocomplete_source(query.term, "tag_query");
+      return await Autocomplete.autocompleteSource(query.term, "tag_query");
     } else if (query.type === "mention") {
-      return await Autocomplete.autocomplete_source(query.term, "mention");
+      return await Autocomplete.autocompleteSource(query.term, "mention");
     } else if (query.type === "emoji") {
-      return await Autocomplete.autocomplete_source(query.term, "emoji", { limit: 50, allowEmpty: true });
+      return await Autocomplete.autocompleteSource(query.term, "emoji", { limit: 50, allowEmpty: true });
     } else {
       return [];
     }
