@@ -197,22 +197,27 @@ export default class Autocomplete {
   // autocomplete menu, then position the caret just after the inserted completion.
   insertCompletion(completion) {
     let input = this.$element.get(0);
-    let caret = input.selectionStart;
-    let term_after_caret = input.value.substring(caret).match(/\S*/)[0];
-    caret += term_after_caret.length;
 
-    // Trim all whitespace (tabs, spaces) except for line returns
-    var before_caret_text = input.value.substring(0, caret).replace(/^[ \t]+|[ \t]+$/gm, "");
-    var after_caret_text = input.value.substring(caret).replace(/^[ \t]+|[ \t]+$/gm, "");
+    if ($(input).is("input") && this.autocompleteType !== "tag_query") {
+      $(input).replaceFieldText(completion);
+    } else {
+      let caret = input.selectionStart;
+      let term_after_caret = input.value.substring(caret).match(/\S*/)[0];
+      caret += term_after_caret.length;
 
-    var regexp = new RegExp(`([-~(]*(?:${Autocomplete.tagPrefixes().join("|")})?)\\S+$`, "g");
-    before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
-    if (after_caret_text.length > 0) {
-      after_caret_text = " " + after_caret_text;
+      // Trim all whitespace (tabs, spaces) except for line returns
+      var before_caret_text = input.value.substring(0, caret).replace(/^[ \t]+|[ \t]+$/gm, "");
+      var after_caret_text = input.value.substring(caret).replace(/^[ \t]+|[ \t]+$/gm, "");
+
+      var regexp = new RegExp(`([-~(]*(?:${Autocomplete.tagPrefixes().join("|")})?)\\S+$`, "g");
+      before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
+      if (after_caret_text.length > 0) {
+        after_caret_text = " " + after_caret_text;
+      }
+
+      $(input).replaceFieldText(before_caret_text + after_caret_text);
+      input.selectionStart = input.selectionEnd = before_caret_text.length;
     }
-
-    $(input).replaceFieldText(before_caret_text + after_caret_text);
-    input.selectionStart = input.selectionEnd = before_caret_text.length;
 
     $(input).trigger("input"); // Manually trigger an input event because programmatically editing the field won't trigger one.
     $(() => $(input).autocomplete("instance").close()); // XXX Hack to close the autocomplete menu after the input event above retriggers it
