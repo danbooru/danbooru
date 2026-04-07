@@ -4,7 +4,7 @@
     <%= fc.input :creator_name, label: "Commenter", input_html: { value: params.dig(:search, :comment, :creator_name), "data-autocomplete": "user" } %>
     <%= fc.input :body_matches, label: "Text", input_html: { value: params.dig(:search, :comment, :body_matches ) } %>
     <%= fc.input :post_tags_match, label: "Tags", input_html: { value: params.dig(:search, :comment, :post_tags_match), "data-autocomplete": "tag-query" } %>
-    <%= fc.input :post_id, label: "Post", input_html: { value: params.dig(:search, :comment, :post_id) } %>
+    <%= fc.input :post_id, label: "Post ID", input_html: { value: params.dig(:search, :comment, :post_id) } %>
   <% end %>
   <%# <%= f.input :comment_id, label: "Comment", input_html: { value: params[:search][:comment_id] } %>
   <%= f.input :is_deleted, label: "Deleted?", as: :select, include_blank: true, selected: params[:search][:is_deleted] %>
