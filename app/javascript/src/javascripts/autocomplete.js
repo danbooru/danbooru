@@ -316,8 +316,7 @@ export default class Autocomplete {
     input.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
   }
 
-  // If we press tab while the autocomplete menu is open but nothing is
-  // focused, complete the first item and close the menu.
+  // Handle the tab key. Complete the focused item (or the first item if nothing is focused) and close the menu.
   static onTab(event) {
     var input = event.target;
     var autocomplete = $(input).autocomplete("instance");
@@ -326,12 +325,20 @@ export default class Autocomplete {
     if ($autocomplete_menu.is(":visible")) {
       if ($autocomplete_menu.has(".ui-state-active").length === 0) {
         autocomplete.menu.next();
-        autocomplete.menu.select();
-        autocomplete.close();
       }
+
+      autocomplete.menu.select();
+      autocomplete.close();
+      event.preventDefault();
     }
 
-    event.preventDefault();
+    // Prevent jQuery UI's own tab handler from firing
+    event.stopImmediatePropagation();
+
+    // Prevent accidentally tabbing out of the tag edit box.
+    if ($(input).is("[data-autocomplete='tag-edit']")) {
+      event.preventDefault();
+    }
   }
 
   static renderItem(list, item) {
