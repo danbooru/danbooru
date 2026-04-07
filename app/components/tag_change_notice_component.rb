@@ -18,7 +18,9 @@ class TagChangeNoticeComponent < ApplicationComponent
 
   def bur_links_for_topic(forum_topic:, burs:)
     if burs.length > 1
-      "topic ##{forum_topic.id}: \"#{forum_topic.title}\" (#{burs.map { |bur| link_to "forum ##{bur.forum_post.id}", bur.forum_post }.to_sentence})"
+      forum_links = safe_join(burs.map.with_index { |bur, i| link_to "[#{i + 1}]", bur.forum_post }, ", ")
+      topic_link = link_to(%{topic ##{forum_topic.id}: "#{forum_topic.title}"}, forum_topic)
+      safe_join([topic_link, " (", forum_links, ")"])
     else
       link_to "topic ##{forum_topic.id}: \"#{forum_topic.title}\"", burs.first.forum_post
     end
