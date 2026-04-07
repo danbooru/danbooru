@@ -9,14 +9,19 @@
 module ApproverPruner
   module_function
 
+  extend ActionView::Helpers::TextHelper
+
   APPROVAL_PERIOD = 45.days
   MINIMUM_APPROVALS = 30
+
+  def enabled?
+    Danbooru.config.approver_pruning_enabled?.to_s.truthy?
+  end
 
   # Get the list of inactive approvers.
   # @return [Array<User>] the list of inactive approvers
   def inactive_approvers
-    recently_promoted_approvers = UserFeedback.where(created_at: APPROVAL_PERIOD.ago..).where_like(:body, "*You gained the ability to approve posts*").pluck(:user_id) # XXX remove in two months
-    recently_promoted_approvers += UserFeedback.where(created_at: APPROVAL_PERIOD.ago..).where_like(:body, "*You have been promoted to an Approver*").pluck(:user_id)
+    recently_promoted_approvers = UserFeedback.where(created_at: APPROVAL_PERIOD.ago..).where_like(:body, "*You have been promoted to an Approver*").pluck(:user_id)
 
     approvers = User.where(level: User::Levels::APPROVER).where.not(id: recently_promoted_approvers)
     approvers.select do |approver|
@@ -26,6 +31,8 @@ module ApproverPruner
 
   # Demote all inactive approvers
   def prune!
+    return unless enabled?
+
     inactive_approvers.each do |user|
       CurrentUser.scoped(User.system) do
         user.update!(level: User::Levels::CONTRIBUTOR)
@@ -42,11 +49,13 @@ module ApproverPruner
 
   # Send a warning dmail to approvers who are pending demotion.
   def dmail_inactive_approvers!
+    return unless enabled?
+
     days_until_next_month = (Date.current.next_month.beginning_of_month - Date.current).to_i
     return unless days_until_next_month <= 21
 
     inactive_approvers.each do |user|
-      Dmail.create_automated(to: user, title: "You will lose approval privileges soon", body: <<~BODY)
+      Dmail.create_automated(to: user, title: "You will lose approval privileges soon", body: word_wrap(<<~BODY.squish))
         You've approved fewer than #{MINIMUM_APPROVALS} posts in the past
         #{APPROVAL_PERIOD.inspect}. You will lose your approval privileges in
         #{days_until_next_month} #{"day".pluralize(days_until_next_month)}

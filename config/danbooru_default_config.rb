@@ -683,6 +683,11 @@ module Danbooru
       true
     end
 
+    # Whether to enable auto demotion of inactive approvers.
+    def approver_pruning_enabled?
+      true
+    end
+
     # If defined, Danbooru will automatically post new forum posts to the
     # Discord channel belonging to this webhook.
     def discord_webhook_id

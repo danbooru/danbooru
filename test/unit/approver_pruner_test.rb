@@ -3,6 +3,7 @@ require "test_helper"
 class ApproverPrunerTest < ActiveSupport::TestCase
   context "ApproverPruner" do
     setup do
+      Danbooru.config.stubs(:approver_pruning_enabled?).returns(true)
       @approver = create(:approver)
     end
 
@@ -36,6 +37,15 @@ class ApproverPrunerTest < ActiveSupport::TestCase
       end
 
       assert_equal("You will lose approval privileges soon", @approver.dmails.received.last.title)
+    end
+
+    should "not demote inactive approvers if the config option is disabled" do
+      Danbooru.config.stubs(:approver_pruning_enabled?).returns(false)
+
+      assert_equal([@approver.id], ApproverPruner.inactive_approvers.map(&:id))
+      assert_nothing_raised { ApproverPruner.prune! }
+      assert_equal(User::Levels::APPROVER, @approver.reload.level)
+      assert_equal(0, @approver.dmails.received.count)
     end
   end
 end
