@@ -17,7 +17,6 @@ class ArtistCommentary < ApplicationRecord
   dtext_attribute :original_description, disable_mentions: true
   dtext_attribute :translated_description, disable_mentions: true
 
-
   validates :post_id, uniqueness: true
   validates :original_title, length: { maximum: 600 }, if: :original_title_changed?
   validates :translated_title, length: { maximum: 300 }, if: :translated_title_changed?

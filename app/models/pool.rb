@@ -12,7 +12,6 @@ class Pool < ApplicationRecord
 
   normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "") }
   normalizes :post_ids, with: ->(post_ids) { post_ids.uniq }
-  normalizes :description, with: ->(description) { description.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   validates :name, visible_string: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?

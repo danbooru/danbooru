@@ -199,6 +199,7 @@ class CommentTest < ActiveSupport::TestCase
       should normalize_attribute(:body).from("  \u200B  ").to("")
       should normalize_attribute(:body).from(" foo ").to("foo")
       should normalize_attribute(:body).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:body).from("foo\nbar").to("foo\r\nbar")
       should normalize_attribute(:body).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
     end
   end

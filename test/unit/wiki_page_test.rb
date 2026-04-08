@@ -75,7 +75,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
 
       context "normalizing line endings and trim spaces" do
-        should normalize_attribute(:body).from(" foo\nbar\n").to("foo\nbar")
+        should normalize_attribute(:body).from(" foo\nbar\n").to("foo\r\nbar")
       end
     end
 

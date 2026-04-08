@@ -161,5 +161,14 @@ class NoteTest < ActiveSupport::TestCase
       should_not allow_value("\u200B").for(:body)
       should_not allow_value("a" * 5001).for(:body)
     end
+
+    context "during normalization" do
+      should normalize_attribute(:body).from(" ").to("")
+      should normalize_attribute(:body).from("  \u200B  ").to("")
+      should normalize_attribute(:body).from(" foo ").to("foo")
+      should normalize_attribute(:body).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:body).from("foo\nbar").to("foo\r\nbar")
+      should normalize_attribute(:body).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
+    end
   end
 end

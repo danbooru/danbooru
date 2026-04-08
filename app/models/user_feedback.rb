@@ -10,8 +10,6 @@ class UserFeedback < ApplicationRecord
   belongs_to :user
   belongs_to :creator, class_name: "User"
 
-  normalizes :body, with: ->(body) { body.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
-
   validates :body, visible_string: true, length: { maximum: 1500 }, if: :body_changed?
   validates :category, presence: true, inclusion: { in: %w[positive negative neutral] }
   after_create :create_dmail, unless: :disable_dmail_notification

@@ -58,7 +58,7 @@ module DTextAttribute
 
         prepended do
           # normalizes :body, with: ->(value) { value.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
-          normalizes name, with: ->(value) { value.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+          normalizes name, with: ->(value) { value.to_s.unicode_normalize(:nfc).normalize_whitespace(eol: "\r\n").strip }
 
           if media_embeds.present? && method_defined?(:"#{name}_changed?")
             # validates :body, media_embed: { ... }, if: :body_changed?

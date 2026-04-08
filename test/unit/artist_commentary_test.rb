@@ -99,6 +99,13 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
         should normalize_attribute(:original_description).from("  foo\u00A0\t\n").to("foo")
         should normalize_attribute(:translated_title).from("  foo\u00A0\t\n").to("foo")
         should normalize_attribute(:translated_description).from("  foo\u00A0\t\n").to("foo")
+
+        should normalize_attribute(:original_description).from(" ").to("")
+        should normalize_attribute(:original_description).from("  \u200B  ").to("")
+        should normalize_attribute(:original_description).from(" foo ").to("foo")
+        should normalize_attribute(:original_description).from("foo\tbar").to("foo bar")
+        should normalize_attribute(:original_description).from("foo\nbar").to("foo\r\nbar")
+        should normalize_attribute(:original_description).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
       end
     end
 

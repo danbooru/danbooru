@@ -111,5 +111,14 @@ class PostDisapprovalTest < ActiveSupport::TestCase
         assert_equal(0, PostDisapproval.where(post: @post).size)
       end
     end
+
+    context "when normalizing the message" do
+      should normalize_attribute(:message).from(" ").to(nil)
+      should normalize_attribute(:message).from("  \u200B  ").to(nil)
+      should normalize_attribute(:message).from(" foo ").to("foo")
+      should normalize_attribute(:message).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:message).from("foo\nbar").to("foo\r\nbar")
+      should normalize_attribute(:message).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
+    end
   end
 end

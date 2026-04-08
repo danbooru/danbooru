@@ -257,6 +257,15 @@ class PoolTest < ActiveSupport::TestCase
       should_not allow_value("xx").for(:name)
       should_not allow_value("x" * 171).for(:name)
     end
+
+    context "when normalizing the description" do
+      should normalize_attribute(:description).from(" ").to("")
+      should normalize_attribute(:description).from("  \u200B  ").to("")
+      should normalize_attribute(:description).from(" foo ").to("foo")
+      should normalize_attribute(:description).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:description).from("foo\nbar").to("foo\r\nbar")
+      should normalize_attribute(:description).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
+    end
   end
 
   context "An existing pool" do
