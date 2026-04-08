@@ -62,6 +62,7 @@ EOF
 
   cat > /etc/apt/apt.conf.d/50snapshot <<EOF
     APT::Snapshot "$UBUNTU_SNAPSHOT";
+    Acquire::Snapshots::URI::Host::ports.ubuntu.com "https://snapshot.ubuntu.com/ubuntu/@SNAPSHOTID@/";
 EOF
 
   rm -rf /var/lib/apt/lists/*
