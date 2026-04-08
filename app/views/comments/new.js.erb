@@ -2,8 +2,4 @@ var $div = $('div.comments-for-post[data-post-id="<%= @comment.post_id %>"] div.
 $div.find(".expand-comment-response").click();
 var $editor = $div.find(".dtext-editor").get(0).editor;
 var msg = <%= raw @comment.body.to_json %>;
-if ($editor.dtext.length > 0) {
-  msg = $editor.dtext + "\n\n" + msg;
-}
-
-$editor.dtext = msg;
+$editor.dtext = ($editor.dtext.trim() + "\n\n" + msg).trim() + "\n\n";
