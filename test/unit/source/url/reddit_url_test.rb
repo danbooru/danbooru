@@ -27,14 +27,18 @@ module Source::Tests::URL
         "https://www.reddit.com/r/BocchiTheRock/comments/1cruel0/comment/l43980q/",
         "https://www.reddit.com/comments/1cruel0/comment/l43980q/",
         "https://old.reddit.com/r/Xenoblade_Chronicles/comments/11etwdd/monolith_soft_2023_brochure_art/jahip48/",
+        "https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/",
+        "https://www.reddit.com/user/blank_page_drawings/comments/nfjz0d/a_sleepy_orc/",
       )
 
       should be_profile_url(
         "https://www.reddit.com/user/xSlimes",
         "https://www.reddit.com/u/Valshier",
+        "https://www.reddit.com/u/Ichxgofuri/s/9LfNfEg6ND",
+        "https://old.reddit.com/user/etm18boi/submitted",
       )
-    end
 
-    should parse_url("https://i.redd.it/p5utgk06ryq81.png").into(site_name: "Reddit")
+      should parse_url("https://i.redd.it/p5utgk06ryq81.png").into(site_name: "Reddit")
+    end
   end
 end
