@@ -14,6 +14,7 @@ module Source::Tests::URL
         "https://www.patreon.com/posts/71057815",
         "https://www.patreon.com/posts/sparkle-71057815",
         "https://www.patreon.com/api/posts/71057815",
+        "https://www.patreon.com/nlch/shop/simple-life-with-my-unobtrusive-girl-1157344",
       )
 
       should be_profile_url(
@@ -50,6 +51,11 @@ module Source::Tests::URL
 
       should parse_url("https://www.patreon.com/cw/iwanokenta").into(
         profile_url: "https://www.patreon.com/iwanokenta",
+      )
+
+      should parse_url("https://www.patreon.com/nlch/shop/simple-life-with-my-unobtrusive-girl-1157344").into(
+        page_url: "https://www.patreon.com/nlch/shop/simple-life-with-my-unobtrusive-girl-1157344",
+        profile_url: "https://www.patreon.com/nlch",
       )
     end
 

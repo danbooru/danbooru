@@ -3,10 +3,10 @@
 class Source::URL::Patreon < Source::URL
   site "Patreon", url: "https://www.patreon.com", domains: %w[patreon.com patreonusercontent.com]
 
-  RESERVED_USERNAMES = %w[api bePatron c card-teaser-image collection checkout file home join
+  RESERVED_USERNAMES = %w[api bePatron c cw card-teaser-image collection checkout file home join
                           login m messages notifications policy posts profile search settings user]
 
-  attr_reader :username, :user_id, :post_id, :attachment_id, :title, :media_hash, :media_params
+  attr_reader :username, :user_id, :post_id, :attachment_id, :title, :shop_title, :shop_item_id, :media_hash, :media_params
 
   def self.match?(url)
     url.domain.in?(%w[patreon.com patreonusercontent.com])
@@ -66,6 +66,11 @@ class Source::URL::Patreon < Source::URL
     in _, "patreon.com", "api", "user", user_id
       @user_id = user_id
 
+    # https://www.patreon.com/nlch/shop/simple-life-with-my-unobtrusive-girl-1157344
+    in _, "patreon.com", username, "shop", slug, *rest unless username.in?(RESERVED_USERNAMES)
+      @username = username
+      @shop_title, _, @shop_item_id = slug.rpartition("-")
+
     # https://www.patreon.com/1041uuu
     # https://www.patreon.com/1041uuu/about
     in _, "patreon.com", username, *rest unless username.in?(RESERVED_USERNAMES)
@@ -90,6 +95,8 @@ class Source::URL::Patreon < Source::URL
   def page_url
     if title.present? && post_id.present?
       "https://www.patreon.com/posts/#{title}-#{post_id}"
+    elsif username.present? && shop_title.present? && shop_item_id.present?
+      "https://www.patreon.com/#{username}/shop/#{shop_title}-#{shop_item_id}"
     elsif post_id.present?
       "https://www.patreon.com/posts/#{post_id}"
     end
