@@ -88,7 +88,7 @@ class Source::Extractor::E621 < Source::Extractor
 
     url = api_response[:sources].filter_map do |url|
       url = Source::URL.parse(url)
-      url if url.page_url.present?
+      url if url&.page_url.present?
     end.first
 
     @sub_extractor ||= Source::Extractor.find(url, default_extractor: nil, parent_extractor: self)
