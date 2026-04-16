@@ -145,5 +145,23 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: "Spent the last couple days modelin some of the designs from \"@JeremeyChinshue\":[https://x.com/JeremeyChinshue]'s \"#somethingseries\":[https://x.com/hashtag/somethingseries]. It's one of the funniest video game parodies I've seen and I had a lotta fun making these guys.",
       )
     end
+
+    context "A post with a deleted source" do
+      strategy_should_work(
+        "https://e621.net/posts/6305694",
+        image_urls: %w[https://static1.e621.net/data/bf/d5/bfd52ec727810f04fa8c897f9c026f5a.jpg],
+        media_files: [{ file_size: 165_929 }],
+        page_url: "https://e621.net/posts/6305694",
+      )
+    end
+
+    context "A post with a non-web source" do
+      strategy_should_work(
+        "https://e621.net/posts/5473882",
+        image_urls: %w[https://static1.e621.net/data/b7/ff/b7ff8c1b1024125f993dae40ed7efa85.png],
+        media_files: [{ file_size: 21_211 }],
+        page_url: "https://e621.net/posts/5473882",
+      )
+    end
   end
 end
