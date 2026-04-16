@@ -355,22 +355,36 @@ module Source::Tests::Extractor
     context "A bilibili image url" do
       strategy_should_work(
         "https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png",
-        image_urls: ["https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png"],
+        image_urls: %w[https://i0.hdslb.com/bfs/activity-plat/static/2cf2b9af5d3c5781d611d6e36f405144/E738vcDvd3.png],
         media_files: [{ file_size: 515_583 }],
         page_url: nil,
         profile_url: nil,
-        tag_name: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 
     context "A bilibili image url with embedded artist ID" do
       strategy_should_work(
         "https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg@1036w.webp",
-        image_urls: ["https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg"],
+        image_urls: %w[https://i0.hdslb.com/bfs/new_dyn/675526fd8baa2f75d7ea0e7ea957bc0811742550.jpg],
         media_files: [{ file_size: 1_536_450 }],
         page_url: nil,
         profile_url: "https://space.bilibili.com/11742550",
-        tag_name: "bilibili_11742550",
+        profile_urls: %w[https://space.bilibili.com/11742550],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 

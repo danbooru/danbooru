@@ -61,20 +61,26 @@ module Source
       end
 
       def published_at
-        if article_json.present?
+        if parsed_url.image_url?
+          pub_ts = nil
+        elsif article_json.present?
           pub_ts = article_json.dig("modules", "module_author", "pub_ts")
         elsif post_json.present?
           pub_ts = post_json.dig("modules", "module_author", "pub_ts")
         end
+
         Time.at(pub_ts).utc if pub_ts
       end
 
       def updated_at
-        if article_json.present?
+        if parsed_url.image_url?
+          pub_time = nil
+        elsif article_json.present?
           pub_time = article_json.dig("modules", "module_author", "pub_time")
         elsif post_json.present?
           pub_time = post_json.dig("modules", "module_author", "pub_time")
         end
+
         if pub_time&.start_with?("编辑于")
           # The input string is in CST.
           time = Time.strptime(pub_time, "编辑于 %Y年%m月%d日 %H:%M")
