@@ -13,9 +13,9 @@
     "@fontsource/ibm-plex-mono": "^5.2.5",
     "@fontsource/indie-flower": "^5.2.5",
     "@fontsource/lora": "^5.2.5",
+    "@fontsource/manufacturing-consent": "^5.2.2",
     "@fontsource/petit-formal-script": "^5.2.5",
     "@fontsource/rokkitt": "^5.2.5",
-    "@fontsource/unifrakturmaguntia": "^5.2.5",
     "@rails/ujs": "^7.1.3-4",
     "@ruffle-rs/ruffle": "^0.1.0-nightly.2024.6.7",
     "@types/babel__core": "7",
@@ -49,8 +49,8 @@
     "webpack-merge": "^6.0.1"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@babel/cli": "^7.24.7",
+    "@eslint/js": "^10.0.1",
     "@webpack-cli/serve": "^3.0.1",
     "eslint": "^10.1.0",
     "eslint-plugin-ignore-erb": "^0.1.1",
