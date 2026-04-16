@@ -24,6 +24,8 @@ module Source::Tests::Extractor
         page_url: "https://huajia.163.com/main/works/rOpdeMW8",
         profile_urls: %w[https://huajia.163.com/main/profile/08nqxj4r],
         display_name: "瓶装咸鱼",
+        published_at: Time.parse("2024-04-30T06:02:09.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -37,6 +39,8 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 264_382 }],
         profile_url: "https://huajia.163.com/main/profile/L8JwqDWB",
         display_name: "凤梨酥酥",
+        published_at: Time.parse("2025-07-13T03:45:35.000000Z"),
+        updated_at: nil,
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )

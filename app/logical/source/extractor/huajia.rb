@@ -34,6 +34,10 @@ module Source
         user["name"]
       end
 
+      def published_at
+        Time.at(work.dig("work", "add_time")).utc if work.present?
+      end
+
       def artist_commentary_title
         if goods.present?
           goods["name"]
