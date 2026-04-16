@@ -35,7 +35,11 @@ module Source
       end
 
       def published_at
-        Time.at(work.dig("work", "add_time")).utc if work.present?
+        if parsed_url.image_url?
+          nil
+        elsif work.dig(:work, :add_time).present?
+          Time.at(work.dig(:work, :add_time)).utc
+        end
       end
 
       def artist_commentary_title
