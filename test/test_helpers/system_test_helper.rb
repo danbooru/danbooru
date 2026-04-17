@@ -1,5 +1,5 @@
 module SystemTestHelper
-  def signup(name, password: "password")
+  def signup(name, password: "correct horse battery staple")
     visit new_user_path
     fill_in "Name", with: name
     fill_in "Password", with: password
