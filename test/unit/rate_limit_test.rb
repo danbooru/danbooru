@@ -72,5 +72,42 @@ class RateLimitTest < ActiveSupport::TestCase
         assert_equal(9, limiter.rate_limits.first.points)
       end
     end
+
+    context "#humanized_action" do
+      should "strip record-specific suffixes and humanize" do
+        assert_equal("Posts: create", RateLimit.new(action: "posts:create").humanized_action)
+        assert_equal("Notes: write", RateLimit.new(action: "notes:write:post-123").humanized_action)
+        assert_equal("Notes: write", RateLimit.new(action: "notes:write:note-7").humanized_action)
+        assert_equal("Wiki pages: write", RateLimit.new(action: "wiki_pages:write:wiki-page-45").humanized_action)
+        assert_equal("Wiki pages: write (large)", RateLimit.new(action: "wiki_pages:write:large").humanized_action)
+        assert_equal("Uploads: create (invalid)", RateLimit.new(action: "uploads:create:invalid").humanized_action)
+        assert_equal("Unknown", RateLimit.new(action: "").humanized_action)
+      end
+    end
+
+    context "#limit_config" do
+      should "return burst and rate for a simple user-level policy method" do
+        user = create(:user)
+        rate_limit = RateLimit.new(action: "artists:write", key: user.cache_key)
+        config = rate_limit.limit_config(user)
+
+        assert_not_nil(config)
+        assert_operator(config[:burst], :>, 0)
+        assert_operator(config[:rate], :>, 0)
+      end
+
+      should "return nil for unknown actions" do
+        user = create(:user)
+        rate_limit = RateLimit.new(action: "unknown_controller:foo", key: user.cache_key)
+        assert_nil(rate_limit.limit_config(user))
+      end
+
+      should "return nil when the policy method raises" do
+        user = create(:user)
+        rate_limit = RateLimit.new(action: "posts:create", key: user.cache_key)
+        PostPolicy.any_instance.stubs(:rate_limit_for_create).raises(StandardError)
+        assert_nil(rate_limit.limit_config(user))
+      end
+    end
   end
 end

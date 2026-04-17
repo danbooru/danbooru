@@ -28,6 +28,19 @@ class RateLimitsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "tbody tr", count: 0
       end
+
+      should "render humanized action names and status pills" do
+        create(:rate_limit, action: "posts:create", key: @user.cache_key, points: 40)
+        create(:rate_limit, action: "notes:write:post-1", key: @user.cache_key, points: -1, limited: true)
+
+        get_auth rate_limits_path, @user
+
+        assert_response :success
+        assert_select "td", text: /Posts: create/
+        assert_select "td", text: /Notes: write/
+        assert_select ".chip-green", text: "OK"
+        assert_select ".chip-red", text: "Limited"
+      end
     end
   end
 end
