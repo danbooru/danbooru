@@ -95,8 +95,8 @@ class PostVersion < ApplicationRecord
           "parent_id" => post.parent_id,
           "source" => post.source,
           "updater_id" => CurrentUser.id,
-          "updated_at" => post.updated_at.try(:iso8601),
-          "created_at" => post.created_at.try(:iso8601),
+          "updated_at" => post.updated_at.try(:iso8601, 9),
+          "created_at" => post.created_at.try(:iso8601, 9),
           "tags" => post.tag_string,
         }
         msg = "add post version\n#{json.to_json}"

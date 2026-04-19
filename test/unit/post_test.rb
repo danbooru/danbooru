@@ -1825,6 +1825,24 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("aaa bbb ddd eee", final_post.tag_string)
         end
 
+        should "merge simultaneous stale tag edits loaded before either save" do
+          post = create(:post, tag_string: "aaa")
+
+          post_edited_by_user_a = Post.find(post.id)
+          post_edited_by_user_b = Post.find(post.id)
+
+          post_edited_by_user_a.old_tag_string = ""
+          post_edited_by_user_a.tag_string = "bbb"
+          post_edited_by_user_a.save
+
+          post_edited_by_user_b.old_tag_string = ""
+          post_edited_by_user_b.tag_string = "ccc"
+          post_edited_by_user_b.save
+
+          final_post = Post.find(post.id)
+          assert_equal("aaa bbb ccc", final_post.tag_string)
+        end
+
         should "merge any parent, source, and rating changes that were made after loading the initial set" do
           post = create(:post, parent: nil, source: "", rating: "q")
           parent_post = create(:post)
@@ -1855,6 +1873,35 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("http://example.com", final_post.source)
           assert_equal("s", final_post.rating)
         end
+      end
+
+      should "overwrite parent, source, rating and tags if old_ fields weren't set" do
+        post = create(:post, parent: nil, source: "http://example.com/1", rating: "q", tag_string: "aaa")
+        parent_post = create(:post)
+
+        post_edited_by_user_a = Post.find(post.id)
+        post_edited_by_user_a.old_parent_id = ""
+        post_edited_by_user_a.old_source = ""
+        post_edited_by_user_a.old_rating = "q"
+        post_edited_by_user_a.old_tag_string = "aaa"
+        post_edited_by_user_a.parent_id = parent_post.id
+        post_edited_by_user_a.source = "http://example.com/2"
+        post_edited_by_user_a.rating = "s"
+        post_edited_by_user_a.tag_string = "aaa bbb"
+        post_edited_by_user_a.save
+
+        post_edited_by_user_b = Post.find(post.id)
+        post_edited_by_user_b.parent_id = nil
+        post_edited_by_user_b.source = "http://example.com/1"
+        post_edited_by_user_b.rating = "q"
+        post_edited_by_user_b.tag_string = "ccc"
+        post_edited_by_user_b.save!
+
+        final_post = Post.find(post.id)
+        assert_nil(final_post.parent_id)
+        assert_equal("http://example.com/1", final_post.source)
+        assert_equal("q", final_post.rating)
+        assert_equal("ccc", final_post.tag_string)
       end
 
       context "that has been tagged with a metatag" do
