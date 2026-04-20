@@ -1,0 +1,11 @@
+{
+  "chat.agent.maxRequests": 100,
+  "chat.tools.terminal.autoApprove": {
+    // run tests
+    "/^bin\\/rails test (lib\\/\\w+\\/)?test\\/[\\w\\/\\.]+( -[in] '.*?')?$/": true,
+    "/^bundle install$/": true,
+    "/^bundle exec ruby -Ilib:test(?: (lib\\/\\w+\\/)?test\\/[\\w\\/\\.]+)+$/": true,
+    // test if files/directories exist
+    "/^test -[df] [\\w\\/\\.]+$/": true,
+  }
+}
