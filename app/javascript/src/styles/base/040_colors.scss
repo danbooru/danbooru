@@ -138,13 +138,19 @@ html, body[data-current-user-theme="light"] {
   --chip-primary-background-color: var(--blue-0);
   --chip-secondary-background-color: var(--white);
   --chip-red-background-color: var(--red-0);
+  --chip-red-background-hover-color: var(--red-1);
   --chip-green-background-color: var(--green-0);
+  --chip-green-background-hover-color: var(--green-1);
   --chip-blue-background-color: var(--blue-0);
   --chip-yellow-background-color: var(--yellow-0);
+  --chip-yellow-background-hover-color: var(--yellow-1);
   --chip-red-border-color: var(--red-2);
+  --chip-red-border-hover-color: var(--red-3);
   --chip-green-border-color: var(--green-2);
+  --chip-green-border-hover-color: var(--green-3);
   --chip-blue-border-color: var(--blue-2);
   --chip-yellow-border-color: var(--yellow-2);
+  --chip-yellow-border-hover-color: var(--yellow-3);
 
   --badge-blue-background-color: var(--blue-5);
 
@@ -289,7 +295,18 @@ html, body[data-current-user-theme="light"] {
   --tag-count-color: var(--muted-text-color);
   --low-post-count-color: var(--red-5);
 
-  --remove-favorite-button: var(--red-4);
+  --add-favorite-button-color: var(--grey-4);
+  --add-favorite-button-hover-color: var(--grey-3);
+  --remove-favorite-button-color: var(--orange-3);
+  --remove-favorite-button-hover-color: var(--orange-4);
+  --vote-up-button-color: var(--grey-4);
+  --vote-up-button-hover-color: var(--grey-3);
+  --vote-up-unvote-button-color: var(--green-4);
+  --vote-up-unvote-button-hover-color: var(--green-5);
+  --vote-down-button-color: var(--grey-4);
+  --vote-down-button-hover-color: var(--grey-3);
+  --vote-down-unvote-button-color: var(--red-4);
+  --vote-down-unvote-button-hover-color: var(--red-5);
 
   --video-background-color: var(--black);
   --video-controls-icon-color: var(--white);
@@ -414,13 +431,19 @@ html, body[data-current-user-theme="light"] {
   --chip-primary-background-color: var(--grey-8);
   --chip-secondary-background-color: var(--grey-7);
   --chip-red-background-color: var(--red-8);
+  --chip-red-background-hover-color: var(--red-7);
   --chip-green-background-color: var(--green-8);
+  --chip-green-background-hover-color: var(--green-7);
   --chip-blue-background-color: var(--blue-8);
   --chip-yellow-background-color: var(--yellow-8);
+  --chip-yellow-background-hover-color: var(--yellow-7);
   --chip-red-border-color: var(--red-6);
+  --chip-red-border-hover-color: var(--red-5);
   --chip-green-border-color: var(--green-6);
+  --chip-green-border-hover-color: var(--green-5);
   --chip-blue-border-color: var(--blue-6);
   --chip-yellow-border-color: var(--yellow-6);
+  --chip-yellow-border-hover-color: var(--yellow-5);
 
   --badge-blue-background-color: var(--blue-5);
 
@@ -552,7 +575,18 @@ html, body[data-current-user-theme="light"] {
 
   --low-post-count-color: var(--red-4);
 
-  --remove-favorite-button: var(--red-4);
+  --add-favorite-button-color: var(--grey-4);
+  --add-favorite-button-hover-color: var(--grey-3);
+  --remove-favorite-button-color: var(--yellow-3);
+  --remove-favorite-button-hover-color: var(--yellow-2);
+  --vote-up-button-color: var(--grey-4);
+  --vote-up-button-hover-color: var(--grey-3);
+  --vote-up-unvote-button-color: var(--green-5);
+  --vote-up-unvote-button-hover-color: var(--green-4);
+  --vote-down-button-color: var(--grey-4);
+  --vote-down-button-hover-color: var(--grey-3);
+  --vote-down-unvote-button-color: var(--red-5);
+  --vote-down-unvote-button-hover-color: var(--red-4);
 
   --video-background-color: var(--black);
   --video-controls-icon-color: var(--white);
