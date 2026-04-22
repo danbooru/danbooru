@@ -1,6 +1,53 @@
 require "test_helper"
 
 class MediaFileVideoTest < ActiveSupport::TestCase
+  context "#dimensions" do
+    should "determine the correct dimensions for a webm file" do
+      skip unless MediaFile.videos_enabled?
+      assert_equal([512, 512], MediaFile.open("test/files/webm/test-512x512.webm").dimensions)
+    end
+
+    should "determine the correct dimensions for a mp4 file" do
+      skip unless MediaFile.videos_enabled?
+      assert_equal([300, 300], MediaFile.open("test/files/mp4/test-300x300.mp4").dimensions)
+    end
+  end
+
+  context "#file_ext" do
+    should "determine the correct extension for a webm file" do
+      assert_equal(:webm, MediaFile.open("test/files/webm/test-512x512.webm").file_ext)
+    end
+
+    should "determine the correct extension for a mp4 file" do
+      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-300x300.mp4").file_ext)
+    end
+
+    should "determine the correct extension for a m4v file" do
+      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-audio.m4v").file_ext)
+    end
+
+    should "determine the correct extension for an iso5 mp4 file" do
+      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-iso5.mp4").file_ext)
+    end
+  end
+
+  context "#preview" do
+    should "generate a preview image for a video" do
+      skip unless MediaFile.videos_enabled?
+
+      Dir.glob("test/files/**/*.{webm,mp4}").grep_v(/corrupt/).each do |file|
+        assert_equal(:jpg, MediaFile.open(file).preview(150, 150).file_ext)
+      end
+    end
+  end
+
+  context "#pixel_hash" do
+    should "return the file's md5 for video files" do
+      assert_equal("34dd2489f7aaa9e57eda1b996ff26ff7", MediaFile.pixel_hash("test/files/webm/test-512x512.webm"))
+      assert_equal("865c93102cad3e8a893d6aac6b51b0d2", MediaFile.pixel_hash("test/files/mp4/test-300x300.mp4"))
+    end
+  end
+
   context "for an mp4 file " do
     should "detect videos with audio" do
       assert_equal(true, MediaFile.open("test/files/mp4/test-audio.mp4").has_audio?)

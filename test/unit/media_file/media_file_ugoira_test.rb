@@ -2,6 +2,20 @@ require "test_helper"
 require "zip"
 
 class MediaFileUgoiraTest < ActiveSupport::TestCase
+  context "#dimensions" do
+    should "determine the correct dimensions for a ugoira file" do
+      skip unless MediaFile.videos_enabled?
+      frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
+      assert_equal([60, 60], MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: frame_delays).dimensions)
+    end
+  end
+
+  context "#file_ext" do
+    should "determine the correct extension for a ugoira file" do
+      assert_equal(:zip, MediaFile.open("test/files/ugoira/ugoira.zip").file_ext)
+    end
+  end
+
   context "A ugoira:" do
     context "a .zip file without an animation.json file or separate frame delays" do
       should "not be recognized as a ugoira" do

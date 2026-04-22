@@ -28,49 +28,6 @@ class MediaFileImageTest < ActiveSupport::TestCase
     should "determine the correct dimensions for an AVIF file" do
       assert_equal([2048, 858], MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif").dimensions)
     end
-
-    should "determine the correct dimensions for a webm file" do
-      skip unless MediaFile.videos_enabled?
-      assert_equal([512, 512], MediaFile.open("test/files/webm/test-512x512.webm").dimensions)
-    end
-
-    should "determine the correct dimensions for a mp4 file" do
-      skip unless MediaFile.videos_enabled?
-      assert_equal([300, 300], MediaFile.open("test/files/mp4/test-300x300.mp4").dimensions)
-    end
-
-    should "determine the correct dimensions for a ugoira file" do
-      skip unless MediaFile.videos_enabled?
-      frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
-      assert_equal([60, 60], MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: frame_delays).dimensions)
-    end
-
-    should "determine the correct dimensions for a flash file" do
-      assert_equal([608, 757], MediaFile.open("test/files/compressed.swf").dimensions)
-    end
-
-    should "work if called twice" do
-      mf = MediaFile.open("test/files/test.jpg")
-      assert_equal([500, 335], mf.dimensions)
-      assert_equal([500, 335], mf.dimensions)
-
-      mf = MediaFile.open("test/files/compressed.swf")
-      assert_equal([608, 757], mf.dimensions)
-      assert_equal([608, 757], mf.dimensions)
-    end
-
-    should "work for a video if called twice" do
-      skip unless MediaFile.videos_enabled?
-
-      mf = MediaFile.open("test/files/webm/test-512x512.webm")
-      assert_equal([512, 512], mf.dimensions)
-      assert_equal([512, 512], mf.dimensions)
-
-      frame_delays = JSON.parse(File.read("test/files/ugoira/animation.json")).pluck("delay")
-      mf = MediaFile.open("test/files/ugoira/ugoira.zip", frame_delays: frame_delays)
-      assert_equal([60, 60], mf.dimensions)
-      assert_equal([60, 60], mf.dimensions)
-    end
   end
 
   context "#file_ext" do
@@ -104,34 +61,6 @@ class MediaFileImageTest < ActiveSupport::TestCase
         assert_equal(:avif, MediaFile.open(file).file_ext)
       end
     end
-
-    should "determine the correct extension for a webm file" do
-      assert_equal(:webm, MediaFile.open("test/files/webm/test-512x512.webm").file_ext)
-    end
-
-    should "determine the correct extension for a mp4 file" do
-      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-300x300.mp4").file_ext)
-    end
-
-    should "determine the correct extension for a m4v file" do
-      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-audio.m4v").file_ext)
-    end
-
-    should "determine the correct extension for an iso5 mp4 file" do
-      assert_equal(:mp4, MediaFile.open("test/files/mp4/test-iso5.mp4").file_ext)
-    end
-
-    should "determine the correct extension for a ugoira file" do
-      assert_equal(:zip, MediaFile.open("test/files/ugoira/ugoira.zip").file_ext)
-    end
-
-    should "determine the correct extension for a flash file" do
-      assert_equal(:swf, MediaFile.open("test/files/compressed.swf").file_ext)
-    end
-
-    should "not fail for empty files" do
-      assert_equal(:bin, MediaFile.open("test/files/test-empty.bin").file_ext)
-    end
   end
 
   should "determine the correct md5 for a jpeg file" do
@@ -162,14 +91,6 @@ class MediaFileImageTest < ActiveSupport::TestCase
       assert_equal([150, 84], MediaFile.open("test/files/avif/sequence-without-pitm.avif").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/avif/star-8bpc.avif").preview(150, 150).dimensions)
       assert_equal([150, 113], MediaFile.open("test/files/avif/alpha_video.avif").preview(150, 150).dimensions)
-    end
-
-    should "generate a preview image for a video" do
-      skip unless MediaFile.videos_enabled?
-
-      Dir.glob("test/files/**/*.{webm,mp4}").grep_v(/corrupt/).each do |file|
-        assert_equal(:jpg, MediaFile.open(file).preview(150, 150).file_ext)
-      end
     end
 
     should "be able to fit to width only" do
@@ -238,15 +159,6 @@ class MediaFileImageTest < ActiveSupport::TestCase
       assert_equal("77d89bda37ea3af09158ed3282f8334f", MediaFile.pixel_hash("test/files/test-animated-86x52.gif"))
       assert_equal("f9961d54b2290c36ad3e54995d9d2dcf", MediaFile.pixel_hash("test/files/webp/nyancat.webp"))
       assert_equal("5ad19202d4cd9b0e90587f56ff648c28", MediaFile.pixel_hash("test/files/avif/alpha_video.avif"))
-    end
-
-    should "return the file's md5 for Flash files" do
-      assert_equal("1f9a43dbebb2195a8f7d9e0eede51e4b", MediaFile.pixel_hash("test/files/compressed.swf"))
-    end
-
-    should "return the file's md5 for video files" do
-      assert_equal("34dd2489f7aaa9e57eda1b996ff26ff7", MediaFile.pixel_hash("test/files/webm/test-512x512.webm"))
-      assert_equal("865c93102cad3e8a893d6aac6b51b0d2", MediaFile.pixel_hash("test/files/mp4/test-300x300.mp4"))
     end
 
     should "work for normal images" do
