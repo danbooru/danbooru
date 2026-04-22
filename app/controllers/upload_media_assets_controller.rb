@@ -27,4 +27,10 @@ class UploadMediaAssetsController < ApplicationController
       respond_with(@upload_media_asset)
     end
   end
+
+  def update
+    @upload_media_asset = authorize UploadMediaAsset.find(params[:id])
+    @upload_media_asset.update(permitted_attributes(@upload_media_asset))
+    respond_with(@upload_media_asset)
+  end
 end

@@ -27,6 +27,8 @@ class UploadMediaAsset < ApplicationRecord
   scope :unfinished, -> { where(status: %w[pending processing]) }
   scope :finished, -> { where(status: %w[active failed]) }
   scope :expired, -> { unfinished.where(created_at: ..4.hours.ago) }
+  scope :hidden, -> { where(is_hidden: true) }
+  scope :not_hidden, -> { where(is_hidden: false) }
 
   def self.visible(user)
     if user.is_admin?
@@ -58,7 +60,7 @@ class UploadMediaAsset < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, %i[id created_at updated_at status source_url page_url error upload media_asset post], current_user: current_user)
+    q = search_attributes(params, %i[id created_at updated_at status is_hidden source_url page_url error upload media_asset post], current_user: current_user)
 
     if params[:is_posted].to_s.truthy?
       q = q.where.associated(:post)
