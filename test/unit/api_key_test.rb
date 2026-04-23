@@ -41,6 +41,8 @@ class ApiKeyTest < ActiveSupport::TestCase
         should_not allow_value(["192.168.0.0/16"]).for(:permitted_ip_addresses)
         should_not allow_value(["10.0.0.0/8"]).for(:permitted_ip_addresses)
         should_not allow_value(["1.2.0.0/16", "1.2.3.0/24"]).for(:permitted_ip_addresses)
+        should_not allow_value(["0.0.0.0"]).for(:permitted_ip_addresses)
+        should_not allow_value(["::"]).for(:permitted_ip_addresses)
         should_not allow_value(21.times.map { |n| "1.2.3.#{n}" }).for(:permitted_ip_addresses)
 
         # should_not allow_value(["blah"]).for(:permitted_ip_addresses)

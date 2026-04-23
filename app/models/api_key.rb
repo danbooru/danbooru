@@ -55,7 +55,7 @@ class ApiKey < ApplicationRecord
       end
 
       permitted_ip_addresses.without(ip_addr).each do |other_ip|
-        if other_ip.in?(ip_addr)
+        if other_ip.in?([ip_addr])
           errors.add(:permitted_ip_addresses, "can't include overlapping IP address ranges (#{other_ip} is a subnet of #{ip_addr})")
           break
         end

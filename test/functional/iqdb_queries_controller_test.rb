@@ -48,6 +48,22 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_select ".post-gallery", /No posts found/
           assert_select "#notice", /.* has no images/
         end
+
+        should "return an error if the url points to a prohibited IP" do
+          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "http://0.0.0.0/test.jpg" }
+
+          assert_response :success
+          assert_select ".post-gallery", /No posts found/
+          assert_select "#notice", /failed with code 591/
+        end
+
+        should "return an error if the url is not a valid absolute url" do
+          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "/test.jpg" }
+
+          assert_response :success
+          assert_select ".post-gallery", /No posts found/
+          assert_select "#notice", /is an invalid URL/
+        end
       end
 
       context "with a post_id parameter" do

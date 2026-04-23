@@ -252,11 +252,25 @@ class DanbooruHttpTest < ActiveSupport::TestCase
     context "public_only feature" do
       should "disallow connections to non-public IPs" do
         response = Danbooru::Http.public_only.get("http://127.0.0.1/foo.txt")
+        assert_equal(591, response.status)
 
+        response = Danbooru::Http.public_only.get("http://127.0.0.1./foo.txt")
+        assert_equal(598, response.status) # `127.0.0.1.` is treated as a domain name, which fails with a DNS resolution error
+
+        response = Danbooru::Http.public_only.get("http://0.0.0.0/foo.txt")
+        assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://attacker.com@127.0.0.1/foo.txt")
+        assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://127.0.0.1.nip.io/foo.txt")
+        assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://[::ffff:7f00:1]/foo.txt")
         assert_equal(591, response.status)
       end
 
-      should "not raise an exception if the domain doesnt't exist" do
+      should "not raise an exception if the domain doesn't exist" do
         response = Danbooru::Http.public_only.get("http://google.dne")
 
         assert_equal(598, response.status)

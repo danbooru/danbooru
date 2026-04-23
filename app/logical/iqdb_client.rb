@@ -29,18 +29,7 @@ class IqdbClient
       if file.present?
         file = file.tempfile
       elsif target_url.present?
-        extractor = Source::Extractor.find(target_url)
-
-        if extractor.parsed_url.image_url?
-          download_url = target_url
-        else
-          raise Error, "#{url} has multiple images. Enter the URL of a single image" if extractor.image_urls.size > 1
-          raise Error, "#{url} has no images" if extractor.image_urls.empty?
-
-          download_url = extractor.image_urls.first
-        end
-
-        file = Source::Extractor.find(download_url).download_file!(download_url)
+        file = download_file(target_url)
       elsif post_id.present?
         file = Post.find(post_id).file(:"180x180")
       elsif media_asset_id.present?
@@ -58,6 +47,26 @@ class IqdbClient
       process_results(results)
     ensure
       file.try(:close)
+    end
+
+    def download_file(url)
+      extractor = Source::Extractor.find(url)
+
+      if extractor.parsed_url.nil?
+        raise Error, "#{url} is an invalid URL"
+      elsif extractor.parsed_url.image_url?
+        download_url = url
+      elsif extractor.image_urls.size > 1
+        raise Error, "#{url} has multiple images. Enter the URL of a single image"
+      elsif extractor.image_urls.empty?
+        raise Error, "#{url} has no images" if extractor.image_urls.empty?
+      else
+        download_url = extractor.image_urls.first
+      end
+
+      Source::Extractor.find(download_url).download_file!(download_url)
+    rescue Danbooru::Http::Error => e
+      raise Error, e.message
     end
 
     # Transform the JSON returned by IQDB to add the full post data for each match.
