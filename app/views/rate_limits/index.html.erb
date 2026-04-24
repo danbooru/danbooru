@@ -1,17 +1,46 @@
 <div id="c-rate-limits">
   <div id="a-index">
+    <p class="prose mb-4">
+      Rate limits cap how many times you can perform certain actions within a given period. Each bucket refills over time, so unused capacity returns if you take a break.
+    </p>
+
     <%= table_for @rate_limits, class: "striped autofit" do |t| %>
-      <% t.column :action %>
-
-      <% t.column :key %>
-
-      <% t.column :points do |rate_limit| %>
-        <%= rate_limit.points.round(2) %>
+      <% t.column "Action" do |rate_limit| %>
+        <%= rate_limit.humanized_action %>
+        <% if CurrentUser.user.is_owner? %>
+          <div class="text-xs text-muted"><%= rate_limit.key %></div>
+        <% end %>
       <% end %>
 
-      <% t.column :limited? %>
+      <% t.column "Usage" do |rate_limit| %>
+        <% config = rate_limit.limit_config(CurrentUser.user) %>
+        <% if config %>
+          <% remaining = [rate_limit.points, 0].max.round %>
+          <% burst = config[:burst].round %>
+          <%= "#{remaining} of #{burst} left" %>
+        <% else %>
+          <%= "~#{[rate_limit.points, 0].max.round} left" %>
+        <% end %>
+      <% end %>
 
-      <% t.column :updated_at do |rate_limit| %>
+      <% t.column "Refills" do |rate_limit| %>
+        <% config = rate_limit.limit_config(CurrentUser.user) %>
+        <% if config %>
+          <%= humanize_rate(config[:rate]) %>
+        <% else %>
+          &mdash;
+        <% end %>
+      <% end %>
+
+      <% t.column "Status" do |rate_limit| %>
+        <% if rate_limit.limited? %>
+          <span class="chip-red text-error text-xs px-2 rounded">Limited</span>
+        <% else %>
+          <span class="chip-green text-success text-xs px-2 rounded">OK</span>
+        <% end %>
+      <% end %>
+
+      <% t.column "Last used" do |rate_limit| %>
         <%= time_ago_in_words_tagged rate_limit.updated_at %>
       <% end %>
     <% end %>
