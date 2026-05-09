@@ -21,17 +21,73 @@ module ApplicationHelper
   end
 
   def diff_name_html(this_name, other_name)
-    DiffBuilder.new(this_name, other_name, /./).build
+    return "<ins>#{h(this_name)}</ins>".html_safe if other_name.blank?
+    return "<del>#{h(other_name)}</del>".html_safe if this_name.blank?
+
+    # Compute the longest common prefix and suffix so we only diff the changed middle.
+    min_len = [this_name.length, other_name.length].min
+
+    prefix_len = 0
+    while prefix_len < min_len && this_name[prefix_len] == other_name[prefix_len]
+      prefix_len += 1
+    end
+
+    suffix_len = 0
+    while suffix_len < min_len - prefix_len &&
+          this_name[this_name.length - 1 - suffix_len] == other_name[other_name.length - 1 - suffix_len]
+      suffix_len += 1
+    end
+
+    prefix = this_name[0, prefix_len]
+    suffix = this_name[-suffix_len, suffix_len]
+    this_middle = this_name[prefix_len, this_name.length - prefix_len - suffix_len]
+    other_middle = other_name[prefix_len, other_name.length - prefix_len - suffix_len]
+
+    if levenshtein_similarity(this_middle, other_middle) < 0.3
+      "#{h(prefix)}<del>#{h(other_middle)}</del><ins>#{h(this_middle)}</ins>#{h(suffix)}".html_safe
+    else
+      "#{h(prefix)}#{DiffBuilder.new(this_middle, other_middle, /./).build}#{h(suffix)}".html_safe
+    end
   end
 
   def diff_body_html(record, other, field)
     if record.blank? || other.blank?
       diff_record = other.presence || record
-      return h(diff_record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe
+      return format_body_text(diff_record[field]).html_safe
     end
 
-    pattern = /(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)/
-    DiffBuilder.new(record[field], other[field], pattern).build
+    new_text = record[field]
+    old_text = other[field]
+
+    # Skip the expensive diff for long, completely different texts. The Levenshtein
+    # check is O(n*m) in pure Ruby, so we only run it when both sides are small
+    # enough that the shortcut is worth the cost.
+    if new_text.length > 10 && [new_text.length, old_text.length].max <= 5_000 &&
+       levenshtein_similarity(new_text, old_text) < 0.15
+      "<del>#{format_body_text(old_text)}</del><ins>#{format_body_text(new_text)}</ins>".html_safe
+    else
+      pattern = %r{
+        (?:<.+?>)               # HTML tags
+        | (?:[\p{Han}\p{Katakana}\p{Hiragana}\p{Hangul}]) # CJK / Hangul characters
+        | (?:\w+)               # Latin words
+        | (?:[ \t]+)            # Horizontal whitespace
+        | (?:\r?\n)             # Line breaks
+        | (?:.+?)               # Remaining individual characters
+      }x
+      DiffBuilder.new(new_text, old_text, pattern).build
+    end
+  end
+
+  # Normalized Levenshtein similarity: 0.0 = completely different, 1.0 = identical.
+  private def levenshtein_similarity(a, b)
+    max_len = [a.length, b.length].max
+    return 1.0 if max_len.zero?
+
+    1.0 - DidYouMean::Levenshtein.distance(a, b).to_f / max_len
+  end
+
+  private def format_body_text(text)
+    h(text).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>')
   end
 
   def status_diff_html(record, type)
