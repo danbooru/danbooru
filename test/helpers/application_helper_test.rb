@@ -1,11 +1,6 @@
 require "test_helper"
 
 class ApplicationHelperTest < ActionView::TestCase
-  # ApplicationHelper#diff_name_html / #diff_body_html call `h` directly. In
-  # production those run inside an ActionView::Base instance, which mixes in
-  # ERB::Util; ActionView::TestCase doesn't, so we mix it in here.
-  include ERB::Util
-
   context "The application helper" do
     context "format_text method" do
       should "not raise an exception for invalid DText" do

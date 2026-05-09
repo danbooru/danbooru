@@ -21,20 +21,18 @@ module ApplicationHelper
   end
 
   def diff_name_html(this_name, other_name)
-    return "<ins>#{h(this_name)}</ins>".html_safe if other_name.blank?
-    return "<del>#{h(other_name)}</del>".html_safe if this_name.blank?
+    return "<ins>#{ERB::Util.html_escape(this_name)}</ins>".html_safe if other_name.blank?
+    return "<del>#{ERB::Util.html_escape(other_name)}</del>".html_safe if this_name.blank?
 
     # Compute the longest common prefix and suffix so we only diff the changed middle.
     min_len = [this_name.length, other_name.length].min
 
     prefix_len = 0
-    while prefix_len < min_len && this_name[prefix_len] == other_name[prefix_len]
-      prefix_len += 1
-    end
+    prefix_len += 1 while prefix_len < min_len && this_name[prefix_len] == other_name[prefix_len]
 
     suffix_len = 0
     while suffix_len < min_len - prefix_len &&
-          this_name[this_name.length - 1 - suffix_len] == other_name[other_name.length - 1 - suffix_len]
+        this_name[this_name.length - 1 - suffix_len] == other_name[other_name.length - 1 - suffix_len]
       suffix_len += 1
     end
 
@@ -44,9 +42,9 @@ module ApplicationHelper
     other_middle = other_name[prefix_len, other_name.length - prefix_len - suffix_len]
 
     if levenshtein_similarity(this_middle, other_middle) < 0.3
-      "#{h(prefix)}<del>#{h(other_middle)}</del><ins>#{h(this_middle)}</ins>#{h(suffix)}".html_safe
+      "#{ERB::Util.html_escape(prefix)}<del>#{ERB::Util.html_escape(other_middle)}</del><ins>#{ERB::Util.html_escape(this_middle)}</ins>#{ERB::Util.html_escape(suffix)}".html_safe
     else
-      "#{h(prefix)}#{DiffBuilder.new(this_middle, other_middle, /./).build}#{h(suffix)}".html_safe
+      "#{ERB::Util.html_escape(prefix)}#{DiffBuilder.new(this_middle, other_middle, /./).build}#{ERB::Util.html_escape(suffix)}".html_safe
     end
   end
 
@@ -63,7 +61,7 @@ module ApplicationHelper
     # check is O(n*m) in pure Ruby, so we only run it when both sides are small
     # enough that the shortcut is worth the cost.
     if new_text.length > 10 && [new_text.length, old_text.length].max <= 5_000 &&
-       levenshtein_similarity(new_text, old_text) < 0.15
+        levenshtein_similarity(new_text, old_text) < 0.15
       "<del>#{format_body_text(old_text)}</del><ins>#{format_body_text(new_text)}</ins>".html_safe
     else
       pattern = %r{
@@ -83,11 +81,11 @@ module ApplicationHelper
     max_len = [a.length, b.length].max
     return 1.0 if max_len.zero?
 
-    1.0 - DidYouMean::Levenshtein.distance(a, b).to_f / max_len
+    1.0 - (DidYouMean::Levenshtein.distance(a, b).to_f / max_len)
   end
 
   private def format_body_text(text)
-    h(text).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>')
+    ERB::Util.html_escape(text).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>')
   end
 
   def status_diff_html(record, type)
