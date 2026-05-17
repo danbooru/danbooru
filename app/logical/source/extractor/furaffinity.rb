@@ -12,7 +12,7 @@ class Source::Extractor
       if parsed_url.image_url?
         [parsed_url.to_s]
       else
-        download_button = html_response&.css(".submission-content .auto_link .button").to_a.find { |el| el.text == "Download" }
+        download_button = html_response&.css("#submission-options .button").to_a.find { |el| el.text == "Download" }
         partial_image = download_button&.[]("href")
         return [] unless partial_image.present?
         [Addressable::URI.join("https://d.furaffinity.net", partial_image).to_s].compact
@@ -21,11 +21,11 @@ class Source::Extractor
 
     def tags
       tags = html_response&.css(".tags").to_a.map!(&:text).compact.uniq
-      tags.map { |tag| [tag, "https://www.furaffinity.net/search/@keywords #{tag}"] }
+      tags.map { |tag| [tag.strip, "https://www.furaffinity.net/search/@keywords #{tag.strip}"] }
     end
 
     def display_name
-      html_response&.at(".submission-id-sub-container a")&.text
+      html_response&.at(".c-usernameBlockSimple__displayName")&.text
     end
 
     def username
@@ -37,7 +37,7 @@ class Source::Extractor
     end
 
     def profile_url_from_page
-      slug = html_response&.at(".submission-id-avatar a")&.[](:href)
+      slug = html_response&.at(".submission-user-icon")&.parent&.[](:href)
       return unless slug.present?
       Source::URL.parse(URI.join("https://www.furaffinity.net/", slug)).profile_url
     end
@@ -47,7 +47,7 @@ class Source::Extractor
     end
 
     def artist_commentary_desc
-      html_response&.at(".submission-content .section-body")&.to_html
+      html_response&.at(".submission-description .section-body")&.to_html
     end
 
     def dtext_artist_commentary_desc
