@@ -4,7 +4,7 @@
 class Source::URL::Xiaohongshu < Source::URL
   site "Xiaohongshu" do
     url "https://www.xiaohongshu.com"
-    domains %w[xiaohongshu.com xhscdn.com xhslink.com]
+    domains %w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com]
 
     credential :session_cookie, help: %{Your Xiaohongshu `gid` cookie.}
     credential :webid_cookie, help: %{Your Xiaohongshu `webId` cookie.}
@@ -16,7 +16,7 @@ class Source::URL::Xiaohongshu < Source::URL
   attr_reader :user_id, :post_id, :full_image_url, :xsec_token, :redirect_id
 
   def self.match?(url)
-    url.domain.in?(%w[xiaohongshu.com xhscdn.com xhslink.com])
+    url.domain.in?(%w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com])
   end
 
   def parse
@@ -26,7 +26,7 @@ class Source::URL::Xiaohongshu < Source::URL
     # https://sns-webpic-qc.xhscdn.com/202405210829/7c81f7805428d2268d2d0723e0f52ce2/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0!nd_dft_wlteh_webp_3 (sample)
     # https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8 (full)
     # https://ci.xiaohongshu.com/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0 (full)
-    in _, "xhscdn.com", /^\d{12}$/, /^\h{32}$/, *subdirs, /^([a-z0-9]+)!/
+    in _, ("xhscdn.com" | "rednotecdn.com"), /^\d{12}$/, /^\h{32}$/, *subdirs, /^([a-z0-9]+)!/
       image_id = basename.split("!").first
       @full_image_url = ["https://ci.xiaohongshu.com", *subdirs, image_id].join("/")
 
@@ -44,23 +44,23 @@ class Source::URL::Xiaohongshu < Source::URL
       @full_image_url = "https://img.xiaohongshu.com/avatar/#{basename.split("@").first}"
 
     # https://www.xiaohongshu.com/explore/6421b331000000002702901f
-    in _, "xiaohongshu.com", ("explore" | "search_result"), post_id
+    in _, ("xiaohongshu.com" | "rednote.com"), ("explore" | "search_result"), post_id
       @post_id = post_id
       @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/discovery/item/65880524000000000700a643
-    in _, "xiaohongshu.com", "discovery", "item", post_id
+    in _, ("xiaohongshu.com" | "rednote.com"), "discovery", "item", post_id
       @post_id = post_id
       @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8/6421b331000000002702901f
-    in _, "xiaohongshu.com", "user", "profile", user_id, post_id
+    in _, ("xiaohongshu.com" | "rednote.com"), "user", "profile", user_id, post_id
       @user_id = user_id
       @post_id = post_id
       @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8
-    in _, "xiaohongshu.com", "user", "profile", user_id
+    in _, ("xiaohongshu.com" | "rednote.com"), "user", "profile", user_id
       @user_id = user_id
 
     # https://xhslink.com/WNd9gI
@@ -83,7 +83,7 @@ class Source::URL::Xiaohongshu < Source::URL
   end
 
   def image_url?
-    host.in?(%w[ci.xiaohongshu.com img.xiaohongshu.com]) || domain == "xhscdn.com"
+    host.in?(%w[ci.xiaohongshu.com img.xiaohongshu.com]) || domain.in?(%w[xhscdn.com rednotecdn.com])
   end
 
   def page_url
