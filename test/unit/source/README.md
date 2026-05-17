@@ -2,6 +2,8 @@
 
 This directory contains the tests for the extractors and URL parsers defined in [app/logical/source](../../../app/logical/source).
 
+To quickly run a set of tests for a site, you can run `bin/test_sources <site_name>`: `bin/test_sources pixiv`, `bin/test_sources twitter`, etc.
+
 ## URL Tests
 
 ### URL type matchers
