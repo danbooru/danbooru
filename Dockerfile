@@ -17,17 +17,18 @@
 # See https://github.com/danbooru/danbooru/wiki/Docker-Guide for more details.
 
 # You must also update .ruby-version and the Gemfile when updating the Ruby version.
-ARG RUBY_VERSION="3.4.5"
-ARG RUBY_MAJOR_VERSION="3.4"
+ARG RUBY_VERSION="4.0.2"
+ARG RUBY_MAJOR_VERSION="4.0"
 
 # Update .tool-versions too when updating these.
 ARG MOZJPEG_VERSION="4.1.5"
 ARG VIPS_VERSION="8.14.2"
 ARG FFMPEG_VERSION="7.1.1"
-ARG EXIFTOOL_VERSION="13.30"
-ARG OPENRESTY_VERSION="1.27.1.2"
-ARG NODE_VERSION="22.16.0"
-ARG UBUNTU_VERSION="24.04"
+ARG EXIFTOOL_VERSION="13.50"
+ARG OPENRESTY_VERSION="1.29.2.3"
+ARG NODE_VERSION="24.14.1"
+ARG UBUNTU_VERSION="noble-20260217@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7072feef0c"
+ARG UBUNTU_SNAPSHOT="20260401T000000Z"
 
 
 # The base layer for everything.
@@ -35,6 +36,7 @@ FROM ubuntu:$UBUNTU_VERSION AS base
 SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"]
 
 ARG RUBY_MAJOR_VERSION
+ARG UBUNTU_SNAPSHOT
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV LANG=C.UTF-8
 ENV GEM_HOME=/home/danbooru/bundle
@@ -49,20 +51,32 @@ RUN <<EOS
     Dpkg::Options {
       "--force-confnew";
       "--force-confdef";
+      "--log=/dev/null";
     }
+
+    Dir::Log::History "/dev/null";
+    Dir::Log::Terminal "/dev/null";
 EOF
 
-  apt-get update
-  apt-get install -y --no-install-recommends \
-    postgresql-client ca-certificates mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
+  apt-get install --update -y --no-install-recommends ca-certificates
+
+  cat > /etc/apt/apt.conf.d/50snapshot <<EOF
+    APT::Snapshot "$UBUNTU_SNAPSHOT";
+    Acquire::Snapshots::URI::Host::ports.ubuntu.com "https://snapshot.ubuntu.com/ubuntu/@SNAPSHOTID@/";
+EOF
+
+  rm -rf /var/lib/apt/lists/*
+  apt-get install --update -y --no-install-recommends \
+    postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0t64 liblcms2-2 libpng16-16 libexpat1 \
-    libglib2.0-0 libgif7 libexif12 libheif1 libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
+    libglib2.0-0 libgif7 libexif12 libheif1 libx264-164 libx265-199 libsvtav1enc1d1 libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
     libreadline8t64 libarchive-zip-perl tini busybox less ncdu curl
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs mount procps python3 tzdata
   apt-get autoremove -y
   rm -rf /etc/gnutls/config /var/{lib,cache,log} /usr/share/{doc,info}/* /usr/local/*
   mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
+  ln -sf /dev/null /var/log/alternatives.log
 
   busybox --install -s
 EOS
@@ -141,21 +155,22 @@ EOS
 # Build FFmpeg. Output is in /usr/local.
 FROM build-base AS build-ffmpeg
 ARG FFMPEG_VERSION
-ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev"
+ARG FFMPEG_BUILD_DEPS="nasm libx264-dev libx265-dev libsvtav1enc-dev libvpx-dev libdav1d-dev zlib1g-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
-  --disable-ffplay --disable-network --disable-doc --disable-static --enable-shared \
-  --enable-libvpx --enable-libdav1d --enable-zlib \
+  --disable-ffplay --disable-network --disable-doc --disable-static --enable-shared --enable-gpl \
+  --enable-libx264 --enable-libx265 --enable-libsvtav1 --enable-libvpx --enable-libdav1d --enable-zlib \
   --disable-muxers \
-    --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=image2 --enable-muxer=null \
+    --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=matroska --enable-muxer=image2 --enable-muxer=null \
   --disable-demuxers \
     --enable-demuxer=mov,mp4,m4a,3gp,3g2,mj2 --enable-demuxer=matroska,webm --enable-demuxer=image2 \
-    --enable-demuxer=apng --enable-demuxer=gif \
+    --enable-demuxer=apng --enable-demuxer=gif --enable-demuxer=concat \
   --disable-filters \
     --enable-filter=scale --enable-filter=thumbnail --enable-filter=silencedetect --enable-filter=ebur128 \
     --enable-filter=aresample --enable-filter=anull --enable-filter=null --enable-filter=copy \
+    --enable-filter=pad --enable-filter=fillborders \
   --disable-encoders \
-    --enable-encoder=libvpx_vp8 --enable-encoder=libvpx_vp9 --enable-encoder=png --enable-encoder=null \
-    --enable-encoder=wrapped_avframe --enable-encoder=pcm_s16le \
+    --enable-encoder=libvpx_vp8 --enable-encoder=libvpx_vp9 --enable-encoder=libx264 --enable-encoder=libx265 --enable-encoder=libsvtav1 \
+    --enable-encoder=png --enable-encoder=null --enable-encoder=wrapped_avframe --enable-encoder=pcm_s16le \
   --disable-decoders \
     --enable-decoder=vp8 --enable-decoder=vp9 --enable-decoder=h264 --enable-decoder=hevc --enable-decoder=libdav1d \
     --enable-decoder=mpeg4 --enable-decoder=mjpeg --enable-decoder=png --enable-decoder=apng --enable-decoder=gif \
@@ -232,10 +247,17 @@ EOS
 # Install NodeJS. Output is in /usr/local.
 FROM build-base AS build-node
 ARG NODE_VERSION
+ARG TARGETARCH
 RUN <<EOS
   apt-get install -y --no-install-recommends xz-utils
 
-  curl -L https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz | tar --strip-components=1 -xJvf -
+  case "$TARGETARCH" in
+    amd64) NODE_ARCH="x64" ;;
+    arm64) NODE_ARCH="arm64" ;;
+    *) echo "Unsupported architecture: $TARGETARCH" >&2; exit 1 ;;
+  esac
+
+  curl -L "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" | tar --strip-components=1 -xJvf -
 
   cp -rdv ./bin /usr/local
   cp -rdv ./lib /usr/local
@@ -281,8 +303,8 @@ WORKDIR /danbooru
 COPY --link package.json package-lock.json ./
 
 RUN <<EOS
-  mkdir -p node_modules public/packs
-  chown danbooru:danbooru /danbooru node_modules public/packs
+  mkdir -p node_modules public/packs public/packs-dev
+  chown danbooru:danbooru /danbooru node_modules public/packs public/packs-dev
 EOS
 
 USER danbooru
@@ -292,12 +314,13 @@ COPY --link postcss.config.js babel.config.json ./
 COPY --link config/shakapacker.yml ./config/
 COPY --link config/webpack/ ./config/webpack/
 COPY --link public/images ./public/images
+COPY --link public/logos ./public/logos
 COPY --link public/fonts ./public/fonts
 COPY --link app/components/ ./app/components
 COPY --link app/javascript/ ./app/javascript
 
 RUN <<EOS
-  npx webpack --mode production -c config/webpack/webpack.config.js
+  RAILS_ENV=production NODE_ENV=production npx webpack --mode production -c config/webpack/webpack.config.js
   rm -f public/packs/**/*.{gz,br}
 EOS
 

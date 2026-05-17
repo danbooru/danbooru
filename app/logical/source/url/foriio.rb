@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Foriio < Source::URL
+  site "Foriio", url: "https://foriio.com", domains: %w[foriio.com fori.io imgix.net cloudfront.net amazonaws.com]
+
   RESERVED_USERNAMES = %w[about benefits business company contests discover keywords legal pro]
 
   attr_reader :username, :work_id, :file

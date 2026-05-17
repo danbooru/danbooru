@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostPrunerTest < ActiveSupport::TestCase
   context "PostPruner" do
@@ -47,7 +47,7 @@ class PostPrunerTest < ActiveSupport::TestCase
         @post = create(:post, created_at: 4.weeks.ago)
         @flag1 = create(:post_flag, post: @post, created_at: 3.weeks.ago, status: :succeeded)
         @flag2 = create(:post_flag, post: @post, created_at: 2.weeks.ago, status: :rejected)
-        @flag3 = create(:post_flag, post: @post, created_at: 1.weeks.ago, status: :pending)
+        @flag3 = create(:post_flag, post: @post, created_at: 1.week.ago, status: :pending)
 
         assert_equal(true, @post.is_flagged?)
         PostPruner.prune!
@@ -94,7 +94,7 @@ class PostPrunerTest < ActiveSupport::TestCase
         @post = create(:post, created_at: 4.weeks.ago, is_deleted: true)
         @appeal1 = create(:post_appeal, post: @post, created_at: 3.weeks.ago, status: :succeeded)
         @appeal2 = create(:post_appeal, post: @post, created_at: 2.weeks.ago, status: :rejected)
-        @appeal3 = create(:post_appeal, post: @post, created_at: 1.weeks.ago, status: :pending)
+        @appeal3 = create(:post_appeal, post: @post, created_at: 1.week.ago, status: :pending)
         PostPruner.prune!
 
         assert_equal(true, @post.reload.is_deleted?)

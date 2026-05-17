@@ -10,7 +10,7 @@ class AutocompleteTest < ApplicationSystemTestCase
     autocomplete(id, text)
     sleep 1 if expected_results.empty?
 
-    assert_selector 'ul.ui-autocomplete li', count: expected_results.size
+    assert_selector "ul.ui-autocomplete li", count: expected_results.size
     expected_results.each do |result|
       assert_selector "li[data-autocomplete-value='#{result}']", count: 1
     end

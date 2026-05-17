@@ -21,7 +21,7 @@ class CloudflareService
 
     cloudflare = Danbooru::Http.external.headers(
       "Authorization" => "Bearer #{api_token}",
-      "Content-Type" => "application/json"
+      "Content-Type" => "application/json",
     )
 
     url = "https://api.cloudflare.com/client/v4/zones/#{zone}/purge_cache"

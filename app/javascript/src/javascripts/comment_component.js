@@ -1,5 +1,3 @@
-import Utility from "./utility";
-
 class CommentComponent {
   static initialize() {
     if ($("#c-posts #a-show, #c-comments").length) {

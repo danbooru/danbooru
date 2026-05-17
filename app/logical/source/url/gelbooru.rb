@@ -2,6 +2,15 @@
 
 # This covers all Gelbooru-based sites.
 class Source::URL::Gelbooru < Source::URL
+  site "Gelbooru", url: "https://gelbooru.com" do
+    credential :user_id, help: %{Your Gelbooru user ID.}
+    credential :api_key, help: %{Your Gelbooru API key. Go to https://gelbooru.com/index.php?page=account&s=options to find your API key.}
+  end
+
+  site "Safebooru", url: "https://safebooru.org"
+  site "TBIB", url: "https://tbib.org"
+  site "Rule34.xxx", url: "https://rule34.xxx"
+
   attr_reader :post_id, :md5, :image_type, :full_image_url
 
   def self.match?(url)
@@ -50,6 +59,14 @@ class Source::URL::Gelbooru < Source::URL
     # https://safebooru.org/thumbnails/4016/thumbnail_64779fbfc87020ed5fd94854fe973bc0.jpg?4196692
     # https://us.rule34.xxx//images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg?6961597
     # https://us.rule34.xxx/thumbnails/6120/thumbnail_0a8fff70045826d2b39fcde4eed17584.jpg?6961597
+    #
+    # https://api-cdn-mp4.rule34.xxx/images/4330/2f85040320f64c0e42128a8b8f6071ce.mp4
+    # https://ny5webm.rule34.xxx//images/4653/3c63956b940d0ff565faa8c7555b4686.mp4?5303486
+    # https://img.rule34.xxx//images/4977/7d76919c2f713c580f69fe129d2d1a44.jpeg?5668795
+    # http://rule34.xxx//images/993/5625625970c9ce8c5121fde518c2c4840801cd29.jpg?992983
+    # http://aimg.rule34.xxx//samples/1267/sample_d628f215f27815dc9c1d365a199ee68e807efac1.jpg?1309664
+    #
+    # http://img3.rule34.xxx/img/rule34//images/1180/76c6497b5138c4122710c2d05458e729a8d34f7b.png?1190815 # XXX unhandled subdir
     in _, ("images" | "samples" | "thumbnails") => image_type, /\A\d+\z/ => directory, /\A(?:sample_|thumbnail_)?(\h{32})\.\w+\z/
       @md5 = $1
       @post_id = query if query&.match?(/\A\d+\z/)
@@ -72,19 +89,6 @@ class Source::URL::Gelbooru < Source::URL
 
     else
       nil
-    end
-  end
-
-  def site_name
-    case domain
-    in "rule34.xxx"
-      "Rule34.xxx"
-    in "tbib.org"
-      "TBIB"
-    in "gelbooru.com"
-      "Gelbooru"
-    in "safebooru.org"
-      "Safebooru"
     end
   end
 

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class TagImplicationTest < ActiveSupport::TestCase
   context "A tag implication" do
@@ -13,20 +13,20 @@ class TagImplicationTest < ActiveSupport::TestCase
 
     context "on validation" do
       subject do
-        FactoryBot.create(:tag, :name => "aaa")
-        FactoryBot.create(:tag, :name => "bbb")
-        FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+        create(:tag, name: "aaa")
+        create(:tag, name: "bbb")
+        create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb")
       end
 
       should normalize_attribute(:antecedent_name).from(" FOO BAR ").to("foo_bar")
       should normalize_attribute(:consequent_name).from(" FOO BAR ").to("foo_bar")
 
-      should allow_value('active').for(:status)
-      should allow_value('deleted').for(:status)
+      should allow_value("active").for(:status)
+      should allow_value("deleted").for(:status)
 
-      should_not allow_value('ACTIVE').for(:status)
-      should_not allow_value('error').for(:status)
-      should_not allow_value('derp').for(:status)
+      should_not allow_value("ACTIVE").for(:status)
+      should_not allow_value("error").for(:status)
+      should_not allow_value("derp").for(:status)
 
       should allow_value(nil).for(:forum_topic_id)
       should_not allow_value(-1).for(:forum_topic_id).with_message("must exist", against: :forum_topic)
@@ -38,10 +38,10 @@ class TagImplicationTest < ActiveSupport::TestCase
       should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
 
       should "not allow duplicate active implications" do
-        ti1 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "active")
-        ti2 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
-        ti3 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
-        ti4 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
+        ti1 = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "active")
+        ti2 = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
+        ti3 = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
+        ti4 = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
         [ti1, ti2, ti3, ti4].each { |ti| assert(ti.valid?) }
 
         ti4.update(status: "active")
@@ -65,51 +65,51 @@ class TagImplicationTest < ActiveSupport::TestCase
     end
 
     should "ensure both tags exist" do
-      FactoryBot.create(:tag_implication, antecedent_name: "a", consequent_name: "b")
+      create(:tag_implication, antecedent_name: "a", consequent_name: "b")
 
       assert(Tag.exists?(name: "a"))
       assert(Tag.exists?(name: "b"))
     end
 
     should "not validate when a tag directly implicates itself" do
-      ti = FactoryBot.build(:tag_implication, antecedent_name: "a", consequent_name: "a")
+      ti = build(:tag_implication, antecedent_name: "a", consequent_name: "a")
 
       assert(ti.invalid?)
       assert_includes(ti.errors[:base], "Cannot alias or implicate a tag to itself")
     end
 
     should "not validate when a circular relation is created" do
-      ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
-      ti3 = FactoryBot.build(:tag_implication, :antecedent_name => "bbb", :consequent_name => "aaa")
+      ti1 = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb")
+      ti2 = create(:tag_implication, antecedent_name: "bbb", consequent_name: "ccc")
+      ti3 = build(:tag_implication, antecedent_name: "bbb", consequent_name: "aaa")
 
       assert(ti1.valid?)
       assert(ti2.valid?)
-      refute(ti3.valid?)
-      assert_equal("Tag implication can not create a circular relation with another tag implication", ti3.errors.full_messages.join(""))
+      assert(ti3.invalid?)
+      assert_equal("Tag implication can not create a circular relation with another tag implication", ti3.errors.full_messages.join)
     end
 
     should "not validate when a transitive relation is created" do
-      ti_ab = FactoryBot.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
-      ti_bc = FactoryBot.create(:tag_implication, :antecedent_name => "b", :consequent_name => "c")
-      ti_ac = FactoryBot.build(:tag_implication, :antecedent_name => "a", :consequent_name => "c")
+      ti_ab = create(:tag_implication, antecedent_name: "a", consequent_name: "b")
+      ti_bc = create(:tag_implication, antecedent_name: "b", consequent_name: "c")
+      ti_ac = build(:tag_implication, antecedent_name: "a", consequent_name: "c")
       ti_ac.save
 
-      assert_equal("a already implies c through another implication", ti_ac.errors.full_messages.join(""))
+      assert_equal("a already implies c through another implication", ti_ac.errors.full_messages.join)
     end
 
     should "not allow for duplicates" do
-      ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti2 = FactoryBot.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ti1 = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb")
+      ti2 = build(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb")
       ti2.save
       assert(ti2.errors.any?, "Tag implication should not have validated.")
       assert_includes(ti2.errors.full_messages, "Implication already exists")
     end
 
     should "not validate if its antecedent or consequent are aliased to another tag" do
-      ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "a")
-      ta2 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "b")
-      ti = FactoryBot.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ta1 = create(:tag_alias, antecedent_name: "aaa", consequent_name: "a")
+      ta2 = create(:tag_alias, antecedent_name: "bbb", consequent_name: "b")
+      ti = build(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb")
 
       assert(ti.invalid?)
       assert_includes(ti.errors[:base], "Antecedent tag must not be aliased to another tag")

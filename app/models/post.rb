@@ -78,22 +78,22 @@ class Post < ApplicationRecord
   after_create_commit :update_iqdb
 
   belongs_to :approver, class_name: "User", optional: true
-  belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
+  belongs_to :uploader, class_name: "User", counter_cache: "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true, autosave: true
   has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5, inverse_of: :post
   has_one :media_metadata, through: :media_asset
-  has_one :artist_commentary, :dependent => :destroy
+  has_one :artist_commentary, dependent: :destroy
   has_one :vote_by_current_user, -> { active.where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
-  has_many :flags, :class_name => "PostFlag", :dependent => :destroy
-  has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
-  has_many :votes, :class_name => "PostVote", :dependent => :destroy
-  has_many :notes, :dependent => :destroy
-  has_many :comments, :dependent => :destroy
-  has_many :children, -> {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
-  has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
-  has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
+  has_many :flags, class_name: "PostFlag", dependent: :destroy
+  has_many :appeals, class_name: "PostAppeal", dependent: :destroy
+  has_many :votes, class_name: "PostVote", dependent: :destroy
+  has_many :notes, dependent: :destroy
+  has_many :comments, dependent: :destroy
+  has_many :children, -> { order("posts.id") }, class_name: "Post", foreign_key: "parent_id"
+  has_many :approvals, class_name: "PostApproval", dependent: :destroy
+  has_many :disapprovals, class_name: "PostDisapproval", dependent: :destroy
   has_many :favorites, dependent: :destroy
-  has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
+  has_many :replacements, class_name: "PostReplacement", dependent: :destroy
   has_many :ai_tags, through: :media_asset
   has_many :events, class_name: "PostEvent"
   has_many :mod_actions, as: :subject, dependent: :destroy
@@ -111,7 +111,7 @@ class Post < ApplicationRecord
   scope :approved, -> { where(is_pending: false, is_deleted: false) }
   scope :appealed, -> { where(id: PostAppeal.pending.select(:post_id)) }
   scope :in_modqueue, -> { where_union_all(pending, flagged, appealed) }
-  scope :expired, -> { pending.where("posts.created_at < ?", Danbooru.config.moderation_period.ago) }
+  scope :expired, -> { pending.where(created_at: ...Danbooru.config.moderation_period.ago) }
 
   scope :unflagged, -> { where(is_flagged: false) }
   scope :has_notes, -> { where.not(last_noted_at: nil) }
@@ -227,7 +227,7 @@ class Post < ApplicationRecord
       is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
     end
 
-    alias has_large has_large?
+    alias_method :has_large, :has_large?
 
     def large_image_width
       if has_large?
@@ -269,7 +269,7 @@ class Post < ApplicationRecord
 
     # XXX
     def current_image_size
-      has_large? && CurrentUser.default_image_size == "large" ? "large" : "original"
+      (has_large? && CurrentUser.default_image_size == "large") ? "large" : "original"
     end
   end
 
@@ -413,9 +413,9 @@ class Post < ApplicationRecord
     def validate_new_tags
       return if CurrentUser.user.nil? || CurrentUser.user.is_builder?
 
-      new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
+      new_tags = post_edit.effective_added_tag_names.reject { |name| Tag.exists?(name: name) }
 
-      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f/MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
+      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
         errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
         throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
       end
@@ -522,6 +522,9 @@ class Post < ApplicationRecord
           pool = Pool.find_by_id(pool_id)
           pool&.add!(self)
 
+        in "pool", "none"
+          remove_from_all_pools
+
         in "pool", name
           pool = Pool.find_by_name(name)
           pool&.add!(self)
@@ -597,7 +600,7 @@ class Post < ApplicationRecord
 
         end
       end
-    rescue
+    rescue StandardError
       # XXX Silently ignore errors so that the edit doesn't fail. We can't let
       # the edit fail because then it will create a new post version even if
       # the edit didn't go through.
@@ -656,12 +659,12 @@ class Post < ApplicationRecord
       tag_array.include?(tag)
     end
 
-    def add_tag(tag)
-      self.tag_string = "#{tag_string} #{tag}"
+    def add_tag(*tags)
+      self.tag_string = [tag_string, *tags].join(" ").strip
     end
 
-    def remove_tag(tag)
-      self.tag_string = (tag_array - Array(tag)).join(" ")
+    def remove_tag(*tags)
+      self.tag_string = (tag_array - tags).join(" ")
     end
 
     def tag_categories
@@ -748,7 +751,7 @@ class Post < ApplicationRecord
       ancestors = []
       parent = self.parent
 
-      while parent.present? && !self.in?(ancestors)
+      while parent.present? && !in?(ancestors)
         ancestors << parent
         parent = parent.parent
       end
@@ -790,7 +793,7 @@ class Post < ApplicationRecord
 
       parent.update_has_children_flag if parent.present?
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
-    rescue
+    rescue StandardError
       # XXX Silently ignore errors so that the edit doesn't fail. We can't let
       # the edit fail because then it will create a new post version even if
       # the edit didn't go through.
@@ -814,7 +817,7 @@ class Post < ApplicationRecord
       return true if has_active_children?
       return true if has_children? && CurrentUser.user.show_deleted_children?
       return true if has_children? && is_deleted?
-      return false
+      false
     end
 
     def has_visible_children
@@ -969,7 +972,7 @@ class Post < ApplicationRecord
         "parent_id" => parent_id,
         "status" => status,
         "has_children" => has_children?,
-        "created_at" => created_at.to_formatted_s(:db),
+        "created_at" => created_at.to_fs(:db),
         "has_notes" => has_notes?,
         "rating" => rating,
         "author" => uploader.name,
@@ -1077,6 +1080,12 @@ class Post < ApplicationRecord
         relation
       end
 
+      def with_disapproval_stats
+        relation = left_outer_joins(:disapprovals).group(:id).select("posts.*")
+        relation = relation.select("COUNT(post_disapprovals.id) AS disapproval_count")
+        relation
+      end
+
       def with_replacement_stats
         relation = left_outer_joins(:replacements).group(:id).select("posts.*")
         relation = relation.select("COUNT(post_replacements.id) AS replacement_count")
@@ -1172,7 +1181,7 @@ class Post < ApplicationRecord
         when "tagcount"
           attribute_matches(value, :tag_count)
         when "duration"
-          attribute_matches(value, "media_assets.duration", :float).joins(:media_asset)
+          attribute_matches(value, "media_assets.duration", :duration).joins(:media_asset)
         when "is"
           is_matches(value, current_user)
         when "has"
@@ -1359,7 +1368,7 @@ class Post < ApplicationRecord
       end
 
       def rating_matches(rating)
-        where(rating: rating.downcase.split(/,/).map(&:first))
+        where(rating: rating.downcase.split(",").map(&:first))
       end
 
       def source_matches(source, quoted = false)
@@ -1742,15 +1751,11 @@ class Post < ApplicationRecord
       def search(params, current_user)
         q = search_attributes(
           params,
-          [:id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
-          :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
-          :image_height, :tag_count, :has_children, :has_active_children,
-          :is_pending, :is_flagged, :is_deleted, :is_banned,
-          :last_comment_bumped_at, :last_commented_at, :last_noted_at,
-          :uploader, :approver, :parent,
-          :artist_commentary, :flags, :appeals, :notes, :comments, :children,
-          :approvals, :replacements, :media_metadata],
-          current_user: current_user
+          %i[id created_at updated_at rating source pixiv_id fav_count score up_score down_score md5 file_ext
+             file_size image_width image_height tag_count has_children has_active_children is_pending is_flagged is_deleted
+             is_banned last_comment_bumped_at last_commented_at last_noted_at uploader approver parent artist_commentary
+             flags appeals notes comments children approvals replacements media_metadata],
+          current_user: current_user,
         )
 
         if params[:tags].present?
@@ -1809,7 +1814,7 @@ class Post < ApplicationRecord
     def validate_no_parent_cycles
       return unless parent_id_changed?
 
-      if self.in?(ancestors)
+      if in?(ancestors)
         errors.add(:base, "Post cannot have itself as a parent")
         throw :abort # Abort to avoid additional error about parent-child chain being more than 4 levels deep
       end
@@ -1853,7 +1858,7 @@ class Post < ApplicationRecord
 
       changed_tags = added_tags + removed_tags
 
-      if RateLimiter.limited?(action: "post:validate_changed_tags", user: CurrentUser.user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f/MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
+      if RateLimiter.limited?(action: "post:validate_changed_tags", user: CurrentUser.user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f / MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
         errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
         throw :abort
       end
@@ -1883,8 +1888,8 @@ class Post < ApplicationRecord
       end
 
       post_edit.invalid_added_tags.each do |tag|
-        tag.errors.messages.each do |_attribute, messages|
-          warnings.add(:base, "Couldn't add tag: #{messages.join(';')}")
+        tag.errors.messages.each_value do |messages|
+          warnings.add(:base, "Couldn't add tag: #{messages.join(";")}")
         end
       end
 
@@ -1948,7 +1953,7 @@ class Post < ApplicationRecord
   end
 
   def levelblocked?(user = CurrentUser.user)
-    #!user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
+    # !user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
     user.id != uploader_id && !user.is_gold? && tag_string.match?(RESTRICTED_TAGS_REGEX)
   end
 

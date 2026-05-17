@@ -17,9 +17,9 @@ class TagRelationship < ApplicationRecord
   belongs_to :consequent_wiki, class_name: "WikiPage", foreign_key: "consequent_name", primary_key: "title", optional: true
   has_many :mod_actions, as: :subject, dependent: :destroy
 
-  scope :active, -> {where(status: "active")}
-  scope :deleted, -> {where(status: "deleted")}
-  scope :retired, -> {where(status: "retired")}
+  scope :active, -> { where(status: "active") }
+  scope :deleted, -> { where(status: "deleted") }
+  scope :retired, -> { where(status: "retired") }
 
   # TagAlias.artist, TagAlias.general, TagAlias.character, TagAlias.copyright, TagAlias.meta
   # TagImplication.artist, TagImplication.general, TagImplication.character, TagImplication.copyright, TagImplication.meta

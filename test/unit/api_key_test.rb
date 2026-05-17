@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ApiKeyTest < ActiveSupport::TestCase
   def self.to_ips(ips)
@@ -41,6 +41,8 @@ class ApiKeyTest < ActiveSupport::TestCase
         should_not allow_value(["192.168.0.0/16"]).for(:permitted_ip_addresses)
         should_not allow_value(["10.0.0.0/8"]).for(:permitted_ip_addresses)
         should_not allow_value(["1.2.0.0/16", "1.2.3.0/24"]).for(:permitted_ip_addresses)
+        should_not allow_value(["0.0.0.0"]).for(:permitted_ip_addresses)
+        should_not allow_value(["::"]).for(:permitted_ip_addresses)
         should_not allow_value(21.times.map { |n| "1.2.3.#{n}" }).for(:permitted_ip_addresses)
 
         # should_not allow_value(["blah"]).for(:permitted_ip_addresses)
@@ -58,7 +60,7 @@ class ApiKeyTest < ActiveSupport::TestCase
 
       should "not allow more than 20 API keys per user" do
         user = create(:user)
-        create_list(:api_key, 20, user: user)
+        create_list(:api_key, 20, user: user) # rubocop:disable FactoryBot/ExcessiveCreateList
         api_key = build(:api_key, user: user)
 
         assert_equal(false, api_key.valid?)

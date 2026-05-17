@@ -9,17 +9,17 @@ class DeepDanbooruClient
 
   def tags!(file)
     html = post!("/upload", form: {
-      file: HTTP::FormData::File.new(file)
+      file: HTTP::FormData::File.new(file),
     }).parse
 
-    tags = html.css("tbody tr").map do |row|
+    tags = html.css("tbody tr").to_h do |row|
       tag_name = row.css("td:first-child").text
       confidence = row.css("td:last-child").text
 
       # If tag_name is "rating:safe", then make a mock tag.
       tag = Tag.find_by_name_or_alias(tag_name) || Tag.new(name: tag_name).freeze
       [tag, confidence.to_f]
-    end.to_h
+    end
 
     tags
   end

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class RetireTagRelationshipsJobTest < ActiveJob::TestCase
   context "RetireTagRelationshipsJob" do

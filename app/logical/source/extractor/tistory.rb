@@ -57,6 +57,10 @@ class Source::Extractor::Tistory < Source::Extractor
         element[:alt] = "[image]"
         element[:src] = Source::URL.parse(element[:src]).try(:full_image_url) || element[:src]
 
+        # Strip URL signature since it expires in a couple days anyway, and it breaks tests and could potentially leak our IP
+        # https://blog.kakaocdn.net/dna/k1Tgn/dJMcacoErBB/AAAAAAAAAAAAAAAAAAAAAJZMrwZnj8dl5BfeDlxnBFYH2SHlqBsg0DCgs3o0EmGZ/img.png?credential=XXX&expires=1772290799&allow_ip=&allow_referer=&signature=XXX
+        element[:src] = element[:src].gsub(/\?.*$/, "") if element[:src].starts_with?("https://blog.kakaocdn.net/dna/")
+
       in "figcaption"
         element.name = "p"
 

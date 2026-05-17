@@ -7,13 +7,6 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       @tag = create(:tag, name: "touhou", category: Tag.categories.copyright, post_count: 1)
     end
 
-    context "edit action" do
-      should "render" do
-        get_auth edit_tag_path(@tag), @user
-        assert_response :success
-      end
-    end
-
     context "index action" do
       should "render" do
         get tags_path
@@ -28,7 +21,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
       context "with blank search parameters" do
         should "strip the blank parameters with a redirect" do
-          get tags_path, params: { search: { name: "touhou", category: "" } }
+          get tags_path, params: { search: { name: "touhou", category: "" }}
           assert_redirected_to tags_path(search: { name: "touhou" })
         end
       end
@@ -55,7 +48,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
             assert_response :success
           end
 
-          should respond_to_search({}).with { [@empty, @axe, @weapon, @vocaloid, @wokada, @hatsune_miku, @miku, @tag] }
+          should respond_to_search.with { [@empty, @axe, @weapon, @vocaloid, @wokada, @hatsune_miku, @miku, @tag] }
           should respond_to_search(name_matches: "hatsune_miku").with { @hatsune_miku }
           should respond_to_search(name_normalize: "HATSUNE_MIKU  ").with { @hatsune_miku }
           should respond_to_search(name_or_alias_matches: "miku").with { [@hatsune_miku, @miku] }
@@ -70,10 +63,10 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
             should respond_to_search(name: "hatsune_miku", has_artist: "false").with { @hatsune_miku }
             should respond_to_search(name: "hatsune_miku", has_wiki_page: "true").with { @hatsune_miku }
             should respond_to_search(name: "vocaloid", has_wiki_page: "false").with { @vocaloid }
-            should respond_to_search(consequent_aliases: {antecedent_name: "miku"}).with { @hatsune_miku }
-            should respond_to_search(consequent_implications: {antecedent_name: "axe"}).with { @weapon }
-            should respond_to_search(wiki_page: {body_matches: "*vocaloid*"}).with { @hatsune_miku }
-            should respond_to_search(artist: {is_banned: "false"}).with { @wokada }
+            should respond_to_search(consequent_aliases: { antecedent_name: "miku" }).with { @hatsune_miku }
+            should respond_to_search(consequent_implications: { antecedent_name: "axe" }).with { @weapon }
+            should respond_to_search(wiki_page: { body_matches: "*vocaloid*" }).with { @hatsune_miku }
+            should respond_to_search(artist: { is_banned: "false" }).with { @wokada }
             should respond_to_search(has_dtext_links: "true").with { @vocaloid }
           end
         end
@@ -97,6 +90,29 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get tag_path(@tag)
         assert_response :success
+      end
+    end
+
+    context "edit action" do
+      should "render" do
+        get_auth edit_tag_path(@tag), @user
+        assert_response :success
+        assert_select("#tag_category")
+      end
+
+      should "not give the option to change the category for a large tag" do
+        @tag.update!(post_count: 1000)
+        get_auth edit_tag_path(@tag), @user
+        assert_response :success
+        assert_not_select("#tag_category")
+      end
+
+      should "not give the option to change the category for artist tags" do
+        @tag = create(:tag, category: Tag.categories.artist)
+        @artist = create(:artist, name: @tag.name)
+        get_auth edit_tag_path(@tag), @user
+        assert_response :success
+        assert_not_select("#tag_category")
       end
     end
 
@@ -132,7 +148,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
         should "not update the category for a member" do
           @member = create(:member_user)
-          put_auth tag_path(@tag), @member, params: {tag: { category: Tag.categories.general }}
+          put_auth tag_path(@tag), @member, params: { tag: { category: Tag.categories.general }}
 
           assert_response 403
           assert_not_equal(Tag.categories.general, @tag.reload.category)
@@ -140,7 +156,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "update the category for a builder" do
-          put_auth tag_path(@tag), @user, params: {tag: { category: Tag.categories.general }}
+          put_auth tag_path(@tag), @user, params: { tag: { category: Tag.categories.general }}
 
           assert_redirected_to @tag
           assert_equal(Tag.categories.general, @tag.reload.category)
@@ -151,6 +167,25 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(Tag.categories.copyright, @tag.first_version.category)
           assert_equal(Tag.categories.general, @tag.last_version.category)
         end
+      end
+
+      should "not change category when the tag is too large to be changed by a builder" do
+        @tag = create(:tag, category: Tag.categories.general, post_count: 1001)
+        put_auth tag_path(@tag), @user, params: { tag: { category: Tag.categories.artist }}
+
+        assert_response 403
+        assert_equal(Tag.categories.general, @tag.reload.category)
+        assert_equal(0, @tag.versions.count)
+      end
+
+      should "not change the category of an artist tag" do
+        @tag = create(:tag, category: Tag.categories.artist)
+        @artist = create(:artist, name: @tag.name)
+
+        put_auth tag_path(@tag), @user, params: { tag: { category: Tag.categories.character }}
+        assert_response 403
+        assert(@tag.reload.artist?)
+        assert_equal(0, @tag.versions.count)
       end
 
       context "for deprecation" do
@@ -167,7 +202,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not remove deprecated status if the user is not an admin" do
-          put_auth tag_path(@deprecated_tag), @normal_user, params: {tag: { is_deprecated: false }}
+          put_auth tag_path(@deprecated_tag), @normal_user, params: { tag: { is_deprecated: false }}
 
           assert_response 403
           assert_equal(true, @deprecated_tag.reload.is_deprecated?)
@@ -175,7 +210,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "remove the deprecated status if the user is admin" do
-          put_auth tag_path(@deprecated_tag), @admin, params: {tag: { is_deprecated: false }}
+          put_auth tag_path(@deprecated_tag), @admin, params: { tag: { is_deprecated: false }}
 
           assert_redirected_to @deprecated_tag
           assert_equal(false, @deprecated_tag.reload.is_deprecated?)
@@ -188,7 +223,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "allow marking a tag as deprecated if it's empty" do
-          put_auth tag_path(@nondeprecated_tag), @normal_user, params: {tag: { is_deprecated: true }}
+          put_auth tag_path(@nondeprecated_tag), @normal_user, params: { tag: { is_deprecated: true }}
 
           assert_redirected_to @nondeprecated_tag
           assert_equal(true, @nondeprecated_tag.reload.is_deprecated?)
@@ -201,7 +236,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not allow marking a tag as deprecated if it's not empty" do
-          put_auth tag_path(@normal_tag), @normal_user, params: {tag: { is_deprecated: true }}
+          put_auth tag_path(@normal_tag), @normal_user, params: { tag: { is_deprecated: true }}
 
           assert_response 403
           assert_equal(false, @normal_tag.reload.is_deprecated?)
@@ -209,7 +244,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "allow admins to mark tags as deprecated" do
-          put_auth tag_path(@normal_tag), @admin, params: {tag: { is_deprecated: true }}
+          put_auth tag_path(@normal_tag), @admin, params: { tag: { is_deprecated: true }}
 
           assert_redirected_to @normal_tag
           assert_equal(true, @normal_tag.reload.is_deprecated?)
@@ -223,7 +258,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
         should "not allow deprecation of a tag with no wiki" do
           @tag_without_wiki = create(:tag, name: "no_wiki", category: Tag.categories.general, post_count: 0)
-          put_auth tag_path(@tag_without_wiki), @user, params: {tag: { is_deprecated: true }}
+          put_auth tag_path(@tag_without_wiki), @user, params: { tag: { is_deprecated: true }}
 
           assert_response 403
           assert_equal(false, @tag_without_wiki.reload.is_deprecated?)
@@ -234,21 +269,12 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           @tag_with_deleted_wiki = create(:tag, name: "deleted_wiki", category: Tag.categories.general, post_count: 0)
           create(:wiki_page, title: "no_wiki", body: "[[no_wiki]]", is_deleted: true)
 
-          put_auth tag_path(@tag_with_deleted_wiki), @user, params: {tag: { is_deprecated: true }}
+          put_auth tag_path(@tag_with_deleted_wiki), @user, params: { tag: { is_deprecated: true }}
 
           assert_response 403
           assert_equal(false, @tag_with_deleted_wiki.reload.is_deprecated?)
           assert_equal(0, @tag_with_deleted_wiki.versions.count)
         end
-      end
-
-      should "not change category when the tag is too large to be changed by a builder" do
-        @tag = create(:tag, category: Tag.categories.general, post_count: 1001)
-        put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.artist}}
-
-        assert_response 403
-        assert_equal(Tag.categories.general, @tag.reload.category)
-        assert_equal(0, @tag.versions.count)
       end
     end
   end

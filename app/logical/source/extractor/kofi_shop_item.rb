@@ -15,7 +15,8 @@ class Source::Extractor::KofiShopItem < Source::Extractor::Kofi
   end
 
   def user_id
-    shop_item_page&.at('a[href^="/home/reportpage"]')&.attr(:href)&.delete_prefix("/home/reportpage?pageid=")
+    href = shop_item_page&.at("a.navbar-creator[href]")&.attr(:href)
+    Source::URL.parse("https://ko-fi.com#{href}")&.user_id if href.present?
   end
 
   def profile_id
@@ -27,8 +28,6 @@ class Source::Extractor::KofiShopItem < Source::Extractor::Kofi
   end
 
   memoize def shop_item_page
-    # Use Ko-fi's backend IP to bypass Cloudflare protection on the https://ko-fi.com/s/:id endpoint.
-    url = "https://104.45.231.79/s/#{shop_item_id}" if shop_item_id.present?
-    http.with_legacy_ssl.headers(Host: "ko-fi.com").cache(1.minute).parsed_get(url)
+    backend_get("/s/#{shop_item_id}") if shop_item_id.present?
   end
 end

@@ -25,6 +25,15 @@ class UserNameChangeRequest < ApplicationRecord
 
   def self.search(params, current_user)
     q = search_attributes(params, [:id, :created_at, :updated_at, :user, :original_name, :desired_name], current_user: current_user)
+
+    if params[:old_name].present?
+      q = q.where("lower(original_name) = ?", User.normalize_name(params[:old_name]))
+    end
+
+    if params[:new_name].present?
+      q = q.where("lower(desired_name) = ?", User.normalize_name(params[:new_name]))
+    end
+
     q.apply_default_order(params)
   end
 

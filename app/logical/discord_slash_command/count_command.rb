@@ -8,7 +8,7 @@ class DiscordSlashCommand
       name: "tags",
       description: "The tags to search",
       required: true,
-      type: ApplicationCommandOptionType::String
+      type: ApplicationCommandOptionType::String,
     }]
 
     def call

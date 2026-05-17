@@ -12,11 +12,11 @@ class UserAction < ApplicationRecord
 
   def self.model_types
     %w[ArtistVersion ArtistCommentaryVersion Ban BulkUpdateRequest Comment
-    CommentVote Dmail FavoriteGroup ForumPost ForumPostVote ForumTopic
-    ModAction ModerationReport NoteVersion Post PostAppeal PostApproval
-    PostDisapproval PostFlag PostReplacement PostVote SavedSearch TagAlias
-    TagImplication TagVersion Upload User UserEvent UserFeedback UserUpgrade
-    UserNameChangeRequest WikiPageVersion]
+       CommentVote Dmail FavoriteGroup ForumPost ForumPostVote ForumTopic
+       ModAction ModerationReport NoteVersion Post PostAppeal PostApproval
+       PostDisapproval PostFlag PostReplacement PostVote SavedSearch TagAlias
+       TagImplication TagVersion Upload User UserEvent UserFeedback UserUpgrade
+       UserNameChangeRequest WikiPageVersion]
   end
 
   def self.for_user(user)
@@ -69,7 +69,7 @@ class UserAction < ApplicationRecord
     UNION ALL
       (#{TagImplication.visible(user).select("'TagImplication', id, creator_id, 'create', created_at").to_sql})
     UNION ALL
-      (#{TagVersion.visible(user).select("'TagVersion', id, updater_id, 'create', created_at").where("updater_id IS NOT NULL").order(created_at: :desc).to_sql})
+      (#{TagVersion.visible(user).select("'TagVersion', id, updater_id, 'create', created_at").where.not(updater_id: nil).order(created_at: :desc).to_sql})
     UNION ALL
       (#{Upload.visible(user).select("'Upload', id, uploader_id, 'create', created_at").order(created_at: :desc).to_sql})
     UNION ALL
@@ -91,7 +91,7 @@ class UserAction < ApplicationRecord
     from("(#{sql}) user_actions")
   end
 
-  def self.visible(user)
+  def self.visible(_user)
     all
   end
 

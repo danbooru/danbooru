@@ -10,7 +10,7 @@ class TagVersion < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :version, :name, :category, :is_deprecated, :tag, :updater, :previous_version], current_user: current_user)
+    q = search_attributes(params, %i[id created_at updated_at version name category is_deprecated tag updater previous_version], current_user: current_user)
 
     if params[:name_matches].present?
       q = q.name_matches(params[:name_matches])

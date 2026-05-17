@@ -29,10 +29,6 @@ class Source::Extractor::NaverCafe < Source::Extractor
     article.dig(:writer, :nick)
   end
 
-  def username
-    article.dig(:writer, :id)
-  end
-
   def tags
     api_article[:tags].to_a.map do |tag|
       [tag, "https://cafe.naver.com/CafeTagArticleList.nhn?search.clubId=#{club_id}&search.tagName=#{Danbooru::URL.escape(tag)}"]
@@ -121,7 +117,7 @@ class Source::Extractor::NaverCafe < Source::Extractor
   end
 
   memoize def api_article
-    api_url = "https://apis.naver.com/cafe-web/cafe-articleapi/v3/cafes/#{club_id}/articles/#{article_id}" if club_id.present? && article_id.present?
+    api_url = "https://apis.naver.com/cafe-web/cafe-articleapi/v4/cafes/#{club_id}/articles/#{article_id}" if club_id.present? && article_id.present?
     http.cache(1.minute).headers("X-Cafe-Product": "pc").parsed_get(api_url)&.dig(:result) || {}
   end
 end

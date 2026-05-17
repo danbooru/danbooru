@@ -46,6 +46,14 @@ class Source::Extractor
       "https://#{username}.tumblr.com" if username.present?
     end
 
+    def published_at
+      if parsed_url.image_url?
+        nil
+      elsif post[:timestamp]
+        Time.at(post[:timestamp]).utc
+      end
+    end
+
     def artist_commentary_title
       case post[:type]
       when "text", "link"
@@ -81,11 +89,6 @@ class Source::Extractor
       end.uniq
     end
 
-    def normalize_tag(tag)
-      tag = tag.tr("-", "_")
-      super(tag)
-    end
-
     # The commentary with reblogs presented as a linear list of quotes, rather than as nested quotes.
     def linear_artist_commentary_desc
       return artist_commentary_desc if post[:trail].blank?
@@ -94,8 +97,8 @@ class Source::Extractor
         post_url = "https://#{item.dig(:blog, :name)}.tumblr.com/post/#{item.dig(:post, :id)}"
 
         # Hack to forcibly escape raw quotes inside alt text. Necessary because Tumblr incorrectly doesn't escape quote
-        # marks inside alt text in the `content_raw` attribute.
-        content = item[:content_raw].gsub(/alt="(.*?)" srcset=/) { %{alt="#{$1.gsub('"', "&quot;")}" srcset=} }
+        # marks inside alt text in the `content_raw` attribute. The /m flag is to match alt text containing newlines.
+        content = item[:content_raw].gsub(/alt="(.*?)" srcset=/m) { %{alt="#{$1.gsub('"', "&quot;")}" srcset=} }
 
         # https://www.tumblr.com/noizave/171237880542/test-ask
         if item[:is_root_item] && item[:is_current_item] && post[:type] == "answer"
@@ -162,7 +165,7 @@ class Source::Extractor
           element.inner_html = <<~EOS
             <h6>Image description</h6>
 
-            <p>#{CGI.escapeHTML(element["alt"]).gsub(/\n\n+/, "<p>")}</p>
+            <p>#{CGI.escapeHTML(element["alt"]).gsub(/\n\n+/, "<p>").gsub("\n", "<br>")}</p>
           EOS
 
         # Include images inside quotes to provide context for responses.
@@ -197,7 +200,7 @@ class Source::Extractor
         post_url = image_page_json.dig(:ImageUrlPage, :post, :postUrl)
 
         # The post URL may be a regular Tumblr post or a custom domain; custom domains are extracted to get the real Tumblr page URL.
-        Source::Extractor.find(post_url).page_url.then { Source::URL.parse(_1) }
+        Source::Extractor.find(post_url).page_url.then { Source::URL.parse(it) }
       end
     end
 

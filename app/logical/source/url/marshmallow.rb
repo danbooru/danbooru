@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Marshmallow < Source::URL
+  site "Marshmallow", url: "https://marshmallow-qa.com"
+
   RESERVED_USERNAMES = %w[about auth attributions broadcasts help me messages users session settings terms]
 
   attr_reader :username

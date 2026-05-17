@@ -2,6 +2,8 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class FuraffinityExtractorTest < ActiveSupport::ExtractorTestCase
+    setup { skip "Furaffinity credentials not configured" unless Source::Extractor::Furaffinity.enabled? }
+
     context "A furaffinity post" do
       strategy_should_work(
         "https://www.furaffinity.net/view/46821705/",
@@ -64,7 +66,7 @@ module Source::Tests::Extractor
 
           Glad you loved this piece, Sheep! ^_^
 
-          Miko @ The Lovely "silentsheep silentsheep":[https://www.furaffinity.net/user/silentsheep]
+          Miko @ The Lovely "silentsheep SilentSheep":[https://www.furaffinity.net/user/silentsheep]
 
           Art @ CuteSexyRoButts from DeviantArt
         EOS

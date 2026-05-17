@@ -109,7 +109,7 @@ class Pool < ApplicationRecord
 
   def versions
     raise NotImplementedError, "Archive service not configured" unless PoolVersion.enabled?
-    PoolVersion.where(pool_id: id).order("id asc")
+    PoolVersion.where(pool_id: id).order(:id)
   end
 
   def is_series?
@@ -213,7 +213,7 @@ class Pool < ApplicationRecord
   end
 
   def cover_post
-    post_count > 0 ? Post.find(post_ids.first) : nil
+    (post_count > 0) ? Post.find(post_ids.first) : nil
   end
 
   def create_version(updater: CurrentUser.user)

@@ -3,7 +3,7 @@ require "test_helper"
 class RecommendedPostsControllerTest < ActionDispatch::IntegrationTest
   context "The recommended posts controller" do
     setup do
-      @user = travel_to(1.month.ago) {create(:user)}
+      @user = travel_to(1.month.ago) { create(:user) }
       @post = as(@user) { create(:post, tag_string: "aaaa") }
       RecommenderService.stubs(:enabled?).returns(true)
     end

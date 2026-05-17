@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class CommentVoteTest < ActiveSupport::TestCase
   context "A CommentVote" do
@@ -35,7 +35,7 @@ class CommentVoteTest < ActiveSupport::TestCase
     context "creating" do
       context "an upvote" do
         should "increment the comment's score" do
-          vote = create(:comment_vote, comment: @comment, score: 1)
+          create(:comment_vote, comment: @comment, score: 1)
 
           assert_equal(1, @comment.reload.score)
         end
@@ -43,7 +43,7 @@ class CommentVoteTest < ActiveSupport::TestCase
 
       context "a downvote" do
         should "decrement the comment's score" do
-          vote = create(:comment_vote, comment: @comment, score: -1)
+          create(:comment_vote, comment: @comment, score: -1)
 
           assert_equal(-1, @comment.reload.score)
         end

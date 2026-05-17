@@ -33,21 +33,21 @@ class DiscordWebhookService
         url: Routes.url_for(forum_post),
         author: {
           name: forum_post.creator.name,
-          url: Routes.url_for(forum_post.creator)
+          url: Routes.url_for(forum_post.creator),
         },
         fields: [
           {
             name: "Replies",
             value: forum_post.topic.response_count,
-            inline: true
+            inline: true,
           },
           {
             name: "Users",
             value: forum_post.topic.forum_posts.distinct.count(:creator_id),
-            inline: true
-          }
-        ]
-      }]
+            inline: true,
+          },
+        ],
+      }],
     }
   end
 

@@ -79,6 +79,7 @@ class MediaFile::Ugoira < MediaFile
         end
       end
 
+      return "zip64 format is not supported" if entry.zip64?
       return "file '#{entry.name}' cannot have comments" if entry.comment_size > 0
       return "file '#{entry.name}' cannot have extra fields (fields: #{entry.extra.keys.join(", ")})" if entry.extra_size > 0
       return "file '#{entry.name}' cannot be compressed" if entry.compression_method != Zip::Entry::STORED
@@ -120,6 +121,7 @@ class MediaFile::Ugoira < MediaFile
     return "must have at least two frames" if frames.size < 2
     return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
     return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
+    return "zip64 format is not supported" if zip.instance_variable_get(:@cdir).instance_variable_get(:@version_needed_for_extract) == Zip::VERSION_NEEDED_TO_EXTRACT_ZIP64 # XXX hack
 
     nil
   ensure
@@ -136,6 +138,11 @@ class MediaFile::Ugoira < MediaFile
     Mime::Type.lookup("video/x-ugoira")
   end
 
+  # @return [Mime::Type, nil] The MIME type of the frames in the ugoira (image/jpeg, image/png, or image/gif).
+  memoize def frame_mime_type
+    frames.first&.mime_type
+  end
+
   # @return [ExifTool::Metadata] The metadata for the file.
   memoize def metadata
     data = super.reject { |key, value| key.starts_with?("ZIP:") }
@@ -145,8 +152,8 @@ class MediaFile::Ugoira < MediaFile
       "Ugoira:FrameOffsets" => frame_offsets,
       "Ugoira:FrameCount" => frame_delays.size,
       "Ugoira:FrameRate" => frame_rate,
-      "Ugoira:FrameMimeType" => frames.first&.mime_type.to_s,
-      "Ugoira:AnimationJsonFormat" => animation_json_format
+      "Ugoira:FrameMimeType" => frame_mime_type.to_s,
+      "Ugoira:AnimationJsonFormat" => animation_json_format,
     )
   end
 
@@ -202,7 +209,7 @@ class MediaFile::Ugoira < MediaFile
       frames.map(&:with_indifferent_access)
     in { frames: Array => frames }
       frames.map(&:with_indifferent_access)
-    in { ugokuIllustData: { frames: Array => frames } }
+    in { ugokuIllustData: { frames: Array => frames }}
       frames.map(&:with_indifferent_access)
     else
       []
@@ -222,7 +229,7 @@ class MediaFile::Ugoira < MediaFile
     in { frames: Array } if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
       "PixivUtil2"
     # { "ugokuIllustData": { "frames": [{ "file": "000001.jpg", "delay": 100 }] } }
-    in { ugokuIllustData: { frames: Array } } if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
+    in { ugokuIllustData: { frames: Array }} if animation_json_frames.all? { |frame| frame in { file: String, delay: Integer, **nil } }
       "PixivToolkit"
     # No animation.json file
     in nil
@@ -268,7 +275,7 @@ class MediaFile::Ugoira < MediaFile
   # @param mtime [Time] The timestamp to set on the files in the zip file.
   # @param data [Hash] Extra data to include in the animation.json file.
   # @return [MediaFile] The new ugoira.
-  def self.create(frames, frame_delays:, mtime: Time.new(1980, 1, 1), data: {})
+  def self.create(frames, frame_delays:, mtime: Time.utc(1980, 1, 1), data: {})
     new(frames, frame_delays:).create_copy(data:, mtime:)
   end
 
@@ -278,7 +285,7 @@ class MediaFile::Ugoira < MediaFile
   # @param mtime [Time] The timestamp to set on the files in the zip file.
   # @param data [Hash] Extra data to include in the animation.json file.
   # @return [MediaFile] The new ugoira.
-  def create_copy(file: Danbooru::Tempfile.new(%w[danbooru-ugoira- .zip]), mtime: Time.new(1980, 1, 1), data: {})
+  def create_copy(file: Danbooru::Tempfile.new(%w[danbooru-ugoira- .zip]), mtime: Time.utc(1980, 1, 1), data: {})
     ziptime = Zip::DOSTime.new(mtime.year, mtime.month, mtime.day, mtime.hour, mtime.min, mtime.sec)
 
     animation_meta = {
@@ -294,7 +301,7 @@ class MediaFile::Ugoira < MediaFile
     # XXX Use rubyzip because libarchive adds some things to the zip that we don't want (extra UniversalTime fields for
     # timestamps and CRCs after the file data).
     Danbooru::Tempfile.create do |animation_json_file|
-      Zip::File.open(file, create: true) do |zip|
+      Zip::File.open(file, create: true, suppress_extra_fields: true) do |zip|
         entries = frames.map.with_index do |frame, n|
           [Zip::Entry.new(zip, "#{"%06d" % n}.#{frame.file_ext}"), frame]
         end
@@ -318,48 +325,162 @@ class MediaFile::Ugoira < MediaFile
     MediaFile::Ugoira.new(file)
   end
 
-  # Convert a ugoira to a webm.
-  # XXX should take width and height and resize image
-  def convert
+  # Convert a ugoira to a video.
+  #
+  # @param width [Integer] The width of the output video. May be padded to an even number if the codec requires it.
+  # @param height [Integer] The height of the output video. May be padded to an even number if the codec requires it.
+  # @param format [Symbol] The video container format (:webm, :mkv, or :mp4). Default: :webm.
+  # @param codec [Symbol] The video codec (:h264, :h265, :vp8, :vp9, or :av1). Default: h264 for mp4, vp9 for webm.
+  # @param quality [Symbol] The quality preset (:high or :lossless). Default: :high.
+  # @param pix_fmt [Symbol] The pixel format (:yuv420p, :yuva420p, :yuv420p10le, :yuv444p). Default: :yuv420p for JPEG frames, :yuva420p for PNG/GIF frames (to preserve transparency).
+  # @param two_pass [Boolean] Whether to use two-pass encoding for vp8/vp9/av1. Two-pass encoding is slower but higher quality. Default: true.
+  # @param threads [Integer] The number of threads to use for encoding.
+  def convert(width: self.width,
+              height: self.height,
+              format: :webm,
+              codec: (format == :mp4) ? :h264 : :vp9,
+              quality: :high,
+              pix_fmt: (frame_mime_type.to_sym == :jpeg) ? :yuv420p : :yuva420p,
+              two_pass: codec.in?(%i[vp8 vp9]),
+              threads: Danbooru.config.max_concurrency.to_i,
+              output_file: Danbooru::Tempfile.new(["danbooru-ugoira-conversion-#{File.basename(file&.path.to_s)}", ".#{format}"], binmode: true))
     synchronize do
-      @convert ||= begin
-        raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
-        raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_delays.present?
+      raise NotImplementedError, "can't convert ugoira to video: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
+      raise "can't convert ugoira to video: no ugoira frame data was provided" unless frame_delays.present?
 
-        output_file = Danbooru::Tempfile.new(["danbooru-ugoira-conversion-", "-#{File.basename(file&.path.to_s)}"], binmode: true)
-        tmpdir_path = tmpdir.path
+      codec = :h264 if codec == :avc
+      codec = :h265 if codec == :hevc
 
-        # Duplicate last frame to avoid it being displayed only for a very short amount of time.
-        last_file_name = File.basename(frames.last.path)
-        last_index, file_ext = last_file_name.split(".")
-        new_last_filename = "#{"%06d" % (last_index.to_i + 1)}.#{file_ext}"
-        path_from = File.join(tmpdir_path, last_file_name)
-        path_to = File.join(tmpdir_path, new_last_filename)
-        FileUtils.cp(path_from, path_to)
+      case format
+      in :mp4
+        raise "#{codec} is not supported by #{format}" if codec == :vp8
 
-        delay_sum = 0
-        timecodes_path = File.join(tmpdir_path, "timecodes.tc")
-        File.open(timecodes_path, "w+") do |f|
-          f.write("# timecode format v2\n")
-          frame_delays.each do |delay|
-            f.write("#{delay_sum}\n")
-            delay_sum += delay
-          end
-          f.write("#{delay_sum}\n")
-          f.write("#{delay_sum}\n")
-        end
+        # https://ffmpeg.org/ffmpeg-formats.html#Options-6
+        # `+faststart` makes playback faster by moving metadata to the start of the file.
+        # `-bf 0` disables B-frames, which makes compression less efficient but fixes an issue where `ffplay` reports incorrect
+        #   playback durations and where `ffprobe -show_frames` doesn't return frame durations. XXX Should remove this
+        format_args = "-f mp4 -movflags +faststart -bf 0"
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir_path}/%06d.#{file_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 1 -passlogfile #{tmpdir_path}/ffmpeg2pass -f null /dev/null")
-        raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
+      in :webm
+        raise "#{codec} is not supported by #{format}" unless codec.in?(%i[vp8 vp9 av1])
+        format_args = "-f webm -cues_to_front 1"
+        format_args += " -auto-alt-ref 0" if codec == :vp8 && pix_fmt == :yuva420p # Can't use yuva420p with vp8 if auto-alt-ref is enabled
 
-        ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{tmpdir_path}/%06d.#{file_ext} -codec:v libvpx-vp9 -crf 12 -b:v 0 -an -threads 8 -tile-columns 2 -tile-rows 1 -row-mt 1 -pass 2 -passlogfile #{tmpdir_path}/ffmpeg2pass #{tmpdir_path}/tmp.webm")
-        raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
+      in :mkv
+        format_args = "-f matroska -cues_to_front 1"
 
-        mkvmerge_out, status = Open3.capture2e("mkvmerge -o #{output_file.path} --webm --timecodes 0:#{tmpdir_path}/timecodes.tc #{tmpdir_path}/tmp.webm")
-        raise Error, "mkvmerge failed: #{mkvmerge_out}" unless status.success?
-
-        MediaFile.open(output_file)
+      else
+        raise "unsupported format: #{format}"
       end
+
+      case [codec, quality]
+      # https://trac.ffmpeg.org/wiki/Encode/H.264
+      in :h264, :high
+        codec_args = "-codec:v libx264 -preset medium -tune animation -crf 18"
+      in :h264, :lossless
+        codec_args = "-codec:v libx264 -preset medium -tune animation -crf 0 -qp 0"
+
+      # https://trac.ffmpeg.org/wiki/Encode/H.265
+      in :h265, :high
+        codec_args = "-codec:v libx265 -preset medium -crf 24"
+      in :h265, :lossless
+        codec_args = "-codec:v libx265 -preset medium -x265-params lossless=1"
+
+      # https://trac.ffmpeg.org/wiki/Encode/VP8
+      # https://ffmpeg.org/ffmpeg-codecs.html#libvpx
+      # https://www.webmproject.org/docs/encoder-parameters/
+      in :vp8, :high
+        # XXX `-b:v 0` is broken, set a high max bitrate instead (https://trac.ffmpeg.org/ticket/9718)
+        codec_args = "-codec:v libvpx -cpu-used 1 -crf 12 -b:v 1000M"
+      in :vp8, :lossless
+        raise NotImplementedError, "lossless encoding is not supported for VP8"
+
+      # https://trac.ffmpeg.org/wiki/Encode/VP9
+      # https://wiki.webmproject.org/ffmpeg/vp9-encoding-guide
+      # https://developers.google.com/media/vp9/settings/vod
+      in :vp9, :high
+        codec_args = "-codec:v libvpx-vp9 -cpu-used 1 -row-mt 1 -tile-columns 2 -tile-rows 1 -crf 12 -b:v 0"
+      in :vp9, :lossless
+        codec_args = "-codec:v libvpx-vp9 -cpu-used 1 -row-mt 1 -tile-columns 2 -tile-rows 1 -lossless 1"
+
+      # https://trac.ffmpeg.org/wiki/Encode/AV1
+      # https://ffmpeg.org/ffmpeg-codecs.html#libsvtav1
+      # https://academysoftwarefoundation.github.io/EncodingGuidelines/EncodeAv1.html
+      in :av1, :high
+        codec_args = "-codec:v libsvtav1"
+      in :av1, :lossless
+        raise NotImplementedError, "lossless encoding is not supported for libsvt AV1"
+
+      else
+        raise "unsupported codec: #{codec}"
+      end
+
+      frames_with_delays = frames.zip(frame_delays)
+      tmpdir_path = tmpdir.path
+
+      files_txt_path = File.join(tmpdir_path, "files.txt")
+      File.open(files_txt_path, "w+") do |file|
+        frames_with_delays.each do |frame, delay|
+          # https://www.ffmpeg.org/ffmpeg-utils.html#Quoting-and-escaping
+          frame_path = frame.file.path.gsub("'", "'\\\\''")
+          # https://ffmpeg.org/ffmpeg-formats.html#concat-1
+          # https://trac.ffmpeg.org/ticket/9210
+          # XXX The concat demuxer rounds frames to the nearest 40ms. To work around this, we multiply by 40 then use
+          # `-itsscale 0.025` to divide by 40 and get back the correct duration.
+          file.puts("file '#{frame_path}'")
+          file.puts("duration #{delay * 40}ms")
+        end
+      end
+
+      filters = "null"
+
+      if width != self.width || height != self.height
+        # https://ffmpeg.org/ffmpeg-filters.html#scale
+        filters += ",scale='#{width}:#{height}:flags=lanczos'"
+      end
+
+      # h264/h265 with 4:2:0 subsampling requires the dimensions to be even. Pad to even dimensions by duplicating the edge pixels.
+      # XXX av1 has a minimum required size of 64x64
+      if (width.odd? || height.odd?) && codec.in?(%i[h264 h265 av1]) && pix_fmt.to_s.include?("420")
+        # https://ffmpeg.org/ffmpeg-filters.html#pad-1
+        # https://ffmpeg.org/ffmpeg-filters.html#fillborders
+        filters += ",pad='iw+mod(iw,2):ih+mod(ih,2)',fillborders='right=#{width % 2}:bottom=#{height % 2}:mode=smear'"
+      end
+
+      ffmpeg_command = %{ffmpeg -loglevel 99 -itsscale 0.025 -f concat -safe 0 -i #{files_txt_path.shellescape} -enc_time_base 1/1000 -video_track_timescale 1000 -fps_mode:v vfr -vf "#{filters}" #{codec_args} #{format_args} -pix_fmt #{pix_fmt} -threads #{threads} -an}
+
+      encoded_output_path = File.join(tmpdir_path, "out.#{format}")
+      if two_pass
+        raise "two-pass encoding is not supported for #{codec}" unless codec.in?(%i[vp8 vp9])
+
+        passlogfile_path = File.join(tmpdir_path, "ffmpeg2pass")
+        FFmpeg.shell!("#{ffmpeg_command} -pass 1 -passlogfile #{passlogfile_path.shellescape} -f null /dev/null")
+        FFmpeg.shell!("#{ffmpeg_command} -pass 2 -passlogfile #{passlogfile_path.shellescape} -y #{encoded_output_path.shellescape}")
+      else
+        FFmpeg.shell!("#{ffmpeg_command} -y #{encoded_output_path.shellescape}")
+      end
+
+      # XXX ffmpeg incorrectly sets the duration of the last frame to 40ms, so here we use mkvmerge to fix it.
+      timestamps_txt_path = File.join(tmpdir_path, "timestamps.txt")
+      File.open(timestamps_txt_path, "w+") do |timecodes|
+        # https://man.archlinux.org/man/mkvmerge.1.en#Timestamp_file_format_v2
+        timecodes.puts("# timestamp format v2")
+
+        frame_delays.size.succ.times do |i|
+          timecodes.puts(frame_delays[0...i].sum)
+        end
+      end
+
+      if format == :mp4
+        # mkvmerge can read .mp4 files, but it can only output .mkv files, so we have to convert the fixed .mkv back to .mp4
+        fixed_output_path = File.join(tmpdir_path, "out-fixed.mkv")
+        FFmpeg.shell!("mkvmerge --timestamps 0:#{timestamps_txt_path.shellescape} #{encoded_output_path.shellescape} -o #{fixed_output_path.shellescape}")
+        FFmpeg.shell!("ffmpeg -i #{fixed_output_path.shellescape} -c copy #{format_args} -y #{output_file.path.shellescape}")
+      else
+        FFmpeg.shell!("mkvmerge --timestamps 0:#{timestamps_txt_path.shellescape} #{encoded_output_path.shellescape} -o #{output_file.path.shellescape}")
+      end
+
+      MediaFile.open(output_file)
     end
   end
 

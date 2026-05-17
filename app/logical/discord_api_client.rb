@@ -27,7 +27,7 @@ class DiscordApiClient
     json = {
       name: name,
       description: description,
-      options: options
+      options: options,
     }
 
     if guild_id.present?
@@ -41,7 +41,7 @@ class DiscordApiClient
   def create_followup_message(interaction_token, allowed_mentions: { parse: [] }, **options)
     post("/webhooks/#{application_id}/#{interaction_token}", {
       allowed_mentions: allowed_mentions,
-      **options
+      **options,
     })
   end
 
@@ -79,7 +79,7 @@ class DiscordApiClient
   def http_headers
     {
       "User-Agent": "#{Danbooru.config.canonical_app_name} (#{Danbooru.config.source_code_url}, 1.0)",
-      "Authorization": "Bot #{bot_token}"
+      "Authorization": "Bot #{bot_token}",
     }
   end
 

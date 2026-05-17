@@ -20,6 +20,12 @@ require "action_view/railtie"
 # require "action_cable/engine"
 require "rails/test_unit/railtie"
 
+require "dotenv"
+
+# Patch Dotenv to log at debug level so that "[dotenv] Loaded .env" messages aren't seen on startup.
+def (Dotenv::Rails.logger).add(_level, ...) = super(Logger::DEBUG, ...)
+Dotenv::Rails.load
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -49,16 +55,13 @@ module Danbooru
     config.app_generators.scaffold_controller :responders_controller
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.2
+    config.load_defaults 8.0
     config.active_record.schema_format = :sql
-
-    # https://guides.rubyonrails.org/configuring.html#config-active-support-cache-format-version
-    config.active_support.cache_format_version = 7.1
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w(assets tasks dtext_rb))
+    config.autoload_lib(ignore: %w[assets tasks dtext_rb])
 
     # Configuration for the application, engines, and railties goes here.
     #
@@ -68,8 +71,8 @@ module Danbooru
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers)
-    config.time_zone = 'Eastern Time (US & Canada)'
+    config.autoload_paths += %W[#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers]
+    config.time_zone = "Eastern Time (US & Canada)"
     config.active_model.i18n_customize_full_message = true
 
     # Hide sensitive model attributes and request params in exception messages
@@ -90,9 +93,9 @@ module Danbooru
     # app/jobs/mail_delivery_job.rb
     config.action_mailer.delivery_job = "MailDeliveryJob"
 
-    logger           = ActiveSupport::Logger.new(STDERR)
+    logger           = ActiveSupport::Logger.new($stderr)
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
-    config.log_tags  = [->(req) {"PID:#{Process.pid}"}]
+    config.log_tags  = [->(_req) { "PID:#{Process.pid}" }]
     config.log_level = Danbooru.config.log_level
 
     config.action_controller.action_on_unpermitted_parameters = :raise

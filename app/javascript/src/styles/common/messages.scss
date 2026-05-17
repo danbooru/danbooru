@@ -5,7 +5,7 @@ div.list-of-messages {
 
   article.message {
     display: flex;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
     padding: 5px;
 
     &:first-of-type {

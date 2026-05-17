@@ -10,7 +10,9 @@ class CommentVotesController < ApplicationController
     comment_id = params[:comment_id] || params[:search][:comment_id]
     @comment = Comment.find(comment_id) if comment_id
 
-    respond_with(@comment_votes)
+    respond_with(@comment_votes) do |format|
+      format.html.tooltip { render layout: false }
+    end
   end
 
   def show
@@ -24,7 +26,7 @@ class CommentVotesController < ApplicationController
     @comment.with_lock do
       @comment_vote = authorize CommentVote.new(comment: @comment, score: params[:score], user: CurrentUser.user)
 
-      CommentVote.active.where(comment: @comment, user: CurrentUser.user).each do |vote|
+      CommentVote.active.where(comment: @comment, user: CurrentUser.user).find_each do |vote|
         vote.soft_delete!(updater: CurrentUser.user)
       end
 

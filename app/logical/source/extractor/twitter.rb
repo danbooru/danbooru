@@ -7,22 +7,6 @@ class Source::Extractor
       SiteCredential.for_site("Twitter").present?
     end
 
-    # List of hashtag suffixes attached to tag other names
-    # Ex: 西住みほ生誕祭2019 should be checked as 西住みほ
-    # The regexes will not match if there is nothing preceding
-    # the pattern to avoid creating empty strings.
-    COMMON_TAG_REGEXES = [
-      /(?<!\A)生誕祭(?:\d*)\z/,
-      /(?<!\A)誕生祭(?:\d*)\z/,
-      /(?<!\A)版もうひとつの深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)版深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)版深夜の真剣お絵かき60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)版深夜のお絵描き60分一本勝負(?:_\d+)?\z/,
-      /(?<!\A)版真剣お絵描き60分一本勝(?:_\d+)?\z/,
-      /(?<!\A)版お絵描き60分一本勝負(?:_\d+)?\z/,
-    ]
-
     def image_urls
       # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:orig
       if parsed_url.full_image_url.present?
@@ -32,7 +16,7 @@ class Source::Extractor
       else
         graphql_tweet.dig(:legacy, :extended_entities, :media).to_a.map do |media|
           if media[:type] == "photo"
-            media[:media_url_https] + ":orig"
+            "#{media[:media_url_https]}:orig"
           elsif media[:type].in?(["video", "animated_gif"])
             variants = media.dig(:video_info, :variants)
             videos = variants.select { |variant| variant[:content_type] == "video/mp4" }
@@ -71,24 +55,35 @@ class Source::Extractor
       graphql_tweet.dig(:core, :user_results, :result, :legacy, :name)
     end
 
+    def graphql_tweet_created_at
+      date_string = graphql_tweet.dig(:legacy, :created_at)
+      if date_string.present?
+        Time.strptime(date_string, "%a %b %d %H:%M:%S %z %Y").utc
+      end
+    end
+
+    def published_at
+      if parsed_url.image_url?
+        parsed_url.parsed_date
+      else
+        graphql_tweet_created_at || parsed_url.parsed_date
+      end
+    end
+
     def artist_commentary_desc
       graphql_tweet.dig(:note_tweet, :note_tweet_results, :result, :text) || graphql_tweet.dig(:legacy, :full_text)
     end
 
     def tags
-      graphql_tweet.dig(:legacy, :entities, :hashtags).to_a.map do |hashtag|
+      hashtags = graphql_tweet.dig(:legacy, :entities, :hashtags).to_a.map do |hashtag|
         [hashtag[:text], "https://x.com/hashtag/#{hashtag[:text]}"]
       end
-    end
 
-    def normalize_tag(tag)
-      COMMON_TAG_REGEXES.each do |rg|
-        norm_tag = tag.gsub(rg, "")
-        if norm_tag != tag
-          return norm_tag
-        end
+      cashtags = graphql_tweet.dig(:legacy, :entities, :symbols).to_a.map do |cashtag|
+        [cashtag[:text], "https://x.com/search?q=$#{cashtag[:text]}"]
       end
-      tag
+
+      hashtags + cashtags
     end
 
     def dtext_artist_commentary_desc
@@ -123,12 +118,12 @@ class Source::Extractor
         { first: e[0][0], last: e[0][1], text: e[1], html: "" }
       end
 
-      entities.sort_by! { _1[:first] }
+      entities.sort_by! { it[:first] }
 
       i = 0
       entities.each do |entity|
         # HTML characters in `desc` are already escaped by Twitter, so we don't have to escape them ourselves.
-        html << desc[i..entity[:first] - 1].gsub("\n", "<br>") if i < entity[:first]
+        html << desc[i..(entity[:first] - 1)].gsub("\n", "<br>") if i < entity[:first]
         html << entity[:html]
         i = entity[:last]
       end
@@ -167,7 +162,7 @@ class Source::Extractor
         withCommunity: true,
         withQuickPromoteEligibilityTweetFields: true,
         withBirdwatchNotes: true,
-        withVoice: true
+        withVoice: true,
       }
 
       features = {
@@ -201,7 +196,7 @@ class Source::Extractor
         longform_notetweets_rich_text_read_enabled: true,
         longform_notetweets_inline_media_enabled: true,
         responsive_web_grok_image_annotation_enabled: true,
-        responsive_web_enhance_cards_enabled: false
+        responsive_web_enhance_cards_enabled: false,
       }
 
       parsed_get("/i/api/graphql/_8aYOgEDz35BrBcBal1-_w/TweetDetail", variables: variables.to_json, features: features.to_json) || {}
@@ -219,11 +214,11 @@ class Source::Extractor
 
     def http
       super.headers(
-        authorization: "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA", # non-secret; used by the official client
-        "x-csrf-token": credentials[:csrf_token]
+        "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA", # non-secret; used by the official client
+        "x-csrf-token": credentials[:csrf_token],
       ).cookies(
         auth_token: credentials[:auth_token],
-        ct0: credentials[:csrf_token]
+        ct0: credentials[:csrf_token],
       )
     end
 

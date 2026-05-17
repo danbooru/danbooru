@@ -64,14 +64,14 @@ class DanbooruLogger
 
   # Get logged HTTP headers from request.
   def self.header_params(request)
-    headers = request.headers.to_h.select { |header, value| header.match?(/\AHTTP_/) }
+    headers = request.headers.to_h.select { |header, _value| header.match?(/\AHTTP_/) }
     headers = headers.transform_keys { |header| header.delete_prefix("HTTP_").downcase }
-    headers = headers.select { |header, value| header.in?(HEADERS) }
+    headers = headers.slice(*HEADERS)
     headers
   end
 
   def self.request_params(request)
-    request.parameters.with_indifferent_access.except(:controller, :action).reject do |key, value|
+    request.parameters.with_indifferent_access.except(:controller, :action).reject do |key, _value|
       # exclude strange URL params that don't come from our app.
       !key.match?(/\A[a-z._]+\z/) || key.match?(/\A_|_\z/)
     end
@@ -95,9 +95,9 @@ class DanbooruLogger
       id: user&.id,
       name: user&.name,
       level: user&.level_string,
-      #ip: request.remote_ip,
-      #safe_mode: CurrentUser.safe_mode?,
-      #bot: Danbooru::UserAgent.new(request.headers["HTTP_USER_AGENT"]).bot.present?,
+      # ip: request.remote_ip,
+      # safe_mode: CurrentUser.safe_mode?,
+      # bot: Danbooru::UserAgent.new(request.headers["HTTP_USER_AGENT"]).bot.present?,
     }
   end
 

@@ -5,10 +5,6 @@
 #
 # @see https://github.com/danbooru/iqdb
 class IqdbClient
-  LOW_SIMILARITY_THRESHOLD = 0.0
-  HIGH_SIMILARITY_THRESHOLD = 65.0
-  DUPLICATE_THRESHOLD = 92.0
-
   class Error < StandardError; end
   attr_reader :iqdb_url, :http
 
@@ -26,27 +22,14 @@ class IqdbClient
 
   concerning :QueryMethods do
     # Search for an image by file, URL, hash, or post ID.
-    def search(post_id: nil, media_asset_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: LOW_SIMILARITY_THRESHOLD, high_similarity: HIGH_SIMILARITY_THRESHOLD, limit: 20)
+    def search(post_id: nil, media_asset_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, limit: 20)
       limit = limit.to_i.clamp(1, 1000)
-      similarity = similarity.to_f.clamp(0.0, 100.0)
-      high_similarity = high_similarity.to_f.clamp(0.0, 100.0)
       target_url = url.presence || file_url.presence || image_url.presence
 
       if file.present?
         file = file.tempfile
       elsif target_url.present?
-        extractor = Source::Extractor.find(target_url)
-
-        if extractor.parsed_url.image_url?
-          download_url = target_url
-        else
-          raise Error, "#{url} has multiple images. Enter the URL of a single image" if extractor.image_urls.size > 1
-          raise Error, "#{url} has no images" if extractor.image_urls.empty?
-
-          download_url = extractor.image_urls.first
-        end
-
-        file = Source::Extractor.find(download_url).download_file!(download_url)
+        file = download_file(target_url)
       elsif post_id.present?
         file = Post.find(post_id).file(:"180x180")
       elsif media_asset_id.present?
@@ -61,28 +44,51 @@ class IqdbClient
         results = []
       end
 
-      process_results(results, similarity, high_similarity)
+      process_results(results)
     ensure
       file.try(:close)
+    end
+
+    def download_file(url)
+      extractor = Source::Extractor.find(url)
+
+      if extractor.parsed_url.nil?
+        raise Error, "#{url} is an invalid URL"
+      elsif extractor.parsed_url.image_url?
+        download_url = url
+      elsif extractor.image_urls.size > 1
+        raise Error, "#{url} has multiple images. Enter the URL of a single image"
+      elsif extractor.image_urls.empty?
+        raise Error, "#{url} has no images" if extractor.image_urls.empty?
+      else
+        download_url = extractor.image_urls.first
+      end
+
+      Source::Extractor.find(download_url).download_file!(download_url)
+    rescue Danbooru::Http::Error => e
+      raise Error, e.message
     end
 
     # Transform the JSON returned by IQDB to add the full post data for each match.
     #
     # @param matches [Array<Hash>] the array of IQDB matches
-    # @param low_similarity [Float] the threshold for a result to be considered low similarity
-    # @param high_similarity [Float] the threshold for a result to be considered high similarity
-    # @return [(Array, Array, Array)] the set of high similarity, low similarity, and all matches
-    def process_results(matches, low_similarity, high_similarity)
-      matches = matches.select { |match| match["score"] >= low_similarity }.sort_by { |match| -match["score"] }
-      posts = Post.includes(:media_asset).where(id: matches.pluck("post_id")).group_by(&:id).transform_values(&:first)
+    # @return [Array<Hash>] the array of IQDB matches with `post:` keys added
+    def process_results(matches)
+      posts = Post.includes(:media_asset).where(id: matches.pluck("post_id")).index_by(&:id)
 
-      matches = matches.map do |match|
-        post = posts.fetch(match["post_id"], nil)
-        match.with_indifferent_access.merge(post: post) if post
-      end.compact
+      matches = matches.filter_map do |match|
+        post = posts[match["post_id"]]
 
-      high_similarity_matches, low_similarity_matches = matches.partition { |match| match["score"] >= high_similarity }
-      [high_similarity_matches, low_similarity_matches, matches]
+        # IQDB returns relatively high scores for bad matches, with most results in the 50%-70% range being false
+        # positives and results above 70% or so being potential matches. This uses a power curve to lower scores such
+        # that a score of 70% becomes 50%, so that >50% is considered a potential match.
+        score = 100 * ((match["score"] / 100.0)**2)
+
+        next if post.nil?
+        { **match, score: score, post: post }.compact.with_indifferent_access
+      end
+
+      matches.sort_by { |match| -match["score"] }
     end
   end
 

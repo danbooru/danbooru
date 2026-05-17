@@ -1,11 +1,11 @@
-require 'test_helper'
+require "test_helper"
 
 class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
   context "The artist commentaries controller" do
     setup do
-      @user = create(:user, id: 1000, name: "danbo", created_at: 2.weeks.ago)
+      @user = create(:user, created_at: 2.weeks.ago)
       as(@user) do
-        @commentary = create(:artist_commentary, post: build(:post, id: 999, tag_string: "hakurei_reimu", uploader: @user), original_title: "ot1", translated_title: "tt1")
+        @commentary = create(:artist_commentary, post: build(:post, tag_string: "hakurei_reimu", uploader: @user), original_title: "ot1", translated_title: "tt1")
         @other_commentary = create(:artist_commentary, translated_title: "", translated_description: "")
       end
     end
@@ -20,18 +20,16 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@deleted_commentary, @other_commentary, @commentary] }
+      should respond_to_search.with { [@deleted_commentary, @other_commentary, @commentary] }
       should respond_to_search(text_matches: "ot1").with { @commentary }
       should respond_to_search(original_present: "true").with { [@other_commentary, @commentary] }
       should respond_to_search(translated_present: "true").with { @commentary }
       should respond_to_search(is_deleted: "yes").with { @deleted_commentary }
       should respond_to_search(order: "id_asc").with { [@commentary, @other_commentary, @deleted_commentary] }
 
-      context "using includes" do
-        should respond_to_search(post_id: 999).with { @commentary }
-        should respond_to_search(post_tags_match: "hakurei_reimu").with { @commentary }
-        should respond_to_search(post: {uploader_name: "danbo"}).with { @commentary }
-      end
+      should respond_to_search(post_id: -> { @commentary.post_id }).with { @commentary }
+      should respond_to_search(post_tags_match: "hakurei_reimu").with { @commentary }
+      should respond_to_search(post: { uploader_name: -> { @user.name }}).with { @commentary }
     end
 
     context "show action" do
@@ -46,43 +44,22 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
 
     context "create_or_update action" do
       should "render for create" do
-        params = {
-          artist_commentary: {
-            original_title: "foo",
-            post_id: create(:post).id
-          },
-          format: "js"
-        }
-
         assert_difference("ArtistCommentary.count", 1) do
-          put_auth create_or_update_artist_commentaries_path(params), @user, as: :js
+          put_auth create_or_update_artist_commentaries_path(artist_commentary: { original_title: "foo", post_id: create(:post).id }, format: "js"), @user, as: :js
         end
         assert_response :success
       end
 
       should "render for update" do
-        params = {
-          artist_commentary: {
-            post_id: @commentary.post_id,
-            original_title: "foo"
-          },
-          format: "js"
-        }
+        put_auth create_or_update_artist_commentaries_path(artist_commentary: { post_id: @commentary.post_id, original_title: "foo" }, format: "js"), @user
 
-        put_auth create_or_update_artist_commentaries_path(params), @user
-        @commentary.reload
         assert_response :success
         assert_equal("foo", @commentary.reload.original_title)
       end
 
       should "work for /posts/:post_id/artist_commentary/create_or_update" do
-        params = {
-          post_id: create(:post).id,
-          artist_commentary: { original_title: "foo" },
-        }
-
         assert_difference("ArtistCommentary.count", 1) do
-          put_auth create_or_update_post_artist_commentary_path(params), @user, xhr: true
+          put_auth create_or_update_post_artist_commentary_path(post_id: create(:post).id, artist_commentary: { original_title: "foo" }), @user, xhr: true
         end
 
         assert_response :success

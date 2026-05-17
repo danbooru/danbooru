@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Dotpict < Source::URL
+  site "Dotpict", url: "https://dotpict.net", domains: %w[dotpict.net dotpicko.net]
+
   attr_reader :username, :user_id, :work_id, :full_image_url, :candidate_full_image_urls
 
   def self.match?(url)
@@ -62,5 +64,9 @@ class Source::URL::Dotpict < Source::URL
     elsif username.present?
       "https://dotpict.net/@#{username}"
     end
+  end
+
+  def secondary_url?
+    profile_url? && user_id.blank?
   end
 end

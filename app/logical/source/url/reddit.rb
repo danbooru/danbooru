@@ -3,6 +3,17 @@
 module Source
   class URL
     class Reddit < Source::URL
+      site "Reddit" do
+        url "https://www.reddit.com"
+        domains %w[reddit.com redd.it redditmedia.com]
+
+        credential :session_cookie, help: %{Your Reddit `reddit_session` cookie.}
+      end
+
+      extractors do
+        [Source::Extractor::Reddit, Source::Extractor::RedditComment]
+      end
+
       attr_reader :subreddit, :work_id, :comment_id, :share_id, :title, :username, :full_image_url
 
       def self.match?(url)
@@ -42,9 +53,15 @@ module Source
           @work_id = work_id
           @title = title
 
+        # https://www.reddit.com/u/Ichxgofuri/s/9LfNfEg6ND
+        in _, "reddit.com", ("user" | "u"), username, "s", share_id
+          @username = username
+          @share_id = share_id
+
         # https://www.reddit.com/user/xSlimes
         # https://www.reddit.com/u/Valshier
-        in _, "reddit.com", ("user" | "u"), username
+        # https://old.reddit.com/user/etm18boi/submitted
+        in _, "reddit.com", ("user" | "u"), username, *rest
           @username = username
 
         # https://www.reddit.com/r/tales/s/RtMDlrF5yo

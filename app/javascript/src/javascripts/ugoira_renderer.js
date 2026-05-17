@@ -1,8 +1,6 @@
 // https://users.cs.jmu.edu/buchhofp/forensics/formats/pkzip.html
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
+import { clamp } from "./utility";
 
 // A UgoiraLoader loads a ugoira from a remote .zip file. It reads the .zip file in chunks using range requests, parses
 // the file to find the frames, and returns the frames as <img src="blob:..."> elements.
@@ -141,7 +139,7 @@ export class UgoiraLoader {
 
     // Read a group of files from N to N+count from the zip file. There is a 40 byte header between each file in the zip file.
     let frameGroupOffset = frames[n].fileOffset;
-    let frameGroupSize = frameGroup.reduce((sum, frame) => sum + frame.fileSize, 0) + 40 * (count - 1);
+    let frameGroupSize = frameGroup.reduce((sum, frame) => sum + frame.fileSize, 0) + (40 * (count - 1));
     let frameGroupData = await this.read(frameGroupOffset, frameGroupSize);
     let images = [];
 
@@ -185,10 +183,12 @@ export class UgoiraLoader {
 
     for (let frame = 0; frame < frames.length; frame += framesPerChunk * chunks) {
       let promises = Array.from({ length: chunks }).map((_, chunk) => {
-        let chunkStart = frame + framesPerChunk * chunk;
+        let chunkStart = frame + (framesPerChunk * chunk);
 
         if (chunkStart < frames.length) {
           return this.loadFrames(chunkStart, framesPerChunk, loadFrameCallback);
+        } else {
+          return null;
         }
       });
 
@@ -223,9 +223,11 @@ export default class UgoiraRenderer {
     this._canvas = canvas;      // The <canvas> element the ugoira is drawn on.
     this._previousTime = null;  // The time in seconds of the last requestAnimationFrame call. Used for measuring elapsed time.
     this._currentTime = 0;      // The current playback time in seceonds (e.g 3.2 means we're 3.2 seconds into the ugoira).
+    this._playbackRate = 1.0;   // The speed multiplier for playback (e.g. 2 means play at double speed).
     this._animationId = null;   // The handle for the requestAnimationFrame callback that updates the canvas.
     this._loadedFrame = null;   // The frame number of the latest frame that is ready to be drawn.
     this._currentFrame = null;  // The frame that is currently being displayed on the canvas.
+    this._error = null;         // The error message if an error occurs while loading frames.
     this._loader = new UgoiraLoader(fileUrl, frameDelays, frameOffsets, fileSize);
     this._frames = this._loader._frames;
 
@@ -235,33 +237,40 @@ export default class UgoiraRenderer {
 
   // Starts loading the ugoira asynchronously. Does nothing if the ugoira is already loading or has been loaded.
   async load() {
-    if (this.networkState === HTMLMediaElement.NETWORK_LOADING || this.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA) {
+    if (this.networkState === HTMLMediaElement.NETWORK_LOADING || this.readyState > HTMLMediaElement.HAVE_METADATA) {
       return;
     }
 
-    this.networkState = HTMLMediaElement.NETWORK_LOADING;
-    await this._loader.load(500000, 4, frame => {
-      this._loadedFrame = Math.max(this._loadedFrame, frame);
+    try {
+      this.networkState = HTMLMediaElement.NETWORK_LOADING;
 
-      if (this.buffered.end(0) >= this.currentTime) {
-        this.readyState = Math.max(this.readyState, HTMLMediaElement.HAVE_FUTURE_DATA);
-      }
+      await this._loader.load(500000, 4, frame => {
+        this._loadedFrame = Math.max(this._loadedFrame, frame);
 
-      if (this._currentFrame === null) {
-        this.drawFrame(this.currentTime);
-      }
+        if (this.buffered.end(0) >= this.currentTime) {
+          this.readyState = Math.max(this.readyState, HTMLMediaElement.HAVE_FUTURE_DATA);
+        }
 
-      this.triggerEvent("progress", { frame: this._loadedFrame });
-    });
+        if (this._currentFrame === null) {
+          this.drawFrame(this.currentTime);
+        }
 
-    this.networkState = HTMLMediaElement.NETWORK_IDLE;
-    this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
+        this.triggerEvent("progress", { frame: this._loadedFrame });
+      });
+
+      this.networkState = HTMLMediaElement.NETWORK_IDLE;
+      this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
+    } catch (error) {
+      this._error = error.message;
+      this.triggerEvent("error");
+    }
   }
 
   // Plays the ugoira. Starts the callback that renders the ugoira frames.
-  play() {
-    this.paused = false;
+  async play() {
+    this.load();
 
+    this.paused = false;
     this._previousTime = null;
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
     this.triggerEvent("play");
@@ -280,7 +289,7 @@ export default class UgoiraRenderer {
     let now = this.now();
     let elapsedTime = now - (this._previousTime ?? now);
 
-    this.currentTime = (this.currentTime + elapsedTime) % this.duration;
+    this.currentTime = (this.currentTime + (elapsedTime * this.playbackRate)) % this.duration;
     this._previousTime = now;
     this._animationId = requestAnimationFrame(() => this.onAnimationFrame());
   }
@@ -332,5 +341,36 @@ export default class UgoiraRenderer {
   // Returns the current time in seconds.
   now() {
     return performance.now() / 1000;
+  }
+
+  get volume() {
+    return 0;
+  }
+
+  set volume(value) {
+  }
+
+  get muted() {
+    return true;
+  }
+
+  set muted(value) {
+  }
+
+  get error() {
+    return { code: MediaError.MEDIA_ERR_DECODE, message: this._error };
+  }
+
+  get playbackRate() {
+    return this._playbackRate;
+  }
+
+  set playbackRate(rate) {
+    let oldRate = this._playbackRate;
+    this._playbackRate = rate;
+
+    if (rate !== oldRate) {
+      this.triggerEvent("ratechange");
+    }
   }
 }

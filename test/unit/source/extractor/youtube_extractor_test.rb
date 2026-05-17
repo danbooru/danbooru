@@ -43,7 +43,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.youtube.com/channel/UCykMWf8B8I7c_jA8FTy2tGw/community?lb=UgkxWevNfezmf-a7CRIO0haWiaDSjTI8mGsf",
         image_urls: %w[https://yt3.ggpht.com/4aUIQfric9Rg3xy5VqtwWCH6iZgVVKyMnsGJiVp7TQk166jKSSjTKgQyKVEgCz2bhGSAvG43fSgnrg=d],
-        media_files: [{ file_size: 2_350_351 }],
+        media_files: [{ file_size: 2_350_291 }],
         page_url: "https://www.youtube.com/post/UgkxWevNfezmf-a7CRIO0haWiaDSjTI8mGsf",
         profile_url: "https://www.youtube.com/@AmiyaAranha",
         profile_urls: %w[https://www.youtube.com/@AmiyaAranha https://www.youtube.com/channel/UCykMWf8B8I7c_jA8FTy2tGw],
@@ -70,9 +70,9 @@ module Source::Tests::Extractor
           https://yt3.ggpht.com/HazeswOR3AKZiCLMV8cgkI7kQAV7PGKT3iy3wAbmptwSETaWpMbQDzFYTLR2RI-TBZYVtzX8B0TF=d
         ],
         media_files: [
-          { file_size: 2_625_469 },
-          { file_size: 658_902 },
-          { file_size: 725_585 },
+          { file_size: 2_625_409 },
+          { file_size: 658_842 },
+          { file_size: 725_525 },
         ],
         page_url: "https://www.youtube.com/post/UgkxBkJE1Eu_6S9sADZF5IuK5MPRSWf4VVz3",
         profile_url: "https://www.youtube.com/@Mirae_Somang",
@@ -116,7 +116,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 1_379_490 }],
         page_url: "https://www.youtube.com/post/UgkxPM838FMMDlZd0fooRblYR4zysjfbgYhv",
         profile_urls: %w[https://www.youtube.com/@RitaKamishiro https://www.youtube.com/channel/UCBJFsaCvgBa1a9BnEaxu97Q],
-        display_name: "Rita Kamishiro / 神代りた",
+        display_name: "Rita Kamishiro",
         username: "RitaKamishiro",
         tags: [
           ["kamiscribble", "https://www.youtube.com/hashtag/kamiscribble"],

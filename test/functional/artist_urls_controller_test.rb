@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ArtistURLsControllerTest < ActionDispatch::IntegrationTest
   context "The artist urls controller" do
@@ -13,14 +13,12 @@ class ArtistURLsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { @banned.urls + @artist.urls }
+      should respond_to_search.with { @banned.urls + @artist.urls }
       should respond_to_search(url_matches: "*bkub*").with { @artist.urls }
       should respond_to_search(is_active: "false").with { @artist.urls }
 
-      context "using includes" do
-        should respond_to_search(artist: {name: "bkub"}).with { @artist.urls }
-        should respond_to_search(artist: {is_banned: "true"}).with { @banned.urls }
-      end
+      should respond_to_search(artist: { name: "bkub" }).with { @artist.urls }
+      should respond_to_search(artist: { is_banned: "true" }).with { @banned.urls }
     end
   end
 end

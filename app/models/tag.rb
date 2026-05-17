@@ -8,13 +8,13 @@ class Tag < ApplicationRecord
 
   attr_accessor :updater, :skip_name_validation, :is_bulk_update_request
 
-  has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
-  has_one :artist, :foreign_key => "name", :primary_key => "name"
-  has_one :antecedent_alias, -> {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"
+  has_one :wiki_page, foreign_key: "title", primary_key: "name"
+  has_one :artist, foreign_key: "name", primary_key: "name"
+  has_one :antecedent_alias, -> { active }, class_name: "TagAlias", foreign_key: "antecedent_name", primary_key: "name"
   has_one :aliased_tag, through: :antecedent_alias, source: :consequent_tag
-  has_many :consequent_aliases, -> {active}, :class_name => "TagAlias", :foreign_key => "consequent_name", :primary_key => "name"
-  has_many :antecedent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "antecedent_name", :primary_key => "name"
-  has_many :consequent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "consequent_name", :primary_key => "name"
+  has_many :consequent_aliases, -> { active }, class_name: "TagAlias", foreign_key: "consequent_name", primary_key: "name"
+  has_many :antecedent_implications, -> { active }, class_name: "TagImplication", foreign_key: "antecedent_name", primary_key: "name"
+  has_many :consequent_implications, -> { active }, class_name: "TagImplication", foreign_key: "consequent_name", primary_key: "name"
   has_many :dtext_links, foreign_key: :link_target, primary_key: :name
   has_many :reactions, as: :model, dependent: :destroy
   has_many :ai_tags
@@ -58,17 +58,15 @@ class Tag < ApplicationRecord
     end
 
     def regexp
-      @regexp ||= Regexp.compile(TagCategory.mapping.keys.sort_by {|x| -x.size}.join("|"))
+      @regexp ||= Regexp.compile(TagCategory.mapping.keys.sort_by { |x| -x.size }.join("|"))
     end
 
     def value_for(string)
       norm_string = string.to_s.downcase
       if norm_string =~ /\A#{TagCategory.category_ids_regex}\z/
         norm_string.to_i
-      elsif TagCategory.mapping[string.to_s.downcase]
-        TagCategory.mapping[string.to_s.downcase]
       else
-        0
+        TagCategory.mapping[string.to_s.downcase]
       end
     end
   end
@@ -197,6 +195,10 @@ class Tag < ApplicationRecord
     end
 
     def validate_category
+      if category != Tag.categories.artist && artist.present?
+        errors.add(:base, "Artist tags must be in the Artist category")
+      end
+
       if is_aliased? && category != aliased_tag.category
         errors.add(:base, "Can't change the category of an aliased tag")
       end
@@ -205,7 +207,7 @@ class Tag < ApplicationRecord
 
   concerning :NameMethods do
     def name=(name)
-      super(name)
+      super
       self.words = Tag.parse_words(name)
     end
 
@@ -232,11 +234,11 @@ class Tag < ApplicationRecord
       end
 
       def create_for_list(names)
-        names.map {|x| find_or_create_by_name(x).name}
+        names.map { |x| find_or_create_by_name(x).name }
       end
 
       def find_or_create_by_name(name, category: nil, current_user: nil, **options)
-        cat_id = categories.value_for(category)
+        cat_id = categories.value_for(category) || 0
         tag = Tag.find_by(name: normalize_name(name))
 
         if tag.nil?
@@ -300,7 +302,7 @@ class Tag < ApplicationRecord
       # Tag.includes_all_words?("holding_hands", ["hand*", "hold*"]) => true
       def includes_all_words?(string, query)
         words = parse_words(string)
-        query.all? { |pattern| words.any? { |word| word.ilike?(pattern) }}
+        query.all? { |pattern| words.any? { |word| word.ilike?(pattern) } }
       end
 
       # Parse a string into a query for performing a word-based search.
@@ -375,7 +377,7 @@ class Tag < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deprecated, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at is_deprecated category post_count name wiki_page artist antecedent_alias consequent_aliases antecedent_implications consequent_implications dtext_links], current_user: current_user)
 
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])

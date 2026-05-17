@@ -14,6 +14,7 @@ import morph from '@alpinejs/morph';
 import persist from '@alpinejs/persist'
 
 require.context("../../../public/images", true);
+require.context("../../../public/logos", true, /\.png$/);
 
 import jQuery from 'jquery';
 require("jquery-ui/ui/widgets/autocomplete");
@@ -44,7 +45,7 @@ import FileUploadComponent from "../src/javascripts/file_upload_component.js";
 import ForumPostComponent from "../src/javascripts/forum_post_component.js";
 import FormValidator from "../src/javascripts/form_validator.js";
 import HelpTooltipComponent from "../src/javascripts/help_tooltip_component.js";
-import IqdbQuery from "../src/javascripts/iqdb_queries.js";
+import Links from "../src/javascripts/links.js";
 import Note from "../src/javascripts/notes.js";
 import Notice from "../src/javascripts/notice.js";
 import MediaAssetComponent from "../src/javascripts/media_asset_component.js";
@@ -58,10 +59,11 @@ import RelatedTag from "../src/javascripts/related_tag.js";
 import Shortcuts from "../src/javascripts/shortcuts.js";
 import TagCounter from "../src/javascripts/tag_counter.js";
 import TimeSeriesComponent from "../src/javascripts/time_series_component.js";
-import Upload from "../src/javascripts/uploads.js";
+import UploadPostComponent from "../src/javascripts/upload_post_component.js";
+import UploadMediaAsset from "../src/javascripts/upload_media_assets.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
 import Utility from "../src/javascripts/utility.js";
-import Ugoira from "../src/javascripts/ugoira.js";
+import VideoPlayer from "../src/javascripts/video_player.js";
 
 let Danbooru = {};
 Danbooru.Autocomplete = Autocomplete;
@@ -79,7 +81,7 @@ Danbooru.FileUploadComponent = FileUploadComponent;
 Danbooru.ForumPostComponent = ForumPostComponent;
 Danbooru.FormValidator = FormValidator;
 Danbooru.HelpTooltipComponent = HelpTooltipComponent;
-Danbooru.IqdbQuery = IqdbQuery;
+Danbooru.Links = Links;
 Danbooru.MediaAssetComponent = MediaAssetComponent;
 Danbooru.Note = Note;
 Danbooru.Notice = Notice;
@@ -93,10 +95,11 @@ Danbooru.RelatedTag = RelatedTag;
 Danbooru.Shortcuts = Shortcuts;
 Danbooru.TagCounter = TagCounter;
 Danbooru.TimeSeriesComponent = TimeSeriesComponent;
-Danbooru.Upload = Upload;
+Danbooru.UploadPostComponent = UploadPostComponent;
+Danbooru.UploadMediaAsset = UploadMediaAsset;
 Danbooru.UserTooltip = UserTooltip;
 Danbooru.Utility = Utility;
-Danbooru.Ugoira = Ugoira;
+Danbooru.VideoPlayer = VideoPlayer;
 
 // Aliases for backwards compatibility with userscripts.
 Utility.notice = Notice.info;
@@ -112,5 +115,5 @@ window.Danbooru = Danbooru;
 Alpine.plugin(morph);
 Alpine.plugin(persist)
 
-$(document).on("alpine:initialized", () => Alpine._initialized = true);
+$(document).on("alpine:initialized", () => { Alpine._initialized = true; });
 $(() => Alpine.start());

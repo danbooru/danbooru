@@ -16,7 +16,7 @@
       <% end %>
     </section>
 
-    <%= render "iqdb_queries/matches" %>
+    <%= render SimilarImagesComponent.new(matches: @matches, current_user: CurrentUser.user, low_similarity: search_params[:similarity]&.to_f, high_similarity: search_params[:high_similarity]&.to_f) %>
   </div>
 </div>
 

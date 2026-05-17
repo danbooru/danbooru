@@ -1,8 +1,8 @@
-require 'test_helper'
+require "test_helper"
 
 class PaginatorTest < ActiveSupport::TestCase
   setup do
-    @posts = FactoryBot.create_list(:post, 5)
+    @posts = create_list(:post, 5)
     CurrentUser.user = User.anonymous
   end
 
@@ -56,13 +56,13 @@ class PaginatorTest < ActiveSupport::TestCase
     end
 
     should "detect the first and last page correctly" do
-      assert(Post.paginate(0, limit: 1).is_first_page?)
-      assert(Post.paginate(1, limit: 1).is_first_page?)
-      refute(Post.paginate(1, limit: 1).is_last_page?)
+      assert_equal(true, Post.paginate(0, limit: 1).is_first_page?)
+      assert_equal(true, Post.paginate(1, limit: 1).is_first_page?)
+      assert_equal(false, Post.paginate(1, limit: 1).is_last_page?)
 
-      refute(Post.paginate(5, limit: 1).is_first_page?)
-      assert(Post.paginate(5, limit: 1).is_last_page?)
-      assert(Post.paginate(6, limit: 1).is_last_page?)
+      assert_equal(false, Post.paginate(5, limit: 1).is_first_page?)
+      assert_equal(true, Post.paginate(5, limit: 1).is_last_page?)
+      assert_equal(true, Post.paginate(6, limit: 1).is_last_page?)
     end
   end
 end

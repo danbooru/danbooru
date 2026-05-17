@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Source::URL::Poipiku < Source::URL
+  site "Poipiku", url: "https://poipiku.com" do
+    credential :session_cookie, help: %{Your Poipiku `POIPIKU_LK` cookie.}
+  end
+
   attr_reader :user_id, :post_id, :image_dir, :image_id, :image_hash, :original_file_ext, :expires, :signature, :key_pair_id
 
   def self.match?(url)

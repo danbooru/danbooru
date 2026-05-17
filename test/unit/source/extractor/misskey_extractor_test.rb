@@ -315,16 +315,18 @@ module Source::Tests::Extractor
 
     context "A note on https://sushi.ski" do
       strategy_should_work(
-        "https://sushi.ski/notes/a7lh8go61x",
-        image_urls: %w[https://media.sushi.ski/files/d2fbd97c-3233-4830-997c-d71251b5d92a.webp],
-        media_files: [{ file_size: 457_006 }],
-        page_url: "https://sushi.ski/notes/a7lh8go61x",
-        profile_urls: %w[https://sushi.ski/@aleus52hz https://sushi.ski/users/9btayf9i49],
-        display_name: nil,
-        username: "aleus52hz",
+        "https://sushi.ski/notes/aj6emmgk64",
+        image_urls: %w[https://media.sushi.ski/files/81c28c2c-bd40-4cd8-9e33-2d96bd5c6028.webp],
+        media_files: [{ file_size: 171_046 }],
+        page_url: "https://sushi.ski/notes/aj6emmgk64",
+        profile_urls: %w[https://sushi.ski/@mgmgrun https://sushi.ski/users/9grk7g7v93],
+        display_name: "繧ゅ＄繧ゅ＄",
+        username: "mgmgrun",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "ビールオフ、HUBのこれ飲んでほしい",
+        dtext_artist_commentary_desc: "モフモフ仲間が増えたぜ",
       )
     end
 

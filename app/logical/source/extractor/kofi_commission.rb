@@ -27,17 +27,16 @@ class Source::Extractor::KofiCommission < Source::Extractor::Kofi
   end
 
   memoize def commission_page
-    # Use Ko-fi's backend IP to bypass Cloudflare protection on the https://ko-fi.com/c/:id endpoint.
     url = "https://104.45.231.79/c/#{commission_id}" if commission_id.present?
-    response = http.with_legacy_ssl.headers(Host: "ko-fi.com").no_follow.cache(1.minute).get(url)
+    response = backend_http.no_follow.cache(1.minute).get(url)
 
-    redirect_url = "https://ko-fi.com#{response[:Location]}" if response.status.in?(300..399)
-    http.cache(1.minute).parsed_get(redirect_url)
+    redirect_url = response[:Location] if response.status.in?(300..399)
+    backend_get(redirect_url) if redirect_url.present?
   end
 
   memoize def commissions
-    url = "https://ko-fi.com/shop/#{user_id}/items/0/0?productType=1" if user_id.present?
-    http.cache(1.minute).parsed_get(url) || []
+    url = "/shop/#{user_id}/items/0/0?productType=1" if user_id.present?
+    backend_get(url) || []
   end
 
   memoize def commission

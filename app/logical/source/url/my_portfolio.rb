@@ -10,16 +10,14 @@
 # @see https://portfolio.adobe.com
 # @see Source::Extractor::MyPortfolio
 class Source::URL::MyPortfolio < Source::URL
+  site "Adobe Portfolio", url: "https://portfolio.adobe.com", domains: %w[myportfolio.com]
+
   RESERVED_USERNAMES = %w[cdn www]
 
   attr_reader :username, :artist_uuid, :image_uuid, :image_size, :page_title
 
   def self.match?(url)
     url.domain == "myportfolio.com"
-  end
-
-  def site_name
-    "Adobe Portfolio"
   end
 
   def parse

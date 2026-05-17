@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class BansControllerTest < ActionDispatch::IntegrationTest
   context "A bans controller" do
@@ -41,7 +41,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @mod = create(:mod_user, name: "mod123")
+        @mod = create(:mod_user)
         @ban1 = create(:ban, created_at: 1.week.ago, duration: 1.day)
         @ban2 = create(:ban, user: build(:builder_user), reason: "blah", banner: @mod, duration: 100.years)
       end
@@ -51,12 +51,12 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@ban2, @ban1] }
+      should respond_to_search.with { [@ban2, @ban1] }
       should respond_to_search(reason_matches: "blah").with { @ban2 }
       should respond_to_search(expired: "false").with { @ban2 }
       should respond_to_search(duration: "<1w").with { @ban1 }
 
-      should respond_to_search(banner_name: "mod123").with { @ban2 }
+      should respond_to_search(banner_name: -> { @mod.name }).with { @ban2 }
       should respond_to_search(banner: { level: User::Levels::MODERATOR }).with { @ban2 }
     end
 
@@ -128,7 +128,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "allow mods to change the ban reason" do
-        @ban = create(:ban)
+        @ban = create(:ban, reason: "old reason")
         @mod = create(:moderator_user)
         put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx" }}
 
@@ -136,7 +136,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xxx", @ban.reload.reason)
         assert_equal(true, @ban.user.is_banned?)
 
-        assert_equal("updated ban reason for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("updated ban reason from \"old reason\" to \"xxx\" for <@#{@ban.user.name}>", ModAction.last.description)
         assert_equal("user_ban_update", ModAction.last.category)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)
@@ -154,7 +154,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_equal(1.day, @ban.reload.duration)
         assert_equal(false, @user.reload.is_banned?)
 
-        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("updated ban duration from 1 year to 1 day for <@#{@ban.user.name}>", ModAction.last.description)
         assert_equal("user_ban_update", ModAction.last.category)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)

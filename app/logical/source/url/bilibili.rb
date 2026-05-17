@@ -9,10 +9,14 @@
 module Source
   class URL
     class Bilibili < Source::URL
-      attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id
+      site "Bilibili", url: "https://www.bilibili.com", domains: %w[bilibili.com biliimg.com hdslb.com bili2233.cn b23.tv]
+
+      extractors { [Source::Extractor::Bilibili, Source::Extractor::URLShortener] }
+
+      attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id, :redirect_id
 
       def self.match?(url)
-        url.domain.in?(%w[bilibili.com biliimg.com hdslb.com]) && url.host != "live.bilibili.com"
+        url.domain.in?(%w[bilibili.com biliimg.com hdslb.com bili2233.cn b23.tv]) && url.host != "live.bilibili.com"
       end
 
       def parse
@@ -84,6 +88,11 @@ module Source
         in ("www" | "m" | ""), ("bilibili.com" | "bilibili.tv"), "s", "video", video_id
           @video_id = video_id
 
+        # https://bili2233.cn/h5v55co
+        # https://b23.tv/h5v55co
+        in _, "bili2233.cn" | "b23.tv", redirect_id
+          @redirect_id = redirect_id
+
         # https://live.bilibili.com/10049889?from=search&seid=8525275464641122982
         # https://live.bilibili.com/blackboard/era/VSuE0f27CnXe3VSY.html
         # https://live.bilibili.com/blackboard/activity-lAFdFMqMOQ.html
@@ -92,6 +101,10 @@ module Source
         else
           nil
         end
+      end
+
+      def extractor_class
+        redirect_id.present? ? Source::Extractor::URLShortener : Source::Extractor::Bilibili
       end
 
       def image_url?

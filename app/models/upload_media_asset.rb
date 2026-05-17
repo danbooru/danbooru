@@ -7,6 +7,7 @@ class UploadMediaAsset < ApplicationRecord
 
   belongs_to :upload
   belongs_to :media_asset, optional: true
+  belongs_to :user, default: -> { upload.uploader }
   has_one :post, through: :media_asset
 
   after_create :async_process_upload!
@@ -33,7 +34,7 @@ class UploadMediaAsset < ApplicationRecord
     elsif user.is_anonymous?
       none
     else
-      where(upload: user.uploads)
+      where(user: user)
     end
   end
 
@@ -57,7 +58,7 @@ class UploadMediaAsset < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :status, :source_url, :page_url, :error, :upload, :media_asset, :post], current_user: current_user)
+    q = search_attributes(params, %i[id created_at updated_at status source_url page_url error upload media_asset post], current_user: current_user)
 
     if params[:is_posted].to_s.truthy?
       q = q.where.associated(:post)
@@ -67,9 +68,9 @@ class UploadMediaAsset < ApplicationRecord
 
     case params[:order]
     when "id_desc"
-      q = q.order(id: :desc)
+      q.order(id: :desc)
     when "id_asc"
-      q = q.order(id: :asc)
+      q.order(id: :asc)
     else
       q.apply_default_order(params)
     end

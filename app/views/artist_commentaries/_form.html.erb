@@ -1,12 +1,12 @@
 <p>If the artist of this image posted some interesting additional information about this work, you can copy it here (<%= link_to_wiki "learn more", "help:artist_commentary" %>).</p>
 
 <form id="fetch-commentary" class="simple_form">
-  <div class="input">
-    <label for="commentary_source">Copy from</label>
-    <%= select_tag :commentary_source_type, options_for_select(%w[Source Post]) %>
-    <%= text_field_tag :commentary_source, post.source %>
-    <%= text_field_tag :commentary_post_id, post.parent_id, :style => "display: none;" %>
-    <%= button_tag "Fetch" %>
+  <div class="input flex flex-wrap items-center gap-2" x-data="{ from: 'Source' }">
+    <label for="commentary_source" class="whitespace-nowrap">Copy from</label>
+    <%= select_tag :commentary_source_type, options_for_select(%w[Source Post]), "x-model": "from" %>
+    <%= text_field_tag :commentary_source, post.source, class: "!w-auto flex-grow-1", placeholder: "Enter source URL", "x-show": "from === 'Source'" %>
+    <%= text_field_tag :commentary_post_id, post.parent_id, style: "display: none;", class: "!w-auto flex-grow-1", placeholder: "Enter post ID", "x-show": "from === 'Post'" %>
+    <%= button_tag "Fetch", class: "button-primary", "x-on:click.prevent": "Danbooru.ArtistCommentary.fetch_commentary()" %>
   </div>
 </form>
 
@@ -17,27 +17,5 @@
   <%= f.input :translated_title, as: :string, input_html: { value: artist_commentary.try(:translated_title) } %>
   <%= f.input :translated_description, input_html: { value: artist_commentary.try(:translated_description) } %>
 
-  <% if post.has_tag?("commentary") %>
-    <%= f.input :remove_commentary_tag, as: :boolean %>
-  <% else %>
-    <%= f.input :add_commentary_tag, as: :boolean %>
-  <% end %>
-
-  <% if post.has_tag?("commentary_request") %>
-    <%= f.input :remove_commentary_request_tag, as: :boolean %>
-  <% else %>
-    <%= f.input :add_commentary_request_tag, as: :boolean %>
-  <% end %>
-
-  <% if post.has_tag?("check_commentary") %>
-    <%= f.input :remove_commentary_check_tag, as: :boolean %>
-  <% else %>
-    <%= f.input :add_commentary_check_tag, as: :boolean %>
-  <% end %>
-
-  <% if post.has_tag?("partial_commentary") %>
-    <%= f.input :remove_partial_commentary_tag, as: :boolean %>
-  <% else %>
-    <%= f.input :add_partial_commentary_tag, as: :boolean %>
-  <% end %>
+  <%= f.input :commentary_tags, label: false, wrapper_html: { class: "radio-button-group thin-x-scrollbar text-xs m-auto w-fit" }, collection: ArtistCommentary::COMMENTARY_TAGS.map { [it.titleize, it] } + [["None", "none"]], as: :radio_buttons, boolean_style: :inline %>
 <% end %>

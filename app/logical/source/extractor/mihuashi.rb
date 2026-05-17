@@ -65,6 +65,34 @@ module Source
         [profile_url, account_url].compact_blank.uniq
       end
 
+      def published_at
+        if parsed_url.image_url?
+          return parsed_url.parsed_date
+        end
+        date_string = nil
+        if work.present?
+          date_string = work[:created_at]
+        elsif project.present?
+          date_string = project[:created_at]
+        elsif character_card.present?
+          date_string = character_card[:created_at]
+        elsif activity_work.present?
+          date_string = activity_work[:created_at]
+        end
+        Time.iso8601(date_string).utc if date_string
+      end
+
+      def updated_at
+        if parsed_url.image_url?
+          return nil
+        end
+        date_string = nil
+        if activity_work.present?
+          date_string = activity_work[:updated_at]
+        end
+        Time.iso8601(date_string).utc if date_string
+      end
+
       def tags
         if work.present?
           work[:tags].to_a.map do |tag|

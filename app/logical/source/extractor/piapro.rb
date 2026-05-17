@@ -69,7 +69,7 @@ class Source::Extractor::Piapro < Source::Extractor
 
   def tags
     page&.css(".contents_taglist .tag a").to_a.map do |tag|
-      [tag.text, "https://piapro.jp/content_list/?view=image&tag=#{Danbooru::URL.escape(tag)}"]
+      [tag.text, "https://piapro.jp/content_list/?view=image&tag=#{Danbooru::URL.escape(tag.text)}"]
     end
   end
 

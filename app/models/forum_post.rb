@@ -36,7 +36,7 @@ class ForumPost < ApplicationRecord
   has_dtext_links :body
   mentionable(
     message_field: :body,
-    title: ->(_user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
+    title: ->(_user_name) { %{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})} },
     body: lambda { |user_name|
       <<~EOF
         @#{creator.name} mentioned you in forum ##{id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]). This is an excerpt from the message:
@@ -50,11 +50,15 @@ class ForumPost < ApplicationRecord
 
   module SearchMethods
     def visible(user)
-      where(topic_id: ForumTopic.visible(user))
+      if policy(user).show_deleted?
+        where(topic_id: ForumTopic.visible(user))
+      else
+        undeleted.where(topic_id: ForumTopic.visible(user))
+      end
     end
 
     def not_visible(user)
-      where.not(topic_id: ForumTopic.visible(user))
+      visible(user).invert_where
     end
 
     def wiki_link_matches(title)
@@ -65,7 +69,7 @@ class ForumPost < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :body, :creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at is_deleted body creator updater topic dtext_links votes tag_alias tag_implication bulk_update_request], current_user: current_user)
 
       if params[:linked_to].present?
         q = q.wiki_link_matches(params[:linked_to])
@@ -79,7 +83,7 @@ class ForumPost < ApplicationRecord
 
   def self.new_reply(params)
     if params[:topic_id]
-      new(:topic_id => params[:topic_id])
+      new(topic_id: params[:topic_id])
     elsif params[:post_id]
       forum_post = ForumPost.find(params[:post_id])
       forum_post.build_response
@@ -113,7 +117,7 @@ class ForumPost < ApplicationRecord
   def update_topic_updated_at_on_create
     if topic
       # need to do this to bypass the topic's original post from getting touched
-      ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", creator.id, Time.now])
+      ForumTopic.where(id: topic.id).update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", creator.id, Time.now])
       topic.response_count += 1
     end
   end
@@ -137,22 +141,22 @@ class ForumPost < ApplicationRecord
   def update_topic_updated_at_on_delete
     max = ForumPost.where(topic_id: topic.id, is_deleted: false).order(updated_at: :desc).first
     if max
-      ForumTopic.where(:id => topic.id).update_all(["updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
+      ForumTopic.where(id: topic.id).update_all(["updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
     end
   end
 
   def update_topic_updated_at_on_undelete
     if topic
-      ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, updated_at = ?", CurrentUser.id, Time.now])
+      ForumTopic.where(id: topic.id).update_all(["updater_id = ?, updated_at = ?", CurrentUser.id, Time.now])
     end
   end
 
   def update_topic_updated_at_on_destroy
     max = ForumPost.where(topic_id: topic.id, is_deleted: false).order(updated_at: :desc).first
     if max
-      ForumTopic.where(:id => topic.id).update_all(["response_count = response_count - 1, updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
+      ForumTopic.where(id: topic.id).update_all(["response_count = response_count - 1, updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
     else
-      ForumTopic.where(:id => topic.id).update_all("response_count = response_count - 1")
+      ForumTopic.where(id: topic.id).update_all("response_count = response_count - 1")
     end
 
     topic.response_count -= 1

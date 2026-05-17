@@ -3,16 +3,6 @@
 class PoolsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  def new
-    @pool = authorize Pool.new(permitted_attributes(Pool))
-    respond_with(@pool)
-  end
-
-  def edit
-    @pool = authorize Pool.find(params[:id])
-    respond_with(@pool)
-  end
-
   def index
     if request.format.html?
       @pools = authorize Pool.paginated_search(params, count_pages: true, defaults: { is_deleted: false })
@@ -23,20 +13,30 @@ class PoolsController < ApplicationController
     respond_with(@pools)
   end
 
-  def gallery
-    limit = params[:limit].presence || CurrentUser.user.per_page
-    search = search_params.presence || ActionController::Parameters.new(category: "series")
-
-    @pools = authorize Pool.search(search, CurrentUser.user).paginate(params[:page], limit: limit, search_count: params[:search])
-    respond_with(@pools)
-  end
-
   def show
     limit = params[:limit].presence || CurrentUser.user.per_page
 
     @pool = authorize Pool.find(params[:id])
     @posts = @pool.posts.paginate(params[:page], limit: limit, count: @pool.post_count)
     respond_with(@pool)
+  end
+
+  def new
+    @pool = authorize Pool.new(permitted_attributes(Pool))
+    respond_with(@pool)
+  end
+
+  def edit
+    @pool = authorize Pool.find(params[:id])
+    respond_with(@pool)
+  end
+
+  def gallery
+    limit = params[:limit].presence || CurrentUser.user.per_page
+    search = search_params.presence || ActionController::Parameters.new(category: "series")
+
+    @pools = authorize Pool.search(search, CurrentUser.user).paginate(params[:page], limit: limit, search_count: params[:search])
+    respond_with(@pools)
   end
 
   def create

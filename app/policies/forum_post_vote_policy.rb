@@ -6,7 +6,7 @@ class ForumPostVotePolicy < ApplicationPolicy
   end
 
   def destroy?
-    unbanned? && record.creator_id == user.id
+    unbanned? && record.creator_id == user.id && policy(record.forum_post).votable?
   end
 
   def rate_limit_for_write(**_options)

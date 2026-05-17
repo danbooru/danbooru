@@ -2,6 +2,8 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class PoipikuExtractorTest < ActiveSupport::ExtractorTestCase
+    setup { skip "Poipiku credentials not configured" unless Source::Extractor::Poipiku.enabled? }
+
     context "A https://poipiku.com/:user_id/:post_id.html page url with a single image" do
       strategy_should_work(
         "https://poipiku.com/583/2867587.html",
@@ -11,7 +13,7 @@ module Source::Tests::Extractor
         ],
         media_files: [{ file_size: 209_902 }],
         profile_url: "https://poipiku.com/583/",
-        profile_urls: %w[https://poipiku.com/583/ https://twitter.com/avocado_0w0],
+        profile_urls: %w[https://poipiku.com/583/ https://x.com/avocado_0w0],
         display_name: "リアクションありがとう～～",
         tag_name: "poipiku_583",
         tags: [],
@@ -106,29 +108,18 @@ module Source::Tests::Extractor
 
     context "A page that requires a login" do
       strategy_should_work(
-        "https://poipiku.com/8566613/9625938.html",
-        page_url: "https://poipiku.com/8566613/11413167.html",
-        image_urls: [
-          %r{https://cdn.poipiku.com/008566613/009625669_020612310_toCYdeSNu.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/008566613/009625669_020612311_woW7C76Mm.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/008566613/009625669_020612314_f7gKnobZf.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/008566613/009625669_020612315_PruYge0kI.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/008566613/009625669_020612316_BzYCPGlTs.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/008566613/009625669_020612317_MLJKcyPlU.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/008566613/009625938_020619084_HBrdSJ8V3.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-        ],
-        profile_url: "https://poipiku.com/8566613/",
-        profile_urls: %w[https://poipiku.com/8566613/],
-        display_name: "kino",
-        tag_name: "kino",
+        "https://poipiku.com/4410796/10302842.html",
+        image_urls: [%r{https://cdn.poipiku.com/004410796/010302842_4pC4tszN1.png\?Expires=.*&Signature=.*&Key-Pair-Id=.*}],
+        media_files: [{ file_size: 10_801_572 }],
+        page_url: "https://poipiku.com/4410796/10302842.html",
+        profile_urls: %w[https://poipiku.com/4410796/],
+        display_name: "Donburi",
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
         tags: [],
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          丹穹 R-18 (※攻めローションガーゼ)
-          普段水を操っている丹が自分から出る水分を制御できないのえっちだよね！のらくがきです
-
-          ⚠︎なんでも大丈夫な方向け
-          少しでも不安を覚えた方はブラウザバック推奨です
-        EOS
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 

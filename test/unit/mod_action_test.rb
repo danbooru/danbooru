@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ModActionTest < ActiveSupport::TestCase
   context "A mod action" do

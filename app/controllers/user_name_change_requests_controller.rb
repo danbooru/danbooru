@@ -5,6 +5,16 @@ class UserNameChangeRequestsController < ApplicationController
 
   skip_before_action :redirect_if_name_invalid?
 
+  def index
+    @change_requests = authorize UserNameChangeRequest.visible(CurrentUser.user).paginated_search(params)
+    respond_with(@change_requests)
+  end
+
+  def show
+    @change_request = authorize UserNameChangeRequest.find(params[:id])
+    respond_with(@change_request)
+  end
+
   def new
     @user = params[:id].present? ? User.find(params[:id]) : CurrentUser.user
     @change_request = authorize UserNameChangeRequest.new(user: @user, **permitted_attributes(UserNameChangeRequest))
@@ -17,15 +27,5 @@ class UserNameChangeRequestsController < ApplicationController
     @change_request.save
 
     respond_with(@change_request, notice: "Name changed", location: @change_request.user)
-  end
-
-  def show
-    @change_request = authorize UserNameChangeRequest.find(params[:id])
-    respond_with(@change_request)
-  end
-
-  def index
-    @change_requests = authorize UserNameChangeRequest.visible(CurrentUser.user).paginated_search(params)
-    respond_with(@change_requests)
   end
 end

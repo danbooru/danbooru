@@ -90,7 +90,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "work for an admin" do
         assert_difference("NewsUpdate.active.count") do
-          post_auth news_updates_path, @admin, params: { news_update: { message: "zzz"}}
+          post_auth news_updates_path, @admin, params: { news_update: { message: "zzz" }}
         end
 
         assert_redirected_to(news_updates_path)
@@ -140,7 +140,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
         @news_update = create(:news_update, creator: @admin, is_deleted: true)
         @other_admin = create(:admin_user)
 
-        put_auth news_update_path(@news_update), @other_admin, params: { news_update: { is_deleted: false } }
+        put_auth news_update_path(@news_update), @other_admin, params: { news_update: { is_deleted: false }}
 
         assert_redirected_to(news_updates_path)
         assert_equal(@admin, @news_update.reload.creator)
@@ -153,7 +153,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
 
       should "not work for a regular user" do
         @news_update = create(:news_update)
-        put_auth news_update_path(@news_update), create(:user), params: { news_update: { is_deleted: false } }
+        put_auth news_update_path(@news_update), create(:user), params: { news_update: { is_deleted: false }}
 
         assert_response 403
       end

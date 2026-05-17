@@ -360,7 +360,7 @@ module Source::Tests::Extractor
         username: nil,
         tags: %w[漫画 RO C82 アークビショップ ラグナロクオンライン],
         dtext_artist_commentary_title: "ABさん 色いじり",
-        dtext_artist_commentary_desc: "C82新刊表紙イラストの、服色を弄ってみました。 黒も捨てがたかったのですけど、EXカラーは青→黒になっただけなのか不安だったので、結局青に～。 本文サンプルは今月末頃に出せたらイイナと思ってます。ABさんのいちゃラブ成人向け本です。 ■C82では他にも新刊とグッズを出す予定です。詳細はサイトで順次出して行きますのでよろしくお願いします <http://sailr.sakura.ne.jp/>",
+        dtext_artist_commentary_desc: "C82新刊表紙イラストの、服色を弄ってみました。 黒も捨てがたかったのですけど、EXカラーは青→黒になっただけなのか不安だったので、結局青に～。 本文サンプルは今月末頃に出せたらイイナと思ってます。ABさんのいちゃラブ成人向け本です。 ■C82では他にも新刊とグッズを出す予定です。詳細はサイトで順次出して行きますのでよろしくお願いします <http://sailr.sakura.ne.jp>",
       )
     end
   end

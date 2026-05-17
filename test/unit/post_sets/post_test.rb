@@ -1,15 +1,15 @@
-require 'test_helper'
+require "test_helper"
 
 module PostSets
   class PostTest < ActiveSupport::TestCase
     context "In all cases" do
       setup do
-        @user = FactoryBot.create(:user)
+        @user = create(:user)
         CurrentUser.user = @user
 
-        @post_1 = FactoryBot.create(:post, :tag_string => "a")
-        @post_2 = FactoryBot.create(:post, :tag_string => "b")
-        @post_3 = FactoryBot.create(:post, :tag_string => "c")
+        @post1 = create(:post, tag_string: "a")
+        @post2 = create(:post, tag_string: "b")
+        @post3 = create(:post, tag_string: "c")
       end
 
       teardown do
@@ -19,14 +19,14 @@ module PostSets
       context "a set for page 2" do
         should "return the second element" do
           @set = PostSets::Post.new("", 2, 1)
-          assert_equal(@post_2.id, @set.posts.first.id)
+          assert_equal(@post2.id, @set.posts.first.id)
         end
       end
 
       context "a set for the 'a' tag query" do
         setup do
-          @post_4 = FactoryBot.create(:post, :tag_string => "a")
-          @post_5 = FactoryBot.create(:post, :tag_string => "a")
+          @post4 = create(:post, tag_string: "a")
+          @post5 = create(:post, tag_string: "a")
         end
 
         context "with no page" do
@@ -36,29 +36,29 @@ module PostSets
           end
 
           should "return the first element" do
-            assert_equal(@post_5.id, @set.posts.first.id)
+            assert_equal(@post5.id, @set.posts.first.id)
           end
         end
 
         context "for before the first element" do
           setup do
-            @set = PostSets::Post.new("a", "b#{@post_5.id}")
+            @set = PostSets::Post.new("a", "b#{@post5.id}")
             ::Post.stubs(:records_per_page).returns(1)
           end
 
           should "return the second element" do
-            assert_equal(@post_4.id, @set.posts.first.id)
+            assert_equal(@post4.id, @set.posts.first.id)
           end
         end
 
         context "for after the second element" do
           setup do
-            @set = PostSets::Post.new("a", "a#{@post_4.id}")
+            @set = PostSets::Post.new("a", "a#{@post4.id}")
             @set.stubs(:records_per_page).returns(1)
           end
 
           should "return the first element" do
-            assert_equal(@post_5.id, @set.posts.first.id)
+            assert_equal(@post5.id, @set.posts.first.id)
           end
         end
       end
@@ -111,12 +111,12 @@ module PostSets
         end
 
         should "find the posts" do
-          assert_equal(@post_1.id, @set.posts.first.id)
+          assert_equal(@post1.id, @set.posts.first.id)
         end
 
         context "that has a matching wiki page" do
           setup do
-            @wiki_page = FactoryBot.create(:wiki_page, :title => "a")
+            @wiki_page = create(:wiki_page, title: "a")
           end
 
           should "find the wiki page" do

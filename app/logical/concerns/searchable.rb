@@ -208,7 +208,7 @@ module Searchable
   # https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
   def where_tsvector_matches(columns, query)
     Array.wrap(columns).map do |column|
-      where("(#{to_tsvector('english', arel_table[column]).to_sql}) @@ websearch_to_tsquery('pg_catalog.english', :query)", query: query)
+      where("(#{to_tsvector("english", arel_table[column]).to_sql}) @@ websearch_to_tsquery('pg_catalog.english', :query)", query: query)
     end.reduce(:or)
   end
 
@@ -261,7 +261,7 @@ module Searchable
     # This way if the relation is negated with `Post.attribute_matches(1, :approver_id).negate_relation`, it will
     # produce `WHERE approver_id != 1 OR approver_id IS NULL`. This is so the search includes NULL values; if it
     # was just `approver_id != 1`, then it would not include when approver_id is NULL.
-    if (operator in :eq | :not_eq) && arg != nil && has_attribute?(field) && column_for_attribute(field).null
+    if (operator in :eq | :not_eq) && !arg.nil? && has_attribute?(field) && column_for_attribute(field).null
       relation = relation.where.not(field => nil)
     end
 
@@ -322,7 +322,7 @@ module Searchable
     def search_attribute(name)
       if relation.has_attribute?(name)
         search_basic_attribute(name)
-      elsif relation.reflections.has_key?(name.to_s)
+      elsif relation.reflections.key?(name.to_s)
         search_association_attribute(name)
       else
         raise ArgumentError, "#{name} is not an attribute or association"
@@ -335,7 +335,7 @@ module Searchable
       if column.try(:array?)
         type = :array
         subtype = column.type
-      elsif relation.defined_enums.has_key?(name.to_s)
+      elsif relation.defined_enums.key?(name.to_s)
         type = :enum
       else
         type = column.type
@@ -369,7 +369,16 @@ module Searchable
       relation = self.relation
 
       if params[key].present?
-        relation = visible(relation, attr).where_numeric_matches(attr, params[key], type)
+        if type == :datetime
+          # Try to parse dates as relative (like <1w) first,
+          # and it that fails then try again as date strings.
+          relation = visible(relation, attr).where_numeric_matches(attr, params[key], :age)
+          if relation.none?
+            relation = visible(self.relation, attr).where_numeric_matches(attr, params[key], type)
+          end
+        else
+          relation = visible(relation, attr).where_numeric_matches(attr, params[key], type)
+        end
       end
 
       if params[:"#{key}_not"].present?
@@ -455,11 +464,11 @@ module Searchable
       end
 
       if params[:"#{attr}_comma"].present?
-        relation = visible(relation, attr).where(attr => params[:"#{attr}_comma"].split(','))
+        relation = visible(relation, attr).where(attr => params[:"#{attr}_comma"].split(","))
       end
 
       if params[:"#{attr}_space"].present?
-        relation = visible(relation, attr).where(attr => params[:"#{attr}_space"].split(' '))
+        relation = visible(relation, attr).where(attr => params[:"#{attr}_space"].split)
       end
 
       if params[:"#{attr}_lower_array"].present?
@@ -467,11 +476,11 @@ module Searchable
       end
 
       if params[:"#{attr}_lower_comma"].present?
-        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_comma"].split(','))
+        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_comma"].split(","))
       end
 
       if params[:"#{attr}_lower_space"].present?
-        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split(' '))
+        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split)
       end
 
       relation
@@ -680,12 +689,10 @@ module Searchable
       return none if model_keys.length > 1
 
       relation = self.relation
-      model_specified = false
       model_key = model_keys[0]
       if model_keys.length == 1 && parameter_hash?(params[model_key])
         # Returning none here for the same reason specified above
         return none if params["#{attr}_type"].present? && params["#{attr}_type"] != model_key
-        model_specified = true
         model = Kernel.const_get(model_key)
         relation = visible(relation, attr).where(attr => model.visible(current_user).search(params[model_key], current_user))
       end

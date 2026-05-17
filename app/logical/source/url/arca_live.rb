@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
 class Source::URL::ArcaLive < Source::URL
-  attr_reader :candidate_full_image_urls, :full_image_url, :channel, :post_id, :username, :user_id
+  site "Arca.live", url: "https://arca.live", domains: %w[arca.live namu.la]
+
+  attr_reader :full_image_url, :channel, :post_id, :username, :user_id
 
   def self.match?(url)
     url.domain.in?(%w[arca.live namu.la])
-  end
-
-  def site_name
-    "Arca.live"
   end
 
   def parse
@@ -20,13 +18,11 @@ class Source::URL::ArcaLive < Source::URL
     # https://ac.namu.la/20221211sac/5ea7fbca5e49ec16beb099fc6fc991690d37552e599b1de8462533908346241e.png (actually .webp)
     # https://ac-o.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.gif?type=orig
     # https://ac.namu.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9.mp4 (.gif sample)
-    in _, "namu.la", date, /\A\h{64}/
-      candidate_url = with_params(type: "orig")
-      if file_ext == "mp4"
-        @candidate_full_image_urls = %w[gif webp mp4].map { |ext| candidate_url.with(file_ext: ext).to_s }
-      else
-        @full_image_url = candidate_url.to_s
-      end
+    #
+    # https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?expires=1772297147&key=6plnf6JeClQOi5WusMFl2g&type=orig
+    # https://ac.namu.la/20241126sac/b2175d9ef4504945d3d989526120dbb6aded501ddedfba8ecc44a64e7aae9059.gif?expires=1772296984&key=cMqxse9Pkam6AelmOahWkA&type=orig
+    in _, "namu.la", _date, /\A\h{64}/
+      @full_image_url = with_params(type: "orig").to_s
 
     # https://arca.live/b/arknights/66031722
     in _, "arca.live", "b", channel, post_id

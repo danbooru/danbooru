@@ -21,7 +21,7 @@ class PasswordsController < ApplicationController
       new_password: params.dig(:user, :password),
       password_confirmation: params.dig(:user, :password_confirmation),
       verification_code: params.dig(:user, :verification_code),
-      request: request
+      request: request,
     )
 
     notice = "Password updated" if success

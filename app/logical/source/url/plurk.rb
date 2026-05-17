@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Source::URL::Plurk < Source::URL
+  site "Plurk", url: "https://www.plurk.com" do
+    credential :session_cookie, help: %{Your Plurk `plurktokena` cookie.}
+  end
+
   RESERVED_USERNAMES = %w[
     aboutUs app brandInfo contact content-policy f help hotlinks login logout m news p portal privacy qrcode s search settings
     signup terms top u EmoticonManager2 Friends Photos UserRecommend

@@ -4,20 +4,9 @@ class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   respond_to :atom, only: [:index, :show]
 
-  before_action :normalize_search, :only => :index
+  before_action :normalize_search, only: :index
   before_action if: -> { request.format.html? && !Danbooru.config.forum_enabled?.to_s.truthy? } do
     redirect_to root_path
-  end
-
-  def new
-    @forum_topic = authorize ForumTopic.new
-    @forum_topic.original_post = ForumPost.new
-    respond_with(@forum_topic)
-  end
-
-  def edit
-    @forum_topic = authorize ForumTopic.find(params[:id])
-    respond_with(@forum_topic)
   end
 
   def index
@@ -50,6 +39,17 @@ class ForumTopicsController < ApplicationController
       @forum_posts = @forum_posts.reverse_order.load
     end
 
+    respond_with(@forum_topic)
+  end
+
+  def new
+    @forum_topic = authorize ForumTopic.new
+    @forum_topic.original_post = ForumPost.new
+    respond_with(@forum_topic)
+  end
+
+  def edit
+    @forum_topic = authorize ForumTopic.find(params[:id])
     respond_with(@forum_topic)
   end
 
@@ -90,7 +90,7 @@ class ForumTopicsController < ApplicationController
     authorize ForumTopic
     CurrentUser.user.update(last_forum_read_at: Time.zone.now)
     ForumTopicVisit.prune!(CurrentUser.user)
-    redirect_to forum_topics_path, :notice => "All topics marked as read"
+    redirect_to forum_topics_path, notice: "All topics marked as read"
   end
 
   private

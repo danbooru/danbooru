@@ -40,7 +40,7 @@ class ApplicationMailer < ActionMailer::Base
         url: "#{request.method} #{request.url}",
         request_id: request.request_id.to_s,
       },
-      **params
+      **params,
     )
   end
 end

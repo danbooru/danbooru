@@ -31,6 +31,7 @@ class PostQuery
     extend Memoist
 
     attr_reader :parser, :metatags, :metatag_regex
+
     delegate :error, :rest, :eos?, :accept, :expect, :rewind, :zero_or_more, :one_or_more, :one_of, to: :parser
 
     # @param input [String] The search string to parse.

@@ -15,7 +15,7 @@ module BulkUpdateRequestPruner
     upcoming_expired_requests.find_each do |bulk_update_request|
       if bulk_update_request.forum_topic
         body = "This bulk update request is pending automatic rejection in #{WARNING_PERIOD.inspect}."
-        unless bulk_update_request.forum_topic.forum_posts.where(creator_id: User.system.id, body: body).exists?
+        unless bulk_update_request.forum_topic.forum_posts.exists?(creator_id: User.system.id, body: body)
           bulk_update_request.forum_updater.update(body)
         end
       end
@@ -37,10 +37,10 @@ module BulkUpdateRequestPruner
   end
 
   def expired_requests
-    BulkUpdateRequest.pending.where("created_at < ?", EXPIRATION_PERIOD.ago)
+    BulkUpdateRequest.pending.where(created_at: ...EXPIRATION_PERIOD.ago)
   end
 
   def upcoming_expired_requests
-    BulkUpdateRequest.pending.where("created_at >= ? and created_at < ?", EXPIRATION_PERIOD.ago, (EXPIRATION_PERIOD - WARNING_PERIOD).ago)
+    BulkUpdateRequest.pending.where(created_at: EXPIRATION_PERIOD.ago...(EXPIRATION_PERIOD - WARNING_PERIOD).ago)
   end
 end

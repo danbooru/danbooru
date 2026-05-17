@@ -4,7 +4,7 @@
 class FileUploadComponent < ApplicationComponent
   attr_reader :url, :referer_url, :drop_target, :max_file_size, :max_files_per_upload
 
-  delegate :simple_form_for, to: :helpers
+  delegate :simple_form_for, :link_to_wiki, to: :helpers
 
   # @param url [String] Optional. The URL to upload. If present, the URL field
   #   will be prefilled in the widget and the upload will be immediately triggered.

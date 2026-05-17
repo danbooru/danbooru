@@ -2,10 +2,21 @@
 
 # @see Source::Extractor::Xiaohongshu
 class Source::URL::Xiaohongshu < Source::URL
-  attr_reader :user_id, :post_id, :full_image_url, :xsec_token
+  site "Xiaohongshu" do
+    url "https://www.xiaohongshu.com"
+    domains %w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com]
+
+    credential :session_cookie, help: %{Your Xiaohongshu `gid` cookie.}
+    credential :webid_cookie, help: %{Your Xiaohongshu `webId` cookie.}
+    credential :web_session_cookie, help: %{Your Xiaohongshu `web_session` cookie.}
+  end
+
+  extractors { [Source::Extractor::Xiaohongshu, Source::Extractor::URLShortener] }
+
+  attr_reader :user_id, :post_id, :full_image_url, :xsec_token, :redirect_id
 
   def self.match?(url)
-    url.domain.in?(%w[xiaohongshu.com xhscdn.com])
+    url.domain.in?(%w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com])
   end
 
   def parse
@@ -15,14 +26,16 @@ class Source::URL::Xiaohongshu < Source::URL
     # https://sns-webpic-qc.xhscdn.com/202405210829/7c81f7805428d2268d2d0723e0f52ce2/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0!nd_dft_wlteh_webp_3 (sample)
     # https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8 (full)
     # https://ci.xiaohongshu.com/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0 (full)
-    in _, "xhscdn.com", /^\d{12}$/, /^\h{32}$/, *subdirs, /^([a-z0-9]+)!/
+    in _, ("xhscdn.com" | "rednotecdn.com"), /^\d{12}$/, /^\h{32}$/, *subdirs, /^([a-z0-9]+)!/
       image_id = basename.split("!").first
       @full_image_url = ["https://ci.xiaohongshu.com", *subdirs, image_id].join("/")
 
     # https://ci.xiaohongshu.com/bd871b0f-f9e7-54da-fd39-80b6af034dad?imageView2/2/w/100/h/100/q/75 (sample)
+    # https://ci.xiaohongshu.com/notes_pre_post/1040g3k031il3oqupga005nsgsmfg8ue6bq81dbg?imageView2/2/w/format/png (sample)
     # https://ci.xiaohongshu.com/bd871b0f-f9e7-54da-fd39-80b6af034dad (full)
     # https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8 (full)
-    in "ci", "xiaohongshu.com", image_id
+    # https://ci.xiaohongshu.com/notes_pre_post/1040g3k031il3oqupga005nsgsmfg8ue6bq81dbg (full)
+    in "ci", "xiaohongshu.com", *rest
       @full_image_url = without(:query).to_s
 
     # https://img.xiaohongshu.com/avatar/5b56be0014de415b2db830a6.jpg@160w_160h_92q_1e_1c_1x.jpg (profile picture, sample)
@@ -31,44 +44,53 @@ class Source::URL::Xiaohongshu < Source::URL
       @full_image_url = "https://img.xiaohongshu.com/avatar/#{basename.split("@").first}"
 
     # https://www.xiaohongshu.com/explore/6421b331000000002702901f
-    in _, "xiaohongshu.com", ("explore" | "search_result"), post_id
+    in _, ("xiaohongshu.com" | "rednote.com"), ("explore" | "search_result"), post_id
       @post_id = post_id
       @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/discovery/item/65880524000000000700a643
-    in _, "xiaohongshu.com", "discovery", "item", post_id
+    in _, ("xiaohongshu.com" | "rednote.com"), "discovery", "item", post_id
       @post_id = post_id
       @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8/6421b331000000002702901f
-    in _, "xiaohongshu.com", "user", "profile", user_id, post_id
+    in _, ("xiaohongshu.com" | "rednote.com"), "user", "profile", user_id, post_id
       @user_id = user_id
       @post_id = post_id
       @xsec_token = params[:xsec_token]
 
     # https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8
-    in _, "xiaohongshu.com", "user", "profile", user_id
+    in _, ("xiaohongshu.com" | "rednote.com"), "user", "profile", user_id
       @user_id = user_id
+
+    # https://xhslink.com/WNd9gI
+    # https://xhslink.com/o/3y3uwYYeyHn
+    # https://xhslink.com/a/jqL6B32eU0F7，复制本条信息，打开
+    in _, "xhslink.com", *_subdirs, redirect_id
+      @redirect_id = redirect_id
 
     # http://sns-video-bd.xhscdn.com/stream/110/258/01e62cb7e42033da010370018f1eb04fee_258.mp4 (video sample)
     # https://sns-video-al.xhscdn.com/pre_post/1040g2t03123bm2b13q6g5o56b7k085i9gkig2ho (video full)
     # https://sns-avatar-qc.xhscdn.com/avatar/1040g2jo30s5tg4ugig605ohki5uk137o34ug2fo (profile picture)
     # https://picasso-static.xiaohongshu.com/fe-platform/81cedd016ad9d8bef38b2cd0c1e725454df53598.png (emoji)
-    # http://xhslink.com/WNd9gI
     else
       nil
     end
   end
 
+  def extractor_class
+    redirect_id.present? ? Source::Extractor::URLShortener : Source::Extractor::Xiaohongshu
+  end
+
   def image_url?
-    host.in?(%w[ci.xiaohongshu.com img.xiaohongshu.com]) || domain == "xhscdn.com"
+    host.in?(%w[ci.xiaohongshu.com img.xiaohongshu.com]) || domain.in?(%w[xhscdn.com rednotecdn.com])
   end
 
   def page_url
-    url = if user_id.present? && post_id.present?
-      "https://www.xiaohongshu.com/user/profile/#{user_id}/#{post_id}"
+    if user_id.present? && post_id.present?
+      url = "https://www.xiaohongshu.com/user/profile/#{user_id}/#{post_id}"
     elsif post_id.present?
-      "https://www.xiaohongshu.com/explore/#{post_id}"
+      url = "https://www.xiaohongshu.com/explore/#{post_id}"
     end
 
     if url.present? && xsec_token.present?

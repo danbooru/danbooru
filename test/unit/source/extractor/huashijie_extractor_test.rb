@@ -2,6 +2,10 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class HuashijieExtractorTest < ActiveSupport::ExtractorTestCase
+    setup do
+      skip "Huashijie extractor requires credentials" unless Source::Extractor::Huashijie.enabled?
+    end
+
     context "A Huashijie sample image url" do
       strategy_should_work(
         "https://bsyimgv2.pandapaint.net/v2/album_cover/user/17873127/1736262275939.png?x-oss-process=style/work_cover&image_process=format,WEBP",

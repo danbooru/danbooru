@@ -5,7 +5,7 @@ class ArtistURL < ApplicationRecord
 
   validates :url, presence: true, length: { maximum: 300, message: "'%{value}' is too long (maximum is 300 characters)" }, uniqueness: { scope: :artist_id }
   validate :validate_url_format
-  belongs_to :artist, :touch => true
+  belongs_to :artist, touch: true
 
   scope :active, -> { where(is_active: true) }
 
@@ -77,32 +77,7 @@ class ArtistURL < ApplicationRecord
   # A secondary URL is an artist URL that we don't normally want to display,
   # usually because it's redundant with the primary profile URL.
   def secondary_url?
-    case url
-    when %r{pixiv\.net/stacc}i
-      true
-    when %r{pixiv\.net/fanbox}i
-      true
-    when %r{https://x\.com/intent}i
-      true
-    when %r{https://x\.com/i/user}i
-      true
-    when %r{(?:www|com|dic)\.nicovideo\.jp}i
-      true
-    when %r{pawoo\.net/web/accounts}i
-      true
-    when %r{misskey\.(?:io|art|design)/users}i
-      true
-    when %r{inkbunny\.net/user\.php}i
-      true
-    when %r{bsky\.app/profile/did:}i
-      true
-    when %r{lofter\.com/mentionredirect.do}i
-      true
-    when %r{mihuashi\.com/users/}i
-      true
-    else
-      false
-    end
+    parsed_url&.secondary_url?
   end
 
   # The sort order of sites in artist URL lists.
@@ -122,7 +97,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def url=(url)
-    super(url)
+    super
     @parsed_url = Source::URL.parse(url)
   end
 

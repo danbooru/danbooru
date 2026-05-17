@@ -152,7 +152,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         should "fail" do
           @another_user = create(:user)
           get_auth user_name_change_request_path(@change_request), @another_user
-          assert_response :forbidden
+          assert_response 403
         end
       end
     end
@@ -171,6 +171,34 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         get user_name_change_requests_path
 
         assert_response 403
+      end
+
+      context "searching" do
+        setup do
+          travel_to(8.days.ago) do
+            @user_name_change_request1 = create(:user_name_change_request, user: @user, original_name: "provence", desired_name: "provence2")
+          end
+          @user_name_change_request2 = create(:user_name_change_request, user: @user, original_name: "provence2", desired_name: "provence")
+          @user2 = create(:user)
+        end
+
+        should respond_to_search(user_name: "Provence").as_user { @user2 }.with { [@user_name_change_request2, @user_name_change_request1] }
+        should respond_to_search(old_name: "Provence").as_user { @user2 }.with { @user_name_change_request1 }
+        should respond_to_search(new_name: "Provence").as_user { @user2 }.with { @user_name_change_request2 }
+
+        context "names with special characters" do
+          setup do
+            @user = create(:user, name: "てはいさ")
+            travel_to(8.days.ago) do
+              @user_name_change_request1 = create(:user_name_change_request, user: @user, original_name: "てはいさ", desired_name: "𛁴𛂣𛀈𛁂")
+            end
+            @user_name_change_request2 = create(:user_name_change_request, user: @user, original_name: "𛁴𛂣𛀈𛁂", desired_name: "FOO_BAR")
+          end
+
+          should respond_to_search(user_name: "foo_bar").as_user { @user2 }.with { [@user_name_change_request2, @user_name_change_request1] }
+          should respond_to_search(new_name: "𛁴𛂣𛀈𛁂").as_user { @user2 }.with { @user_name_change_request1 }
+          should respond_to_search(new_name: "foo bar").as_user { @user2 }.with { @user_name_change_request2 }
+        end
       end
     end
   end

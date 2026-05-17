@@ -5,7 +5,7 @@ Rails.application.config.good_job.smaller_number_is_higher_priority = true
 
 # Called when a background job raises an unhandled exception. Only called for background jobs run with `perform_later`,
 # not foreground jobs run with `perform_now`.
-GoodJob.on_thread_error = ->(exception) do
+GoodJob.on_thread_error = lambda do |exception|
   DanbooruLogger.log(exception)
 end
 

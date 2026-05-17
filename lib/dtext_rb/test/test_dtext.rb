@@ -1392,11 +1392,11 @@ class DTextTest < Minitest::Test
     assert_parse('<p>one</p><div class="spoiler"><p>two</p></div><div class="spoiler"><p>three</p></div>', "one\n \n[spoiler]two[/spoiler]\n \n[spoiler]three[/spoiler]")
   end
 
-  def test_complex_links_1
+  def test_complex_links1
     assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/~1\">2 3</a> | <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/~4\">5 6</a></p>", "[[1|2 3]] | [[4|5 6]]")
   end
 
-  def test_complex_links_2
+  def test_complex_links2
     assert_parse("<p>Tags <strong>(<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/howto%3Atag\">Tagging Guidelines</a> | <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/howto%3Atag_checklist\">Tag Checklist</a> | <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/tag_groups\">Tag Groups</a>)</strong></p>", "Tags [b]([[howto:tag|Tagging Guidelines]] | [[howto:tag_checklist|Tag Checklist]] | [[Tag Groups]])[/b]")
   end
 
@@ -1973,7 +1973,7 @@ class DTextTest < Minitest::Test
       "Ten Desires", "Touhou (PC-98)", "Touhou Bougetsushou", "Touhou Gouyoku Ibun", "Touhou Hisoutensoku", "Touhou Sangetsusei",
       "Trojan Green Asteroid", "Turbo Byakuren", "Unconnected Marketeers", "Undefined Fantastic Object", "Urban Legend in Limbo",
       "Violet Detector", "Wild and Horned Hermit", "Wily Beast and Weakest Creature", "Yousei Daisensou", "ZUN (artist)", "danmaku",
-      "gameplay mechanics", "grimoire_of_marisa", "grimoire_of_usami", "lotus eaters", "parody"
+      "gameplay mechanics", "grimoire_of_marisa", "grimoire_of_usami", "lotus eaters", "parody",
     ]
 
     assert_wiki_pages(touhou_tags, File.read("test/files/touhou-wiki.txt"))

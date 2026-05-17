@@ -6,6 +6,7 @@ class MediaAssetPreviewComponent < ApplicationComponent
   DEFAULT_SIZE = 180
 
   attr_reader :media_asset, :size, :link_target, :classes, :inner_classes, :html, :save_data
+
   delegate :duration_to_hhmmss, :sound_icon, to: :helpers
 
   renders_one :header

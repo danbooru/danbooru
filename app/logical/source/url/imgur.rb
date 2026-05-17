@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Imgur < Source::URL
+  site "Imgur", url: "https://imgur.com", domains: %w[imgur.com imgur.io]
+
   attr_reader :image_id, :album_id, :image, :username, :slug
 
   def self.match?(url)

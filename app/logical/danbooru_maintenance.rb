@@ -10,7 +10,7 @@ module DanbooruMaintenance
     queue PruneUploadsJob
     queue PruneJobsJob
     queue PruneBansJob
-    #queue AmcheckDatabaseJob
+    # queue AmcheckDatabaseJob
   end
 
   def daily

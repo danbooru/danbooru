@@ -14,6 +14,10 @@ export function delay(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
+export function round(value, precision) {
+  return Math.round(value / precision) * precision;
+}
+
 Utility.meta = function(key) {
   return $("meta[name=" + key + "]").attr("content");
 }
@@ -185,6 +189,8 @@ export function uploadError(upload) {
   // The upload failed with a validation error (normally an invalid URL or too many queued assets)
   } else if (upload.errors) {
     return errorFromResponse(upload);
+  } else {
+    return null;
   }
 }
 

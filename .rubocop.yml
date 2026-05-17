@@ -1,13 +1,25 @@
-# some of these settings are overridden in also test/.rubocop.yml
-
-require:
+# https://docs.rubocop.org/rubocop/latest/configuration.html
+# https://docs.rubocop.org/rubocop-factory_bot/latest/cops_factorybot.html
+#
+# Ruby: https://rubystyle.guide/
+# Rails: https://rails.rubystyle.guide/
+# Airbnb: https://github.com/airbnb/ruby
+# Gitlab: https://docs.gitlab.com/development/backend/ruby_style_guide/
+# Shopify: https://ruby-style-guide.shopify.dev/
+plugins:
   - rubocop-rails
+  - rubocop-factory_bot
 
 AllCops:
   NewCops: enable
+  ActiveSupportExtensionsEnabled: true
+  StringLiteralsFrozenByDefault: true
+  SuggestExtensions: false
   Exclude:
-    - "bin/*"
     - "node_modules/**/*"
+    - "public/**/*"
+    - "script/**/*"
+    - "tmp/**/*"
 
 Bundler/OrderedGems:
   Enabled: false
@@ -36,49 +48,60 @@ Layout/LineLength:
 Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
 
-Layout/SpaceInsideBlockBraces:
-  Enabled: false
-
 Layout/SpaceInsideHashLiteralBraces:
-  Enabled: false
+  EnforcedStyle: compact
+
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "**/test/**/*"
 
 Lint/DuplicateBranch:
   Enabled: false
+
+Lint/SymbolConversion:
+  EnforcedStyle: consistent
+
+Lint/UselessAssignment:
+  Exclude:
+    - "**/test/**/*"
 
 Metrics/AbcSize:
   Enabled: false
 
 Metrics/BlockLength:
-  Max: 50
-  AllowedMethods:
-    - concerning
-    - context
-    - should
+  Max: 400
+  Exclude:
+    - "**/test/**/*"
 
 Metrics/BlockNesting:
   CountBlocks: false
   Max: 4
 
 Metrics/ClassLength:
-  Max: 500
+  Max: 750
+  Exclude:
+    - "**/test/**/*"
 
 Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/MethodLength:
-  Max: 100
+  Max: 250
 
 Metrics/ModuleLength:
-  Max: 500
+  Max: 400
 
 Metrics/ParameterLists:
   Max: 6
 
 Metrics/PerceivedComplexity:
-  Max: 20
+  Max: 100
 
 Lint/InheritException:
   EnforcedStyle: standard_error
+
+Naming/BlockForwarding:
+  Enabled: false
 
 Naming/HeredocDelimiterNaming:
   Enabled: false
@@ -86,7 +109,7 @@ Naming/HeredocDelimiterNaming:
 Naming/MethodParameterName:
   Enabled: false
 
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: false
 
 Rails/Blank:
@@ -150,9 +173,6 @@ Style/FrozenStringLiteralComment:
 Style/GuardClause:
   MinBodyLength: 20
 
-Style/HashSyntax:
-  Enabled: false
-
 Style/IfUnlessModifier:
   Enabled: false
 
@@ -161,6 +181,10 @@ Style/MutableConstant:
 
 Style/NegatedIf:
   Enabled: false
+
+Style/NumericLiterals:
+  AllowedPatterns:
+  - \d{4}(_\d{4})*
 
 Style/NumericPredicate:
   Enabled: false
@@ -183,9 +207,6 @@ Style/PerlBackrefs:
 Style/RedundantAssignment:
   Enabled: false
 
-Style/RedundantReturn:
-  Enabled: false
-
 Style/RegexpLiteral:
   EnforcedStyle: mixed
   AllowInnerSlashes: false
@@ -200,7 +221,7 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
-  Enabled: false
+  EnforcedStyle: double_quotes
 
 Style/SymbolArray:
   MinSize: 10
@@ -213,13 +234,13 @@ Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
 
 Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: consistent_comma
+  EnforcedStyleForMultiline: diff_comma
 
 Style/TrailingCommaInArrayLiteral:
-  EnforcedStyleForMultiline: consistent_comma
+  EnforcedStyleForMultiline: diff_comma
 
 Style/TrailingCommaInHashLiteral:
-  EnforcedStyleForMultiline: consistent_comma
+  EnforcedStyleForMultiline: diff_comma
 
 Style/WordArray:
   MinSize: 10

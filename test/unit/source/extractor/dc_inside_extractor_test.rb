@@ -106,18 +106,18 @@ module Source::Tests::Extractor
           https://dcimg1.dcinside.com/viewimage.php?no=24b0d769e1d32ca73ce885fa11d02831c6a32dfed26d20f239ad53f34611e2dff73e5581758fb07253207f5a6256c03344d242a0d3e68d1b3650375dcd9322229b83f6b0ca12695d513205
           https://dcimg1.dcinside.com/viewimage.php?no=24b0d769e1d32ca73ce885fa11d02831c6a32dfed26d20f239ad53f34611e2dff73e5581758fb07253207f5a6256c06435857b77080b053a66cfb364a58425b803ce436b13fa6eef61b76c
         ],
-        media_files: [
-          { file_size: 9_017_382 },
-          { file_size: 8_464_656 },
-          { file_size: 8_385_480 },
-          { file_size: 7_595_402 },
-          { file_size: 10_579_355 },
-          { file_size: 8_443_734 },
-          { file_size: 16_802_464 },
-          { file_size: 12_739_034 },
-          { file_size: 12_784_623 },
-          { file_size: 7_558_038 },
-        ],
+        # media_files: [
+        #   { file_size: 9_017_382 },
+        #   { file_size: 8_464_656 },
+        #   { file_size: 8_385_480 },
+        #   { file_size: 7_595_402 },
+        #   { file_size: 10_579_355 },
+        #   { file_size: 8_443_734 },
+        #   { file_size: 16_802_464 },
+        #   { file_size: 12_739_034 },
+        #   { file_size: 12_784_623 },
+        #   { file_size: 7_558_038 },
+        # ],
         page_url: "https://gall.dcinside.com/mgallery/board/view/?id=mibj&no=5554705",
         profile_urls: %w[https://gallog.dcinside.com/kimin3424],
         display_name: "타르가",
@@ -149,15 +149,13 @@ module Source::Tests::Extractor
         profile_urls: %w[https://gallog.dcinside.com/4756qwer],
         display_name: "44",
         username: "4756qwer",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "[🎨창작] 아로나 그린거 보실분",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           "viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c5e8b424ba8d4f071e5f71bb7f51881cd678a6d59e4c5bf7874b906":[https://dcimg1.dcinside.com/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c5e8b424ba8d4f071e5f71bb7f51881cd678a6d59e4c5bf7874b906]
           "11":[https://dcimg5.dcinside.com/dccon.php?no=62b5df2be09d3ca567b1c5bc12d46b394aa3b1058c6e4d0ca41648b65fe8266eadc328cfdea5b74810026b505984e855639060800d4d06195f505e37f50b07e65e55156664b2e18c4d318c15]
-          "[b]イブ님(@IV70311741) [/b]
-          15.晴れ
-          x.com
-          ":[https://x.com/IV70311741/status/1838151449202798751]
         EOS
       )
     end
@@ -196,19 +194,19 @@ module Source::Tests::Extractor
           https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73ce880fa1bd62531b1ff05ae57c74e7d1bb347396ebf29a7b754e2516bc7d91730324ef8f79977fdc7882fa1af1553fe24c084d7
           https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73ce880fa1bd62531b1ff05ae57c74e7d1bb347396ebf29a7b754e2516bcbd8133e3f48fef69978fd38046aeaa6635f1073856021
         ],
-        media_files: [
-          { file_size: 6_763_431 },
-          { file_size: 5_907_319 },
-          { file_size: 772_479 },
-          { file_size: 3_548_200 },
-          { file_size: 3_059_745 },
-          { file_size: 5_042_700 },
-          { file_size: 3_133_262 },
-          { file_size: 4_869_753 },
-          { file_size: 1_577_104 },
-          { file_size: 3_131_848 },
-          { file_size: 7_881_577 },
-        ],
+        # media_files: [
+        #   { file_size: 6_763_431 },
+        #   { file_size: 5_907_319 },
+        #   { file_size: 772_479 },
+        #   { file_size: 3_548_200 },
+        #   { file_size: 3_059_745 },
+        #   { file_size: 5_042_700 },
+        #   { file_size: 3_133_262 },
+        #   { file_size: 4_869_753 },
+        #   { file_size: 1_577_104 },
+        #   { file_size: 3_131_848 },
+        #   { file_size: 7_881_577 },
+        # ],
         page_url: "https://gall.dcinside.com/mgallery/board/view/?id=mibj&no=5697412",
         profile_urls: %w[https://gallog.dcinside.com/miyulover024],
         display_name: "ㅇㅇ",

@@ -28,7 +28,7 @@ class ForumPostComponent < ApplicationComponent
   end
 
   def render?
-    policy(forum_post).show_deleted?
+    !forum_post.is_deleted? || policy(forum_post).show_deleted?
   end
 
   def reported?

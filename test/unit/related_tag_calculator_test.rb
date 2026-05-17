@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class RelatedTagCalculatorTest < ActiveSupport::TestCase
   def frequent_tags_for_search(tag_search, user = CurrentUser.user, **options)

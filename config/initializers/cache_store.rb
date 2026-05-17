@@ -13,8 +13,8 @@ Rails.application.configure do
         reconnect_attempts: 0, # default: 0
         error_handler: lambda { |method:, returning:, exception:|
           DanbooruLogger.log(exception, method: method, returning: returning)
-        }
-      }
+        },
+      },
     ]
   end
 

@@ -30,7 +30,7 @@ class NewsUpdatesController < ApplicationController
   def create
     @news_update = authorize NewsUpdate.new(creator: CurrentUser.user, **permitted_attributes(NewsUpdate))
     @news_update.save
-    respond_with(@news_update, :location => news_updates_path)
+    respond_with(@news_update, location: news_updates_path)
   end
 
   def update

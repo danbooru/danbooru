@@ -6,7 +6,9 @@ class Note < ApplicationRecord
   attr_accessor :html_id
 
   belongs_to :post
-  has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
+  has_many :versions, -> { order("note_versions.id ASC") }, class_name: "NoteVersion", dependent: :destroy
+  normalizes :body, with: ->(body) { body.to_s.unicode_normalize(:nfc).normalize_whitespace(eol: "\r\n").strip }
+
   validates :x, presence: true
   validates :y, presence: true
   validates :width, presence: true
@@ -21,7 +23,7 @@ class Note < ApplicationRecord
 
   module SearchMethods
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version, :post], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at is_active x y width height body version post], current_user: current_user)
 
       q.apply_default_order(params)
     end
@@ -64,7 +66,7 @@ class Note < ApplicationRecord
     if merge_version?(updater.id)
       merge_version
     else
-      Note.where(:id => id).update_all("version = coalesce(version, 0) + 1")
+      Note.where(id: id).update_all("version = coalesce(version, 0) + 1")
       reload
       create_new_version(updater.id)
     end
@@ -76,15 +78,15 @@ class Note < ApplicationRecord
 
   def create_new_version(updater_id)
     versions.create(
-      :updater_id => updater_id,
-      :post_id => post_id,
-      :x => x,
-      :y => y,
-      :width => width,
-      :height => height,
-      :is_active => is_active,
-      :body => body,
-      :version => version
+      updater_id: updater_id,
+      post_id: post_id,
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      is_active: is_active,
+      body: body,
+      version: version,
     )
   end
 

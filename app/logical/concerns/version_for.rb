@@ -20,8 +20,8 @@ module VersionFor
   class_methods do
     # Declare a class as the version model belonging to a `versionable` model.
     def version_for(versioned_model_name)
-      #raise "#{name} must have a `previous_version_id` attribute" if !has_attribute?(:previous_version_id)
-      #raise "#{name} must have a `version` attribute" if !has_attribute?(:version)
+      # raise "#{name} must have a `previous_version_id` attribute" if !has_attribute?(:previous_version_id)
+      # raise "#{name} must have a `version` attribute" if !has_attribute?(:version)
 
       @versioned_model_name = versioned_model_name                      # "tag"
       @versioned_model_id_column = "#{versioned_model_name}_id"         # "tag_id"
@@ -87,7 +87,7 @@ module VersionFor
   #
   # The hash looks like `{ attr => [old_value, new_value] }`.
   def diff(version = previous_version)
-    versioned_columns.map { |attr| [attr, [version&.send(attr), send(attr)]] }.to_h
+    versioned_columns.index_with { |attr| [version&.send(attr), send(attr)] }
   end
 
   # Revert the model back to this version.

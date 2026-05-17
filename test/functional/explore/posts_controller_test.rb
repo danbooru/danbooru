@@ -13,10 +13,10 @@ module Explore
           assert_response :success
         end
 
-         should "work with a blank date" do
+        should "work with a blank date" do
           get popular_explore_posts_path(date: "")
           assert_response :success
-         end
+        end
       end
 
       context "#viewed" do

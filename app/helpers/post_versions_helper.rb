@@ -44,7 +44,7 @@ module PostVersionsHelper
     prefix = ((field == :parent_id) ? "parent" : field.to_s)
     search = "#{prefix}:#{value}"
     display = ((field == :rating) ? post_version.pretty_rating : value)
-    %{<b>#{field.to_s.titleize}:</b> #{link_to(display, posts_path(:tags => search))}}.html_safe
+    %{<b>#{field.to_s.titleize}:</b> #{link_to(display, posts_path(tags: search))}}.html_safe
   end
 
   def post_version_value(value)

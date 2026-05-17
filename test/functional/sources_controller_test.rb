@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SourcesControllerTest < ActionDispatch::IntegrationTest
   context "The sources controller" do

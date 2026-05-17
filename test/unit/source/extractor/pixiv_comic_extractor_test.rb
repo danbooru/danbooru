@@ -6,7 +6,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://public-img-comic.pximg.net/images/magazine_cover/e772MnFuZZ5oQsadLQ2b/317.jpg?20240120120001",
         image_urls: %w[https://public-img-comic.pximg.net/images/magazine_cover/e772MnFuZZ5oQsadLQ2b/317.jpg],
-        media_files: [{ file_size: 153_724 }],
+        media_files: [{ file_size: 165_201 }],
         page_url: "https://comic.pixiv.net/magazines/317",
         profile_urls: [],
         display_name: nil,
@@ -61,13 +61,13 @@ module Source::Tests::Extractor
           ["日記", "https://comic.pixiv.net/tags/日記"],
         ],
         dtext_artist_commentary_title: "今日もとなりへ猫詣で!",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。"にゃんにゃんコミックス、発売中!!":[https://comic.pixiv.net/store/products/1236533]
-        EOS
+        dtext_artist_commentary_desc: "片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。",
       )
     end
 
     context "A novel work cover sample image" do
+      setup { skip "Dead site?" }
+
       strategy_should_work(
         "https://img-novel.pximg.net/c!/f=webp:auto,w=384,q=75/img-novel/work_main/BJruKIb2nWvhTadwsL68/3877.jpg?20240430174032",
         image_urls: %w[https://img-novel.pximg.net/img-novel/work_main/BJruKIb2nWvhTadwsL68/3877.jpg?20240430174032],
@@ -91,6 +91,8 @@ module Source::Tests::Extractor
     end
 
     context "A novel page image" do
+      setup { skip "Dead site?" }
+
       strategy_should_work(
         "https://img-novel.pximg.net/img-novel/page/11588/GRqnlQ258aa3CFxpRIys/1.jpg?20240426103009",
         image_urls: %w[https://img-novel.pximg.net/img-novel/page/11588/GRqnlQ258aa3CFxpRIys/1.jpg?20240426103009],
@@ -143,9 +145,7 @@ module Source::Tests::Extractor
           ["日記", "https://comic.pixiv.net/tags/日記"],
         ],
         dtext_artist_commentary_title: "今日もとなりへ猫詣で!",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。"にゃんにゃんコミックス、発売中!!":[https://comic.pixiv.net/store/products/1236533]
-        EOS
+        dtext_artist_commentary_desc: "片親の小学生×強面の猫が織りなす、心温まる平々凡々な飼育日記。",
       )
     end
 
@@ -225,6 +225,8 @@ module Source::Tests::Extractor
     end
 
     context "A novel work page" do
+      setup { skip "Dead site?" }
+
       strategy_should_work(
         "https://comic.pixiv.net/novel/works/3877",
         image_urls: %w[https://img-novel.pximg.net/img-novel/work_main/BJruKIb2nWvhTadwsL68/3877.jpg?20240430174032],
@@ -248,6 +250,8 @@ module Source::Tests::Extractor
     end
 
     context "A novel story page" do
+      setup { skip "Dead site?" }
+
       strategy_should_work(
         "https://comic.pixiv.net/novel/viewer/stories/11560",
         image_urls: %w[

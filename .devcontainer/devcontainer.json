@@ -40,10 +40,21 @@
         "Shopify.ruby-lsp",
         "KoichiSasada.vscode-rdbg",
         "eamodio.gitlens",
-        "ms-azuretools.vscode-docker",
         "EditorConfig.EditorConfig",
-        "ms-ossdata.vscode-pgsql"
+        "ms-ossdata.vscode-pgsql",
+        "github.vscode-github-actions",
+        "ms-azuretools.vscode-containers",
+        "GitHub.copilot-chat",
+        "redhat.vscode-yaml"
       ],
+      "mcp": {
+        "servers": {
+          "github": {
+            "type": "http",
+            "url": "https://api.githubcopilot.com/mcp/"
+          }
+        }
+      },
       "settings": {
         "pgsql.connections": [
           {

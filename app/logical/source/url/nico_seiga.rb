@@ -21,6 +21,13 @@
 
 module Source
   class URL::NicoSeiga < Source::URL
+    site "Nico Seiga" do
+      url "https://seiga.nicovideo.jp"
+      domains %w[nicovideo.jp nicoseiga.jp nicomanga.jp nimg.jp nico.ms]
+
+      credential :user_session, help: %{Your NicoSeiga `user_session` cookie.}
+    end
+
     attr_reader :illust_id, :manga_id, :image_id, :oekaki_id, :video_id, :user_id, :username, :profile_url
 
     def self.match?(url)
@@ -202,6 +209,10 @@ module Source
       end
       # elsif image_id.present?
       #   "https://seiga.nicovideo.jp/image/source/#{image_id}"
+    end
+
+    def secondary_url?
+      profile_url? && subdomain.in?(%w[www com dic])
     end
   end
 end

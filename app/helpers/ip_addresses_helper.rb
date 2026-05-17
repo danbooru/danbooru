@@ -9,7 +9,7 @@ module IpAddressesHelper
       height: height,
       frameborder: 0,
       allowfullscreen: true,
-      src: "https://www.bing.com/maps/embed?w=#{width}&h=#{height}&cp=#{lat}~#{long}&lvl=#{zoom}"
+      src: "https://www.bing.com/maps/embed?w=#{width}&h=#{height}&cp=#{lat}~#{long}&lvl=#{zoom}",
     )
   end
 end

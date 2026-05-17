@@ -54,7 +54,7 @@ class RelatedTagCalculator
     end
 
     def attributes
-      %i[tag cosine_similarity jaccard_similarity overlap_coefficient frequency].map { |name| [name, send(name)] }.to_h
+      %i[tag cosine_similarity jaccard_similarity overlap_coefficient frequency].index_with { |name| send(name) }
     end
   end
 

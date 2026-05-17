@@ -34,7 +34,7 @@ class SiteCredentialPolicy < ApplicationPolicy
   end
 
   def permitted_attributes_for_create
-    [:site, :is_enabled, { credential: {} }]
+    [:site, :is_enabled, { credential: {}}]
   end
 
   def permitted_attributes_for_update

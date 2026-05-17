@@ -185,6 +185,8 @@ module Source::Tests::Extractor
     end
 
     context "A redditmedia url" do
+      setup { skip "Dead domain?" }
+
       strategy_should_work(
         "https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4",
         image_urls: ["https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4"],
@@ -387,7 +389,7 @@ module Source::Tests::Extractor
 
           h1. More markdown
 
-          For further formatting help see: "Reddit's guide":[https://www.reddit.com/wiki/markdown] | "Reddit's commenting guide":[https://www.reddit.com/wiki/commenting] | "Raerth's guide":[https://www.reddit.com/r/raerth/comments/cw70q/reddit_comment_formatting/] | "Markdown primer":[https://www.reddit.com/r/reddit.com/comments/6ewgt/reddit_markdown_primer_or_how_do_you_do_all_that/c03nik6/] | "Preview your post":[https://redditpreview.com/]
+          For further formatting help see: "Reddit's guide":[https://www.reddit.com/wiki/markdown] | "Reddit's commenting guide":[https://www.reddit.com/wiki/commenting] | "Raerth's guide":[https://www.reddit.com/r/raerth/comments/cw70q/reddit_comment_formatting/] | "Markdown primer":[https://www.reddit.com/r/reddit.com/comments/6ewgt/reddit_markdown_primer_or_how_do_you_do_all_that/c03nik6/] | "Preview your post":[https://redditpreview.com]
 
           [b]Or to tag another Redditor or subreddit:[/b]
 

@@ -9,27 +9,26 @@ module Source
         if parsed_url.image_url?
           [parsed_url.full_image_url]
         else
-          image_urls_from_commentary
+          image_urls_from_commentary.map do |url|
+            url = image_urls_from_api.find { |u| u.filename == url.filename } || url
+            url.full_image_url || url.to_s
+          end
         end
       end
 
-      def image_urls_from_commentary
-        urls = artist_commentary_desc.to_s.parse_html.css("img:not(.arca-emoticon), video:not(.arca-emoticon)")&.to_a.filter_map do |element|
-          extract_image_url(element)
+      # The commentary contains all the videos and images, but not the original files, only samples.
+      # The API has to be used to find the originals.
+      memoize def image_urls_from_commentary
+        artist_commentary_desc.to_s.parse_html.css("img:not(.arca-emoticon), video:not(.arca-emoticon)").to_a.filter_map do |element|
+          url = element.attr("data-originalurl") || element.attr("src")
+          Source::URL.parse(URI.join("https:", url).to_s)
         end
       end
 
-      def extract_image_url(element)
-        url = element.attr("data-originalurl") || element.attr("src")
-        url = "https:#{url}" if url.starts_with?("//")
-        url = Source::URL.parse(url)
-
-        if url.full_image_url.present?
-          url.full_image_url
-        elsif url.candidate_full_image_urls.present? && element["data-orig"].present?
-          url.candidate_full_image_urls.find { |u| Source::URL.parse(u).file_ext == element["data-orig"] && http_exists?(u) } || url.to_s
-        else
-          url.candidate_full_image_urls.find { |u| http_exists?(u) } || url.to_s
+      # The API contains the original images, but not the videos.
+      memoize def image_urls_from_api
+        api_response[:images].to_a.filter_map do |url|
+          Source::URL.parse(URI.join("https:", url).to_s)
         end
       end
 
@@ -42,25 +41,25 @@ module Source
       end
 
       def page_url
-        channel = api_response.dig("boardSlug") || parsed_url.channel || parsed_referer&.channel || "breaking"
-        post_id = api_response.dig("id") || parsed_url.post_id || parsed_referer&.post_id
+        channel = api_response["boardSlug"] || parsed_url.channel || parsed_referer&.channel || "breaking"
+        post_id = api_response["id"] || parsed_url.post_id || parsed_referer&.post_id
         "https://arca.live/b/#{channel}/#{post_id}" if channel.present? && post_id.present?
       end
 
       def username
-        api_response.dig("nickname")
+        api_response["nickname"]
       end
 
       def artist_id
-        api_response.dig("publicId")
+        api_response["publicId"]
       end
 
       def artist_commentary_title
-        api_response.dig("title")
+        api_response["title"]
       end
 
       def artist_commentary_desc
-        api_response.dig("content")
+        api_response["content"]
       end
 
       def dtext_artist_commentary_desc
@@ -68,13 +67,12 @@ module Source
           case element.name
           in "a" if element["href"].present?
             element["href"] = element["href"].gsub(%r{\Ahttps?://unsafelink\.com/}i, "")
-          in "video"
-            # Placeholder text for unsupported browsers.
-            element.content = nil
+          in "video" unless element["class"]&.include?("arca-emoticon")
+            element.content = "[video]"
           else
             nil
           end
-        end.squeeze("\n\n").strip
+        end.gsub(/\n\n+/, "\n\n").strip
       end
 
       def post_id

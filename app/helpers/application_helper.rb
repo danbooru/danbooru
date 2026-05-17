@@ -12,7 +12,7 @@ module ApplicationHelper
   ]
 
   def listing_type(*fields, member_check: true, types: [:revert, :standard])
-    (fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?) ? types[0] : types[1])
+    ((fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?)) ? types[0] : types[1])
   end
 
   def diff_list_html(this_list, other_list, ul_class: ["diff-list"], li_class: [], show_unchanged: true)
@@ -38,7 +38,7 @@ module ApplicationHelper
     other = record.send(type)
 
     if other.blank?
-      return type == "previous" ? "New" : ""
+      return (type == "previous") ? "New" : ""
     end
 
     changed_fields = record.class.status_fields.select do |field, _status|
@@ -98,7 +98,7 @@ module ApplicationHelper
   def time_tag(content, time, **options)
     datetime = time.strftime("%Y-%m-%dT%H:%M%:z")
 
-    tag.time content || datetime, datetime: datetime, title: time.to_formatted_s, **options
+    tag.time content || datetime, datetime: datetime, title: time.to_fs, **options
   end
 
   def duration_to_hhmmss(seconds)
@@ -264,7 +264,7 @@ module ApplicationHelper
 
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
     search_form_for(url, classes: "quick-search-form one-line-form py-1.5 px-3 md:w-180px w-full") do |f|
-      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
+      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { "id": nil, "data-autocomplete": autocomplete }
       out += tag.input type: :hidden, name: :redirect, value: redirect
       out += capture { yield f } if block_given?
       out
@@ -304,7 +304,7 @@ module ApplicationHelper
 
   def format_errors(errors)
     messages = errors.full_messages
-    messages = messages.map {|e| "* #{e}"} if messages.count > 1
+    messages = messages.map { |e| "* #{e}" } if messages.count > 1
     messages.join("\n")
   end
 
@@ -331,15 +331,15 @@ module ApplicationHelper
       class: "c-#{controller_param} a-#{action_param} flex flex-col",
       spellcheck: "false",
       data: {
-        controller: controller_param,
-        action: action_param,
-        layout: layout,
+        "controller": controller_param,
+        "action": action_param,
+        "layout": layout,
         "current-user-ip-addr": request.remote_ip,
         "current-user-save-data": CurrentUser.save_data,
         **data_attributes_for(current_user, "current-user", USER_DATA_ATTRIBUTES),
         **data_attributes_for(cookies, "cookie", COOKIE_DATA_ATTRIBUTES),
         **extra_attributes,
-      }
+      },
     }
   end
 
@@ -354,9 +354,9 @@ module ApplicationHelper
   end
 
   def data_attributes_for(record, prefix = "data", attributes = record.html_data_attributes)
-    attributes.map do |attr|
+    attributes.to_h do |attr|
       if attr.is_a?(Array)
-        name = attr.map {|sym| sym.to_s.dasherize.delete("?")}.join('-')
+        name = attr.map { |sym| sym.to_s.dasherize.delete("?") }.join("-")
         value = record
         attr.each do |sym|
           value = value.send(sym)
@@ -383,7 +383,7 @@ module ApplicationHelper
       else
         [:"#{prefix}-#{name}", value]
       end
-    end.to_h
+    end
   end
 
   def page_title(title = nil, suffix: "| #{Danbooru.config.app_name}")

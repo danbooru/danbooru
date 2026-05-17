@@ -33,9 +33,14 @@ class Source::Extractor::Carrd < Source::Extractor
       if !self_and_ancestors.map(&:name).intersect?(%w[p img video text h1 h2 h3 h4 h5 h6]) && element.at("p, img, video, h1, h2, h3, h4, h5, h6").nil?
         element.content = nil
 
-      # Turn <a href="assets/images/gallery02/2973b8cd.jpg"><img src="..."></a> tags into "[image]":[https://...] links.
+      # <a href="/cdn-cgi/l/email-protection#701d191d191b1112191949464630171d11191c5e131f1d">email</a>
+      elsif element.name == "a" && element[:href].to_s.start_with?("/cdn-cgi/l/email-protection")
+        element[:href] = nil
+
+      # Turn <a href="assets/images/gallery02/2973b8cd.jpg"><img src="..."></a> tags into "[image]":[https://...] links
       elsif element.name == "a" && element.at("img, video").present?
-        element[:href] = extract_image_url(element)
+        img = element.at("img, video")
+        element[:href] = extract_image_url(element) || extract_image_url(img)
         element.inner_html = "[image]"
 
       # Turn <img src="assets/images/gallery02/2973b8cd.jpg" alt="Untitled"> tags into "[image]":[https://...] links.
@@ -56,7 +61,10 @@ class Source::Extractor::Carrd < Source::Extractor
   # Given an <img> or <video> element, extract the relative URL from the data-src or src attribute and turn it into an absolute URL.
   def extract_image_url(element)
     image_url = [element["data-src"], element["src"], element["href"]].compact.find { |src| src.starts_with?("assets") }
-    Source::URL.parse(URI.join(profile_url, image_url).to_s).without(:query).to_s
+    return nil unless image_url.present?
+
+    image_url = Source::URL.parse(URI.join(profile_url, image_url).to_s)&.without(:query)
+    image_url.try(:full_image_url)&.to_s || image_url.to_s
   end
 
   def page_id

@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require_relative "../config/environment"
+
+# Like `ls` or `exiftool`, but for listing properties of media files. See app/logical/media_file/cli.rb for the implementation.
+#
+# Usage: `bin/media-ls [options] [FILE|DIR ...]`
+exit MediaFile::CLI.run!(*ARGV)

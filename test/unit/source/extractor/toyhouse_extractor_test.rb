@@ -2,6 +2,10 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class ToyhouseExtractorTest < ActiveSupport::ExtractorTestCase
+    setup do
+      skip "Toyhou.se extractor is broken (requires curl-impersonate)"
+    end
+
     context "A thumbnail image URL" do
       strategy_should_work(
         "https://f2.toyhou.se/file/f2-toyhou-se/thumbnails/73744030_WfK.png",

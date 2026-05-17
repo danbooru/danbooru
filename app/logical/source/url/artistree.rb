@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Artistree < Source::URL
+  site "Artistree", url: "https://artistree.io", domains: %w[artistree.io cloudfront.net]
+
   RESERVED_USERNAMES = %w[artist-guide blog cookie-policy contact faq mission press privacy-policy search static team terms-and-conditions]
 
   attr_reader :username, :commission_id

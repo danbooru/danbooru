@@ -4,17 +4,6 @@ class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
   layout "sidebar"
 
-  def new
-    @wiki_page = authorize WikiPage.new(permitted_attributes(WikiPage))
-    respond_with(@wiki_page)
-  end
-
-  def edit
-    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
-    authorize @wiki_page
-    respond_with(@wiki_page)
-  end
-
   def index
     if params[:title].present?
       authorize WikiPage
@@ -40,6 +29,17 @@ class WikiPagesController < ApplicationController
     else
       respond_with(@wiki_page)
     end
+  end
+
+  def new
+    @wiki_page = authorize WikiPage.new(permitted_attributes(WikiPage))
+    respond_with(@wiki_page)
+  end
+
+  def edit
+    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
+    authorize @wiki_page
+    respond_with(@wiki_page)
   end
 
   def create

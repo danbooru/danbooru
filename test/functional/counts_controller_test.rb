@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class CountsControllerTest < ActionDispatch::IntegrationTest
   context "The counts commentary controller" do

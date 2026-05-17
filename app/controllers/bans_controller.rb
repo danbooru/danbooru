@@ -3,16 +3,6 @@
 class BansController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  def new
-    @ban = authorize Ban.new(permitted_attributes(Ban))
-    respond_with(@ban)
-  end
-
-  def edit
-    @ban = authorize Ban.find(params[:id])
-    respond_with(@ban)
-  end
-
   def index
     @bans = authorize Ban.paginated_search(params, count_pages: true)
     @bans = @bans.includes(:user, :banner) if request.format.html?
@@ -25,6 +15,16 @@ class BansController < ApplicationController
     respond_with(@ban) do |format|
       format.html { redirect_to bans_path(search: { id: @ban.id }) }
     end
+  end
+
+  def new
+    @ban = authorize Ban.new(permitted_attributes(Ban))
+    respond_with(@ban)
+  end
+
+  def edit
+    @ban = authorize Ban.find(params[:id])
+    respond_with(@ban)
   end
 
   def create

@@ -4,25 +4,55 @@ module Source::Tests::Extractor
   class HentaiFoundryExtractorTest < ActiveSupport::ExtractorTestCase
     context "A hentai-foundry post" do
       strategy_should_work(
-        "https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda",
-        image_urls: ["https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png"],
-        username: "Afrobull",
-        artist_commentary_title: "kuroeda",
-        profile_url: "https://www.hentai-foundry.com/user/Afrobull",
-        media_files: [{ file_size: 1_349_887 }],
-        tags: [["elf", "https://www.hentai-foundry.com/pictures/tagged/elf"]],
+        "https://www.hentai-foundry.com/pictures/user/TonyRa/1086642/Mercy",
+        image_urls: %w[https://pictures.hentai-foundry.com/t/TonyRa/1086642/TonyRa-1086642-Mercy.jpg],
+        media_files: [{ file_size: 451_297 }],
+        page_url: "https://www.hentai-foundry.com/pictures/user/TonyRa/1086642",
+        profile_urls: %w[https://www.hentai-foundry.com/user/TonyRa],
+        display_name: nil,
+        username: "TonyRa",
+        published_at: nil,
+        updated_at: nil,
+        tags: [
+          ["mercy", "https://www.hentai-foundry.com/pictures/tagged/mercy"],
+          ["mercy_overwatch", "https://www.hentai-foundry.com/pictures/tagged/mercy_overwatch"],
+          ["overwatch", "https://www.hentai-foundry.com/pictures/tagged/overwatch"],
+          ["overwatch_mercy", "https://www.hentai-foundry.com/pictures/tagged/overwatch_mercy"],
+          ["pinups", "https://www.hentai-foundry.com/pictures/tagged/pinups"],
+        ],
+        dtext_artist_commentary_title: "Mercy",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Thank you for consider supporting me, more hot content
+          "PATREON":[http://patreon.com/tonyra_art]
+          "X ( Twitter )":[https://twitter.com/tonyra_art]
+        EOS
       )
     end
 
     context "A hentai-foundry picture" do
       strategy_should_work(
-        "https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda",
-        image_urls: ["https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png"],
-        username: "Afrobull",
-        artist_commentary_title: "kuroeda",
-        profile_url: "https://www.hentai-foundry.com/user/Afrobull",
-        media_files: [{ file_size: 1_349_887 }],
-        tags: [["elf", "https://www.hentai-foundry.com/pictures/tagged/elf"]],
+        "https://pictures.hentai-foundry.com/t/TonyRa/1086642/TonyRa-1086642-Mercy.jpg",
+        image_urls: %w[https://pictures.hentai-foundry.com/t/TonyRa/1086642/TonyRa-1086642-Mercy.jpg],
+        media_files: [{ file_size: 451_297 }],
+        page_url: "https://www.hentai-foundry.com/pictures/user/TonyRa/1086642",
+        profile_urls: %w[https://www.hentai-foundry.com/user/TonyRa],
+        display_name: nil,
+        username: "TonyRa",
+        published_at: nil,
+        updated_at: nil,
+        tags: [
+          ["mercy", "https://www.hentai-foundry.com/pictures/tagged/mercy"],
+          ["mercy_overwatch", "https://www.hentai-foundry.com/pictures/tagged/mercy_overwatch"],
+          ["overwatch", "https://www.hentai-foundry.com/pictures/tagged/overwatch"],
+          ["overwatch_mercy", "https://www.hentai-foundry.com/pictures/tagged/overwatch_mercy"],
+          ["pinups", "https://www.hentai-foundry.com/pictures/tagged/pinups"],
+        ],
+        dtext_artist_commentary_title: "Mercy",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Thank you for consider supporting me, more hot content
+          "PATREON":[http://patreon.com/tonyra_art]
+          "X ( Twitter )":[https://twitter.com/tonyra_art]
+        EOS
       )
     end
 
@@ -87,7 +117,7 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: <<~EOS.chomp,
           It's a 4th piece in a set of 6
           Previous ones being - This is a sequel to my drawings "[b]&quot;Butts&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/butts], "[b]&quot;Bubbs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/bubbs] and "[b]&quot;Diccs&quot;[/b]":[https://www.newgrounds.com/art/view/queencomplex/diccs]
-          "[b]QUEENCOMPLEX.NET[/b]":[https://queencomplex.net/]
+          "[b]QUEENCOMPLEX.NET[/b]":[https://queencomplex.net]
           The place to see my newest drawings
           and the place to support my work.
           "[b]@Queen_Complexxx[/b]":[https://twitter.com/Queen_Complexxx] - My Twitter

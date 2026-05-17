@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Toyhouse < Source::URL
+  site "Toyhouse", url: "https://toyhou.se"
+
   attr_reader :image_id, :image_hash, :character_id, :character_name, :gallery_id, :gallery_name, :username
 
   def self.match?(url)

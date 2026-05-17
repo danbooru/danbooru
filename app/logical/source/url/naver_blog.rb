@@ -4,6 +4,8 @@
 # @see https://blog.naver.com
 # @see https://raw.githubusercontent.com/qsniyg/maxurl/master/src/userscript.ts#:~:text=pstatic.net
 class Source::URL::NaverBlog < Source::URL
+  site "Naver Blog", url: "https://blog.naver.com", domains: %w[naver.com naver.net pstatic.net blog.me]
+
   RESERVED_USERNAMES = %w[guestbook memo mylog prologue]
 
   attr_reader :username, :post_id, :full_image_url
@@ -74,11 +76,31 @@ class Source::URL::NaverBlog < Source::URL
     in username, "blog.me", *rest
       @username = username
 
+    # https://matome.naver.jp/odai/2149603591079310801
+    # https://form.naver.com/response/X1jXUEdRnVLV9cYHVUmW-w
+    # https://closers.nexon.game.naver.com/Ucc/WebToon/List?emSearchType=WriterName&strSearch=티아셰
+    # http://share.naver.com/web/shareView.nhn
+    # http://mypage.naver.co.jp/ys0079/
+
+    # https://comic.naver.com/bestChallenge/list.nhn?titleId=717924
+    # https://comic.naver.com/community/u/_rbv5l
+    # https://m.comic.naver.com/webtoon/list?titleId=817631
+
+    # https://chzzk.naver.com/6d2681641660b11e483f1d5a645f34ac
+
+    # https://grafolio.ogq.me/project/spotlight
+    # https://patron.naver.com/grafolio/p/intro/138694
+    # https://lcs.naver.com/m?u=https%3A%2F%2Fblog.naver.com%2Fprologue%2FPrologueList.naver%3FblogId%3Dyanusunya%26skinType%3D%26skinId%3D%26from%3Dmenu%26userSelectMenu%3Dtrue&e=https%3A%2F%2Fblog.naver.com%2FPostView.naver%3FblogId%3Dyanusunya%26logNo%3D222103816436%26redirect%3DDlog%26widgetTypeCall%3Dtrue%26topReferer%3Dhttps%253A%252F%252Fblog.naver.com%252FPostList.naver%253FblogId%253Dyanusunya%2526categoryNo%253D86%2526skinType%253D%2526skinId%253D%2526from%253Dmenu%2526userSelectMenu%253Dtrue%26trackingCode%3Dnaver_etc%26directAccess%3Dfalse&os=Win32&ln=en-US&sr=1920x1080&pr=1&bw=920&bh=910&c=24&j=N&k=Y&i=90000003_00000000000000338A1ABAB2&ct=&navigationStart=1714702048132&fetchStart=1714702048132&domainLookupStart=1714702048132&domainLookupEnd=1714702048132&connectStart=1714702048132&connectEnd=1714702048132&secureConnectionStart=1714702048132&requestStart=1714702048140&responseStart=1714702048501&responseEnd=1714702048509&domLoading=1714702048516&domInteractive=1714702048770&domContentLoadedEventStart=1714702048815&domContentLoadedEventEnd=1714702048819&domComplete=1714702049039&loadEventStart=1714702049039&loadEventEnd=1714702049046&first-contentful-paint=503&ngt=1&pid=a93998cdd155c0e7e70105510d209373&ts=1714702049050&EOU
+
+    # https://paperwaffle.com/bbs/content.php?co_id=profile&mb_id=naver_92f008d0
+
     # https://ssl.pstatic.net/static/blog/img_ani_blogid1.gif
     # http://sstatic.naver.net/people/194/201710101543498651.jpg?type=w1
     # http://sstatic.naver.net/people/portraitGroup/201709/20170929171408460-4330243.jpg?type=w1
     # https://s.pstatic.net/shopping.phinf/20180115_4/ce3dfbda-c44b-43aa-83d0-2ffb8fa3dd47.jpg
     # https://shopping-phinf.pstatic.net/20180115_4/ce3dfbda-c44b-43aa-83d0-2ffb8fa3dd47.jpg
+
+    # https://download.blog.naver.com/66f37acadb8b825e7395f3c5fc18671abcee10f2e4/MjAyMDA3MDZfMTg4/MDAxNTk0MDA2MjkzNTI5.tux9ktf-odR_xPVnwpBwSveI4Bmew4U9HoKXj0-Vycgg.omzS2hv2ZEegEkUaTZs1UH59xowhrbBUom6XTgP8TSAg.PNG/%C0%A5%C5%F7%C5%B8%C0%CC%C6%B2_%BD%C3%C1%F0410.png
     else
       nil
     end

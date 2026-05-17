@@ -14,7 +14,7 @@ module PoolVersionsHelper
       else
         name_diff = diff_name_html(other.name, pool_version.name)
       end
-      %(<br><br><b>Rename:</b><br>&ensp;#{name_diff}</p>).html_safe
+      %{<br><br><b>Rename:</b><br>&ensp;#{name_diff}</p>}.html_safe
     else
       ""
     end

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class IpGeolocationsControllerTest < ActionDispatch::IntegrationTest
   context "The ip geolocations controller" do

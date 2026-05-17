@@ -6,6 +6,10 @@
 # https://fantia.jp/profiles/tus_2n9n0fm05fizg
 
 class Source::URL::Fantia < Source::URL
+  site "Fantia", url: "https://fantia.jp" do
+    credential :session_id, help: %{Your Fantia `_session_id` cookie.}
+  end
+
   attr_reader :full_image_url, :candidate_full_image_urls, :download_url, :fanclub_id, :username, :post_id, :product_id
 
   def self.match?(url)
@@ -117,6 +121,10 @@ class Source::URL::Fantia < Source::URL
     elsif username.present?
       "https://fantia.jp/#{username}"
     end
+  end
+
+  def secondary_url?
+    profile_url? && fanclub_id.blank?
   end
 
   def work_id

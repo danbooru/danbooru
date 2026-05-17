@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class StatusControllerTest < ActionDispatch::IntegrationTest
   context "The status controller" do
@@ -13,17 +13,17 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
     end
 
     should "work for an xml response" do
-      get status_path(format: :json)
+      get status_path(format: :xml)
       assert_response :success
     end
 
     should "work for a header containing UTF-8 characters" do
-      get status_path, headers: { "User-Agent": "Portimão".force_encoding("ASCII-8BIT") }
+      get status_path, headers: { "User-Agent": "Portimão".dup.force_encoding("ASCII-8BIT") }
       assert_response :success
     end
 
     should "work for a header containing invalid UTF-8 characters" do
-      get status_path, headers: { "User-Agent": "Portim\xE3o".force_encoding("ASCII-8BIT") }
+      get status_path, headers: { "User-Agent": "Portim\xE3o".dup.force_encoding("ASCII-8BIT") }
       assert_response :success
     end
 

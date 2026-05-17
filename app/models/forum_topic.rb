@@ -4,8 +4,8 @@ class ForumTopic < ApplicationRecord
   alias_attribute :category, :category_id
 
   enum :category, {
-    General: 0,
-    Tags: 1,
+    "General": 0,
+    "Tags": 1,
     "Bugs & Features": 2,
   }, scopes: false, instance_methods: false, validate: true, default: "General"
 
@@ -35,7 +35,7 @@ class ForumTopic < ApplicationRecord
   before_update :create_mod_action
   after_update :update_posts_on_deletion_or_undeletion
   after_update :update_original_post
-  after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
+  after_save(if: ->(topic) { topic.is_locked? && topic.saved_change_to_is_locked? }) do
     ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock, subject: self, user: updater)
   end
 
@@ -118,7 +118,7 @@ class ForumTopic < ApplicationRecord
       if visit
         visit.update!(last_read_at: updated_at)
       else
-        ForumTopicVisit.create(:user_id => user.id, :forum_topic_id => id, :last_read_at => updated_at)
+        ForumTopicVisit.create(user_id: user.id, forum_topic_id: id, last_read_at: updated_at)
       end
 
       unread_topics = ForumTopic.visible(user).active.unread_by_user(user)
@@ -165,7 +165,7 @@ class ForumTopic < ApplicationRecord
   end
 
   def page_for(post_id)
-    (forum_posts.where("id < ?", post_id).count / Danbooru.config.posts_per_page.to_f).ceil
+    (forum_posts.where(id: ...post_id).count / Danbooru.config.posts_per_page.to_f).ceil
   end
 
   def last_page
@@ -180,7 +180,7 @@ class ForumTopic < ApplicationRecord
   end
 
   def update_original_post
-    original_post&.update_columns(:updater_id => updater.id, :updated_at => Time.now)
+    original_post&.update_columns(updater_id: updater.id, updated_at: Time.zone.now)
   end
 
   def pretty_title

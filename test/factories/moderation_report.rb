@@ -1,8 +1,8 @@
 FactoryBot.define do
-  factory(:moderation_report) do
+  factory :moderation_report do
     creator
-    reason {"xxx"}
+    reason { "xxx" }
     status { :pending }
-    model { build(:comment) }
+    model factory: :comment
   end
 end

@@ -8,7 +8,7 @@ class DiscordSlashCommand
       name: "name",
       description: "The name of the country to show",
       required: false,
-      type: ApplicationCommandOptionType::String
+      type: ApplicationCommandOptionType::String,
     }]
 
     def call

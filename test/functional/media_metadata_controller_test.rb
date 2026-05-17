@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class MediaMetadataControllerTest < ActionDispatch::IntegrationTest
   context "The media metadata controller" do

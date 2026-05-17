@@ -17,7 +17,7 @@ class Source::Extractor::Patreon < Source::Extractor
     # The list of media objects can contain duplicate files. This happens for old posts with inline images where the
     # first image was made the post's cover image. These files have unique URLs despite being MD5-identical, so we
     # filter them out by their name/size/dimensions. Ex: https://www.patreon.com/posts/sailormoonredraw-37219108.
-    unique_media = media.uniq { _1.values_at(*%w[file_name dimensions size_bytes mimetype]) }
+    unique_media = media.uniq { it.values_at(*%w[file_name dimensions size_bytes mimetype]) }
     unique_media.pluck("display").pluck("url").compact
   end
 
@@ -43,7 +43,7 @@ class Source::Extractor::Patreon < Source::Extractor
   end
 
   def tags
-    api_response["included"].to_a.select { _1["type"] == "post_tag" }.pluck("attributes").pluck("value").map do |tag|
+    api_response["included"].to_a.select { it["type"] == "post_tag" }.pluck("attributes").pluck("value").map do |tag|
       [tag, "#{profile_url}/posts?filters[tag]=#{Danbooru::URL.escape(tag)}"]
     end
   end
@@ -55,22 +55,22 @@ class Source::Extractor::Patreon < Source::Extractor
   def artist_commentary_desc
     if post["post_type"] == "poll"
       <<~EOS
-        #{post["content"]}
+        #{content_html}
 
         <h6>Poll: #{CGI.escapeHTML(poll["question_text"])}</h6>
 
         <ul>
-          #{poll_choices.pluck("text_content").map { |choice| "<li>#{CGI.escapeHTML(choice)}</li>" }.join("\n")}
+          #{poll_choices.pluck("text_content").map { |choice| "<li>#{CGI.escapeHTML(choice.to_s)}</li>" }.join("\n")}
         </ul>
       EOS
     else
-      post["content"]
+      content_html
     end
   end
 
   def dtext_artist_commentary_desc
     # Ignore commentary if it only contains inline images with no actual text.
-    return "" if post["content"].to_s.parse_html.text.blank?
+    return "" if content_html.to_s.parse_html.text.blank?
 
     DText.from_html(artist_commentary_desc, base_url: "https://www.patreon.com") do |element|
       if element.name == "img"
@@ -81,24 +81,95 @@ class Source::Extractor::Patreon < Source::Extractor
     end
   end
 
+  memoize def content_json
+    post[:content_json_string]&.parse_json || {}
+  end
+
+  memoize def content_html
+    rich_text_to_html(content_json)
+  end
+
+  def rich_text_to_html(node)
+    case node
+    in Array
+      node.map { |child| rich_text_to_html(child) }.join
+    in Hash
+      children_html = rich_text_to_html(node[:content])
+
+      html = case node[:type]
+      in "doc"
+        children_html
+      in "text"
+        CGI.escapeHTML(node[:text].to_s).gsub("\n", "<br>")
+      in "paragraph"
+        "<p>#{children_html}</p>"
+      in "hardBreak"
+        "<br>"
+      in "heading"
+        level = node.dig(:attrs, :level).to_i.clamp(1, 6)
+        "<h#{level}>#{children_html}</h#{level}>"
+      in "bulletList"
+        "<ul>#{children_html}</ul>"
+      in "orderedList"
+        "<ol>#{children_html}</ol>"
+      in "listItem"
+        "<li>#{children_html}</li>"
+      in "blockquote"
+        "<blockquote>#{children_html}</blockquote>"
+      in "image"
+        image_url = node.dig(:attrs, :src)
+        image_url.present? ? %{<img src="#{CGI.escapeHTML(image_url)}">} : ""
+      in "link"
+        href = node.dig(:attrs, :href)
+        href.present? ? %{<a href="#{CGI.escapeHTML(href)}">#{children_html}</a>} : children_html
+      else
+        children_html
+      end
+
+      node[:marks].to_a.reduce(html) do |body, mark|
+        mark_type = mark[:type]
+
+        case mark_type
+        in "bold"
+          "<strong>#{body}</strong>"
+        in "italic"
+          "<em>#{body}</em>"
+        in "underline"
+          "<u>#{body}</u>"
+        in "strike"
+          "<s>#{body}</s>"
+        in "code"
+          "<code>#{body}</code>"
+        in "link"
+          href = mark.dig(:attrs, :href)
+          href.present? ? %{<a href="#{CGI.escapeHTML(href)}">#{body}</a>} : body
+        else
+          body
+        end
+      end
+    else
+      CGI.escapeHTML(node.to_s)
+    end
+  end
+
   def post
     api_response.dig("data", "attributes") || {}
   end
 
   def user
-    api_response["included"].to_a.find { _1["type"] == "user" } || {}
+    api_response["included"].to_a.find { it["type"] == "user" } || {}
   end
 
   def media
-    api_response["included"].to_a.select { _1["type"] == "media" }.pluck("attributes")
+    api_response["included"].to_a.select { it["type"] == "media" }.pluck("attributes")
   end
 
   def poll
-    api_response["included"].to_a.find { _1["type"] == "poll" }&.dig("attributes") || {}
+    api_response["included"].to_a.find { it["type"] == "poll" }&.dig("attributes") || {}
   end
 
   def poll_choices
-    api_response["included"].to_a.select { _1["type"] == "poll_choice" }.pluck("attributes").sort_by { _1["position"] }
+    api_response["included"].to_a.select { it["type"] == "poll_choice" }.pluck("attributes").sort_by { it["position"] }
   end
 
   def post_id

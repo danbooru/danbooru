@@ -10,7 +10,8 @@ module Source
         elsif parsed_url.image_url?
           [parsed_url.to_s]
         else
-          [asset["animationUrl"] || asset["imageStorageUrl"]].compact
+          url = asset["animationUrl"] || asset["imageUrl"]
+          [Source::URL.parse(url).try(:full_image_url) || url].compact
         end
       end
 
@@ -43,24 +44,18 @@ module Source
       end
 
       memoize def creator
-        ref = asset.dig("creator", "__ref")
-        records[ref] || {}
+        asset.dig("collection", "owner") || {}
       end
 
       memoize def asset
-        records.values.find { |record| record["__typename"] == "AssetType" } || {}
-      end
+        script = page&.css("script")&.grep(/itemByIdentifier/)&.first&.text.to_s
+        json = script[/\.push\((\{.*\})\)\s*\z/m, 1]&.parse_json || {}
 
-      memoize def records
-        api_response.dig("props", "pageProps", "initialRecords") || {}
+        json[:rehydrate]&.values&.first&.dig(:data, :itemByIdentifier) || {}
       end
 
       memoize def page
         http.cache(1.minute).parsed_get(page_url)
-      end
-
-      memoize def api_response
-        page&.at("#__NEXT_DATA__")&.text&.parse_json || {}
       end
     end
   end

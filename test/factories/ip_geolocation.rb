@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:ip_geolocation) do
+  factory :ip_geolocation do
     ip_addr { Faker::Internet.public_ip_v4_address }
     network { Faker::Internet.public_ip_v4_address }
     asn { 42 }

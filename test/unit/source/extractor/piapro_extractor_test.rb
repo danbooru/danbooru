@@ -8,27 +8,24 @@ module Source::Tests::Extractor
 
     context "A sample image URL" do
       strategy_should_work(
-        "https://cdn.piapro.jp/thumb_i/w2/w22xmltnyzcsrqxu_20240303200945_0860_0600.png",
-        image_urls: [%r{https://dl.piapro.jp/image/w2/w22xmltnyzcsrqxu_20240303200945.png\?response-content-disposition=attachment%3B%20filename%2A%3DUTF-8%27%27%25E7%2597%259B%25E3%2581%2584%25E7%2597%259B%25E3%2581%2584%25E7%2597%259B%25E3%2581%2584_nibiirooo__.*.png&Expires=.*&Signature=.*&Key-Pair-Id=APKAIJPPZV4JCCSOERBA}],
-        media_files: [{ file_size: 2_627_543 }],
-        page_url: "https://piapro.jp/content/w22xmltnyzcsrqxu",
-        profile_url: "https://piapro.jp/nibiirooo_",
-        profile_urls: %w[https://piapro.jp/nibiirooo_],
-        display_name: "鈍色",
-        username: "nibiirooo_",
-        tag_name: "nibiirooo",
-        other_names: ["鈍色", "nibiirooo_"],
+        "https://cdn.piapro.jp/thumb_i/74/74w6x4s2s39aag5q_20240325172302_0860_0600.png",
+        image_urls: [%r{https://dl.piapro.jp/image/74/74w6x4s2s39aag5q_20240325172302.png\?response-content-disposition=attachment%3B%20filename%2A%3DUTF-8%27%27%25E6%25B6%2599_Akechannogohan_.*.png&Expires=.*&Signature=.*&Key-Pair-Id=APKAIJPPZV4JCCSOERBA}],
+        media_files: [{ file_size: 733_073 }],
+        page_url: "https://piapro.jp/content/74w6x4s2s39aag5q",
+        profile_url: "https://piapro.jp/Akechannogohan",
+        profile_urls: %w[https://piapro.jp/Akechannogohan],
+        display_name: "みんなのごはん",
+        username: "Akechannogohan",
+        published_at: nil,
+        updated_at: nil,
         tags: [
-          ["#ダーク", "https://piapro.jp/content_list/?view=image&tag=%23ダーク"],
-          ["#ダークイラスト", "https://piapro.jp/content_list/?view=image&tag=%23ダークイラスト"],
-          ["#デジタル", "https://piapro.jp/content_list/?view=image&tag=%23デジタル"],
-          ["#デジタルイラスト", "https://piapro.jp/content_list/?view=image&tag=%23デジタルイラスト"],
-          ["#暗闇", "https://piapro.jp/content_list/?view=image&tag=%23暗闇"],
-          ["#闇", "https://piapro.jp/content_list/?view=image&tag=%23闇"],
-          ["#キャラクター", "https://piapro.jp/content_list/?view=image&tag=%23キャラクター"],
+          ["#初音ミク", "https://piapro.jp/content_list/?view=image&tag=%23初音ミク"],
         ],
-        dtext_artist_commentary_title: "痛い痛い痛い",
-        dtext_artist_commentary_desc: "",
+        dtext_artist_commentary_title: "涙",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          泣いちゃった、みくさん
+          泣いてない差分あり(別投稿)
+        EOS
       )
     end
 

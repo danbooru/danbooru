@@ -117,9 +117,9 @@ class DText
     name = path[%r!/wiki_pages/(.*)\z!i, 1]
     name = CGI.unescape(name)
     name = WikiPage.normalize_title(name)
-    wiki = wiki_pages.find { _1.title == name }
-    tag = tags.find { _1.name == name }
-    artist = artists.find { _1.name == name }
+    wiki = wiki_pages.find { it.title == name }
+    tag = tags.find { it.name == name }
+    artist = artists.find { it.name == name }
 
     if tag.present?
       node["class"] += " tag-type-#{tag.category}"
@@ -172,10 +172,10 @@ class DText
     caption = node.inner_html.presence
 
     if type == "post"
-      asset = posts.find { _1.id == id }&.media_asset
+      asset = posts.find { it.id == id }&.media_asset
       href = Routes.post_path(id)
     else
-      asset = media_assets.find { _1.id == id }
+      asset = media_assets.find { it.id == id }
       href = Routes.media_asset_path(id)
     end
 
@@ -192,10 +192,9 @@ class DText
       variant = asset.variant(:"720x720")
       asset_html = %{<a class="inline-block" href="#{href}"><img src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}"></a>}
     elsif asset.is_ugoira?
-      asset_html = ApplicationController.new.view_context.render(UgoiraComponent.new(asset, default_quality: :sample))
+      asset_html = ApplicationController.new.view_context.render(VideoComponent.new(asset, default_quality: :sample))
     elsif asset.is_video?
-      variant = asset.variant(:original)
-      asset_html = %{<video src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}" autoplay controls muted loop>}
+      asset_html = ApplicationController.new.view_context.render(VideoComponent.new(asset, muted: true))
     end
 
     node.inner_html  = %{<div class="media-embed-image">#{asset_html}</div>}
@@ -209,11 +208,11 @@ class DText
 
     case type
     when "tag-alias"
-      request = tag_aliases.find { _1.id == id }
+      request = tag_aliases.find { it.id == id }
     when "tag-implication"
-      request = tag_implications.find { _1.id == id }
+      request = tag_implications.find { it.id == id }
     when "bulk-update-request"
-      request = bulk_update_requests.find { _1.id == id }
+      request = bulk_update_requests.find { it.id == id }
     end
 
     body = case request
@@ -557,7 +556,7 @@ class DText
   # @param options [Hash] The options to pass to DText.escape.
   # @return [String] the DText output.
   def self.from_plaintext(text, **options)
-    escape(text.to_s, **options).then { normalize_whitespace(_1) }
+    escape(text.to_s, **options).then { normalize_whitespace(it) }
   end
 
   # Normalize the whitespace in a piece of DText, and remove any unnecessary whitespace.
@@ -565,7 +564,7 @@ class DText
   # @param text [String] The DText input.
   # @return [String] The normalized DText output.
   def self.normalize_whitespace(text)
-    text.to_s.normalize_whitespace(eol: "\n").gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").squeeze(" ").strip
+    text.to_s.normalize_whitespace.gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").squeeze(" ").strip
   end
 
   # Convert HTML to DText.
@@ -608,7 +607,7 @@ class DText
     children.map do |element|
       case element.name
       in "text"
-        escape(element.content, allowed_shortlinks:).normalize_whitespace(eol: "\n").gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
+        escape(element.content, allowed_shortlinks:).normalize_whitespace.gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
       in "br" if element.ancestors.any? { |e| e.name.in?(%w[a h1 h2 h3 h4 h5 h6]) }
         " "
       in "br" if element.ancestors.any? { |e| e.name == "li" } && element.next.present?
@@ -632,7 +631,7 @@ class DText
       in "inline-spoiler" # fake tag added by source extractors
         content = html_to_dtext(element, **options, &block).strip
         "[spoiler]#{content}[/spoiler]" if content.present?
-      in "small" unless element.ancestors.any? { |e| e.name == "small" }
+      in "small" unless element.ancestors.any? { |e| e.name.in?(%w[a small]) }
         content = html_to_dtext(element, **options, &block)
         "[tn]#{content}[/tn]" if content.present?
       in "b" unless element.ancestors.any? { |e| e.name == "b" }
@@ -652,37 +651,43 @@ class DText
         "[code]#{content}[/code]" if content.present?
       in "li"
         content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
-        depth = element.ancestors.count { _1.name in "ul" | "ol" }.clamp(1..)
+        depth = element.ancestors.count { it.name in "ul" | "ol" }.clamp(1..)
         list = "*" * depth
         "#{list} #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")
         hn = element.name
         title = html_to_dtext(element, **options, &block).strip
         "\n\n#{hn}. #{title}\n\n" if title.present?
+      in "iframe"
+        src = element["src"]
+        "\n\n#{src}\n\n" if src.present?
       in "a"
         title = html_to_dtext(element, **options, inline: true, &block).squeeze(" ")
         url = element["href"].to_s
 
-        if title.blank?
-          ""
-        elsif !url.match?(%r{\A(https?://|mailto:|//|/)}i)
+        normalized_url = Danbooru::URL.normalize(url, base_url:) || url
+        normalized_title = Danbooru::URL.normalize(title, base_url:) || title
+
+        # <a href="https://example.com"> </a> -> " "
+        # <a href="javascript:alert(1)">text</a> -> "text"
+        if title.blank? || !normalized_url.match?(%r{\A(https?://|mailto:)}i)
           title
-        elsif url.starts_with?("mailto:") && url.delete_prefix("mailto:") == title
-          "<#{url}>"
-        elsif url.starts_with?("//") && title == url # protocol-relative url
-          "<https:#{url}>"
-        elsif url.starts_with?("//") && title != url # protocol-relative url
-          %{"#{title.gsub('"', "&quot;")}":[https:#{url}]}
-        elsif url.starts_with?("/") && base_url.present? && title == url
-          "<#{File.join(base_url, url)}>"
-        elsif url.starts_with?("/") && base_url.present? && title != url
-          %{"#{title.gsub('"', "&quot;")}":[#{File.join(base_url, url)}]}
-        elsif url.starts_with?("/")
+
+        # <a href="/relative">text</a> -> "text" (if base_url is not provided)
+        elsif normalized_url.starts_with?("/")
           title
-        elsif title == url
-          "<#{url}>"
+
+        # <a href="mailto:user@gmail.com">user@gmail.com> -> <mailto:user@gmail.com>
+        elsif normalized_url.starts_with?("mailto:") && normalized_url.delete_prefix("mailto:") == title
+          build_link(normalized_url)
+
+        # <a href="https://example.com">https://example.com</a> -> "<https://example.com>"
+        elsif normalized_title == normalized_url
+          build_link(normalized_url)
+
+        # <a href="https://example.com">example</a> -> '"example":[https://example.com]'
         else
-          %{"#{title.gsub('"', "&quot;")}":[#{url}]}
+          build_link(normalized_url, title: title)
         end
       in "img"
         alt_text = element["title"] || element["alt"] || ""
@@ -710,6 +715,22 @@ class DText
         html_to_dtext(element, **options, &block)
       end
     end.join
+  end
+
+  # Build a DText link. If the link text is the same as the URL, then format it as `<url>`, otherwise as `"title":[url]`.
+  #
+  # @param url [String] The URL.
+  # @param title [String] The link text.
+  # @return [String] The DText link.
+  def self.build_link(url, title: url)
+    if title == url
+      escaped_url = url.gsub("<", "%3C").gsub(">", "%3E")
+      "<#{escaped_url}>"
+    else
+      escaped_title = title.gsub('"', "&quot;")
+      escaped_url = url.gsub("[", "%5B").gsub("]", "%5D")
+      %{"#{escaped_title}":[#{escaped_url}]}
+    end
   end
 
   # Escape a piece of plain text so that special characters aren't interpreted as DText.

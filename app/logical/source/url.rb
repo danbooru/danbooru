@@ -8,6 +8,7 @@
 #
 # To add a new site, create a subclass of Source::URL and implement `#match?` to define
 # which URLs belong to the site, and `#parse` to parse and extract information from the URL.
+# Use `site` to define which site(s) are supported by the class.
 #
 # The following methods should be implemented by subclasses:
 #
@@ -16,6 +17,9 @@
 # * image_url?
 # * page_url
 # * profile_url
+# * source_site (if the class supports more than one site)
+# * extractor_class (if the class has multiple possible extractors)
+# * self.extractors (if the class has multiple possible extractors)
 #
 # Source::URL is a subclass of Danbooru::URL, so it inherits some common utility methods
 # from there.
@@ -29,101 +33,39 @@
 # @see Danbooru::URL
 module Source
   class URL < Danbooru::URL
-    SUBCLASSES = [
-      Source::URL::Pixiv,
-      Source::URL::Twitter,
-      Source::URL::ArtStation,
-      Source::URL::Booth,
-      Source::URL::DeviantArt,
-      Source::URL::Fanbox,
-      Source::URL::Fandom,
-      Source::URL::Fantia,
-      Source::URL::Fc2,
-      Source::URL::Foundation,
-      Source::URL::Gelbooru,
-      Source::URL::HentaiFoundry,
-      Source::URL::Instagram,
-      Source::URL::Lofter,
-      Source::URL::Mastodon,
-      Source::URL::Moebooru,
-      Source::URL::NicoSeiga,
-      Source::URL::Nijie,
-      Source::URL::Newgrounds,
-      Source::URL::PixivSketch,
-      Source::URL::Plurk,
-      Source::URL::Reddit,
-      Source::URL::Skeb,
-      Source::URL::Tinami,
-      Source::URL::Tumblr,
-      Source::URL::TwitPic,
-      Source::URL::Weibo,
-      Source::URL::Anifty,
-      Source::URL::Furaffinity,
-      Source::URL::Bilibili,
-      Source::URL::Rule34DotUs,
-      Source::URL::FourChan,
-      Source::URL::Picdig,
-      Source::URL::Enty,
-      Source::URL::ArcaLive,
-      Source::URL::Imgur,
-      Source::URL::Zerochan,
-      Source::URL::Poipiku,
-      Source::URL::AboutMe,
-      Source::URL::ArtStreet,
-      Source::URL::Gumroad,
-      Source::URL::Misskey,
-      Source::URL::Xfolio,
-      Source::URL::CiEn,
-      Source::URL::Inkbunny,
-      Source::URL::E621,
-      Source::URL::Bluesky,
-      Source::URL::Danbooru2,
-      Source::URL::Pinterest,
-      Source::URL::Foriio,
-      Source::URL::Itaku,
-      Source::URL::Postype,
-      Source::URL::Artistree,
-      Source::URL::Galleria,
-      Source::URL::Dotpict,
-      Source::URL::Discord,
-      Source::URL::Opensea,
-      Source::URL::Behance,
-      Source::URL::Cohost,
-      Source::URL::Piapro,
-      Source::URL::MyPortfolio,
-      Source::URL::Note,
-      Source::URL::PixivComic,
-      Source::URL::NaverBlog,
-      Source::URL::NaverCafe,
-      Source::URL::NaverPost,
-      Source::URL::Xiaohongshu,
-      Source::URL::Patreon,
-      Source::URL::Blogger,
-      Source::URL::Vk,
-      Source::URL::Google,
-      Source::URL::Youtube,
-      Source::URL::Bcy,
-      Source::URL::URLShortener,
-      Source::URL::Redgifs,
-      Source::URL::Carrd,
-      Source::URL::Toyhouse,
-      Source::URL::Skland,
-      Source::URL::Miyoushe,
-      Source::URL::Grafolio,
-      Source::URL::Kakao,
-      Source::URL::Tistory,
-      Source::URL::Kofi,
-      Source::URL::PixivFactory,
-      Source::URL::Pixellent,
-      Source::URL::Odaibako,
-      Source::URL::Facebook,
-      Source::URL::DcInside,
-      Source::URL::Marshmallow,
-      Source::URL::Huashijie,
-      Source::URL::Mihuashi,
-      Source::URL::Privatter,
-      Source::URL::Huajia,
-    ]
+    # @return [Array<Source::Site>] The list of sites handled by this class.
+    class_attribute :sites
+
+    # True if all URL subclasses have been loaded and don't need to be loaded again.
+    class_attribute :subclasses_loaded, default: false
+
+    # The autoloader used to load Source::URL subclasses.
+    class_attribute :autoloader, default: Zeitwerk::Loader
+
+    # A macro that defines a new site with the given name and options.
+    def self.site(name, **options, &block)
+      self.sites ||= []
+      self.sites << Site.new(name: name, url_class: self, **options, &block)
+    end
+
+    # A macro that defines the list of extractors used by an URL class, if the class can use multiple extractors. Usage:
+    #
+    #   extractors { [Source::Extractor::Reddit, Source::Extractor::RedditComment] }
+    #
+    # Most sites only have one extractor, which has the same name as the URL class (e.g. Source::URL::Pixiv ->
+    # Source::Extractor::Pixiv). For sites like Reddit or Ko-fi, which have multiple extractors for different URLs, this
+    # is used to set the list of all possible extractors used by a site.
+    #
+    # When called with a block, this sets the list of extractors. When not called with a block, it returns them.
+    #
+    # @return [Array<Source::Extractor>] The extractor classes used by this URL class.
+    def self.extractors(&block)
+      if block_given?
+        define_singleton_method(:extractors, &block) # redefine this method to return the list of extractors
+      else
+        ["Source::Extractor::#{name.demodulize}".safe_constantize].compact
+      end
+    end
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
     #
@@ -133,7 +75,9 @@ module Source
       return url if url.is_a?(Source::URL)
 
       url = Danbooru::URL.parse!(url)
-      subclass = SUBCLASSES.find { |c| c.match?(url) } || Source::URL::Null
+      subclass = Source::Site.find_by_domain(url.domain).find { |site| site.url_class.match?(url) }&.url_class
+      subclass = url_subclasses.find { |subclass| subclass.match?(url) } if subclass.nil?
+      subclass = Source::URL::Null if subclass.nil?
       subclass.new(url)
     end
 
@@ -154,10 +98,16 @@ module Source
       raise NotImplementedError
     end
 
-    # Return the extractor class to use for this URL. By default, it's the Source::Extractor subclass with the same name
-    # as this Source::URL subclass. Subclasses can override this to provide a different extractor.
+    # @return [Array<Source::URL>] The set of Source::URL subclasses. Loaded lazily on demand.
+    def self.url_subclasses
+      self.subclasses_loaded ||= autoloader&.eager_load_namespace(Source::URL).present?
+      Source::URL.descendants.excluding(Source::URL::Null)
+    end
+
+    # @return [Source::Extractor, nil] The extractor class to use for this URL. By default, it's the Source::Extractor subclass
+    #   with the same name as this Source::URL subclass. Subclasses can override this to use different extractors for different URLs.
     def extractor_class
-      "Source::Extractor::#{self.class.name.demodulize}".safe_constantize
+      self.class.extractors.sole if self.class.extractors.one?
     end
 
     # Return the extractor corresponding to this URL.
@@ -168,12 +118,20 @@ module Source
       extractor_class&.new(self, **)
     end
 
-    # The name of the site this URL belongs to.
-    #
-    # @return [String]
+    # @return [Source::Site, nil] The site this URL belongs to. May be overridden if the URL class handles multiple
+    # sites. By default, if there are multiple sites it chooses the site with the same domain.
+    def source_site
+      if self.class.sites.one?
+        self.class.sites.sole
+      else
+        sites = Source::Site.find_by_domain(domain)
+        sites.sole if sites.one?
+      end
+    end
+
+    # @return [String, nil] # The name of the site this URL belongs to.
     def site_name
-      # "Source::URL::NicoSeiga" => "Nico Seiga"
-      self.class.name.demodulize.titleize
+      source_site&.name
     end
 
     # True if the URL is from a recognized site. False if the URL is from an unrecognized site.
@@ -213,11 +171,25 @@ module Source
     # Examples:
     #
     # * https://www.pixiv.net/users/9948
-    # * https://x.com/i/user/889592953
+    # * https://x.com/bkub_comic
     #
     # @return [Boolean]
     def profile_url?
       profile_url.present? && !page_url? && !image_url?
+    end
+
+    # True if the URL is a secondary profile page URL.
+    # A secondary URL is an artist URL that we don't normally want to display,
+    # usually because it's redundant with the primary profile URL.
+    #
+    # Examples:
+    #
+    # * https://www.pixiv.net/stacc/bkubb
+    # * https://x.com/i/889592953
+    #
+    # @return [Boolean]
+    def secondary_url?
+      false
     end
 
     # Convert an image URL to the URL of the page containing the image, or
@@ -319,6 +291,10 @@ module Source
 
     def self.profile_url?(url)
       Source::URL.parse(url)&.profile_url?
+    end
+
+    def self.secondary_url?(url)
+      Source::URL.parse(url)&.secondary_url?
     end
 
     def self.bad_link?(url)

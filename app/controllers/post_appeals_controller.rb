@@ -3,11 +3,6 @@
 class PostAppealsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  def new
-    @post_appeal = authorize PostAppeal.new(permitted_attributes(PostAppeal))
-    respond_with(@post_appeal)
-  end
-
   def index
     @post_appeals = authorize PostAppeal.paginated_search(params)
 
@@ -20,13 +15,6 @@ class PostAppealsController < ApplicationController
     respond_with(@post_appeals)
   end
 
-  def create
-    @post_appeal = authorize PostAppeal.new(creator: CurrentUser.user, **permitted_attributes(PostAppeal))
-    @post_appeal.save
-
-    respond_with(@post_appeal, notice: "Post appealed")
-  end
-
   def show
     @post_appeal = authorize PostAppeal.find(params[:id])
     respond_with(@post_appeal) do |fmt|
@@ -34,9 +22,21 @@ class PostAppealsController < ApplicationController
     end
   end
 
+  def new
+    @post_appeal = authorize PostAppeal.new(permitted_attributes(PostAppeal))
+    respond_with(@post_appeal)
+  end
+
   def edit
     @post_appeal = authorize PostAppeal.find(params[:id])
     respond_with(@post_appeal)
+  end
+
+  def create
+    @post_appeal = authorize PostAppeal.new(creator: CurrentUser.user, **permitted_attributes(PostAppeal))
+    @post_appeal.save
+
+    respond_with(@post_appeal, notice: "Post appealed")
   end
 
   def update

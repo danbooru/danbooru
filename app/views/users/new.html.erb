@@ -9,6 +9,7 @@
       <h1 class="pb-4">Sign Up</h1>
 
       <%= edit_form_for(@user, validate: true, formatted_errors: true, html: { id: "signup-form", class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
+        <%= f.input :url, as: :hidden, input_html: { value: @url } %>
         <%= f.input :name, as: :string, label: "Username", input_html: { autocapitalize: "none", minlength: UserNameValidator::MIN_LENGTH, maxlength: UserNameValidator::MAX_LENGTH }, required: true %>
         <%= f.simple_fields_for(@user.email_address || @user.build_email_address) do |fa| %>
           <%= fa.input :address, label: "Email", required: false, as: :email, input_html: { value: fa.object.address, pattern: Danbooru::EmailAddress::EMAIL_REGEX, placeholder: "your.name@example.com" }, hint: "Optional" %>
@@ -21,7 +22,7 @@
       <% end %>
 
       <p class="fineprint">
-        Already have an account? <%= link_to "Login here", login_path %>.
+        Already have an account? <%= link_to "Login here", login_path(url: @url) %>.
       </p>
     </div>
   </div>

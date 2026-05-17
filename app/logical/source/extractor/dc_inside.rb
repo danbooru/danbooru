@@ -66,6 +66,6 @@ class Source::Extractor::DcInside < Source::Extractor
 
   def http_downloader
     # downloads are prone to being interrupted, especially for large files
-    super.use(retriable: { max_retries: 10 })
+    super.use(retriable: { max_retries: 10 }).headers(Referer: "https://gall.dcinside.com/")
   end
 end

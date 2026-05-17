@@ -46,7 +46,7 @@ class UserMailer < ApplicationMailer
       @user,
       from: "#{Danbooru.config.canonical_app_name} <#{Danbooru.config.account_security_email}>",
       subject: "Verify login from new location",
-      require_verified_email: false
+      require_verified_email: false,
     )
   end
 

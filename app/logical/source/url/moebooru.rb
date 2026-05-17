@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Source::URL::Moebooru < Source::URL
+  site "Yande.re", url: "https://yande.re"
+  site "Konachan", url: "https://konachan.com"
+
   attr_reader :work_id, :md5, :original_file_ext
 
   def self.match?(url)
@@ -90,13 +93,6 @@ class Source::URL::Moebooru < Source::URL
 
     else
       nil
-    end
-  end
-
-  def site_name
-    case domain
-    when "yande.re" then "Yande.re"
-    when "konachan.com" then "Konachan"
     end
   end
 

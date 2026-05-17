@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class RelatedTagsControllerTest < ActionDispatch::IntegrationTest
   context "The related tags controller" do

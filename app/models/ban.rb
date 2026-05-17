@@ -29,9 +29,8 @@ class Ban < ApplicationRecord
   after_save :update_user_on_save, if: :saved_change_to_duration?
 
   belongs_to :user
-  belongs_to :banner, :class_name => "User"
+  belongs_to :banner, class_name: "User"
 
-  normalizes :reason, with: ->(reason) { reason.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   before_validation { user&.lock! }
   validates :duration, presence: true
@@ -77,7 +76,7 @@ class Ban < ApplicationRecord
   end
 
   def validate_deletions
-    if delete_posts && !post_deletion_reason.present?
+    if delete_posts && post_deletion_reason.blank?
       errors.add(:post_deletion_reason, "is required")
     end
 
@@ -95,7 +94,7 @@ class Ban < ApplicationRecord
   end
 
   def user_name
-    user ? user.name : nil
+    user&.name
   end
 
   def user_name=(username)
@@ -144,7 +143,10 @@ class Ban < ApplicationRecord
     if previously_new_record?
       ModAction.log(%{banned <@#{user_name}> #{humanized_duration}: #{reason}}, :user_ban, subject: user, user: banner)
     elsif saved_changes? && updater.present?
-      ModAction.log(%{updated ban #{saved_changes.keys.without("updated_at").to_sentence} for <@#{user_name}>}, :user_ban_update, subject: user, user: updater)
+      changes = saved_changes.without("updated_at").map do |attr, (old_val, new_val)|
+        "#{attr} from #{old_val.inspect} to #{new_val.inspect}"
+      end
+      ModAction.log(%{updated ban #{changes.to_sentence} for <@#{user_name}>}, :user_ban_update, subject: user, user: updater)
     end
   end
 

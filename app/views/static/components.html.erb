@@ -1,0 +1,242 @@
+<div id="c-static">
+  <div id="a-components">
+    <h1 class="text-center">Components</h1>
+
+    <div class="m-auto max-w-1080px space-y-8">
+      <div class="space-y-4">
+        <h2>Flex</h2>
+
+        <div class="space-y-2">
+          <% %w[flex-0 flex-initial flex-none flex-1 flex-auto flex-grow-1].each do |cls| %>
+            <div class="flex items-center gap-4">
+              <span class="flex-none w-120px text-xs">.<%= cls %></span>
+
+              <div class="flex flex-1 items-center gap-1 h-12 p-1 card-outlined">
+                <div class="flex flex-none  items-center justify-center w-8 h-6 p-1 text-xs card-outlined">A</div>
+                <div class="flex <%= cls %> items-center justify-center     h-6 p-1 text-xs card-outlined">.<%= cls %></div>
+                <div class="flex flex-none  items-center justify-center w-8 h-6 p-1 text-xs card-outlined">C</div>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="flex items-center gap-4">
+            <span class="flex-none w-120px text-xs">.flex-col</span>
+
+            <div class="flex flex-col gap-1 p-1 card-outlined">
+              <div class="flex items-center justify-center p-1 text-xs card-outlined">A</div>
+              <div class="flex items-center justify-center p-1 text-xs card-outlined">B</div>
+              <div class="flex items-center justify-center p-1 text-xs card-outlined">C</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <span class="flex-none w-120px text-xs">.flex-wrap</span>
+
+            <div class="flex flex-wrap w-150px gap-1 p-1 card-outlined">
+              <% 6.times do |i| %>
+                <div class="flex items-center justify-center w-8 p-1 text-xs card-outlined"><%= ("A".ord + i).chr %></div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Flex Alignment</h2>
+
+        <div class="space-y-2">
+          <% %w[items-start items-center items-end items-stretch justify-center justify-between justify-end].each do |cls| %>
+            <div class="flex items-center gap-4">
+              <span class="flex-none w-120px text-xs">.<%= cls %></span>
+
+              <div class="flex flex-1 <%= cls %> gap-1 h-16 p-1 card-outlined">
+                <div class="flex items-center justify-center w-8 min-h-12 p-1 text-xs text-center card-outlined">A</div>
+                <div class="flex items-center justify-center w-8 min-h-8 p-1 text-xs text-center card-outlined">B</div>
+                <div class="flex items-center justify-center w-8 min-h-12 p-1 text-xs text-center card-outlined">C</div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Grid Columns</h2>
+
+        <div class="space-y-2">
+          <% [1, 2, 3, 4, 5, 6, 8, 10, 12].each do |cols| %>
+            <div class="flex items-center gap-4">
+              <span class="text-xs w-120px flex-none">.grid-cols-<%= cols %></span>
+              <div class="grid grid-cols-<%= cols %> gap-1 flex-1">
+                <% cols.times do %>
+                  <div class="card-outlined text-xs text-center p-1">col</div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Typography</h2>
+
+        <div class="flex flex-wrap items-baseline gap-4">
+          <span class="text-xxs">.text-xxs</span>
+          <span class="text-xs">.text-xs</span>
+          <span class="text-sm">.text-sm</span>
+          <span class="text-md">.text-md</span>
+          <span class="text-lg">.text-lg</span>
+          <span class="text-xl">.text-xl</span>
+          <span class="text-xxl">.text-xxl</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <span class="text-muted">.text-muted</span>
+          <span class="text-success">.text-success</span>
+          <span class="text-error">.text-error</span>
+          <span class="text-warning">.text-warning</span>
+          <span class="text-danger">.text-danger</span>
+          <span class="link-color">.link-color</span>
+          <span class="bg:primary-color text-inverse px-2 rounded">.text-inverse</span>
+          <span class="bg:primary-color text-inverse px-2 rounded">.bg:primary-color</span>
+          <span class="bg:error-color text-inverse px-2 rounded">.bg:error-color</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span class="font-bold">.font-bold</span>
+          <span class="font-italic">.font-italic</span>
+          <span class="font-normal">.font-normal</span>
+          <span class="font-monospace">.font-monospace</span>
+          <span class="font-arial">.font-arial</span>
+          <span class="font-header">.font-header</span>
+          <span class="underline">.underline</span>
+          <span class="underline decoration-dotted">.decoration-dotted</span>
+          <span class="line-through">.line-through</span>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Chips</h2>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="chip-primary">.chip-primary</span>
+          <span class="chip-red">.chip-red</span>
+          <span class="chip-green">.chip-green</span>
+          <span class="chip-blue">.chip-blue</span>
+          <span class="chip-yellow">.chip-yellow</span>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Badges</h2>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex flex-col justify-center items-center gap-2 text-center p-2 w-150px h-16 card-outlined">
+            <span>.badge-blue <span class="badge-blue">1</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Cards</h2>
+
+        <div class="flex flex-wrap gap-4">
+          <div class="flex flex-col justify-center items-center gap-2 text-center p-2 w-150px h-16 card-outlined">
+            .card-outlined
+          </div>
+
+          <div class="flex flex-col justify-center items-center gap-2 text-center p-2 w-150px h-16 card-elevated">
+            .card-elevated
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Scrollbars</h2>
+
+        <div class="flex flex-wrap gap-4">
+          <div class="flex flex-col justify-center items-center gap-2 text-center p-2 w-150px h-150px card-outlined">
+            <span>.thin-scrollbar</span>
+
+            <div class="thin-scrollbar w-full h-full p-2">
+              <% 20.times do |i| %>
+                <div>Line <%= i + 1 %> of scrollable content</div>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="flex flex-col justify-center items-center gap-2 text-center p-2 w-150px h-150px card-outlined">
+            <span>.thin-x-scrollbar</span>
+
+            <div class="thin-x-scrollbar w-full h-full p-2">
+              <% 4.times do |i| %>
+                <div class="whitespace-nowrap">Line <%= i + 1 %> of scrollable content that is very long</div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Buttons</h2>
+
+        <div class="grid grid-cols-5 place-items-center gap-2">
+          <span></span>
+          <span>.button-primary</span>
+          <span>.button-outline</span>
+          <span>.button-primary[disabled]</span>
+          <span>.button-outline[disabled]</span>
+
+          <% %w[button-lg button-md button-sm button-xs button-xxs].each do |size| %>
+            <span>.<%= size %></span>
+            <%= link_to "Save", "javascript:void(0)", class: "w-min button-primary #{size}" %>
+            <%= link_to "Save", "javascript:void(0)", class: "w-min button-outline-primary #{size}" %>
+            <%= link_to "Save", "javascript:void(0)", class: "w-min button-primary #{size}", disabled: true %>
+            <%= link_to "Save", "javascript:void(0)", class: "w-min button-outline-primary #{size}", disabled: true %>
+          <% end %>
+        </div>
+
+        <div class="grid grid-cols-5 place-items-center gap-2">
+          <span></span>
+          <span>.button-danger</span>
+          <span>.button-outline-danger</span>
+          <span>.button-danger[disabled]</span>
+          <span>.button-outline-danger[disabled]</span>
+
+          <% %w[button-lg button-md button-sm button-xs button-xxs].each do |size| %>
+            <span>.<%= size %></span>
+            <%= link_to "Delete", "javascript:void(0)", class: "w-min button-danger #{size}" %>
+            <%= link_to "Delete", "javascript:void(0)", class: "w-min button-outline-danger #{size}" %>
+            <%= link_to "Delete", "javascript:void(0)", class: "w-min button-danger #{size}", disabled: true %>
+            <%= link_to "Delete", "javascript:void(0)", class: "w-min button-outline-danger #{size}", disabled: true %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>Icons</h2>
+
+        <div class="flex flex-wrap gap-2">
+            <% IconHelper.svg_icon_methods.each do |method_name| %>
+              <div class="flex flex-col justify-center items-center gap-2 text-xs text-center card-outlined p-2 w-150px">
+                <%= send(method_name, class: "w-6 h-6") %>
+                <div class="max-w-full truncate"><%= method_name %></div>
+              </div>
+            <% end %>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <h2>External Site Icons</h2>
+
+        <div class="flex flex-wrap gap-2">
+          <% IconHelper::SITE_ICONS.keys.each do |site| %>
+            <div class="flex flex-col justify-center items-center gap-2 text-xs text-center card-outlined p-2 w-150px">
+              <%= external_site_icon(site, class: "w-6 h-6") %>
+              <div class="max-w-full truncate"><%= site %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

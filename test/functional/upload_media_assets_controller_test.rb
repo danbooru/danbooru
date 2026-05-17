@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UploadsMediaAssetsControllerTest < ActionDispatch::IntegrationTest
   context "The uploads media assets controller" do

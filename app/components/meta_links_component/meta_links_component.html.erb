@@ -1,9 +1,0 @@
-<% content_for(:html_header) do %>
-  <% if prev_page.present? %>
-    <%= tag.link rel: "prev", href: url_for_page(prev_page) %>
-  <% end %>
-
-  <% if next_page.present? %>
-    <%= tag.link rel: "next", href: url_for_page(next_page) %>
-  <% end %>
-<% end %>

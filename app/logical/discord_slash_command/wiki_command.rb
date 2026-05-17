@@ -11,7 +11,7 @@ class DiscordSlashCommand
         name: "name",
         description: "The name of the wiki page",
         required: true,
-        type: ApplicationCommandOptionType::String
+        type: ApplicationCommandOptionType::String,
       },
     ]
 
@@ -25,7 +25,7 @@ class DiscordSlashCommand
             title: wiki_page.pretty_title,
             url: Routes.url_for(wiki_page),
             **example_embed,
-          }]
+          }],
         )
       end
     end
@@ -51,7 +51,7 @@ class DiscordSlashCommand
         search = "#{tag.name} is:sfw -animated -6+girls -comic"
       end
 
-      Post.system_tag_match(search).limit(500).sort_by(&:score).last
+      Post.system_tag_match(search).limit(500).max_by(&:score)
     end
 
     def example_embed
@@ -64,7 +64,7 @@ class DiscordSlashCommand
         author: {
           name: example_post.dtext_shortlink,
           url: Routes.url_for(example_post),
-        }
+        },
       }
     end
 

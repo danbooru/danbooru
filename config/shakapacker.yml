@@ -38,13 +38,13 @@ default: &default
   #
   # XXX Transpile @alpinejs/morph with Babel to fix an issue with it not working in iOS <14.
   # XXX Transpile alpinejs to fix an issue with it not working in Firefox <72 (use of nullish coalescing operator).
-  additional_paths: ["app/components", "public/images", "node_modules/alpinejs", "node_modules/@alpinejs/morph"]
+  additional_paths: ["app/components", "public/images", "public/logos", "node_modules/alpinejs", "node_modules/@alpinejs/morph"]
 
   # Reload manifest.json on all requests so we reload latest compiled packs
   cache_manifest: false
 
-  # Select loader to use, available options are 'babel' (default), 'swc' or 'esbuild'
-  webpack_loader: 'babel'
+  # Select transpiler to use, available options are 'babel', 'swc' or 'esbuild'
+  javascript_transpiler: 'babel'
 
   # Set to true to enable check for matching versions of shakapacker gem and NPM package - will raise an error if there is a mismatch or wildcard versioning is used
   ensure_consistent_versioning: false

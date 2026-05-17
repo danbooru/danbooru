@@ -3,6 +3,7 @@
 # This component represents the tooltip that displays when you hover over a post's score.
 class PostVotesTooltipComponent < ApplicationComponent
   attr_reader :post, :current_user
+
   delegate :upvote_icon, :downvote_icon, to: :helpers
 
   def initialize(post:, current_user:)

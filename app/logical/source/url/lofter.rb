@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Lofter < Source::URL
+  site "Lofter", url: "https://www.lofter.com", domains: %w[lofter.com 127.net lf127.net 126.net]
+
   RESERVED_USERNAMES = %w[i uls www]
 
   attr_reader :username, :user_id, :work_id, :full_image_url
@@ -73,5 +75,9 @@ class Source::URL::Lofter < Source::URL
     elsif user_id.present?
       "https://www.lofter.com/mentionredirect.do?blogId=#{user_id}"
     end
+  end
+
+  def secondary_url?
+    profile_url? && username.blank?
   end
 end

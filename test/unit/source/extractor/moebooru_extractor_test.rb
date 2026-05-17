@@ -10,7 +10,7 @@ module Source::Tests::Extractor
           media_files: [{ file_size: 362_554 }],
           tags: ["bayashiko", "journey_to_the_west", "sun_wukong"],
           page_url: "https://yande.re/post/show/482880",
-          profile_url: "https://twitter.com/apononori",
+          profile_url: "https://x.com/apononori",
         )
       end
 
@@ -21,7 +21,7 @@ module Source::Tests::Extractor
           media_files: [{ file_size: 362_554 }],
           tags: ["bayashiko", "journey_to_the_west", "sun_wukong"],
           page_url: "https://yande.re/post/show/482880",
-          profile_url: "https://twitter.com/apononori",
+          profile_url: "https://x.com/apononori",
         )
       end
 
@@ -68,7 +68,7 @@ module Source::Tests::Extractor
           media_files: [{ file_size: 362_554 }],
           tags: ["bayashiko", "journey_to_the_west", "sun_wukong"],
           page_url: "https://yande.re/post/show/482880",
-          profile_url: "https://twitter.com/apononori",
+          profile_url: "https://x.com/apononori",
         )
       end
     end

@@ -10,7 +10,17 @@
 # * https://pic04.nijie.info/omata/4829_20161128012012.png (page: http://nijie.info/view_popup.php?id=33224#diff_3)
 
 class Source::URL::Nijie < Source::URL
-  attr_reader :work_id, :user_id
+  site "Nijie" do
+    url "https://nijie.info"
+    domains %w[nijie.net nijie.info]
+
+    credential :login, help: %{Your Nijie login}
+    credential :password, help: %{Your nijie password}
+  end
+
+  extractors { [Source::Extractor::Nijie, Source::Extractor::URLShortener] }
+
+  attr_reader :work_id, :user_id, :redirect_url
 
   def self.match?(url)
     url.domain.in?(%w[nijie.net nijie.info])
@@ -56,6 +66,10 @@ class Source::URL::Nijie < Source::URL
     in _, /^\d+$/, *subdir, "dojin_main", "dojin_sam", file if image_url?
       nil
 
+    # https://nijie.info/jump.php?https%3A%2F%2Fwww.google.com
+    in "nijie.info", "jump.php"
+      @redirect_url = query
+
     # https://pic.nijie.net/__s4__/d7e38dee79ff08328ccdb0b5a2edeb7e5454f3ad2e3ec8bf044d47c0faf317fd2cfc650ebe4361ce3b43062b23cf44638f9ac782ce690f1db4b7f5fff72ee91fffebe1c4ae6fb677b43854f3c9ec4c9dcc418dd165e834839f381a2c.jpg
     else
       nil
@@ -90,6 +104,11 @@ class Source::URL::Nijie < Source::URL
     else
       nil
     end
+  end
+
+  def extractor_class
+    # https://nijie.info/jump.php?https%3A%2F%2Fwww.google.com
+    redirect_url.present? ? Source::Extractor::URLShortener : Source::Extractor::Nijie
   end
 
   def image_url?

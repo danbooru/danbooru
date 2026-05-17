@@ -6,6 +6,8 @@
 # @see Source::Extractor::Tistory
 # @see Source::Extractor::NaverPost
 class Source::URL::Kakao < Source::URL
+  site "Kakao", url: "https://www.kakaocorp.com", domains: %w[daumcdn.net kakaocdn.net]
+
   attr_reader :full_image_url
 
   def self.match?(url)

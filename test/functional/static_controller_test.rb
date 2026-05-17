@@ -134,4 +134,18 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
   end
+
+  context "colors action" do
+    should "work" do
+      get colors_path
+      assert_response :success
+    end
+  end
+
+  context "components action" do
+    should "work" do
+      get components_path
+      assert_response :success
+    end
+  end
 end

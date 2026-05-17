@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SearchableTest < ActiveSupport::TestCase
   context "#search method" do
@@ -338,6 +338,27 @@ class SearchableTest < ActiveSupport::TestCase
         @ai_tag2 = create(:ai_tag)
 
         assert_search_equals([@ai_tag1], post: { id: @post.id })
+      end
+    end
+
+    context "timestamps" do
+      should "work with relative times" do
+        freeze_time do
+          @post = create(:post, last_comment_bumped_at: 35.hours.ago)
+
+          assert_search_equals([@post], last_comment_bumped_at: "1d..2d")
+          assert_search_equals([@post], last_comment_bumped_at: "<1w")
+          assert_search_equals([], last_comment_bumped_at: ">3d")
+        end
+      end
+
+      should "work with absolute times" do
+        @post = create(:post, last_comment_bumped_at: "2026-02-01T01:23:45Z")
+
+        assert_search_equals([@post], last_comment_bumped_at: "..2026-02-03T00:00:00Z")
+        assert_search_equals([@post], last_comment_bumped_at: "2026-02-01T00:00:00Z..2026-02-02T00:00:00Z")
+        assert_search_equals([@post], last_comment_bumped_at: ">2026-02-01T00:00:00Z")
+        assert_search_equals([], last_comment_bumped_at: "<2026-02-01T00:00:00Z")
       end
     end
   end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # @see Source::URL::Zerochan
+# @see https://www.zerochan.net/api
 module Source
   class Extractor
     class Zerochan < Source::Extractor
@@ -31,7 +32,7 @@ module Source
       end
 
       def http
-        super.cookies(z_id: credentials[:user_id], z_hash: credentials[:session_cookie])
+        super.headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash} (#{credentials[:user_id]})").cookies(z_id: credentials[:user_id], z_hash: credentials[:session_cookie])
       end
     end
   end

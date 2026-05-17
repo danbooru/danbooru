@@ -11,17 +11,19 @@ class Source::Extractor::Vk < Source::Extractor
     elsif parsed_url.image_url?
       [parsed_url.to_s]
     elsif page_type == "wall" && !repost?
-      # .MediaGrid__interactive grabs attached images. Ex: https://m.vk.com/wall-191516762_1706.
+      # .PhotoPrimaryAttachment__interactive grabs a single attached image. Ex: https://m.vk.com/wall-185765571_2635.
+      # .MediaGrid__interactive grabs multiple attached images. Ex: https://m.vk.com/wall-184253008_27.
       # .SecondaryAttachment grabs attached files. Ex: https://m.vk.com/wall-184253008_27.
-      page&.css("img.PhotoPrimaryAttachment__imageElement, a.MediaGrid__interactive, a.SecondaryAttachment").to_a.flat_map do |element|
-        url = element[:src] || element[:href]
+      page&.css("a.PhotoPrimaryAttachment__interactive, a.MediaGrid__interactive, a.SecondaryAttachment").to_a.flat_map do |element|
+        url = element["data-src_big"] || element["href"]
         url = URI.join("https://vk.com", url).to_s
 
         # Resolve both sample image URLs and document URLs (https://vk.com/doc495199190_630536868) to full image URLs.
         Source::Extractor.find(url).image_urls
       end
     elsif page_type == "photo"
-      [Source::URL.parse(photo["photo"]).try(:full_image_url) || photo["photo"]].compact
+      url = photo[:original_src]
+      [Source::URL.parse(url).try(:full_image_url) || url].compact
     elsif page_type == "doc"
       # https://m.vk.com/doc495199190_630536868 -> https://psv4.userapi.com/c235131/u495199190/docs/d59/b94c28ecfbf7/Strakh_Pakhnet_Lyubovyu.png
       url = http.cache(1.minute).redirect_url(mobile_url, method: "GET").to_s
@@ -140,7 +142,7 @@ class Source::Extractor::Vk < Source::Extractor
   memoize def photo
     return {} unless page.present? && page_type == "photo"
 
-    json = page&.at("script#page_script")&.text&.slice(/.*PHOTOVIEW_PAGE":({.*})/m, 1)&.delete_suffix("}));}")&.parse_json || {}
+    json = page&.at("script#page_script")&.text&.slice(/"PHOTOS\\\/PHOTOVIEW_PAGE": ({.*?}) }\)\);}\);window.taggedInline/xm, 1)&.parse_json || {}
     json["photos"].to_a.find { |photo| photo["id"] == json["initial_photo_id"] } || {}
   end
 

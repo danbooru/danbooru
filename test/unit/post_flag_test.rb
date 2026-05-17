@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostFlagTest < ActiveSupport::TestCase
   context "PostFlag: " do
@@ -120,6 +120,15 @@ class PostFlagTest < ActiveSupport::TestCase
       should_not allow_value("").for(:reason)
       should_not allow_value(" ").for(:reason)
       should_not allow_value("\u200B").for(:reason)
+    end
+
+    context "when normalizing the reason" do
+      should normalize_attribute(:reason).from(" ").to("")
+      should normalize_attribute(:reason).from("  \u200B  ").to("")
+      should normalize_attribute(:reason).from(" foo ").to("foo")
+      should normalize_attribute(:reason).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:reason).from("foo\nbar").to("foo\r\nbar")
+      should normalize_attribute(:reason).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
     end
   end
 end

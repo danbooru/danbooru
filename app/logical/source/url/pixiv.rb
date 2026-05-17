@@ -2,12 +2,24 @@
 
 module Source
   class URL::Pixiv < Source::URL
-    attr_reader :work_id, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame
+    site "Pixiv" do
+      url "https://www.pixiv.net"
+      domains %w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net]
+
+      credential :phpsessid, help: %{Your Pixiv `PHPSESSID` cookie.}
+    end
+
+    extractors { [Source::Extractor::Pixiv, Source::Extractor::URLShortener] }
+
+    attr_reader :work_id, :image_hash, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame, :redirect_url
 
     def self.match?(url)
-      return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::PixivComic.match?(url) || Source::URL::PixivFactory.match?(url) || Source::URL::Booth.match?(url)
-
-      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl])
+      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net]) &&
+        !Source::URL::Fanbox.match?(url) &&       # https://pixiv.net/fanbox/creator/1566167
+        !Source::URL::PixivSketch.match?(url) &&  # https://sketch.pixiv.net/items/5835314698645024323
+        !Source::URL::PixivComic.match?(url) &&   # https://comic.pixiv.net/works/10137
+        !Source::URL::PixivFactory.match?(url) && # https://factory.pixiv.net/palette/collections/imys_tachie#image-13760863
+        !Source::URL::Booth.match?(url)           # https://booth.pximg.net/b242a7bd-0747-48c4-891d-9e8552edd5d7/i/3746752/52dbee27-7ad2-4048-9c1d-827eee36625c.jpg
     end
 
     def parse
@@ -15,6 +27,7 @@ module Source
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
       # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
       # https://i.pximg.net/img-zip-ugoira/img/2016/04/09/14/25/29/56268141_ugoira1920x1080.zip
+      # https://i.pximg.net/img-zip-ugoira/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira600x600.zip
       # https://i.pximg.net/img-original/img/2019/05/27/17/59/33/74932152_ugoira0.jpg
       # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
       # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg
@@ -38,6 +51,9 @@ module Source
 
       # https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg (sample image; sci = series cover image)
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg (full image)
+      #
+      # https://i.pximg.net/c/250x250_80_a2/img-master/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0_square1200.jpg
+      # https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg
       in *, ("img-original" | "img-master" | "img-zip-ugoira" | "img-inf" | "custom-thumb" | "novel-cover-original" | "novel-cover-master") => image_type, "img", year, month, day, hour, min, sec, _ if image_url?
         @image_type = image_type
         @date = [year, month, day, hour, min, sec]
@@ -54,14 +70,34 @@ module Source
         parse_filename
         @username = username
 
+      # https://i.pximg.net/user-profile/img/2014/12/18/10/31/23/8733472_7dc7310db6cc37163af145d04499e411_170.jpg
+      in *, "user-profile", "img", year, month, day, hour, min, sec, _ if image_url?
+        @date = [year, month, day, hour, min, sec]
+
+      # https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg
+      # https://i.pximg.net/c/1920x960_80_a2_g5/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg
+      in *, "background", "img", year, month, day, hour, min, sec, _ if image_url?
+        @image_type = "background"
+        @date = [year, month, day, hour, min, sec]
+        parse_filename
+
       # https://i.pximg.net/imgaz/upload/20240417/163474511.jpg
+      # https://i.pximg.net/imgaz/upload/20240809/962537205.jpg
       # contest images?
-      in _, _, "imgaz", "upload", _year_month_day, _ if image_url?
+      in _, _, "imgaz", "upload", year_month_day, _ if image_url?
         @image_type = "imgaz"
+        year, month, day = year_month_day.match(/^(\d{4})(\d{2})(\d{2})$/).captures
+        @date = [year, month, day, 0, 0, 0]
+
+      # https://i.pximg.net/imgaz/2022/11/17/21/27/54/contest_pc_header_ja_606.jpg
+      # https://i.pximg.net/imgaz/2024/07/31/19/27/09/contest_ogp_813.png
+      in _, _, "imgaz", year, month, day, hour, min, sec, _ if image_url?
+        @image_type = "imgaz"
+        @date = [year, month, day, hour, min, sec]
 
       # https://www.pixiv.net/en/artworks/46324488
       # https://www.pixiv.net/artworks/46324488
-      in _, "pixiv.net", *, "artworks", work_id
+      in _, ("pixiv.net" | "phixiv.net"), *, "artworks", work_id
         @work_id = work_id
 
       # https://www.pixiv.net/novel/show.php?id=9434677
@@ -85,7 +121,7 @@ module Source
       # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
-      in _, "pixiv.net", "member_illust.php" if params[:illust_id].present?
+      in _, ("pixiv.net" | "phixiv.net"), "member_illust.php" if params[:illust_id].present?
         @work_id = params[:illust_id]
 
       # https://www.pixiv.net/member.php?id=339253
@@ -126,6 +162,10 @@ module Source
       in _, "p.tl", "m", user_id
         @user_id = user_id
 
+      # https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com
+      in _, "pixiv.net", "jump.php"
+        @redirect_url = query
+
       # http://p.tl/dcYB/ (dead; Pixiv's URL shortening service, closed in 2017)
       else
         nil
@@ -134,6 +174,12 @@ module Source
 
     def parse_filename
       case filename&.split("_").to_a
+
+      # https://i.pximg.net/c/250x250_80_a2/img-master/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0_square1200.jpg
+      # https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg
+      in /^\d+-\h{32}$/ => id_hash, /^p\d+$/ => page, *rest
+        @work_id, @image_hash = id_hash.split("-")
+        @page = page.delete_prefix("p").to_i
 
       # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
       # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
@@ -150,7 +196,7 @@ module Source
       # https://i.pximg.net/c/600x600/novel-cover-master/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4_master1200.jpg (sample image; ci = cover image)
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.jpg (full image)
       # https://i.pximg.net/novel-cover-original/img/2018/04/02/19/38/29/9434677_6ab6c651d5568ff39e2ba6ab45edaf28.jpg (assumed novel cover image)
-      in /^(ci)?\d+$/ => novel_id, /^\h{32}$/, *rest
+      in /^(ci)?\d+$/ => novel_id, /^\h{32}$/, *rest if image_type.in?(%w[novel-cover-original novel-cover-master])
         @novel_id = novel_id.delete_prefix("ci")
 
       # https://i.pximg.net/c/480x960/novel-cover-master/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc_master1200.jpg (sample image; sci = series cover image)
@@ -163,10 +209,23 @@ module Source
       in /^tei\d+$/ => novel_embedded_image_id, /^\h{32}$/, *rest
         @novel_embedded_image_id = novel_embedded_image_id.delete_prefix("tei")
 
+      # https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg
+      in /^\d+$/ => user_id, /^\h{32}$/, *rest if image_type == "background"
+        @user_id = user_id
+
       # https://i.pximg.net/img-original/img/2024/07/24/08/46/41/120834265_ugoira0.png
       in /^\d+$/ => work_id, /^ugoira(\d+)$/
         @work_id = work_id
         @ugoira_frame = $1.to_i
+
+      # https://i.pximg.net/img-original/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira0.jpg
+      in /^\d+-\h{32}$/ => id_hash, /^ugoira(\d+)$/
+        @work_id, @image_hash = id_hash.split("-")
+        @ugoira_frame = $1.to_i
+
+      # https://i.pximg.net/img-zip-ugoira/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira600x600.zip
+      in /^\d+-\h{32}$/ => id_hash, /^ugoira/
+        @work_id, @image_hash = id_hash.split("-")
 
       # https://i.pximg.net/c/240x240/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg
       # http://i2.pixiv.net/img18/img/evazion/14901720.png
@@ -224,7 +283,8 @@ module Source
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/33/05/ci18588585_2332b5586ce5a9b039859254b6b220d4.jpg
       # https://i.pximg.net/novel-cover-original/img/2022/10/23/17/31/13/sci9593812_3eb12772f4715a9700d44ffee1107adc.jpg
       # https://i.pximg.net/novel-cover-original/img/2022/11/02/10/04/22/tei62073304808_46e2ad585d3b76d042a1f12ea49625e5.jpg
-      elsif image_url? && image_type.in?(%w[img-original novel-cover-original]) && date.present?
+      # https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg
+      elsif image_url? && image_type.in?(%w[img-original novel-cover-original background]) && date.present?
         "https://i.pximg.net/#{image_type}/img/#{date.join("/")}/#{basename}"
       end
     end
@@ -232,11 +292,16 @@ module Source
     def candidate_full_image_urls
       return [] unless image_url? && date.present?
 
+      # https://i.pximg.net/c/250x250_80_a2/img-master/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0_square1200.jpg
+      # https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg
+      if image_hash.present? && work_id.present? && page.present?
+        %w[jpg png gif].map { |ext| "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}-#{image_hash}_p#{page}.#{ext}" }
+
       # https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg
       # https://i.pximg.net/c/360x360_70/custom-thumb/img/2022/03/08/00/00/56/96755248_p0_custom1200.jpg
       # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
       # https://i.pximg.net/custom-thumb/img/2022/03/08/00/00/56/96755248_p0_custom1200.jpg
-      if work_id.present? && page.present?
+      elsif work_id.present? && page.present?
         %w[jpg png gif].map { |ext| "https://i.pximg.net/img-original/img/#{date.join("/")}/#{work_id}_p#{page}.#{ext}" }
 
       # https://i.pximg.net/img-master/img/2024/07/24/08/46/41/120834265_master1200.jpg
@@ -258,7 +323,11 @@ module Source
     end
 
     def ugoira_zip_url
-      "https://i.pximg.net/img-zip-ugoira/img/#{date.join("/")}/#{work_id}_ugoira1920x1080.zip?original" if is_ugoira?
+      if is_ugoira? && work_id.present? && image_hash.present?
+        "https://i.pximg.net/img-zip-ugoira/img/#{date.join("/")}/#{work_id}-#{image_hash}_ugoira1920x1080.zip?original"
+      elsif is_ugoira? && work_id.present?
+        "https://i.pximg.net/img-zip-ugoira/img/#{date.join("/")}/#{work_id}_ugoira1920x1080.zip?original"
+      end
     end
 
     def ugoira_frame_url(n = 0, ext = file_ext)
@@ -266,10 +335,17 @@ module Source
     end
 
     def image_sample?
-      image_url? && !(
-        image_type.in?(%w[img-original novel-cover-original imgaz]) ||
-        (ugoira_zip_url? && to_s == ugoira_zip_url)
-      )
+      image_url? && !full_image_url?
+    end
+
+    def full_image_url?
+      image_type.in?(%w[img-original novel-cover-original imgaz]) ||
+        (ugoira_zip_url? && to_s == ugoira_zip_url) ||
+        (image_type == "background" && to_s == full_image_url)
+    end
+
+    def bad_link?
+      image_url? && page_url.nil? && profile_url.nil?
     end
 
     def page_url
@@ -290,9 +366,17 @@ module Source
       end
     end
 
+    def secondary_url?
+      profile_url? && user_id.blank?
+    end
+
     def parsed_date
       # Dates in image URLs are in JST (UTC+9)
-      Time.new(*date, "+09:00").in_time_zone("UTC") if date.present?
+      Time.new(*date, "+09:00").utc if date.present?
+    end
+
+    def extractor_class
+      redirect_url.present? ? Source::Extractor::URLShortener : Source::Extractor::Pixiv
     end
   end
 end

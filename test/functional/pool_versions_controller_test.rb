@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The pool versions controller" do
@@ -9,11 +9,11 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @pool = as(@user) { create(:pool) }
-        @user_2 = create(:user)
-        @user_3 = create(:user)
+        @user2 = create(:user)
+        @user3 = create(:user)
 
-        as(@user_2) { @pool.update(post_ids: "1 2") }
-        as(@user_3) { @pool.update(post_ids: "1 2 3 4") }
+        as(@user2) { @pool.update(post_ids: "1 2") }
+        as(@user3) { @pool.update(post_ids: "1 2 3 4") }
 
         @versions = @pool.versions
       end
@@ -27,7 +27,7 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "list all versions that match the search criteria" do
-        get pool_versions_path, params: {:search => {:updater_id => @user_2.id}}
+        get pool_versions_path, params: { search: { updater_id: @user2.id }}
         assert_response :success
         assert_select "#pool-version-#{@versions[0].id}", false
         assert_select "#pool-version-#{@versions[1].id}"
@@ -39,7 +39,7 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         @post = as(@user) { create(:post) }
         @pool = as(@user) { create(:pool) }
-        as (@user) { @pool.update(name: "blah", description: "desc", post_ids: [@post.id]) }
+        as(@user) { @pool.update(name: "blah", description: "desc", post_ids: [@post.id]) }
 
         get diff_pool_version_path(@pool.versions.last.id)
         assert_response :success

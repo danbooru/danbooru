@@ -176,6 +176,10 @@ module Source
       memoize def comments
         api_response&.dig(1, "data", "children").to_a
       end
+
+      def http
+        super.cookies(reddit_session: credentials[:session_cookie])
+      end
     end
   end
 end

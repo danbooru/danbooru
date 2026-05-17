@@ -1,0 +1,144 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+require "erb"
+require "net/http"
+require "json"
+require "open3"
+
+# Generate a changelog between two commits.
+class ChangelogGenerator
+  def initialize
+    @options = {
+      repo: `git config --get remote.origin.url`.strip.split(":").last.delete_suffix(".git"), # Name of the Github repo, e.g. danbooru/danbooru
+      commits: "origin/production..master", # The range of commits to include in the changelog
+      format: "dtext",  # Output format ("dtext", "html", or "markdown")
+      verbose: false,   # Whether to print the commands being run
+    }
+  end
+
+  # @param argv [Array<String>] The command-line arguments.
+  def run(argv = ARGV)
+    OptionParser.new do |parser|
+      parser.banner = <<~EOS
+        Usage: #{parser.program_name} [OPTIONS]
+
+        Generate a changelog between two commits (default: since last push to production).
+
+      EOS
+
+      parser.on("-h", "--help", "Show this help message") do
+        puts parser
+        exit
+      end
+
+      parser.on("-v", "--verbose", "Show the commands being run")
+      parser.on("-c", "--commits=RANGE", "Commit range to include in the changelog, in 'from..to' format. Default: #{@options[:commits]}")
+      parser.on("-f", "--format=FORMAT", %w[html dtext markdown], "Output format (HTML, DText, Markdown). Default: #{@options[:format]}")
+      parser.on("-r", "--repo=OWNER/NAME", "Name of the GitHub repository (default: #{@options[:repo]})")
+
+      parser.parse!(argv, into: @options)
+
+      raise "Invalid arguments `#{argv.join(" ")}`" if argv.any?
+    end
+
+    dtext = render_changelog
+    puts format_output(dtext)
+  rescue StandardError => e
+    abort "Error: #{e.message}"
+  end
+
+  # @return [String] The changelog in DText format.
+  def render_changelog
+    commit_url = "https://github.com/#{@options[:repo]}/commit"
+    compare_url = "https://github.com/#{@options[:repo]}/compare/#{@options[:commits]}"
+
+    changes, fixes = ["Added a feature."], ["Fixed a bug."]
+
+    ERB.new(<<~'EOS', trim_mode: "-").result(binding).gsub(/\n\n+/, "\n\n")
+      h4. <%= Time.now.strftime("%Y-%m-%d") %>
+
+      <%- if changes.any? -%>
+      h6. Changes
+      <%- end -%>
+
+      <%- changes.each do |change| -%>
+      * <%= change %>
+      <%- end -%>
+
+      <%- if fixes.any? -%>
+      h6. Fixes
+      <%- end -%>
+
+      <%- fixes.each do |fix| -%>
+      * <%= fix %>
+      <%- end -%>
+
+      [expand=Commits]
+      [table]
+        [thead]
+          [tr]
+            [th]Commit[/th]
+            [th]Message[/th]
+          [/tr]
+        [/thead]
+      <%- commits.each do |commit| -%>
+        [tr][td]"<%= commit[:sha][0..8] %>":[<%= "#{commit_url}/#{commit[:sha]}" %>][/td] [td]<%= commit[:title].chomp(".") %> (<%= commit[:author] %>)[/td][/tr]
+      <%- end -%>
+      [/table]
+      [/expand]
+
+      Full changelog: <%= compare_url %>
+    EOS
+  end
+
+  # @param dtext [String] The changelog in DText format.
+  # @return [String] The changelog in the specified output format.
+  def format_output(dtext)
+    case @options[:format].downcase
+    in "dtext"
+      dtext
+    in "html"
+      require_relative "../config/environment"
+      DText.new(dtext).format_text
+    in "markdown"
+      require_relative "../config/environment"
+      DText.new(dtext).to_markdown
+    end
+  end
+
+  # @return [Array<Hash>] The list of commits, with keys :sha, :title, and :author.
+  def commits
+    @commits ||= shell(%W[git log --topo-order --first-parent --pretty=format:%H%x1f%P%x1f%an%x1f%s%x1f%b%x1e #{@options[:commits]}]).split("\x1e").map do |record|
+      sha, parents, author, message, body = record.split("\x1f", 5)
+      pr_number = message[/\AMerge pull request #(\d+)/, 1]
+
+      # For merge commits, use the title and author of the PR.
+      if pr_number
+        merge_parent_sha = parents.to_s.split[1]
+        merge_author = shell(%W[git show -s --format=%aN #{merge_parent_sha}])
+        author = "pull ##{pr_number} by #{merge_author}"
+        title = body.lines.first
+      else
+        title = message
+      end
+
+      title = title.gsub(/#\d+/, "issue \\0")
+      { sha: sha.strip, title: title.strip, author: author.strip }
+    end
+  end
+
+  # @param args [Array<String>] The command and its arguments.
+  # @return [String] The combined standard output and standard error of the command.
+  def shell(args)
+    command = args.join(" ")
+
+    warn command if @options[:verbose]
+    output, status = Open3.capture2e(*args)
+    raise "`#{command}` failed" unless status.success?
+
+    output
+  end
+end
+
+ChangelogGenerator.new.run

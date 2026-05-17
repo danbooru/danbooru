@@ -7,6 +7,7 @@ class SessionsController < ApplicationController
 
   def new
     @session = authorize SessionLoader.new(request)
+    @url = params.dig(:session, :url).presence || params[:url].presence || root_path
 
     if params[:signed_login_event].present? && @session.authorize_login_event!(params[:signed_login_event])
       notice = "New location verified. Login again to continue"

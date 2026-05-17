@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
   def assert_tag_match(posts, query, relation: Post.all, current_user: CurrentUser.user, tag_limit: nil, **options)
@@ -156,7 +156,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for an invalid metatag value" do
       should "return nothing" do
-        post = create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
+        create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
 
         assert_tag_match([], "score:foo")
         assert_tag_match([], "score:42x")
@@ -190,6 +190,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
         assert_tag_match([], "age:foo")
         assert_tag_match([], "age:30")
+
+        assert_tag_match([], "duration:foo")
+        assert_tag_match([], "duration:1x")
+        assert_tag_match([], "duration:30s1m")
 
         assert_tag_match([], "md5:foo")
 
@@ -624,6 +628,41 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[2], posts[0]], "-flags:1")
     end
 
+    should "return posts for the approval_count:<N> metatag" do
+      posts = create_list(:post, 3, is_pending: true)
+      create(:post_approval, post: posts[0])
+      create(:post_flag, post: posts[0])
+      create(:post_approval, post: posts[0])
+      create(:post_approval, post: posts[1])
+
+      assert_tag_match([posts[0]], "approval_count:2")
+      assert_tag_match([posts[1]], "approval_count:1")
+      assert_tag_match([posts[1], posts[0]], "approval_count:>0")
+
+      assert_tag_match([posts[0]], "approvals:2")
+      assert_tag_match([posts[1]], "approvals:1")
+      assert_tag_match([posts[1], posts[0]], "approvals:>0")
+
+      assert_tag_match([posts[2]], "-approvals:>0")
+    end
+
+    should "return posts for the disapproval_count:<N> metatag" do
+      posts = create_list(:post, 3, is_pending: true)
+      create(:post_disapproval, post: posts[0])
+      create(:post_disapproval, post: posts[0])
+      create(:post_disapproval, post: posts[1])
+
+      assert_tag_match([posts[0]], "disapproval_count:2")
+      assert_tag_match([posts[1]], "disapproval_count:1")
+      assert_tag_match([posts[1], posts[0]], "disapproval_count:>0")
+
+      assert_tag_match([posts[0]], "disapprovals:2")
+      assert_tag_match([posts[1]], "disapprovals:1")
+      assert_tag_match([posts[1], posts[0]], "disapprovals:>0")
+
+      assert_tag_match([posts[2]], "-disapprovals:>0")
+    end
+
     should "return posts for the commentaryupdater:<name> metatag" do
       user1 = create(:user)
       user2 = create(:user)
@@ -652,9 +691,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post3 = create(:post)
       post4 = create(:post)
 
-      artcomm1 = create(:artist_commentary, post: post1, translated_title: "azur lane")
-      artcomm2 = create(:artist_commentary, post: post2, translated_title: "", translated_description: "")
-      artcomm3 = create(:artist_commentary, post: post3, original_title: "", original_description: "", translated_title: "", translated_description: "")
+      create(:artist_commentary, post: post1, translated_title: "azur lane")
+      create(:artist_commentary, post: post2, translated_title: "", translated_description: "")
+      create(:artist_commentary, post: post3, original_title: "", original_description: "", translated_title: "", translated_description: "")
 
       assert_tag_match([post2, post1], "commentary:true")
       assert_tag_match([post4, post3], "commentary:false")
@@ -684,8 +723,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post1 = create(:post)
       post2 = create(:post)
 
-      comment1 = create(:comment, post: post1, body: "petting cats")
-      comment2 = create(:comment, post: post2, body: "walking dogs")
+      create(:comment, post: post1, body: "petting cats")
+      create(:comment, post: post2, body: "walking dogs")
 
       assert_tag_match([post1], "comment:petting")
       assert_tag_match([post1], "comment:pet")
@@ -706,8 +745,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post1 = create(:post)
       post2 = create(:post)
 
-      note1 = create(:note, post: post1, body: "petting cats")
-      note2 = create(:note, post: post2, body: "walking dogs")
+      create(:note, post: post1, body: "petting cats")
+      create(:note, post: post2, body: "walking dogs")
 
       assert_tag_match([post1], "note:petting")
       assert_tag_match([post1], "note:pet")
@@ -763,7 +802,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "-age:>1y")
       assert_tag_match([], "-age:<1y")
 
-      assert_tag_match([], "age:<60")
+      assert_tag_match([post], "age:<60")
+
+      assert_tag_match([post], "age:<1m30s")
+      assert_tag_match([post], "age:<1h30m")
+      assert_tag_match([post], "age:0s..1h30m")
+      assert_tag_match([], "age:>1h30m")
     end
 
     should "return posts for the ratio:<x:y> metatag" do
@@ -794,7 +838,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the duration:<x> metatag" do
-      post = create(:post, media_asset: create(:media_asset, file: "test/files/webm/test-512x512.webm"))
+      post = create(:post, media_asset: create(:media_asset, duration: 0.48, file: "test/files/webm/test-512x512.webm"))
 
       assert_tag_match([post], "duration:0.48")
       assert_tag_match([post], "duration:>0.4")
@@ -805,6 +849,58 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "-duration:<0.4")
       assert_tag_match([], "-duration:<0.5")
       assert_tag_match([], "-duration:>0.4")
+
+      assert_tag_match([post], "duration:<1s")
+      assert_tag_match([post], "duration:<1sec")
+      assert_tag_match([post], "duration:<1second")
+      assert_tag_match([post], "duration:<1seconds")
+      assert_tag_match([post], "duration:>0.4s")
+      assert_tag_match([], "duration:>1s")
+
+      assert_tag_match([post], "duration:<1min")
+      assert_tag_match([post], "duration:<1minute")
+      assert_tag_match([post], "duration:<1minutes")
+      assert_tag_match([], "duration:>1min")
+
+      assert_tag_match([post], "duration:<1h")
+      assert_tag_match([post], "duration:<1hour")
+      assert_tag_match([post], "duration:<1hours")
+      assert_tag_match([], "duration:>1h")
+
+      assert_tag_match([post], "duration:<1d")
+      assert_tag_match([post], "duration:<1day")
+      assert_tag_match([post], "duration:<1days")
+      assert_tag_match([], "duration:>1d")
+
+      assert_tag_match([post], "duration:<1w")
+      assert_tag_match([post], "duration:<1week")
+      assert_tag_match([post], "duration:<1weeks")
+      assert_tag_match([], "duration:>1w")
+
+      assert_tag_match([post], "duration:<1mo")
+      assert_tag_match([post], "duration:<1month")
+      assert_tag_match([post], "duration:<1months")
+      assert_tag_match([], "duration:>1mo")
+
+      assert_tag_match([post], "duration:<1y")
+      assert_tag_match([post], "duration:<1year")
+      assert_tag_match([post], "duration:<1years")
+      assert_tag_match([], "duration:>1y")
+
+      long_post = create(:post, media_asset: create(:media_asset, duration: 90.0))
+      assert_tag_match([long_post], "duration:90")
+      assert_tag_match([long_post], "duration:90s")
+      assert_tag_match([long_post], "duration:1.5min")
+      assert_tag_match([long_post], "duration:>1min")
+      assert_tag_match([long_post], "duration:1min..2min")
+      assert_tag_match([], "duration:>2min")
+      assert_tag_match([], "duration:1s..1min")
+
+      assert_tag_match([long_post], "duration:1:30")
+      assert_tag_match([long_post], "duration:1m30s")
+      assert_tag_match([long_post], "duration:1:25..1:35")
+      assert_tag_match([long_post], "duration:1m25s..1m35s")
+      assert_tag_match([], "duration:>2:00")
     end
 
     should "return posts for the is:<status> metatag" do
@@ -936,7 +1032,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(all - [flagged], "-status:flagged")
       assert_tag_match(all - [appealed], "-status:appealed")
       assert_tag_match(all - [deleted, appealed], "-status:deleted")
-      assert_tag_match(all - [banned],  "-status:banned")
+      assert_tag_match(all - [banned], "-status:banned")
       assert_tag_match(all - [banned], "-status:active")
 
       assert_tag_match([], "status:garbage")
@@ -1241,7 +1337,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for a upvote:<user>, downvote:<user> metatag" do
-      CurrentUser.scoped(create(:mod_user)) do
+      as(create(:mod_user)) do
         upvoted   = create(:post, tag_string: "upvote:self")
         downvoted = create(:post, tag_string: "downvote:self")
 
@@ -1322,7 +1418,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
           image_height: 100 * n * n,
           image_width: 100 * (3 - n) * n,
           tag_string: tags[n - 1],
-          media_asset: build(:media_asset, image_height: 100 * n * n, image_width: 100 * (3 - n) * n, file_size: 1.megabyte * n)
+          media_asset: build(:media_asset, image_height: 100 * n * n, image_width: 100 * (3 - n) * n, file_size: 1.megabyte * n),
         )
 
         u = create(:user, created_at: 2.weeks.ago)
@@ -1395,9 +1491,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       user = create(:gold_user)
 
       as(user) do
-        comment1 = create(:comment, creator: user, post: post1)
-        comment2 = create(:comment, creator: user, post: post2, do_not_bump_post: true)
-        comment3 = create(:comment, creator: user, post: post3)
+        create(:comment, creator: user, post: post1)
+        create(:comment, creator: user, post: post2, do_not_bump_post: true)
+        create(:comment, creator: user, post: post3)
       end
 
       assert_tag_match([post3, post1, post2], "order:comment_bumped")
@@ -1479,7 +1575,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "fail if the search exceeds the tag limit" do
-      post1 = create(:post, rating: "s")
+      create(:post, rating: "s")
 
       assert_raise(PostQuery::TagLimitError) do
         PostQuery.search("a b c user:bob fav:bob pool:disgustingly_adorable", tag_limit: 5)
@@ -1496,12 +1592,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "succeed for exclusive tag searches with no other tag" do
-      post1 = create(:post, rating: "s", tag_string: "aaa")
+      create(:post, rating: "s", tag_string: "aaa")
       assert_tag_match([], "-aaa")
     end
 
     should "succeed for exclusive tag searches combined with a metatag" do
-      post1 = create(:post, rating: "s", tag_string: "aaa")
+      create(:post, rating: "s", tag_string: "aaa")
       assert_tag_match([], "-aaa id:>0")
       assert_tag_match([], "-a* rating:s")
     end
@@ -1652,13 +1748,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       should "return the correct favorite count for a fav:<name> search" do
-        fav = create(:favorite)
-        User.where(id: fav.user).update_all(favorite_count: 42) # XXX favorite_count is readonly; update it this way to bypass the readonly check.
+        user = create(:user, favorite_count: 41)
+        create(:favorite, user: user)
 
-        assert_fast_count(42, "fav:#{fav.user.name}")
-        assert_fast_count(42, "ordfav:#{fav.user.name}")
+        assert_fast_count(42, "fav:#{user.name}")
+        assert_fast_count(42, "ordfav:#{user.name}")
 
-        assert_fast_count(1, "-fav:#{fav.user.name}")
+        assert_fast_count(1, "-fav:#{user.name}")
       end
 
       should "return the correct favorite count for a fav:<name> search for a user with private favorites" do
@@ -1707,8 +1803,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         end
 
         should "not fail for a two tag search by a member" do
-          post1 = create(:post, tag_string: "aaa bbb rating:g")
-          post2 = create(:post, tag_string: "aaa bbb rating:e")
+          create(:post, tag_string: "aaa bbb rating:g")
+          create(:post, tag_string: "aaa bbb rating:e")
 
           assert_fast_count(1, "aaa bbb", { safe_mode: true })
         end
@@ -1729,6 +1825,26 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
         assert_equal(1, PostQuery.new("comm:#{@user.name}", current_user: @user).fast_count)
         assert_equal(0, PostQuery.new("comm:#{@user.name}").fast_count)
+      end
+    end
+
+    context "PostQuery#normalize" do
+      should "apply aliases by default when normalizing queries" do
+        create(:tag_alias, antecedent_name: "bunny_ears", consequent_name: "rabbit_ears")
+
+        assert_equal("rabbit_ears", PostQuery.normalize("bunny_ears").to_s)
+      end
+
+      should "allow aliases to be skipped when normalizing queries" do
+        create(:tag_alias, antecedent_name: "bunny_ears", consequent_name: "rabbit_ears")
+
+        assert_equal("bunny_ears", PostQuery.normalize("bunny_ears", apply_aliases: false).to_s)
+      end
+
+      should "normalize complex queries" do
+        post_query = PostQuery.normalize(" ~bunny_ears  ~source:imageboard ")
+
+        assert_equal("bunny_ears or source:imageboard", post_query.to_s)
       end
     end
   end

@@ -13,7 +13,7 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { @media_asset }
+      should respond_to_search.with { @media_asset }
       should respond_to_search(metadata: { "File:ColorComponents" => 3 }).with { @media_asset }
       should respond_to_search(metadata: { "File:ColorComponents" => 4 }).with { [] }
     end

@@ -8,11 +8,6 @@ form.simple_form {
   div.input {
     margin-bottom: 1em;
 
-    input[type="text"], input[type="file"], input[type="password"], input[type="email"], input[type="url"] {
-      width: 100%;
-      max-width: 25em;
-    }
-
     .hint {
       padding-left: 1em;
 

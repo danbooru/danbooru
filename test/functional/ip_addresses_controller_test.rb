@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class IpAddressesControllerTest < ActionDispatch::IntegrationTest
   context "The IP addresses controller" do

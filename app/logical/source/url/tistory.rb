@@ -10,6 +10,8 @@
 # @see Source::Extractor::Tistory
 # @see Source::Extractor::Null
 class Source::URL::Tistory < Source::URL
+  site "Tistory", url: "https://www.tistory.com"
+
   RESERVED_SUBDOMAINS = [nil, "www"]
 
   attr_reader :username, :post_id, :post_title

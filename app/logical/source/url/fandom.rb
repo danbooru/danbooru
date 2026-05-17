@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Fandom < Source::URL
+  site "Fandom", url: "https://www.fandom.com", domains: %w[nocookie.net fandom.com wikia.com]
+
   # Matches language codes like 'ja' or 'pt-br'
   LANG_CODE_REGEX = /^[a-z]{2,3}(-[a-z]{2,3})?$/
 

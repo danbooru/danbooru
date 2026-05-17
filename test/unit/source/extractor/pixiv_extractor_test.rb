@@ -17,6 +17,8 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/341433",
         display_name: "Nardack",
         username: "nardack",
+        published_at: Time.parse("2015-03-14T08:53:00.000000Z"),
+        updated_at: Time.parse("2015-03-14T08:53:00.000000Z"),
         tags: %w[神崎蘭子 双葉杏 アイドルマスターシンデレラガールズ Star!! アイマス10000users入り],
         dtext_artist_commentary_title: "ツイログ",
         dtext_artist_commentary_desc: "",
@@ -28,12 +30,14 @@ module Source::Tests::Extractor
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
         image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original"],
         media_files: [
-          { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
+          { file_size: 33_197, width: 80, height: 82, frame_delays: [125] * 2, pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245", error: nil },
         ],
         page_url: "https://www.pixiv.net/artworks/62247364",
         profile_url: "https://www.pixiv.net/users/22252953",
         display_name: "uroobnad2",
         username: "user_myeg3558",
+        published_at: Time.parse("2017-04-03T23:57:00.000000Z"),
+        updated_at: Time.parse("2017-04-03T23:57:00.000000Z"),
         tags: %w[Ugoira png blue],
         dtext_artist_commentary_title: "ugoira",
         dtext_artist_commentary_desc: "",
@@ -55,12 +59,14 @@ module Source::Tests::Extractor
         "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
         image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original"],
         media_files: [
-          { file_size: 33_197, frame_delays: [125, 125], pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245" },
+          { file_size: 33_197, width: 80, height: 82, frame_delays: [125] * 2, pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245", error: nil },
         ],
         page_url: "https://www.pixiv.net/artworks/62247364",
         profile_url: "https://www.pixiv.net/users/22252953",
         display_name: "uroobnad2",
         username: "user_myeg3558",
+        published_at: Time.parse("2017-04-03T23:57:38.000000Z"),
+        updated_at: nil,
         tags: %w[Ugoira png blue],
         dtext_artist_commentary_title: "ugoira",
         dtext_artist_commentary_desc: "",
@@ -78,6 +84,8 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/22252953",
         display_name: "uroobnad2",
         username: "user_myeg3558",
+        published_at: Time.parse("2017-04-03T23:57:38.000000Z"),
+        updated_at: nil,
         tags: %w[Ugoira png blue],
         dtext_artist_commentary_title: "ugoira",
         dtext_artist_commentary_desc: "",
@@ -91,6 +99,8 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 10_155 }],
         page_url: "https://www.pixiv.net/artworks/120834265",
         profile_urls: %w[https://www.pixiv.net/users/1802419 https://www.pixiv.net/stacc/thejunebug],
+        published_at: Time.parse("2024-07-23T23:46:41.000000Z"),
+        updated_at: nil,
       )
     end
 
@@ -105,6 +115,8 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.pixiv.net/artworks/113760314",
         image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2023/11/27/19/51/28/113760314_ugoira1920x1080.zip?original"],
+        published_at: Time.parse("2023-11-27T10:51:00.000000Z"),
+        updated_at: Time.parse("2023-11-27T10:51:00.000000Z"),
         media_files: [
           {
             file_size: 5_320_292,
@@ -175,6 +187,8 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://i.pximg.net/img-zip-ugoira/img/2024/03/24/07/15/10/117197872_ugoira1920x1080.zip",
         image_urls: [],
+        published_at: Time.parse("2024-03-23T22:15:10.000000Z"),
+        updated_at: nil,
       )
     end
 
@@ -186,9 +200,81 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/27207",
         display_name: "イチリ",
         username: "itiri",
+        published_at: Time.parse("2017-08-17T15:09:00.000000Z"),
+        updated_at: Time.parse("2017-08-17T15:09:00.000000Z"),
         tags: %w[Fate/GrandOrder フランケンシュタイン(Fate) 水着 バーサーかわいい 新宿のアーチャー パパ製造機 Fate/GO5000users入り フランケンシュタイン(水着) セイバー(Fate)],
         dtext_artist_commentary_title: "水着フランたそ",
         dtext_artist_commentary_desc: "ますたーもひかげですずむ？",
+      )
+    end
+
+    context "A hashed-filename Pixiv artwork URL" do
+      strategy_should_work(
+        "https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg",
+        image_urls: %w[https://i.pximg.net/img-original/img/2026/03/01/07/35/25/141762848-757d4d64b92a41c496c04aa34ae56855_p0.jpg],
+        media_files: [{ file_size: 360_831 }],
+        page_url: "https://www.pixiv.net/artworks/141762848",
+        profile_urls: %w[https://www.pixiv.net/users/213128 https://www.pixiv.net/stacc/witch_shootingstar],
+        display_name: "みーちゃ",
+        username: "witch_shootingstar",
+        published_at: Time.parse("2026-02-28T22:35:25.000000Z"),
+        updated_at: nil,
+        tags: [
+          ["ご注文はうさぎですか?", "https://www.pixiv.net/tags/ご注文はうさぎですか%3F/artworks"],
+          ["桐間紗路", "https://www.pixiv.net/tags/桐間紗路/artworks"],
+          ["シャロ", "https://www.pixiv.net/tags/シャロ/artworks"],
+          ["内田真礼", "https://www.pixiv.net/tags/内田真礼/artworks"],
+        ],
+        dtext_artist_commentary_title: "シャロちゃん",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          🐰＜ Twitter [ [b]"twitter/MityaStar":[https://twitter.com/MityaStar][/b] ]
+          🐰＜ FANBOX [ <https://shootingstar.fanbox.cc> ]
+          🐰＜ Skeb [ <https://skeb.jp/@MityaStar> ]
+        EOS
+      )
+    end
+
+    context "A hashed-filename ugoira URL" do
+      strategy_should_work(
+        "https://www.pixiv.net/en/artworks/142520613",
+        image_urls: %w[https://i.pximg.net/img-zip-ugoira/img/2026/03/20/14/30/40/142520613-15ca79b1a148b305fcc73d45564b51b2_ugoira1920x1080.zip?original],
+        media_files: [{ file_size: 11_689_271, width: 720, height: 1280, frame_delays: [32] * 115, pixel_hash: "3b77ebb7c1e7ca13bb9a3610cc518c9e", md5: "77e7756cb6ddd50efc5ae3d441a306c9", error: nil }],
+        # media_files: [{ file_size: 17_320_728 , width: 608, height: 1080 }],
+        page_url: "https://www.pixiv.net/artworks/142520613",
+        profile_urls: %w[https://www.pixiv.net/users/1851972 https://www.pixiv.net/stacc/t-tumekiri],
+        display_name: "ｔつめきり",
+        username: "t-tumekiri",
+        published_at: Time.parse("2026-03-20T05:30:00.000000Z"),
+        updated_at: Time.parse("2026-03-20T05:30:00.000000Z"),
+        tags: [
+          ["うごイラ", "https://www.pixiv.net/tags/うごイラ/artworks"],
+          ["ウマ娘プリティーダービー", "https://www.pixiv.net/tags/ウマ娘プリティーダービー/artworks"],
+          ["スイープトウショウ(ウマ娘)", "https://www.pixiv.net/tags/スイープトウショウ(ウマ娘)/artworks"],
+          ["水着ウマ娘", "https://www.pixiv.net/tags/水着ウマ娘/artworks"],
+          ["コイカツ!", "https://www.pixiv.net/tags/コイカツ!/artworks"],
+        ],
+        dtext_artist_commentary_title: "スイープさんが水着でダンスを披露するだけのうごイラですわ",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          スイープさんが水着でダンスを披露するだけのうごイラですわ
+          健康的で微笑ましいうごイラですわ
+          ※下記のシーンをお借りしましたわ、Thanksですわ！
+          [b]pixiv #142277713 "»":[/posts?tags=pixiv%3A142277713][/b]
+        EOS
+      )
+    end
+
+    context "An unlisted Pixiv artwork page URL" do
+      setup { skip "Unlisted Pixiv posts not yet implemented" }
+
+      strategy_should_work(
+        "https://www.pixiv.net/en/artworks/unlisted/ntQchboUi1CsqMhDpo5j",
+        image_urls: [%r{\Ahttps://i\.pximg\.net/img-original/img/2021/06/01/00/45/05/90237981-\h{32}_p0\.jpg\z}],
+        page_url: "https://www.pixiv.net/artworks/unlisted/ntQchboUi1CsqMhDpo5j",
+        profile_url: "https://www.pixiv.net/users/44859333",
+        display_name: "33回転",
+        username: "user_xmfa7574",
+        published_at: Time.parse("2021-05-31T15:45:00.000000Z"),
+        updated_at: Time.parse("2021-05-31T15:45:00.000000Z"),
       )
     end
 
@@ -200,6 +286,8 @@ module Source::Tests::Extractor
         profile_url: nil,
         display_name: nil,
         username: nil,
+        published_at: Time.parse("2018-12-29T16:04:55.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -216,6 +304,8 @@ module Source::Tests::Extractor
         display_name: "影おじ (隠れエリア)",
         profile_url: "https://www.pixiv.net/users/6570768",
         profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
+        published_at: Time.parse("2022-08-14T10:23:06.000000Z"),
+        updated_at: nil,
         tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber30000users入り 両手に茎 乱交 輪姦],
       )
     end
@@ -228,10 +318,17 @@ module Source::Tests::Extractor
           https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p1.png
           https://i.pximg.net/img-original/img/2022/08/14/21/21/24/100474393_p2.png
         ],
+        image_sources: [
+          { published_at: Time.parse("2022-08-14T12:21:24.000000Z") },
+          { published_at: Time.parse("2022-08-14T12:21:24.000000Z") },
+          { published_at: Time.parse("2022-08-14T12:21:24.000000Z") },
+        ],
         dtext_artist_commentary_title: "シャイリリー",
         display_name: "影おじ (隠れエリア)",
         profile_url: "https://www.pixiv.net/users/6570768",
         profile_urls: %w[https://www.pixiv.net/stacc/haku3490 https://www.pixiv.net/users/6570768],
+        published_at: Time.parse("2022-08-14T04:00:00.000000Z"),
+        updated_at: Time.parse("2022-08-14T12:21:00.000000Z"),
         tags: %w[r-18 shylily シャイリリー バーチャルyoutuber バーチャルyoutuber30000users入り 両手に茎 乱交 輪姦],
       )
     end
@@ -243,6 +340,8 @@ module Source::Tests::Extractor
         dtext_artist_commentary_title: "Rem's present",
         display_name: "Anzatiridonia",
         profile_url: "https://www.pixiv.net/users/33589885",
+        published_at: Time.parse("2022-12-02T20:06:00.000000Z"),
+        updated_at: Time.parse("2022-12-02T20:06:00.000000Z"),
         tags: %w[AI Re:ゼロから始める異世界生活 レム リゼロ レム(リゼロ) AIイラスト AnythingV3 Present sweater],
       )
     end
@@ -371,6 +470,8 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/22252953",
         display_name: "uroobnad2",
         username: "user_myeg3558",
+        published_at: Time.parse("2017-04-03T23:54:00.000000Z"),
+        updated_at: Time.parse("2017-04-03T23:54:00.000000Z"),
         tags: %w[blue png],
         dtext_artist_commentary_title: "single image",
         dtext_artist_commentary_desc: "description here",
@@ -386,6 +487,8 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/22252953",
         display_name: "uroobnad2",
         username: "user_myeg3558",
+        published_at: Time.parse("2017-04-03T23:54:15.000000Z"),
+        updated_at: nil,
         tags: %w[blue png],
         dtext_artist_commentary_title: "single image",
         dtext_artist_commentary_desc: "description here",
@@ -401,6 +504,8 @@ module Source::Tests::Extractor
         profile_url: "https://www.pixiv.net/users/22252953",
         display_name: "uroobnad2",
         username: "user_myeg3558",
+        published_at: Time.parse("2017-04-03T23:54:15.000000Z"),
+        updated_at: nil,
         tags: %w[blue png],
         dtext_artist_commentary_title: "single image",
         dtext_artist_commentary_desc: "description here",
@@ -418,6 +523,8 @@ module Source::Tests::Extractor
         display_name: "病んだ犬",
         username: "3md0m2ng",
         other_names: ["病んだ犬", "3md0m2ng"],
+        published_at: Time.parse("2024-04-26T04:03:41.000000Z"),
+        updated_at: nil,
         tags: [
           ["ひろがるスカイ!プリキュア", "https://www.pixiv.net/tags/ひろがるスカイ!プリキュア/artworks"],
           ["百合", "https://www.pixiv.net/tags/百合/artworks"],
@@ -446,6 +553,8 @@ module Source::Tests::Extractor
         display_name: "wlop",
         username: "wlop",
         other_names: ["wlop"],
+        published_at: Time.parse("2022-03-07T15:00:56.000000Z"),
+        updated_at: nil,
         tags: [
           ["ghostblade", "https://www.pixiv.net/tags/ghostblade/artworks"],
           ["original", "https://www.pixiv.net/tags/オリジナル/artworks"],
@@ -467,6 +576,25 @@ module Source::Tests::Extractor
         profile_url: nil,
         display_name: nil,
         username: nil,
+        published_at: Time.parse("2014-12-18T01:31:23.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A background sample image URL" do
+      strategy_should_work(
+        "https://i.pximg.net/c/1920x960_80_a2_g5/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg",
+        image_urls: %w[https://i.pximg.net/background/img/2024/11/08/13/57/28/16699330_6c8a2ddee87ea8584a83f51301552f62.jpg],
+        media_files: [{ file_size: 1_657_731 }],
+        page_url: nil,
+        profile_urls: %w[https://www.pixiv.net/users/16699330],
+        display_name: nil,
+        username: nil,
+        published_at: Time.parse("2024-11-08T04:57:28.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -482,6 +610,8 @@ module Source::Tests::Extractor
         profile_url: nil,
         display_name: nil,
         username: nil,
+        published_at: Time.parse("2015-10-24T23:45:27.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -494,6 +624,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg],
         media_files: [{ file_size: 532_037 }],
         page_url: "https://www.pixiv.net/novel/show.php?id=8465454",
+        published_at: Time.parse("2017-07-27T14:14:17.000000Z"),
+        updated_at: nil,
       )
     end
 
@@ -508,6 +640,8 @@ module Source::Tests::Extractor
         display_name: "緋錬",
         username: nil,
         other_names: ["緋錬"],
+        published_at: Time.parse("2017-07-27T14:14:17.000000Z"),
+        updated_at: nil,
         tags: [
           ["ガールズ&パンツァー", "https://www.pixiv.net/tags/ガールズ%26パンツァー/novels"],
           ["ガルパン", "https://www.pixiv.net/tags/ガルパン/novels"],
@@ -562,6 +696,8 @@ module Source::Tests::Extractor
         display_name: nil,
         username: nil,
         other_names: [],
+        published_at: Time.parse("2022-11-02T01:04:22.000000Z"),
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -591,6 +727,8 @@ module Source::Tests::Extractor
         display_name: "しゅか",
         username: nil,
         other_names: ["しゅか"],
+        published_at: Time.parse("2022-10-23T08:34:58.000000Z"),
+        updated_at: Time.parse("2025-02-26T11:02:10.000000Z"),
         tags: [
           ["original", "https://www.pixiv.net/tags/オリジナル/novels"],
           ["オリキャラ", "https://www.pixiv.net/tags/オリキャラ/novels"],
@@ -625,6 +763,8 @@ module Source::Tests::Extractor
         display_name: "しゅか",
         username: nil,
         other_names: ["しゅか"],
+        published_at: Time.parse("2022-10-23T08:31:13.000000Z"),
+        updated_at: Time.parse("2025-02-26T11:02:10.000000Z"),
         tags: [
           ["original", "https://www.pixiv.net/tags/オリジナル/novels"],
           ["pixivファンタジアSOZ", "https://www.pixiv.net/tags/pixivファンタジアSOZ/novels"],
@@ -671,6 +811,8 @@ module Source::Tests::Extractor
           ["【SOZアロイスとユーゴ】", "https://www.pixiv.net/tags/【SOZアロイスとユーゴ】/novels"],
           ["創作", "https://www.pixiv.net/tags/創作/novels"],
         ],
+        published_at: Time.parse("2022-10-23T08:31:13.000000Z"),
+        updated_at: Time.parse("2025-02-26T11:02:10.000000Z"),
         dtext_artist_commentary_title: "ユーゴとアロイス",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           PFSOZの自キャラのSS。傾向はブロマンス。友情と家族愛。魔術師リーリンの息子であるユーゴは正体を隠した父親に育てられるが、彼との関係に行き詰まり、外の世界を知ろうとアラディア院の門をたたくのだった。
@@ -690,15 +832,44 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 1_770_646 }],
         page_url: "https://www.pixiv.net/novel/series/9593812",
         profile_url: "https://www.pixiv.net/users/66091066",
+        published_at: Time.parse("2022-10-23T08:31:13.000000Z"),
+        updated_at: nil,
       )
     end
 
-    context "An imgaz url" do
+    context "An imgaz url with a date but no time" do
       strategy_should_work(
         "https://i.pximg.net/imgaz/upload/20240417/163474511.jpg",
         image_urls: %w[https://i.pximg.net/imgaz/upload/20240417/163474511.jpg],
         media_files: [{ file_size: 3_049_892 }],
         page_url: nil,
+        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: Time.parse("2024-04-16T15:00:00.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "An imgaz url with a date and a time" do
+      strategy_should_work(
+        "https://i.pximg.net/imgaz/2022/11/17/21/27/54/contest_pc_header_ja_606.jpg",
+        image_urls: %w[https://i.pximg.net/imgaz/2022/11/17/21/27/54/contest_pc_header_ja_606.jpg],
+        media_files: [{ file_size: 1_058_781 }],
+        page_url: nil,
+        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: Time.parse("2022-11-17T12:27:54.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
   end

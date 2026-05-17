@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Skland < Source::URL
+  site "Skland", url: "https://www.skland.com", domains: %w[skland.com hycdn.cn]
+
   attr_reader :article_id, :profile_id, :full_image_url
 
   def self.match?(url)

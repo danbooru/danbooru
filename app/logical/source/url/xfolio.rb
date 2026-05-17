@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Source::URL::Xfolio < Source::URL
+  site "Xfolio", url: "https://xfolio.jp" do
+    credential :session_cookie, help: %{Your Xfolio `xfolio_session` cookie}
+  end
+
   attr_reader :username, :work_id, :image_id
 
   def self.match?(url)

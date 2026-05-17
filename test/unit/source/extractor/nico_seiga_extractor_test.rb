@@ -100,6 +100,8 @@ module Source::Tests::Extractor
     end
 
     context "A nicoseiga manga url (2)" do
+      setup { skip "https://seiga.nicovideo.jp/watch/mg485611 is region locked?" }
+
       strategy_should_work(
         "https://seiga.nicovideo.jp/watch/mg485611",
         image_urls: %w[

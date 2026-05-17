@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-#
+
 # This file contains all the configuration settings for Danbooru.
 #
 # Don't edit this file. Instead, to configure your Danbooru instance, copy this
@@ -252,17 +252,17 @@ module Danbooru
 
     # Maximum resolution (width * height) of an upload. Default: 441 megapixels (21000x21000 pixels).
     def max_image_resolution
-      21000 * 21000
+      21_000 * 21_000
     end
 
     # Maximum width of an upload.
     def max_image_width
-      40000
+      40_000
     end
 
     # Maximum height of an upload.
     def max_image_height
-      40000
+      40_000
     end
 
     # Maximum duration of an video in seconds.
@@ -457,9 +457,9 @@ module Danbooru
       nil
     end
 
-    # Your Newgrounds "vmkIdu5l8m" cookie. Login to Newgrounds then use the
-    # devtools to find the "vmkIdu5l8m" cookie.
-    def newgrounds_session_cookie
+    # Your Newgrounds "ng_remember" cookie. Login to Newgrounds then use the
+    # devtools to find the "ng_remember" cookie.
+    def newgrounds_ng_remember_cookie
       nil
     end
 
@@ -483,6 +483,21 @@ module Danbooru
     end
 
     def deviantart_client_secret
+      nil
+    end
+
+    # Your DeviantArt `auth` cookie.
+    def deviantart_auth_cookie
+      nil
+    end
+
+    # Your DeviantArt `auth_secure` cookie.
+    def deviantart_auth_secure_cookie
+      nil
+    end
+
+    # Your DeviantArt `userinfo` cookie.
+    def deviantart_userinfo_cookie
       nil
     end
 
@@ -591,6 +606,10 @@ module Danbooru
     def plurk_session_cookie
     end
 
+    # Your Reddit "reddit_session" cookie
+    def reddit_session_cookie
+    end
+
     # Your Xiaohongshu "gid" cookie. Login to Xiaohongshu then use the devtools to find the "gid" cookie.
     def xiaohongshu_session_cookie
     end
@@ -628,19 +647,20 @@ module Danbooru
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
-      jpeg_artifacts corrupted_image missing_image missing_sample missing_thumbnail
-      resolution_mismatch source_larger source_smaller source_request non-web_source]
+         jpeg_artifacts corrupted_image missing_image missing_sample missing_thumbnail
+         resolution_mismatch source_larger source_smaller source_request non-web_source]
     end
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
-      %w[ai-generated ai-assisted anime_screencap bad_source duplicate hard_translated image_sample md5_mismatch
-      nude_filter off-topic paid_reward resized third-party_edit]
+      %w[ai-generated ai-assisted anime_screenshot game_screenshot bad_source duplicate
+         hard-translated image_sample md5_mismatch nude_filter off-topic paid_reward resized
+         third-party_edit]
     end
 
     # Whether the Gold account upgrade page should be enabled.
     def user_upgrades_enabled?
-      true
+      false
     end
 
     # Whether to enable API rate limits.
@@ -660,64 +680,6 @@ module Danbooru
 
     # Whether to enable autocomplete.
     def autocomplete_enabled?
-      true
-    end
-
-    # The URL of the Shopify checkout page where account upgrades are sold.
-    def shopify_checkout_url
-    end
-
-    # The secret used to verify webhooks from Shopify. Get it from the https://xxx.myshopify.com/admin/settings/notifications page.
-    def shopify_webhook_secret
-    end
-
-    def stripe_secret_key
-    end
-
-    def stripe_publishable_key
-    end
-
-    def stripe_webhook_secret
-    end
-
-    def stripe_gold_usd_price_id
-    end
-
-    def stripe_platinum_usd_price_id
-    end
-
-    def stripe_gold_to_platinum_usd_price_id
-    end
-
-    def stripe_gold_eur_price_id
-    end
-
-    def stripe_platinum_eur_price_id
-    end
-
-    def stripe_gold_to_platinum_eur_price_id
-    end
-
-    def stripe_promotion_discount_id
-    end
-
-    # The login ID for Authorize.net. Used for accepting payments for user upgrades.
-    # Signup for a test account at https://developer.authorize.net/hello_world/sandbox.html.
-    def authorize_net_login_id
-    end
-
-    # The transaction key for Authorize.net. This is the API secret for API calls.
-    def authorize_net_transaction_key
-    end
-
-    # The signature key for Authorize.net. Used for verifying webhooks sent by Authorize.net.
-    # Generate at Account > Settings > Security Settings > General Security Settings > API Credentials and Keys
-    def authorize_net_signature_key
-    end
-
-    # Whether to use the test environment or the live environment for Authorize.net. The test environment
-    # allows testing payments without using real credit cards.
-    def authorize_net_test_mode
       true
     end
 

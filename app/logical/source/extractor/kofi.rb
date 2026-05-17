@@ -37,7 +37,7 @@ class Source::Extractor::Kofi < Source::Extractor
   end
 
   def user_id
-    parsed_url.user_id || parsed_referer&.user_id || profile_page&.at('a[href^="/home/reportpage"]')&.attr(:href)&.delete_prefix("/home/reportpage?pageid=")
+    parsed_url.user_id || parsed_referer&.user_id || profile_page&.at("a[data-reported-page-id]")&.attr("data-reported-page-id")
   end
 
   def tags
@@ -53,6 +53,15 @@ class Source::Extractor::Kofi < Source::Extractor
   end
 
   memoize def profile_page
-    http.cache(1.minute).parsed_get("https://ko-fi.com/#{profile_id}") if profile_id.present?
+    backend_get("/#{profile_id}") if profile_id.present?
+  end
+
+  def backend_get(path)
+    # Use Ko-fi's backend IP to bypass Cloudflare protection
+    backend_http.cache(1.minute).parsed_get("https://104.45.231.79#{path}") if path.present?
+  end
+
+  def backend_http
+    http.with_legacy_ssl.headers(Host: "ko-fi.com")
   end
 end

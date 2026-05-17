@@ -2,7 +2,7 @@
   <% if pending_burs.present? %>
     <p class="fineprint tag-change-notice mt-3">
       This tag is being discussed in
-      <%= pending_burs.group_by { |bur| bur.forum_topic }.map {|forum_topic, burs| bur_links_for_topic(forum_topic: forum_topic, burs: burs) }.to_sentence.html_safe %>.
+      <%= to_sentence(pending_burs.group_by(&:forum_topic).map { |forum_topic, burs| bur_links_for_topic(forum_topic: forum_topic, burs: burs) }) %>.
     </p>
   <% end %>
 <% end %>

@@ -22,14 +22,12 @@
 # * http://twitpic.com/photos/Type10TK (dead)
 
 class Source::URL::TwitPic < Source::URL
+  site "TwitPic", url: "https://twitpic.com", domains: %w[twitpic.com twimg.com cloudfront.net]
+
   attr_reader :base36_id, :username
 
   def self.match?(url)
     url.host.in?(%w[twitpic.com o.twimg.com dn3pm25xmtlyu.cloudfront.net d3j5vwomefv46c.cloudfront.net])
-  end
-
-  def site_name
-    "TwitPic"
   end
 
   def parse

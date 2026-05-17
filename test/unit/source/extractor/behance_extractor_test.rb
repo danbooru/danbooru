@@ -2,10 +2,6 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class BehanceExtractorTest < ActiveSupport::ExtractorTestCase
-    setup do
-      skip "Behance cookie not configured" unless Source::Extractor::Behance.enabled?
-    end
-
     context "A mir-s3-cdn-cf.behance.net sample image URL" do
       strategy_should_work(
         "https://mir-s3-cdn-cf.behance.net/project_modules/1400/ea4c7e97612065.5ec92bae8dc45.jpg",
@@ -538,7 +534,7 @@ module Source::Tests::Extractor
 
           Romeo Arturio
 
-          "FACEBOOK":[https://www.facebook.com/nbaongoc1102] | "ART STATION":[https://www.artstation.com/romeoarturio]| "TWITTER":[https://twitter.com/RomeoArthur1412]
+          "FACEBOOK":[https://www.facebook.com/nbaongoc1102] | "ART STATION":[https://www.artstation.com/romeoarturio] | "TWITTER":[https://twitter.com/RomeoArthur1412]
 
           romeoarthur1412@gmail.com
 
@@ -554,6 +550,8 @@ module Source::Tests::Extractor
     end
 
     context "A NSFW Behance post" do
+      setup { skip "Behance credentials required for NSFW posts" unless Source::Extractor::Behance.enabled? }
+
       strategy_should_work(
         "https://www.behance.net/gallery/10784599/The-Garden",
         image_urls: %w[https://mir-s3-cdn-cf.behance.net/project_modules/source/a247f410784599.560eb10242efc.jpg],

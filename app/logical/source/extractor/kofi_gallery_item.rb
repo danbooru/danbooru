@@ -37,7 +37,6 @@ class Source::Extractor::KofiGalleryItem < Source::Extractor::Kofi
   end
 
   memoize def gallery_page
-    url = "https://104.45.231.79/Gallery/LoadGalleryItem?galleryItemId=#{gallery_item_id}" if gallery_item_id.present?
-    http.with_legacy_ssl.headers(Host: "ko-fi.com").cache(1.minute).parsed_get(url)
+    backend_get("/Gallery/LoadGalleryItem?galleryItemId=#{gallery_item_id}") if gallery_item_id.present?
   end
 end

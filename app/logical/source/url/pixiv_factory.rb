@@ -5,6 +5,8 @@
 # @see Source::Extractor::PixivFactory
 module Source
   class URL::PixivFactory < Source::URL
+    site "Pixiv Factory", url: "https://factory.pixiv.net", domains: %w[pixiv.net ctfassets.net]
+
     attr_reader :full_image_url, :image_id, :collection_name
 
     def self.match?(url)

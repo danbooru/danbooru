@@ -14,7 +14,7 @@ class PostEvent < ApplicationRecord
     %w[Upload Flag Appeal Approval Disapproval Delete Undelete Ban Unban Replacement Regenerate RegenerateIqdb MoveFavorites NoteLockCreate NoteLockDelete RatingLockCreate RatingLockDelete]
   end
 
-  def self.visible(user)
+  def self.visible(_user)
     all
   end
 
@@ -25,9 +25,9 @@ class PostEvent < ApplicationRecord
     when "Upload"
       where(model_type: "Post")
     when "Flag", "Appeal", "Approval", "Disapproval", "Replacement"
-      where(model_type: "Post" + category)
+      where(model_type: "Post#{category}")
     when *categories
-      where(model: ModAction.where(category: "post_" + category.underscore))
+      where(model: ModAction.where(category: "post_#{category.underscore}"))
     else
       none
     end

@@ -24,7 +24,7 @@ Rails.application.configure do
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
-      "Cache-Control" => "public, max-age=#{2.days.to_i}"
+      "Cache-Control": "public, max-age=#{2.days.to_i}",
     }
   else
     config.action_controller.perform_caching = false
@@ -56,7 +56,6 @@ Rails.application.configure do
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
 
-
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
@@ -68,18 +67,51 @@ Rails.application.configure do
 
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
-  config.file_watcher = ActiveSupport::EventedFileUpdateChecker unless Danbooru.config.debug_mode
+  #
+  # In clustered Puma worker mode (`PUMA_WORKERS>0`), listen can fail to start
+  # in forked workers (`Listen::Error::NotStarted`), so use the polling watcher.
+  if ENV.fetch("PUMA_WORKERS", "0").to_i <= 0
+    config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+  else
+    config.file_watcher = ActiveSupport::FileUpdateChecker
+  end
 
   BetterErrors::Middleware.allow_ip!(IPAddr.new("0.0.0.0/0"))
   BetterErrors::Middleware.allow_ip!(IPAddr.new("::/0"))
 
   # Log SQL queries at INFO level instead of DEBUG level.
-  config.active_record.logger = Logger.new(STDERR)
-  def (config.active_record.logger).add(level, message = nil, prog = nil)
+  config.active_record.logger = Logger.new($stderr)
+  def (config.active_record.logger).add(_level, message = nil, prog = nil)
     Rails.logger.add(Logger::Severity::INFO, message, prog)
   end
 
   # https://bigbinary.com/blog/rails-6-adds-guard-against-dns-rebinding-attacks
-  # hxxps://github.com/rails/rails/pull/33145
-  config.hosts += [".ngrok.io", ".ngrok.app", ".ngrok.dev", ".ngrok-free.app", ".ngrok-free.dev", ".app.github.dev", ".nip.io", ".localhost", ".local", Danbooru::URL.parse!(Danbooru.config.canonical_url).host]
+  # https://guides.rubyonrails.org/configuring.html#actiondispatch-hostauthorization
+  #
+  # For security reasons, requests to dev instances are only allowed from trusted domain names. Allowing untrusted
+  # domain names would open the door to remote code execution via DNS rebinding attacks.
+
+  # `ngrok http 3000` - https://ngrok.com/docs/getting-started
+  config.hosts += [".ngrok.io", ".ngrok.app", ".ngrok.dev", ".ngrok-free.app", ".ngrok-free.dev"]
+
+  # `gh codespace create -r danbooru/danbooru` - https://docs.github.com/en/codespaces
+  config.hosts += [".app.github.dev"]
+
+  # `cloudflared tunnel --url http://localhost:3000` - https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/
+  config.hosts += [".trycloudflare.com"]
+
+  # `devtunnel host -p 3000` - https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started
+  config.hosts += [/.*\.devtunnels\.ms$/]
+
+  # http://127-0-0-1.sslip.io:3000 - https://sslip.io
+  config.hosts += [/.*\.sslip\.io/i]
+
+  # https://en.wikipedia.org/wiki/.local
+  config.hosts += [".local", Danbooru::URL.parse!(Danbooru.config.canonical_url).host]
+
+  # Allow dotless hosts - `danbooru:3000`, etc
+  config.hosts += [/[^.]+/]
+
+  # Allow requests sent with no `Host:` header (for `bundle exec derailed exec perf:ips`)
+  config.hosts += [nil]
 end

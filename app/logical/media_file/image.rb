@@ -26,8 +26,7 @@ class MediaFile::Image < MediaFile
   def is_supported?
     case file_ext
     when :avif
-      # XXX Mirrored AVIFs should be unsupported too, but we currently can't detect the mirrored flag using exiftool or ffprobe.
-      !metadata.is_rotated? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.is_animated_avif?
+      !metadata.is_rotated? && !metadata.is_mirrored? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.has_auxiliary_image? && !metadata.is_animated_avif?
     when :webp
       !is_animated?
     else
@@ -50,7 +49,7 @@ class MediaFile::Image < MediaFile
     # return video.error if is_animated? && video.error.present?
 
     nil
-  rescue Vips::Error => e
+  rescue Vips::Error
     # XXX Vips has a single global error buffer that is shared between threads and that isn't cleared between operations.
     # We can't reliably use `e.message` here because it may pick up errors from other threads, or from previous
     # operations in the same thread.
@@ -90,7 +89,7 @@ class MediaFile::Image < MediaFile
   #   isn't animated or is corrupt. Note that libvips and ffmpeg may disagree on the duration.
   def vips_duration
     # XXX Browsers typically raise the frame time to 0.1s if it's less than or equal to 0.01s.
-    image.get("delay").map { |delay| delay <= 10 ? 100 : delay }.sum / 1000.0
+    image.get("delay").map { |delay| (delay <= 10) ? 100 : delay }.sum / 1000.0
   rescue Vips::Error
     nil
   end

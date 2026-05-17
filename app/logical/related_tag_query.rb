@@ -16,7 +16,7 @@ class RelatedTagQuery
     @media_asset = media_asset
     @categories = categories
     @categories = @categories.to_s.split(/[[:space:],]/) unless categories.is_a?(Array)
-    @categories = @categories.map { |c| Tag.categories.value_for(c) }
+    @categories = @categories.map { |c| Tag.categories.value_for(c) }.compact
     @order = order
     @search_sample_size = search_sample_size.to_i.clamp(0, 100_000)
     @search_sample_size = 5000 if @search_sample_size == 0
@@ -87,7 +87,7 @@ class RelatedTagQuery
 
     versions = PostVersion.where(updater_id: user.id).where("updated_at > ?", since).order(id: :desc).limit(max_edits)
     tags = versions.flat_map(&:added_tags)
-    tags = tags.reject { |tag| tag.match?(/\A(source:|parent:|rating:)/) }
+    tags = tags.grep_v(/\A(source:|parent:|rating:)/)
     tags = tags.group_by(&:itself).transform_values(&:size).sort_by { |tag, count| [-count, tag] }.map(&:first)
     tags = tags.take(max_tags)
     tags = Tag.nonempty.undeprecated.named_or_aliased_in_order(tags)

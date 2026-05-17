@@ -19,7 +19,7 @@ class PostQueryBuilder
     flag_count
     child_count deleted_child_count active_child_count
     pool_count deleted_pool_count active_pool_count series_pool_count collection_pool_count
-    appeal_count approval_count replacement_count
+    appeal_count approval_count replacement_count disapproval_count
   ]
 
   # allow e.g. `deleted_comments` as a synonym for `deleted_comment_count`
@@ -101,7 +101,6 @@ class PostQueryBuilder
     relation = relation.with_stats(tables)
     relation
   end
-
 
   # Generate a SQL relation from a PostQuery.
   def build_relation(post_query, relation = Post.all)

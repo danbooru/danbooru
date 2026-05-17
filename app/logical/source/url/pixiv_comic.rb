@@ -3,6 +3,8 @@
 module Source
   class URL
     class PixivComic < Source::URL
+      site "Pixiv Comic", url: "https://comic.pixiv.net", domains: %w[pixiv.net pximg.net]
+
       attr_reader :full_image_url, :magazine_id, :work_id, :story_id, :novel_work_id, :novel_story_id
 
       def self.match?(url)

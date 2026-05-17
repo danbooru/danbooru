@@ -25,6 +25,7 @@
 # @see https://www.postgresql.org/docs/current/sql-explain.html
 class ExplainParser
   extend Memoist
+
   attr_reader :relation
 
   # @param the ActiveRecord relation

@@ -6,27 +6,6 @@ class UsersController < ApplicationController
   around_action :set_timeout, only: [:profile, :show]
   verify_captcha only: :create
 
-  def new
-    @user = authorize User.new
-    respond_with(@user)
-  end
-
-  def edit
-    @user = authorize User.find(params[:id])
-    respond_with(@user)
-  end
-
-  def settings
-    @user = authorize CurrentUser.user
-
-    if @user.is_anonymous?
-      redirect_to login_path(url: settings_path)
-    else
-      params[:action] = "edit"
-      respond_with(@user, template: "users/edit")
-    end
-  end
-
   def index
     if params[:name].present?
       params[:search] ||= {}
@@ -51,6 +30,28 @@ class UsersController < ApplicationController
     end
   end
 
+  def new
+    @user = authorize User.new
+    @url = params.dig(:user, :url).presence || params[:url].presence || root_path
+    respond_with(@user)
+  end
+
+  def edit
+    @user = authorize User.find(params[:id])
+    respond_with(@user)
+  end
+
+  def settings
+    @user = authorize CurrentUser.user
+
+    if @user.is_anonymous?
+      redirect_to login_path(url: settings_path)
+    else
+      params[:action] = "edit"
+      respond_with(@user, template: "users/edit")
+    end
+  end
+
   def profile
     @user = authorize CurrentUser.user
 
@@ -65,12 +66,13 @@ class UsersController < ApplicationController
   def create
     user_signup = UserSignup.new(request)
     @user = authorize(user_signup.user)
+    @url = params.dig(:user, :url).presence || params[:url].presence
 
     if @user.save(context: [:create, :deliverable])
       set_current_user
     end
 
-    respond_with(@user)
+    respond_with(@user, location: @url)
   end
 
   def update

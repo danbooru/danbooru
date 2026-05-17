@@ -178,35 +178,23 @@ module Source::Tests::Extractor
       )
     end
 
-    context "A Fanbox post with missing imageIds" do
+    context "A Fanbox post with previously missing imageIds" do
       strategy_should_work(
         "https://www.fanbox.cc/@asdkd123/posts/10274875",
-        image_urls: %w[
-          https://downloads.fanbox.cc/images/post/10274875/N7wxp4ikGcGKavDI2WFAvR5D.png
-          https://downloads.fanbox.cc/images/post/10274875/jIIOsS079oyxTpmESgQNX3Rf.png
-          https://downloads.fanbox.cc/images/post/10274875/xDqYK8sBjY2VIWCsyQMCTvxJ.png
-        ],
-        media_files: [
-          { file_size: 8_804_311 },
-          { file_size: 8_845_871 },
-          { file_size: 8_921_414 },
-        ],
+        image_urls: %w[https://downloads.fanbox.cc/images/post/10274875/kvTBhV0kxabbEYCTijx0BpOz.png],
+        media_files: [{ file_size: 12_053_977 }],
         page_url: "https://asdkd123.fanbox.cc/posts/10274875",
         profile_urls: %w[https://asdkd123.fanbox.cc],
         display_name: "asdkd123",
         username: "asdkd123",
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["Uma", "https://fanbox.cc/tags/Uma"],
           ["全体公開", "https://fanbox.cc/tags/全体公開"],
         ],
         dtext_artist_commentary_title: "ファル子〇ー2025.7.24",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          https://downloads.fanbox.cc/images/post/10274875/N7wxp4ikGcGKavDI2WFAvR5D.png
-
-          https://downloads.fanbox.cc/images/post/10274875/jIIOsS079oyxTpmESgQNX3Rf.png
-
-          https://downloads.fanbox.cc/images/post/10274875/xDqYK8sBjY2VIWCsyQMCTvxJ.png
-        EOS
+        dtext_artist_commentary_desc: "https://downloads.fanbox.cc/images/post/10274875/kvTBhV0kxabbEYCTijx0BpOz.png",
       )
     end
 

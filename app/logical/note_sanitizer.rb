@@ -14,7 +14,7 @@ module NoteSanitizer
     "span" => %w[class],
     "div" => %w[class align],
     "p" => %w[class align],
-    "font" => %w[color size]
+    "font" => %w[color size],
   }
 
   ALLOWED_PROPERTIES = %w[
@@ -69,32 +69,30 @@ module NoteSanitizer
   def self.sanitize(text)
     Sanitize.clean(
       text,
-      :elements => ALLOWED_ELEMENTS,
-      :attributes => ALLOWED_ATTRIBUTES,
-      :add_attributes => {
-        "a" => { "rel" => "external noreferrer nofollow" }
+      elements: ALLOWED_ELEMENTS,
+      attributes: ALLOWED_ATTRIBUTES,
+      add_attributes: {
+        "a" => { "rel" => "external noreferrer nofollow" },
       },
-      :protocols => {
-        "a" => {
-          "href" => ["http", "https", :relative]
-        }
+      protocols: {
+        "a" => { "href" => ["http", "https", :relative] },
       },
-      :css => {
+      css: {
         allow_comments: false,
         allow_hacks: false,
         at_rules: [],
         protocols: [],
-        properties: ALLOWED_PROPERTIES
+        properties: ALLOWED_PROPERTIES,
       },
-      :transformers => [
-        method(:sanitize_css!)
-      ]
+      transformers: [
+        method(:sanitize_css!),
+      ],
     )
   end
 
   # Remove disallowed CSS properties from the HTML element's style attribute.
   # @param node [Nokogiri::HTML5::DocumentFragment] The HTML element to sanitize.
-  def self.sanitize_css!(node:, **env)
+  def self.sanitize_css!(node:, **_env)
     node["style"] = sanitize_style(node["style"])
   end
 
@@ -116,6 +114,7 @@ module NoteSanitizer
         nil
 
       in :whitespace
+        # node
         nil
 
       else
@@ -124,6 +123,7 @@ module NoteSanitizer
       end
     end
 
+    # Crass::Parser.stringify(nodes)
     Crass::Parser.stringify(nodes).strip
   end
 

@@ -3,7 +3,7 @@
 class PostAppeal < ApplicationRecord
   dtext_attribute :reason, inline: true # defines :dtext_reason
 
-  belongs_to :creator, :class_name => "User"
+  belongs_to :creator, class_name: "User"
   belongs_to :post
 
   validates :reason, visible_string: { allow_empty: true }, length: { maximum: 140 }
@@ -18,7 +18,7 @@ class PostAppeal < ApplicationRecord
     rejected: 2,
   }
 
-  scope :expired, -> { pending.where("post_appeals.created_at < ?", Danbooru.config.moderation_period.ago) }
+  scope :expired, -> { pending.where(post_appeals: { created_at: ...Danbooru.config.moderation_period.ago }) }
 
   def prune_disapprovals
     PostDisapproval.where(post: post).delete_all

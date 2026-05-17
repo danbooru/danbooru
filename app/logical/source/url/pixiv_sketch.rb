@@ -2,6 +2,8 @@
 
 module Source
   class URL::PixivSketch < Source::URL
+    site "Pixiv Sketch", url: "https://sketch.pixiv.net", domains: %w[pixiv.net pximg.net]
+
     attr_reader :work_id, :username, :full_image_url
 
     def self.match?(url)

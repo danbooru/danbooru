@@ -95,7 +95,7 @@ class DTextTest < ActiveSupport::TestCase
         assert_match(/dtext-tag-does-not-exist/, format_text("[[no tag]]"))
         assert_match(/dtext-tag-empty/, format_text("[[empty tag]]"))
 
-        refute_match(/dtext-tag-does-not-exist/, format_text("[[help:nothing]]"))
+        assert_no_match(/dtext-tag-does-not-exist/, format_text("[[help:nothing]]"))
       end
 
       should "parse [ta:<id>], [ti:<id>], [bur:<id>] pseudo tags" do
@@ -128,17 +128,17 @@ class DTextTest < ActiveSupport::TestCase
       end
 
       should "link artist tags to the artist page instead of the wiki page" do
-        tag = create(:tag, name: "m&m", category: Tag.categories.artist)
-        artist = create(:artist, name: "m&m")
+        create(:tag, name: "m&m", category: Tag.categories.artist)
+        create(:artist, name: "m&m")
 
         assert_equal('<p><a class="dtext-link dtext-wiki-link tag-type-1" href="/artists/show_or_new?name=m%26m">m&amp;m</a></p>', format_text("[[m&m]]"))
       end
 
       should "not link general tags to artist pages" do
-        tag = create(:tag, name: "cat")
-        artist = create(:artist, name: "cat", is_deleted: true)
+        create(:tag, name: "cat")
+        create(:artist, name: "cat", is_deleted: true)
 
-        assert_match(%r!/wiki_pages/cat!, format_text("[[cat]]"))
+        assert_match(%r{/wiki_pages/cat}, format_text("[[cat]]"))
       end
     end
 
@@ -236,6 +236,9 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal('"example":[https://www.example.com]', DText.from_html('<a href="https://www.example.com">example</a>'))
         assert_equal("<https://www.example.com>", DText.from_html('<a href="https://www.example.com">https://www.example.com</a>'))
 
+        assert_equal('"example":[https://www.example.com]', DText.from_html('<a href="https://www.example.com" rel="nofollow" target="_blank" class="x">example</a>'))
+        assert_equal('"example":[https://www.example.com/path#frag]', DText.from_html('<a href="https://www.example.com/path#frag">example</a>'))
+
         assert_equal("<mailto:user@example.com>", DText.from_html('<a href="mailto:user@example.com">user@example.com</a>'))
         assert_equal('"user":[mailto:user@example.com]', DText.from_html('<a href="mailto:user@example.com">user</a>'))
 
@@ -251,7 +254,22 @@ class DTextTest < ActiveSupport::TestCase
 
         assert_equal("", DText.from_html('<a href="http://example.com"></a>'))
         assert_equal("", DText.from_html('<a href="http://example.com"> </a>'))
-        assert_equal("example", DText.from_html('<a>example</a>'))
+        assert_equal("example", DText.from_html("<a>example</a>"))
+        assert_equal("example", DText.from_html('<a href="garbage">example</a>'))
+
+        assert_equal('"link":[http://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="http://example.com/search[text]=東方">link</a>'))
+        assert_equal('"link":[http://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="http://example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9">link</a>'))
+        assert_equal('"link":[https://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="//example.com/search[text]=東方">link</a>'))
+        assert_equal('"link":[https://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="//example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9">link</a>'))
+        assert_equal('"link":[http://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="/search[text]=東方">link</a>', base_url: "http://example.com"))
+        assert_equal('"link":[http://example.com/search%5Btext%5D=東方]', DText.from_html('<a href="/search%5Btext%5D=%E6%9D%B1%E6%96%B9">link</a>', base_url: "http://example.com"))
+
+        assert_equal("<https://example.com/search[text]=東方>", DText.from_html('<a href="https://example.com/search[text]=東方">https://example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9</a>'))
+        assert_equal("<https://example.com/search[text]=東方>", DText.from_html('<a href="//example.com/search[text]=東方">https://example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9</a>'))
+
+        # <small> inside a link should not wrap link text in [tn], since [tn] is invalid inside link text
+        assert_equal('"fascinating":[https://example.com]', DText.from_html('<a href="https://example.com"><small>fascinating</small></a>'))
+        assert_equal('[tn]prefix [/tn]"link":[https://example.com][tn] suffix[/tn]', DText.from_html('<p><small>prefix </small><a href="https://example.com"><small>link</small></a><small> suffix</small></p>'))
       end
 
       should "omit redundant nested formatting tags" do
@@ -359,6 +377,10 @@ class DTextTest < ActiveSupport::TestCase
 
       should "convert <code> tags to DText" do
         assert_equal("foo [code]bar[/code] baz", DText.from_html("<p>foo <code>bar</code> baz</p>"))
+      end
+
+      should "convert <iframe> tags to DText" do
+        assert_equal("https://www.youtube.com/embed/dQw4w9WgXcQ?si=kx95-wHZ-pqFONjj", DText.from_html(%{ <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=kx95-wHZ-pqFONjj">fallback</iframe>}))
       end
     end
 

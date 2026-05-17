@@ -52,9 +52,9 @@ module Source::Tests::Extractor
           { file_size: 519_547 },
         ],
         page_url: "https://ko-fi.com/i/IV7V6X5X5F",
-        profile_urls: %w[https://ko-fi.com/D1D5VUW3P],
+        profile_urls: %w[https://ko-fi.com/itssim https://ko-fi.com/D1D5VUW3P],
         display_name: "ItsSim",
-        username: nil,
+        username: "itssim",
         tags: [],
         dtext_artist_commentary_title: "Requests from Discord art stream",
         dtext_artist_commentary_desc: "",
@@ -77,32 +77,26 @@ module Source::Tests::Extractor
 
     context "A commission page" do
       strategy_should_work(
-        "https://ko-fi.com/c/780f9a88f9",
+        "https://ko-fi.com/c/661ac8fb64",
         image_urls: %w[
-          https://storage.ko-fi.com/cdn/useruploads/display/d49a3d18-2777-42b4-abc1-8fc6cec88771_47acfea4-fbd9-40f3-8f2b-4e754cacb4ed.png
-          https://storage.ko-fi.com/cdn/useruploads/display/PNG_4d7caae0-af23-40cd-b1f7-75deda8027dd.PNG
-          https://storage.ko-fi.com/cdn/useruploads/display/PNG_4de0b1a0-a3a0-42c3-a6c6-ba9152791bec.PNG
+          https://storage.ko-fi.com/cdn/useruploads/display/a6828a74-902b-4710-95db-19054e650a06_sketchsheet.png
+          https://storage.ko-fi.com/cdn/useruploads/display/4c04530f-e9a8-4bc2-a1f8-bea3239a7c68_040.png
+          https://storage.ko-fi.com/cdn/useruploads/display/41fca99f-82de-43a2-b0a9-d5b695a4adce_043.png
         ],
         media_files: [
-          { file_size: 279_930 },
-          { file_size: 465_339 },
-          { file_size: 606_571 },
+          { file_size: 236_658 },
+          { file_size: 213_675 },
+          { file_size: 260_235 },
         ],
-        page_url: "https://ko-fi.com/c/780f9a88f9",
-        profile_urls: %w[https://ko-fi.com/thom_sketching https://ko-fi.com/B0B7BOXI6],
-        display_name: "THOM",
-        username: "thom_sketching",
+        page_url: "https://ko-fi.com/c/661ac8fb64",
+        profile_urls: %w[https://ko-fi.com/ashytown https://ko-fi.com/A0A7NRL1W],
+        display_name: "AshyTown",
+        username: "ashytown",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "Bust sketch",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          Description: Character portrait sketch from waist or shoulders up.
-
-          Refinement: Fairly clean but sketch lines are visible
-          Colour: No
-          Revisions: No
-
-          Disclaimer: I mostly work on weekends, so depending on which day you place your commission (and how many commissions I have going), it might take a few days before I finish it.
-        EOS
+        dtext_artist_commentary_title: "Sketches",
+        dtext_artist_commentary_desc: "A sketch of your choice. Can either be Half to Full body",
       )
     end
 

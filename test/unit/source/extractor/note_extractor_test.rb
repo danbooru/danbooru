@@ -57,6 +57,8 @@ module Source::Tests::Extractor
         ],
         dtext_artist_commentary_title: "NSR250R MC21",
         dtext_artist_commentary_desc: <<~EOS.chomp,
+          "[image]":[https://assets.st-note.com/img/1623726537463-B8LOZ1JZUS.png]
+
           ＜ご依頼品＞オーナー様 Twitter：@potatohedron 様
         EOS
       )
@@ -87,7 +89,13 @@ module Source::Tests::Extractor
           ["Skeb", "https://note.com/hashtag/Skeb"],
         ],
         dtext_artist_commentary_title: "ドゥーちゃん設定画",
-        dtext_artist_commentary_desc: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "[image]":[https://assets.st-note.com/img/1644650226241-bzIA1lJqZ5.jpg]
+
+          "[image]":[https://assets.st-note.com/img/1644650226235-KvbOotyDxw.jpg]
+
+          "[image]":[https://assets.st-note.com/img/1644650226282-CHFfsrvUqu.jpg]
+        EOS
       )
     end
 
@@ -136,7 +144,7 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: <<~EOS.chomp,
           みなさん新年あけましておめでとうございます。2023年もキャビコをどうぞよろしくお願いいたします。
 
-          新年最初にご紹介するのは、キャビコの新しいプラキット化アイテム[b]「メカトロポリス」[/b]です。これをデザインされたのはあのレジェンド"メカデザイナー[b]大河原邦男[/b]":[https://ja.wikipedia.org/wiki/%E5%A4%A7%E6%B2%B3%E5%8E%9F%E9%82%A6%E7%94%B7]氏です。"モデリズム":[http://moderhythm.blog26.fc2.com/]の"小林和史":[https://twitter.com/kobax27]氏が生み出した「"[b]メカトロウィーゴ[/b]":[https://chubu01.wixsite.com/moderhythm/untitled-c119c][b]」[/b]を大河原氏が大胆にアレンジすることで生み出されたのが、今回ご紹介する「メカトロポリス」なるオリジナルロボットです。
+          新年最初にご紹介するのは、キャビコの新しいプラキット化アイテム[b]「メカトロポリス」[/b]です。これをデザインされたのはあのレジェンド"メカデザイナー[b]大河原邦男[/b]":[https://ja.wikipedia.org/wiki/大河原邦男]氏です。"モデリズム":[http://moderhythm.blog26.fc2.com]の"小林和史":[https://twitter.com/kobax27]氏が生み出した「"[b]メカトロウィーゴ[/b]":[https://chubu01.wixsite.com/moderhythm/untitled-c119c][b]」[/b]を大河原氏が大胆にアレンジすることで生み出されたのが、今回ご紹介する「メカトロポリス」なるオリジナルロボットです。
 
           "[image]":[https://assets.st-note.com/img/1672450615522-C1tkj2EAhv.jpg]
 
@@ -196,7 +204,7 @@ module Source::Tests::Extractor
 
           このモックアップは現在、小林氏自らの手によって彩色作業を行ってもらっています。2月26日のキャビコ5周年イベント[b]「おかげさまです。キャビコです。」[/b]では彩色済みのモックアップを展示するとともに、小林氏にも[b]「モデリズム ブース」[/b]を出展していただけることになりました。
 
-          <http://moderhythm.blog26.fc2.com/>
+          <http://moderhythm.blog26.fc2.com>
 
           イベント当日はここでしか買えないアイテムも発売されるかもしれませんので、ぜひ楽しみにしていてください。
 
@@ -241,21 +249,20 @@ module Source::Tests::Extractor
           { file_size: 1_176_143 },
         ],
         page_url: "https://sanriotimes.sanrio.co.jp/n/nf3fa7f0c4c9d",
-        profile_url: "https://sanriotimes.sanrio.co.jp",
         profile_urls: %w[https://sanriotimes.sanrio.co.jp],
-        display_name: "SanrioTimes",
+        display_name: "サンリオタイムズ",
         username: "sanrio_times",
-        tag_name: "sanrio_times",
-        other_names: ["SanrioTimes", "sanrio_times"],
+        published_at: nil,
+        updated_at: nil,
         tags: [
           ["キャラクター", "https://note.com/hashtag/キャラクター"],
           ["企業のnote", "https://note.com/hashtag/企業のnote"],
           ["ハローキティ", "https://note.com/hashtag/ハローキティ"],
           ["サンリオ時間", "https://note.com/hashtag/サンリオ時間"],
-          ["サンリオタイムズ", "https://note.com/hashtag/サンリオタイムズ"],
           ["hellokitty", "https://note.com/hashtag/hellokitty"],
-          ["サンリオnote", "https://note.com/hashtag/サンリオnote"],
+          ["サンリオタイムズ", "https://note.com/hashtag/サンリオタイムズ"],
           ["ハローキティ50周年", "https://note.com/hashtag/ハローキティ50周年"],
+          ["サンリオnote", "https://note.com/hashtag/サンリオnote"],
           ["アニバーサリーイヤー", "https://note.com/hashtag/アニバーサリーイヤー"],
         ],
         dtext_artist_commentary_title: "５０周年のアニバーサリーイヤーを迎えて。  ハローキティに特別インタビュー！",
@@ -472,9 +479,7 @@ module Source::Tests::Extractor
 
           ◎関連記事
 
-          <https://sunmarkweb.com/n/nfd651638a501>
-
-          <https://sunmarkweb.com/n/nbfefd1ff39d6>
+          <https://sunmarkweb.com/n/nae621d6283cf>
 
           "[image]":[https://sunmarkweb.com/n/nfdb87d960b06]
         EOS

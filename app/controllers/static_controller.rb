@@ -30,6 +30,9 @@ class StaticController < ApplicationController
   def colors
   end
 
+  def components
+  end
+
   def opensearch
   end
 

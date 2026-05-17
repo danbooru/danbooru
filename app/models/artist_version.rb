@@ -17,7 +17,7 @@ class ArtistVersion < ApplicationRecord
 
   module SearchMethods
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names, :updater, :artist], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at is_deleted is_banned name group_name urls other_names updater artist], current_user: current_user)
 
       case params[:order]
       when /\A(id|created_at|updated_at|name)(?:_(asc|desc))?\z/i
@@ -34,12 +34,12 @@ class ArtistVersion < ApplicationRecord
   extend SearchMethods
 
   def previous
-    @previous ||= ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").limit(1).to_a
+    @previous ||= ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order(created_at: :desc).limit(1).to_a
     @previous.first
   end
 
   def current
-    @previous ||= ArtistVersion.where(artist_id: artist_id).order("created_at desc").limit(1).to_a
+    @previous ||= ArtistVersion.where(artist_id: artist_id).order(created_at: :desc).limit(1).to_a
     @previous.first
   end
 

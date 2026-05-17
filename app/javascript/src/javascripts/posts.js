@@ -1,6 +1,6 @@
 import CurrentUser from './current_user'
 import Utility from './utility'
-import { delay, isMobile, isTouchscreen }  from './utility'
+import { delay, isMobile } from './utility'
 import Notice from './notice'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
@@ -100,10 +100,11 @@ Post.open_edit_dialog = function() {
   $("#comments").hide();
   $("#post-sections li").removeClass("active");
   $("#post-edit-link").parent("li").addClass("active");
+
   $(".upload-container").css("display", "block");
+  $(".upload-container .docking-menu-tab").hide();
 
   var $tag_string = $("#post_tag_string");
-  $("body.c-uploads .docking-menu-tab, body.c-upload-media-assets .docking-menu-tab").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
   $("#form").appendTo(dialog);
@@ -159,10 +160,10 @@ Post.open_edit_dialog = function() {
 Post.close_edit_dialog = function(e, ui) {
   $("#form").appendTo($("#c-posts #edit, .upload-edit-container"));
   $(".upload-container").css("display", "");
+  $(".upload-container .docking-menu-tab").show();
   $("#edit-dialog").remove();
   var $tag_string = $("#post_tag_string");
   $("div.input").has($tag_string).prevAll().show();
-  $("body.c-uploads .docking-menu-tab, body.c-upload-media-assets .docking-menu-tab").show();
   $tag_string.css({"resize": "", "width": ""});
   $(document).trigger("danbooru:close-post-edit-dialog");
 }
@@ -215,7 +216,9 @@ Post.initialize_links = function() {
 
 Post.initialize_post_relationship_previews = function() {
   var current_post_id = $("meta[name=post-id]").attr("content");
-  $("[id=post_" + current_post_id + "]").addClass("current-post");
+  var $current_post = $(`[id=post_${current_post_id}]`);
+  $current_post.addClass("current-post");
+  Post.scroll_relationship_preview($current_post);
 
   if (Cookie.get("show-relationship-previews") === "0") {
     this.toggle_relationship_preview($("#has-children-relationship-preview"), $("#has-children-relationship-preview-link"));
@@ -238,10 +241,31 @@ Post.toggle_relationship_preview = function(preview, preview_link) {
   if (preview.is(":visible")) {
     preview_link.html("&laquo; hide");
     Cookie.put("show-relationship-previews", "1");
+    Post.scroll_relationship_preview(preview.find(".current-post"));
   } else {
     preview_link.html("show &raquo;");
     Cookie.put("show-relationship-previews", "0");
   }
+}
+
+Post.scroll_relationship_preview = function($post) {
+  let $post_container = $post.parent('.posts-container');
+  let $previous_post = $post.prev();
+
+  if ($post.length === 0 || $post_container.length === 0 || $previous_post.length === 0) {
+    return;
+  }
+
+  let post = $post.get(0);
+  let post_container = $post_container.get(0);
+  let previous_post = $previous_post.get(0);
+  let post_rect = post.getBoundingClientRect();
+  let post_container_rect = post_container.getBoundingClientRect();
+  let previous_post_rect = previous_post.getBoundingClientRect();
+  let target_scroll_left = post_container.scrollLeft + (post_rect.left - post_container_rect.left) - (previous_post_rect.width / 2);
+  let max_scroll_left = Math.max(0, post_container.scrollWidth - post_container.clientWidth);
+
+  post_container.scrollLeft = Math.max(0, Math.min(target_scroll_left, max_scroll_left));
 }
 
 Post.initialize_post_preview_size_menu = function() {

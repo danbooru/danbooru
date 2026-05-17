@@ -2,12 +2,18 @@
 
 # @see Source::Extractor::Kofi
 class Source::URL::Kofi < Source::URL
+  site "Ko-fi", url: "https://ko-fi.com", domains: %w[ko-fi.com msecnd.net azurewebsites.net]
+
+  extractors do
+    [Source::Extractor::KofiGalleryItem, Source::Extractor::KofiShopItem, Source::Extractor::KofiCommission, Source::Extractor::KofiPost, Source::Extractor::Kofi]
+  end
+
   RESERVED_USERNAMES = %w[c i s about account album cdn commissions discord explore gallery gold memberships post privacy shop terms]
 
   attr_reader :full_image_url, :username, :user_id, :gallery_item_id, :shop_item_id, :commission_id, :post_id, :album_id, :slug
 
   def self.match?(url)
-    url.domain == "ko-fi.com" || url.host == "az743702.vo.msecnd.net"
+    url.domain == "ko-fi.com" || url.host.in?(%w[az743702.vo.msecnd.net ko-fi-live.azurewebsites.net])
   end
 
   def parse
@@ -31,39 +37,42 @@ class Source::URL::Kofi < Source::URL
       nil
 
     # https://ko-fi.com/i/IU7U5SS0YZ
-    in _, "ko-fi.com", "i", gallery_item_id
+    in _, _, "i", gallery_item_id
       @gallery_item_id = gallery_item_id
 
     # https://ko-fi.com/s/5fc8f89b6e
-    in _, "ko-fi.com", "s", shop_item_id
+    in _, _, "s", shop_item_id
       @shop_item_id = shop_item_id
 
     # https://ko-fi.com/c/780f9a88f9
-    in _, "ko-fi.com", "c", commission_id
+    in _, _, "c", commission_id
       @commission_id = commission_id
 
     # https://ko-fi.com/post/Hooligans-Update-3-May-30th-2024-S6S0YPT5K
-    in _, "ko-fi.com", "post", slug
+    in _, _, "post", slug
       @slug, _, @post_id = slug.rpartition("-")
 
     # https://ko-fi.com/album/Original-Artworks-Q5Q2JPOWH
-    in _, "ko-fi.com", "album", slug
+    in _, _, "album", slug
       @slug, _, @album_id = slug.rpartition("-")
 
     # https://ko-fi.com/Gallery/LockedGalleryItem?id=IV7V6XDSRU#checkoutModal
-    in _, "ko-fi.com", "Gallery", "LockedGalleryItem"
+    in _, _, "Gallery", "LockedGalleryItem"
       @gallery_item_id = params[:id]
 
     # https://ko-fi.com/E1E7FH8ZY?viewimage=IU7U5SS0YZ
     # https://ko-fi.com/T6T41FDFF/gallery/?action=gallery
-    in _, "ko-fi.com", /^[A-Z0-9]{9}$/ => user_id, *rest
+    # https://ko-fi.com/D1D61UZW1U/commissions
+    # https://ko-fi-live.azurewebsites.net/D1D5VUW3P?viewimage=IV7V6X5X5F
+    in _, _, /^[A-Z0-9]{9,}$/ => user_id, *rest
       @user_id = user_id
       @gallery_item_id = params[:viewimage]
 
     # https://ko-fi.com/johndaivid
     # https://ko-fi.com/thom_sketching/gallery?viewimage=IO5O1BOYV6#galleryItemView
     # https://ko-fi.com/thom_sketching/commissions?commissionAlias=780f9a88f9&amp;openCommissionsMenu=True#buyShopCommissionModal
-    in _, "ko-fi.com", username, *rest unless username&.downcase.in?(RESERVED_USERNAMES)
+    # https://ko-fi-live.azurewebsites.net/gyngerwombatart
+    in _, _, username, *rest unless username&.downcase.in?(RESERVED_USERNAMES)
       @username = username
       @gallery_item_id = params[:viewimage]
       @commission_id = params[:commissionAlias]
@@ -71,10 +80,6 @@ class Source::URL::Kofi < Source::URL
     else
       nil
     end
-  end
-
-  def site_name
-    "Ko-fi"
   end
 
   def extractor_class

@@ -6,6 +6,7 @@ module Danbooru
       attr_reader :cookie_jar
 
       def initialize(cookie_jar: HTTP::CookieJar.new)
+        super
         @cookie_jar = cookie_jar
       end
 
@@ -26,7 +27,7 @@ module Danbooru
       end
 
       def cookies_for_request(request)
-        saved_cookies = cookie_jar.each(request.uri).map { |c| [c.name, c.value] }.to_h
+        saved_cookies = cookie_jar.each(request.uri).to_h { |c| [c.name, c.value] }
         request_cookies = HTTP::Cookie.cookie_value_to_hash(request.headers["Cookie"].to_s)
         saved_cookies.merge(request_cookies).map { |name, value| "#{name}=#{value}" }.join("; ")
       end

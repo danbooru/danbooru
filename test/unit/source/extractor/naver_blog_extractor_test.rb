@@ -42,28 +42,28 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://blog.naver.com/sjhsh352/223378243886",
         image_urls: %w[
-          http://blogfiles.naver.net/MjAyNDAzMDlfNTMg/MDAxNzA5OTc3NjgzNTY0.cERosGA8-6Wp9ckDJtEJJk06c7tKyNwAJHCV-KMU-Gkg.15_fCdaYCdvOy0BB6VF1wRdNgM0bL_TBTDFhJbI-khsg.JPEG/%EC%97%B0%EC%8A%B528.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfNTkg/MDAxNzA5OTc3Njg0MDMy.rSUlPdyMwdYUbyxUJSJ6gESkqOQWSUNlxM7V3Dlw_o8g.0Q6WK14Lg2V0ivNlcgp2kPJeadxaLAbnuuZhIDLQSckg.JPEG/%EC%97%B0%EC%8A%B531.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfNTIg/MDAxNzA5OTc3Njg1NTY0.UoxFqWOvNEhiuxJJ0kpktgnEPczFRKZ3E-xMeExhSl0g.1l6HuoTh6rkYT36CiP0x56LMj6-HJM_GxFuLbaOZ6UUg.JPEG/%EC%97%B0%EC%8A%B532.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfMjY1/MDAxNzA5OTc3Njg1NzI1.eQaPrGAoYEdCxMlWHGcAjZH9rTM24kOoWJgiikfYY1wg.Oj61aX8tU6_54BS04VVK5urafrspm5cnppquFzD3n4Eg.JPEG/%EC%97%B0%EC%8A%B534.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfMTkz/MDAxNzA5OTc3Njg2NDU2.CGICUTf88WpAqi6DnfmtJT3sYDQQRHapm6nsqY4SYLQg.CdTTYxY6Toz65HYk037NRq2EDMS4l5E1Ia1PxWjbA9Ug.JPEG/%EC%97%B0%EC%8A%B536.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfNzYg/MDAxNzA5OTc3Njg2MDg4.rll_jkQwm_24YCJqVUHE0Zpacyp4_TAxa2xNHwWJZUIg.hz4H_aQR6QqoRlVfN9AgZZZ39ivSbYFqtDKGwEf-sFUg.JPEG/%EC%97%B0%EC%8A%B537.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfMjE2/MDAxNzA5OTc3Njg0MDA5.RWY_LhMRCmOa5kM5QuGkf59yNKisiuzkGXuBj3mQjucg.IiNYEXqPu1J2h7Z0yfdi0SKE8o72QcS-KM8DrhUXEFog.JPEG/%EC%97%B0%EC%8A%B544.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfMjY1/MDAxNzA5OTc3Njg0NTUx.Zt4eTkzKl7M_aTsQbpIponQIUy_nU5xU8fN7nDp707Qg.w10y2YZMvZAaQK3ZMnPMFRFA-eyCvWfLfi60TcDXqFQg.JPEG/%EC%97%B0%EC%8A%B546.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfMTI4/MDAxNzA5OTc3Njg0MDEy.etXEuAgtEzw04lOJUbRSkHRqACI2xgQRtD6QS1b8N6gg.PuHzL2Y-KAI6InFndlreP0Agome18u1_SFgZdIui4lcg.JPEG/%EC%97%B0%EC%8A%B547.jpg
-          http://blogfiles.naver.net/MjAyNDAzMDlfMTgz/MDAxNzA5OTc3NjgzNjEx.WUzEcrR0ry36cLbxZ-30O8Z__tK_g7sazURXQuPVLL4g.drL8-weVjKSy89aTGxlU-Cn-UwzJK2sD3y9qvV7_Ev0g.JPEG/%EC%97%B0%EC%8A%B550.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMjM1/MDAxNzY3ODYzMTQ1NzE3.X1uhHyomt-NFXliaDTrfSXRd6U1iRjyng5EH9xCd8PYg.b_ke3PbhwYdz1ONXIDJNpvSX_-GmUmAkJMgLVziZXBog.JPEG/%EA%B0%80%EC%95%BC%EB%B3%B4%EC%A0%95.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMTUy/MDAxNzY3ODYzMTQ3MzA3.kl7YVWYrh6jfo8cHu-Xrw2buhVl1HinMQl_Zrr_7zFQg.abPpK-w_V_IRVjMx0jlFrXf4InuiecgbU1-O6qF3I0sg.JPEG/%EC%97%B0%EC%8A%B5239.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfOTcg/MDAxNzY3ODYzMTQ3NTAy.MmEFeHnY4mbiq8ApPO_0jlV0-UzvFd5wL79TYWdSYCUg.m6b_L9B4ihohWRGdOcImiwQ3SPPM8H6VtyA8Htz1S3Ag.JPEG/%EC%97%B0%EC%8A%B5241.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMTU0/MDAxNzY3ODYzMTQ1NjE2.S0qnZOgri3vqcPpecDiwY9S6r3wUt2UnVFSoq230-Jwg.wz6uC8zC-hrSyPPNjD7UfWXFuvtSccdjBTZOCWiLl6wg.JPEG/%EC%97%B0%EC%8A%B5242.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMTAz/MDAxNzY3ODYzMTQ1Mzc2.kH6_J10yDymCxwJ_0rnKLMGwA81_Zt8hDK00z9ehZRAg.fcfqg2temrCmRvEvhl3KNVQ9IZjELnk5Me0ITD7gzPEg.JPEG/%EC%97%B0%EC%8A%B5244.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfOTIg/MDAxNzY3ODYzMTQ1NTQ0.pWRM-ISlqiwevgyOA5uXffYBvaG_Iwmk00JmOeCywUcg.eZq4AqyunK-bTsm0ibCOx7VzflNmC-pw5kyHE-UNWMog.JPEG/%EC%97%B0%EC%8A%B5245.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMjI1/MDAxNzY3ODYzMTQ1ODQx.0arV7saoekVZI8s7Js_pHJRrwhoy0ncu4R-FqSC7nlAg.tUzfdP_Mrcco1YM7DUAzodVrt3SRCxrc4EqQPcBLYVkg.JPEG/%EC%97%B0%EC%8A%B5246.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMjc2/MDAxNzY3ODYzMTQ1NTkz.lXuZBTBUKlvgMfg0oq11TEAFbqZ-WtvnmyPJJNRa7LYg.eljyh-_f7SejWRMxUmAcCyx5dn1z58BKeqKSYfYsersg.JPEG/%EC%97%B0%EC%8A%B5247.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMTI1/MDAxNzY3ODYzMTQ2OTkx.wGh4JEX2dajD2WoBBwpjr3mY_REf-g9UIA6vX0FBAeog.Yvo-hjsRheX45-dKaN5iewrt8AjBZ0mgCcWqsH_WONIg.JPEG/%EC%97%B0%EC%8A%B5248.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMjE3/MDAxNzY3ODYzMTQ3Mzc3.mmd5jmzIExnA2iCeImmsUvjnYNUqAYQYr_EKAX0LFw8g.YQJlLWb-VW_Vhb14Owce-malQWEsA0T26Z3TQEHjyRwg.JPEG/%EC%97%B0%EC%8A%B5249.jpg
         ],
         media_files: [
-          { file_size: 7_920_147 },
-          { file_size: 9_977_752 },
-          { file_size: 7_086_628 },
-          { file_size: 5_158_991 },
-          { file_size: 10_780_827 },
-          { file_size: 10_374_931 },
-          { file_size: 8_402_893 },
-          { file_size: 12_838_088 },
-          { file_size: 12_049_574 },
-          { file_size: 7_355_991 },
+          { file_size: 6_478_361 },
+          { file_size: 6_266_584 },
+          { file_size: 6_731_692 },
+          { file_size: 7_104_825 },
+          { file_size: 5_869_112 },
+          { file_size: 6_488_599 },
+          { file_size: 6_850_074 },
+          { file_size: 6_472_427 },
+          { file_size: 6_219_829 },
+          { file_size: 7_753_930 },
         ],
         page_url: "https://blog.naver.com/sjhsh352/223378243886",
         profile_url: "https://blog.naver.com/sjhsh352",
@@ -77,25 +77,25 @@ module Source::Tests::Extractor
         ],
         dtext_artist_commentary_title: "대문",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfNTMg/MDAxNzA5OTc3NjgzNTY0.cERosGA8-6Wp9ckDJtEJJk06c7tKyNwAJHCV-KMU-Gkg.15_fCdaYCdvOy0BB6VF1wRdNgM0bL_TBTDFhJbI-khsg.JPEG/연습28.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfMjM1/MDAxNzY3ODYzMTQ1NzE3.X1uhHyomt-NFXliaDTrfSXRd6U1iRjyng5EH9xCd8PYg.b_ke3PbhwYdz1ONXIDJNpvSX_-GmUmAkJMgLVziZXBog.JPEG/가야보정.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfNTkg/MDAxNzA5OTc3Njg0MDMy.rSUlPdyMwdYUbyxUJSJ6gESkqOQWSUNlxM7V3Dlw_o8g.0Q6WK14Lg2V0ivNlcgp2kPJeadxaLAbnuuZhIDLQSckg.JPEG/연습31.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfMTUy/MDAxNzY3ODYzMTQ3MzA3.kl7YVWYrh6jfo8cHu-Xrw2buhVl1HinMQl_Zrr_7zFQg.abPpK-w_V_IRVjMx0jlFrXf4InuiecgbU1-O6qF3I0sg.JPEG/연습239.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfNTIg/MDAxNzA5OTc3Njg1NTY0.UoxFqWOvNEhiuxJJ0kpktgnEPczFRKZ3E-xMeExhSl0g.1l6HuoTh6rkYT36CiP0x56LMj6-HJM_GxFuLbaOZ6UUg.JPEG/연습32.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfOTcg/MDAxNzY3ODYzMTQ3NTAy.MmEFeHnY4mbiq8ApPO_0jlV0-UzvFd5wL79TYWdSYCUg.m6b_L9B4ihohWRGdOcImiwQ3SPPM8H6VtyA8Htz1S3Ag.JPEG/연습241.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfMjY1/MDAxNzA5OTc3Njg1NzI1.eQaPrGAoYEdCxMlWHGcAjZH9rTM24kOoWJgiikfYY1wg.Oj61aX8tU6_54BS04VVK5urafrspm5cnppquFzD3n4Eg.JPEG/연습34.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfMTU0/MDAxNzY3ODYzMTQ1NjE2.S0qnZOgri3vqcPpecDiwY9S6r3wUt2UnVFSoq230-Jwg.wz6uC8zC-hrSyPPNjD7UfWXFuvtSccdjBTZOCWiLl6wg.JPEG/연습242.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfMTkz/MDAxNzA5OTc3Njg2NDU2.CGICUTf88WpAqi6DnfmtJT3sYDQQRHapm6nsqY4SYLQg.CdTTYxY6Toz65HYk037NRq2EDMS4l5E1Ia1PxWjbA9Ug.JPEG/연습36.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfMTAz/MDAxNzY3ODYzMTQ1Mzc2.kH6_J10yDymCxwJ_0rnKLMGwA81_Zt8hDK00z9ehZRAg.fcfqg2temrCmRvEvhl3KNVQ9IZjELnk5Me0ITD7gzPEg.JPEG/연습244.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfNzYg/MDAxNzA5OTc3Njg2MDg4.rll_jkQwm_24YCJqVUHE0Zpacyp4_TAxa2xNHwWJZUIg.hz4H_aQR6QqoRlVfN9AgZZZ39ivSbYFqtDKGwEf-sFUg.JPEG/연습37.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfOTIg/MDAxNzY3ODYzMTQ1NTQ0.pWRM-ISlqiwevgyOA5uXffYBvaG_Iwmk00JmOeCywUcg.eZq4AqyunK-bTsm0ibCOx7VzflNmC-pw5kyHE-UNWMog.JPEG/연습245.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfMjE2/MDAxNzA5OTc3Njg0MDA5.RWY_LhMRCmOa5kM5QuGkf59yNKisiuzkGXuBj3mQjucg.IiNYEXqPu1J2h7Z0yfdi0SKE8o72QcS-KM8DrhUXEFog.JPEG/연습44.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfMjI1/MDAxNzY3ODYzMTQ1ODQx.0arV7saoekVZI8s7Js_pHJRrwhoy0ncu4R-FqSC7nlAg.tUzfdP_Mrcco1YM7DUAzodVrt3SRCxrc4EqQPcBLYVkg.JPEG/연습246.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfMjY1/MDAxNzA5OTc3Njg0NTUx.Zt4eTkzKl7M_aTsQbpIponQIUy_nU5xU8fN7nDp707Qg.w10y2YZMvZAaQK3ZMnPMFRFA-eyCvWfLfi60TcDXqFQg.JPEG/연습46.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfMjc2/MDAxNzY3ODYzMTQ1NTkz.lXuZBTBUKlvgMfg0oq11TEAFbqZ-WtvnmyPJJNRa7LYg.eljyh-_f7SejWRMxUmAcCyx5dn1z58BKeqKSYfYsersg.JPEG/연습247.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfMTI4/MDAxNzA5OTc3Njg0MDEy.etXEuAgtEzw04lOJUbRSkHRqACI2xgQRtD6QS1b8N6gg.PuHzL2Y-KAI6InFndlreP0Agome18u1_SFgZdIui4lcg.JPEG/연습47.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfMTI1/MDAxNzY3ODYzMTQ2OTkx.wGh4JEX2dajD2WoBBwpjr3mY_REf-g9UIA6vX0FBAeog.Yvo-hjsRheX45-dKaN5iewrt8AjBZ0mgCcWqsH_WONIg.JPEG/연습248.jpg]
 
-          "[image]":[http://blogfiles.naver.net/MjAyNDAzMDlfMTgz/MDAxNzA5OTc3NjgzNjEx.WUzEcrR0ry36cLbxZ-30O8Z__tK_g7sazURXQuPVLL4g.drL8-weVjKSy89aTGxlU-Cn-UwzJK2sD3y9qvV7_Ev0g.JPEG/연습50.jpg]
+          "[image]":[http://blogfiles.naver.net/MjAyNjAxMDhfMjE3/MDAxNzY3ODYzMTQ3Mzc3.mmd5jmzIExnA2iCeImmsUvjnYNUqAYQYr_EKAX0LFw8g.YQJlLWb-VW_Vhb14Owce-malQWEsA0T26Z3TQEHjyRwg.JPEG/연습249.jpg]
 
           [b]비얌Biyam[/b]
 
@@ -108,6 +108,14 @@ module Source::Tests::Extractor
           2. 뭘 그리는가?
 
           주로 고증을 맞춘 역사 그림을 많이 그리지만 좋아하는 만화, 게임 등의 팬아트, 갑자기 삘 꽂혀서 그리는 캐릭터 디자인 등등을 그리는 중. 최근에 든 생각인데 특히 좋아하는 건 '고증에 맞으면서도 현대인에게 낯선 비주얼의 과거의 복식' 인 듯하다.
+
+          3. <데뷔했어요, 수령님!>
+
+          <https://comic.naver.com/challenge/list?titleId=846023>
+
+          <https://comic.naver.com/challenge/list?titleId=846023>
+
+          도전만화에서 연재 중인데 많이들 봐주십시오 감사합니다
 
           기타 잡다한 링크들
 

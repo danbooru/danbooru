@@ -4,13 +4,13 @@ class PaginatorComponentTest < ViewComponent::TestCase
   def render_sequential_paginator(records, page: 1, limit: 3, page_limit: 100)
     records = records.paginate(page, limit: limit, page_limit: page_limit)
     params = ActionController::Parameters.new(controller: records.model_name.plural, action: :index)
-    return render_inline(SequentialPaginatorComponent.new(records: records, params: params))
+    render_inline(SequentialPaginatorComponent.new(records: records, params: params))
   end
 
   def render_numbered_paginator(records, page: 1, limit: 3, page_limit: 100)
     records = records.paginate(page, limit: limit, page_limit: page_limit)
     params = ActionController::Parameters.new(controller: records.model_name.plural, action: :index)
-    return render_inline(NumberedPaginatorComponent.new(records: records, params: params))
+    render_inline(NumberedPaginatorComponent.new(records: records, params: params))
   end
 
   def assert_page(expected_page, link)
@@ -30,15 +30,15 @@ class PaginatorComponentTest < ViewComponent::TestCase
       should "work with an aN page" do
         html = render_sequential_paginator(Tag.all, page: "a#{@tags[5].id}", limit: 3)
 
-        assert_page("a#{@tags[5+3].id}", html.css("a[rel=prev]"))
-        assert_page("b#{@tags[5+1].id}", html.css("a[rel=next]"))
+        assert_page("a#{@tags[5 + 3].id}", html.css("a[rel=prev]"))
+        assert_page("b#{@tags[5 + 1].id}", html.css("a[rel=next]"))
       end
 
       should "work with a bN page" do
         html = render_sequential_paginator(Tag.all, page: "b#{@tags[5].id}", limit: 3)
 
-        assert_page("a#{@tags[5-1].id}", html.css("a[rel=prev]"))
-        assert_page("b#{@tags[5-3].id}", html.css("a[rel=next]"))
+        assert_page("a#{@tags[5 - 1].id}", html.css("a[rel=prev]"))
+        assert_page("b#{@tags[5 - 3].id}", html.css("a[rel=next]"))
       end
     end
 
@@ -72,7 +72,7 @@ class PaginatorComponentTest < ViewComponent::TestCase
 
       context "for a search with zero results" do
         should "work for page 1" do
-          html = render_numbered_paginator(Tag.none, page: 1, limit: 3)
+          render_numbered_paginator(Tag.none, page: 1, limit: 3)
 
           assert_css("span.paginator-current", text: "1")
           assert_css("span.paginator-prev")
@@ -85,7 +85,7 @@ class PaginatorComponentTest < ViewComponent::TestCase
         should "show the unlimited paginator" do
           @tags = Tag.all
           @tags.stubs(:total_count).returns(Float::INFINITY)
-          html = render_numbered_paginator(@tags, page: 1, limit: 200)
+          render_numbered_paginator(@tags, page: 1, limit: 200)
 
           assert_css("span.paginator-current", text: "1")
           assert_css("span.paginator-prev")

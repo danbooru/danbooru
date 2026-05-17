@@ -1,9 +1,8 @@
 require "test_helper"
 
 class MediaAssetComponentTest < ViewComponent::TestCase
-  def render_component(media_asset, **options)
-    user = create(:user)
-    render_inline(MediaAssetComponent.new(media_asset: media_asset, current_user: user, **options))
+  def render_component(media_asset, current_user: create(:user), **options)
+    render_inline(MediaAssetComponent.new(media_asset: media_asset, current_user: current_user, **options))
   end
 
   context "The MediaAssetComponent" do
@@ -40,6 +39,43 @@ class MediaAssetComponentTest < ViewComponent::TestCase
         node = render_component(media_asset)
 
         assert_equal(media_asset.variant(:original).file_url, node.css(".media-asset-component div.ruffle-container").attr("data-swf").value)
+      end
+    end
+
+    context "for a removed asset" do
+      should "show that the image is deleted" do
+        media_asset = create(:media_asset, status: :deleted)
+        render_component(media_asset)
+
+        assert_text("Image deleted.")
+      end
+    end
+
+    context "for a processing asset" do
+      should "render a spinner" do
+        media_asset = create(:media_asset, status: :processing)
+        render_component(media_asset)
+
+        assert_css(".media-asset-component .animate-spin")
+      end
+    end
+
+    context "for a failed asset" do
+      should "show that the upload failed" do
+        media_asset = create(:media_asset, status: :failed)
+        render_component(media_asset)
+
+        assert_text("Upload failed.")
+      end
+    end
+
+    context "for an unavailable asset" do
+      should "show that the image is unavailable" do
+        media_asset = create(:media_asset)
+        MediaAssetPolicy.any_instance.stubs(:can_see_image?).returns(false)
+        render_component(media_asset)
+
+        assert_text("Image unavailable.")
       end
     end
   end

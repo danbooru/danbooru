@@ -48,6 +48,14 @@ module Source
         "https://www.weibo.com/#{artist_id}/#{illust_base62_id}" if artist_id.present? && illust_base62_id.present?
       end
 
+      def published_at
+        if parsed_url.image_url?
+          nil
+        elsif page_json[:created_at]
+          Time.strptime(page_json[:created_at], "%a %b %d %H:%M:%S %z %Y").utc
+        end
+      end
+
       def tags
         tags = page_json[:text]&.parse_html&.css(".surl-text").to_a.map(&:text).select { |text| text&.match?(/^\#.*\#$/) }
         tags.map do |tag|

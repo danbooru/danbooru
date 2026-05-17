@@ -34,13 +34,13 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
       context "for a user with backup codes" do
         should "show the user's existing backup codes" do
-          @user = create(:user_with_2fa, backup_codes: [11111111, 22222222, 33333333])
+          @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
           get_auth user_backup_codes_path(@user), @user
 
           assert_response :success
           assert_equal(true, @user.reload.backup_codes.present?)
           assert_equal(false, @user.user_events.backup_code_generate.exists?)
-          assert_equal([11111111, 22222222, 33333333], @user.backup_codes)
+          assert_equal([1111_1111, 2222_2222, 3333_3333], @user.backup_codes)
         end
       end
 
@@ -71,23 +71,23 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
       context "for a user with backup codes" do
         should "regenerate the user's backup codes" do
-          @user = create(:user_with_2fa, backup_codes: [11111111, 22222222, 33333333])
+          @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
           post_auth user_backup_codes_path(@user), @user
 
           assert_redirected_to user_backup_codes_path(@user)
           assert_equal(3, @user.reload.backup_codes.size)
           assert_equal(true, @user.backup_codes.all? { |code| code.to_s.rjust(User::BACKUP_CODE_LENGTH, "0").match?(/\A\d{8}\z/) })
-          assert_not_equal([11111111, 22222222, 33333333], @user.backup_codes)
+          assert_not_equal([1111_1111, 2222_2222, 3333_3333], @user.backup_codes)
           assert_equal(true, @user.user_events.backup_code_generate.exists?(login_session_id: @user.login_sessions.last.login_id))
           assert_equal("Backup codes regenerated", flash[:notice])
         end
 
         should "not allow a user to regenerate a different user's backup codes" do
-          @user = create(:user_with_2fa, backup_codes: [11111111, 22222222, 33333333])
+          @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
           post_auth user_backup_codes_path(@user), create(:user)
 
           assert_response 403
-          assert_equal([11111111, 22222222, 33333333], @user.backup_codes)
+          assert_equal([1111_1111, 2222_2222, 3333_3333], @user.backup_codes)
           assert_equal(false, @user.user_events.backup_code_generate.exists?)
           assert_nil(flash[:notice])
         end

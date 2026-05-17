@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class DanbooruHttpTest < ActiveSupport::TestCase
   def httpbin_url(path = "")
@@ -34,7 +34,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "fail if the request takes too long to download" do
         # XXX should return status 597 instead
         assert_raises(HTTP::TimeoutError) do
-          response = Danbooru::Http.timeout(1).get(httpbin_url("drip?duration=10&numbytes=10")).flush
+          Danbooru::Http.timeout(1).get(httpbin_url("drip?duration=10&numbytes=10")).flush
         end
       end
 
@@ -180,17 +180,17 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
     context "retriable feature" do
       should "not retry if the Retry-After header is sent with a 2xx or 3xx response" do
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", headers: { "Retry-After": "0" }, body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(1).returns(response_200)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", headers: { "Retry-After": "0" }, body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(1).returns(response200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/200"))
         assert_equal(200, response.status)
       end
 
       should "retry after the max_delay if the server returns a 429 error with no Retry-After header" do
-        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
+        response429 = ::HTTP::Response.new(status: 429, version: "1.1", body: "", request: nil)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response429, response200)
 
         duration = Benchmark.realtime do
           response = Danbooru::Http.use(retriable: { max_delay: 1.second }).get(httpbin_url("status/429"))
@@ -201,27 +201,27 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "retry immediately if the request returns a >=597 error" do
-        response_597 = ::HTTP::Response.new(status: 597, version: "1.1", body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_597, response_200)
+        response597 = ::HTTP::Response.new(status: 597, version: "1.1", body: "", request: nil)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response597, response200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/597"))
         assert_equal(200, response.status)
       end
 
       should "retry if the Retry-After header is an integer" do
-        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": "1" }, body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
+        response429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": "1" }, body: "", request: nil)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response429, response200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/429"))
         assert_equal(200, response.status)
       end
 
       should "retry if the Retry-After header is a date" do
-        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "", request: nil)
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
+        response429 = ::HTTP::Response.new(status: 429, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "", request: nil)
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response429, response200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/429"))
         assert_equal(200, response.status)
@@ -252,11 +252,25 @@ class DanbooruHttpTest < ActiveSupport::TestCase
     context "public_only feature" do
       should "disallow connections to non-public IPs" do
         response = Danbooru::Http.public_only.get("http://127.0.0.1/foo.txt")
+        assert_equal(591, response.status)
 
+        response = Danbooru::Http.public_only.get("http://127.0.0.1./foo.txt")
+        assert_equal(598, response.status) # `127.0.0.1.` is treated as a domain name, which fails with a DNS resolution error
+
+        response = Danbooru::Http.public_only.get("http://0.0.0.0/foo.txt")
+        assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://attacker.com@127.0.0.1/foo.txt")
+        assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://127.0.0.1.nip.io/foo.txt")
+        assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://[::ffff:7f00:1]/foo.txt")
         assert_equal(591, response.status)
       end
 
-      should "not raise an exception if the domain doesnt't exist" do
+      should "not raise an exception if the domain doesn't exist" do
         response = Danbooru::Http.public_only.get("http://google.dne")
 
         assert_equal(598, response.status)
@@ -292,13 +306,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
       should "fail if a download is too large" do
         assert_raises(Danbooru::Http::FileTooLargeError) do
-          response, file = Danbooru::Http.max_size(500).download_media(httpbin_url("bytes/1000"))
+          Danbooru::Http.max_size(500).download_media(httpbin_url("bytes/1000"))
         end
       end
 
       should "fail if a streaming download is too large" do
         assert_raises(Danbooru::Http::FileTooLargeError) do
-          response, file = Danbooru::Http.max_size(500).download_media(httpbin_url("stream-bytes/1000"))
+          Danbooru::Http.max_size(500).download_media(httpbin_url("stream-bytes/1000"))
         end
       end
     end

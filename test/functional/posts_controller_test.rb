@@ -24,7 +24,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
   context "The posts controller" do
     setup do
-      @user = travel_to(1.month.ago) {create(:user)}
+      @user = travel_to(1.month.ago) { create(:user) }
       @post = as(@user) { create(:post, tag_string: "aaaa") }
       Danbooru.config.stubs(:canonical_url).returns("http://www.example.com")
     end
@@ -219,7 +219,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             create(:wiki_page, title: "1girl")
           end
 
-          get posts_path, params: {:tags => "1girl solo"}
+          get posts_path, params: { tags: "1girl solo" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
         end
@@ -392,11 +392,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "hide restricted posts" do
-          Post.update_all(is_banned: true)
+          Post.update(is_banned: true)
           get posts_path(format: :atom)
 
           assert_response :success
-          assert_select "entry", 0
+          assert_select("entry", 0)
+          assert_equal(3, Post.count)
         end
       end
 
@@ -510,7 +511,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "show_seq action" do
       should "render" do
-        posts = FactoryBot.create_list(:post, 3)
+        posts = create_list(:post, 3)
 
         get show_seq_post_path(posts[1].id), params: { seq: "prev" }
         assert_redirected_to(posts[2])
@@ -541,7 +542,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "show action" do
       should "render" do
-        get post_path(@post), params: {:id => @post.id}
+        get post_path(@post), params: { id: @post.id }
         assert_response :success
       end
 
@@ -643,6 +644,30 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "a banned post" do
+        setup do
+          @post.update!(is_banned: true)
+        end
+
+        should "return 451 for html" do
+          get_auth post_path(@post), @user
+
+          assert_response 451
+        end
+
+        should "render for tooltip" do
+          get_auth post_path(@post, variant: "tooltip", preview: "true"), @user
+
+          assert_response :success
+        end
+
+        should "render for json" do
+          get_auth post_path(@post), @user, as: :json
+
+          assert_response :success
+        end
+      end
+
       context "a deleted post uploaded by an admin" do
         should "be approvable by the same admin" do
           admin = create(:admin_user)
@@ -669,7 +694,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get_auth post_path(post), @user
 
           assert_response :success
-          assert_select "video#image"
+          assert_select "#image.video-component"
           assert_not_select "#translate"
         end
       end
@@ -762,6 +787,34 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to post1
         assert_equal("post1 post2", post1.reload.tag_string)
         assert_equal("e", post1.rating)
+      end
+
+      should "not clobber the parent_id of a duplicate" do
+        parent_post = create_post!(rating: "s", media_asset: create(:media_asset))
+        media_asset = create(:media_asset)
+        post1 = create_post!(rating: "s", parent_id: parent_post.id, media_asset: media_asset)
+        create_post!(rating: "s", parent_id: nil, media_asset: media_asset)
+
+        assert_redirected_to post1
+        assert_equal(parent_post.id, post1.reload.parent_id)
+      end
+
+      should "apply metatags to a duplicate" do
+        media_asset = create(:media_asset)
+        post1 = create_post!(rating: "s", media_asset: media_asset)
+        create_post!(rating: "s", tag_string: "fav:me", media_asset: media_asset)
+
+        assert_redirected_to post1
+        assert_equal(1, post1.reload.favorites.count)
+      end
+
+      should "merge tags if rating was forgotten" do
+        media_asset = create(:media_asset)
+        post1 = create_post!(rating: "s", tag_string: "post1", media_asset: media_asset)
+        create_post!(rating: "", tag_string: "post2", media_asset: media_asset)
+
+        assert_redirected_to post1
+        assert_equal("post1 post2", post1.reload.tag_string)
       end
 
       should "apply the rating from the tags" do
@@ -899,7 +952,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_post_source_equals("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", "https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", "https://www.pixiv.net/en/artworks/64476642")
 
         assert_post_source_equals("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig")
-        assert_post_source_equals("https://twitter.com/noizave/status/875768175136317440", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://x.com/noizave/status/875768175136317440")
+        assert_post_source_equals("https://x.com/noizave/status/875768175136317440", "https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN.jpg:orig", "https://x.com/noizave/status/875768175136317440")
 
         assert_post_source_equals("https://noizave.tumblr.com/post/162206271767", "https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png")
 
@@ -915,7 +968,6 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         )
 
         assert_post_source_equals("https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg?1443931773", "https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg?1443931773")
-        assert_post_source_equals("https://jeyrain.artstation.com/projects/04XA4", "https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg?1443931773", "https://www.artstation.com/artwork/04XA4")
 
         assert_post_source_equals("https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg", "https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg")
         assert_post_source_equals("https://h.bilibili.com/83341894", "https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg", "https://h.bilibili.com/83341894")
@@ -960,7 +1012,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "redirect to the post on success" do
-        put_auth post_path(@post), @user, params: {:post => {:tag_string => "bbb"}}
+        put_auth post_path(@post), @user, params: { post: { tag_string: "bbb" }}
         assert_redirected_to post_path(@post)
 
         @post.reload
@@ -968,7 +1020,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "ignore restricted params" do
-        put_auth post_path(@post), @user, params: {:post => {:last_noted_at => 1.minute.ago}}
+        put_auth post_path(@post), @user, params: { post: { last_noted_at: 1.minute.ago }}
         assert_nil(@post.reload.last_noted_at)
       end
 
@@ -999,7 +1051,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "delete the post" do
-        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" }}
 
         assert_redirected_to @post
         assert_equal(true, @post.reload.is_deleted?)
@@ -1008,7 +1060,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       should "delete the post if the post is currently flagged" do
         create(:post_flag, post: @post, reason: "blah")
-        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" }}
 
         assert_redirected_to @post
         assert_equal(true, @post.reload.is_deleted?)
@@ -1019,7 +1071,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       should "delete the post even if the deleter has flagged the post previously" do
         create(:post_flag, post: @post, creator: @approver, created_at: 7.days.ago, status: "rejected", reason: "blah")
-        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" }}
 
         assert_redirected_to @post
         assert_equal(true, @post.reload.is_deleted?)
@@ -1061,7 +1113,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         @version = @post.versions.first
         assert_equal("aaaa", @version.tags)
-        put_auth revert_post_path(@post), @user, params: {:version_id => @version.id}
+        put_auth revert_post_path(@post), @user, params: { version_id: @version.id }
         assert_redirected_to post_path(@post)
         @post.reload
         assert_equal("aaaa", @post.tag_string)
@@ -1070,7 +1122,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "not allow reverting to a previous version of another post" do
         @post2 = as(@user) { create(:post, uploader_id: @user.id, tag_string: "herp") }
 
-        put_auth revert_post_path(@post), @user, params: { :version_id => @post2.versions.first.id }
+        put_auth revert_post_path(@post), @user, params: { version_id: @post2.versions.first.id }
         @post.reload
         assert_not_equal(@post.tag_string, @post2.tag_string)
         assert_response :missing

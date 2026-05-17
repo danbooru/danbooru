@@ -1,17 +1,17 @@
-require 'test_helper'
+require "test_helper"
 
 class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
   context "The user feedbacks controller" do
     setup do
-      @user = create(:user, name: "cirno")
-      @critic = create(:gold_user, name: "eiki")
-      @mod = create(:moderator_user, id: 1000)
+      @user = create(:user)
+      @critic = create(:gold_user)
+      @mod = create(:moderator_user)
       @user_feedback = create(:user_feedback, user: @user, creator: @critic)
     end
 
     context "new action" do
       should "render" do
-        get_auth new_user_feedback_path, @critic, params: { user_feedback: { user_id: @user.id } }
+        get_auth new_user_feedback_path, @critic, params: { user_feedback: { user_id: @user.id }}
         assert_response :success
       end
     end
@@ -48,33 +48,24 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "as a user" do
-        setup do
-          CurrentUser.user = @user
-        end
+        user_feedbacks = respond_to_search.as_user { @user }
 
-        should respond_to_search({}).with { [@other_feedback, @user_feedback] }
-        should respond_to_search(body_matches: "blah").with { @other_feedback }
-        should respond_to_search(category: "positive").with { @user_feedback }
-        should respond_to_search(is_deleted: "true").with { [] }
+        should user_feedbacks.with { [@other_feedback, @user_feedback] }
+        should user_feedbacks.search_params(body_matches: "blah").with { @other_feedback }
+        should user_feedbacks.search_params(category: "positive").with { @user_feedback }
+        should user_feedbacks.search_params(is_deleted: "true").with { [] }
 
-        context "using includes" do
-          should respond_to_search(creator_name: "eiki").with { @user_feedback }
-          should respond_to_search(creator_id: 1000).with { @other_feedback }
-          should respond_to_search(creator: {level: User::Levels::GOLD}).with { @user_feedback }
-        end
+        should user_feedbacks.search_params(creator_name: -> { @critic.name }).with { @user_feedback }
+        should user_feedbacks.search_params(creator_id: -> { @mod.id }).with { @other_feedback }
+        should user_feedbacks.search_params(creator: { level: User::Levels::GOLD }).with { @user_feedback }
       end
 
       context "as a moderator" do
-        setup do
-          CurrentUser.user = @mod
-        end
+        user_feedbacks = respond_to_search.as_user { @mod }
 
-        should respond_to_search({}).with { [@unrelated_feedback, @other_feedback, @user_feedback] }
-        should respond_to_search(is_deleted: "true").with { @unrelated_feedback }
-
-        context "using includes" do
-          should respond_to_search(user_name: "cirno").with { [@other_feedback, @user_feedback] }
-        end
+        should user_feedbacks.with { [@unrelated_feedback, @other_feedback, @user_feedback] }
+        should user_feedbacks.search_params(is_deleted: "true").with { @unrelated_feedback }
+        should user_feedbacks.search_params(user_name: -> { @user.name }).with { [@other_feedback, @user_feedback] }
       end
     end
 
@@ -138,7 +129,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @user_feedback
           assert_equal("blah", @user_feedback.reload.body)
-          assert_match(/updated user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_match(%r{updated user feedback for "#{@user.name}":/users/#{@user.id}}, ModAction.last.description)
           assert_equal("user_feedback_update", ModAction.last.category)
           assert_equal(@user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
@@ -149,7 +140,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @user_feedback
           assert(@user_feedback.reload.is_deleted?)
-          assert_match(/deleted user feedback for "#{@user.name}":\/users\/#{@user.id}/, ModAction.last.description)
+          assert_match(%r{deleted user feedback for "#{@user.name}":/users/#{@user.id}}, ModAction.last.description)
           assert_equal("user_feedback_delete", ModAction.last.category)
           assert_equal(@user, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
@@ -160,7 +151,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
           put_auth user_feedback_path(@user_feedback), @mod, params: { id: @user_feedback.id, user_feedback: { is_deleted: "true" }}
 
           assert_response 403
-          refute(@user_feedback.reload.is_deleted?)
+          assert_equal(false, @user_feedback.reload.is_deleted?)
         end
       end
     end

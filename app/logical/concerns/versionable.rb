@@ -43,12 +43,12 @@ module Versionable
 
   # Return a hash of the versioned columns with their current values.
   def versioned_attributes
-    versioned_columns.map { |attr| [attr, send(attr)] }.to_h.with_indifferent_access
+    versioned_columns.index_with { |attr| send(attr) }.with_indifferent_access
   end
 
   # Return a hash of the versioned columns with their values before the last save.
   def versioned_attributes_before_last_save
-    versioned_columns.map { |attr| [attr, attribute_before_last_save(attr)] }.to_h.with_indifferent_access
+    versioned_columns.index_with { |attr| attribute_before_last_save(attr) }.with_indifferent_access
   end
 
   def saved_changes_to_versioned_attributes?
@@ -98,7 +98,7 @@ module Versionable
   end
 
   # After a new version is created, we have to clear the assocation cache manually so it doesn't return stale results.
-  def reset_version_association_cache(record)
+  def reset_version_association_cache(_record)
     association(:first_version).reset
     association(:last_version).reset
   end

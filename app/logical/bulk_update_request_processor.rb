@@ -30,7 +30,7 @@ class BulkUpdateRequestProcessor
 
   # Parse the script into a list of commands.
   def commands
-    script.split(/\r\n|\r|\n/).reject(&:blank?).map do |line|
+    script.split(/\r\n|\r|\n/).compact_blank.map do |line|
       line = line.gsub(/[[:space:]]+/, " ").strip
       next if line.empty?
 
@@ -47,7 +47,7 @@ class BulkUpdateRequestProcessor
         [:rename, Tag.normalize_name($1), Tag.normalize_name($2)]
       when /\A(?:mass update|update) (.+?) -> (.*)\z/i
         [:mass_update, $1, $2]
-      when /\Acategory (\S+) -> (#{Tag.categories.regexp})\z/i
+      when /\Acategory (\S+) -> (.*)\z/i
         [:change_category, Tag.normalize_name($1), $2.downcase]
       when /\Aconvert (.+?) -> (.*)\z/i
         [:convert, $1, $2]
@@ -159,8 +159,17 @@ class BulkUpdateRequestProcessor
 
   def validate_change_category(tag_name, category)
     tag = Tag.find_by_name(tag_name)
+
     if tag.nil?
-      errors.add(:base, "Can't change category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] doesn't exist)")
+      errors.add(:base, "Can't change the category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] doesn't exist)")
+    elsif Tag.categories.value_for(category).nil?
+      errors.add(:base, "Can't change the category of [[#{tag_name}]] to #{category} (#{category} is not a valid category)")
+    elsif validation_context == :approval
+      # do nothing
+    elsif Tag.categories.value_for(category) == tag.category
+      errors.add(:base, "Can't change the category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] is already in that category)")
+    elsif Tag.categories.value_for(category) != Tag.categories.artist && tag.artist.present?
+      errors.add(:base, "Can't change the category of [[#{tag_name}]] to #{category} ([[#{tag_name}]] must be an Artist tag)")
     end
   end
 
@@ -303,9 +312,9 @@ class BulkUpdateRequestProcessor
         when :deprecate
           tag = Tag.find_or_create_by_name(args[0])
           tag.update!(is_deprecated: true, updater: User.system)
-          TagAlias.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
-          TagImplication.active.where(consequent_name: tag.name).each { |ti| ti.reject!(User.system) }
-          TagImplication.active.where(antecedent_name: tag.name).each { |ti| ti.reject!(User.system) }
+          TagAlias.active.where(consequent_name: tag.name).find_each { |ti| ti.reject!(User.system) }
+          TagImplication.active.where(consequent_name: tag.name).find_each { |ti| ti.reject!(User.system) }
+          TagImplication.active.where(antecedent_name: tag.name).find_each { |ti| ti.reject!(User.system) }
 
         when :undeprecate
           tag = Tag.find_or_create_by_name(args[0])
@@ -368,7 +377,13 @@ class BulkUpdateRequestProcessor
       "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
 
     when :mass_update
-      "mass update {{#{args[0]}}} -> {{#{args[1]}}}"
+      lhs = PostQuery.normalize(args[0], apply_aliases: false)
+      rhs = PostQuery.normalize(args[1], apply_aliases: false)
+
+      lhs_link = lhs.is_simple_tag? ? "[[#{args[0]}]]" : "{{#{args[0]}}}"
+      rhs_link = rhs.is_simple_tag? ? "[[#{args[1]}]]" : "{{#{args[1]}}}"
+
+      "mass update #{lhs_link} -> #{rhs_link}"
 
     when :nuke
       if PostQuery.normalize(args[0]).is_simple_tag?
@@ -448,8 +463,8 @@ class BulkUpdateRequestProcessor
     query = PostQuery.normalize(tag_or_pool)
 
     if query.is_simple_tag?
-      TagImplication.active.where(consequent_name: tag_or_pool).each { |ti| ti.reject!(User.system) }
-      TagImplication.active.where(antecedent_name: tag_or_pool).each { |ti| ti.reject!(User.system) }
+      TagImplication.active.where(consequent_name: tag_or_pool).find_each { |ti| ti.reject!(User.system) }
+      TagImplication.active.where(antecedent_name: tag_or_pool).find_each { |ti| ti.reject!(User.system) }
     end
 
     if query.is_metatag?(:pool)

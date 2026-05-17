@@ -8,7 +8,9 @@ class PostVotesController < ApplicationController
     @post_votes = @post_votes.includes(:user, post: [:uploader, :media_asset]) if request.format.html?
     @post = Post.find(params.dig(:search, :post_id)) if params.dig(:search, :post_id).present?
 
-    respond_with(@post_votes)
+    respond_with(@post_votes) do |format|
+      format.html.tooltip { render layout: false }
+    end
   end
 
   def show

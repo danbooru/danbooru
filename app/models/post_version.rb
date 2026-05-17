@@ -44,7 +44,7 @@ class PostVersion < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :updated_at, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version], current_user: current_user)
+      q = search_attributes(params, %i[id updated_at updater_id post_id tags added_tags removed_tags rating rating_changed parent_id parent_changed source source_changed version], current_user: current_user)
 
       if params[:changed_tags]
         q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
@@ -121,17 +121,17 @@ class PostVersion < ApplicationRecord
     @previous ||= begin
       # HACK: if all the post versions for this post have already been preloaded,
       # we can use that to avoid a SQL query.
-      if association(:post).loaded? && post && post.association(:versions).loaded?
+      if association(:post).loaded? && post&.association(:versions)&.loaded?
         [post.versions.sort_by(&:version).reverse.find { |v| v.version < version }]
       else
-        PostVersion.where("post_id = ? and version < ?", post_id, version).order("version desc").limit(1).to_a
+        PostVersion.where("post_id = ? and version < ?", post_id, version).order(version: :desc).limit(1).to_a
       end
     end
     @previous.first
   end
 
   def current
-    @current ||= PostVersion.where(post_id: post_id).order("version desc").limit(1).to_a
+    @current ||= PostVersion.where(post_id: post_id).order(version: :desc).limit(1).to_a
     @current.first
   end
 

@@ -35,8 +35,8 @@ class SiteCredential < ApplicationRecord
     {
       id: 800,
       name: "Deviant Art",
-      default_credential: { client_id: Danbooru.config.deviantart_client_id, client_secret: Danbooru.config.deviantart_client_secret },
-      help: %{Your "DeviantArt":https://www.deviantart.com client ID and client secret. Go to https://www.deviantart.com/developers/ to create a new application.},
+      default_credential: { client_id: Danbooru.config.deviantart_client_id, client_secret: Danbooru.config.deviantart_client_secret, auth: Danbooru.config.deviantart_auth_cookie, auth_secure: Danbooru.config.deviantart_auth_secure_cookie, userinfo: Danbooru.config.deviantart_userinfo_cookie },
+      help: %{Your "DeviantArt":https://www.deviantart.com 'client_id' and 'cilent_secret' from https://www.deviantart.com/developers/, and your 'auth', 'auth_secure', and 'userinfo' cookies.},
     }, {
       id: 900,
       name: "Fantia",
@@ -65,8 +65,8 @@ class SiteCredential < ApplicationRecord
     }, {
       id: 1200,
       name: "Newgrounds",
-      default_credential: { session_cookie: Danbooru.config.newgrounds_session_cookie },
-      help: %{Your "Newgrounds":https://www.newgrounds.com 'vmkIdu5l8m' cookie.},
+      default_credential: { session_cookie: Danbooru.config.newgrounds_ng_remember_cookie },
+      help: %{Your "Newgrounds":https://www.newgrounds.com 'ng_remember' cookie.},
     }, {
       id: 1300,
       name: "Nico Seiga",
@@ -107,6 +107,11 @@ class SiteCredential < ApplicationRecord
       name: "Plurk",
       default_credential: { session_cookie: Danbooru.config.plurk_session_cookie },
       help: %{Your "Plurk":https://www.plurk.com 'plurktokena' cookie.},
+    }, {
+      id: 2050,
+      name: "Reddit",
+      default_credential: { session_cookie: Danbooru.config.reddit_session_cookie },
+      help: %{Your "Reddit":https://reddit.com 'reddit_session' cookie.},
     }, {
       id: 2100,
       name: "Tinami",
@@ -166,6 +171,8 @@ class SiteCredential < ApplicationRecord
   validates :site, presence: true, inclusion: { in: sites.keys, allow_nil: true }
   validates :credential, presence: true
   validate :validate_credential, if: :credential_changed?
+
+  normalizes :credential, with: ->(credential) { credential.transform_values(&:strip) }
 
   after_destroy :create_mod_action
   after_save :create_mod_action

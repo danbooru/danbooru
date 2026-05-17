@@ -7,11 +7,11 @@ class ExifTool
   extend Memoist
 
   # @see https://exiftool.org/exiftool_pod.html#OPTIONS
-  DEFAULT_OPTIONS = %q(
+  DEFAULT_OPTIONS = %q{
     -G1 -duplicates -unknown -struct --binary
     -x 'System:*' -x ExifToolVersion -x FileTypeExtension
     -x MIMEType -x ImageSize -x MegaPixels
-  ).squish
+  }.squish
 
   attr_reader :file
 
@@ -40,6 +40,7 @@ class ExifTool
   # @see https://exiftool.org/TagNames/index.html
   class Metadata
     attr_reader :metadata
+
     delegate_missing_to :metadata
 
     # @param [Hash] a hash of metadata as returned by ExifTool
@@ -103,12 +104,22 @@ class ExifTool
       file_ext == :avif && metadata["QuickTime:CleanAperture"].present?
     end
 
+    # AVIF files can be mirrored with the "imir" transform.
+    def is_mirrored?
+      file_ext == :avif && metadata["QuickTime:Mirroring"].present?
+    end
+
+    # AVIF files can contain an auxiliary image (for example, an alpha image).
+    def has_auxiliary_image?
+      file_ext == :avif && metadata["QuickTime:AuxiliaryImageType"].present?
+    end
+
     # AVIF files can be a collection of smaller images combined in a grid to
     # form a larger image. This is done to reduce memory usage during encoding.
     #
     # https://0xc0000054.github.io/pdn-avif/using-image-grids.html
     def is_grid_image?
-      file_ext == :avif && metadata["Meta:MetaImageSize"].present?
+      file_ext == :avif && metadata["Meta:PrimaryItemReference"].to_i > 1 && !is_animated_avif?
     end
 
     # Some animations technically have a finite loop count, but loop for hundreds
@@ -126,9 +137,9 @@ class ExifTool
       metadata["PNG:Software"] == "NovelAI" ||
         metadata["PNG:Title"] == "AI generated image" ||
         metadata["PNG:Description"]&.match?(/masterpiece|best quality/) ||
-        metadata.has_key?("PNG:Parameters") ||
-        metadata.has_key?("PNG:Sd-metadata") ||
-        metadata.has_key?("PNG:Dream")
+        metadata.key?("PNG:Parameters") ||
+        metadata.key?("PNG:Sd-metadata") ||
+        metadata.key?("PNG:Dream")
     end
 
     # True if the video has audible sound. False if the video doesn't have an audio track, or the audio track is inaudible.
@@ -137,11 +148,11 @@ class ExifTool
     end
 
     def width
-      metadata.find { |name, value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageWidth\z/) }&.second
+      metadata.find { |name, _value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageWidth\z/) }&.second
     end
 
     def height
-      metadata.find { |name, value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageHeight\z/) }&.second
+      metadata.find { |name, _value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageHeight\z/) }&.second
     end
 
     # @see http://www.vurdalakov.net/misc/gif/netscape-looping-application-extension
@@ -152,12 +163,12 @@ class ExifTool
       return Float::INFINITY if metadata["GIF:AnimationIterations"] == "Infinite"
       return Float::INFINITY if metadata["PNG:AnimationPlays"] == "inf"
       return Float::INFINITY if metadata["RIFF:AnimationLoopCount"] == "inf"
-      return metadata["GIF:AnimationIterations"] if has_key?("GIF:AnimationIterations")
-      return metadata["PNG:AnimationPlays"] if has_key?("PNG:AnimationPlays")
-      return metadata["RIFF:AnimationLoopCount"] if has_key?("RIFF:AnimationLoopCount")
+      return metadata["GIF:AnimationIterations"] if key?("GIF:AnimationIterations")
+      return metadata["PNG:AnimationPlays"] if key?("PNG:AnimationPlays")
+      return metadata["RIFF:AnimationLoopCount"] if key?("RIFF:AnimationLoopCount")
 
       # If the AnimationIterations tag isn't present, then it's counted as a loop count of 0.
-      return 0 if is_animated_gif? && !has_key?("GIF:AnimationIterations")
+      return 0 if is_animated_gif? && !key?("GIF:AnimationIterations")
 
       nil
     end
@@ -173,23 +184,23 @@ class ExifTool
     end
 
     def file_ext
-      if has_key?("File:ColorComponents")
+      if key?("File:ColorComponents")
         :jpg
-      elsif has_key?("PNG:ColorType")
+      elsif key?("PNG:ColorType")
         :png
-      elsif has_key?("GIF:GIFVersion")
+      elsif key?("GIF:GIFVersion")
         :gif
       elsif metadata["QuickTime:CompatibleBrands"].to_a.include?("avif") || metadata["QuickTime:CompatibleBrands"].to_a.include?("avis")
         :avif
-      elsif has_key?("QuickTime:MovieHeaderVersion")
+      elsif key?("QuickTime:MovieHeaderVersion")
         :mp4
       elsif keys.grep(/\ARIFF:/).any?
         :webp
-      elsif has_key?("Matroska:DocType")
+      elsif key?("Matroska:DocType")
         :webm
-      elsif has_key?("Flash:FlashVersion")
+      elsif key?("Flash:FlashVersion")
         :swf
-      elsif has_key?("ZIP:ZipCompression")
+      elsif key?("ZIP:ZipCompression")
         :ugoira
       end
     end

@@ -36,7 +36,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
         assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
-        assert(node.css("article .sound-icon").present?)
+        assert(node.css("article .volume-high-icon").present?)
       end
     end
 

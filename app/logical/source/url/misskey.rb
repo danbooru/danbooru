@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class Source::URL::Misskey < Source::URL
+  site "Misskey", url: "https://misskey-hub.net"
+  site "Misskey.io", url: "https://misskey.io", domains: %w[misskey.io misskeyusercontent.com misskeyusercontent.jp arkjp.net]
+  site "Misskey.art", url: "https://misskey.art"
+  site "Misskey.design", url: "https://misskey.design"
+
   attr_reader :username, :user_id, :note_id, :play_id
 
   def self.match?(url)
@@ -51,15 +56,6 @@ class Source::URL::Misskey < Source::URL
     super || basename&.match?(/\h{8}-\h{4}-\h{4}-\h{4}-\h{12}/)
   end
 
-  def site_name
-    case domain
-    in "arkjp.net" | "misskeyusercontent.com" | "misskeyusercontent.jp"
-      "Misskey.io"
-    else
-      domain.capitalize
-    end
-  end
-
   def image_sample?
     return nil unless image_url?
     filename.starts_with? "thumbnail-"
@@ -79,5 +75,9 @@ class Source::URL::Misskey < Source::URL
     elsif user_id.present?
       "https://#{host}/users/#{user_id}"
     end
+  end
+
+  def secondary_url?
+    profile_url? && username.blank?
   end
 end

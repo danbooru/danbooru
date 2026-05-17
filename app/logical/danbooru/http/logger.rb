@@ -5,7 +5,8 @@ module Danbooru
     class Logger < HTTP::Feature
       attr_reader :logger
 
-      def initialize(logger: ::Logger.new(STDERR))
+      def initialize(logger: ::Logger.new($stderr))
+        super
         @logger = logger
       end
 

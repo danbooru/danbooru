@@ -13,9 +13,13 @@
       <% end %>
 
       <% t.column "Comment", td: {class: "col-expand"} do |vote| %>
-        <div class="prose">
-          <%= vote.comment.dtext_body.format_text %>
-        </div>
+        <%= tag.div(class: ["prose", ("opacity-30" if vote.comment.is_deleted?)]) do %>
+          <% if !vote.comment.is_deleted? || policy(vote.comment).can_see_deleted? %>
+            <%= vote.comment.dtext_body.format_text %>
+          <% else %>
+            [deleted]
+          <% end %>
+        <% end %>
       <% end %>
 
       <% t.column "Status" do |vote| %>
@@ -27,9 +31,18 @@
       <% end %>
 
       <% t.column "Commenter" do |vote| %>
-        <%= link_to_user vote.comment.creator %>
-        <%= link_to "»", comment_votes_path(search: { comment: { creator_name: vote.comment.creator.name }}) %>
-        <div><%= time_ago_in_words_tagged(vote.comment.created_at) %></div>
+        <%= tag.div(class: ("opacity-30" if vote.comment.is_deleted?)) do %>
+          <% if !vote.comment.is_deleted? || policy(vote.comment).can_see_creator? %>
+            <%= link_to_user vote.comment.creator %>
+            <% if vote.comment.is_deleted? %>
+              [deleted]
+            <% end %>
+            <%= link_to "»", comment_votes_path(search: { comment: { creator_name: vote.comment.creator.name }}) %>
+          <% else %>
+            [deleted]
+          <% end %>
+          <div><%= time_ago_in_words_tagged(vote.comment.created_at) %></div>
+        <% end %>
       <% end %>
 
       <% t.column "Voter" do |vote| %>

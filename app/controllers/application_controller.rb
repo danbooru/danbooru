@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   class RequestBodyNotAllowedError < StandardError; end
 
   include Pundit::Authorization
+
   helper_method :search_params, :permitted_attributes
 
   self.responder = ApplicationResponder
@@ -24,7 +25,7 @@ class ApplicationController < ActionController::Base
   after_action :reset_current_user
   layout "default"
 
-  rescue_from Exception, :with => :rescue_exception
+  rescue_from Exception, with: :rescue_exception
 
   def self.rescue_with(*klasses, status: 500)
     rescue_from(*klasses) do |exception|
@@ -254,6 +255,9 @@ class ApplicationController < ActionController::Base
 
   def set_variant
     request.variant = params[:variant].try(:to_sym)
+
+    # Fix `request.format.html?` returning false when the request is made with `Accept: */*`
+    request.format = :html if request.format == Mime::ALL
   end
 
   def check_get_body

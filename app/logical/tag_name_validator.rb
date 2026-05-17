@@ -46,7 +46,7 @@ class TagNameValidator < ActiveModel::EachValidator
     when "new", "search", "and", "or", "not"
       record.errors.add(attribute, "'#{value}' is a reserved name and cannot be used")
     when /\A(.+)_\(cosplay\)\z/i
-      tag_name = $1;
+      tag_name = $1
       char_tag = Tag.find_by_name(tag_name)
 
       if char_tag.present? && char_tag.antecedent_alias.present?

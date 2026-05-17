@@ -3,28 +3,6 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  def new
-    @artist = authorize Artist.new_with_defaults(permitted_attributes(Artist))
-    respond_with(@artist)
-  end
-
-  def edit
-    @artist = authorize Artist.find(params[:id])
-    respond_with(@artist)
-  end
-
-  def ban
-    @artist = authorize Artist.find(params[:id])
-    @artist.ban!(CurrentUser.user)
-    redirect_to(artist_path(@artist), :notice => "Artist was banned")
-  end
-
-  def unban
-    @artist = authorize Artist.find(params[:id])
-    @artist.unban!(CurrentUser.user)
-    redirect_to(artist_path(@artist), :notice => "Artist was unbanned")
-  end
-
   def index
     # XXX
     params[:search][:name] = params.delete(:name) if params[:name]
@@ -38,6 +16,28 @@ class ArtistsController < ApplicationController
     @artist = authorize Artist.find(params[:id])
     raise PageRemovedError if request.format.html? && @artist.is_banned? && !policy(@artist).can_view_banned?
     respond_with(@artist)
+  end
+
+  def new
+    @artist = authorize Artist.new_with_defaults(permitted_attributes(Artist))
+    respond_with(@artist)
+  end
+
+  def edit
+    @artist = authorize Artist.find(params[:id])
+    respond_with(@artist)
+  end
+
+  def ban
+    @artist = authorize Artist.find(params[:id])
+    @artist.ban!(CurrentUser.user)
+    redirect_to(artist_path(@artist), notice: "Artist was banned")
+  end
+
+  def unban
+    @artist = authorize Artist.find(params[:id])
+    @artist.unban!(CurrentUser.user)
+    redirect_to(artist_path(@artist), notice: "Artist was unbanned")
   end
 
   def create
@@ -57,7 +57,7 @@ class ArtistsController < ApplicationController
   def destroy
     @artist = authorize Artist.find(params[:id])
     @artist.update(is_deleted: true)
-    redirect_to(artist_path(@artist), :notice => "Artist deleted")
+    redirect_to(artist_path(@artist), notice: "Artist deleted")
   end
 
   def revert

@@ -3,12 +3,12 @@ require "test_helper"
 class UsersControllerTest < ActionDispatch::IntegrationTest
   context "The users controller" do
     setup do
-      @user = create(:user, name: "bob")
+      @user = create(:user)
     end
 
     context "index action" do
       setup do
-        @mod_user = create(:moderator_user, name: "yukari")
+        @mod_user = create(:moderator_user)
         @other_user = create(:contributor_user, inviter: @mod_user, created_at: 2.weeks.ago)
         @uploader = create(:user, created_at: 2.weeks.ago)
       end
@@ -99,21 +99,21 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should respond_to_search({}).with { [@uploader, @other_user, @mod_user, @user, User.system] }
+      should respond_to_search.with { [@uploader, @other_user, @mod_user, @user, User.system] }
       should respond_to_search(min_level: User::Levels::BUILDER).with { [@other_user, @mod_user, User.system] }
-      should respond_to_search(name_matches: "yukari").with { @mod_user }
+      should respond_to_search(name_matches: -> { @mod_user.name }).with { @mod_user }
 
       context "using includes" do
         setup do
-          as (@uploader) { @post = create(:post, tag_string: "touhou", uploader: @uploader, is_flagged: true) }
-          as (@user) do
+          as(@uploader) { @post = create(:post, tag_string: "touhou", uploader: @uploader, is_flagged: true) }
+          as(@user) do
             create(:note, post: @post)
             create(:artist_commentary, post: @post)
             create(:artist)
             create(:wiki_page)
             @forum = create(:forum_post, creator: @user, topic: build(:forum_topic, creator: @user))
           end
-          as (@other_user) do
+          as(@other_user) do
             @other_post = create(:post, rating: "e", uploader: @other_user)
             create(:post_appeal, creator: @other_user)
             create(:comment, creator: @other_user, post: @other_post)
@@ -121,7 +121,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
             create(:tag_alias, creator: @other_user)
             create(:tag_implication, creator: @other_user)
           end
-          as (@mod_user) do
+          as(@mod_user) do
             create(:post_approval, user: @mod_user, post: @post)
             create(:user_feedback, user: @other_user, creator: @mod_user)
             create(:ban, user: @other_user, banner: @mod_user)
@@ -144,8 +144,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(has_post_approvals: "true").with { @mod_user }
         should respond_to_search(has_posts: "true").with { [@uploader, @other_user] }
         should respond_to_search(posts_tags_match: "touhou").with { @uploader }
-        should respond_to_search(posts: {rating: "e"}).with { @other_user }
-        should respond_to_search(inviter: {name: "yukari"}).with { @other_user }
+        should respond_to_search(posts: { rating: "e" }).with { @other_user }
+        should respond_to_search(inviter: { name: -> { @mod_user.name }}).with { @other_user }
 
         context "a user with private forum posts" do
           setup do
@@ -285,9 +285,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth user_path(@user), @user, as: :json
 
         assert_response :success
-        assert_equal(false, response.parsed_body.has_key?("bcrypt_password_hash"))
-        assert_equal(false, response.parsed_body.has_key?("totp_secret"))
-        assert_equal(false, response.parsed_body.has_key?("backup_codes"))
+        assert_equal(false, response.parsed_body.key?("bcrypt_password_hash"))
+        assert_equal(false, response.parsed_body.key?("totp_secret"))
+        assert_equal(false, response.parsed_body.key?("backup_codes"))
       end
 
       should "show the last_ip_addr to mods" do
@@ -326,7 +326,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "strip '?' from attributes" do
-        get_auth user_path(@user), @user, params: {format: :xml}
+        get_auth user_path(@user), @user, params: { format: :xml }
         xml = Hash.from_xml(response.body)
 
         assert_response :success
@@ -367,6 +367,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           @admin = create(:admin_user)
           @member = create(:user)
           @feedback = create(:user_feedback, user: @member, category: :positive)
+        end
+
+        should "render for an XHR request" do
+          get user_path(@member, variant: "tooltip"), headers: { "Accept" => "*/*" }, xhr: true
+
+          assert_response :success
         end
 
         should "render for a banned user" do
@@ -486,6 +492,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("127.0.0.1", User.last.last_ip_addr.to_s)
       end
 
+      should "redirect to the given URL after creating a user" do
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, url: comments_path }
+        assert_redirected_to comments_url
+      end
+
+      should "not redirect to an offsite URL after creating a user" do
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, url: "https://evil.com" }
+        assert_response 403
+      end
+
       should "not create a user with an invalid name" do
         assert_no_difference("User.count") do
           post users_path, params: { user: { name: "x" * 100, password: "xxxxx1", password_confirmation: "xxxxx1" }}
@@ -536,7 +552,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not create a user with an undeliverable email address" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "nobody@nothing.donmai.us" } } }
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "nobody@nothing.donmai.us" }}}
 
           assert_response :success
           assert_nil(session[:user_id])
@@ -561,7 +577,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           Danbooru.config.stubs(:captcha_secret_key).returns("2x0000000000000000000000000000000AA") # always fails
 
           assert_no_difference(["User.count"]) do
-            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+            post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
 
             assert_response 401
           end
@@ -571,7 +587,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
           Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA") # always passes
 
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+          post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
 
           assert_redirected_to User.last
           assert_equal("xxx", User.last.name)
@@ -588,7 +604,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         should "not create a user if the captcha response is missing" do
           assert_no_difference(["User.count"]) do
-            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" } }
+            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
             assert_response 401
           end
@@ -596,7 +612,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         should "not create a user if the captcha response is invalid" do
           assert_no_difference(["User.count"]) do
-            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+            post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
 
             assert_response 401
           end
@@ -639,7 +655,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         should "mark users signing up from a partial banned IP as restricted" do
           self.remote_addr = @valid_ip
 
-          @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :partial)
+          @ip_ban = create(:ip_ban, ip_addr: remote_addr, category: :partial)
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
@@ -752,7 +768,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "update a user" do
-        put_auth user_path(@user), @user, params: {:user => {:favorite_tags => "xyz"}}
+        put_auth user_path(@user), @user, params: { user: { favorite_tags: "xyz" }}
 
         assert_redirected_to edit_user_path(@user)
         assert_equal("xyz", @user.reload.favorite_tags)
@@ -806,7 +822,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       context "for a banned user" do
         should "allow the user to edit their settings" do
           @user = create(:banned_user)
-          put_auth user_path(@user), @user, params: {:user => {:favorite_tags => "xyz"}}
+          put_auth user_path(@user), @user, params: { user: { favorite_tags: "xyz" }}
 
           assert_equal("xyz", @user.reload.favorite_tags)
         end

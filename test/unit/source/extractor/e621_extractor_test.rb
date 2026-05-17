@@ -22,6 +22,7 @@ module Source::Tests::Extractor
           ["disembodied_hand", "https://e621.net/posts?tags=disembodied_hand"],
           ["duo", "https://e621.net/posts?tags=duo"],
           ["fangs", "https://e621.net/posts?tags=fangs"],
+          ["felid", "https://e621.net/posts?tags=felid"],
           ["feral", "https://e621.net/posts?tags=feral"],
           ["fur", "https://e621.net/posts?tags=fur"],
           ["grass", "https://e621.net/posts?tags=grass"],
@@ -43,6 +44,7 @@ module Source::Tests::Extractor
           ["2022", "https://e621.net/posts?tags=2022"],
           ["digital_media_(artwork)", "https://e621.net/posts?tags=digital_media_(artwork)"],
           ["hi_res", "https://e621.net/posts?tags=hi_res"],
+          ["mammal", "https://e621.net/posts?tags=mammal"],
           ["rating:s", "https://e621.net/posts?tags=rating:s"],
         ],
         dtext_artist_commentary_title: "とても良い子に育ちました",
@@ -65,7 +67,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://static1.e621.net/data/94/c3/94c307b4e9c680f99e85f7cc5c212b58.png],
         media_files: [{ file_size: 376_646 }],
         page_url: "https://e621.net/posts/5497488",
-        profile_urls: %w[https://e621.net/users/103838 https://www.deviantart.com/marsminer/ https://inkbunny.net/MarsMiner https://martian-canine.newgrounds.com/ https://twitter.com/MarsMinerNsfw https://marsminersfw.newtumbl.com/ https://marsminernsfw.newtumbl.com/ https://mars-venussfw.tumblr.com/ https://marsminer-venusspring.tumblr.com/ https://foxearedastronaut.tumblr.com/ https://ouremptyworld.tumblr.com/ https://www.furaffinity.net/user/marsminer/ https://beta.furrynetwork.com/otterastronaut/ https://volsk.sofurry.com/ https://twitter.com/xVenusSpringx https://www.facebook.com/marsminervenusspring https://keefkeefthings.tumblr.com/ https://picarto.tv/MarsMiner https://www.twitch.tv/martiancanine https://derpibooru.org/profiles/marsminer https://www.patreon.com/martiancanine https://ko-fi.com/J3J35DMV https://streamlabs.com/MarsMiner https://discord.gg/0zeschOe4893oaue https://www.pillowfort.social/MarsMiner https://twitter.com/martiancanine https://twitter.com/mars_miner https://twitter.com/intent/user?user_id=729707557],
+        profile_urls: %w[https://e621.net/users/103838 https://www.deviantart.com/marsminer/ https://inkbunny.net/MarsMiner https://martian-canine.newgrounds.com/ https://twitter.com/MarsMinerNsfw https://marsminersfw.newtumbl.com/ https://marsminernsfw.newtumbl.com/ https://mars-venussfw.tumblr.com/ https://marsminer-venusspring.tumblr.com/ https://foxearedastronaut.tumblr.com/ https://ouremptyworld.tumblr.com/ https://www.furaffinity.net/user/marsminer/ https://beta.furrynetwork.com/otterastronaut/ https://volsk.sofurry.com/ https://twitter.com/xVenusSpringx https://www.facebook.com/marsminervenusspring https://keefkeefthings.tumblr.com/ https://picarto.tv/MarsMiner https://www.twitch.tv/martiancanine https://derpibooru.org/profiles/marsminer https://www.patreon.com/martiancanine https://ko-fi.com/J3J35DMV https://streamlabs.com/MarsMiner https://discord.gg/0zeschOe4893oaue https://www.pillowfort.social/MarsMiner https://bsky.app/profile/marsminernsfw.bsky.social https://x.com/mars_miner https://x.com/i/user/729707557],
         display_name: "MarsMiner",
         username: "mars_miner",
         dtext_artist_commentary_title: "",
@@ -136,11 +138,29 @@ module Source::Tests::Extractor
         image_urls: %w[https://static1.e621.net/data/af/2d/af2d4d798faf80f122018a552dde76e6.jpg],
         media_files: [{ file_size: 81_799 }],
         page_url: "https://e621.net/posts/1857735",
-        profile_urls: %w[https://twitter.com/Sonicjeremy https://twitter.com/intent/user?user_id=852701820090822656],
+        profile_urls: %w[https://x.com/Sonicjeremy https://x.com/i/user/852701820090822656],
         display_name: "JeremySide",
         username: "Sonicjeremy",
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "Spent the last couple days modelin some of the designs from \"@JeremeyChinshue\":[https://twitter.com/JeremeyChinshue]'s \"#somethingseries\":[https://twitter.com/hashtag/somethingseries]. It's one of the funniest video game parodies I've seen and I had a lotta fun making these guys.",
+        dtext_artist_commentary_desc: "Spent the last couple days modelin some of the designs from \"@JeremeyChinshue\":[https://x.com/JeremeyChinshue]'s \"#somethingseries\":[https://x.com/hashtag/somethingseries]. It's one of the funniest video game parodies I've seen and I had a lotta fun making these guys.",
+      )
+    end
+
+    context "A post with a deleted source" do
+      strategy_should_work(
+        "https://e621.net/posts/6305694",
+        image_urls: %w[https://static1.e621.net/data/bf/d5/bfd52ec727810f04fa8c897f9c026f5a.jpg],
+        media_files: [{ file_size: 165_929 }],
+        page_url: "https://e621.net/posts/6305694",
+      )
+    end
+
+    context "A post with a non-web source" do
+      strategy_should_work(
+        "https://e621.net/posts/5473882",
+        image_urls: %w[https://static1.e621.net/data/b7/ff/b7ff8c1b1024125f993dae40ed7efa85.png],
+        media_files: [{ file_size: 21_211 }],
+        page_url: "https://e621.net/posts/5473882",
       )
     end
   end

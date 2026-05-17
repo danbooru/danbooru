@@ -52,7 +52,7 @@ class Source::Extractor
     end
 
     def artist_commentary_title
-      page&.css(".pictureDetails__titleLink, .series_title_area h1.name")&.text.to_s.normalize_whitespace.strip.gsub("\r\n", " ").squeeze(" ")
+      page&.css(".pictureDetails__titleLink, .series_title_area h1.name")&.text.to_s.normalize_whitespace.strip.gsub("\n", " ").squeeze(" ")
     end
 
     def artist_commentary_desc

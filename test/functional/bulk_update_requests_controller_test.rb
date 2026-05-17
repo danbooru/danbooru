@@ -3,10 +3,10 @@ require "test_helper"
 class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
   context "BulkUpdateRequestsController" do
     setup do
-      @user = create(:user, id: 999)
+      @user = create(:user)
       @builder = create(:builder_user)
       @admin = create(:admin_user)
-      as(@admin) { @forum_topic = create(:forum_topic, id: 100, category_id: 0) }
+      as(@admin) { @forum_topic = create(:forum_topic, category_id: 0) }
       as(@user) { @bulk_update_request = create(:bulk_update_request, user: @user, forum_topic: @forum_topic, script: "create alias aaa -> bbb") }
     end
 
@@ -49,33 +49,33 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
     context "#update" do
       should "allow admins to update other people's requests" do
-        put_auth bulk_update_request_path(@bulk_update_request.id), create(:admin_user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), create(:admin_user), params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_redirected_to bulk_update_request_path(@bulk_update_request)
         assert_equal("create alias zzz -> 222", @bulk_update_request.reload.script)
       end
 
       should "not allow builders to update other people's requests" do
-        put_auth bulk_update_request_path(@bulk_update_request.id), create(:builder_user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), create(:builder_user), params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_response 403
         assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
       end
 
       should "not allow members to update other people's requests" do
-        put_auth bulk_update_request_path(@bulk_update_request.id), create(:user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), create(:user), params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_response 403
         assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
       end
 
       should "allow users to update their own request when it has <5 votes" do
         4.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
-        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_redirected_to bulk_update_request_path(@bulk_update_request)
         assert_equal("create alias zzz -> 222", @bulk_update_request.reload.script)
       end
 
       should "not allow users to update their own request when it has 5 votes or more" do
         5.times { create(:forum_post_vote, forum_post: @bulk_update_request.forum_post, creator: build(:user), score: 1) }
-        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: { bulk_update_request: { script: "create alias zzz -> 222" }}
         assert_response 403
         assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
       end
@@ -96,9 +96,9 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
     context "#index" do
       setup do
-        @other_BUR = create(:bulk_update_request, user: @builder, script: "create alias cirno -> 9")
-        @rejected_BUR = create(:bulk_update_request, status: "rejected")
-        @approved_BUR = create(:bulk_update_request, status: "approved", approver: @admin)
+        @other_bur = create(:bulk_update_request, user: @builder, script: "create alias cirno -> 9")
+        @rejected_bur = create(:bulk_update_request, status: "rejected")
+        @approved_bur = create(:bulk_update_request, status: "approved", approver: @admin)
       end
 
       should "render" do
@@ -106,19 +106,19 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should respond_to_search({}).with { [@approved_BUR, @rejected_BUR, @other_BUR, @bulk_update_request] }
-      should respond_to_search(order: "id_desc").with { [@approved_BUR, @rejected_BUR, @other_BUR, @bulk_update_request] }
-      should respond_to_search(status: "pending").with { [@other_BUR, @bulk_update_request] }
-      should respond_to_search(script_matches: "cirno -> 9").with { @other_BUR }
-      should respond_to_search(tags_include_any: "cirno").with { @other_BUR }
+      should respond_to_search.with { [@approved_bur, @rejected_bur, @other_bur, @bulk_update_request] }
+      should respond_to_search(order: "id_desc").with { [@approved_bur, @rejected_bur, @other_bur, @bulk_update_request] }
+      should respond_to_search(status: "pending").with { [@other_bur, @bulk_update_request] }
+      should respond_to_search(script_matches: "cirno -> 9").with { @other_bur }
+      should respond_to_search(tags_include_any: "cirno").with { @other_bur }
 
       context "using includes" do
-        should respond_to_search(forum_topic_id: 100).with { @bulk_update_request }
-        should respond_to_search(forum_topic: {category_id: 0}).with { @bulk_update_request }
-        should respond_to_search(user_id: 999).with { @bulk_update_request }
-        should respond_to_search(user: {level: User::Levels::BUILDER}).with { @other_BUR }
-        should respond_to_search(has_approver: "true").with { @approved_BUR }
-        should respond_to_search(has_approver: "false").with { [@rejected_BUR, @other_BUR, @bulk_update_request] }
+        should respond_to_search(forum_topic_id: -> { @forum_topic.id }).with { @bulk_update_request }
+        should respond_to_search(forum_topic: { category_id: 0 }).with { @bulk_update_request }
+        should respond_to_search(user_id: -> { @user.id }).with { @bulk_update_request }
+        should respond_to_search(user: { level: User::Levels::BUILDER }).with { @other_bur }
+        should respond_to_search(has_approver: "true").with { @approved_bur }
+        should respond_to_search(has_approver: "false").with { [@rejected_bur, @other_bur, @bulk_update_request] }
       end
     end
 
@@ -185,7 +185,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response 403
           assert_equal("pending", @bulk_update_request.reload.status)
-          assert_equal(false, TagAlias.where(antecedent_name: "artist1", consequent_name: "artist2").exists?)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "artist1", consequent_name: "artist2"))
         end
 
         should "succeed for a small artist move" do

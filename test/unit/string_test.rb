@@ -1,17 +1,17 @@
-require 'test_helper'
+require "test_helper"
 
 class StringTest < ActiveSupport::TestCase
   context "String#to_escaped_for_sql_like" do
     should "work" do
-      assert_equal('foo\%bar', 'foo%bar'.to_escaped_for_sql_like)
-      assert_equal('foo\_bar', 'foo_bar'.to_escaped_for_sql_like)
-      assert_equal('foo%bar', 'foo*bar'.to_escaped_for_sql_like)
-      assert_equal('foo*bar', 'foo\*bar'.to_escaped_for_sql_like)
+      assert_equal('foo\%bar', "foo%bar".to_escaped_for_sql_like)
+      assert_equal('foo\_bar', "foo_bar".to_escaped_for_sql_like)
+      assert_equal("foo%bar", "foo*bar".to_escaped_for_sql_like)
+      assert_equal("foo*bar", 'foo\*bar'.to_escaped_for_sql_like)
       assert_equal('foo\\\\%bar', 'foo\\\\*bar'.to_escaped_for_sql_like)
       assert_equal('foo\\\\bar', 'foo\bar'.to_escaped_for_sql_like)
 
       assert_equal('%\\\\%', '*\\\\*'.to_escaped_for_sql_like)
-      assert_equal('%*%', '*\**'.to_escaped_for_sql_like)
+      assert_equal("%*%", '*\**'.to_escaped_for_sql_like)
     end
   end
 
@@ -31,14 +31,14 @@ class StringTest < ActiveSupport::TestCase
     end
 
     should "normalize line endings" do
-      assert_equal("foo\r\nbar", "foo\r\nbar".normalize_whitespace)
-      assert_equal("foo\r\nbar", "foo\nbar".normalize_whitespace)
-      assert_equal("foo\r\nbar", "foo\rbar".normalize_whitespace)
-      assert_equal("foo\r\nbar", "foo\vbar".normalize_whitespace)
-      assert_equal("foo\r\nbar", "foo\fbar".normalize_whitespace)
-      assert_equal("foo\r\nbar", "foo\u0085bar".normalize_whitespace)
-      assert_equal("foo\r\nbar", "foo\u2028bar".normalize_whitespace)
-      assert_equal("foo\r\nbar", "foo\u2029bar".normalize_whitespace)
+      assert_equal("foo\nbar", "foo\r\nbar".normalize_whitespace)
+      assert_equal("foo\nbar", "foo\nbar".normalize_whitespace)
+      assert_equal("foo\nbar", "foo\rbar".normalize_whitespace)
+      assert_equal("foo\nbar", "foo\vbar".normalize_whitespace)
+      assert_equal("foo\nbar", "foo\fbar".normalize_whitespace)
+      assert_equal("foo\nbar", "foo\u0085bar".normalize_whitespace)
+      assert_equal("foo\nbar", "foo\u2028bar".normalize_whitespace)
+      assert_equal("foo\nbar", "foo\u2029bar".normalize_whitespace)
     end
   end
 

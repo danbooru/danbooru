@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class PostQueryParserTest < ActiveSupport::TestCase
   def assert_parse_equals(expected, input)
@@ -114,18 +114,18 @@ class PostQueryParserTest < ActiveSupport::TestCase
 
       assert_parse_equals('source:"foo bar"', 'source:"foo bar"')
       assert_parse_equals('source:foobar"(', 'source:foobar"(')
-      assert_parse_equals('source:', 'source:')
+      assert_parse_equals("source:", "source:")
       assert_parse_equals('source:""', 'source:""')
       assert_parse_equals('source:"\""', 'source:"\""')
       assert_parse_equals(%q{source:"don't say \"lazy\" okay"}, %q{source:"don't say \"lazy\" okay"})
-      assert_parse_equals(%q{(and source:"foo)bar" a)}, %q{(a (source:"foo)bar"))})
+      assert_parse_equals('(and source:"foo)bar" a)', '(a (source:"foo)bar"))')
 
       assert_parse_equals('source:"foo bar"', "source:'foo bar'")
       assert_parse_equals("source:foobar'(", "source:foobar'(")
       assert_parse_equals('source:""', "source:''")
       assert_parse_equals('source:"\'"', "source:'\\''")
       assert_parse_equals(%q{source:"don't say \"lazy\" okay"}, %q{source:'don\'t say "lazy" okay'})
-      assert_parse_equals(%q{(and source:"foo)bar" a)}, %q{(a (source:'foo)bar'))})
+      assert_parse_equals('(and source:"foo)bar" a)', "(a (source:'foo)bar'))")
 
       assert_parse_equals('(and source:"foo bar" baz)', %q{source:foo\ bar baz})
       assert_parse_equals(%q{(and source:"don't say \"lazy\"" blah)}, %q{source:don't\ say\ "lazy" blah})
@@ -223,7 +223,7 @@ class PostQueryParserTest < ActiveSupport::TestCase
        "skirt\u0085tail", "skirt\u00a0tail", "skirt\u1680tail", "skirt\u2000tail", "skirt\u2001tail", "skirt\u2002tail",
        "skirt\u2003tail", "skirt\u2004tail", "skirt\u2005tail", "skirt\u2006tail", "skirt\u2007tail", "skirt\u2008tail",
        "skirt\u2009tail", "skirt\u200atail", "skirt\u2028tail", "skirt\u2029tail", "skirt\u202ftail", "skirt\u205ftail",
-       "skirt\u3000tail",].each do |search|
+       "skirt\u3000tail"].each do |search|
         assert_parse_equals("(and skirt tail)", search)
       end
     end

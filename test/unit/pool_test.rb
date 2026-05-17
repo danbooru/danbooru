@@ -1,9 +1,9 @@
-require 'test_helper'
+require "test_helper"
 
 class PoolTest < ActiveSupport::TestCase
   setup do
     travel_to(1.month.ago) do
-      @user = FactoryBot.create(:user)
+      @user = create(:user)
       CurrentUser.user = @user
     end
   end
@@ -14,7 +14,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Searching pools" do
     should "find pools by name" do
-      @pool = FactoryBot.create(:pool, name: "Test Pool")
+      @pool = create(:pool, name: "Test Pool")
       @pool2 = create(:pool, name: "Yuru_Yuri_-_\\\\Akarin!!//")
 
       assert_equal(@pool.id, Pool.find_by_name("test pool").id)
@@ -67,8 +67,8 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Creating a pool" do
     setup do
-      @posts = FactoryBot.create_list(:post, 5)
-      @pool = FactoryBot.create(:pool, post_ids: @posts.map(&:id))
+      @posts = create_list(:post, 5)
+      @pool = create(:pool, post_ids: @posts.map(&:id))
     end
 
     should "initialize the post count" do
@@ -107,9 +107,9 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Updating a pool" do
     setup do
-      @pool = FactoryBot.create(:pool, category: "series")
-      @p1 = FactoryBot.create(:post)
-      @p2 = FactoryBot.create(:post)
+      @pool = create(:pool, category: "series")
+      @p1 = create(:post)
+      @p2 = create(:post)
     end
 
     context "by adding a new post" do
@@ -119,7 +119,7 @@ class PoolTest < ActiveSupport::TestCase
 
       context "by #attributes=" do
         setup do
-          @pool.attributes = {post_ids: [@p1.id, @p2.id]}
+          @pool.attributes = { post_ids: [@p1.id, @p2.id] }
           @pool.save
         end
 
@@ -153,21 +153,18 @@ class PoolTest < ActiveSupport::TestCase
       context "to a deleted pool" do
         setup do
           # must be a builder to update deleted pools.
-          CurrentUser.user = FactoryBot.create(:builder_user)
+          CurrentUser.user = create(:builder_user)
 
-          @pool.update_attribute(:is_deleted, true)
-          @pool.post_ids += [@p2.id]
-          @pool.save
-          @pool.reload
-          @p2.reload
+          @pool.update(is_deleted: true)
+          @pool.update(post_ids: @pool.post_ids + [@p2.id])
         end
 
         should "add the post to the pool" do
-          assert_equal([@p1.id, @p2.id], @pool.post_ids)
+          assert_equal([@p1.id, @p2.reload.id], @pool.reload.post_ids)
         end
 
         should "increment the post count" do
-          assert_equal(2, @pool.post_count)
+          assert_equal(2, @pool.reload.post_count)
         end
       end
     end
@@ -260,14 +257,23 @@ class PoolTest < ActiveSupport::TestCase
       should_not allow_value("xx").for(:name)
       should_not allow_value("x" * 171).for(:name)
     end
+
+    context "when normalizing the description" do
+      should normalize_attribute(:description).from(" ").to("")
+      should normalize_attribute(:description).from("  \u200B  ").to("")
+      should normalize_attribute(:description).from(" foo ").to("foo")
+      should normalize_attribute(:description).from("foo\tbar").to("foo bar")
+      should normalize_attribute(:description).from("foo\nbar").to("foo\r\nbar")
+      should normalize_attribute(:description).from("Pokémon".unicode_normalize(:nfd)).to("Pokémon".unicode_normalize(:nfc))
+    end
   end
 
   context "An existing pool" do
     setup do
-      @pool = FactoryBot.create(:pool)
-      @p1 = FactoryBot.create(:post)
-      @p2 = FactoryBot.create(:post)
-      @p3 = FactoryBot.create(:post)
+      @pool = create(:pool)
+      @p1 = create(:post)
+      @p2 = create(:post)
+      @p3 = create(:post)
       @pool.add!(@p1)
       @pool.add!(@p2)
       @pool.add!(@p3)

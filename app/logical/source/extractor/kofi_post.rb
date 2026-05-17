@@ -22,7 +22,7 @@ class Source::Extractor::KofiPost < Source::Extractor::Kofi
   end
 
   def artist_commentary_desc
-    post_page&.css('script[text()*="shadowDom"]')&.text&.slice(%r{'<div class="fr-view article-body">(.*)</div>';}, 1)
+    post_page&.css('script[text()*="shadowDom"]')&.text&.slice(%r{'<div class="fr-view article-body">(.*)</div>';}, 1)&.gsub("\\'", "'")
   end
 
   def dtext_artist_commentary_desc
@@ -51,8 +51,6 @@ class Source::Extractor::KofiPost < Source::Extractor::Kofi
   end
 
   memoize def post_page
-    # Use Ko-fi's backend IP to bypass Cloudflare protection.
-    url = "https://104.45.231.79/post/#{slug}-#{post_id}" if slug.present? && post_id.present?
-    http.with_legacy_ssl.headers(Host: "ko-fi.com").cache(1.minute).parsed_get(url)
+    backend_get("/post/#{slug}-#{post_id}") if slug.present? && post_id.present?
   end
 end

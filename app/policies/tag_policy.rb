@@ -2,9 +2,10 @@
 
 class TagPolicy < ApplicationPolicy
   def can_change_category?
-    user.is_admin? ||
-      (user.is_builder? && record.post_count < 1_000) ||
-      (user.is_member? && record.post_count < 50)
+    return false if record.artist.present? && record.category == Tag.categories.artist
+    return true if user.is_admin?
+    return true if user.is_builder? && record.post_count < 1_000
+    record.post_count < 50
   end
 
   def can_change_deprecated_status?

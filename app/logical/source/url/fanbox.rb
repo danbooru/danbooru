@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Fanbox < Source::URL
+  site "Fanbox", url: "https://www.fanbox.cc", domains: %w[fanbox.cc pixiv.net pximg.net]
+
   RESERVED_SUBDOMAINS = %w[www downloads]
 
   attr_reader :username, :user_id, :work_id
@@ -82,7 +84,7 @@ class Source::URL::Fanbox < Source::URL
 
   def full_image_url
     # https://downloads.fanbox.cc/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png
-    return to_s if image_url? && !to_s.match?(%r{/[cw]/\w+/})
+    to_s if image_url? && !to_s.match?(%r{/[cw]/\w+/})
   end
 
   def candidate_full_image_urls
@@ -112,5 +114,9 @@ class Source::URL::Fanbox < Source::URL
     elsif user_id.present?
       "https://www.pixiv.net/fanbox/creator/#{user_id}"
     end
+  end
+
+  def secondary_url?
+    profile_url? && username.blank?
   end
 end

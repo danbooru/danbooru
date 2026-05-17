@@ -63,7 +63,7 @@ class BigqueryExportService
       MediaAsset,
       Favorite,
       AITag,
-      UserAction
+      UserAction,
     ]
 
     models

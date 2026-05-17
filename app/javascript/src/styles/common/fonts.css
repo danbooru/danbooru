@@ -302,14 +302,14 @@
     url("@fontsource/petit-formal-script/files/petit-formal-script-latin-400-normal.woff") format("woff");
 }
 
-/* https://fonts.google.com/specimen/UnifrakturMaguntia */
+/* https://fonts.google.com/specimen/Manufacturing+Consent */
 @font-face {
   font-family: "Blackletter";
   font-display: swap;
   src:
-    local("UnifrakturMaguntia"),
-    url("@fontsource/unifrakturmaguntia/files/unifrakturmaguntia-latin-400-normal.woff2") format("woff2"),
-    url("@fontsource/unifrakturmaguntia/files/unifrakturmaguntia-latin-400-normal.woff") format("woff");
+    local("Manufacturing Consent"),
+    url("@fontsource/manufacturing-consent/files/manufacturing-consent-latin-400-normal.woff2") format("woff2"),
+    url("@fontsource/manufacturing-consent/files/manufacturing-consent-latin-400-normal.woff") format("woff");
 }
 
 /* https://www.dafont.com/anarchy2.font */

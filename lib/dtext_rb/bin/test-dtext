@@ -1,0 +1,196 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+require "json"
+require "zlib"
+require "fileutils"
+require "open3"
+require_relative "../../../config/environment" unless defined?(Rails)
+
+# A tool for dumping DText from the database, then testing the HTML output. This is useful for verifying that changes to
+# the DText parser don't cause unexpected changes to the rendered HTML.
+class DTextExporter
+  attr_reader :output_dir, :models, :logger, :mode
+
+  def self.run!(argv)
+    options = {
+      output_dir: Dir.pwd,
+      models: [],
+      mode: :dump,
+    }
+
+    OptionParser.new do |opts|
+      opts.banner = "Usage: bin/test-dtext [options]"
+
+      opts.on("-o", "--output-dir DIR", "Output directory (default: current directory)") do |dir|
+        options[:output_dir] = dir
+      end
+
+      opts.on("-m", "--models x,y,z", Array, "Use the specified models") do |model_names|
+        options[:models] = model_names.map(&:camelize).map(&:safe_constantize)
+      end
+
+      opts.on("--regen", "Regenerate DText in *.json.gz files") do
+        options[:mode] = :regen
+      end
+
+      opts.on("--test", "Test DText in *.json.gz files") do
+        options[:mode] = :test
+      end
+    end.parse!(argv)
+
+    new(**options).run!
+  end
+
+  def initialize(output_dir: Dir.pwd, models: [], mode: :dump, logger: $stdout)
+    @output_dir = output_dir
+    @models = models.presence || all_models
+    @mode = mode
+    @logger = logger
+  end
+
+  def run!
+    FileUtils.mkdir_p(output_dir)
+
+    case mode
+    when :dump
+      dump_dtext
+    when :regen
+      regenerate_html
+    when :test
+      test_html
+    end
+  end
+
+  def dump_dtext
+    models.each do |model|
+      dtext_attributes_for(model).each do |attribute|
+        export_attribute(model, attribute)
+      end
+    end
+  end
+
+  def dtext_attributes_for(model)
+    model
+      .instance_methods
+      .grep(/\Adtext_(?!.*_was\z).+/)
+      .map { |method_name| method_name.to_s.delete_prefix("dtext_") }
+      .select { |attribute| model.column_names.include?(attribute) }
+      .uniq
+      .sort
+  end
+
+  def export_attribute(model, attribute)
+    filename = "#{model.name.underscore}.#{attribute}.json.gz"
+    filepath = File.join(output_dir, filename)
+
+    Zlib::GzipWriter.open(filepath) do |gzip|
+      logger.print "\n#{filepath}: "
+
+      model.select(:id, attribute).find_in_batches(batch_size: 1_000) do |records|
+        records.each do |record|
+          dtext = record.public_send(attribute)
+          html = record.public_send("dtext_#{attribute}").to_html
+
+          gzip.puts(
+            {
+              model: model.name,
+              attribute: attribute,
+              id: record.id,
+              dtext: dtext,
+              html: html,
+            }.to_json,
+          )
+        end
+
+        logger.print "."
+      end
+    end
+  end
+
+  def regenerate_html
+    target_files.each do |filepath|
+      logger.print "\n#{filepath}: "
+
+      temp_file = Tempfile.new(["dtext-dump-", ".json.gz"], output_dir)
+      line_count = 0
+
+      Zlib::GzipWriter.open(temp_file.path) do |output|
+        Zlib::GzipReader.open(filepath) do |input|
+          input.each_line do |line|
+            json = JSON.parse(line)
+
+            json["html"] = render_html(json["model"], json["attribute"], json["dtext"])
+            output.puts(json.to_json)
+
+            line_count += 1
+            logger.print "." if line_count % 1_000 == 0
+          end
+        end
+      end
+
+      FileUtils.mv(temp_file.path, filepath)
+      temp_file.close!
+    end
+  end
+
+  def test_html
+    total_failures = 0
+
+    target_files.each do |filepath|
+      failures = 0
+
+      logger.print "#{filepath}: "
+
+      Zlib::GzipReader.open(filepath) do |file|
+        file.each_line.with_index(1) do |line, i|
+          json = JSON.parse(line)
+          expected_html = json["html"]
+          actual_html = render_html(json["model"], json["attribute"], json["dtext"])
+
+          if expected_html != actual_html
+            failures += 1
+            logger.puts "\nMismatch model=#{json["model"]} id=#{json["id"]} attribute=#{json["attribute"]} line=#{i}"
+            logger.puts "DText:\n#{json["dtext"]}"
+            logger.puts "Expected: `#{expected_html}`"
+            logger.puts "Actual:   `#{actual_html}`"
+          end
+
+          logger.print "." if i % 1_000 == 0
+        end
+      end
+
+      logger.puts
+      total_failures += failures
+    end
+
+    logger.puts "total failures: #{total_failures}"
+  end
+
+  def all_models
+    Rails.application.eager_load!
+
+    ApplicationRecord
+      .descendants
+      .reject(&:abstract_class?)
+      .select { |model| model.table_exists? && dtext_attributes_for(model).present? }
+      .sort_by(&:name)
+  end
+
+  def target_files
+    if models.present?
+      models.flat_map { |model| Dir.glob(File.join(output_dir, "#{model.name.underscore}.*.json.gz")) }.sort
+    else
+      Dir.glob(File.join(output_dir, "*.json.gz"))
+    end
+  end
+
+  def render_html(model_name, attribute, dtext)
+    record = model_name.safe_constantize.new
+    # record[attribute] = dtext
+    record.define_singleton_method(attribute) { dtext } # XXX avoid normalizing the dtext on assigment, which would strip spaces and break tests
+    record.send("dtext_#{attribute}").to_html
+  end
+end
+
+DTextExporter.run!(ARGV)

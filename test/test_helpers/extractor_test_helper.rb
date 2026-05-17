@@ -13,6 +13,7 @@ module ExtractorTestHelper
       referer = arguments.delete(:referer)
       deleted = arguments.delete(:deleted)
       media_files = arguments.delete(:media_files)
+      image_sources = arguments.delete(:image_sources)
       options = arguments.delete(:options).to_h
 
       should "work" do
@@ -32,8 +33,21 @@ module ExtractorTestHelper
           media_files.zip(files).each do |expected_file_attributes, actual_file|
             expected_file_attributes.each do |attribute, expected_value|
               actual_value = actual_file.send(attribute)
-              assert_equal(expected_value, actual_value, "expected #{attribute} to be #{expected_value}; got #{actual_value}")
+
+              if expected_value.nil?
+                assert_nil(actual_value, "expected #{attribute} to be nil; got #{actual_value}")
+              else
+                assert_equal(expected_value, actual_value, "expected #{attribute} to be #{expected_value}; got #{actual_value}")
+              end
             end
+          end
+        end
+
+        if image_sources.present?
+          assert_equal(image_sources.size, strategy.image_sources.size, "expected #{image_sources.size} image sources; got #{strategy.image_sources.size}")
+
+          image_sources.zip(strategy.image_sources).each do |expected_child_attributes, actual_child_source|
+            should_match_source_data(actual_child_source, expected_child_attributes)
           end
         end
 

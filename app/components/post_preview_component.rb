@@ -10,7 +10,7 @@ class PostPreviewComponent < ApplicationComponent
   with_collection_parameter :post
   renders_one :footer
 
-  attr_reader :post, :tags, :size, :classes, :show_deleted, :link_target, :recommended, :show_votes, :fit, :save_data, :current_user, :options
+  attr_reader :post, :tags, :size, :classes, :html, :show_deleted, :link_target, :recommended, :show_votes, :fit, :save_data, :current_user, :options
 
   delegate :external_link_to, :time_ago_in_words_tagged, :duration_to_hhmmss, :render_post_votes, :empty_heart_icon, :sound_icon, to: :helpers
   delegate :image_width, :image_height, :file_ext, :file_size, :duration, :is_animated?, to: :media_asset
@@ -20,7 +20,8 @@ class PostPreviewComponent < ApplicationComponent
   # @param tags [String] The current tag search, if any.
   # @param size [String] The size of the thumbnail. One of "150", "180", "225",
   #   "225w", "270", "270w", or "360".
-  # param classes [String] A list of CSS classes to apply to the container.
+  # @param classes [String] A list of CSS classes to apply to the container.
+  # @param html [Hash] A list of HTML attributes to apply to the container.
   # @param show_deleted [Boolean] If true, show thumbnails for deleted posts.
   #   If false, hide thumbnails of deleted posts.
   # @param show_votes [Boolean] If true, show scores and vote buttons beneath the thumbnail.
@@ -31,12 +32,13 @@ class PostPreviewComponent < ApplicationComponent
   # @param fit [Symbol] If `:fixed`, make the thumbnail container a fixed size
   #   (e.g. 180x180), even if the thumbnail image is smaller than that. If `:compact`,
   #   make the thumbnail container shrink to the same size as the thumbnail image.
-  def initialize(post:, tags: "", size: DEFAULT_SIZE, classes: nil, show_deleted: false, show_votes: false, link_target: post, recommended: nil, save_data: CurrentUser.save_data, fit: :compact, current_user: CurrentUser.user, **options)
+  def initialize(post:, tags: "", size: DEFAULT_SIZE, classes: nil, html: {}, show_deleted: false, show_votes: false, link_target: post, recommended: nil, save_data: CurrentUser.save_data, fit: :compact, current_user: CurrentUser.user, **options)
     super
     @post = post
     @tags = tags.presence
     @size = size.presence || DEFAULT_SIZE
     @classes = classes
+    @html = html
     @show_deleted = show_deleted
     @show_votes = show_votes
     @link_target = link_target
@@ -52,7 +54,7 @@ class PostPreviewComponent < ApplicationComponent
   end
 
   def article_attrs
-    { class: [classes, *preview_class].compact.join(" "), **data_attributes }
+    { class: [classes, *preview_class].compact.join(" "), **data_attributes, **html }
   end
 
   def variant

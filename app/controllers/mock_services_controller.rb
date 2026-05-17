@@ -35,13 +35,13 @@ class MockServicesController < ApplicationController
   end
 
   def iqdb_query
-    @data = posts.map { |post| { post_id: post.id, score: rand(0..100)} }
+    @data = posts.map { |post| { post_id: post.id, score: rand(0..100) } }
     render json: @data
   end
 
   def autotagger_evaluate
     limit = params.fetch(:limit, 50)
-    predictions = tags(limit).pluck(:name).map { |name| [name, rand(0.0..1.0)] }.to_h
+    predictions = tags(limit).pluck(:name).index_with { rand(0.0..1.0) }
     data = { filename: "test.jpg", tags: predictions }
 
     render json: data

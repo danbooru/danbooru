@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 class Source::URL::Blogger < Source::URL
+  site "Blogger" do
+    url "https://blogger.com"
+    domains %w[blogger.com blogspot.com googleusercontent.com]
+
+    credential :api_key, help: %{Your Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.}
+  end
+
   RESERVED_SUBDOMAINS = %w[bp cdn www]
 
   attr_reader :page_name, :user_id, :year, :month, :title, :full_image_url

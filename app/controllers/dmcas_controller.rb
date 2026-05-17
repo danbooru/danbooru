@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class DmcasController < ApplicationController
+  def show
+    authorize nil, policy_class: DmcaPolicy
+  end
+
   def create
     @dmca = params[:dmca].slice(:name, :email, :address, :infringing_urls, :original_urls, :proof, :perjury_agree, :good_faith_agree, :signature)
     authorize @dmca, policy_class: DmcaPolicy
@@ -22,10 +26,6 @@ class DmcasController < ApplicationController
 
     UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: Danbooru.config.dmca_email).deliver_now
     UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now unless Danbooru::EmailAddress.new(@dmca[:email]).undeliverable?
-  end
-
-  def show
-    authorize nil, policy_class: DmcaPolicy
   end
 
   def template

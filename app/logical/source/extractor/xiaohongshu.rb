@@ -4,6 +4,10 @@
 # @see https://github.com/NanmiCoder/MediaCrawler/blob/main/media_platform/xhs/client.py
 # @see https://github.com/JoeanAmier/XHS-Downloader
 class Source::Extractor::Xiaohongshu < Source::Extractor
+  def self.enabled?
+    SiteCredential.for_site("Xiaohongshu").present?
+  end
+
   def image_urls
     if parsed_url.full_image_url.present?
       [parsed_url.full_image_url]

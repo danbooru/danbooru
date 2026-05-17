@@ -44,30 +44,41 @@ class DeviantArtApiClient
       mature_content: mature_content,
       ext_submission: ext_submission,
       ext_camera: ext_camera,
-      ext_stats: ext_stats
+      ext_stats: ext_stats,
     }
 
     request("deviation/metadata", **params)
   end
 
   def request(url, **params)
-    params = { access_token: access_token.token, **params }
+    params = { access_token: access_token[:access_token], **params }
 
     url = URI.join(BASE_URL, url).to_s
     response = http.cache(1.minute).get(url, params: params)
     response.parse.with_indifferent_access
   end
 
-  def oauth
-    OAuth2::Client.new(client_id, client_secret, site: "https://www.deviantart.com", token_url: "/oauth2/token")
-  end
-
   def access_token
-    @access_token = oauth.client_credentials.get_token if @access_token.nil? || @access_token.expired?
+    @access_token = request_access_token if @access_token.nil? || access_token_expired?
     @access_token
   end
 
   def access_token=(hash)
-    @access_token = OAuth2::AccessToken.from_hash(oauth, hash)
+    @access_token = hash.with_indifferent_access
+  end
+
+  def access_token_expired?
+    expires_at = @access_token[:expires_at]
+
+    expires_at.blank? || Time.zone.at(expires_at) <= Time.zone.now
+  end
+
+  # https://www.deviantart.com/developers/http/v1/20160316/authentication
+  def request_access_token
+    http.parsed_post("https://www.deviantart.com/oauth2/token", form: {
+      grant_type: "client_credentials",
+      client_id: client_id,
+      client_secret: client_secret,
+    }) || {}
   end
 end

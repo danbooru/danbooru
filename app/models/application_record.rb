@@ -199,8 +199,8 @@ class ApplicationRecord < ActiveRecord::Base
     # This assumes the table only has one uniqueness constraint in the database.
     def save_if_unique(column)
       save
-    rescue ActiveRecord::RecordNotUnique => e
-      self.errors.add(column, :taken)
+    rescue ActiveRecord::RecordNotUnique
+      errors.add(column, :taken)
       false
     end
   end

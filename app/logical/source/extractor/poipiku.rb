@@ -3,6 +3,10 @@
 # @see Source::URL::Poipiku
 class Source::Extractor
   class Poipiku < Source::Extractor
+    def self.enabled?
+      SiteCredential.for_site("Poipiku").present?
+    end
+
     delegate :profile_url, :user_id, to: :parsed_url
 
     # Paswords to check.

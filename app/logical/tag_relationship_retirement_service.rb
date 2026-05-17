@@ -48,9 +48,9 @@ module TagRelationshipRetirementService
   end
 
   def inactive_gentag_aliases
-    aliases = TagAlias.general.active.where("tag_aliases.created_at < ?", THRESHOLD.ago)
-    aliases = aliases.select do |tag_alias|
-      !tag_alias.consequent_tag.posts.exists?(["created_at > ?", THRESHOLD.ago])
+    aliases = TagAlias.general.active.where(created_at: ...THRESHOLD.ago)
+    aliases = aliases.reject do |tag_alias|
+      tag_alias.consequent_tag.posts.exists?(["created_at > ?", THRESHOLD.ago])
     end
 
     aliases += TagAlias.active.empty
@@ -58,6 +58,6 @@ module TagRelationshipRetirementService
   end
 
   def inactive_artist_aliases
-    TagAlias.active.artist.where("tag_aliases.created_at < ?", THRESHOLD.ago)
+    TagAlias.active.artist.where(created_at: ...THRESHOLD.ago)
   end
 end

@@ -20,7 +20,7 @@ class UploadMediaAssetsController < ApplicationController
     @media_asset = @upload_media_asset.media_asset
     @post = Post.new_from_upload(@upload_media_asset, add_artist_tag: true, source: @upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys)
 
-    if request.format.html? && @media_asset&.post&.present?
+    if request.format.html? && @media_asset&.post.present?
       flash[:notice] = "Duplicate of post ##{@media_asset.post.id}"
       redirect_to @media_asset.post
     else

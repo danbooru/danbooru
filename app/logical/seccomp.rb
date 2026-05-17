@@ -221,6 +221,7 @@ module Seccomp
   # https://github.com/seccomp/libseccomp
   module LibSeccomp
     extend FFI::Library
+
     ffi_lib "libseccomp"
 
     # https://github.com/seccomp/libseccomp/blob/main/include/seccomp.h.in#L121
@@ -359,7 +360,7 @@ module Seccomp
         yield self
       end
 
-      pid, status = Process.wait2(pid)
+      _pid, status = Process.wait2(pid)
       if status.signaled? && Signal.signame(status.termsig) == "SYS"
         raise Error, "Subprocess called unauthorized syscall (see dmesg for details)"
       end
@@ -482,9 +483,9 @@ module Seccomp
   #
   # @return [Hash<Integer, String>] a hash of syscall numbers to syscall names
   def self.syscalls
-    @syscalls ||= 0.upto(8192).map do |n|
-      [n, resolve_syscall_number(n) ]
-    end.to_h.compact
+    @syscalls ||= 0.upto(8192).index_with do |n|
+      resolve_syscall_number(n)
+    end.compact
   end
 
   # Recursively expand a list of syscall names, that may contain a mixture of regular

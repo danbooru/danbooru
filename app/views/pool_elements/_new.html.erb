@@ -3,7 +3,7 @@
 
   <div class="input">
     <label>Pool Name</label>
-    <span id="pool-name-container"><%= text_field_tag "pool_name", "", :data => { autocomplete: "pool" } %></span>
+    <%= text_field_tag "pool_name", "", "data-autocomplete": "pool", class: "w-full max-w-360px" %>
   </div>
 
   <div class="input">

@@ -47,6 +47,14 @@ module Source
         sub_extractor&.other_names || []
       end
 
+      def published_at
+        sub_extractor&.published_at
+      end
+
+      def updated_at
+        sub_extractor&.updated_at
+      end
+
       def tags
         sub_extractor&.tags || []
       end

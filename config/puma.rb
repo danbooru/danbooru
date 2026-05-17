@@ -9,6 +9,9 @@
 # * PUMA_WORKERS
 # * PUMA_MIN_THREADS
 # * PUMA_MAX_THREADS
+# * PUMA_CHECK_INTERVAL
+# * PUMA_MAX_KEEP_ALIVE
+# * PUMA_PERSISTENT_TIMEOUT
 # * PUMA_WORKER_TIMEOUT
 # * PUMA_PIDFILE
 # * PUMA_CONTROL_URL
@@ -25,9 +28,9 @@
 rails_env = ENV.fetch("RAILS_ENV", "development")
 
 # The server port or listening address. Default is http://0.0.0.0:3000.
-if ENV.has_key?("PUMA_PORT")
+if ENV.key?("PUMA_PORT")
   port ENV["PUMA_PORT"]
-elsif ENV.has_key?("PUMA_BIND")
+elsif ENV.key?("PUMA_BIND")
   bind ENV["PUMA_BIND"]
 else
   # low_latency=true means TCP_NODELAY
@@ -41,15 +44,14 @@ end
 # the application would be max `threads` * `workers`. Workers do not work on
 # JRuby or Windows (both of which do not support processes). The Postgres
 # connection limit may need to be raised for high `thread` * `worker` counts.
-if ENV.has_key?("PUMA_WORKERS")
+if ENV.key?("PUMA_WORKERS")
   workers ENV["PUMA_WORKERS"]
 elsif rails_env == "development"
   # Use single worker mode in development for easier debugging
   workers 0
 else
   # Default to one worker process per CPU core in production
-  require "concurrent-ruby"
-  workers Concurrent.available_processor_count.to_i.clamp(1..)
+  workers :auto
 end
 
 # The number of threads per worker to use. The `threads` method
@@ -70,9 +72,11 @@ worker_timeout ENV.fetch("PUMA_WORKER_TIMEOUT", 60)
 # Default: once per second.
 worker_check_interval ENV.fetch("PUMA_CHECK_INTERVAL", 1).to_i
 
-# The number of seconds to wait for another request within a persistent (keep
-# alive) session.
-persistent_timeout 20
+# The maximum number of requests to process in a keep alive connection before closing it.
+max_keep_alive ENV.fetch("PUMA_MAX_KEEP_ALIVE", 1000).to_i
+
+# The number of seconds to wait for another request within a persistent (keep alive) session.
+persistent_timeout ENV.fetch("PUMA_PERSISTENT_TIMEOUT", 65).to_i
 
 # The number of seconds to wait until we get the first data for the request
 first_data_timeout 30
@@ -82,14 +86,6 @@ environment rails_env
 
 # The `pidfile` that Puma will use.
 pidfile ENV.fetch("PUMA_PIDFILE", "tmp/pids/server.pid")
-
-# Use the `preload_app!` method when specifying a `workers` number.
-# This directive tells Puma to first boot the application and load code
-# before forking the application. This takes advantage of Copy On Write
-# process behavior so workers use less memory.
-if rails_env != "development"
-  preload_app!
-end
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
@@ -113,14 +109,14 @@ activate_control_app ENV.fetch("PUMA_CONTROL_URL", "tcp://localhost:9293"), no_t
 # error, or if a middleware raises an error before or after the request is handled by the app.
 #
 # When RAILS_ENV is development, errors will be swallowed by the BetterErrors gem before they get to this point.
-lowlevel_error_handler do |exception, env|
+lowlevel_error_handler do |exception, _env|
   ApplicationMetrics[:puma_exceptions_total][exception: exception.class.name].increment
 
   backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
   message = <<~EOS
     An unexpected error has occurred.
 
-    Details: #{exception.class.to_s} exception raised.
+    Details: #{exception.class} exception raised.
 
     #{backtrace}
   EOS
@@ -130,10 +126,10 @@ rescue Exception => second_exception # This should never happen
   message = <<~EOS
     An unexpected error has occurred on the error page. Oh baby, a triple fault!
 
-    Details: #{exception.class.to_s} exception raised.
+    Details: #{exception.class} exception raised.
     #{exception.backtrace.join("\n")}
 
-    #{second_exception.class.to_s} exception raised.
+    #{second_exception.class} exception raised.
     #{second_exception.backtrace.join("\n")}
   EOS
 
@@ -143,20 +139,20 @@ end
 # https://github.com/schneems/puma_worker_killer
 # https://docs.gitlab.com/ee/administration/operations/puma.html#puma-worker-killer
 before_fork do
-  require 'puma_worker_killer'
+  require "puma_worker_killer"
 
   PumaWorkerKiller.rolling_restart_splay_seconds = 0.0..180.0 # 0 to 3 minutes in seconds
   PumaWorkerKiller.enable_rolling_restart ENV.fetch("PUMA_RESTART_INTERVAL", 2 * 60 * 60).to_i # every 2 hours by default
 end
 
 # This is called in the master process right before a worker is started.
-on_worker_fork do |worker_id|
+before_worker_fork do |worker_id|
   ApplicationMetrics[:puma_restarts_total][worker: worker_id].increment
 end
 
 # This is called every time a worker process starts or restarts. It's not called in single mode (when workers == 0)
 # when there are no child worker processes.
-on_worker_boot do |worker_id|
+before_worker_boot do |worker_id|
   # Starts a background thread that serves process metrics on a Unix domain socket under tmp/.
   require_relative "../app/logical/application_metrics"
   ApplicationMetrics.puma_worker_id = worker_id.to_s

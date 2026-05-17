@@ -1,16 +1,11 @@
-require 'test_helper'
+require "test_helper"
 
 class BanTest < ActiveSupport::TestCase
   context "A ban" do
     context "deleting user data" do
       setup do
         @banner = create(:moderator_user)
-        CurrentUser.user = @banner
         @bannee = create(:user)
-      end
-
-      teardown do
-        CurrentUser.user = nil
       end
 
       should "delete the user's pending posts" do
@@ -151,7 +146,7 @@ class BanTest < ActiveSupport::TestCase
         @ban.update!(duration: 1.day, updater: @mod)
         assert_equal(false, @ban.user.reload.is_banned?)
 
-        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("updated ban duration from 1 year to 1 day for <@#{@ban.user.name}>", ModAction.last.description)
         assert_equal("user_ban_update", ModAction.last.category)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)
@@ -165,7 +160,7 @@ class BanTest < ActiveSupport::TestCase
         @ban.update!(duration: 1.year, updater: @mod)
         assert_equal(true, @ban.user.reload.is_banned?)
 
-        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("updated ban duration from 3 months to 1 year for <@#{@ban.user.name}>", ModAction.last.description)
         assert_equal("user_ban_update", ModAction.last.category)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)

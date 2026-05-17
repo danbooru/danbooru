@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class LegacyControllerTest < ActionDispatch::IntegrationTest
   context "The legacy controller" do

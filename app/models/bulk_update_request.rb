@@ -14,6 +14,8 @@ class BulkUpdateRequest < ApplicationRecord
   belongs_to :forum_post, optional: true
   belongs_to :approver, optional: true, class_name: "User"
 
+  normalizes :script, with: ->(script) { script.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
+
   # XXX these validations must match the forum post validations
   validates :reason, visible_string: true, length: { maximum: 20_000 }, on: :create
   validates :title, visible_string: true, length: { maximum: 200 }, on: :create, if: ->(bur) { bur.forum_topic_id.blank? }
@@ -30,7 +32,7 @@ class BulkUpdateRequest < ApplicationRecord
   after_create :create_forum_topic
 
   scope :pending_first, -> { order(Arel.sql("(case status when 'processing' then 0 when 'pending' then 1 when 'approved' then 2 when 'rejected' then 3 when 'failed' then 4 else 5 end)")) }
-  scope :pending, -> {where(status: "pending")}
+  scope :pending, -> { where(status: "pending") }
   scope :approved, -> { where(status: "approved") }
   scope :rejected, -> { where(status: "rejected") }
   scope :processing, -> { where(status: "processing") }

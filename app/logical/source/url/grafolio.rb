@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Grafolio < Source::URL
+  site "Grafolio", url: "https://grafolio.ogq.me"
+
   attr_reader :username, :user_id, :project_id, :full_image_url
 
   def self.match?(url)

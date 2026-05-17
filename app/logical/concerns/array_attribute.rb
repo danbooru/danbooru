@@ -23,9 +23,9 @@ module ArrayAttribute
 
         define_method "#{name}=" do |value|
           if value.respond_to?(:to_str)
-            super value.to_str.scan(parse).map(&cast)
+            super(value.to_str.scan(parse).map(&cast))
           elsif value.respond_to?(:to_a)
-            super value.to_a
+            super(value.to_a)
           else
             raise ArgumentError, "#{name} must be a String or an Array"
           end

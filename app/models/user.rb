@@ -95,11 +95,11 @@ class User < ApplicationRecord
   attribute :favorite_count, default: 0
   attribute :per_page, default: 20
   attribute :theme, default: :auto
-  attribute :upload_points, default: Danbooru.config.initial_upload_points.to_i
+  attribute :upload_points, default: -> { Danbooru.config.initial_upload_points.to_i }
   attribute :bit_prefs, default: 0
   attribute :is_deleted, default: false
 
-  has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
+  has_bit_flags BOOLEAN_ATTRIBUTES, field: "bit_prefs"
   enum :theme, { auto: 0, light: 50, dark: 100 }, suffix: true
 
   attr_reader :password
@@ -119,7 +119,7 @@ class User < ApplicationRecord
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
   validates :password, confirmation: { message: "Passwords don't match" }
   validates :comment_threshold, inclusion: { in: (-100..5) }
-  validates :level, inclusion: { in: User::Levels.constants.map { |c| User::Levels.const_get(c) } }, if: :level_changed?
+  validates :level, inclusion: { in: User::Levels.constants.map { |c| User::Levels.const_get(c) }}, if: :level_changed?
   validates :level, exclusion: { in: [User::Levels::ANONYMOUS] }, if: :level_changed?
   validate :validate_enable_private_favorites, on: :update
   validate :validate_blacklisted_tags, if: :blacklisted_tags_changed?
@@ -137,41 +137,41 @@ class User < ApplicationRecord
   has_many :comments, foreign_key: :creator_id
   has_many :comment_votes, dependent: :destroy
   has_many :wiki_page_versions, foreign_key: :updater_id
-  has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
+  has_many :feedback, class_name: "UserFeedback", dependent: :destroy
   has_many :forum_post_votes, dependent: :destroy, foreign_key: :creator_id
   has_many :forum_topic_visits, dependent: :destroy
   has_many :visited_forum_topics, through: :forum_topic_visits, source: :forum_topic
   has_many :moderation_reports, as: :model
   has_many :pool_versions, foreign_key: :updater_id
-  has_many :posts, :foreign_key => "uploader_id"
+  has_many :posts, foreign_key: "uploader_id"
   has_many :post_appeals, foreign_key: :creator_id
-  has_many :post_approvals, :dependent => :destroy
-  has_many :post_disapprovals, :dependent => :destroy
+  has_many :post_approvals, dependent: :destroy
+  has_many :post_disapprovals, dependent: :destroy
   has_many :post_events, class_name: "PostEvent", foreign_key: :creator_id
   has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
   has_many :post_versions, foreign_key: :updater_id
   has_many :post_reactions, -> { post }, class_name: "Reaction", foreign_key: :creator_id
-  has_many :bans, -> {order("bans.id desc")}
+  has_many :bans, -> { order("bans.id desc") }
   has_many :received_upgrades, class_name: "UserUpgrade", foreign_key: :recipient_id, dependent: :destroy
   has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
   has_many :user_events, dependent: :destroy
   has_one :active_ban, -> { active }, class_name: "Ban"
   has_one :email_address, dependent: :destroy
   has_many :api_keys, dependent: :destroy
-  has_many :note_versions, :foreign_key => "updater_id"
-  has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
+  has_many :note_versions, foreign_key: "updater_id"
+  has_many :dmails, -> { order("dmails.id desc") }, foreign_key: "owner_id"
   has_many :saved_searches
-  has_many :forum_topics, :foreign_key => "creator_id"
-  has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
-  has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}
-  has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
+  has_many :forum_topics, foreign_key: "creator_id"
+  has_many :forum_posts, -> { order("forum_posts.created_at, forum_posts.id") }, foreign_key: "creator_id"
+  has_many :user_name_change_requests, -> { order("user_name_change_requests.created_at desc") }
+  has_many :favorite_groups, -> { order(name: :asc) }, foreign_key: :creator_id
   has_many :favorites
   has_many :ip_bans, foreign_key: :creator_id
   has_many :tag_aliases, foreign_key: :creator_id
   has_many :tag_implications, foreign_key: :creator_id
   has_many :uploads, foreign_key: :uploader_id, dependent: :destroy
-  has_many :upload_media_assets, through: :uploads, dependent: :destroy
+  has_many :upload_media_assets, dependent: :destroy
   has_many :mod_actions, as: :subject, dependent: :destroy
   has_many :reactions, as: :model, dependent: :destroy
   has_many :site_credentials, foreign_key: :creator_id, dependent: :destroy
@@ -379,7 +379,7 @@ class User < ApplicationRecord
       shared_session_ids = UserEvent.shared_session_ids_for(self).includes(:user)
       shared_ip_addresses = UserEvent.shared_ip_addresses_for(self).includes(:user, :ip_geolocation)
       events = (shared_session_ids + shared_ip_addresses).take(limit)
-      accounts = { session_ids: {}, ip_addresses: {}, ip_geolocations: {} }
+      accounts = { session_ids: {}, ip_addresses: {}, ip_geolocations: {}}
 
       events.each do |event|
         next if event.user.in?(accounts[:session_ids].values.flatten) || event.user.in?(accounts[:ip_addresses].values.flatten)
@@ -651,7 +651,7 @@ class User < ApplicationRecord
       max_updated_at = ForumTopic.visible(self).active.maximum(:updated_at)
       return false if max_updated_at.nil?
       return true if last_forum_read_at.nil?
-      return max_updated_at > last_forum_read_at
+      max_updated_at > last_forum_read_at
     end
   end
 
@@ -869,11 +869,11 @@ class User < ApplicationRecord
 
       q = search_attributes(
         params,
-        [:id, :created_at, :updated_at, :name, :level, :is_deleted, :post_upload_count, :post_update_count,
-         :note_update_count, :favorite_count, :posts, :note_versions, :artist_commentary_versions, :post_appeals,
-         :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_topics, :forum_posts,
-         :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter],
-        current_user: current_user
+        %i[id created_at updated_at name level is_deleted post_upload_count post_update_count
+           note_update_count favorite_count posts note_versions artist_commentary_versions post_appeals
+           post_approvals artist_versions comments wiki_page_versions feedback forum_topics forum_posts
+           forum_post_votes tag_aliases tag_implications bans inviter],
+        current_user: current_user,
       )
 
       if params[:name_matches].present?
@@ -889,11 +889,11 @@ class User < ApplicationRecord
       end
 
       if params[:min_level].present?
-        q = q.where("level >= ?", params[:min_level].to_i)
+        q = q.where(level: params[:min_level].to_i..)
       end
 
       if params[:max_level].present?
-        q = q.where("level <= ?", params[:max_level].to_i)
+        q = q.where(level: ..params[:max_level].to_i)
       end
 
       if params[:is_banned].present?
@@ -935,7 +935,7 @@ class User < ApplicationRecord
     self.new_post_navigation_layout = true
   end
 
-  def dtext_shortlink(**options)
+  def dtext_shortlink(**_options)
     "<@#{name}>"
   end
 

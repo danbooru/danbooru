@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::Odaibako < Source::URL
+  site "Odaibako", url: "https://odaibako.net"
+
   attr_reader :username, :odai_id, :post_id, :image_hash, :original_file_ext
 
   def self.match?(url)

@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 class Source::URL::Vk < Source::URL
-  RESERVED_USERNAMES = %w[about audio blog clips games groups feed jobs join legal login mobile products technology services terms video]
+  site "Vk", url: "https://vk.com", domains: %w[vk.com vk.cc vk.me vk.ru vk.team vk.company vkontakte.ru mvk.com userapi.com]
+
+  extractors { [Source::Extractor::Vk, Source::Extractor::URLShortener] }
+
+  RESERVED_USERNAMES = %w[about audio away.php blog clips games groups feed jobs join legal login mobile products technology services terms video]
   PAGE_TYPES = %w[album albums audio audios clip club doc event id market page photo post product public topic uslugi video videos wall wpt]
   ID_REGEX = /^(#{Regexp.union(PAGE_TYPES)})(-?\d+)(?:_(\d+))?/ # wall-111670353_64474
 
-  attr_reader :full_image_url, :username, :page_type, :id, :owner_id, :item_id, :parent_id, :parent_owner_id, :parent_item_id, :article_slug, :doc_hash
+  attr_reader :full_image_url, :username, :page_type, :id, :owner_id, :item_id, :parent_id, :parent_owner_id, :parent_item_id, :article_slug, :doc_hash, :redirect_url
 
   def self.match?(url)
     url.domain.in?(%w[vk.com vk.cc vk.me vk.ru vk.team vk.company vkontakte.ru mvk.com userapi.com])
@@ -21,11 +25,24 @@ class Source::URL::Vk < Source::URL
     in _, "userapi.com", ("impf" | "impg"), *subdirs, file
       @full_image_url = "https://pp.userapi.com/#{subdirs.join("/")}/#{file}"
 
+    # https://sun9-82.userapi.com/s/v1/ig2/AFxC0mg2RFaJNkKI-2SZI0MRJh7j3LPA3IxwyR3NWjv7c-ORpcoUAqPIRM-q1agdATTZAQDhKWosNajAOieOQG5O.jpg?quality=96&as=32x25,48x38,72x56,108x85,160x126,240x188,360x282,480x377,540x424,640x502,720x565,1080x847,1280x1004,1440x1130,1491x1170&from=bu&cs=1280x0 (sample)
+    # * https://sun9-82.userapi.com/s/v1/ig2/AFxC0mg2RFaJNkKI-2SZI0MRJh7j3LPA3IxwyR3NWjv7c-ORpcoUAqPIRM-q1agdATTZAQDhKWosNajAOieOQG5O.jpg?quality=96&as=32x25,48x38,72x56,108x85,160x126,240x188,360x282,480x377,540x424,640x502,720x565,1080x847,1280x1004,1440x1130,1491x1170&from=bu&cs=99999x99999 (full)
+    # * https://pp.userapi.com/cVSC2N_f8Gdou4EA6NspTDPTd3SRKpcaFUZ_tQ/VfhBKGBr30g.jpg (same as above)
+    # * https://vk.com/wall-143305139_11128?z=photo-143305139_457245182%2Fwall-143305139_11133 (page url for above)
+    # https://psv4.userapi.com/s/v1/d/bZgTPvOyyPCm01sOtQaevZk93NaI1fQ2Ap460dFeFnQ3HZcRk0w5Lod-OK1ouDAQ-gJR2hgAWl3jtE2rNJjENYABUYeTYkeESbWV0AGmmejw8dFx/Sasha03811.nef?cs=99999x99999
+    # https://psv4.userapi.com/s/v1/d/70TsTOU74Yb1WLcBikvYAiE6Ndx552XKzNPVPfHntl36JHI9yCdOxaE6yUEDgGfclpFBqYW6VxM0md28OlwrTeXyBw1pzxZMzwA6oWTC3vt4KVnE/Strakh_Pakhnet_Lyubovyu.png (signed doc URL)
+    in /^(sun|psv)/, "userapi.com", "s", "v1", *_rest
+      @full_image_url = with_params(cs: "99999x99999").to_s
+
     # http://sun4.dataix-kz-akkol.userapi.com/c854320/v854320725/772f0/W3F-BmEDE5c.jpg (redirects to https://pp.userapi.com/c854320/v854320725/772f0/W3F-BmEDE5c.jpg)
     # https://sun9-55.userapi.com/c235131/u495199190/d59/-3/y_1029db78fe.jpg (sample)
     # https://psv4.userapi.com/c235131/u495199190/docs/d59/b94c28ecfbf7/Strakh_Pakhnet_Lyubovyu.png?extra=mZ9zdTdOqm0QPKfsJ8msJr5XMKqxvfSiQNZHBjCceMvuMmxeJiE_bTi12ZXc66HkriH02LKY4aq7tQQh-suMtdtaNYXUNe49sgrS8m3M02eUnwjXzATQ3oHWqB0iuPqfMcmj3uQqmjwsNlc (full)
     in /^(sun|psv)/, "userapi.com", *rest
       @full_image_url = "https://pp.userapi.com#{path}"
+
+    # https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com
+    in _, "vk.com", "away.php"
+      @redirect_url = params[:to]
 
     # The `z` param opens the page in an overlay over the current page.
     # https://vk.com/sgips?z=album-111670353_227001377
@@ -110,6 +127,10 @@ class Source::URL::Vk < Source::URL
     else
       nil
     end
+  end
+
+  def extractor_class
+    redirect_url.present? ? Source::Extractor::URLShortener : Source::Extractor::Vk
   end
 
   def parse_id(id)

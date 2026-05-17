@@ -3,6 +3,8 @@
 # @see Source::URL::Google
 # @see Source::Extractor::Youtube
 class Source::URL::Youtube < Source::URL
+  site "Youtube", url: "https://www.youtube.com", domains: %w[youtube.com youtu.be ytimg.com ggpht.com googleusercontent.com]
+
   RESERVED_NAMES = %w[about account ads c channel creators feed gaming learn new playables playlist podcasts post premium results shorts t user vi watch]
 
   attr_reader :username, :handle, :channel_name, :channel_id, :bare_id, :video_id, :post_id, :playlist_id, :full_image_url

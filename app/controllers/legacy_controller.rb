@@ -21,12 +21,12 @@ class LegacyController < ApplicationController
   end
 
   def tags
-    @tags = Tag.limit(100).search(params, CurrentUser.user).paginate(params[:page], :limit => params[:limit])
+    @tags = Tag.limit(100).search(params, CurrentUser.user).paginate(params[:page], limit: params[:limit])
     authorize @tags, policy_class: LegacyControllerPolicy
   end
 
   def unavailable
-    render :plain => "this resource is no longer available", :status => 410
+    render plain: "this resource is no longer available", status: 410
   end
 
   private

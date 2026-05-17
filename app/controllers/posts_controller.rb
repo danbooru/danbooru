@@ -14,7 +14,7 @@ class PostsController < ApplicationController
         format.html { redirect_to(@post) }
       end
     elsif params[:random].to_s.truthy?
-      query = "#{post_set.normalized_query.to_s} random:#{post_set.per_page}".strip
+      query = "#{post_set.normalized_query} random:#{post_set.per_page}".strip
       authorize Post
       redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol)
     else
@@ -30,7 +30,7 @@ class PostsController < ApplicationController
 
   def show
     @post = authorize Post.eager_load(:uploader, :media_asset).find(params[:id])
-    raise PageRemovedError if request.format.html? && @post.banblocked?(CurrentUser.user)
+    raise PageRemovedError if request.format.html? && !request.variant.tooltip? && @post.banblocked?(CurrentUser.user)
 
     if request.format.html?
       include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
@@ -58,14 +58,6 @@ class PostsController < ApplicationController
     end
   end
 
-  def update
-    @post = authorize Post.find(params[:id])
-    @post.update(permitted_attributes(@post))
-    @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
-    respond_with_post_after_update(@post)
-  end
-
   def create
     @upload_media_asset = UploadMediaAsset.find(params[:upload_media_asset_id])
     @post = authorize Post.new_from_upload(@upload_media_asset, **permitted_attributes(Post).to_h.symbolize_keys)
@@ -76,13 +68,21 @@ class PostsController < ApplicationController
       respond_with(@post, notice: notice)
     elsif @post.errors.of_kind?(:md5, :taken)
       @original_post = Post.find_by!(md5: @post.md5)
-      @original_post.update(rating: @post.rating, parent_id: @post.parent_id, tag_string: "#{@original_post.tag_string} #{@post.tag_string}")
+      @original_post.update(rating: @post.rating.presence || @original_post.rating, parent_id: @post.parent_id || @original_post.parent_id, tag_string: "#{@original_post.tag_string} #{params.dig(:post, :tag_string)}")
       flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       redirect_to @original_post
     else
       @post.tag_string = params.dig(:post, :tag_string) # Preserve original tag string on validation error
       respond_with(@post, render: { template: "upload_media_assets/show" })
     end
+  end
+
+  def update
+    @post = authorize Post.find(params[:id])
+    @post.update(permitted_attributes(@post))
+    @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
+    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
+    respond_with_post_after_update(@post)
   end
 
   def destroy
@@ -114,7 +114,7 @@ class PostsController < ApplicationController
 
     if @post.errors.any?
       @error_message = @post.errors.full_messages.join("; ")
-      render :json => {:success => false, :reason => @error_message}.to_json, :status => 400
+      render json: { success: false, reason: @error_message }.to_json, status: 400
     else
       head 204
     end
@@ -157,7 +157,7 @@ class PostsController < ApplicationController
   end
 
   def log_search_count
-    DanbooruLogger.add_attributes("search", { count: post_set.post_count, })
+    DanbooruLogger.add_attributes("search", { count: post_set.post_count })
   end
 
   def respond_with_post_after_update(post)
@@ -175,7 +175,7 @@ class PostsController < ApplicationController
       end
 
       format.json do
-        render :json => post.to_json
+        render json: post.to_json
       end
     end
   end

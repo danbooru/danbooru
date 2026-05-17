@@ -4,6 +4,8 @@ class Source::URL::Carrd < Source::URL
   DOMAINS = %w[carrd.co crd.co]
   RESERVED_SUBDOMAINS = [nil, "www"]
 
+  site "Carrd", url: "https://carrd.co", domains: DOMAINS
+
   attr_reader :username, :page_id, :full_image_url, :candidate_full_image_urls
 
   def self.match?(url)
@@ -16,7 +18,8 @@ class Source::URL::Carrd < Source::URL
     # https://caminukai-art.carrd.co/assets/images/gallery12/690db30b.jpg?v=3850522b (cropped thumbnail)
     # https://caminukai-art.carrd.co/assets/images/gallery13/ddc31be4_original.jpg?v=3850522b (full)
     # https://rosymiz.carrd.co/assets/images/gallery01/1a19b400.jpg?v=c6f079b5 (full)
-    # https://rosymiz.carrd.co/assets/videos/video02.mp4.jpg?v=c6f079b5 (video cover)
+    # https://rosymiz.carrd.co/assets/videos/video02.mp4.jpg?v=c6f079b5 (video cover, dead)
+    # https://rosymiz.carrd.co/assets/videos/video02_poster.jpg?v=856a426b (video cover)
     # https://rosymiz.carrd.co/assets/videos/video02.mp4?v=c6f079b5 (video)
     # https://rosymiz.carrd.co/assets/images/image01.jpg?v=c6f079b5 (profile image)
     # https://hyphensam.com/assets/images/image04.jpg?v=208ad020

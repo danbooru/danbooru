@@ -117,7 +117,7 @@ module Source::Tests::Extractor
         ],
         page_url: "https://qiuchenghanshuang.lofter.com/post/1f9d6464_2b736607b",
         profile_urls: %w[https://qiuchenghanshuang.lofter.com https://www.lofter.com/mentionredirect.do?blogId=530408548],
-        display_name: "秋某",
+        display_name: "Atum-n",
         username: "qiuchenghanshuang",
         tags: [
           ["缄默德克萨斯", "https://www.lofter.com/tag/缄默德克萨斯"],
@@ -146,7 +146,7 @@ module Source::Tests::Extractor
         ],
         page_url: "https://sdz013.lofter.com/post/1ec04eca_1ccabb5df",
         profile_urls: %w[https://sdz013.lofter.com https://www.lofter.com/mentionredirect.do?blogId=515919562],
-        display_name: "闪闪电电鼠",
+        display_name: "闪光电电鼠",
         username: "sdz013",
         tags: [
           ["军团要塞2", "https://www.lofter.com/tag/军团要塞2"],
@@ -329,7 +329,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 827_495 }],
         page_url: "https://xingfulun16203.lofter.com/post/77a68dc4_2b9f0f00c",
         profile_urls: %w[https://xingfulun16203.lofter.com https://www.lofter.com/mentionredirect.do?blogId=2007403972],
-        display_name: "高考去了",
+        display_name: "12378",
         username: "xingfulun16203",
         tags: [
           ["夸奈", "https://www.lofter.com/tag/夸奈"],

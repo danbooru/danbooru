@@ -23,18 +23,16 @@ module Danbooru
       end
 
       def to_escaped_for_sql_like
-        string = self.gsub(/%|_|\*|\\\*|\\\\|\\/) do |str|
+        gsub(/%|_|\*|\\\*|\\\\|\\/) do |str|
           case str
-          when '%'    then '\%'
-          when '_'    then '\_'
-          when '*'    then '%'
-          when '\*'   then '*'
-          when '\\\\' then '\\\\'
-          when '\\'   then '\\\\'
+          when "%"    then '\%'
+          when "_"    then '\_'
+          when "*"    then "%"
+          when '\*'   then "*"
+          when "\\\\" then "\\\\"
+          when "\\"   then "\\\\"
           end
         end
-
-        string
       end
 
       # escape \ and * characters so that they're treated literally in LIKE searches.
@@ -43,19 +41,20 @@ module Danbooru
       end
 
       def to_escaped_for_tsquery_split
-        scan(/\S+/).map {|x| x.to_escaped_for_tsquery}.join(" & ")
+        scan(/\S+/).map(&:to_escaped_for_tsquery).join(" & ")
       end
 
       def to_escaped_for_tsquery
-        "'#{gsub(/\0/, '').gsub(/'/, '\0\0').gsub(/\\/, '\0\0\0\0')}'"
+        # bad backslash escape; WikiPage.other_names_match('\\(^o^)/')
+        "'#{gsub(/\0/, "").gsub("'", '\0\0').gsub("\\", '\0\0\0\0')}'"
       end
 
       def truthy?
-        self.match?(/\A(true|t|yes|y|on|1)\z/i)
+        match?(/\A(true|t|yes|y|on|1)\z/i)
       end
 
       def falsy?
-        self.match?(/\A(false|f|no|n|off|0)\z/i)
+        match?(/\A(false|f|no|n|off|0)\z/i)
       end
 
       # Do a case-insensitive wildcard match against `pattern`. The `*` character is treated as a wildcard, `\*` is
@@ -77,7 +76,7 @@ module Danbooru
       # Normalize horizontal and vertical whitespace characters, and strip zero-width space characters.
       #
       # https://en.wikipedia.org/wiki/Whitespace_character
-      def normalize_whitespace(eol: "\r\n")
+      def normalize_whitespace(eol: "\n")
         strip_zwsp.normalize_spaces.normalize_eol(eol)
       end
 
@@ -91,8 +90,8 @@ module Danbooru
         gsub(/\p{Zs}|\t/, " ")
       end
 
-      # Normalize various line ending characters to CRLF.
-      def normalize_eol(eol = "\r\n")
+      # Normalize various line ending characters to LF.
+      def normalize_eol(eol = "\n")
         gsub(/\r?\n|\r|\v|\f|\u0085|\u2028|\u2029/, eol)
       end
 
@@ -100,7 +99,7 @@ module Danbooru
       #
       # @return [String] The string with every word capitalized.
       def startcase
-        self.gsub(/(?<![a-z'])([a-z]+)/i, &:capitalize)
+        gsub(/(?<![a-z'])([a-z]+)/i, &:capitalize)
       end
 
       # Parse a JSON string into a Ruby object.

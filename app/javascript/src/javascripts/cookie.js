@@ -43,6 +43,7 @@ Cookie.unescape = function(val) {
 
 Cookie.getItem = Cookie.get;
 Cookie.setItem = Cookie.put;
+Cookie.removeItem = Cookie.remove;
 
 Cookie.initialize = function() {
   if (this.get("hide-upgrade-account") !== "1") {

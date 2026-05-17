@@ -4,6 +4,10 @@
 module Source
   class Extractor
     class Tinami < Source::Extractor
+      def self.enabled?
+        SiteCredential.for_site("Tinami").present?
+      end
+
       def image_urls
         if parsed_url.image_url?
           [url]

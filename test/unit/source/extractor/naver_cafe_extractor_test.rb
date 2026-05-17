@@ -46,10 +46,9 @@ module Source::Tests::Extractor
           { file_size: 1_649_911 },
         ],
         page_url: "https://cafe.naver.com/ca-fe/cafes/29314033/articles/28725",
-        profile_url: "https://cafe.naver.com/ca-fe/cafes/29314033/members/4vIbbomOH8CTZ_G1UeT4VA",
-        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/29314033/members/4vIbbomOH8CTZ_G1UeT4VA https://cafe.naver.com/masterofeternity],
+        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/29314033/members/mCj7iZvwTSUa2KcrOELkZNQ7Xn6MdTGqmvVdpE34FJU https://cafe.naver.com/masterofeternity],
         display_name: "화이트유키s",
-        username: "hahazx12",
+        username: nil,
         tags: [
           ["MOE", "https://cafe.naver.com/CafeTagArticleList.nhn?search.clubId=29314033&search.tagName=MOE"],
           ["2023", "https://cafe.naver.com/CafeTagArticleList.nhn?search.clubId=29314033&search.tagName=2023"],
@@ -128,10 +127,9 @@ module Source::Tests::Extractor
           { file_size: 820_348 },
         ],
         page_url: "https://cafe.naver.com/ca-fe/cafes/29767250/articles/785",
-        profile_url: "https://cafe.naver.com/ca-fe/cafes/29767250/members/hgoxi0a3Zv2O7xQinIz4yw",
-        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/29767250/members/hgoxi0a3Zv2O7xQinIz4yw https://cafe.naver.com/nexonmoe],
+        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/29767250/members/9VaEgGz_tvNsCkFUeBzDtLwKc4_9twb0DX6lF987j-c https://cafe.naver.com/nexonmoe],
         display_name: "GM 크리스틴",
-        username: "hahazxy123",
+        username: nil,
         tags: [
           ["MOE", "https://cafe.naver.com/CafeTagArticleList.nhn?search.clubId=29767250&search.tagName=MOE"],
           ["웹툰", "https://cafe.naver.com/CafeTagArticleList.nhn?search.clubId=29767250&search.tagName=웹툰"],
@@ -148,10 +146,9 @@ module Source::Tests::Extractor
         image_urls: %w[http://cafefiles.naver.net/20150603_254/qleleldhcks_1433308613966az8y9_PNG/%BC%A8%B4%ED2.png],
         media_files: [{ file_size: 1_001_221 }],
         page_url: "https://cafe.naver.com/ca-fe/cafes/10947985/articles/204011",
-        profile_url: "https://cafe.naver.com/ca-fe/cafes/10947985/members/UXlF5_JnP6V8TthTFy5WXA",
-        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/10947985/members/UXlF5_JnP6V8TthTFy5WXA https://cafe.naver.com/ohwow],
+        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/10947985/members/jiAonBck__P__Y24u0bYCBtj1WFC8B-YglDHIjdQfSE https://cafe.naver.com/ohwow],
         display_name: "Chyan1",
-        username: "qleleldhcks",
+        username: nil,
         tags: [],
         dtext_artist_commentary_title: "섀도우댄서 그려봤어요!",
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -167,7 +164,7 @@ module Source::Tests::Extractor
 
           감사합니담 :D !
 
-          [b][출처][/b] "섀댄 그려봤습니다 (던파카페 -던카(던전앤파이터 커뮤니티 &아트스킨 &아이템거래))":[http://cafe.naver.com/dfither/10843674] |[b]작성자[/b] "Chyan":[http://cafe.naver.com/dfither.cafe?iframe_url=/CafeMemberNetworkView.nhn%3Fm=view%26memberid=qleleldhcks]
+          [b][출처][/b] "섀댄 그려봤습니다 (던파카페 -던카(던전앤파이터 커뮤니티 &아트스킨 &아이템거래))":[http://cafe.naver.com/dfither/10843674] |[b]작성자[/b] "Chyan":[http://cafe.naver.com/dfither.cafe?iframe_url=/CafeMemberNetworkView.nhn%3Fm=view%26memberid=qlel****]
 
           [b]<던전앤파이터 아트게시판 공지>[/b]
 
@@ -194,10 +191,9 @@ module Source::Tests::Extractor
           { file_size: 463_898 },
         ],
         page_url: "https://cafe.naver.com/honkaistarrail/229677",
-        profile_url: "https://cafe.naver.com/ca-fe/cafes/30487825/members/Vto2qFWaBkptLlqVHADCbw",
-        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/30487825/members/Vto2qFWaBkptLlqVHADCbw https://cafe.naver.com/honkaistarrail],
+        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/30487825/members/H11u1fdSGPn2eqLR8avQzUx0zA_O4GmzgLGIGacRqsY https://cafe.naver.com/honkaistarrail],
         display_name: "GM폼폼",
-        username: "honkaistarrail",
+        username: nil,
         tags: [
           ["페나코니꿈의상점", "https://cafe.naver.com/CafeTagArticleList.nhn?search.clubId=30487825&search.tagName=페나코니꿈의상점"],
           ["은랑에디션", "https://cafe.naver.com/CafeTagArticleList.nhn?search.clubId=30487825&search.tagName=은랑에디션"],
@@ -249,7 +245,6 @@ module Source::Tests::Extractor
         "https://cafe.naver.com/feveraca/544",
         image_urls: [],
         page_url: "https://cafe.naver.com/feveraca/544",
-        profile_url: "https://cafe.naver.com/feveraca",
         profile_urls: %w[https://cafe.naver.com/feveraca],
         display_name: nil,
         username: nil,

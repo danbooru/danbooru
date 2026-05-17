@@ -8,6 +8,8 @@ class PostDisapproval < ApplicationRecord
 
   belongs_to :post
   belongs_to :user
+
+  normalizes :message, with: ->(value) { value.presence }
   validates :user, uniqueness: { scope: :post, message: "have already hidden this post" }
   validates :reason, inclusion: { in: REASONS }
   validates :message, visible_string: { allow_empty: true }, length: { maximum: 140 }
@@ -15,9 +17,9 @@ class PostDisapproval < ApplicationRecord
 
   scope :with_message, -> { where.not(message: nil) }
   scope :without_message, -> { where(message: nil) }
-  scope :breaks_rules, -> {where(:reason => "breaks_rules")}
-  scope :poor_quality, -> {where(:reason => "poor_quality")}
-  scope :disinterest, -> {where(:reason => "disinterest")}
+  scope :breaks_rules, -> { where(reason: "breaks_rules") }
+  scope :poor_quality, -> { where(reason: "poor_quality") }
+  scope :disinterest, -> { where(reason: "disinterest") }
 
   def self.prune!
     PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago).delete_all
@@ -51,10 +53,5 @@ class PostDisapproval < ApplicationRecord
     if post.is_active?
       errors.add(:post, "is already active and cannot be disapproved")
     end
-  end
-
-  def message=(message)
-    message = nil if message.blank?
-    super(message)
   end
 end
