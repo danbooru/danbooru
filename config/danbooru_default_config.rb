@@ -877,6 +877,19 @@ module Danbooru
     def reactions
       {}
     end
+
+    # A hash of site names to a function taking a tag name and returning a URL for
+    # tag searches on that site. Used to render other names links on wiki pages.
+    def tag_lookup_sites
+      {
+        Pixiv: ->(name) { "https://www.pixiv.net/tags/#{Danbooru::URL.escape(name)}/artworks" },
+        Twitter: ->(name) { "https://x.com/hashtag/#{Danbooru::URL.escape(name)}" },
+        Bluesky: ->(name) { "https://bsky.app/hashtag/#{Danbooru::URL.escape(name)}" },
+        Weibo: ->(name) { "https://s.weibo.com/weibo?q=%23#{Danbooru::URL.escape(name)}%23" },
+        Lofter: ->(name) { "https://www.lofter.com/tag/#{Danbooru::URL.escape(name)}" },
+        Tumblr: ->(name) { "https://www.tumblr.com/tagged/#{Danbooru::URL.escape(name).tr('_', ' ')}" },
+      }
+    end
   end
 
   EnvironmentConfiguration = Struct.new(:config) do

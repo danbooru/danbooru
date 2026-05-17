@@ -23,6 +23,10 @@ class PopupMenuComponent {
 
   // Hides the menu when a menu item is clicked.
   static onMenuItemClicked(event) {
+    if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.button === 1) {
+      return;
+    }
+
     let menuHideOnClick = $(event.target).parents(".popup-menu").data("hide-on-click");
     let itemHideOnClick = $(event.target).parents("li").data("hide-on-click");
     let hideOnClick = itemHideOnClick !== undefined ? itemHideOnClick : menuHideOnClick;
