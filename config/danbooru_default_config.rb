@@ -882,7 +882,7 @@ module Danbooru
     # tag searches on that site. Used to render other names links on wiki pages.
     def tag_lookup_sites
       {
-        pixiv: ->(name) { "https://www.pixiv.net/tags/#{name}/artworks" },
+        Pixiv: ->(name) { "https://www.pixiv.net/tags/#{name}/artworks" },
         Twitter: ->(name) { "https://x.com/hashtag/#{name}" },
         Bluesky: ->(name) { "https://bsky.app/hashtag/#{name}" },
         Weibo: ->(name) { "https://s.weibo.com/weibo?q=%23#{name}%23" },
