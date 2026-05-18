@@ -40,7 +40,7 @@ class Upload < ApplicationRecord
   scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
 
   def self.visible(user)
-    if user.is_admin?
+    if user.is_moderator?
       all
     else
       where(uploader: user)
