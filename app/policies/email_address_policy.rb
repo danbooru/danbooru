@@ -39,6 +39,10 @@ class EmailAddressPolicy < ApplicationPolicy
   def rate_limit_for_update(**_options)
     if record.invalid?
       { action: "email_addresses:write:invalid", rate: 1.0 / 1.second, burst: 5 }
+    elsif policy(record.user).can_recover_account?
+      # sometimes we have to remove an email from an old account to associate it to a new one,
+      # so we need a slightly higher rate
+      { rate: 2.0 / 10.minutes, burst: 5 }
     else
       { rate: 1.0 / 10.minutes, burst: 3 }
     end
