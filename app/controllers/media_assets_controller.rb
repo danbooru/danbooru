@@ -16,6 +16,8 @@ class MediaAssetsController < ApplicationController
     @media_asset = authorize MediaAsset.includes(uploads: :uploader).find(params[:id])
     @post = Post.find_by_md5(@media_asset.md5)
 
+    @visible_uma = @media_asset.upload_media_assets.sort_by(&:created_at).select { |uma| policy(uma.upload).show? }
+
     if CurrentUser.is_owner? && request.format.symbol.in?(%i[jpeg webp avif])
       width = params.fetch(:width, @media_asset.image_width).to_i
       height = params.fetch(:height, @media_asset.image_height).to_i

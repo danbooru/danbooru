@@ -124,6 +124,27 @@
 
         <div>
           <table class="striped text-xs w-full">
+
+            <% if @visible_uma.any? %>
+              <tr>
+                <th colspan="2" class="text-center">Uploads</th>
+              </tr>
+
+              <% @visible_uma.each do |uma| %>
+                <tr>
+                  <th class="text-left">Upload</th>
+                  <td class="break-all"><%= link_to "##{uma.upload.id}", uma.upload %> </td>
+                <tr>
+                  <th class="text-left">Uploader</th>
+                  <td class="break-all"><%= link_to "@#{uma.upload.uploader.name}", uma.upload.uploader %> </td>
+                </tr>
+                <tr>
+                  <th class="text-left">Raw Source</th>
+                  <td class="break-all"><%= external_link_to uma.source_url %></td>
+                </tr>
+              <% end %>
+            <% end %>
+
             <tr>
               <th colspan="2" class="text-center">Metadata</th>
             </tr>
@@ -133,15 +154,6 @@
                 <th class="text-left">Post</th>
                 <td class="break-all"><%= link_to "##{@post.id}", @post %></td>
               </tr>
-            <% end %>
-
-            <% @media_asset.uploads.sort_by(&:created_at).each do |upload| %>
-              <% if policy(upload).show? %>
-                <tr>
-                  <th class="text-left">Upload</th>
-                  <td class="break-all"><%= link_to "##{upload.id}", upload %> (<%= link_to "@#{upload.uploader.name}", upload.uploader %>)</td>
-                </tr>
-              <% end %>
             <% end %>
 
             <% if policy(@media_asset).can_see_image? %>
