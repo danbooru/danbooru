@@ -41,7 +41,10 @@ class Source::Extractor::Postype < Source::Extractor
   end
 
   def artist_commentary_desc
-    post_content.dig(:data, :html) || post_content_from_html
+    subtitle = post[:subTitle].presence
+    content = post_content.dig(:data, :html) || post_content_from_html
+    return content unless subtitle
+    "<p>#{CGI.escapeHTML(subtitle)}</p>#{content}"
   end
 
   def dtext_artist_commentary_desc

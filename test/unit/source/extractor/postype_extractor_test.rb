@@ -265,6 +265,8 @@ module Source::Tests::Extractor
         ],
         dtext_artist_commentary_title: "도로헤도로 로그 모음 - 6",
         dtext_artist_commentary_desc: <<~EOS.chomp,
+          2021년
+
           제대로 그린 게 없음 주의
 
           "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2022/03/08/15/33/077029c711213e7524f7927322f66277.png?w=1000&q=90]
