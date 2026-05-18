@@ -67,8 +67,8 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_select "a[href='/uploads/#{@upload1.id}']", count: 0
       end
 
-      should "show all upload IDs to an admin" do
-        get_auth media_asset_path(@upload1.media_assets.first), create(:admin_user)
+      should "show all upload IDs to a mod" do
+        get_auth media_asset_path(@upload1.media_assets.first), create(:moderator_user)
         assert_select "a[href='/uploads/#{@upload1.id}']", count: 1, text: "##{@upload1.id}"
         assert_select "a[href='/uploads/#{@upload2.id}']", count: 1, text: "##{@upload2.id}"
       end

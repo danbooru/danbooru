@@ -6,7 +6,7 @@ class UploadPolicy < ApplicationPolicy
   end
 
   def show?
-    user.is_admin? || record.uploader_id == user.id
+    user.is_moderator? || record.uploader_id == user.id
   end
 
   def rate_limit_for_create(**_options)
