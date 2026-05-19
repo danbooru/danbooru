@@ -404,7 +404,7 @@ FROM danbooru-base AS development
 
 RUN <<EOS
   apt-get update
-  apt-get install -y --no-install-recommends g++ make ragel=6.10-4 git sudo gpg socat libyaml-dev libpq-dev
+  apt-get install -y --no-install-recommends g++ make ragel=6.10-4 git sudo gpg socat libyaml-dev libpq-dev gh
 
   groupadd admin -U danbooru
   passwd -d danbooru
