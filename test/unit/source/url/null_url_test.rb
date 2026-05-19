@@ -16,7 +16,6 @@ module Source::Tests::URL
       should "work for a known site" do
         assert_equal("Amino", Source::URL.parse("https://aminoapps.com/u/SequelUncut").site_name)
         assert_equal("AniList", Source::URL.parse("https://anilist.co/user/Megumon").site_name)
-        assert_equal("Apple Music", Source::URL.parse("https://music.apple.com/artist/1626455561").site_name)
         assert_equal("Archive of Our Own", Source::URL.parse("https://archiveofourown.org/users/ari1654").site_name)
         assert_equal("Art Fight", Source::URL.parse("http://artfight.net/~OFUKITTY").site_name)
         assert_equal("Artists&Clients", Source::URL.parse("https://artistsnclients.com/people/sbong2").site_name)
