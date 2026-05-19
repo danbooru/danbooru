@@ -45,7 +45,9 @@ module Source
 
       def download_file!(url)
         media_file = super(url)
-        media_file.frame_delays = ugoira_frame_delays if ugoira_frame_delays.present?
+        if !media_file.is_a?(MediaFile::Ugoira) && ugoira_frame_delays.present?
+          media_file = MediaFile.open(media_file.file, frame_delays: ugoira_frame_delays)
+        end
         media_file
       end
 
