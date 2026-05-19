@@ -24,18 +24,17 @@ class Source::URL::AppleMusic < Source::URL
       @album_name = album_name
       @album_id = album_id.delete_prefix("id")
 
+    # https://a1.mzstatic.com/us/r1000/0/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg
+    in /^a\d+\.mzstatic\.com/ => host, *path
+      @full_image_url = "https://#{host}/#{path.join("/")}"
+
     # https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg/296x296bb.webp
     # https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/.../10000x10000.png
-    in host, "image", "thumb", *rest if host.end_with?("mzstatic.com")
-      if rest.last.to_s.match?(/\A\d+x\d+.*\.\w+\z/i)
-        *prefix, _filename = rest
-        @full_image_url = "https://#{host}/image/thumb/#{prefix.join("/")}/10000x10000.png"
-      else
-        @full_image_url = to_s
-      end
+    in /^is(\d+)-ssl\.mzstatic\.com/ => host, "image", "thumb", *segments
+      new_host = "a#{host[/\d+/]}.mzstatic.com"
+      dir = segments.last.match?(/\A\d+x\d+.*\.\w+\z/i) ? segments[..-2] : segments
+      @full_image_url = "https://#{new_host}/us/r1000/0/#{dir.join("/")}"
 
-    else
-      nil
     end
   end
 
