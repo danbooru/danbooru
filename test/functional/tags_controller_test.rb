@@ -201,15 +201,20 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           @admin = create(:admin_user)
         end
 
-        should "not remove deprecated status if the user is not an admin" do
-          put_auth tag_path(@deprecated_tag), @normal_user, params: { tag: { is_deprecated: false }}
+        should "allow admins to deprecate a tag" do
+          put_auth tag_path(@normal_tag), @admin, params: { tag: { is_deprecated: true }}
 
-          assert_response 403
-          assert_equal(true, @deprecated_tag.reload.is_deprecated?)
-          assert_equal(0, @tag.versions.count)
+          assert_redirected_to @normal_tag
+          assert_equal(true, @normal_tag.reload.is_deprecated?)
+
+          assert_equal(2, @normal_tag.versions.count)
+          assert_nil(@normal_tag.first_version.updater)
+          assert_equal(@admin, @normal_tag.last_version.updater)
+          assert_equal(false, @normal_tag.first_version.is_deprecated)
+          assert_equal(true, @normal_tag.last_version.is_deprecated)
         end
 
-        should "remove the deprecated status if the user is admin" do
+        should "allow admins to undeprecate a tag" do
           put_auth tag_path(@deprecated_tag), @admin, params: { tag: { is_deprecated: false }}
 
           assert_redirected_to @deprecated_tag
@@ -222,38 +227,18 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @deprecated_tag.last_version.is_deprecated)
         end
 
-        should "allow marking a tag as deprecated if it's empty" do
+        should "not allow normal users to deprecate a tag" do
           put_auth tag_path(@nondeprecated_tag), @normal_user, params: { tag: { is_deprecated: true }}
 
-          assert_redirected_to @nondeprecated_tag
-          assert_equal(true, @nondeprecated_tag.reload.is_deprecated?)
-
-          assert_equal(2, @nondeprecated_tag.versions.count)
-          assert_nil(@nondeprecated_tag.first_version.updater)
-          assert_equal(@normal_user, @nondeprecated_tag.last_version.updater)
-          assert_equal(false, @nondeprecated_tag.first_version.is_deprecated)
-          assert_equal(true, @nondeprecated_tag.last_version.is_deprecated)
+          assert_response 403
+          assert_equal(false, @nondeprecated_tag.reload.is_deprecated?)
         end
 
-        should "not allow marking a tag as deprecated if it's not empty" do
-          put_auth tag_path(@normal_tag), @normal_user, params: { tag: { is_deprecated: true }}
+        should "not allow normal users to undeprecate a tag" do
+          put_auth tag_path(@deprecated_tag), @normal_user, params: { tag: { is_deprecated: false }}
 
           assert_response 403
-          assert_equal(false, @normal_tag.reload.is_deprecated?)
-          assert_equal(0, @normal_tag.versions.count)
-        end
-
-        should "allow admins to mark tags as deprecated" do
-          put_auth tag_path(@normal_tag), @admin, params: { tag: { is_deprecated: true }}
-
-          assert_redirected_to @normal_tag
-          assert_equal(true, @normal_tag.reload.is_deprecated?)
-
-          assert_equal(2, @normal_tag.versions.count)
-          assert_nil(@normal_tag.first_version.updater)
-          assert_equal(@admin, @normal_tag.last_version.updater)
-          assert_equal(false, @normal_tag.first_version.is_deprecated)
-          assert_equal(true, @normal_tag.last_version.is_deprecated)
+          assert_equal(true, @deprecated_tag.reload.is_deprecated?)
         end
 
         should "not allow deprecation of a tag with no wiki" do

@@ -10,7 +10,8 @@ class TagPolicy < ApplicationPolicy
 
   def can_change_deprecated_status?
     return false if (record.wiki_page.blank? || record.wiki_page.is_deleted?) && !record.is_deprecated?
-    user.is_admin? || (record.post_count == 0 && !record.is_deprecated?)
+
+    user.is_admin?
   end
 
   def permitted_attributes
