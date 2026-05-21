@@ -18,8 +18,19 @@ class SimilarImagesComponentTest < ViewComponent::TestCase
         render_inline(SimilarImagesComponent.new(matches: [{ post: post, score: 80 }], current_user: User.anonymous))
 
         assert_css(".post-gallery article", count: 1)
+        assert_css("#blacklist-box")
         assert_no_text("No similar posts found.")
         assert_no_css("a", text: /low similarity match/)
+      end
+    end
+
+    context "with show_blacklist disabled" do
+      should "not render the blacklist controls" do
+        post = create(:post)
+        render_inline(SimilarImagesComponent.new(matches: [{ post: post, score: 80 }], current_user: User.anonymous, show_blacklist: false))
+
+        assert_css(".post-gallery article", count: 1)
+        assert_no_css("#blacklist-box")
       end
     end
 
