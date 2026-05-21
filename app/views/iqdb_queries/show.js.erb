@@ -1,5 +1,9 @@
-<% similar_images_component = SimilarImagesComponent.new(matches: @matches, current_user: CurrentUser.user, low_similarity: search_params[:similarity]&.to_f, high_similarity: search_params[:high_similarity]&.to_f) %>
+<% similar_images_component = SimilarImagesComponent.new(matches: @matches, current_user: CurrentUser.user, show_blacklist: false, low_similarity: search_params[:similarity]&.to_f, high_similarity: search_params[:high_similarity]&.to_f) %>
 $("#iqdb-similar").html("<%= j render similar_images_component %>").show();
+
+<% if similar_images_component.any_similarity_matches.any? %>
+  $("#blacklist-box").get(0)?.blacklist.apply();
+<% end %>
 
 <% if similar_images_component.high_similarity_matches.size > 0 %>
   $(".upload-container .tab.similar-tab").html("Similar <%= j tag.span(similar_images_component.high_similarity_matches.size, class: "rounded-full mx-1 px-2 text-sm text-center text-inverse bg:primary-color") %>")

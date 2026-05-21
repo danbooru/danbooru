@@ -226,6 +226,8 @@
             <% t.panel("Similar") do %>
               <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
 
+              <%= render BlacklistComponent.new(user: current_user, inline: true) %>
+
               <div class="space-y-4">
                 <% if source.present? && source.related_posts.present? %>
                   <div id="related-posts-by-source">
