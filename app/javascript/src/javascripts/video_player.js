@@ -79,6 +79,7 @@ export default class VideoPlayer {
       this._showVolumeSlider = true;
     });
     this.$container.find(".volume-controls").on("mouseleave", event => hideVolumeSlider());
+    this.$container.find(".volume-controls").on("wheel", event => this.onVolumeScroll(event));
 
     let quality = this.$container.data("quality");
     this.setQuality(quality);
@@ -193,6 +194,11 @@ export default class VideoPlayer {
 
       this.scrubbingVolume = false;
     }
+  }
+
+  onVolumeScroll(event) {
+    event.preventDefault();
+    this.volume += event.originalEvent.deltaY < 0 ? 0.1 : -0.1;
   }
 
   onKeypress(event) {
