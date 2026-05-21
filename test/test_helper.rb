@@ -62,10 +62,11 @@ class ActiveSupport::TestCase
   include FactoryBot::Syntax::Methods
   extend PostArchiveTestHelper
   extend PoolArchiveTestHelper
-  include ReportbooruHelper
   include AutotaggerHelper
+  include BulkUpdateRequestTestHelper
   include DatabaseTestHelper
   include IqdbTestHelper
+  include ReportbooruHelper
   include UploadTestHelper
   include UrlTestHelper
   extend NormalizeAttributeHelper
