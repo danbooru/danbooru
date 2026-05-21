@@ -13,35 +13,38 @@ class CategoryCommandTest < ActiveSupport::TestCase
   context "the category command" do
     context "on creation" do
       should "fail if the tag doesn't already exist" do
-        @bur = build(:bulk_update_request, script: "category hello -> artist")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't change the category of [[hello]] to artist ([[hello]] doesn't exist)"], @bur.errors[:base])
+        assert_invalid_bur(
+          script: "category hello -> artist",
+          errors: ["Can't change the category of [[hello]] to artist ([[hello]] doesn't exist)"],
+        )
       end
 
       should "not allow changing a tag to an invalid category" do
-        @tag = create(:tag, name: "foo")
-        @bur = build(:bulk_update_request, script: "category foo -> bar")
+        create(:tag, name: "foo")
 
-        assert_not(@bur.valid?)
-        assert_equal(["Can't change the category of [[foo]] to bar (bar is not a valid category)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "category foo -> bar",
+          errors: ["Can't change the category of [[foo]] to bar (bar is not a valid category)"],
+        )
       end
 
       should "not allow changing a tag to its own category" do
-        @tag = create(:tag, name: "touhou", category: Tag.categories.copyright)
-        @bur = build(:bulk_update_request, script: "category touhou -> copyright")
+        create(:tag, name: "touhou", category: Tag.categories.copyright)
 
-        assert_not(@bur.valid?)
-        assert_equal(["Can't change the category of [[touhou]] to copyright ([[touhou]] is already in that category)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "category touhou -> copyright",
+          errors: ["Can't change the category of [[touhou]] to copyright ([[touhou]] is already in that category)"],
+        )
       end
 
       should "not allow changing an artist tag's category" do
         @tag = create(:tag, name: "noizave", category: Tag.categories.artist)
-        @artist = create(:artist, name: @tag.name)
-        @bur = build(:bulk_update_request, script: "category noizave -> general")
+        create(:artist, name: @tag.name)
 
-        assert_not(@bur.valid?)
-        assert_equal(["Can't change the category of [[noizave]] to general ([[noizave]] must be an Artist tag)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "category noizave -> general",
+          errors: ["Can't change the category of [[noizave]] to general ([[noizave]] must be an Artist tag)"],
+        )
       end
     end
 

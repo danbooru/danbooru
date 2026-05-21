@@ -13,17 +13,17 @@ class NukeCommandTest < ActiveSupport::TestCase
   context "the nuke command" do
     context "on creation" do
       should "raise an error when trying to nuke a pool that doesn't exist (by name)" do
-        @bur = build(:bulk_update_request, script: "nuke pool:mario_quest")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't nuke {{pool:mario_quest}} (pool doesn't exist)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "nuke pool:mario_quest",
+          errors: ["Can't nuke {{pool:mario_quest}} (pool doesn't exist)"],
+        )
       end
 
       should "raise an error when trying to nuke a pool that doesn't exist (by ID)" do
-        @bur = build(:bulk_update_request, script: "nuke pool:12345678")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't nuke {{pool:12345678}} (pool doesn't exist)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "nuke pool:12345678",
+          errors: ["Can't nuke {{pool:12345678}} (pool doesn't exist)"],
+        )
       end
     end
 

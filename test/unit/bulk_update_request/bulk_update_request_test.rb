@@ -85,9 +85,10 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
             create alias ccc -> 222
           EOS
 
-          @bur = build(:bulk_update_request, script: @script)
-          assert_equal(false, @bur.valid?)
-          assert_equal(["Invalid line: create alias bbb > 111"], @bur.errors[:base])
+          assert_invalid_bur(
+            script: @script,
+            errors: ["Invalid line: create alias bbb > 111"],
+          )
         end
       end
 
@@ -106,19 +107,19 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
       context "a bulk update request that is too long" do
         should "fail" do
-          @bur = build(:bulk_update_request, script: "nuke touhou\n" * 200)
-
-          assert_equal(false, @bur.valid?)
-          assert_equal(["Bulk update request is too long (maximum size: 100 lines). Split your request into smaller chunks and try again."], @bur.errors.full_messages)
+          assert_invalid_bur(
+            script: "nuke touhou\n" * 200,
+            errors: ["Bulk update request is too long (maximum size: 100 lines). Split your request into smaller chunks and try again."],
+          )
         end
       end
 
       context "a bulk update request with duplicate lines" do
         should "fail" do
-          @bur = build(:bulk_update_request, script: "imply a -> b\nimply b -> a\n" * 2)
-
-          assert_equal(false, @bur.valid?)
-          assert_equal(["Duplicate line found: create implication [[a]] -> [[b]]", "Duplicate line found: create implication [[b]] -> [[a]]"], @bur.errors.full_messages)
+          assert_invalid_bur(
+            script: "imply a -> b\nimply b -> a\n" * 200,
+            errors: ["Duplicate line found: create implication [[a]] -> [[b]]", "Duplicate line found: create implication [[b]] -> [[a]]"],
+          )
         end
       end
     end

@@ -14,10 +14,11 @@ class UndeprecateCommandTest < ActiveSupport::TestCase
     context "on creation" do
       should "fail if the tag is not deprecated" do
         create(:tag, name: "silver_hair")
-        @bur = build(:bulk_update_request, script: "undeprecate silver_hair")
 
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't undeprecate [[silver_hair]] (tag is not deprecated)"], @bur.errors[:base])
+        assert_invalid_bur(
+          script: "undeprecate silver_hair",
+          errors: ["Can't undeprecate [[silver_hair]] (tag is not deprecated)"],
+        )
       end
     end
 

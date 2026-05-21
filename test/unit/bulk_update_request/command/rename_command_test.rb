@@ -13,26 +13,28 @@ class RenameCommandTest < ActiveSupport::TestCase
   context "the rename command" do
     context "on creation" do
       should "fail if the old tag doesn't exist" do
-        @bur = build(:bulk_update_request, script: "rename aaa -> bbb")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't rename [[aaa]] -> [[bbb]] ([[aaa]] doesn't exist)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "rename aaa -> bbb",
+          errors: ["Can't rename [[aaa]] -> [[bbb]] ([[aaa]] doesn't exist)"],
+        )
       end
 
       should "fail if the old tag has more than 200 posts" do
         create(:tag, name: "aaa", post_count: 1000)
-        @bur = build(:bulk_update_request, script: "rename aaa -> bbb")
 
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't rename [[aaa]] -> [[bbb]] ([[aaa]] has more than 200 posts, use an alias instead)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "rename aaa -> bbb",
+          errors: ["Can't rename [[aaa]] -> [[bbb]] ([[aaa]] has more than 200 posts, use an alias instead)"],
+        )
       end
 
       should "fail if the consequent name is invalid" do
         create(:tag, name: "tag")
-        @bur = build(:bulk_update_request, script: "rename tag -> tag_")
 
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't rename [[tag]] -> [[tag_]] ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "rename tag -> tag_",
+          errors: ["Can't rename [[tag]] -> [[tag_]] ('tag_' cannot end with an underscore)"],
+        )
       end
     end
 

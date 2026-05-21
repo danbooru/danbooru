@@ -14,17 +14,18 @@ class RemoveAliasCommandTest < ActiveSupport::TestCase
     context "on creation" do
       should "fail to validate if the alias isn't active" do
         create(:tag_alias, antecedent_name: "foo", consequent_name: "bar", status: "deleted")
-        @bur = build(:bulk_update_request, script: "remove alias foo -> bar")
 
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't remove alias [[foo]] -> [[bar]] (alias doesn't exist)"], @bur.errors[:base])
+        assert_invalid_bur(
+          script: "remove alias foo -> bar",
+          errors: ["Can't remove alias [[foo]] -> [[bar]] (alias doesn't exist)"],
+        )
       end
 
       should "fail to validate if the alias doesn't already exist" do
-        @bur = build(:bulk_update_request, script: "remove alias foo -> bar")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't remove alias [[foo]] -> [[bar]] (alias doesn't exist)"], @bur.errors[:base])
+        assert_invalid_bur(
+          script: "remove alias foo -> bar",
+          errors: ["Can't remove alias [[foo]] -> [[bar]] (alias doesn't exist)"],
+        )
       end
     end
 

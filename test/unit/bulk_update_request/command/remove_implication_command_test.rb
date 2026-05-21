@@ -14,17 +14,18 @@ class RemoveImplicationCommandTest < ActiveSupport::TestCase
     context "on creation" do
       should "fail to validate if the implication isn't active" do
         create(:tag_implication, antecedent_name: "foo", consequent_name: "bar", status: "deleted")
-        @bur = build(:bulk_update_request, script: "remove implication foo -> bar")
 
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't remove implication [[foo]] -> [[bar]] (implication doesn't exist)"], @bur.errors[:base])
+        assert_invalid_bur(
+          script: "remove implication foo -> bar",
+          errors: ["Can't remove implication [[foo]] -> [[bar]] (implication doesn't exist)"],
+        )
       end
 
       should "fail to validate if the implication doesn't already exist" do
-        @bur = build(:bulk_update_request, script: "remove implication foo -> bar")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't remove implication [[foo]] -> [[bar]] (implication doesn't exist)"], @bur.errors[:base])
+        assert_invalid_bur(
+          script: "remove implication foo -> bar",
+          errors: ["Can't remove implication [[foo]] -> [[bar]] (implication doesn't exist)"],
+        )
       end
     end
 

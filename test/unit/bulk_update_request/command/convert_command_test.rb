@@ -16,34 +16,39 @@ class ConvertCommandTest < ActiveSupport::TestCase
         @post = create(:post, tag_string: "bar cute")
         @wiki = create(:wiki_page, title: "cute", body: "", is_deleted: true)
 
-        @bur = build(:bulk_update_request, script: "convert cute -> pool:cute")
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't convert [[cute]] -> {{pool:cute}} (either the tag or the pool must have a description)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "convert cute -> pool:cute",
+          errors: ["Can't convert [[cute]] -> {{pool:cute}} (either the tag or the pool must have a description)"],
+        )
       end
 
       should "refuse to convert a pool to another pool" do
         @pool = create(:pool, name: "cute", description: "asd")
-        @bur = build(:bulk_update_request, script: "convert pool:cute -> pool:cute2")
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't convert {{pool:cute}} -> {{pool:cute2}} (convert takes exactly one pool and one tag)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "convert pool:cute -> pool:cute2",
+          errors: ["Can't convert {{pool:cute}} -> {{pool:cute2}} (convert takes exactly one pool and one tag)"],
+        )
       end
 
       should "refuse to convert a tag to another tag" do
-        @bur = build(:bulk_update_request, script: "convert tag1 -> tag2")
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't convert {{tag1}} -> {{tag2}} (convert takes exactly one pool and one tag)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "convert tag1 -> tag2",
+          errors: ["Can't convert {{tag1}} -> {{tag2}} (convert takes exactly one pool and one tag)"],
+        )
       end
 
       should "refuse to accept too many arguments on the right side" do
-        @bur = build(:bulk_update_request, script: "convert tag1 -> tag2 pool:1")
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't convert {{tag1}} -> {{tag2 pool:1}} (convert takes exactly one pool and one tag)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "convert tag1 -> tag2 pool:1",
+          errors: ["Can't convert {{tag1}} -> {{tag2 pool:1}} (convert takes exactly one pool and one tag)"],
+        )
       end
 
       should "refuse to accept too many arguments on the left side" do
-        @bur = build(:bulk_update_request, script: "convert tag1 pool:1 -> tag2")
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't convert {{tag1 pool:1}} -> {{tag2}} (convert takes exactly one pool and one tag)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "convert tag1 pool:1 -> tag2",
+          errors: ["Can't convert {{tag1 pool:1}} -> {{tag2}} (convert takes exactly one pool and one tag)"],
+        )
       end
     end
 

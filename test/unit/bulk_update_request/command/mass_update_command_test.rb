@@ -13,10 +13,10 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
   context "the mass update command" do
     context "on creation" do
       should "not allow invalid searches in mass updates" do
-        @bur = build(:bulk_update_request, script: "mass update (foo -> bar")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't mass update {{(foo}} -> {{bar}} (the search {{(foo}} has a syntax error)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "mass update (foo -> bar",
+          errors: ["Can't mass update {{(foo}} -> {{bar}} (the search {{(foo}} has a syntax error)"],
+        )
       end
 
       should "render simple tags as wiki links in dtext" do

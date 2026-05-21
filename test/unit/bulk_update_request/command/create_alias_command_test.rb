@@ -14,31 +14,32 @@ class CreateAliasCommandTest < ActiveSupport::TestCase
     context "on creation" do
       should "fail if the alias is invalid" do
         create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc")
-        @bur = build(:bulk_update_request, script: "create alias aaa -> bbb")
 
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't create alias [[aaa]] -> [[bbb]] (bbb is already aliased to ccc)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "create alias aaa -> bbb",
+          errors: ["Can't create alias [[aaa]] -> [[bbb]] (bbb is already aliased to ccc)"],
+        )
       end
 
       should "fail if the antecedent name is invalid" do
-        @bur = build(:bulk_update_request, script: "create alias tag_ -> tag")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't create alias [[tag_]] -> [[tag]] ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "create alias tag_ -> tag",
+          errors: ["Can't create alias [[tag_]] -> [[tag]] ('tag_' cannot end with an underscore)"],
+        )
       end
 
       should "fail if the consequent name is invalid" do
-        @bur = build(:bulk_update_request, script: "create alias tag -> tag_")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't create alias [[tag]] -> [[tag_]] ('tag_' cannot end with an underscore)"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "create alias tag -> tag_",
+          errors: ["Can't create alias [[tag]] -> [[tag_]] ('tag_' cannot end with an underscore)"],
+        )
       end
 
       should "fail if the consequent name contains a tag type prefix" do
-        @bur = build(:bulk_update_request, script: "alias blah -> char:bar")
-
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't create alias [[blah]] -> [[char:bar]] ('char:bar' cannot begin with 'char:')"], @bur.errors.full_messages)
+        assert_invalid_bur(
+          script: "alias blah -> char:bar",
+          errors: ["Can't create alias [[blah]] -> [[char:bar]] ('char:bar' cannot begin with 'char:')"],
+        )
       end
     end
 

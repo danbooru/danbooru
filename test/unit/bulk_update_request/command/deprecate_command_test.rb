@@ -14,19 +14,21 @@ class DeprecateCommandTest < ActiveSupport::TestCase
     context "on creation" do
       should "not work for tags without a wiki page" do
         create(:tag, name: "no_wiki")
-        @bur = build(:bulk_update_request, script: "deprecate no_wiki")
 
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't deprecate [[no_wiki]] (tag must have a wiki page)"], @bur.errors[:base])
+        assert_invalid_bur(
+          script: "deprecate no_wiki",
+          errors: ["Can't deprecate [[no_wiki]] (tag must have a wiki page)"],
+        )
       end
 
       should "not work for tags with a deleted wiki page" do
         create(:tag, name: "deleted_wiki")
         create(:wiki_page, title: "deleted_wiki", is_deleted: true)
-        @bur = build(:bulk_update_request, script: "deprecate deleted_wiki")
 
-        assert_equal(false, @bur.valid?)
-        assert_equal(["Can't deprecate [[deleted_wiki]] (wiki page is deleted)"], @bur.errors[:base])
+        assert_invalid_bur(
+          script: "deprecate deleted_wiki",
+          errors: ["Can't deprecate [[deleted_wiki]] (wiki page is deleted)"],
+        )
       end
     end
 
