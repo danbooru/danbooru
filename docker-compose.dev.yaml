@@ -211,7 +211,7 @@ services:
     expose:
     - 9324
     volumes:
-      - sqs-data:/data"
+      - sqs-data:/data
     restart: unless-stopped
     stdin_open: true
     tty: true
