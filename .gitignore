@@ -1,14 +1,25 @@
+# secrets
 .env.*
 .gitconfig
+
+# histfiles
 .irb_history
+.history
+
+# danbooru local config
 /config/danbooru_local_config.rb
-/node_modules/
+
+# tmp folders
 /log/
 /tmp/
+
+# javascript cache folders
+/node_modules/
 /public/data/
 /public/packs-dev/
 /public/packs-test/
 /public/packs/
+
+# dtext compilation artifacts
 lib/dtext_rb/ext/dtext/Makefile
 lib/dtext_rb/ext/dtext/dtext.cpp
-.history
