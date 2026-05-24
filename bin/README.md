@@ -20,6 +20,7 @@ These scripts are specific to this project.
 | `media-conv` | Convert media files using Danbooru's media conversion logic. |
 | `media-ls` | List properties of media files (like `ls`, but using Danbooru's media file logic). |
 | `setup` | Install Docker and Git, clone the repo, and initialize config files for a fresh install. |
+| `test-sources` | Run all of a specific site's parsing & extractor tests. |
 | `update` | Update Ruby gems and npm packages and run pending migrations. |
 
 ## Bundler Scripts

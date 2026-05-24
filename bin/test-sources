@@ -2,8 +2,8 @@
 # Run source extractor and URL tests for a given site.
 #
 # Usage:
-#   bin/test_sources <site>   Run extractor + URL tests for <site>
-#   bin/test_sources ls       List available sites
+#   bin/test-sources <site>   Run extractor + URL tests for <site>
+#   bin/test-sources ls       List available sites
 
 ROOT = File.expand_path("..", __dir__)
 EXTRACTOR_DIR = "#{ROOT}/test/unit/source/extractor"
@@ -34,15 +34,15 @@ case ARGV[0]
 when "ls"
   puts all_sites
 when nil, "-h", "--help"
-  puts "Usage: bin/test_sources <site>"
-  puts "       bin/test_sources ls"
+  puts "Usage: bin/test-sources <site>"
+  puts "       bin/test-sources ls"
   exit ARGV[0] ? 0 : 1
 else
   tests = find_tests(ARGV[0])
 
   if tests.empty?
     warn "No test files found for: #{ARGV[0]}"
-    warn "Run 'bin/test_sources ls' to see available sites."
+    warn "Run 'bin/test-sources ls' to see available sites."
     exit 1
   end
 
