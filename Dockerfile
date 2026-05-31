@@ -96,6 +96,7 @@ EOS
 
 # Build Ruby. Output is in /usr/local.
 FROM build-base AS build-ruby
+ARG JOBS
 ARG RUBY_VERSION
 ARG RUBY_MAJOR_VERSION
 ARG RUBY_BUILD_DEPS="rustc libssl-dev libgmp-dev libyaml-dev libffi-dev libreadline-dev zlib1g-dev"
@@ -104,7 +105,7 @@ RUN <<EOS
   curl -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR_VERSION}/ruby-${RUBY_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   ./configure --enable-yjit --enable-shared --disable-install-doc
-  make -j install
+  make -j$JOBS install
 
   find /usr/local -type f -executable -exec strip --strip-unneeded {} \;
   rm -rf *
@@ -116,6 +117,7 @@ EOS
 
 # Build MozJPEG. Output is in /usr/local.
 FROM build-base AS build-mozjpeg
+ARG JOBS
 ARG MOZJPEG_VERSION
 ARG MOZJPEG_BUILD_DEPS="cmake nasm libpng-dev zlib1g-dev"
 RUN <<EOS
@@ -123,7 +125,7 @@ RUN <<EOS
   curl -L "https://github.com/mozilla/mozjpeg/archive/refs/tags/v${MOZJPEG_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_STATIC=0 -DWITH_ARITH_ENC=1 -DWITH_ARITH_DEC=1 .
-  make -j install/strip
+  make -j$JOBS install/strip
 
   rm -rf * /usr/local/share /usr/local/man
 
@@ -154,6 +156,7 @@ EOS
 
 # Build FFmpeg. Output is in /usr/local.
 FROM build-base AS build-ffmpeg
+ARG JOBS
 ARG FFMPEG_VERSION
 ARG FFMPEG_BUILD_DEPS="nasm libx264-dev libx265-dev libsvtav1enc-dev libvpx-dev libdav1d-dev zlib1g-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
@@ -186,7 +189,7 @@ RUN <<EOS
   curl -L "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${FFMPEG_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   ./configure $FFMPEG_BUILD_OPTIONS
-  make -j install
+  make -j$JOBS install
 
   rm -rf * /usr/local/include /usr/local/share
 
@@ -199,6 +202,7 @@ EOS
 
 # Build ExifTool. Output is in /usr/local.
 FROM build-base AS build-exiftool
+ARG JOBS
 ARG EXIFTOOL_VERSION
 ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.38 libarchive-zip-perl"
 RUN <<EOS
@@ -206,7 +210,7 @@ RUN <<EOS
   curl -L "https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
   perl Makefile.PL
-  make -j install
+  make -j$JOBS install
 
   rm -rf * /usr/local/man /usr/local/share/**/*.pod
 
@@ -220,6 +224,7 @@ EOS
 
 # Build OpenResty. Output is in /usr/local.
 FROM build-base AS build-openresty
+ARG JOBS
 ARG OPENRESTY_VERSION
 ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre3-dev zlib1g-dev"
 ARG OPENRESTY_BUILD_OPTIONS="\
@@ -233,8 +238,8 @@ RUN <<EOS
   apt-get install -y --no-install-recommends $OPENRESTY_BUILD_DEPS
   curl -L "https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
-  ./configure -j$(nproc) --prefix=/usr/local $OPENRESTY_BUILD_OPTIONS
-  make -j install
+  ./configure -j$JOBS --prefix=/usr/local $OPENRESTY_BUILD_OPTIONS
+  make -j$JOBS install
 
   find /usr/local -type f -executable -exec strip --strip-unneeded {} \;
   rm -rf * /usr/local/{site,pod,COPYRIGHT}
@@ -285,8 +290,10 @@ RUN <<EOS
 EOS
 
 COPY --link Gemfile Gemfile.lock ./
+
+ARG JOBS
 RUN <<EOS
-  BUNDLE_FROZEN=1 bundle install --no-cache --jobs $(nproc)
+  BUNDLE_FROZEN=1 bundle install --no-cache --jobs $JOBS
 
   cd $GEM_HOME
   find . -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out|gem|rdoc)$' -delete

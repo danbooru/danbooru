@@ -31,6 +31,8 @@ set -euxo pipefail
 ARCH="$(docker info -f '{{ .ClientInfo.Arch }}')"
 CURRENT_PLATFORM="linux/$ARCH"
 
+JOBS="${JOBS:-$(nproc)}"
+
 IMAGE="${1:-danbooru}"
 PLATFORM="${2:-$CURRENT_PLATFORM}"
 
@@ -43,9 +45,9 @@ docker buildx create --use --name nonparallel-builder --config buildkitd.toml 2>
 if [[ $PLATFORM != $CURRENT_PLATFORM && $PLATFORM != *,* ]]; then
   # If we're building for a different platform, and it's not a multi-platform image, then name the image after the platform so it doesn't conflict with images for the native platform.
   TARGET_ARCH="${PLATFORM#*/}" # linux/arm64 -> arm64
-  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --build-arg SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH --target development --file Dockerfile --output type=docker,name=$IMAGE:development-$TARGET_ARCH,rewrite-timestamp=true
-  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --build-arg SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH --target production  --file Dockerfile --output type=docker,name=$IMAGE:$TARGET_ARCH,rewrite-timestamp=true
+  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --build-arg SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH --build-arg JOBS=$JOBS --target development --file Dockerfile --output type=docker,name=$IMAGE:development-$TARGET_ARCH,rewrite-timestamp=true
+  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --build-arg SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH --build-arg JOBS=$JOBS --target production  --file Dockerfile --output type=docker,name=$IMAGE:$TARGET_ARCH,rewrite-timestamp=true
 else
-  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --build-arg SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH --target development --file Dockerfile --output type=docker,name=$IMAGE:development,rewrite-timestamp=true
-  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --build-arg SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH --target production  --file Dockerfile --output type=docker,name=$IMAGE,rewrite-timestamp=true
+  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --build-arg SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH --build-arg JOBS=$JOBS --target development --file Dockerfile --output type=docker,name=$IMAGE:development,rewrite-timestamp=true
+  git archive HEAD | docker buildx build - --platform $PLATFORM --build-arg DOCKER_IMAGE_REVISION=$DOCKER_IMAGE_REVISION --build-arg DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE --build-arg SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH --build-arg JOBS=$JOBS --target production  --file Dockerfile --output type=docker,name=$IMAGE,rewrite-timestamp=true
 fi
