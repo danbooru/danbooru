@@ -147,7 +147,10 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
 
+          # https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+          # ubuntu-latest on public repositories has 4 vCPU
           build-args: |
+            JOBS=4
             DOCKER_IMAGE_REVISION=${{ github.sha }}
             DOCKER_IMAGE_BUILD_DATE=${{ fromJSON(steps.development-metadata.outputs.json).labels['org.opencontainers.image.created'] }}
 
