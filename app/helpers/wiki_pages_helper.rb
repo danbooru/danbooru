@@ -6,6 +6,6 @@ module WikiPagesHelper
       render ExternalTagLinkComponent.new(name)
     end
 
-    tag.div safe_join(html, " "), class: "flex gap-1 flex-wrap"
+    tag.div safe_join(html, " "), class: "flex gap-1 flex-wrap mb-3"
   end
 end
