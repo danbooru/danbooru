@@ -125,11 +125,10 @@
         <% if policy(wiki_page).edit? %>
           <%= link_to "", edit_wiki_page_path(wiki_page.id), "data-shortcut": "e", style: "display: none;" %>
         <% end %>
+        <% if wiki_page.other_names.present? %>
+          <%= wiki_page_other_names_list(wiki_page) %>
+        <% end %>
         <div class="prose">
-          <% if wiki_page.other_names.present? %>
-            <%= wiki_page_other_names_list(wiki_page) %>
-          <% end %>
-
           <%= wiki_page.dtext_body.format_text %>
           <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
 
