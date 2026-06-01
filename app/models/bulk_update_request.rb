@@ -14,6 +14,8 @@ class BulkUpdateRequest < ApplicationRecord
   belongs_to :forum_post, optional: true
   belongs_to :approver, optional: true, class_name: "User"
 
+  has_many :votes, through: :forum_post
+
   normalizes :script, with: ->(script) { script.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   # XXX these validations must match the forum post validations
@@ -48,6 +50,15 @@ class BulkUpdateRequest < ApplicationRecord
       end
 
       params[:order] ||= "status_desc"
+
+      if params[:score].present? || params[:order].in?(%w[score score_desc score_asc])
+        q = q.with_score
+      end
+
+      if params[:score].present?
+        q = q.where_numeric_matches(:score, params[:score])
+      end
+
       case params[:order]
       when "id_desc"
         q = q.order(id: :desc)
@@ -57,11 +68,21 @@ class BulkUpdateRequest < ApplicationRecord
         q = q.order(updated_at: :desc)
       when "updated_at_asc"
         q = q.order(updated_at: :asc)
+      when "score", "score_desc"
+        q = q.order(score: :desc, id: :desc)
+      when "score_asc"
+        q = q.order(score: :asc, id: :desc)
       else
         q = q.apply_default_order(params)
       end
 
       q
+    end
+
+    def with_score
+      subquery = left_outer_joins(:votes).group(:id).select("bulk_update_requests.*")
+      subquery = subquery.select("COALESCE(SUM(forum_post_votes.score), 0) AS score")
+      from(subquery.arel.as("bulk_update_requests"))
     end
   end
 
