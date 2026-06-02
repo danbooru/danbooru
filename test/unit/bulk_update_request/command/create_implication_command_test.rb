@@ -55,6 +55,13 @@ class CreateImplicationCommandTest < ActiveSupport::TestCase
         )
       end
 
+      should "fail if attempting to create a circular relation" do
+        assert_invalid_bur(
+          script: "imply a -> b\nimply b -> a\n",
+          errors: ["Can't create implication [[b]] -> [[a]] (Tag implication can not create a circular relation with another tag implication)"],
+        )
+      end
+
       should "fail for an implication between tags of different categories" do
         create(:tag, name: "hatsune_miku", category: Tag.categories.character)
         create(:tag, name: "vocaloid", category: Tag.categories.copyright)
