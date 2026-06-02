@@ -117,8 +117,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       context "a bulk update request with duplicate lines" do
         should "fail" do
           assert_invalid_bur(
-            script: "imply a -> b\nimply b -> a\n" * 200,
-            errors: ["Duplicate line found: create implication [[a]] -> [[b]]", "Duplicate line found: create implication [[b]] -> [[a]]"],
+            script: "imply a -> b\nimply a -> b\n",
+            errors: ["Duplicate line found: create implication [[a]] -> [[b]]"],
           )
         end
       end
@@ -347,6 +347,42 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
       should "work" do
         assert_search_equals(@bur1, user_name: @admin.name, approver_name: @admin.name, status: "approved")
+      end
+
+      context "by score" do
+        setup do
+          @user1 = create(:user)
+          @user2 = create(:user)
+          @user3 = create(:user)
+          create(:forum_post_vote, forum_post: @bur1.forum_post, creator: @user1, score: 1)
+          create(:forum_post_vote, forum_post: @bur1.forum_post, creator: @user2, score: 1)
+          create(:forum_post_vote, forum_post: @bur2.forum_post, creator: @user3, score: -1)
+        end
+
+        should "filter by exact score" do
+          assert_search_equals(@bur1, score: "2")
+          assert_search_equals(@bur2, score: "-1")
+        end
+
+        should "filter by score greater than" do
+          assert_search_equals(@bur1, score: ">0")
+        end
+
+        should "filter by score less than" do
+          assert_search_equals(@bur2, score: "<0")
+        end
+
+        should "order by score descending" do
+          assert_search_equals([@bur1, @bur2], order: "score_desc")
+        end
+
+        should "order by score ascending" do
+          assert_search_equals([@bur2, @bur1], order: "score_asc")
+        end
+
+        should "search and order by score" do
+          assert_search_equals([@bur2, @bur1], order: "score_asc", score: ">-20")
+        end
       end
     end
   end

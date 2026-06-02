@@ -2,7 +2,8 @@
   <%= f.input :user_name, label: "Creator", input_html: { value: params[:search][:user_name], data: { autocomplete: "user" } } %>
   <%= f.input :approver_name, label: "Approver", input_html: { value: params[:search][:approver_name], data: { autocomplete: "user" } } %>
   <%= f.input :tags_include_any, label: "Tags", input_html: { value: params[:search][:tags_include_any], data: { autocomplete: "tag-query" } } %>
+  <%= f.input :score, input_html: { value: params[:search][:score] } %>
   <%= f.input :status, label: "Status", collection: %w[pending approved rejected processing failed], include_blank: true, selected: params[:search][:status] %>
-  <%= f.input :order, collection: [%w[Newest id_desc], %w[Oldest id_asc], %w[Last\ updated updated_at_desc], %w[Status status_desc]], include_blank: true, selected: params[:search][:order] %>
+  <%= f.input :order, collection: [%w[Newest id_desc], %w[Oldest id_asc], %w[Last\ updated updated_at_desc], %w[Status status_desc], %w[Score\ (highest) score_desc], %w[Score\ (lowest) score_asc]], include_blank: true, selected: params[:search][:order] %>
   <%= f.submit "Search" %>
 <% end %>
