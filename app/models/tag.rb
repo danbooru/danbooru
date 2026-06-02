@@ -307,12 +307,11 @@ class Tag < ApplicationRecord
 
       # Parse a string into a query for performing a word-based search.
       #
-      # Tag.parse_query("holding_hand") => ["holding", "hand*"]
-      # Tag.parse_query("looking_at_") => ["looking", "at"]
+      # Every parsed word is treated as a prefix so partial words can match in any order.
+      # Tag.parse_query("holding_hand") => ["holding*", "hand*"]
+      # Tag.parse_query("looking_at_") => ["looking*", "at*"]
       def parse_query(string)
-        query = parse_words(string)
-        query[-1] += "*" unless string.match?(/[#{WORD_DELIMITERS}]\z/)
-        query
+        parse_words(string).map { |word| "#{word}*" }
       end
     end
   end

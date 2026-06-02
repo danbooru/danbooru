@@ -22,5 +22,16 @@ class AutocompleteComponentTest < ViewComponent::TestCase
       assert_css(".ui-menu-item[data-autocomplete-value=':smile:']")
       assert_css(".ui-menu-item b", text: "smi")
     end
+
+    should "highlight reordered partial word prefixes for tag-word results" do
+      create(:tag, name: "mismatched_thighhighs", category: Tag.categories.general, post_count: 123)
+      service = AutocompleteService.new("thi_mis", :tag_query)
+
+      render_inline(AutocompleteComponent.new(autocomplete_service: service))
+
+      assert_css(".ui-menu-item[data-autocomplete-value='mismatched_thighhighs']")
+      assert_css(".ui-menu-item b", text: "mis")
+      assert_css(".ui-menu-item b", text: "thi")
+    end
   end
 end

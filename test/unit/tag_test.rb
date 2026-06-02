@@ -290,6 +290,10 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(%w[<|>_<|>], Tag.new(name: "<|>_<|>").words)
       assert_equal(%w[k-----s], Tag.new(name: "k-----s").words)
       assert_equal(%w[m.u.g.e.n], Tag.new(name: "m.u.g.e.n").words)
+
+      assert_equal(%w[holding* hand*], Tag.parse_query("holding_hand"))
+      assert_equal(%w[looking* at*], Tag.parse_query("looking_at_"))
+      assert_equal(%w[mis* thi*], Tag.parse_query("mis_thi"))
     end
 
     context "during name validation" do

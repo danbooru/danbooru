@@ -133,14 +133,14 @@ class AutocompleteService
   # Find tags or tag aliases containing all the words in the search string, in any order.
   # Example: "haruhi_suzumiya" => "suzumiya_haruhi_no_yuuutsu"
   #
-  # Rank results with exact matches first (unless it's a small tag), then substring matches
-  # next (e.g. tags where the words are in the same order and next to each other), then word
-  # matches last (e.g. tag where the words are in a different order, or not next to each other).
+  # Rank results by autocomplete relevance: exact matches first, then high-quality prefix
+  # matches (especially at the beginning of words), then word-order quality, then popularity.
   #
   # @param string [String] the string to complete
   # @return [Array<Hash>] the autocomplete results
   def tag_word_matches(string)
     query = Tag.parse_query(string)
+    query_words = Tag.parse_words(string)
 
     name_matches = Tag.nonempty.where_all_in_array_like(:words, query)
     alias_matches = Tag.nonempty.where(name: TagAlias.active.joins(:antecedent_tag).where_all_in_array_like("tags.words", query).select(:consequent_name))
@@ -154,23 +154,63 @@ class AutocompleteService
 
     results = results.sort_by do |result|
       name = result[:antecedent] || result[:value]
-      post_count = result[:post_count]
+      rank = tag_word_rank(name, query_words, string, result[:post_count].to_i)
 
-      large = (post_count > 100) ? 1 : 0
-      exact = (name == string) ? 1 : 0
-      substr = name.include?(string) ? 1 : 0
+      order = [
+        -rank[:exact_name],
+        -rank[:full_prefix],
+        -rank[:full_order],
+        -rank[:contiguous_order],
+        -rank[:ordered_count],
+        rank[:first_order_index],
+        -rank[:exact_word_matches],
+        -rank[:post_count],
+        result[:value],
+      ]
 
       # If the search contains punctuation, rank exact matches first then substring matches. Otherwise, if it
       # doesn't contain any punctuation, rank exact matches among large tags before small tags. This is so we
       # rank exact matches first, but not if they're random small character or artist tags with simple names.
-      if string.match?(/[^a-zA-Z0-9]/)
-        [-exact, -substr, -post_count, result[:value]]
-      else
-        [-large, -exact, -substr, -post_count, result[:value]]
+      unless string.match?(/[^a-zA-Z0-9]/)
+        large = (rank[:post_count] > 100) ? 1 : 0
+        order = [-large] + order
       end
+
+      order
     end
 
     results.take(limit)
+  end
+
+  def tag_word_rank(name, query_words, query_string, post_count)
+    words = Tag.parse_words(name)
+
+    ordered_match_indexes = []
+    last_index = -1
+
+    query_words.each do |query_word|
+      next_index = words.find_index.with_index { |word, i| i > last_index && word.starts_with?(query_word) }
+      break if next_index.nil?
+
+      ordered_match_indexes << next_index
+      last_index = next_index
+    end
+
+    full_order = ordered_match_indexes.size == query_words.size
+    contiguous_order = full_order && ordered_match_indexes.each_cons(2).all? { |a, b| b == a + 1 }
+    first_order_index = ordered_match_indexes.first || 1_000_000
+    exact_word_matches = query_words.count { |query_word| words.any? { |word| word == query_word } }
+
+    {
+      exact_name: name == query_string ? 1 : 0,
+      full_prefix: name.starts_with?(query_string) ? 1 : 0,
+      full_order: full_order ? 1 : 0,
+      contiguous_order: contiguous_order ? 1 : 0,
+      ordered_count: ordered_match_indexes.size,
+      first_order_index: first_order_index,
+      exact_word_matches: exact_word_matches,
+      post_count: post_count,
+    }
   end
 
   # Find tags or tag aliases starting with the given search string.
