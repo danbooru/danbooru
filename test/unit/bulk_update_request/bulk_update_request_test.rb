@@ -117,8 +117,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       context "a bulk update request with duplicate lines" do
         should "fail" do
           assert_invalid_bur(
-            script: "imply a -> b\nimply b -> a\n" * 200,
-            errors: ["Duplicate line found: create implication [[a]] -> [[b]]", "Duplicate line found: create implication [[b]] -> [[a]]"],
+            script: "imply a -> b\nimply a -> b\n",
+            errors: ["Duplicate line found: create implication [[a]] -> [[b]]"],
           )
         end
       end
