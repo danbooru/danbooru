@@ -144,8 +144,10 @@ jobs:
 
           # https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#registry-cache
           # https://dev.to/pst418/speed-up-multi-stage-docker-builds-in-ci-cd-with-buildkit-s-registry-cache-11gi
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+          cache-from:  |
+            type=registry,ref=ghcr.io/${{ github.repository }}:buildcache-development
+            type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache-development,mode=max
 
           # https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories
           # ubuntu-latest on public repositories has 4 vCPU
