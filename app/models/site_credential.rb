@@ -135,7 +135,7 @@ class SiteCredential < ApplicationRecord
     }, {
       id: 2450,
       name: "Xiaohongshu",
-      default_credential: { session_cookie: Danbooru.config.xiaohongshu_session_cookie, web_id: Danbooru.config.xiaohongshu_webid_cookie, web_session: Danbooru.config.xiaohongshu_web_session_cookie },
+      default_credential: { api_host: Danbooru.config.xiaohongshu_api_host, session_cookie: Danbooru.config.xiaohongshu_session_cookie, web_id: Danbooru.config.xiaohongshu_webid_cookie, web_session: Danbooru.config.xiaohongshu_web_session_cookie },
       help: %{Your "Xiaohongshu":https://www.xiaohongshu.com 'gid', 'webId' and 'web_session' cookies.},
     }, {
       id: 2500,

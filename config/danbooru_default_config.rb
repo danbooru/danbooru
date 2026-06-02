@@ -610,6 +610,10 @@ module Danbooru
     def reddit_session_cookie
     end
 
+    # Your Xiaohongshu site host. Can be either "www.xiaohongshu.com" or "www.rednote.com".
+    def xiaohongshu_api_host
+    end
+
     # Your Xiaohongshu "gid" cookie. Login to Xiaohongshu then use the devtools to find the "gid" cookie.
     def xiaohongshu_session_cookie
     end
