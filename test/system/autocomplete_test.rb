@@ -49,7 +49,7 @@ class AutocompleteTest < ApplicationSystemTestCase
       end
 
       should "work for username metatags" do
-        %w[user approver commenter comm noter noteupdater artcomm fav ordfav appealer flagger upvote downvote].each do |metatag|
+        %w[user approver commenter comm noter noteupdater artcomm upvote downvote fav ordvote ordfav appealer flagger].each do |metatag|
           assert_search_autocomplete_equals(["#{metatag}:DanbooruBot"], "#{metatag}:Danbo")
           assert_search_autocomplete_equals(["#{metatag}:DanbooruBot"], "-#{metatag}:Danbo")
         end

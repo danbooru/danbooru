@@ -1220,6 +1220,8 @@ class Post < ApplicationRecord
           favorites_include(value, current_user)
         when "ordfav"
           ordfav_matches(value, current_user)
+        when "ordvote"
+          ordvote_matches(value, current_user)
         when "reacted"
           reacted_by(value)
         when "unaliased"
@@ -1491,6 +1493,16 @@ class Post < ApplicationRecord
 
         if user.present? && Pundit.policy!(current_user, user).can_see_favorites?
           joins(:favorites).merge(Favorite.where(user: user)).order("favorites.id DESC")
+        else
+          none
+        end
+      end
+
+      def ordvote_matches(username, current_user = User.anonymous)
+        user = User.find_by_name(username)
+
+        if user.present?
+          joins(:votes).merge(PostVote.active.visible(current_user).where(user: user)).order("post_votes.id DESC")
         else
           none
         end

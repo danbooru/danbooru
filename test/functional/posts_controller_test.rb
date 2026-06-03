@@ -534,6 +534,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(post_path(@post, q: "ordfav:#{@user.name}"))
       end
 
+      should "render for a ordvote: search" do
+        @post = as(@user) { create(:post, tag_string: "downvote:me") }
+        get_auth random_posts_path(tags: "ordvote:#{@user.name}"), @user
+
+        assert_redirected_to(post_path(@post, q: "ordvote:#{@user.name}"))
+      end
+
       should "return a 404 when no random posts can be found" do
         get random_posts_path, params: { tags: "qoigjegoi" }
         assert_response 404
