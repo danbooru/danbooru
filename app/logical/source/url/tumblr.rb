@@ -13,7 +13,7 @@ class Source::URL::Tumblr < Source::URL
   IMAGE_SIZES = %w[1280 720 640 540 500h 500 400 250 100]
   RESERVED_NAMES = %w[about app blog dashboard developers explore jobs login logo policy press register security tagged tips]
 
-  attr_reader :work_id, :blog_name, :full_image_url, :candidate_full_image_urls, :redirect_id
+  attr_reader :work_id, :blog_name, :blog_id, :full_image_url, :candidate_full_image_urls, :redirect_id
 
   def self.match?(url)
     url.domain.in?(%w[tumblr.com tmblr.co])
@@ -75,6 +75,10 @@ class Source::URL::Tumblr < Source::URL
     # https://at.tumblr.com/everythingfox/everythingfox-so-sleepy/d842mqsx8lwd
     in "at", "tumblr.com", blog_name, title, _
       @blog_name = blog_name
+
+    # https://www.tumblr.com/blog/view/t:0COK151uIXGkmk2AhdVXJA
+    in (nil | "www"), "tumblr.com", "blog", "view", /^t:[A-Za-z0-9_-]+/ => blog_id, *rest
+      @blog_id = blog_id.sub("t:", "")
 
     # https://www.tumblr.com/blog/view/artofelaineho/187614935612  # old dashboard links
     in (nil | "www"), "tumblr.com", "blog", "view", blog_name, /^\d+$/ => work_id
@@ -140,6 +144,8 @@ class Source::URL::Tumblr < Source::URL
   def profile_url
     if blog_name.present?
       "https://#{blog_name}.tumblr.com"
+    elsif blog_id.present?
+      "https://www.tumblr.com/blog/view/t:#{blog_id}"
 
     # https://yra.sixc.me
     elsif domain != "tumblr.com"

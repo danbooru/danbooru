@@ -28,10 +28,12 @@ module Source::Tests::URL
         "https://www.tumblr.com/dashboard/blog/dankwartart",
         "https://www.tumblr.com/blog/artofelaineho",
         "https://www.tumblr.com/blog/view/artofelaineho",
+        "https://www.tumblr.com/blog/view/t:0COK151uIXGkmk2AhdVXJA",
         "https://tumblr.com/tawni-tailwind",
         "https://tumblr.com/dashboard/blog/dankwartart",
         "https://tumblr.com/blog/kervalchan",
         "https://tumblr.com/blog/view/artofelaineho",
+        "https://tumblr.com/blog/view/t:0COK151uIXGkmk2AhdVXJA",
         "https://rosarrie.tumblr.com/archive",
         "https://solisnotte.tumblr.com/about",
         "https://whereisnovember.tumblr.com/tagged/art",
@@ -82,6 +84,10 @@ module Source::Tests::URL
 
       should parse_url("https://at.tumblr.com/cyanideqpoison/u2czj612ttzq").into(
         profile_url: "https://cyanideqpoison.tumblr.com",
+      )
+
+      should parse_url("https://www.tumblr.com/blog/view/t:0COK151uIXGkmk2AhdVXJA").into(
+        blog_id: "0COK151uIXGkmk2AhdVXJA",
       )
     end
 
