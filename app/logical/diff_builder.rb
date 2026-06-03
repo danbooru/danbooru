@@ -4,6 +4,7 @@ require "diff/lcs/array" # diff-lcs gem
 
 # Builds an HTML diff between two pieces of text.
 class DiffBuilder
+  NAME_PATTERN = /./
   BODY_PATTERN = %r{
     (?:<.+?>)               # HTML tags
     | (?:[\p{Han}\p{Katakana}\p{Hiragana}\p{Hangul}]) # CJK / Hangul characters
@@ -12,29 +13,37 @@ class DiffBuilder
     | (?:\r?\n)             # Line breaks
     | (?:.+?)               # Remaining individual characters
   }x
+  PARAGRAPH_MARK_HTML = '<span class="paragraph-mark">¶</span><br>'
+  DIFFED_PARAGRAPH_MARK_HTML = '<del><span class="paragraph-mark">¶</span></del><ins><span class="paragraph-mark">¶</span></ins><br>'
 
   attr_reader :this_text, :that_text, :pattern
 
-  def self.diff_name_html(this_name, other_name)
-    return "<ins>#{ERB::Util.html_escape(this_name)}</ins>".html_safe if other_name.blank?
-    return "<del>#{ERB::Util.html_escape(other_name)}</del>".html_safe if this_name.blank?
+  def initialize(this_text, that_text, pattern = BODY_PATTERN)
+    @this_text = this_text.to_s
+    @that_text = that_text.to_s
+    @pattern = pattern
+  end
+
+  def diff_name_html
+    return "<ins>#{ERB::Util.html_escape(this_text)}</ins>".html_safe if that_text.blank?
+    return "<del>#{ERB::Util.html_escape(that_text)}</del>".html_safe if this_text.blank?
 
     # Compute the longest common prefix and suffix so we only diff the changed middle.
-    min_len = [this_name.length, other_name.length].min
+    min_len = [this_text.length, that_text.length].min
 
     prefix_len = 0
-    prefix_len += 1 while prefix_len < min_len && this_name[prefix_len] == other_name[prefix_len]
+    prefix_len += 1 while prefix_len < min_len && this_text[prefix_len] == that_text[prefix_len]
 
     suffix_len = 0
     while suffix_len < min_len - prefix_len &&
-        this_name[this_name.length - 1 - suffix_len] == other_name[other_name.length - 1 - suffix_len]
+        this_text[this_text.length - 1 - suffix_len] == that_text[that_text.length - 1 - suffix_len]
       suffix_len += 1
     end
 
-    prefix = this_name[0, prefix_len]
-    suffix = this_name[-suffix_len, suffix_len]
-    this_middle = this_name[prefix_len, this_name.length - prefix_len - suffix_len]
-    other_middle = other_name[prefix_len, other_name.length - prefix_len - suffix_len]
+    prefix = this_text[0, prefix_len]
+    suffix = this_text[-suffix_len, suffix_len]
+    this_middle = this_text[prefix_len, this_text.length - prefix_len - suffix_len]
+    other_middle = that_text[prefix_len, that_text.length - prefix_len - suffix_len]
 
     escaped_prefix = ERB::Util.html_escape(prefix)
     escaped_suffix = ERB::Util.html_escape(suffix)
@@ -44,32 +53,29 @@ class DiffBuilder
       new_html = ERB::Util.html_escape(this_middle)
       "#{escaped_prefix}<del>#{old_html}</del><ins>#{new_html}</ins>#{escaped_suffix}".html_safe
     else
-      middle_html = new(this_middle, other_middle, /./).build
+      middle_html = self.class.new(this_middle, other_middle, pattern).build
       "#{escaped_prefix}#{middle_html}#{escaped_suffix}".html_safe
     end
   end
 
-  def self.diff_body_html(new_text, old_text)
-    new_text = new_text.to_s
-    old_text = old_text.to_s
-
+  def diff_body_html
     # Skip the expensive diff for long, completely different texts. The Levenshtein
     # check is O(n*m) in pure Ruby, so we only run it when both sides are small
     # enough that the shortcut is worth the cost.
-    if new_text.length > 10 && [new_text.length, old_text.length].max <= 5_000 &&
-        levenshtein_similarity(new_text, old_text) < 0.15
-      old_html = format_body_html(old_text)
-      new_html = format_body_html(new_text)
+    if this_text.length > 10 && [this_text.length, that_text.length].max <= 5_000 &&
+        levenshtein_similarity(this_text, that_text) < 0.15
+      old_html = html_escape_with_paragraph_marks(that_text)
+      new_html = html_escape_with_paragraph_marks(this_text)
       "<del>#{old_html}</del><ins>#{new_html}</ins>".html_safe
     else
-      new(new_text, old_text, BODY_PATTERN).build
+      build
     end
   end
 
-  def initialize(this_text, that_text, pattern)
-    @this_text = this_text
-    @that_text = that_text
-    @pattern = pattern
+  # Renders one side of a version diff without change markers. Used when the
+  # other side is missing, so there is nothing to compare against.
+  def format_body_html
+    html_escape_with_paragraph_marks(this_text)
   end
 
   def build
@@ -89,7 +95,7 @@ class DiffBuilder
       new_cr = hunk[1].try(:new_element)
       if old_cr && new_cr && old_cr.match?(/^\r?\n$/) && new_cr.match?(/^\r?\n$/)
         hunk_position = hunk[0].old_position
-        output[hunk_position] = '<del><span class="paragraph-mark">¶</span></del><ins><span class="paragraph-mark">¶</span></ins><br>'
+        output[hunk_position] = DIFFED_PARAGRAPH_MARK_HTML
         next
       end
 
@@ -105,10 +111,10 @@ class DiffBuilder
         case chg.action
         when "-"
           oldstart = chg.old_position
-          output[chg.old_position] = '<span class="paragraph-mark">¶</span><br>' if chg.old_element.match(/^\r?\n$/)
+          output[chg.old_position] = PARAGRAPH_MARK_HTML if chg.old_element.match(/^\r?\n$/)
         when "+"
           if chg.new_element.match(/^\r?\n$/)
-            output.insert(chg.old_position, '<span class="paragraph-mark">¶</span><br>')
+            output.insert(chg.old_position, PARAGRAPH_MARK_HTML)
           else
             output.insert(chg.old_position, escape_html[chg.new_element].to_s)
           end
@@ -125,19 +131,20 @@ class DiffBuilder
       end
     end
 
-    output.join.gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe
+    output.join.gsub(/\r?\n/, PARAGRAPH_MARK_HTML).html_safe
   end
 
-  def self.format_body_html(text)
-    ERB::Util.html_escape(text).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe
+  private
+
+  def html_escape_with_paragraph_marks(text)
+    ERB::Util.html_escape(text).gsub(/\r?\n/, PARAGRAPH_MARK_HTML).html_safe
   end
 
   # Normalized Levenshtein similarity: 0.0 = completely different, 1.0 = identical.
-  def self.levenshtein_similarity(a, b)
+  def levenshtein_similarity(a, b)
     max_len = [a.length, b.length].max
     return 1.0 if max_len.zero?
 
     1.0 - (DidYouMean::Levenshtein.distance(a, b).to_f / max_len)
   end
-  private_class_method :levenshtein_similarity
 end

@@ -21,16 +21,16 @@ module ApplicationHelper
   end
 
   def diff_name_html(this_name, other_name)
-    DiffBuilder.diff_name_html(this_name, other_name)
+    DiffBuilder.new(this_name, other_name, DiffBuilder::NAME_PATTERN).diff_name_html
   end
 
   def diff_body_html(record, other, field)
     if record.blank? || other.blank?
       diff_record = other.presence || record
-      return DiffBuilder.format_body_html(diff_record[field])
+      return DiffBuilder.new(diff_record[field], nil).format_body_html
     end
 
-    DiffBuilder.diff_body_html(record[field], other[field])
+    DiffBuilder.new(record[field], other[field]).diff_body_html
   end
 
   def status_diff_html(record, type)
