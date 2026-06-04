@@ -33,6 +33,10 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
     parsed_url.page_url || parsed_referer&.page_url
   end
 
+  def api_host
+    credentials[:api_host].presence || "www.xiaohongshu.com"
+  end
+
   def profile_url
     "https://www.xiaohongshu.com/user/profile/#{user_id}" if user_id.present?
   end
@@ -81,7 +85,8 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   memoize def page
-    http.cache(1.minute).parsed_get(page_url)
+    url = Danbooru::URL.parse(page_url).with(host: api_host).to_s
+    http.cache(1.minute).parsed_get(url)
   end
 
   memoize def page_json
