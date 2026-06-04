@@ -25,8 +25,8 @@ class DiffBuilder
   end
 
   def diff_name_html
-    return "<ins>#{ERB::Util.html_escape(this_text)}</ins>".html_safe if that_text.blank?
-    return "<del>#{ERB::Util.html_escape(that_text)}</del>".html_safe if this_text.blank?
+    return diff_html(new_html: ERB::Util.html_escape(this_text)) if that_text.blank?
+    return diff_html(old_html: ERB::Util.html_escape(that_text)) if this_text.blank?
 
     # Compute the longest common prefix and suffix so we only diff the changed middle.
     min_len = [this_text.length, that_text.length].min
@@ -51,10 +51,10 @@ class DiffBuilder
     if levenshtein_similarity(this_middle, other_middle) < 0.3
       old_html = ERB::Util.html_escape(other_middle)
       new_html = ERB::Util.html_escape(this_middle)
-      "#{escaped_prefix}<del>#{old_html}</del><ins>#{new_html}</ins>#{escaped_suffix}".html_safe
+      diff_html(prefix_html: escaped_prefix, old_html: old_html, new_html: new_html, suffix_html: escaped_suffix)
     else
       middle_html = self.class.new(this_middle, other_middle, pattern).build
-      "#{escaped_prefix}#{middle_html}#{escaped_suffix}".html_safe
+      diff_html(prefix_html: escaped_prefix, middle_html: middle_html, suffix_html: escaped_suffix)
     end
   end
 
@@ -66,7 +66,7 @@ class DiffBuilder
         levenshtein_similarity(this_text, that_text) < 0.15
       old_html = html_escape_with_paragraph_marks(that_text)
       new_html = html_escape_with_paragraph_marks(this_text)
-      "<del>#{old_html}</del><ins>#{new_html}</ins>".html_safe
+      diff_html(old_html: old_html, new_html: new_html)
     else
       build
     end
@@ -135,6 +135,23 @@ class DiffBuilder
   end
 
   private
+
+  def diff_html(prefix_html: nil, old_html: nil, new_html: nil, middle_html: nil, suffix_html: nil)
+    html = +""
+
+    html << prefix_html unless prefix_html.nil?
+
+    if middle_html.nil?
+      html << "<del>#{old_html}</del>" unless old_html.nil?
+      html << "<ins>#{new_html}</ins>" unless new_html.nil?
+    else
+      html << middle_html
+    end
+
+    html << suffix_html unless suffix_html.nil?
+
+    html.html_safe
+  end
 
   def html_escape_with_paragraph_marks(text)
     ERB::Util.html_escape(text).gsub(/\r?\n/, PARAGRAPH_MARK_HTML).html_safe
