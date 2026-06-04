@@ -15,6 +15,9 @@ class DiffBuilder
   }x
   PARAGRAPH_MARK_HTML = '<span class="paragraph-mark">¶</span><br>'
   DIFFED_PARAGRAPH_MARK_HTML = '<del><span class="paragraph-mark">¶</span></del><ins><span class="paragraph-mark">¶</span></ins><br>'
+  MAX_LEVENSHTEIN_LENGTH = 5_000
+  MIN_WHOLESALE_DIFF_LENGTH = 10
+  WHOLESALE_BODY_DIFF_SIMILARITY = 0.15
 
   attr_reader :this_text, :that_text, :pattern
 
@@ -62,8 +65,11 @@ class DiffBuilder
     # Skip the expensive diff for long, completely different texts. The Levenshtein
     # check is O(n*m) in pure Ruby, so we only run it when both sides are small
     # enough that the shortcut is worth the cost.
-    if this_text.length > 10 && [this_text.length, that_text.length].max <= 5_000 &&
-        levenshtein_similarity(this_text, that_text) < 0.15
+    max_length = [this_text.length, that_text.length].max
+
+    if max_length > MIN_WHOLESALE_DIFF_LENGTH &&
+        max_length <= MAX_LEVENSHTEIN_LENGTH &&
+        levenshtein_similarity(this_text, that_text) < WHOLESALE_BODY_DIFF_SIMILARITY
       old_html = html_escape_with_paragraph_marks(that_text)
       new_html = html_escape_with_paragraph_marks(this_text)
       diff_html(old_html: old_html, new_html: new_html)
@@ -142,8 +148,8 @@ class DiffBuilder
     html << prefix_html unless prefix_html.nil?
 
     if middle_html.nil?
-      html << "<del>#{old_html}</del>" unless old_html.nil?
-      html << "<ins>#{new_html}</ins>" unless new_html.nil?
+      html << "<del>#{old_html}</del>" unless old_html.nil? || old_html.empty?
+      html << "<ins>#{new_html}</ins>" unless new_html.nil? || new_html.empty?
     else
       html << middle_html
     end
