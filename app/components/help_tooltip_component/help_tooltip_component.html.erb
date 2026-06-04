@@ -1,6 +1,6 @@
-<a class="help-tooltip-link inline-block <%= link_class %>" href="javascript:void(0)">
+<%= tag.a(class: "help-tooltip-link inline-block #{link_class}", href: "javascript:void(0)", **tooltip_options) do %>
   <%= icon %>
-</a>
+<% end %>
 
 <div class="help-tooltip-content" style="display: none;">
   <%= tooltip_content %>
