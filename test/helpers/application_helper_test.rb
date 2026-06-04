@@ -64,8 +64,8 @@ class ApplicationHelperTest < ActionView::TestCase
 
       should "html-escape names so raw markup cannot leak through" do
         html = diff_name_html("<x>", "<y>")
-        refute_includes(html, "<x>")
-        refute_includes(html, "<y>")
+        assert_not_includes(html, "<x>")
+        assert_not_includes(html, "<y>")
         assert_includes(html, "&lt;")
         assert_includes(html, "&gt;")
       end

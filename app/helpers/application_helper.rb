@@ -48,7 +48,7 @@ module ApplicationHelper
     statuses = changed_fields.map { |field, status| status }
     altered = record.updater_id != other.updater_id
 
-    tag.div(class: "version-statuses", "data-altered": altered) do
+    tag.div("class": "version-statuses", "data-altered": altered) do
       safe_join(statuses, tag.br)
     end
   end
@@ -167,7 +167,7 @@ module ApplicationHelper
       if compact
         text = time_ago_in_words(time)
         text = text.gsub(/almost|about|over/, "").strip
-        text = text.gsub(/less than a/, "<1")
+        text = text.gsub("less than a", "<1")
         text = text.gsub(/ minutes?/, "m")
         text = text.gsub(/ hours?/, "h")
         text = text.gsub(/ days?/, "d")
@@ -183,7 +183,7 @@ module ApplicationHelper
     elsif time.future?
       if compact
         text = distance_of_time_in_words(Time.now, time)
-        text = text.gsub(/almost|about|over/, "").gsub(/less than a/, "<1").strip
+        text = text.gsub(/almost|about|over/, "").gsub("less than a", "<1").strip
         time_tag(text, time)
       else
         time_tag("in " + distance_of_time_in_words(Time.now, time), time)
@@ -196,7 +196,7 @@ module ApplicationHelper
   end
 
   def external_link_to(url, text = url, truncate: nil, strip: false, **link_options, &block)
-    text = capture { yield } if block_given?
+    text = capture(&block) if block_given?
     text = text.gsub(%r{\Ahttps?://}i, "") if strip == :scheme
     text = text.gsub(%r{\Ahttps?://(?:www\.)?}i, "") if strip == :subdomain
     text = text.truncate(truncate) if truncate
