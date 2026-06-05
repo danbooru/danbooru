@@ -882,6 +882,11 @@ module Danbooru
       {}
     end
 
+    # A list of terms to use as the blacklist for new and anonymous users.
+    def default_blacklist
+      []
+    end
+
     # A hash of site names to a function taking a tag name and returning a URL for
     # tag searches on that site. Used to render other names links on wiki pages.
     def tag_lookup_sites
