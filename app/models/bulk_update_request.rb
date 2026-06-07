@@ -137,7 +137,7 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def processor
-    @processor ||= BulkUpdateRequestProcessor.new(self)
+    @processor ||= BulkUpdateRequest::Processor.new(self)
   end
 
   def is_tag_move_allowed?

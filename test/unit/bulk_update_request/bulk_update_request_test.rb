@@ -262,7 +262,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
 
       should "leave the BUR pending if there is a validation error during approval" do
-        @req.stubs(:update!).raises(BulkUpdateRequestProcessor::Error.new("blah"))
+        @req.stubs(:update!).raises(BulkUpdateRequest::Processor::Error.new("blah"))
         assert_equal("pending", @req.reload.status)
       end
 

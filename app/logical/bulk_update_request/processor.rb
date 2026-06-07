@@ -2,7 +2,7 @@
 
 # Process a bulk update request. Parses the request and applies each line in
 # sequence.
-class BulkUpdateRequestProcessor
+class BulkUpdateRequest::Processor
   # Maximum tag size allowed by the rename command before an alias must be used.
   MAXIMUM_RENAME_COUNT = 200
 
@@ -294,16 +294,16 @@ class BulkUpdateRequestProcessor
           tag_implication&.reject!(User.system)
 
         when :mass_update
-          BulkUpdateRequestProcessor.mass_update(args[0], args[1])
+          BulkUpdateRequest::Processor.mass_update(args[0], args[1])
 
         when :nuke
-          BulkUpdateRequestProcessor.nuke(args[0])
+          BulkUpdateRequest::Processor.nuke(args[0])
 
         when :rename
           TagMover.new(args[0], args[1], user: User.system).move!
 
         when :convert
-          BulkUpdateRequestProcessor.convert(args[0], args[1])
+          BulkUpdateRequest::Processor.convert(args[0], args[1])
 
         when :change_category
           tag = Tag.find_or_create_by_name(args[0])
@@ -355,7 +355,7 @@ class BulkUpdateRequestProcessor
     commands.all? do |command, *args|
       case command
       when :create_alias, :rename
-        BulkUpdateRequestProcessor.is_tag_move_allowed?(args[0], args[1])
+        BulkUpdateRequest::Processor.is_tag_move_allowed?(args[0], args[1])
       else
         false
       end
