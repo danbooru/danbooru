@@ -227,7 +227,7 @@ module Source
 
     # @return [Danbooru::Http] The HTTP client to use for downloading files. Extractors can override this to add custom headers or cookies.
     memoize def http_downloader
-      http.timeout(DOWNLOAD_TIMEOUT).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
+      http.timeout(DOWNLOAD_TIMEOUT).max_size(MediaAsset::MAX_FILE_SIZE).use(:spoof_referrer).use(:unpolish_cloudflare)
     end
 
     # Fetch the given URL and return the parsed response, or nil on a non-2xx response. Also tracks whether the

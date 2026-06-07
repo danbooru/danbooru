@@ -18,7 +18,7 @@
 
       <div class="dropzone-hint">
         <div>Choose file or drag image here</div>
-        <div class="hint fineprint !p-0">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>.</div>
+        <div class="hint fineprint !p-0">Max size: <%= number_to_human_size(MediaAsset::MAX_FILE_SIZE) %>.</div>
       </div>
     </div>
   <% end %>

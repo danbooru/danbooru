@@ -14,7 +14,7 @@ class FileUploadComponent < ApplicationComponent
   #   just on the upload widget itself.
   # @param max_file_size [Integer] The max size in bytes of an upload.
   # @param max_files_per_upload [Integer] The maximum number of files per upload.
-  def initialize(url: nil, referer_url: nil, drop_target: nil, max_file_size: Danbooru.config.max_file_size, max_files_per_upload: Upload::MAX_FILES_PER_UPLOAD)
+  def initialize(url: nil, referer_url: nil, drop_target: nil, max_file_size: MediaAsset::MAX_FILE_SIZE, max_files_per_upload: Upload::MAX_FILES_PER_UPLOAD)
     @url = url
     @referer_url = referer_url
     @drop_target = drop_target
