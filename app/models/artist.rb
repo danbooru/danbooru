@@ -217,7 +217,7 @@ class Artist < ApplicationRecord
   module BanMethods
     def unban!(current_user)
       with_lock do
-        BulkUpdateRequestProcessor.mass_update(name, "-status:banned", user: current_user)
+        BulkUpdateRequest::Processor.mass_update(name, "-status:banned", user: current_user)
 
         CurrentUser.scoped(current_user) { update!(is_banned: false) }
         ModAction.log("unbanned artist ##{id}", :artist_unban, subject: self, user: current_user)
@@ -226,7 +226,7 @@ class Artist < ApplicationRecord
 
     def ban!(banner)
       with_lock do
-        BulkUpdateRequestProcessor.mass_update(name, "status:banned", user: banner)
+        BulkUpdateRequest::Processor.mass_update(name, "status:banned", user: banner)
 
         CurrentUser.scoped(banner) { update!(is_banned: true) }
         ModAction.log("banned artist ##{id}", :artist_ban, subject: self, user: banner)
