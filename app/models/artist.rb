@@ -60,7 +60,7 @@ class Artist < ApplicationRecord
 
       self.urls = string.to_s.scan(/[^[:space:]]+/).map do |url|
         is_active, url = ArtistURL.parse_prefix(url)
-        self.urls.find_or_initialize_by(url: url, is_active: is_active)
+        urls.find_or_initialize_by(url: url, is_active: is_active)
       end.uniq(&:url)
 
       self.url_string_changed = (url_string_was != url_string)
@@ -217,7 +217,7 @@ class Artist < ApplicationRecord
   module BanMethods
     def unban!(current_user)
       with_lock do
-        BulkUpdateRequest::Processor.mass_update(name, "-status:banned", user: current_user)
+        BulkUpdateRequest::Command::MassUpdate.mass_update(name, "-status:banned", user: current_user)
 
         CurrentUser.scoped(current_user) { update!(is_banned: false) }
         ModAction.log("unbanned artist ##{id}", :artist_unban, subject: self, user: current_user)
@@ -226,7 +226,7 @@ class Artist < ApplicationRecord
 
     def ban!(banner)
       with_lock do
-        BulkUpdateRequest::Processor.mass_update(name, "status:banned", user: banner)
+        BulkUpdateRequest::Command::MassUpdate.mass_update(name, "status:banned", user: banner)
 
         CurrentUser.scoped(banner) { update!(is_banned: true) }
         ModAction.log("banned artist ##{id}", :artist_ban, subject: self, user: banner)

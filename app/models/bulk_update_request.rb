@@ -16,6 +16,8 @@ class BulkUpdateRequest < ApplicationRecord
 
   has_many :votes, through: :forum_post
 
+  delegate :approval_level, to: :processor
+
   normalizes :script, with: ->(script) { script.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   # XXX these validations must match the forum post validations
@@ -138,10 +140,6 @@ class BulkUpdateRequest < ApplicationRecord
 
   def processor
     @processor ||= BulkUpdateRequest::Processor.new(self)
-  end
-
-  def is_tag_move_allowed?
-    processor.is_tag_move_allowed?
   end
 
   def has_too_many_votes_to_edit?

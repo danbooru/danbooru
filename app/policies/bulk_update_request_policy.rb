@@ -14,7 +14,7 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
   def approve?
     return false if !unbanned? || record.is_approved?
 
-    user.is_admin? || (user.is_builder? && record.is_tag_move_allowed?)
+    user.level >= record.approval_level
   end
 
   def destroy?
