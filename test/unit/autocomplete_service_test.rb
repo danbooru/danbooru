@@ -80,6 +80,29 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_includes("touhou", "TOU", :tag_query)
       end
 
+      should "autocomplete tags by partial prefixes in any word order" do
+        create(:tag, name: "mismatched_thighhighs")
+
+        assert_autocomplete_includes("mismatched_thighhighs", "mis_thighhighs", :tag_query)
+        assert_autocomplete_includes("mismatched_thighhighs", "th_mismatched", :tag_query)
+        assert_autocomplete_includes("mismatched_thighhighs", "mis_thi", :tag_query)
+        assert_autocomplete_includes("mismatched_thighhighs", "thi_mis", :tag_query)
+      end
+
+      should "rank better prefix matches before weaker prefix matches" do
+        create(:tag, name: "thick_thighs", post_count: 10_000)
+        create(:tag, name: "thigh_gap", post_count: 10)
+
+        assert_autocomplete_equals(%w[thigh_gap thick_thighs], "thigh", :tag_query)
+      end
+
+      should "prefer original word order when ranking word matches" do
+        create(:tag, name: "thighhighs_mismatched", post_count: 10_000)
+        create(:tag, name: "mismatched_thighhighs", post_count: 10)
+
+        assert_autocomplete_equals(%w[mismatched_thighhighs thighhighs_mismatched], "mis_thi", :tag_query)
+      end
+
       context "for a tag abbreviation" do
         should "autocomplete abbreviations" do
           create(:tag, name: "mole", post_count: 150)
