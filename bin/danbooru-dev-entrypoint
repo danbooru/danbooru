@@ -2,18 +2,19 @@
 
 # This is the entrypoint for Docker containers started with `bin/dev` or `docker compose -f docker-compose.dev.yaml`.
 
-# Warn if the programs listed in .tool-versions don't match the versions installed in the Docker image.
+# Warn if the ARG *_VERSION values in the Dockerfile don't match the versions installed in the Docker image.
 warn_if_outdated_image() {
-  while read -r tool required_version; do
-    installed_version=${tool^^}_VERSION # RUBY_VERSION, NODE_VERSION, etc
+  versions=$(grep -E '^ARG [A-Z]+_VERSION="' Dockerfile | sed 's/^ARG \([^=]*\)="\([^"]*\)"/\1 \2/' | sort -u)
 
-    if [[ -z ${!installed_version} ]]; then
+  while read -r var_name required_version; do
+    if [[ -z ${!var_name} ]]; then
       out_of_date=true
-    elif [[ $required_version != ${!installed_version} ]]; then
-      echo "Warning: $tool-${!installed_version} is installed, but $tool-$required_version is required."
+    elif [[ $required_version != ${!var_name} ]]; then
+      tool=${var_name%_VERSION}
+      echo "Warning: ${tool,,}-${!var_name} is installed, but ${tool,,}-${required_version} is required."
       out_of_date=true
     fi
-  done < <(sed -e 's/[[:space:]]*#.*// ; /^[[:space:]]*$/d' .tool-versions)
+  done <<< "$versions"
 
   if [[ -n $out_of_date ]]; then
     echo 'Warning: Your docker image is out of date. Run `bin/dev pull` to update if you encounter any errors.'
