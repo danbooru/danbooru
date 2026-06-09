@@ -17,7 +17,7 @@ class PostEdit
   PRE_METATAGS = %w[parent -parent rating source status] + CATEGORIZATION_METATAGS
 
   # Post-metatags rely on the post's ID, so they must be applied after the post is saved to ensure the ID has been created.
-  POST_METATAGS = %w[newpool pool -pool favgroup -favgroup fav -fav child -child upvote downvote disapproved status -status]
+  POST_METATAGS = %w[newpool newfavgroup pool -pool favgroup -favgroup fav -fav child -child upvote downvote disapproved status -status]
 
   METATAGS = PRE_METATAGS + POST_METATAGS
   METATAG_NAME_REGEX = /(#{METATAGS.join("|")}):/io
@@ -140,7 +140,7 @@ class PostEdit
 
       name = name.delete_suffix(":").downcase
       name = TagCategory.short_name_mapping.fetch(name, name) # 'art:bkub' => 'artist:bkub'
-      value = value.downcase unless name.in?(["newpool", "source"])
+      value = value.downcase unless name.in?(["newpool", "newfavgroup", "source"])
       value = value.gsub(/[[:space:]]/, "_") unless name == "source"
 
       Metatag.new(name: name, value: value)
