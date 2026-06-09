@@ -539,6 +539,17 @@ class Post < ApplicationRecord
             pool.add!(self)
           end
 
+        in "newfavgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id(name, CurrentUser.user)
+
+          # XXX race condition
+          if favgroup.nil?
+            FavoriteGroup.create!(name: name, creator: CurrentUser.user, post_ids: [id])
+          else
+            raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
+            favgroup.add(self)
+          end
+
         in "fav", name
           raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
           Favorite.create(post: self, user: CurrentUser.user)
