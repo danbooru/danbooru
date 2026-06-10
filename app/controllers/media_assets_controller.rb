@@ -20,6 +20,9 @@ class MediaAssetsController < ApplicationController
       @visible_uma = @media_asset.upload_media_assets.visible(CurrentUser.user).select("*, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY id DESC) AS n")
       @visible_uma = UploadMediaAsset.from(@visible_uma).where("n < 6").select("*").order(id: :desc)
       @visible_uma = @visible_uma.includes(upload: :uploader)
+      @visible_dtext_links = @media_asset.dtext_links.includes(:model).visible(CurrentUser.user).limit(20)
+      @visible_dtext_links += @media_asset.post&.dtext_links&.includes(:model)&.visible(CurrentUser.user)&.limit(20).to_a
+      @visible_dtext_links.sort_by! { [it.model_type, it.model_id] }
     end
 
     if CurrentUser.is_owner? && request.format.symbol.in?(%i[jpeg webp avif])
