@@ -34,7 +34,7 @@ class PostPolicy < ApplicationPolicy
   end
 
   def move_favorites?
-    user.is_approver? && record.fav_count > 0 && record.parent_id.present?
+    unbanned? && user.is_approver? && record.fav_count > 0 && record.parent_id.present?
   end
 
   def regenerate?
@@ -42,7 +42,7 @@ class PostPolicy < ApplicationPolicy
   end
 
   def delete?
-    user.is_approver? && !record.is_deleted?
+    unbanned? && user.is_approver? && !record.is_deleted?
   end
 
   def destroy?
@@ -50,11 +50,11 @@ class PostPolicy < ApplicationPolicy
   end
 
   def ban?
-    user.is_approver? && !record.is_banned?
+    unbanned? && user.is_approver? && !record.is_banned?
   end
 
   def unban?
-    user.is_approver? && record.is_banned?
+    unbanned? && user.is_approver? && record.is_banned?
   end
 
   def expunge?

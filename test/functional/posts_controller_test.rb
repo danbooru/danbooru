@@ -1096,6 +1096,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(0, @post.flags.count)
       end
 
+      should "not allow banned approvers to delete the post" do
+        @banned_approver = create(:banned_user, level: User::Levels::APPROVER)
+        delete_auth post_path(@post), @banned_approver, params: { commit: "Delete", post: { reason: "test" }}
+
+        assert_response 403
+        assert_equal(false, @post.reload.is_deleted?)
+      end
+
       should "render the delete post dialog for an xhr request" do
         delete_auth post_path(@post), @approver, xhr: true
 

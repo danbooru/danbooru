@@ -47,6 +47,21 @@ module Moderator
               assert_equal([], @child.favorites.map(&:user_id))
             end
           end
+
+          should "not allow banned approvers to move favorites" do
+            as(@user) do
+              @parent = create(:post)
+              @child = create(:post, parent: @parent)
+            end
+            users = create_list(:user, 2)
+            users.each { |u| Favorite.create!(post: @child, user: u) }
+
+            @banned_approver = create(:banned_user, level: User::Levels::APPROVER)
+            post_auth move_favorites_moderator_post_post_path(@child.id), @banned_approver, params: { commit: "Submit" }
+
+            assert_response 403
+            assert_equal([], @parent.reload.favorites.to_a)
+          end
         end
 
         context "expunge action" do
@@ -65,6 +80,14 @@ module Moderator
             assert_redirected_to @post
             assert_equal(true, @post.reload.is_banned?)
           end
+
+          should "not allow banned approvers to ban posts" do
+            @banned_approver = create(:banned_user, level: User::Levels::APPROVER)
+            post_auth ban_moderator_post_post_path(@post), @banned_approver
+
+            assert_response 403
+            assert_equal(false, @post.reload.is_banned?)
+          end
         end
 
         context "unban action" do
@@ -74,6 +97,15 @@ module Moderator
 
             assert_redirected_to(@post)
             assert_equal(false, @post.reload.is_banned?)
+          end
+
+          should "not allow banned approvers to unban posts" do
+            @post.update!(is_banned: true)
+            @banned_approver = create(:banned_user, level: User::Levels::APPROVER)
+            post_auth unban_moderator_post_post_path(@post), @banned_approver
+
+            assert_response 403
+            assert_equal(true, @post.reload.is_banned?)
           end
         end
       end

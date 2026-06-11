@@ -2,7 +2,7 @@
 
 class PostApprovalPolicy < ApplicationPolicy
   def create?
-    user.is_approver?
+    unbanned? && user.is_approver?
   end
 
   def can_approve_own_uploads?

@@ -10,11 +10,11 @@ class PoolPolicy < ApplicationPolicy
   end
 
   def destroy?
-    !record.is_deleted? && user.is_builder?
+    unbanned? && !record.is_deleted? && user.is_builder?
   end
 
   def undelete?
-    record.is_deleted? && user.is_builder?
+    unbanned? && record.is_deleted? && user.is_builder?
   end
 
   def revert?

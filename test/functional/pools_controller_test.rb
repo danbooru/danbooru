@@ -100,6 +100,14 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @pool.reload.is_deleted?)
         assert_equal("Pool deleted", flash[:notice])
       end
+
+      should "not allow banned builders to delete a pool" do
+        @banned_builder = create(:banned_user, level: User::Levels::BUILDER)
+        delete_auth pool_path(@pool), @banned_builder
+
+        assert_response 403
+        assert_equal(false, @pool.reload.is_deleted?)
+      end
     end
 
     context "undelete action" do
@@ -110,6 +118,15 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to @pool
         assert_equal(false, @pool.reload.is_deleted?)
         assert_equal("Pool undeleted", flash[:notice])
+      end
+
+      should "not allow banned builders to undelete a pool" do
+        @pool = as(@mod) { create(:pool, is_deleted: true) }
+        @banned_builder = create(:banned_user, level: User::Levels::BUILDER)
+        post_auth undelete_pool_path(@pool), @banned_builder
+
+        assert_response 403
+        assert_equal(true, @pool.reload.is_deleted?)
       end
     end
 
