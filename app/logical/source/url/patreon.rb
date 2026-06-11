@@ -71,6 +71,12 @@ class Source::URL::Patreon < Source::URL
       @username = username
       @shop_title, _, @shop_item_id = slug.rpartition("-")
 
+    # https://www.patreon.com/PrincessHinghoi/posts/yada-yada-desu-160554516
+    in _, "patreon.com", username, "posts", /([\d\w-]+)-(\d+)/ unless username.in?(RESERVED_USERNAMES)
+      @username = username
+      @title = Regexp.last_match(1)
+      @post_id = Regexp.last_match(2)
+
     # https://www.patreon.com/1041uuu
     # https://www.patreon.com/1041uuu/about
     in _, "patreon.com", username, *rest unless username.in?(RESERVED_USERNAMES)
@@ -93,7 +99,9 @@ class Source::URL::Patreon < Source::URL
   end
 
   def page_url
-    if title.present? && post_id.present?
+    if username.present? && title.present? && post_id.present?
+      "https://www.patreon.com/#{username}/posts/#{title}-#{post_id}"
+    elsif title.present? && post_id.present?
       "https://www.patreon.com/posts/#{title}-#{post_id}"
     elsif username.present? && shop_title.present? && shop_item_id.present?
       "https://www.patreon.com/#{username}/shop/#{shop_title}-#{shop_item_id}"

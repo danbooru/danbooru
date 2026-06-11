@@ -15,6 +15,7 @@ module Source::Tests::URL
         "https://www.patreon.com/posts/sparkle-71057815",
         "https://www.patreon.com/api/posts/71057815",
         "https://www.patreon.com/nlch/shop/simple-life-with-my-unobtrusive-girl-1157344",
+        "https://www.patreon.com/PrincessHinghoi/posts/yada-yada-desu-160554516",
       )
 
       should be_profile_url(
