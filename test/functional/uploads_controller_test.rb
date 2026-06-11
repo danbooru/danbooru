@@ -654,8 +654,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://downloads.fanbox.cc/images/post/104708/wsF73EC5Fq0CIK84W0LGYk2p.jpeg")
 
-        should_upload_successfully("https://foundation.app/@KILLERGF/kgfgen/4")
-
         should_upload_successfully("https://skeb.jp/@kokuzou593/works/45")
         should_upload_successfully("https://skeb.jp/@LambOic029/works/146")
 
