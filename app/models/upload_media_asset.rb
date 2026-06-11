@@ -29,7 +29,7 @@ class UploadMediaAsset < ApplicationRecord
   scope :expired, -> { unfinished.where(created_at: ..4.hours.ago) }
 
   def self.visible(user)
-    if user.is_admin?
+    if user.is_moderator?
       all
     elsif user.is_anonymous?
       none
