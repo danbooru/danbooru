@@ -24,6 +24,7 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         @user2 = create(:user)
         @upload1 = create(:completed_source_upload, uploader: @user1)
         @upload2 = create(:completed_source_upload, uploader: @user2, upload_media_assets: [build(:upload_media_asset, media_asset: @upload1.media_assets.first)])
+        @post = create(:post, media_asset: @upload1.media_assets.first)
       end
 
       should "render" do
@@ -71,6 +72,24 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         get_auth media_asset_path(@upload1.media_assets.first), create(:moderator_user)
         assert_select "a[href='/uploads/#{@upload1.id}']", count: 1, text: "##{@upload1.id}"
         assert_select "a[href='/uploads/#{@upload2.id}']", count: 1, text: "##{@upload2.id}"
+      end
+
+      should "show links to embeds" do
+        @comment = create(:comment, body: "!asset ##{@upload1.media_assets.first.id}")
+        get media_asset_path(@upload1.media_assets.first)
+        assert_select "a[href='/comments/#{@comment.id}']", count: 1, text: "##{@comment.id}"
+      end
+
+      should "not show embedding dtext links in non-visible models" do
+        @mod_topic = create(:forum_topic, min_level: User::Levels::MODERATOR, original_post: build(:forum_post, body: "!asset ##{@upload2.media_assets.first}"))
+        get media_asset_path(@upload2.media_assets.first)
+        assert_not_select "a[href='/forum_posts/#{@mod_topic.original_post.id}']"
+      end
+
+      should "show links to embeds of the post" do
+        @comment = create(:comment, body: "!post ##{@post.id}")
+        get media_asset_path(@post.media_asset)
+        assert_select "a[href='/comments/#{@comment.id}']", count: 1, text: "##{@comment.id}"
       end
     end
 

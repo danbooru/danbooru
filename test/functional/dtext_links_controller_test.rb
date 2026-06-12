@@ -9,6 +9,8 @@ class DtextLinksControllerTest < ActionDispatch::IntegrationTest
       @wiki = create(:wiki_page, title: "case", body: "[[test]]")
       @forum = create(:forum_post, topic: build(:forum_topic, title: "blah"), body: "[[case]]")
       @pool = create(:pool, description: "[[case]]")
+      @comment = create(:comment, body: "[[baz]]\n!asset #1")
+      @deleted_comment = create(:comment, body: "[[baz]]\n!asset #1", is_deleted: true)
       create(:tag, name: "test")
     end
   end
@@ -19,7 +21,7 @@ class DtextLinksControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
 
-    should respond_to_search.with { @pool.dtext_links + @forum.dtext_links + @wiki.dtext_links }
+    should respond_to_search.with { (@pool.dtext_links + @forum.dtext_links + @wiki.dtext_links + @comment.dtext_links).sort_by { -it.id } }
     should respond_to_search(ForumPost: { topic: { min_level: 40 }}).with { [] }
     should respond_to_search(ForumPost: { topic: { min_level: 40 }}).as_user { create(:moderator_user) }.with { @secret_forum.dtext_links }
 
@@ -30,5 +32,8 @@ class DtextLinksControllerTest < ActionDispatch::IntegrationTest
     should respond_to_search(has_linked_wiki: "true").with { @pool.dtext_links + @forum.dtext_links }
     should respond_to_search(ForumPost: { topic: { title_matches: "blah" }}).with { @forum.dtext_links }
     should respond_to_search(ForumPost: { topic: { title_matches: "nah" }}).with { [] }
+    should respond_to_search(model_type: "Comment").with { @comment.dtext_links.sort_by { -it.id } }
+    should respond_to_search(model_type: "Comment").as_user { @mod }.with { (@deleted_comment.dtext_links + @comment.dtext_links).sort_by { -it.id } }
+    should respond_to_search(link_type: :embedded_media_asset).with { @comment.dtext_links.last }
   end
 end

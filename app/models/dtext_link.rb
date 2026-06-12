@@ -20,16 +20,19 @@ class DtextLink < ApplicationRecord
   scope :wiki_page, -> { where(model_type: "WikiPage") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
   scope :pool, -> { where(model_type: "Pool") }
+  scope :comment, -> { where(model_type: "Comment") }
   scope :embedded_media, -> { where(link_type: %i[embedded_post embedded_media_asset]) }
 
   def self.visible(user)
+    # Deleted comments are technically still visible, so we can't use `Comment.visible(user)`.
+    comment_subquery = Pundit.policy(user, Comment).can_see_deleted? ? Comment.unscoped : Comment.undeleted
     # XXX the double negation is to prevent postgres from choosing a bad query
     # plan (it doesn't know that most forum posts aren't mod-only posts).
-    wiki_page.or(forum_post.where.not(model_id: ForumPost.not_visible(user))).or(pool)
+    wiki_page.or(forum_post.where.not(model_id: ForumPost.not_visible(user))).or(pool).or(comment.where(model_id: comment_subquery))
   end
 
   def self.model_types
-    %w[WikiPage ForumPost Pool]
+    %w[WikiPage ForumPost Pool Comment]
   end
 
   # @param dtext [DText]
