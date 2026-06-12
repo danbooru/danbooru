@@ -15,6 +15,14 @@ module ApplicationHelper
     ((fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?)) ? types[0] : types[1])
   end
 
+  def reordered?(array, other_array)
+    ((array - other_array) | (other_array - array)).none? && array != other_array
+  end
+
+  def diff_list_order_html(this_list, other_list, ul_class: ["diff-list"], li_class: [], show_unchanged: true)
+    render "diff_order", this_list: this_list, other_list: other_list, ul_class: ul_class, li_class: li_class, show_unchanged: show_unchanged
+  end
+
   def diff_list_html(this_list, other_list, ul_class: ["diff-list"], li_class: [], show_unchanged: true)
     diff = SetDiff.new(this_list, other_list)
     render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class, show_unchanged: show_unchanged
@@ -46,7 +54,7 @@ module ApplicationHelper
         (!record.has_attribute?(field) && record.send(field, type))
     end
 
-    statuses = changed_fields.map { |field, status| status }
+    statuses = changed_fields.map(&:second)
     altered = record.updater_id != other.updater_id
 
     tag.div(class: "version-statuses", "data-altered": altered) do

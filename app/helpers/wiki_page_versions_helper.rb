@@ -3,14 +3,18 @@
 module WikiPageVersionsHelper
   def wiki_version_show_diff(wiki_page_version, type)
     other = wiki_page_version.send(type)
-    other.present? && ((wiki_page_version.body != other.body) || wiki_page_version.other_names_changed(type))
+    other.present? && ((wiki_page_version.body != other.body) || wiki_page_version.other_names_changed?(type) || wiki_page_version.other_names_reordered?(type))
   end
 
   def wiki_version_other_names_diff(this_version, other_version)
     this_names = this_version.other_names
     other_names = other_version.other_names
 
-    diff_list_html(this_names, other_names, ul_class: ["wiki-other-names-diff-list flex flex-wrap gap-1"], li_class: ["wiki-other-name chip-primary text-sm truncate"])
+    if reordered?(this_names, other_names)
+      diff_list_order_html(this_names, other_names, ul_class: ["wiki-other-names-diff-list flex flex-wrap gap-1 mb-2"], li_class: ["wiki-other-name chip-primary text-sm truncate"])
+    else
+      diff_list_html(this_names, other_names, ul_class: ["wiki-other-names-diff-list flex flex-wrap gap-1"], li_class: ["wiki-other-name chip-primary text-sm truncate"])
+    end
   end
 
   def wiki_version_title_diff(wiki_page_version, type)
