@@ -338,6 +338,23 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} filetype:jpg")
     end
 
+    should "return posts for the ordvote:<name> metatag" do
+      post1 = create(:post)
+      post2 = create(:post)
+
+      create(:post_vote, post: post1, user: CurrentUser.user, score: 1)
+      create(:post_vote, post: post2, user: CurrentUser.user, score: -1)
+
+      assert_tag_match([post2, post1], "ordvote:#{CurrentUser.user.name}")
+      assert_tag_match([], "ordvote:does_not_exist")
+
+      assert_tag_match([post2, post1], "ordvote:#{CurrentUser.user.name} commentary:false")
+      assert_tag_match([post1], "ordvote:#{CurrentUser.user.name} upvotes:>0")
+      assert_tag_match([post2], "ordvote:#{CurrentUser.user.name} downvotes:>0")
+      assert_tag_match([post2, post1], "ordvote:#{CurrentUser.user.name} comments:0")
+      assert_tag_match([post2, post1], "ordvote:#{CurrentUser.user.name} -has:comments")
+    end
+
     should "return posts for the pool:<name> metatag" do
       SqsService.any_instance.stubs(:send_message)
 
@@ -1657,14 +1674,17 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     should "not allow conflicting order metatags" do
       assert_search_error("order:score ordfav:a")
+      assert_search_error("order:score ordvote:a")
       assert_search_error("order:score ordfavgroup:a")
       assert_search_error("order:score ordpool:a")
       assert_search_error("ordfav:a ordpool:b")
+      assert_search_error("ordvote:a ordpool:b")
     end
 
     should "not allow metatags that can't be used more than once" do
       assert_search_error("order:score order:favcount")
       assert_search_error("ordfav:a ordfav:b")
+      assert_search_error("ordvote:a ordvote:b")
       assert_search_error("ordfavgroup:a ordfavgroup:b")
       assert_search_error("ordpool:a ordpool:b")
       assert_search_error("limit:5 limit:10")
@@ -1674,6 +1694,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "not allow non-negatable metatags to be negated" do
       assert_search_error("-order:score")
       assert_search_error("-ordfav:a")
+      assert_search_error("-ordvote:a")
       assert_search_error("-ordfavgroup:a")
       assert_search_error("-ordpool:a")
       assert_search_error("-limit:20")
@@ -1683,6 +1704,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "not allow non-OR'able metatags to be OR'd" do
       assert_search_error("a or order:score")
       assert_search_error("a or ordfav:a")
+      assert_search_error("a or ordvote:a")
       assert_search_error("a or ordfavgroup:a")
       assert_search_error("a or ordpool:a")
       assert_search_error("a or limit:20")
