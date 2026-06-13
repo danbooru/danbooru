@@ -2,6 +2,6 @@
 
 class UploadMediaAssetPolicy < ApplicationPolicy
   def show?
-    user.is_admin? || record.upload.uploader_id == user.id
+    user.is_moderator? || record.upload.uploader_id == user.id
   end
 end

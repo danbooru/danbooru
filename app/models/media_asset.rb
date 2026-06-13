@@ -582,7 +582,7 @@ class MediaAsset < ApplicationRecord
   end
 
   def source_urls
-    urls = upload_media_assets.map do |uma|
+    urls = upload_media_assets.limit(10).map do |uma|
       Source::URL.page_url(uma.source_url) || Source::URL.page_url(uma.page_url) || uma.page_url || uma.source_url
     end
 
