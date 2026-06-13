@@ -142,7 +142,7 @@ module Source::Tests::Extractor
         strategy_should_work(
           "https://safebooru.org//images/4010/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg?4189916",
           image_urls: ["https://safebooru.org//images/4010/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg?4189916"],
-          artist_name: "チー之介",
+          artist_name: "チー之介@リクエスト受付中",
           profile_url: "https://www.pixiv.net/users/57673194",
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume violet_eyes white_shirt wings rating:q ウマ娘 ライスシャワー ハロウィンイラスト 二次創作 ウマ娘プリティーダービー ライスシャワー(ウマ娘) 更衣室 Make_up_Vampire! ドラキュライス 困り顔],
           artist_commentary_title: "ハロウィンライス",
@@ -170,7 +170,7 @@ module Source::Tests::Extractor
           "https://safebooru.org//images/4010/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg",
           referer: "https://safebooru.org/index.php?page=post&s=view&id=4189916",
           image_urls: ["https://safebooru.org//images/4010/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
-          artist_name: "チー之介",
+          artist_name: "チー之介@リクエスト受付中",
           profile_url: "https://www.pixiv.net/users/57673194",
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume violet_eyes white_shirt wings rating:q ウマ娘 ライスシャワー ハロウィンイラスト 二次創作 ウマ娘プリティーダービー ライスシャワー(ウマ娘) 更衣室 Make_up_Vampire! ドラキュライス 困り顔],
           artist_commentary_title: "ハロウィンライス",
@@ -184,7 +184,7 @@ module Source::Tests::Extractor
         strategy_should_work(
           "https://safebooru.org/index.php?page=post&s=view&id=4189916",
           image_urls: ["https://safebooru.org/images/4010/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
-          artist_name: "チー之介",
+          artist_name: "チー之介@リクエスト受付中",
           profile_url: "https://www.pixiv.net/users/57673194",
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume violet_eyes white_shirt wings rating:q ウマ娘 ライスシャワー ハロウィンイラスト 二次創作 ウマ娘プリティーダービー ライスシャワー(ウマ娘) 更衣室 Make_up_Vampire! ドラキュライス 困り顔],
           artist_commentary_title: "ハロウィンライス",
@@ -198,7 +198,7 @@ module Source::Tests::Extractor
         strategy_should_work(
           "https://safebooru.org/index.php?page=post&s=list&md5=8ca0f76e014175f11085d64932d980a5",
           image_urls: ["https://safebooru.org/images/4010/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
-          artist_name: "チー之介",
+          artist_name: "チー之介@リクエスト受付中",
           profile_url: "https://www.pixiv.net/users/57673194",
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim long_hair looking_at_viewer make_up_in_halloween!_(umamusume) official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt skirt_bow solo spider_web_print standing star_ornament twitter_username umamusume violet_eyes white_shirt wings rating:q ウマ娘 ライスシャワー ハロウィンイラスト 二次創作 ウマ娘プリティーダービー ライスシャワー(ウマ娘) 更衣室 Make_up_Vampire! ドラキュライス 困り顔],
           artist_commentary_title: "ハロウィンライス",
@@ -233,7 +233,7 @@ module Source::Tests::Extractor
         strategy_should_work(
           "https://tbib.org//images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg?11480218",
           image_urls: ["https://tbib.org//images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg?11480218"],
-          artist_name: "チー之介",
+          artist_name: "チー之介@リクエスト受付中",
           profile_url: "https://www.pixiv.net/users/57673194",
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bow_skirt bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim locker locker_room long_hair looking_at_viewer make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
           artist_commentary_title: "ハロウィンライス",
@@ -261,7 +261,7 @@ module Source::Tests::Extractor
           "https://tbib.org//images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg",
           referer: "https://tbib.org/index.php?page=post&s=view&id=11480218",
           image_urls: ["https://tbib.org//images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
-          artist_name: "チー之介",
+          artist_name: "チー之介@リクエスト受付中",
           profile_url: "https://www.pixiv.net/users/57673194",
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bow_skirt bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim locker locker_room long_hair looking_at_viewer make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
           artist_commentary_title: "ハロウィンライス",
@@ -275,7 +275,7 @@ module Source::Tests::Extractor
         strategy_should_work(
           "https://tbib.org/index.php?page=post&s=view&id=11480218",
           image_urls: ["https://tbib.org/images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
-          artist_name: "チー之介",
+          artist_name: "チー之介@リクエスト受付中",
           profile_url: "https://www.pixiv.net/users/57673194",
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bow_skirt bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim locker locker_room long_hair looking_at_viewer make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
           artist_commentary_title: "ハロウィンライス",
@@ -289,7 +289,7 @@ module Source::Tests::Extractor
         strategy_should_work(
           "https://tbib.org/index.php?page=post&s=list&md5=8ca0f76e014175f11085d64932d980a5",
           image_urls: ["https://tbib.org/images/10725/febe33d5f6d46e21c073289bb9884d4e0630761c.jpg"],
-          artist_name: "チー之介",
+          artist_name: "チー之介@リクエスト受付中",
           profile_url: "https://www.pixiv.net/users/57673194",
           tags: %w[1girl ^^^ animal_ears black_bow black_bowtie black_gloves black_hair black_hairband black_skirt black_wings blue_flower blue_rose bow bow_skirt bowtie brooch center_frills changing_room cheesecake_(artist) collared_shirt commentary dated demon_wings fangs flower flying_sweatdrops frilled_hairband frilled_sleeves frills frown gloves hair_flower hair_ornament hair_over_one_eye hairband halloween halloween_costume high-waist_skirt highres horse_ears horse_girl indoors jack-o'-lantern_ornament jewelry lace-trimmed_gloves lace_trim locker locker_room long_hair looking_at_viewer make_up_vampire! official_alternate_costume open_mouth orange_bow puffy_short_sleeves puffy_sleeves purple_eyes rating:q rice_shower_(make_up_vampire!)_(umamusume) rice_shower_(umamusume) rose shirt short_sleeves skirt solo spider_web_print standing star_ornament twitter_username umamusume white_shirt wings ウマ娘 ウマ娘プリティーダービー ドラキュライス ハロウィンイラスト ライスシャワー ライスシャワー(ウマ娘) 二次創作 困り顔 更衣室],
           artist_commentary_title: "ハロウィンライス",
