@@ -37,7 +37,8 @@ class WikiPageVersion < ApplicationRecord
   def self.status_fields
     {
       body: "Body",
-      other_names_changed: "OtherNames",
+      other_names_changed?: "OtherNames",
+      other_names_reordered?: "OtherNamesOrder",
       title: "Renamed",
       was_deleted: "Deleted",
       was_undeleted: "Undeleted",
@@ -46,9 +47,14 @@ class WikiPageVersion < ApplicationRecord
     }
   end
 
-  def other_names_changed(type)
+  def other_names_changed?(type)
     other = send(type)
-    ((other_names - other.other_names) | (other.other_names - other_names)).length.positive?
+    ((other_names - other.other_names) | (other.other_names - other_names)).any?
+  end
+
+  def other_names_reordered?(type)
+    other = send(type)
+    !other_names_changed?(type) && other.other_names != other_names
   end
 
   def was_deleted(type)
