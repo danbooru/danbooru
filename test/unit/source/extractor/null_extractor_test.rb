@@ -33,6 +33,23 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A null source with a referer" do
+      strategy_should_work(
+        # "http://nghttp2.org/httpbin/image/jpeg",
+        "http://139.162.123.134/httpbin/image/jpeg",
+        referer: "https://discord.com/channels/1234567890/1234567890/1234567890",
+        image_urls: %w[http://139.162.123.134/httpbin/image/jpeg],
+        media_files: [{ file_size: 35_588 }],
+        page_url: "https://discord.com/channels/1234567890/1234567890/1234567890",
+        profile_urls: %w[],
+        display_name: nil,
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: nil,
+        dtext_artist_commentary_desc: nil,
+      )
+    end
+
     context "A file:// source" do
       strategy_should_work(
         "file://image.jpg",
