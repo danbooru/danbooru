@@ -10,6 +10,7 @@ module ExtractorTestHelper
   class_methods do
     def strategy_should_work(url, arguments = {})
       # XXX: can't use **kwargs because of a bug with shoulda-context
+      call_location = caller_locations.find { |loc| loc.path.end_with?("_test.rb") }&.to_s || caller_locations(1, 1).first.to_s
       referer = arguments.delete(:referer)
       deleted = arguments.delete(:deleted)
       media_files = arguments.delete(:media_files)
@@ -67,6 +68,8 @@ module ExtractorTestHelper
         end
 
         should_match_source_data(strategy, arguments)
+      rescue Minitest::Assertion => e
+        raise e.exception("Defined at: #{call_location}\n#{e.message}")
       end
     end
   end
