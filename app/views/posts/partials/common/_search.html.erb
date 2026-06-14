@@ -1,7 +1,9 @@
 <%# path, tags %>
 
 <section id="search-box">
-  <h2>Search</h2>
+  <h2>
+    Search <%= help_tooltip embed_wiki("help:search_notice", classes: "text-xs"), link_class: "inactive-link", tooltip_options: { "tippy-placement": "right" } %>
+  </h2>
 
   <%= form_tag(path, method: "get", id: "search-box-form", class: "flex") do %>
     <% if current_page?(action: "index") %>
