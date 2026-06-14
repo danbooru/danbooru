@@ -43,7 +43,7 @@ class CategoryCommandTest < ActiveSupport::TestCase
 
         assert_invalid_bur(
           script: "category noizave -> general",
-          errors: ["Can't change the category of [[noizave]] to general ([[noizave]] must be an Artist tag)"],
+          errors: ["Can't change the category of [[noizave]] to general ([[noizave]] has an artist entry)"],
         )
       end
     end
