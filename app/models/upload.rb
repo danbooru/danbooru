@@ -145,6 +145,12 @@ class Upload < ApplicationRecord
       q = q.where(id: Upload.where.missing(:posts))
     end
 
+    if params[:is_hidden].to_s.truthy?
+      q = q.where(id: Upload.joins(:upload_media_assets).merge(UploadMediaAsset.hidden).select(:id))
+    elsif params[:is_hidden].to_s.falsy?
+      q = q.where.not(id: Upload.joins(:upload_media_assets).merge(UploadMediaAsset.hidden).select(:id))
+    end
+
     if params[:any_source_matches].present?
       q = q.any_source_matches(params[:any_source_matches])
     end
