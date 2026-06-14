@@ -196,7 +196,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "#destroy action" do
       should "delete the user when given the correct password" do
-        delete_auth user_path(@user), @user, params: { user: { password: "password" }}
+        delete_auth user_path(@user), @user, params: { user: { password: "correct horse battery staple" }}
 
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
@@ -209,7 +209,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not delete the user when given an incorrect password" do
-        delete_auth user_path(@user), @user, params: { user: { password: "hunter2" }}
+        delete_auth user_path(@user), @user, params: { user: { password: "secure-delete-pass-789" }}
 
         assert_redirected_to deactivate_user_path(@user)
         assert_equal(false, @user.reload.is_deleted?)
@@ -233,13 +233,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow users to delete other users" do
-        delete_auth user_path(@user), create(:user), params: { user: { password: "password" }}
+        delete_auth user_path(@user), create(:user), params: { user: { password: "correct horse battery staple" }}
 
         assert_response 403
       end
 
       should "not allow logged-out users to delete other users" do
-        delete user_path(@user), params: { user: { password: "password" }}
+        delete user_path(@user), params: { user: { password: "correct horse battery staple" }}
 
         assert_response 403
       end
@@ -451,12 +451,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a user" do
         freeze_time
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+        post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
         assert_equal(User::Levels::MEMBER, User.last.level)
-        assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
+        assert_equal(User.last, User.last.authenticate_password("correct horse battery staple"))
         assert_nil(User.last.email_address)
         assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
         assert_no_enqueued_jobs
@@ -470,11 +470,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "create a user with a valid email" do
         freeze_time
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "webmaster@danbooru.donmai.us" }}}
+        post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple", email_address: { address: "webmaster@danbooru.donmai.us" }}}
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
-        assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
+        assert_equal(User.last, User.last.authenticate_password("correct horse battery staple"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
         assert_equal(false, User.last.email_address.is_verified?)
         assert_equal(true, User.last.user_events.user_creation.exists?(login_session_id: User.last.login_sessions.last.login_id))
@@ -493,18 +493,18 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "redirect to the given URL after creating a user" do
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, url: comments_path }
+        post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }, url: comments_path }
         assert_redirected_to comments_url
       end
 
       should "not redirect to an offsite URL after creating a user" do
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, url: "https://evil.com" }
+        post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }, url: "https://evil.com" }
         assert_response 403
       end
 
       should "not create a user with an invalid name" do
         assert_no_difference("User.count") do
-          post users_path, params: { user: { name: "x" * 100, password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "x" * 100, password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_response :success
           assert_nil(session[:user_id])
@@ -528,7 +528,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not create a user with a mismatched password" do
         assert_no_difference("User.count") do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx2" }}
+          post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "different horse battery staple" }}
 
           assert_response :success
           assert_nil(session[:user_id])
@@ -540,7 +540,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not create a user with an invalid email" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "test" }}}
+          post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple", email_address: { address: "test" }}}
 
           assert_response :success
           assert_nil(session[:user_id])
@@ -552,7 +552,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not create a user with an undeliverable email address" do
         assert_no_difference(["User.count", "EmailAddress.count"]) do
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address: { address: "nobody@nothing.donmai.us" }}}
+          post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple", email_address: { address: "nobody@nothing.donmai.us" }}}
 
           assert_response :success
           assert_nil(session[:user_id])
@@ -564,7 +564,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow logged-in users to create new accounts" do
         assert_no_difference("User.count") do
-          post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post_auth users_path, @user, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_response 403
         end
@@ -577,7 +577,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           Danbooru.config.stubs(:captcha_secret_key).returns("2x0000000000000000000000000000000AA") # always fails
 
           assert_no_difference(["User.count"]) do
-            post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+            post users_path, params: { "user": { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }, "cf-turnstile-response": "blah" }
 
             assert_response 401
           end
@@ -587,7 +587,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
           Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA") # always passes
 
-          post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+          post users_path, params: { "user": { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }, "cf-turnstile-response": "blah" }
 
           assert_redirected_to User.last
           assert_equal("xxx", User.last.name)
@@ -604,7 +604,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         should "not create a user if the captcha response is missing" do
           assert_no_difference(["User.count"]) do
-            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+            post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
             assert_response 401
           end
@@ -612,7 +612,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         should "not create a user if the captcha response is invalid" do
           assert_no_difference(["User.count"]) do
-            post users_path, params: { "user": { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, "cf-turnstile-response": "blah" }
+            post users_path, params: { "user": { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }, "cf-turnstile-response": "blah" }
 
             assert_response 401
           end
@@ -630,7 +630,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         should "work for a public IPv6 address" do
           self.remote_addr = @valid_ipv6
 
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_redirected_to User.last
           assert_equal(true, User.last.is_member?)
@@ -643,7 +643,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           skip unless IpLookup.enabled?
           self.remote_addr = @proxy_ip
 
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_redirected_to User.last
           assert_equal(false, User.last.is_member?)
@@ -656,7 +656,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           self.remote_addr = @valid_ip
 
           @ip_ban = create(:ip_ban, ip_addr: remote_addr, category: :partial)
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_redirected_to User.last
           assert_equal(false, User.last.is_member?)
@@ -671,7 +671,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           skip unless IpLookup.enabled?
           self.remote_addr = @valid_ip
 
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_redirected_to User.last
           assert_equal(true, User.last.is_member?)
@@ -684,7 +684,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           self.remote_addr = @valid_ip
 
           create(:user_event, created_at: 1.hour.ago, category: :login, ip_addr: @valid_ip)
-          post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "dupe", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_redirected_to User.last
           assert_equal(false, User.last.is_member?)
@@ -697,7 +697,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           self.remote_addr = @valid_ip
 
           create(:user, last_logged_in_at: 1.hour.ago, last_ip_addr: @valid_ip)
-          post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "dupe", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_redirected_to User.last
           assert_equal(false, User.last.is_member?)
@@ -712,7 +712,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           get new_user_path # create a session
           create(:user_event, category: :login, session_id: session[:session_id])
 
-          post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "dupe", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_redirected_to User.last
           assert_equal(false, User.last.is_member?)
@@ -724,7 +724,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         should "not mark users signing up from localhost as restricted" do
           self.remote_addr = "127.0.0.1"
 
-          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          post users_path, params: { user: { name: "xxx", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }}
 
           assert_redirected_to User.last
           assert_equal(true, User.last.is_member?)

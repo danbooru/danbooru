@@ -130,7 +130,7 @@ class UserTest < ActiveSupport::TestCase
     end
 
     should "authenticate password" do
-      assert_equal(@user, @user.authenticate_password("password"))
+      assert_equal(@user, @user.authenticate_password("correct horse battery staple"))
       assert_equal(false, @user.authenticate_password("password2"))
     end
 

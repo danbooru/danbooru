@@ -145,16 +145,16 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     context "update action" do
       context "for a user without 2FA enabled" do
         setup do
-          @user = create(:user, password: "old_password")
+          @user = create(:user, password: "strong-old-passphrase")
         end
 
         should "change the user's password when given a valid new password" do
           freeze_time
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password" })
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "correct horse battery staple" })
 
           assert_redirected_to @user
           assert_equal(@user.id, session[:user_id])
-          assert_equal(true, @user.reload.authenticate_password("password").present?)
+          assert_equal(true, @user.reload.authenticate_password("correct horse battery staple").present?)
           assert_equal(true, @user.user_events.login.exists?(login_session_id: @user.login_sessions.last.login_id))
           assert_equal(true, @user.user_events.password_reset.exists?(login_session_id: nil))
           assert_equal(true, @user.login_sessions.exists?)
@@ -165,11 +165,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when the passwords don't match" do
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "wrong" })
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "wrong" })
 
           assert_response :success
           assert_nil(session[:user_id])
-          assert_equal(false, @user.authenticate_password("password").present?)
+          assert_equal(false, @user.authenticate_password("correct horse battery staple").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)
@@ -180,11 +180,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when not given a signed_id" do
-          put password_reset_path(user: { password: "password", password_confirmation: "password" })
+          put password_reset_path(user: { password: "correct horse battery staple", password_confirmation: "correct horse battery staple" })
 
           assert_redirected_to password_reset_path
           assert_nil(session[:user_id])
-          assert_equal(false, @user.authenticate_password("password").present?)
+          assert_equal(false, @user.authenticate_password("correct horse battery staple").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)
@@ -195,11 +195,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when given an expired signed_id" do
-          put password_reset_path(user: { signed_id: @user.signed_id(expires_at: 1.minute.ago, purpose: :password_reset), password: "password", password_confirmation: "password" })
+          put password_reset_path(user: { signed_id: @user.signed_id(expires_at: 1.minute.ago, purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "correct horse battery staple" })
 
           assert_redirected_to password_reset_path
           assert_nil(session[:user_id])
-          assert_equal(false, @user.authenticate_password("password").present?)
+          assert_equal(false, @user.authenticate_password("correct horse battery staple").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)
@@ -210,11 +210,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when given an invalid signed_id" do
-          put password_reset_path(user: { signed_id: "invalid", password: "password", password_confirmation: "password" })
+          put password_reset_path(user: { signed_id: "invalid", password: "correct horse battery staple", password_confirmation: "correct horse battery staple" })
 
           assert_redirected_to password_reset_path
           assert_nil(session[:user_id])
-          assert_equal(false, @user.authenticate_password("password").present?)
+          assert_equal(false, @user.authenticate_password("correct horse battery staple").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)
@@ -226,11 +226,11 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "not change the user's password when the user is already logged in as another user" do
           @user2 = create(:user)
-          put_auth password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password" }), @user2
+          put_auth password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "correct horse battery staple" }), @user2
 
           assert_redirected_to profile_path
           assert_equal(@user2.id, session[:user_id])
-          assert_equal(false, @user.authenticate_password("password").present?)
+          assert_equal(false, @user.authenticate_password("correct horse battery staple").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)
@@ -242,15 +242,15 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a user with 2FA enabled" do
         setup do
-          @user = create(:user_with_2fa, password: "old_password")
+          @user = create(:user_with_2fa, password: "strong-old-passphrase")
         end
 
         should "change the user's password when the verification code is correct" do
           freeze_time
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: @user.totp.code })
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "correct horse battery staple", verification_code: @user.totp.code })
 
           assert_redirected_to @user
-          assert_equal(true, @user.reload.authenticate_password("password").present?)
+          assert_equal(true, @user.reload.authenticate_password("correct horse battery staple").present?)
           assert_equal(true, @user.user_events.login.exists?(login_session_id: @user.login_sessions.last.login_id))
           assert_equal(true, @user.user_events.password_reset.exists?(login_session_id: nil))
           assert_equal(true, @user.login_sessions.exists?)
@@ -264,10 +264,10 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           backup_code = @user.backup_codes.first
 
           freeze_time
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: backup_code })
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "correct horse battery staple", verification_code: backup_code })
 
           assert_redirected_to @user
-          assert_equal(true, @user.reload.authenticate_password("password").present?)
+          assert_equal(true, @user.reload.authenticate_password("correct horse battery staple").present?)
           assert_equal(true, @user.user_events.login.exists?(login_session_id: @user.login_sessions.last.login_id))
           assert_equal(true, @user.user_events.password_reset.exists?(login_session_id: nil))
           assert_equal(true, @user.login_sessions.exists?)
@@ -279,10 +279,10 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when the verification code is incorrect" do
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: "wrong" })
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "correct horse battery staple", verification_code: "wrong" })
 
           assert_response :success
-          assert_equal(false, @user.reload.authenticate_password("password").present?)
+          assert_equal(false, @user.reload.authenticate_password("correct horse battery staple").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)
@@ -295,10 +295,10 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "not spend a backup code when the new password is invalid" do
           backup_code = @user.backup_codes.first
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "12345", verification_code: backup_code })
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "secure-current-pass-123", verification_code: backup_code })
 
           assert_response :success
-          assert_equal(false, @user.reload.authenticate_password("password").present?)
+          assert_equal(false, @user.reload.authenticate_password("correct horse battery staple").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)
@@ -312,12 +312,12 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a deleted user" do
         should "not change the user's password" do
-          @user = create(:user, is_deleted: true, password: "old_password")
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password" })
+          @user = create(:user, is_deleted: true, password: "strong-old-passphrase")
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "correct horse battery staple", password_confirmation: "correct horse battery staple" })
 
           assert_response :success
           assert_nil(session[:user_id])
-          assert_equal(false, @user.reload.authenticate_password("password").present?)
+          assert_equal(false, @user.reload.authenticate_password("correct horse battery staple").present?)
           assert_equal(false, @user.user_events.login.exists?)
           assert_equal(false, @user.user_events.password_reset.exists?)
           assert_equal(false, @user.login_sessions.exists?)

@@ -3,7 +3,7 @@ require "test_helper"
 class SessionsControllerTest < ActionDispatch::IntegrationTest
   context "the sessions controller" do
     setup do
-      @user = create(:user, password: "password", email_address_attributes: { address: "Foo.Bar+nospam@Googlemail.com" })
+      @user = create(:user, password: "correct horse battery staple", email_address_attributes: { address: "Foo.Bar+nospam@Googlemail.com" })
     end
 
     context "new action" do
@@ -59,14 +59,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "fail if the user is already logged in" do
-        post_auth session_path, @user, params: { session: { name: @user.name, password: "password" }}
+        post_auth session_path, @user, params: { session: { name: @user.name, password: "correct horse battery staple" }}
 
         assert_response 403
       end
 
       should "log the user in when given the correct password" do
         freeze_time
-        post session_path, params: { session: { name: @user.name, password: "password" }}
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}
 
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
@@ -79,7 +79,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "log the user in when given their email address" do
         freeze_time
-        post session_path, params: { session: { name: "Foo.Bar+nospam@Googlemail.com", password: "password" }}
+        post session_path, params: { session: { name: "Foo.Bar+nospam@Googlemail.com", password: "correct horse battery staple" }}
 
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
@@ -92,7 +92,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "normalize the user's email address when logging in" do
         freeze_time
-        post session_path, params: { session: { name: "foobar@gmail.com", password: "password" }}
+        post session_path, params: { session: { name: "foobar@gmail.com", password: "correct horse battery staple" }}
 
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
@@ -105,7 +105,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "be case-insensitive towards the user's name when logging in" do
         freeze_time
-        post session_path, params: { session: { name: @user.name.upcase, password: "password" }}
+        post session_path, params: { session: { name: @user.name.upcase, password: "correct horse battery staple" }}
 
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
@@ -127,7 +127,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not log the user in when given an incorrect email" do
-        post session_path, params: { session: { name: "foo@gmail.com", password: "password" }}
+        post session_path, params: { session: { name: "foo@gmail.com", password: "correct horse battery staple" }}
 
         assert_response 401
         assert_nil(session[:user_id])
@@ -136,7 +136,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not log the user in when given an incorrect username" do
-        post session_path, params: { session: { name: "dne", password: "password" }}
+        post session_path, params: { session: { name: "dne", password: "correct horse battery staple" }}
 
         assert_response 401
         assert_nil(session[:user_id])
@@ -145,10 +145,10 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow approvers without 2FA to login from a proxy" do
-        user = create(:approver_user, password: "password")
+        user = create(:approver_user, password: "correct horse battery staple")
         Danbooru::IpAddress.any_instance.stubs(:is_proxy?).returns(true)
 
-        post session_path, params: { session: { name: user.name, password: "password" }}
+        post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}
 
         assert_response 401
         assert_nil(session[:user_id])
@@ -157,10 +157,10 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow inactive accounts without 2FA to login from a proxy" do
-        user = create(:user, password: "password", last_logged_in_at: 1.year.ago)
+        user = create(:user, password: "correct horse battery staple", last_logged_in_at: 1.year.ago)
         Danbooru::IpAddress.any_instance.stubs(:is_proxy?).returns(true)
 
-        post session_path, params: { session: { name: user.name, password: "password" }}
+        post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}
 
         assert_response 401
         assert_nil(session[:user_id])
@@ -169,10 +169,10 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "allow approvers with 2FA enabled to login from a proxy" do
-        user = create(:user_with_2fa, password: "password", level: User::Levels::APPROVER)
+        user = create(:user_with_2fa, password: "correct horse battery staple", level: User::Levels::APPROVER)
         Danbooru::IpAddress.any_instance.stubs(:is_proxy?).returns(true)
 
-        post session_path, params: { session: { name: user.name, password: "password" }}
+        post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}
 
         assert_response :success
         assert_nil(session[:user_id])
@@ -183,9 +183,9 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not log the user in yet if they have 2FA enabled" do
-        user = create(:user_with_2fa, password: "password")
+        user = create(:user_with_2fa, password: "correct horse battery staple")
 
-        post session_path, params: { session: { name: user.name, password: "password" }}
+        post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}
 
         assert_response :success
         assert_nil(session[:user_id])
@@ -200,7 +200,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         Danbooru.config.stubs(:captcha_site_key).returns("3x00000000000000000000FF") # forces an interactive challenge
         Danbooru.config.stubs(:captcha_secret_key).returns("2x0000000000000000000000000000000AA") # always fails
 
-        post session_path, params: { "session": { name: @user.name, password: "password" }, "cf-turnstile-response": "blah" }
+        post session_path, params: { "session": { name: @user.name, password: "correct horse battery staple" }, "cf-turnstile-response": "blah" }
 
         assert_response 401
         assert_nil(session[:user_id])
@@ -215,7 +215,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA") # always passes
 
         freeze_time
-        post session_path, params: { "session": { name: @user.name, password: "password", url: users_path }, "cf-turnstile-response": "blah" }
+        post session_path, params: { "session": { name: @user.name, password: "correct horse battery staple", url: users_path }, "cf-turnstile-response": "blah" }
 
         assert_redirected_to users_path
         assert_equal(@user.id, session[:user_id])
@@ -227,18 +227,18 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "redirect the user when given an url param" do
-        post session_path, params: { session: { name: @user.name, password: "password" }, url: tags_path }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }, url: tags_path }
         assert_redirected_to tags_path
       end
 
       should "not allow redirects to protocol-relative URLs" do
-        post session_path, params: { session: { name: @user.name, password: "password" }, url: "//example.com" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }, url: "//example.com" }
         assert_response 403
       end
 
       should "not allow deleted users to login" do
         @user.update!(is_deleted: true)
-        post session_path, params: { session: { name: @user.name, password: "password" }}
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}
 
         assert_response 401
         assert_nil(session[:user_id])
@@ -250,7 +250,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow IP banned users to login" do
         @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
         assert_response 403
         assert_nil(session[:user_id])
@@ -265,7 +265,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "allow partial IP banned users to login" do
         @ip_ban = create(:ip_ban, category: :partial, ip_addr: "1.2.3.4")
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
@@ -276,7 +276,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "ignore deleted IP bans when logging in" do
         @ip_ban = create(:ip_ban, is_deleted: true, category: :full, ip_addr: "1.2.3.4")
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
@@ -288,9 +288,9 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       context "for a builder" do
         context "with 2FA and with an email address" do
           should "not send a login verification email when logging in from a new IP address" do
-            user = create(:user_with_2fa, level: User::Levels::BUILDER, password: "password", email_address_attributes: { address: "user@example.com" })
+            user = create(:user_with_2fa, level: User::Levels::BUILDER, password: "correct horse battery staple", email_address_attributes: { address: "user@example.com" })
 
-            post session_path, params: { session: { name: user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+            post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
             assert_response :success
             assert_nil(session[:user_id])
@@ -304,9 +304,9 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         context "without 2FA but with an email address" do
           should "send a login verification email when logging in from a new IP address" do
-            user = create(:builder_user, password: "password", email_address_attributes: { address: "user@example.com" })
+            user = create(:builder_user, password: "correct horse battery staple", email_address_attributes: { address: "user@example.com" })
 
-            post session_path, params: { session: { name: user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+            post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
             assert_response 401
             assert_nil(session[:user_id])
@@ -321,11 +321,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           end
 
           should "not send a login verification email when logging in from an authorized IP address" do
-            user = create(:builder_user, password: "password", email_address_attributes: { address: "user@example.com" })
+            user = create(:builder_user, password: "correct horse battery staple", email_address_attributes: { address: "user@example.com" })
             create(:user_event, user: user, category: :login_verification, ip_addr: "1.2.3.4")
 
             freeze_time
-            post session_path, params: { session: { name: user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+            post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
             assert_redirected_to root_path
             assert_equal(user.id, session[:user_id])
@@ -338,10 +338,10 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           end
 
           should "not count failed login attempts as authorized IPs" do
-            user = create(:builder_user, password: "password", email_address_attributes: { address: "user@example.com" })
+            user = create(:builder_user, password: "correct horse battery staple", email_address_attributes: { address: "user@example.com" })
             create(:user_event, user: user, category: :failed_login, ip_addr: "1.2.3.4")
 
-            post session_path, params: { session: { name: user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+            post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
             assert_response 401
             assert_nil(session[:user_id])
@@ -357,10 +357,10 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         context "without 2FA or an email address" do
           should "not send a login verification email when logging in from a new IP address" do
-            user = create(:builder_user, password: "password")
+            user = create(:builder_user, password: "correct horse battery staple")
 
             freeze_time
-            post session_path, params: { session: { name: user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+            post session_path, params: { session: { name: user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
             assert_redirected_to root_path
             assert_equal(user.id, session[:user_id])
@@ -379,7 +379,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         freeze_time
 
         5.times do
-          post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+          post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
 
           assert_redirected_to root_path
           assert_equal(@user.id, session[:user_id])
@@ -387,17 +387,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           reset! # clear session id
         end
 
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
         travel 4.minutes
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
         travel 9.minutes
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
       end
@@ -407,7 +407,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         freeze_time
 
         5.times do |n|
-          post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.#{n}" }
+          post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.#{n}" }
 
           assert_redirected_to root_path
           assert_equal(@user.id, session[:user_id])
@@ -415,17 +415,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           reset! # clear session id
         end
 
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.21" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.21" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
         travel 4.minutes
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.22" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.22" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
         travel 9.minutes
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.23" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1.2.3.23" }
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
       end
@@ -435,7 +435,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         freeze_time
 
         5.times do |n|
-          post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1:2:3:4:#{n}::1" }
+          post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1:2:3:4:#{n}::1" }
 
           assert_redirected_to root_path
           assert_equal(@user.id, session[:user_id])
@@ -443,17 +443,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           reset! # clear session id
         end
 
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1:2:3:4:21::1" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1:2:3:4:21::1" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
         travel 4.minutes
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1:2:3:4:22::1" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1:2:3:4:22::1" }
         assert_response 429
         assert_not_equal(@user.id, session[:user_id])
 
         travel 9.minutes
-        post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1:2:3:4:23::1" }
+        post session_path, params: { session: { name: @user.name, password: "correct horse battery staple" }}, headers: { REMOTE_ADDR: "1:2:3:4:23::1" }
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
       end
@@ -461,7 +461,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     context "verify_totp action" do
       should "log the user in if they enter the correct 2FA code" do
-        @user = create(:user_with_2fa, password: "password")
+        @user = create(:user_with_2fa, password: "correct horse battery staple")
 
         freeze_time
         post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: @user.totp.code, url: users_path }}
@@ -476,7 +476,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "log the user in if they enter a 2FA code that was generated less than 30 seconds ago" do
-        @user = create(:user_with_2fa, password: "password")
+        @user = create(:user_with_2fa, password: "correct horse battery staple")
         code = travel_to(25.seconds.ago) { @user.totp.code }
 
         post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path }}
@@ -489,7 +489,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "log the user in if they enter a 2FA code that was generated less than 30 seconds in the future" do
-        @user = create(:user_with_2fa, password: "password")
+        @user = create(:user_with_2fa, password: "correct horse battery staple")
         code = travel_to(25.seconds.from_now) { @user.totp.code }
 
         post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path }}
@@ -502,7 +502,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not log the user in if they enter an incorrect 2FA code" do
-        @user = create(:user_with_2fa, password: "password")
+        @user = create(:user_with_2fa, password: "correct horse battery staple")
 
         post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: "invalid", url: users_path }}
 
@@ -515,7 +515,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not log the user in if they enter a 2FA code that was generated more than a minute ago" do
-        @user = create(:user_with_2fa, password: "password")
+        @user = create(:user_with_2fa, password: "correct horse battery staple")
         code = travel_to(65.seconds.ago) { @user.totp.code }
 
         post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path }}
@@ -529,7 +529,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not log the user in if they enter a 2FA code that was generated more than a minute in the future" do
-        @user = create(:user_with_2fa, password: "password")
+        @user = create(:user_with_2fa, password: "correct horse battery staple")
         code = travel_to(65.seconds.from_now) { @user.totp.code }
 
         post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path }}
@@ -613,12 +613,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     context "reauthenticate action" do
       context "for a user with 2FA enabled" do
         setup do
-          @user = create(:user_with_2fa, password: "password")
+          @user = create(:user_with_2fa, password: "correct horse battery staple")
         end
 
         should "succeed if the user enters the right password and 2FA code" do
           travel_to(1.day.ago) { login_as(@user) }
-          post reauthenticate_session_path, params: { session: { password: "password", verification_code: @user.totp.code, url: users_path }}
+          post reauthenticate_session_path, params: { session: { password: "correct horse battery staple", verification_code: @user.totp.code, url: users_path }}
 
           assert_redirected_to users_path
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
@@ -629,7 +629,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           backup_code = @user.backup_codes.first
 
           travel_to(1.day.ago) { login_as(@user) }
-          post reauthenticate_session_path, params: { session: { password: "password", verification_code: backup_code, url: users_path }}
+          post reauthenticate_session_path, params: { session: { password: "correct horse battery staple", verification_code: backup_code, url: users_path }}
 
           assert_redirected_to users_path
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
@@ -639,7 +639,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         should "fail if the user enters the right password but the wrong 2FA code" do
           travel_to(1.day.ago) { login_as(@user) }
-          post reauthenticate_session_path, params: { session: { password: "password", verification_code: "wrong", url: users_path }}
+          post reauthenticate_session_path, params: { session: { password: "correct horse battery staple", verification_code: "wrong", url: users_path }}
 
           assert_response :success
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
@@ -659,7 +659,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           backup_code = "99999999"
 
           travel_to(1.day.ago) { login_as(@user) }
-          post reauthenticate_session_path, params: { session: { password: "password", verification_code: backup_code, url: users_path }}
+          post reauthenticate_session_path, params: { session: { password: "correct horse battery staple", verification_code: backup_code, url: users_path }}
 
           assert_response :success
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
@@ -681,7 +681,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       context "for a user without 2FA enabled" do
         should "succeed if the user enters the right password" do
           travel_to(1.day.ago) { login_as(@user) }
-          post reauthenticate_session_path, params: { session: { password: "password", url: users_path }}
+          post reauthenticate_session_path, params: { session: { password: "correct horse battery staple", url: users_path }}
 
           assert_redirected_to users_path
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
@@ -701,7 +701,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a user who is not logged in" do
         should "fail" do
-          post reauthenticate_session_path, params: { session: { password: "password", url: users_path }}
+          post reauthenticate_session_path, params: { session: { password: "correct horse battery staple", url: users_path }}
 
           assert_response 403
           assert_nil(session[:user_id])
