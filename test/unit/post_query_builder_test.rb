@@ -973,6 +973,22 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2], "-is:wiki_image")
     end
 
+    should "return posts for the is:<resolution> metatag" do
+      @lowres = create(:post, media_asset: build(:media_asset, image_height: 600, image_width: 600))
+      @highres_vertical = create(:post, media_asset: build(:media_asset, image_height: 2000, image_width: 1200))
+      @highres_horizontal = create(:post, media_asset: build(:media_asset, image_height: 1200, image_width: 2000))
+      @absurdres_vertical = create(:post, media_asset: build(:media_asset, image_height: 4000, image_width: 2250))
+      @absurdres_horizontal = create(:post, media_asset: build(:media_asset, image_height: 2250, image_width: 4000))
+      @incredibly_absurdres_vertical = create(:post, media_asset: build(:media_asset, image_height: 8000, image_width: 4500))
+      @incredibly_absurdres_horizontal = create(:post, media_asset: build(:media_asset, image_height: 4500, image_width: 8000))
+
+      assert_tag_match([@lowres], "is:lowres")
+      assert_tag_match([@incredibly_absurdres_horizontal, @incredibly_absurdres_vertical, @absurdres_horizontal, @absurdres_vertical, @highres_horizontal, @highres_vertical], "is:highres")
+      assert_tag_match([@incredibly_absurdres_horizontal, @incredibly_absurdres_vertical, @absurdres_horizontal, @absurdres_vertical], "is:absurdres")
+      assert_tag_match([@incredibly_absurdres_horizontal, @incredibly_absurdres_vertical], "is:incredibly_absurdres")
+      assert_tag_match([@absurdres_horizontal], "is:absurdres -is:incredibly_absurdres ratio:16:9")
+    end
+
     should "return posts for the has:<value> metatag" do
       parent = create(:post)
       child = create(:post, parent: parent)

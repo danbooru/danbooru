@@ -42,6 +42,13 @@ class Post < ApplicationRecord
     sfw: ["g", "s"],
   }.with_indifferent_access
 
+  RESOLUTION_ALIASES = {
+    lowres: { width: ..640, height: ..640 },
+    highres: { width: 1920.., height: 1080.. }, # 1080p
+    absurdres: { width: 3840.., height: 2160.. }, # 4k
+    incredibly_absurdres: { width: 7680.., height: 4320.. }, # 8k
+  }.with_indifferent_access
+
   deletable
   has_bit_flags %w[has_embedded_notes _unused_has_cropped is_taken_down]
 
@@ -1281,6 +1288,8 @@ class Post < ApplicationRecord
           rating_matches(value)
         when *Post::RATING_ALIASES.keys
           where(rating: Post::RATING_ALIASES.fetch(value.downcase))
+        when *Post::RESOLUTION_ALIASES.keys
+          resolution_matches(value.downcase)
         else
           none
         end
@@ -1494,6 +1503,15 @@ class Post < ApplicationRecord
         else
           none
         end
+      end
+
+      def resolution_matches(value)
+        res = RESOLUTION_ALIASES.fetch(value)
+        height, width = res[:height], res[:width]
+
+        horizontal = attribute_matches(height, "media_assets.image_height").and(attribute_matches(width, "media_assets.image_width"))
+        vertical = attribute_matches(width, "media_assets.image_height").and(attribute_matches(height, "media_assets.image_width"))
+        joins(:media_asset).merge(horizontal.or(vertical))
       end
 
       def reacted_by(username)
