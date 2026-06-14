@@ -28,8 +28,8 @@ class DiffBuilder
   end
 
   def diff_name_html
-    return diff_html(new_html: ERB::Util.html_escape(this_text)) if that_text.blank?
-    return diff_html(old_html: ERB::Util.html_escape(that_text)) if this_text.blank?
+    return diff_html(new_text: this_text) if that_text.blank?
+    return diff_html(old_text: that_text) if this_text.blank?
 
     # Compute the longest common prefix and suffix so we only diff the changed middle.
     min_len = [this_text.length, that_text.length].min
@@ -48,31 +48,22 @@ class DiffBuilder
     this_middle = this_text[prefix_len, this_text.length - prefix_len - suffix_len]
     other_middle = that_text[prefix_len, that_text.length - prefix_len - suffix_len]
 
-    escaped_prefix = ERB::Util.html_escape(prefix)
-    escaped_suffix = ERB::Util.html_escape(suffix)
-
     if levenshtein_similarity(this_middle, other_middle) < 0.3
-      old_html = ERB::Util.html_escape(other_middle)
-      new_html = ERB::Util.html_escape(this_middle)
-      diff_html(prefix_html: escaped_prefix, old_html: old_html, new_html: new_html, suffix_html: escaped_suffix)
+      diff_html(prefix: prefix, old_text: other_middle, new_text: this_middle, suffix: suffix)
     else
       middle_html = self.class.new(this_middle, other_middle, pattern).build
-      diff_html(prefix_html: escaped_prefix, middle_html: middle_html, suffix_html: escaped_suffix)
+      diff_html(prefix: prefix, middle_html: middle_html, suffix: suffix)
     end
   end
 
   def diff_body_html
-    # Skip the expensive diff for long, completely different texts. The Levenshtein
-    # check is O(n*m) in pure Ruby, so we only run it when both sides are small
-    # enough that the shortcut is worth the cost.
+    # Avoid an O(n*m) Levenshtein check on long bodies.
     max_length = [this_text.length, that_text.length].max
 
     if max_length > MIN_WHOLESALE_DIFF_LENGTH &&
         max_length <= MAX_LEVENSHTEIN_LENGTH &&
         levenshtein_similarity(this_text, that_text) < WHOLESALE_BODY_DIFF_SIMILARITY
-      old_html = html_escape_with_paragraph_marks(that_text)
-      new_html = html_escape_with_paragraph_marks(this_text)
-      diff_html(old_html: old_html, new_html: new_html)
+      diff_html(old_text: that_text, new_text: this_text, paragraph_marks: true)
     else
       build
     end
@@ -81,7 +72,7 @@ class DiffBuilder
   # Renders one side of a version diff without change markers. Used when the
   # other side is missing, so there is nothing to compare against.
   def format_body_html
-    html_escape_with_paragraph_marks(this_text)
+    format_diff_text(this_text, paragraph_marks: true).html_safe
   end
 
   def build
@@ -142,25 +133,32 @@ class DiffBuilder
 
   private
 
-  def diff_html(prefix_html: nil, old_html: nil, new_html: nil, middle_html: nil, suffix_html: nil)
+  def diff_html(prefix: nil, old_text: nil, new_text: nil, middle_html: nil, suffix: nil, paragraph_marks: false)
     html = +""
 
-    html << prefix_html unless prefix_html.nil?
+    html << format_diff_text(prefix) unless prefix.nil?
 
     if middle_html.nil?
-      html << "<del>#{old_html}</del>" unless old_html.nil? || old_html.empty?
-      html << "<ins>#{new_html}</ins>" unless new_html.nil? || new_html.empty?
+      unless old_text.nil? || old_text.empty?
+        html << "<del>#{format_diff_text(old_text, paragraph_marks: paragraph_marks)}</del>"
+      end
+
+      unless new_text.nil? || new_text.empty?
+        html << "<ins>#{format_diff_text(new_text, paragraph_marks: paragraph_marks)}</ins>"
+      end
     else
       html << middle_html
     end
 
-    html << suffix_html unless suffix_html.nil?
+    html << format_diff_text(suffix) unless suffix.nil?
 
     html.html_safe
   end
 
-  def html_escape_with_paragraph_marks(text)
-    ERB::Util.html_escape(text).gsub(/\r?\n/, PARAGRAPH_MARK_HTML).html_safe
+  def format_diff_text(text, paragraph_marks: false)
+    html = ERB::Util.html_escape(text)
+    html = html.gsub(/\r?\n/, PARAGRAPH_MARK_HTML) if paragraph_marks
+    html
   end
 
   # Normalized Levenshtein similarity: 0.0 = completely different, 1.0 = identical.
