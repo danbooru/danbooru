@@ -96,6 +96,7 @@ en:
     errors:
       messages:
         record_invalid: "%{errors}"
+        pwned_password: "has appeared in a data breach and can't be used"
       models:
         tag:
           attributes:
