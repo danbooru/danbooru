@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
 class ModAction < ApplicationRecord
+  MOD_ONLY_CATEGORIES = %i[
+    ip_ban_create
+    ip_ban_delete
+    ip_ban_undelete
+    moderation_report_handled
+    moderation_report_rejected
+    email_address_update
+    backup_code_send
+  ]
+
   dtext_attribute :description, inline: true # defines :dtext_description
 
   belongs_to :creator, class_name: "User"
@@ -95,7 +105,7 @@ class ModAction < ApplicationRecord
     if user.is_moderator?
       all
     else
-      where.not(category: %i[ip_ban_create ip_ban_delete ip_ban_undelete moderation_report_handled moderation_report_rejected email_address_update backup_code_send])
+      where.not(category: MOD_ONLY_CATEGORIES)
     end
   end
 

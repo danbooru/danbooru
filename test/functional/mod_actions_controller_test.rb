@@ -83,6 +83,22 @@ class ModActionsControllerTest < ActionDispatch::IntegrationTest
         get mod_action_path(@mod_action)
         assert_redirected_to mod_actions_path(search: { id: @mod_action.id })
       end
+
+      should "render 403 for hidden categories for non-moderators" do
+        mod_action = create(:mod_action, category: "email_address_update")
+
+        get_auth mod_action_path(mod_action), create(:user)
+
+        assert_response 403
+      end
+
+      should "allow moderators to view hidden categories" do
+        mod_action = create(:mod_action, category: "email_address_update")
+
+        get_auth mod_action_path(mod_action), create(:moderator_user)
+
+        assert_redirected_to mod_actions_path(search: { id: mod_action.id })
+      end
     end
   end
 end
