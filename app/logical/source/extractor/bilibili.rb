@@ -344,7 +344,7 @@ module Source
 
         modules = data["modules"]
         if modules.present?
-          data["modules"] = modules.each { |mod| mod.delete("module_type") }.reduce({}, :merge)
+          data["modules"] = modules.each { |mod| mod.delete("module_type") }.reduce({}) { |mod, hash| mod.merge(hash) { |_key, v1, v2| v1 || v2 } }
         end
 
         data
