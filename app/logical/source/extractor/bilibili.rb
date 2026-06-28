@@ -69,7 +69,7 @@ module Source
           pub_ts = post_json.dig("modules", "module_author", "pub_ts")
         end
 
-        Time.at(pub_ts).utc if pub_ts
+        Time.at(pub_ts.to_i).utc if pub_ts
       end
 
       def updated_at
