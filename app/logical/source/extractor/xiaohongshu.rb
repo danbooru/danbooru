@@ -85,7 +85,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   memoize def page
-    url = Danbooru::URL.parse(page_url).with(host: api_host).to_s
+    url = Danbooru::URL.parse(page_url)&.with(host: api_host).to_s
     http.cache(1.minute).parsed_get(url)
   end
 
