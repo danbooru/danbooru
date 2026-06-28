@@ -88,7 +88,7 @@ module Source::Tests::Extractor
           https://si.imgix.net/5189de71/uploads/origins/b7fd6358-aed9-4b35-be4d-2f86b8773836?bg=%23fff&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&auto=format&fm=webp&w=800&s=468fa4953b31b9ba03285d7391106d06
         ],
         media_files: [
-          { file_size: 118_854 },
+          { file_size: 118_969 },
           { file_size: 120_870 },
         ],
         page_url: "https://skeb.jp/@63ntm/works/9",
@@ -119,7 +119,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://skeb.jp/@goma_feet/works/1",
         image_urls: %w[https://si.imgix.net/74d299ef/uploads/origins/78ca23dc-a053-4ebe-894f-d5a06e228af8?bg=%23fff&auto=format&fm=webp&w=800&s=0f091c291e3eeaa8ffe4e35a314b153e],
-        media_files: [{ file_size: 102_020 }],
+        media_files: [{ file_size: 102_068 }],
         page_url: "https://skeb.jp/@goma_feet/works/1",
         profile_urls: %w[https://skeb.jp/@goma_feet],
         display_name: "ごましお",
@@ -143,12 +143,12 @@ module Source::Tests::Extractor
     context "A post with two watermarked images" do
       strategy_should_work(
         "https://skeb.jp/@LambOic029/works/146",
-        image_urls: [
-          %r{si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?.*&w=800},
-          %r{si.imgix.net/51934468/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?.*&w=800},
+        image_urls: %w[
+          https://si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&auto=format&fm=webp&w=800&s=b05759b268a7097fba239aaa1486ff55
+          https://si.imgix.net/51934468/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?bg=%23fff&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&auto=format&fm=webp&w=800&s=208483fdc2d6f91844472db105deab6f
         ],
         media_files: [
-          { file_size: 120_358 },
+          { file_size: 120_362 },
           { file_size: 109_980 },
         ],
         page_url: "https://skeb.jp/@LambOic029/works/146",
@@ -222,7 +222,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://skeb.jp/@kz12_nb/works/13",
         image_urls: %w[https://si.imgix.net/ea5bad96/uploads/origins/18def21b-d39c-44f7-be5b-b5c2b7e9c467?bg=%23fff&auto=format&fm=webp&w=800&s=941a593992956f23f1812fb148809ad9],
-        media_files: [{ file_size: 174_000 }],
+        media_files: [{ file_size: 173_964 }],
         page_url: "https://skeb.jp/@kz12_nb/works/13",
         profile_urls: %w[https://skeb.jp/@kz12_nb],
         display_name: "弱。",
@@ -251,7 +251,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=a526036c5ee23d52045f382ea627511f",
         image_urls: %w[https://si.imgix.net/5827955f/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&fm=webp&w=800&s=a526036c5ee23d52045f382ea627511f],
-        media_files: [{ file_size: 120_358 }],
+        media_files: [{ file_size: 120_362 }],
         page_url: nil,
         profile_urls: [],
         display_name: nil,
