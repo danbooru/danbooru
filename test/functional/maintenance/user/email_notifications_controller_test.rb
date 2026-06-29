@@ -15,6 +15,12 @@ module Maintenance
             get_auth maintenance_user_email_notification_path(user_id: @user.id), @user
             assert_response :success
           end
+
+          should "render when force_authenticated is enabled" do
+            Danbooru.config.stubs(:force_authenticated?).returns(true)
+            get maintenance_user_email_notification_path(user_id: @user.id, sig: @sig)
+            assert_response :success
+          end
         end
 
         context "#destroy" do

@@ -446,6 +446,22 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get new_user_path
         assert_response :success
       end
+
+      context "when signups are restricted to admins" do
+        setup do
+          Danbooru.config.stubs(:signups_restricted_to_admin?).returns(true)
+        end
+
+        should "deny access for anonymous users" do
+          get new_user_path
+          assert_response 403
+        end
+
+        should "allow access for admin users" do
+          get_auth new_user_path, create(:admin_user)
+          assert_response :success
+        end
+      end
     end
 
     context "create action" do
@@ -567,6 +583,26 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_response 403
+        end
+      end
+
+      context "when signups are restricted to admins" do
+        setup do
+          Danbooru.config.stubs(:signups_restricted_to_admin?).returns(true)
+        end
+
+        should "deny access for anonymous users" do
+          assert_no_difference("User.count") do
+            post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+            assert_response 403
+          end
+        end
+
+        should "allow admin users to create accounts" do
+          post_auth users_path, create(:admin_user), params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal("xxx", User.last.name)
         end
       end
 
@@ -854,6 +890,42 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth demote_user_path(@user), @user
 
         assert_response 403
+      end
+    end
+
+    context "secondary links" do
+      should "show the signup link to anonymous users when signups are not restricted" do
+        get users_path
+
+        assert_response :success
+        assert_select "a[href='#{new_user_path}']"
+      end
+
+      should "not show the signup link to admin users when signups are not restricted" do
+        get_auth users_path, create(:admin_user)
+
+        assert_response :success
+        assert_select "a[href='#{new_user_path}']", count: 0
+      end
+
+      context "when signups are restricted to admins" do
+        setup do
+          Danbooru.config.stubs(:signups_restricted_to_admin?).returns(true)
+        end
+
+        should "not show the signup link to anonymous users" do
+          get users_path
+
+          assert_response :success
+          assert_select "a[href='#{new_user_path}']", count: 0
+        end
+
+        should "show the signup link to admin users" do
+          get_auth users_path, create(:admin_user)
+
+          assert_response :success
+          assert_select "a[href='#{new_user_path}']"
+        end
       end
     end
   end

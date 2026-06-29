@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class ForumPostPolicy < ApplicationPolicy
-  def index?
-    true
-  end
-
   def show?
     policy(record.topic).show? && (!record.is_deleted? || show_deleted?)
   end

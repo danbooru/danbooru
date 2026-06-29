@@ -344,6 +344,41 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "when force_authenticated is enabled" do
+      setup do
+        Danbooru.config.stubs(:force_authenticated?).returns(true)
+      end
+
+      should "deny anonymous users via the index policy" do
+        get posts_path
+
+        assert_response 403
+      end
+
+      should "deny anonymous users for JSON requests" do
+        get posts_path(format: :json)
+
+        assert_response 403
+      end
+
+      should "allow authenticated users to pass through" do
+        get_auth posts_path, create(:user)
+
+        assert_response :success
+      end
+
+      should "allow anonymous users on pages whose policies explicitly allow it" do
+        get new_session_path
+
+        assert_response :success
+      end
+    end
+
+    should "allow anonymous users when force_authenticated is disabled" do
+      get posts_path
+      assert_response :success
+    end
+
     context "when the api limit is exceeded" do
       should "fail with a 429 error" do
         user = create(:user)

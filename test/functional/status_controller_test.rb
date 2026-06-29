@@ -27,6 +27,12 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
 
+    should "work when force_authenticated is enabled" do
+      Danbooru.config.stubs(:force_authenticated?).returns(true)
+      get status_path
+      assert_response :success
+    end
+
     should "work when the database is down" do
       without_database do
         get status_path

@@ -9,6 +9,7 @@ class ApplicationPolicy
   end
 
   def index?
+    return false if Danbooru.config.force_authenticated? && user.is_anonymous?
     true
   end
 

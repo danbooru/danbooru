@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class BackgroundJobPolicy < ApplicationPolicy
-  def index?
-    true
-  end
-
   def update?
     user.is_admin?
   end
