@@ -47,6 +47,16 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A source with no page URL" do
+      should "not raise when fetching the page" do
+        source = Source::Extractor.find("https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8")
+
+        assert_nil(source.page_url)
+        assert_nil(source.send(:page))
+        assert_nothing_raised { source.profile_urls }
+      end
+    end
+
     context "A post with multiple images" do
       setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
 
