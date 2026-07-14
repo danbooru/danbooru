@@ -95,47 +95,30 @@ class RateLimit < ApplicationRecord
   # limit's action when invoked by `user`, by calling into the corresponding
   # Pundit policy. Returns nil if the policy/action can't be resolved or the
   # method raises (e.g. record-dependent branches with no available record).
+  #
+  # Memoized because the view calls this once per column, for the same user.
   def limit_config(user)
+    return @limit_config if defined?(@limit_config)
+
     controller, action_name, = parsed_action
-    policy_class = resolve_policy_class(controller)
-    return nil unless policy_class && action_name.present?
-
-    record = build_dummy_record(controller)
-    policy = policy_class.new(user, record)
-    method = :"rate_limit_for_#{action_name}"
-    return nil unless policy.respond_to?(method)
-
-    config = policy.send(method, request: nil)
-    return nil if config.blank? || config[:burst].nil? || config[:rate].nil?
-
-    { burst: config[:burst].to_f, rate: config[:rate].to_f }
+    @limit_config =
+      if controller.present? && action_name.present?
+        dummy_record = controller.classify.safe_constantize&.new
+        policy = dummy_record&.policy(user)
+        config = policy.try(:"rate_limit_for_#{action_name}", request: nil)
+        { burst: config[:burst].to_f, rate: config[:rate].to_f } if config.present? && config[:burst] && config[:rate]
+      end
   rescue StandardError
-    nil
+    @limit_config = nil
   end
 
   private
 
   def parsed_action
-    parts = action.to_s.split(":")
-    [parts[0], parts[1], parts[2..]&.join(":")]
+    action.split(":", 3)
   end
 
   def record_suffix?(modifier)
     modifier.match?(/\A[a-z-]+-\d+\z/)
-  end
-
-  def resolve_policy_class(controller)
-    return nil if controller.blank?
-
-    ["#{controller.classify}Policy", "#{controller.camelize}Policy"].each do |name|
-      return name.constantize if Object.const_defined?(name)
-    end
-    nil
-  end
-
-  def build_dummy_record(controller)
-    controller.classify.constantize.new
-  rescue StandardError
-    nil
   end
 end

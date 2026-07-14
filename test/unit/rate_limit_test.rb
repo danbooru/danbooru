@@ -108,6 +108,15 @@ class RateLimitTest < ActiveSupport::TestCase
         PostPolicy.any_instance.stubs(:rate_limit_for_create).raises(StandardError)
         assert_nil(rate_limit.limit_config(user))
       end
+
+      should "memoize the result instead of resolving the policy again on each call" do
+        user = create(:user)
+        rate_limit = RateLimit.new(action: "artists:write", key: user.cache_key)
+
+        ArtistPolicy.any_instance.expects(:rate_limit_for_write).once.returns(burst: 10, rate: 1)
+
+        2.times { rate_limit.limit_config(user) }
+      end
     end
   end
 end

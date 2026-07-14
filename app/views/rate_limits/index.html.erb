@@ -4,12 +4,10 @@
       Rate limits cap how many times you can perform certain actions within a given period. Each bucket refills over time, so unused capacity returns if you take a break.
     </p>
 
-    <%= table_for @rate_limits, class: "striped autofit" do |t| %>
+    <%= table_for @displayed_rate_limits, class: "striped autofit" do |t| %>
       <% t.column "Action" do |rate_limit| %>
         <%= rate_limit.humanized_action %>
-        <% if CurrentUser.user.is_owner? %>
-          <div class="text-xs text-muted"><%= rate_limit.key %></div>
-        <% end %>
+        <div class="text-xs text-muted"><%= rate_limit.key %></div>
       <% end %>
 
       <% t.column "Usage" do |rate_limit| %>
