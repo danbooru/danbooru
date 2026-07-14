@@ -41,5 +41,13 @@ class PwnedPasswordValidatorTest < ActiveSupport::TestCase
       user = build(:user, password: "password")
       assert(user.valid?)
     end
+
+    should "accept the password without calling the API if the check is disabled" do
+      Danbooru.config.stubs(:pwned_password_check_enabled?).returns(false)
+      Danbooru::Http.any_instance.expects(:get).never
+
+      user = build(:user, password: "password")
+      assert(user.valid?)
+    end
   end
 end

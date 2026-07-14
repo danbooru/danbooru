@@ -16,7 +16,7 @@ class PwnedPasswordValidator < ActiveModel::EachValidator
   API_URL = "https://api.pwnedpasswords.com/range/"
 
   def validate_each(rec, attr, password)
-    return if password.blank?
+    return if password.blank? || !Danbooru.config.pwned_password_check_enabled?
 
     count = pwned_count(password)
     rec.errors.add(attr, :pwned_password, count: count) if count > 0

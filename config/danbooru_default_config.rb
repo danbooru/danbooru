@@ -683,6 +683,13 @@ module Danbooru
       true
     end
 
+    # Whether to check passwords against the HaveIBeenPwned database when
+    # users sign up or change their password. Disable this if you don't want
+    # Danbooru to make outbound requests to a third-party API.
+    def pwned_password_check_enabled?
+      true
+    end
+
     # If defined, Danbooru will automatically post new forum posts to the
     # Discord channel belonging to this webhook.
     def discord_webhook_id
