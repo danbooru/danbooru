@@ -109,6 +109,8 @@
   a.dtext-named-external-link::after {
     // https://stackoverflow.com/a/66093928
     content: "";
+    display: inline-block;
+    height: 1em;
     padding: 0 0.25rem;
     margin: 0 0 0 0.25rem;
     vertical-align: middle;
@@ -120,6 +122,8 @@
 
   a.dtext-post-search-link::after {
     content: "";
+    display: inline-block;
+    height: 1em;
     padding: 0 0.3125rem;
     margin: 0 0 0 0.25rem;
     vertical-align: middle;
