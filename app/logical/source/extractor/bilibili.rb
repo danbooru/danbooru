@@ -69,7 +69,7 @@ module Source
           pub_ts = post_json.dig("modules", "module_author", "pub_ts")
         end
 
-        Time.at(pub_ts).utc if pub_ts
+        Time.at(pub_ts.to_i).utc if pub_ts
       end
 
       def updated_at
@@ -344,7 +344,7 @@ module Source
 
         modules = data["modules"]
         if modules.present?
-          data["modules"] = modules.each { |mod| mod.delete("module_type") }.reduce({}, :merge)
+          data["modules"] = modules.each { |mod| mod.delete("module_type") }.reduce({}) { |mod, hash| mod.merge(hash) { |_key, v1, v2| v1 || v2 } }
         end
 
         data
