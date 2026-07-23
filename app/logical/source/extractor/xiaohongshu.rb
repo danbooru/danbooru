@@ -85,6 +85,8 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   memoize def page
+    return nil if page_url.blank?
+
     url = Danbooru::URL.parse(page_url).with(host: api_host).to_s
     http.cache(1.minute).parsed_get(url)
   end

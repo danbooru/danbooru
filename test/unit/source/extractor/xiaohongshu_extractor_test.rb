@@ -47,6 +47,15 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A source with no page URL" do
+      strategy_should_work(
+        "https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8",
+        image_urls: %w[https://ci.xiaohongshu.com/1000g00828idf6nofk05g5ohki5uk137o8beqcv8],
+        media_files: [{ file_size: 561_862 }],
+        page_url: nil,
+      )
+    end
+
     context "A post with multiple images" do
       setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
 
@@ -243,7 +252,7 @@ module Source::Tests::Extractor
 
     context "A post on rednote.com" do
       setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
-    
+
       strategy_should_work(
         "https://www.rednote.com/explore/69d503c7000000001f007995?xsec_token=ABR7xc7xnydtN9Cqof7XXZDNQnk_bgI9LF753p_b_5IZg=",
         image_urls: %w[
