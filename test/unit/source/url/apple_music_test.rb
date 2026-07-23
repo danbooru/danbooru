@@ -11,8 +11,10 @@ module Source::Tests::URL
 
       should be_page_url(
         "https://music.apple.com/jp/album/mágico-catástrofe-digital-edition/1503302894",
+        "https://music.apple.com/jp/album/1503302894",
         "https://music.apple.com/jp/album/track-name/1503302894?i=1503302895",
         "https://music.apple.com/album/mágico-catástrofe-digital-edition/1503302894",
+        "https://music.apple.com/album/1742535680",
       )
 
       should be_profile_url(
@@ -26,6 +28,19 @@ module Source::Tests::URL
         album_name: "mágico-catástrofe-digital-edition",
         country_code: "jp",
         page_url: "https://music.apple.com/jp/album/mágico-catástrofe-digital-edition/1503302894",
+      )
+
+      should parse_url("https://music.apple.com/jp/album/1503302894").into(
+        site_name: "Apple Music",
+        album_id: "1503302894",
+        country_code: "jp",
+        page_url: "https://music.apple.com/jp/album/1503302894",
+      )
+
+      should parse_url("https://music.apple.com/album/1503302894").into(
+        site_name: "Apple Music",
+        album_id: "1503302894",
+        page_url: "https://music.apple.com/album/1503302894",
       )
 
       should parse_url("https://itunes.apple.com/jp/album/mágico-catástrofe-digital-edition/id1503302894").into(

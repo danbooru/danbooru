@@ -13,6 +13,28 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A slugless Apple Music album page" do
+      strategy_should_work(
+        "https://music.apple.com/jp/album/1503302894",
+        image_urls: %w[https://a1.mzstatic.com/us/r1000/0/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg],
+        page_url: "https://music.apple.com/jp/album/1503302894",
+        tags: [],
+        dtext_artist_commentary_title: "マジコカタストロフィ - Digital Edition",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A slugless countryless Apple Music album page" do
+      strategy_should_work(
+        "https://music.apple.com/album/1742535680",
+        image_urls: %w[https://a1.mzstatic.com/us/r1000/0/Music221/v4/1b/e7/ac/1be7accb-63a2-b95f-ad85-50bc6a60ee92/0198448234047_cover.jpg],
+        page_url: "https://music.apple.com/album/1742535680",
+        tags: [],
+        dtext_artist_commentary_title: "Grown-Up's Paradise - Single",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
     context "A direct mzstatic image thumb URL with a referer" do
       strategy_should_work(
         "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg/296x296bb.webp",

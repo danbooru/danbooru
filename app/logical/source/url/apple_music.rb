@@ -19,6 +19,13 @@ class Source::URL::AppleMusic < Source::URL
       @album_name = album_name
       @album_id = album_id.delete_prefix("id")
 
+    # https://music.apple.com/jp/album/mágico-catástrofe-digital-edition/1503302894
+    # https://music.apple.com/jp/album/track-name/1503302894?i=1503302895
+    # https://itunes.apple.com/us/album/disasterpiece/id1870255337
+    in "music" | "itunes", "apple.com", country_code, "album", album_id
+      @country_code = country_code
+      @album_id = album_id.delete_prefix("id")
+
     # https://music.apple.com/us/artist/mori-calliope/1536368549
     # https://itunes.apple.com/us/artist/mori-calliope/id1536368549
     # https://music.apple.com/us/artist/guchiry/1438071892
@@ -32,6 +39,11 @@ class Source::URL::AppleMusic < Source::URL
     # https://itunes.apple.com/album/mágico-catástrofe-digital-edition/id1503302894
     in "music" | "itunes", "apple.com", "album", album_name, album_id
       @album_name = album_name
+      @album_id = album_id.delete_prefix("id")
+
+    # https://music.apple.com/album/1503302894
+    # https://itunes.apple.com/album/id1503302894
+    in "music" | "itunes", "apple.com", "album", album_id
       @album_id = album_id.delete_prefix("id")
 
     # https://a1.mzstatic.com/us/r1000/0/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg
@@ -63,8 +75,10 @@ class Source::URL::AppleMusic < Source::URL
   end
 
   def page_url
-    if album_id.present?
+    if album_id.present? && album_name.present?
       ["https://music.apple.com", country_code, "album", album_name, album_id].compact.join("/")
+    elsif album_id.present?
+      ["https://music.apple.com", country_code, "album", album_id].compact.join("/")
     end
   end
 
