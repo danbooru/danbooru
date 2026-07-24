@@ -20,7 +20,7 @@
 # last. Levels are mapped to upload slots such that levels range from 0 - 35,
 # and upload slots range from 5 - 40.
 #
-# @see https://danbooru.donmai.us/wiki_pages/about:upload_limits
+# @see https://danbooru.donmai.us/wiki_pages/help:upload_limits
 class UploadLimit
   extend Memoist
 

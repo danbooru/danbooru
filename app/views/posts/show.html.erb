@@ -210,14 +210,14 @@
   <% if @post.in_modqueue? %>
     <div class="notice notice-small post-notice post-notice-pending">
       <% if @post.is_pending? %>
-        This post is pending approval. (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+        This post is pending approval. (<%= link_to_wiki "learn more", "help:mod_queue" %>)
       <% elsif @post.is_flagged? %>
         This post was flagged and is pending approval (<%= link_to_wiki "learn more", "howto:flag" %>)
         <ul class="list-bulleted">
           <li><%= render "post_flags/reasons", flag: @post.flags.select(&:pending?).last %></li>
         </ul>
       <% elsif @post.is_appealed? %>
-        This post was appealed and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+        This post was appealed and is pending approval (<%= link_to_wiki "learn more", "help:mod_queue" %>)
         <ul class="list-bulleted">
           <li><%= render "post_appeals/reasons", appeal: @post.appeals.select(&:pending?).last %></li>
         </ul>
