@@ -8,11 +8,24 @@ class Source::Extractor::NaverCafe < Source::Extractor
     elsif parsed_url.image_url?
       [parsed_url.to_s]
     else
-      html_artist_commentary_desc&.parse_html&.css("img").to_a.pluck("src").filter_map do |src|
-        url = Source::URL.parse(src)
+      html_artist_commentary_desc&.parse_html&.css("img, script.__se_module_data").to_a.filter_map do |element|
+        if element.name == "img"
+          url = Source::URL.parse(element["src"])
 
-        # exclude stickers (ex: https://storep-phinf.pstatic.net/ogq_57f943581ff20/original_16.png?type=p50_50)
-        url.full_image_url if url.is_a?(Source::URL::NaverCafe)
+          # exclude stickers (ex: https://storep-phinf.pstatic.net/ogq_57f943581ff20/original_16.png?type=p50_50)
+          url.full_image_url if url.is_a?(Source::URL::NaverCafe)
+        else
+          video = (element["data-module"] || element["data-module-v2"]).to_s.parse_json
+          next unless video&.dig(:type) == "v2_video"
+
+          video_id = video.dig(:data, :vid)
+          inkey = video.dig(:data, :inkey)
+          next if video_id.blank? || inkey.blank?
+
+          api_url = "https://apis.naver.com/rmcnmv/rmcnmv/vod/play/v2.0/#{video_id}"
+          videos = http.cache(1.minute).parsed_get(api_url, params: { key: inkey })&.dig(:videos, :list).to_a
+          videos.max_by { |item| item.dig(:encodingOption, :width).to_i * item.dig(:encodingOption, :height).to_i }&.dig(:source)
+        end
       end
     end
   end

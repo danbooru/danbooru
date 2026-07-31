@@ -34,7 +34,8 @@ class Source::URL::NaverCafe < Source::URL
       @full_image_url = Source::URL.parse(params[:src]).try(:full_image_url)
 
     # https://cafe.naver.com/ca-fe/cafes/29767250/articles/785
-    in "cafe", "naver.com", "ca-fe", "cafes", club_id, "articles", article_id
+    # https://cafe.naver.com/f-e/cafes/27842958/articles/20970846
+    in "cafe", "naver.com", ("ca-fe" | "f-e"), "cafes", club_id, "articles", article_id
       @club_id = club_id
       @article_id = article_id
 

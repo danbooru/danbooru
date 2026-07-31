@@ -107,6 +107,25 @@ module Source::Tests::Extractor
       )
     end
 
+    context "An /f-e/ article with an embedded video" do
+      strategy_should_work(
+        "https://cafe.naver.com/f-e/cafes/27842958/articles/20970846",
+        image_urls: [
+          %r{\Ahttp://cafefiles\.naver\.net/.+\.png\z},
+          %r{\Ahttps://[^/]+-naver-vod\.pstatic\.net/.+\.mp4\?},
+        ],
+        media_files: [
+          { file_size: 503_415 },
+          { file_size: 831_253 },
+        ],
+        page_url: "https://cafe.naver.com/ca-fe/cafes/27842958/articles/20970846",
+        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/27842958/members/CywxX84zY2F5lhajKwDhEA5s3VFsUBi0v3Ukn9mFwzw https://cafe.naver.com/steamindiegame],
+        display_name: "이건또뭐라니",
+        username: nil,
+        dtext_artist_commentary_title: "내 골반이 멈추지 않는 탓일까 ㅜ.ㅜ(+영상",
+      )
+    end
+
     context "An article with images as attachments" do
       strategy_should_work(
         "https://cafe.naver.com/ca-fe/cafes/29767250/articles/785",
