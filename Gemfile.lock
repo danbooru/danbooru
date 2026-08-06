@@ -315,7 +315,6 @@ GEM
     method_source (1.1.0)
     mini_histogram (0.3.1)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.9)
     minitest (6.0.3)
       drb (~> 2.0)
       prism (~> 1.5)
@@ -346,9 +345,6 @@ GEM
       net-protocol
     net-ssh (7.3.2)
     nio4r (2.7.5)
-    nokogiri (1.19.2)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.19.2-x86_64-linux-gnu)
       racc (~> 1.4)
     numo-narray (0.9.2.1)
@@ -574,9 +570,9 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.7.5)
+    zxcvbn-ruby (1.4.0)
 
 PLATFORMS
-  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -668,6 +664,7 @@ DEPENDENCIES
   view_component
   webrick
   x25519
+  zxcvbn-ruby
 
 CHECKSUMS
   abbrev (0.1.2) sha256=ad1b4eaaaed4cb722d5684d63949e4bde1d34f2a95e20db93aecfe7cbac74242
@@ -781,7 +778,6 @@ CHECKSUMS
   method_source (1.1.0) sha256=181301c9c45b731b4769bc81e8860e72f9161ad7d66dd99103c9ab84f560f5c5
   mini_histogram (0.3.1) sha256=6a114b504e4618b0e076cc672996036870f7cc6f16b8e5c25c0c637726d2dd94
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
-  mini_portile2 (2.8.9) sha256=0cd7c7f824e010c072e33f68bc02d85a00aeb6fce05bb4819c03dfd3c140c289
   minitest (6.0.3) sha256=88ac8a1de36c00692420e7cb3cc11a0773bbcb126aee1c249f320160a7d11411
   minitest-reporters (1.8.0) sha256=8ce5280fb73ad3178ae525454df169b6f28c1b38b1d088ea91815d3a370ba384
   mocha (3.1.0) sha256=75f42d69ebfb1f10b32489dff8f8431d37a418120ecdfc07afe3bc183d4e1d56
@@ -797,7 +793,6 @@ CHECKSUMS
   net-smtp (0.5.1) sha256=ed96a0af63c524fceb4b29b0d352195c30d82dd916a42f03c62a3a70e5b70736
   net-ssh (7.3.2) sha256=65029e213c380e20e5fd92ece663934ab0a0fe888e0cd7cc6a5b664074362dd4
   nio4r (2.7.5) sha256=6c90168e48fb5f8e768419c93abb94ba2b892a1d0602cb06eef16d8b7df1dca1
-  nokogiri (1.19.2) sha256=38fdd8b59db3d5ea9e7dfb14702e882b9bf819198d5bf976f17ebce12c481756
   nokogiri (1.19.2-x86_64-linux-gnu) sha256=fa8feca882b73e871a9845f3817a72e9734c8e974bdc4fbad6e4bc6e8076b94f
   numo-narray (0.9.2.1) sha256=eed76b47eebe1288ffd878b387f1882f4863d8e6ab5dd61453768139e14adceb
   optimist (3.2.1) sha256=8cf8a0fd69f3aa24ab48885d3a666717c27bc3d9edd6e976e18b9d771e72e34e
@@ -899,6 +894,7 @@ CHECKSUMS
   x25519 (1.0.11) sha256=24168680ded91fdd06a4b3c2b0800c71dc149c71265ba57d91df5832a7002b6d
   xpath (3.2.0) sha256=6dfda79d91bb3b949b947ecc5919f042ef2f399b904013eb3ef6d20dd3a4082e
   zeitwerk (2.7.5) sha256=d8da92128c09ea6ec62c949011b00ed4a20242b255293dd66bf41545398f73dd
+  zxcvbn-ruby (1.4.0) sha256=655253a68ce12b9a8991c7a885e43eb516fecd3334f91ca97f57f9679653259f
 
 RUBY VERSION
   ruby 4.0.2p0

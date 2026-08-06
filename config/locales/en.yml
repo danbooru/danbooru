@@ -96,6 +96,7 @@ en:
     errors:
       messages:
         record_invalid: "%{errors}"
+        weak_password: "is too weak: %{warning}"
       models:
         tag:
           attributes:

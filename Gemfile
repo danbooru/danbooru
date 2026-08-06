@@ -59,6 +59,7 @@ gem "bcrypt_pbkdf"
 gem "connection_pool"
 gem "rotp"
 gem "rqrcode"
+gem "zxcvbn-ruby", require: "zxcvbn"
 gem "kramdown"
 gem "abbrev"
 gem "rubyzip", require: false

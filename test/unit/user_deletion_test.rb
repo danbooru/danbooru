@@ -25,7 +25,7 @@ class UserDeletionTest < ActiveSupport::TestCase
     context "for a moderator" do
       should "fail" do
         @user = create(:moderator_user)
-        @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
+        @deletion = UserDeletion.new(user: @user, password: "correct horse battery staple", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "Moderators cannot delete their account")
         assert_equal(false, @user.reload.is_deleted)
@@ -35,7 +35,7 @@ class UserDeletionTest < ActiveSupport::TestCase
     context "for an admin" do
       should "fail" do
         @user = create(:admin_user)
-        @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
+        @deletion = UserDeletion.new(user: @user, password: "correct horse battery staple", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "Admins cannot delete their account")
         assert_equal(false, @user.reload.is_deleted)
@@ -45,7 +45,7 @@ class UserDeletionTest < ActiveSupport::TestCase
     context "for a banned user" do
       should "fail" do
         @user = create(:banned_user)
-        @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
+        @deletion = UserDeletion.new(user: @user, password: "correct horse battery staple", request: @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "You cannot delete your account if you are banned")
         assert_equal(false, @user.reload.is_deleted)
@@ -68,7 +68,7 @@ class UserDeletionTest < ActiveSupport::TestCase
       @active_login_session = create(:login_session, user: @user, status: :active)
       @inactive_login_session = create(:login_session, user: @user, status: :logged_out)
       @request.session[:login_id] = @login_session.login_id
-      @deletion = UserDeletion.new(user: @user, password: "password", request: @request)
+      @deletion = UserDeletion.new(user: @user, password: "correct horse battery staple", request: @request)
     end
 
     should "blank out the email" do
@@ -96,7 +96,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
     should "reset the password" do
       @deletion.delete!
-      assert_equal(false, @user.authenticate_password("password"))
+      assert_equal(false, @user.authenticate_password("correct horse battery staple"))
     end
 
     should "destroy the 2FA secret and backup codes" do
@@ -219,13 +219,13 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "undeleting a user's account" do
     should "restore the user's name and reset their password" do
-      @user = create(:user, name: "fumimi", password: "hunter2")
-      @deletion = UserDeletion.new(user: @user, deleter: create(:owner_user), password: "hunter2")
+      @user = create(:user, name: "fumimi", password: "secure-delete-pass-789")
+      @deletion = UserDeletion.new(user: @user, deleter: create(:owner_user), password: "secure-delete-pass-789")
 
       @deletion.delete!
       assert_equal("user_#{@user.id}", @user.reload.name)
       assert_equal(true, @user.is_deleted)
-      assert_equal(false, @user.authenticate_password("hunter2").present?)
+      assert_equal(false, @user.authenticate_password("secure-delete-pass-789").present?)
       assert_equal("deleted user ##{@user.id}", ModAction.last.description)
       assert_equal("user_delete", ModAction.last.category)
       assert_equal(@deletion.deleter, ModAction.last.creator)
@@ -234,7 +234,7 @@ class UserDeletionTest < ActiveSupport::TestCase
       @deletion.undelete!
       assert_equal("fumimi", @user.reload.name)
       assert_equal(false, @user.is_deleted)
-      assert_equal(true, @user.authenticate_password("hunter2").present?)
+      assert_equal(true, @user.authenticate_password("secure-delete-pass-789").present?)
       assert_equal("undeleted user ##{@user.id}", ModAction.last.description)
       assert_equal("user_undelete", ModAction.last.category)
       assert_equal(@deletion.deleter, ModAction.last.creator)

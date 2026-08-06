@@ -124,7 +124,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     context "on api authentication" do
       setup do
-        @user = create(:user, password: "password")
+        @user = create(:user, password: "correct horse battery staple")
         @api_key = create(:api_key, user: @user)
 
         ActionController::Base.allow_forgery_protection = true
@@ -292,7 +292,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           token = css_select("form input[name=authenticity_token]").first["value"]
 
           # login
-          post session_path, params: { authenticity_token: token, session: { name: @user.name, password: "password" }}
+          post session_path, params: { authenticity_token: token, session: { name: @user.name, password: "correct horse battery staple" }}
           assert_redirected_to root_path
 
           # try to submit a form with cookies but without the csrf token
@@ -306,7 +306,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     context "on session cookie authentication" do
       setup do
-        @user = create(:user, password: "password")
+        @user = create(:user, password: "correct horse battery staple")
         login_as(@user)
       end
 
