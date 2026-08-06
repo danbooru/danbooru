@@ -42,7 +42,7 @@ UserTooltip.on_show = async function (instance) {
   let $tooltip = $(instance.popper);
 
   // skip if tooltip has already been rendered.
-  if ($tooltip.has(".user-tooltip-body").length) {
+  if ($tooltip.has(".user-tooltip").length) {
     return;
   }
 
