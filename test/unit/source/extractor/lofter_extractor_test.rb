@@ -11,6 +11,7 @@ module Source::Tests::Extractor
         profile_urls: [],
         display_name: nil,
         username: nil,
+        published_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -42,6 +43,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://gengar563.lofter.com https://www.lofter.com/mentionredirect.do?blogId=511892108],
         display_name: "续杯超盐酸",
         username: "gengar563",
+        published_at: Time.parse("2020-06-04T12:51:42Z"),
         tags: [
           ["废弃盐酸处理厂", "https://www.lofter.com/tag/废弃盐酸处理厂"],
           ["jojo的奇妙冒险", "https://www.lofter.com/tag/jojo的奇妙冒险"],
@@ -72,6 +74,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://yuli031458.lofter.com https://www.lofter.com/mentionredirect.do?blogId=828627057],
         display_name: "52hertzc",
         username: "yuli031458",
+        published_at: Time.parse("2021-04-05T02:59:25Z"),
         tags: [
           ["明日方舟", "https://www.lofter.com/tag/明日方舟"],
           ["阿米娅", "https://www.lofter.com/tag/阿米娅"],
@@ -90,6 +93,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://chengyeliuli.lofter.com https://www.lofter.com/mentionredirect.do?blogId=487749177],
         display_name: "桃原",
         username: "chengyeliuli",
+        published_at: Time.parse("2022-09-30T07:27:47Z"),
         tags: [
           ["卡涅利安", "https://www.lofter.com/tag/卡涅利安"],
           ["arknights", "https://www.lofter.com/tag/arknights"],
@@ -119,6 +123,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://qiuchenghanshuang.lofter.com https://www.lofter.com/mentionredirect.do?blogId=530408548],
         display_name: "Atum-n",
         username: "qiuchenghanshuang",
+        published_at: Time.parse("2022-11-05T02:28:49Z"),
         tags: [
           ["缄默德克萨斯", "https://www.lofter.com/tag/缄默德克萨斯"],
           ["明日方舟", "https://www.lofter.com/tag/明日方舟"],
@@ -146,8 +151,9 @@ module Source::Tests::Extractor
         ],
         page_url: "https://sdz013.lofter.com/post/1ec04eca_1ccabb5df",
         profile_urls: %w[https://sdz013.lofter.com https://www.lofter.com/mentionredirect.do?blogId=515919562],
-        display_name: "闪光电电鼠",
+        display_name: "无人在意的冷门选手",
         username: "sdz013",
+        published_at: Time.parse("2021-08-04T18:12:26Z"),
         tags: [
           ["军团要塞2", "https://www.lofter.com/tag/军团要塞2"],
           ["TF2", "https://www.lofter.com/tag/TF2"],
@@ -166,6 +172,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://okitagumi.lofter.com https://www.lofter.com/mentionredirect.do?blogId=510242539],
         display_name: "3626151",
         username: "okitagumi",
+        published_at: Time.parse("2017-05-19T14:09:59Z"),
         tags: [
           ["冲田组", "https://www.lofter.com/tag/冲田组"],
           ["加州清光", "https://www.lofter.com/tag/加州清光"],
@@ -231,6 +238,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://honkai.lofter.com https://www.lofter.com/mentionredirect.do?blogId=535969683],
         display_name: "崩崩CG Collection",
         username: "honkai",
+        published_at: Time.parse("2019-01-15T16:14:09Z"),
         tags: [
           ["崩坏学园2", "https://www.lofter.com/tag/崩坏学园2"],
           ["登陆CG", "https://www.lofter.com/tag/登陆CG"],
@@ -297,6 +305,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://jiuhaotaiyangdeshexian.lofter.com https://www.lofter.com/mentionredirect.do?blogId=1945337055],
         display_name: "鸠号太阳的射线-",
         username: "jiuhaotaiyangdeshexian",
+        published_at: Time.parse("2023-02-27T08:19:12Z"),
         tags: [],
         dtext_artist_commentary_title: "Q:老师！想问问最近会不会画ITZY？🥰🥰",
         dtext_artist_commentary_desc: "不好意思现在才看到！那就画一个荔枝猫猫吧😄",
@@ -312,6 +321,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://wooden-brain.lofter.com https://www.lofter.com/mentionredirect.do?blogId=509664859],
         display_name: "依末",
         username: "wooden-brain",
+        published_at: Time.parse("2020-06-24T11:01:59Z"),
         tags: [
           ["短视频", "https://www.lofter.com/tag/短视频"],
           ["明日方舟", "https://www.lofter.com/tag/明日方舟"],
@@ -331,6 +341,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://xingfulun16203.lofter.com https://www.lofter.com/mentionredirect.do?blogId=2007403972],
         display_name: "12378",
         username: "xingfulun16203",
+        published_at: Time.parse("2023-08-22T05:14:00Z"),
         tags: [
           ["夸奈", "https://www.lofter.com/tag/夸奈"],
           ["我推的孩子", "https://www.lofter.com/tag/我推的孩子"],
@@ -358,6 +369,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://lesegeng.lofter.com https://www.lofter.com/mentionredirect.do?blogId=520809479],
         display_name: "羔",
         username: "lesegeng",
+        published_at: Time.parse("2024-05-06T01:19:01Z"),
         tags: [
           ["幻密", "https://www.lofter.com/tag/幻密"],
           ["apex", "https://www.lofter.com/tag/apex"],
@@ -377,6 +389,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://gxszdddd.lofter.com],
         display_name: nil,
         username: "gxszdddd",
+        published_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",

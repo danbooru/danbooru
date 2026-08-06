@@ -55,6 +55,10 @@ module Source
         end
       end
 
+      def published_at
+        Time.at(post[:publishTime] / 1000).utc if post[:publishTime].present?
+      end
+
       def display_name
         blog[:blogNickName]&.strip
       end
