@@ -28,7 +28,7 @@ module Source
       # The API contains the original images, but not the videos.
       memoize def image_urls_from_api
         api_response[:images].to_a.filter_map do |url|
-          Source::URL.parse(URI.join("https:", url).to_s)
+          Source::URL.parse(URI.join("https:", url).to_s).with_params(type: "orig")
         end
       end
 
