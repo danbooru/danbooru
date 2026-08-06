@@ -15,6 +15,7 @@ module Source::Tests::URL
 
       should be_page_url(
         "https://cafe.naver.com/ca-fe/cafes/29767250/articles/785",
+        "https://cafe.naver.com/f-e/cafes/30487825/articles/787181",
         "https://m.cafe.naver.com/ca-fe/web/cafes/29767250/articles/785",
         "https://cafe.naver.com/ArticleRead.nhn?clubid=29767250&articleid=793",
         "https://m.cafe.naver.com/ArticleRead.nhn?clubid=29767250&articleid=793",

@@ -107,6 +107,23 @@ module Source::Tests::Extractor
       )
     end
 
+    context "An /f-e/ article with an embedded video" do
+      strategy_should_work(
+        "https://cafe.naver.com/f-e/cafes/30487825/articles/787181",
+        image_urls: [
+          %r{\Ahttps://[^/]+-naver-vod\.(?:pstatic|akamaized)\.net/.+\.mp4\?},
+        ],
+        media_files: [
+          { file_size: 3_362_200 },
+        ],
+        page_url: "https://cafe.naver.com/ca-fe/cafes/30487825/articles/787181",
+        profile_urls: %w[https://cafe.naver.com/ca-fe/cafes/30487825/members/ka3gDYkoYjVkd95BS9avn4zvOB0Z3BiM1qz-NYC1FH0 https://cafe.naver.com/honkaistarrail],
+        display_name: "세레븐",
+        username: nil,
+        dtext_artist_commentary_title: "마이데이 더빙해봤는데 봐주랍",
+      )
+    end
+
     context "An article with images as attachments" do
       strategy_should_work(
         "https://cafe.naver.com/ca-fe/cafes/29767250/articles/785",
