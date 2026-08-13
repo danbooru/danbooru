@@ -21,6 +21,20 @@ class NoteVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render previous comparisons from old to new" do
+        get note_versions_path, params: { search: { note_id: @note.id }, type: "previous" }
+
+        assert_response :success
+        assert_body_diff_direction
+      end
+
+      should "render current comparisons from old to new" do
+        get note_versions_path, params: { search: { note_id: @note.id }, type: "current" }
+
+        assert_response :success
+        assert_body_diff_direction
+      end
+
       should respond_to_search.with { @versions.reverse }
       should respond_to_search(body_matches: "blah").with { @versions[1] }
       should respond_to_search(version: 1).with { @versions[0] }
@@ -40,6 +54,16 @@ class NoteVersionsControllerTest < ActionDispatch::IntegrationTest
         get note_version_path(@note.versions.first), as: :json
         assert_response :success
       end
+    end
+  end
+
+  private
+
+  def assert_body_diff_direction
+    assert_select "td.diff-body" do |cells|
+      assert(cells.any? do |cell|
+        cell.at_css("del")&.text == "blah" && cell.at_css("ins")&.text == "1 2 3"
+      end)
     end
   end
 end
