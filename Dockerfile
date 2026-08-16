@@ -21,10 +21,16 @@
 ARG RUBY_VERSION="4.0.2"
 ARG RUBY_MAJOR_VERSION="4.0"
 
+# The comments above these ARGs help renovate figure out where to check for new versions of these dependencies.
+# github: mozilla/mozjpeg
 ARG MOZJPEG_VERSION="4.1.5"
+# github: libvips/libvips
 ARG VIPS_VERSION="8.14.2"
+# github: FFmpeg/FFmpeg
 ARG FFMPEG_VERSION="7.1.1"
+# github: exiftool/exiftool
 ARG EXIFTOOL_VERSION="13.50"
+# github: openresty/openresty
 ARG OPENRESTY_VERSION="1.29.2.3"
 ARG NODE_VERSION="24.14.1"
 ARG UBUNTU_VERSION="noble-20260217@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7072feef0c"
