@@ -6,6 +6,7 @@
     "config:recommended",
     "mergeConfidence:all-badges"
   ],
+  "rangeStrategy": "bump",
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
   "minimumReleaseAge": "14 days",
