@@ -58,7 +58,7 @@
     "stylelint": "^17.14.1",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-config-standard-scss": "^17.0.0",
-    "webpack-dev-server": "^5.2.2"
+    "webpack-dev-server": "^6.0.0"
   },
   "scripts": {
     "eslint-all": "npx eslint --cache --cache-location tmp/ --ext .js,.js.erb app/",
