@@ -24,6 +24,7 @@ ARG RUBY_MAJOR_VERSION="4.0"
 # The comments above these ARGs help renovate figure out where to check for new versions of these dependencies.
 # github: mozilla/mozjpeg
 ARG MOZJPEG_VERSION="4.1.5"
+# TODO: remove CMAKE_POLICY_VERSION_MINIMUM from mozjpeg stage once it's updated (see below)
 # github: libvips/libvips
 ARG VIPS_VERSION="8.14.2"
 # github: FFmpeg/FFmpeg
@@ -33,9 +34,9 @@ ARG EXIFTOOL_VERSION="13.50"
 # github: openresty/openresty
 ARG OPENRESTY_VERSION="1.29.2.3"
 ARG NODE_VERSION="24.18.1"
-ARG UBUNTU_VERSION="noble-20260217@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7072feef0c"
+ARG UBUNTU_VERSION="resolute-20260724.1@sha256:678c6550cc43645e08669028bc177f50be4e7c5b8cca677067b1914d4afc7a03"
 # Remember to update the UBUNTU_SNAPSHOT ARG below when UBUNTU_VERSION is updated
-ARG UBUNTU_SNAPSHOT="20260401T000000Z"
+ARG UBUNTU_SNAPSHOT="20260801T000000Z"
 
 
 # The base layer for everything.
@@ -74,9 +75,10 @@ EOF
 
   rm -rf /var/lib/apt/lists/*
   apt-get install --update -y --no-install-recommends \
-    postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
-    libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0t64 liblcms2-2 libpng16-16 libexpat1 \
-    libglib2.0-0 libgif7 libexif12 libheif1 libx264-164 libx265-199 libsvtav1enc1d1 libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
+    postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.40 libpq5 libpcre2-8-0 libsodium23 \
+    libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4-0t64 liblcms2-2 libpng16-16t64 libexpat1 \
+    libglib2.0-0t64 libgif7 libexif12 libheif1 libheif-plugin-dav1d libheif-plugin-libde265 libx264-165 libx265-215 libsvtav1enc2 \
+    libvpx12 libdav1d7 libseccomp-dev libjemalloc2 libarchive13t64 libyaml-0-2 libffi8 \
     libreadline8t64 libarchive-zip-perl tini busybox less ncdu curl
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs mount procps python3 tzdata
@@ -123,6 +125,9 @@ EOS
 
 
 # Build MozJPEG. Output is in /usr/local.
+# TODO: remove CMAKE_POLICY_VERSION_MINIMUM once MozJPEG has a new release > 4.1.5.
+# MozJPEG declares a minimum CMake required version which CMake 4, the default version for Ubuntu 26.04,
+# does not support. It is fixed in their master branch, but no new release has been published yet.
 FROM build-base AS build-mozjpeg
 ARG JOBS
 ARG MOZJPEG_VERSION
@@ -131,7 +136,7 @@ RUN <<EOS
   apt-get install -y --no-install-recommends $MOZJPEG_BUILD_DEPS
   curl -L "https://github.com/mozilla/mozjpeg/archive/refs/tags/v${MOZJPEG_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
-  cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_STATIC=0 -DWITH_ARITH_ENC=1 -DWITH_ARITH_DEC=1 .
+  cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_STATIC=0 -DWITH_ARITH_ENC=1 -DWITH_ARITH_DEC=1 .
   make -j$JOBS install/strip
 
   rm -rf * /usr/local/share /usr/local/man
@@ -211,7 +216,7 @@ EOS
 FROM build-base AS build-exiftool
 ARG JOBS
 ARG EXIFTOOL_VERSION
-ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.38 libarchive-zip-perl"
+ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.40 libarchive-zip-perl"
 RUN <<EOS
   apt-get install -y --no-install-recommends $EXIFTOOL_BUILD_DEPS
   curl -L "https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
@@ -233,7 +238,7 @@ EOS
 FROM build-base AS build-openresty
 ARG JOBS
 ARG OPENRESTY_VERSION
-ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre3-dev zlib1g-dev"
+ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre2-dev zlib1g-dev"
 ARG OPENRESTY_BUILD_OPTIONS="\
  --with-threads --with-compat --with-pcre-jit --with-file-aio \
  --with-http_gunzip_module --with-http_gzip_static_module \
@@ -286,7 +291,7 @@ EOS
 FROM build-ruby AS build-gems
 WORKDIR /danbooru
 
-RUN apt-get install -y --no-install-recommends libpq-dev ragel=6.10-4
+RUN apt-get install -y --no-install-recommends libpq-dev ragel
 
 COPY --chown=danbooru:danbooru lib/dtext_rb/ lib/dtext_rb/
 USER danbooru
@@ -418,7 +423,7 @@ FROM danbooru-base AS development
 
 RUN <<EOS
   apt-get update
-  apt-get install -y --no-install-recommends g++ make ragel=6.10-4 git sudo gpg socat libyaml-dev libpq-dev gh
+  apt-get install -y --no-install-recommends g++ make ragel git sudo gpg socat libyaml-dev libpq-dev gh
 
   groupadd admin -U danbooru
   passwd -d danbooru
