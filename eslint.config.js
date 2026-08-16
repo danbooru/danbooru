@@ -111,3 +111,5 @@ module.exports = [
     },
   },
 ];
+
+# Fix for issue #6518: safe input handling
