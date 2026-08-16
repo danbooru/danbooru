@@ -1,6 +1,133 @@
+
+
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    "mergeConfidence:all-badges"
+  ],
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true,
+  "minimumReleaseAge": "14 days",
+  "prConcurrentLimit": 5,
+  "customManagers": [
+    {
+      "description": "Track the Ruby version pinned in the Dockerfile so it can be grouped with .ruby-version",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG RUBY_VERSION=\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "ruby",
+      "datasourceTemplate": "ruby-version"
+    },
+    {
+      "description": "Track the Node version pinned in the Dockerfile. Only LTS versions are suggested",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG NODE_VERSION=\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version",
+      "depTypeTemplate": "docker-dependencies"
+    },
+    {
+      "description": "Track any '# github: owner/repo' comment followed by an 'ARG FOO_VERSION=\"...\"' line in the Dockerfile, checking GitHub tags for new versions.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "#\\s*github:\\s*(?<packageName>[\\w.-]+/[\\w.-]+)\\s*\\n\\s*ARG (?<argName>[A-Z0-9]+)_VERSION=\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "{{lowercase argName}}",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^[a-zA-Z]?(?<version>\\d.*)$",
+      "versioningTemplate": "semver-coerced",
+      "depTypeTemplate": "docker-dependencies"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Keep the Ruby version in .ruby-version and the Dockerfile in sync by updating them in the same PR/commit",
+      "groupName": "ruby version",
+      "matchDatasources": [
+        "ruby-version"
+      ]
+    },
+    {
+      "description": "Don't automatically create PRs for non-package manager dependencies (such as Ruby version)",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "prCreation": "approval"
+    },
+    {
+      "description": "Give highest priority to npm/bundler updates",
+      "matchPackageNames": [
+        "npm",
+        "bundler"
+      ],
+      "prPriority": 100
+    },
+    {
+      "description": "Group all non-major updates together",
+      "groupName": "{{manager}} non-major dependencies",
+      "groupSlug": "{{manager}}-minor-patch",
+      "matchManagers": [
+        "npm",
+        "bundler",
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    },
+    {
+      "description": "Better PR titles",
+      "commitMessageTopic": "{{manager}} dependency {{depName}}",
+      "commitMessageExtra": "from {{currentVersion}} to {{newVersion}}",
+      "matchPackageNames": [
+        "*"
+      ]
+    },
+    {
+      "description": "Use the file path instead of just 'dockerfile' in the title for Dockerfiles outside the repo root, since there are multiple Dockerfiles in this repo",
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "matchFileNames": [
+        "!Dockerfile"
+      ],
+      "commitMessageTopic": "{{packageFile}} dependency {{depName}}"
+    },
+    {
+      "description": "Use 'ruby' title for main ruby version updates",
+      "matchDatasources": [
+        "ruby-version"
+      ],
+      "commitMessageTopic": "{{depName}}"
+    },
+    {
+      "description": "Use short names instead of the full repo slur for the misc Dockerfile build tools",
+      "matchDepTypes": [
+        "docker-dependencies"
+      ],
+      "commitMessageTopic": "dockerfile dependency {{depName}}"
+    },
+    {
+      "description": "Groups together shakapacker updates",
+      "matchPackageNames": [
+        "shakapacker"
+      ],
+      "groupName": "shakapacker-bundler-stack"
+    }
   ]
 }
+
