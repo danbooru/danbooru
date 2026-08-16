@@ -5,10 +5,12 @@
   "extends": [
     "config:recommended",
     "mergeConfidence:all-badges",
-    ":maintainLockFilesWeekly",
     "abandonments:recommended",
     ":configMigration"
   ],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "rangeStrategy": "bump",
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
@@ -66,6 +68,16 @@
         "bundler"
       ],
       "rangeStrategy": "update-lockfile"
+    },
+    {
+      "description": "Only run lock file maintenance on package-lock.json. Our Gemfile does not specify max versions, so refreshing Gemfile.lock risks updating everything.",
+      "matchManagers": [
+        "bundler"
+      ],
+      "matchUpdateTypes": [
+        "lockFileMaintenance"
+      ],
+      "enabled": false
     },
     {
       "description": "Don't automatically create PRs for non-package manager dependencies (such as Ruby version)",
