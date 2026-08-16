@@ -4,7 +4,10 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "mergeConfidence:all-badges"
+    "mergeConfidence:all-badges",
+    ":maintainLockFilesWeekly",
+    "abandonments:recommended",
+    ":configMigration"
   ],
   "rangeStrategy": "bump",
   "separateMajorMinor": true,
