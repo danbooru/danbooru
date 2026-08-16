@@ -45,13 +45,12 @@
     "twemoji-colr-font": "^15.0.3",
     "webpack": "^5.109.2",
     "webpack-assets-manifest": "^6.5.2",
-    "webpack-cli": "^6.0.1",
+    "webpack-cli": "^7.2.2",
     "webpack-merge": "^6.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.29.7",
     "@eslint/js": "^10.0.1",
-    "@webpack-cli/serve": "^3.0.1",
     "eslint": "^10.8.0",
     "eslint-plugin-ignore-erb": "^0.1.1",
     "globals": "^17.9.0",
