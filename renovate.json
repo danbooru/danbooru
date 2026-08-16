@@ -55,13 +55,6 @@
   ],
   "packageRules": [
     {
-      "description": "Keep the Ruby version in .ruby-version and the Dockerfile in sync by updating them in the same PR/commit",
-      "groupName": "ruby version",
-      "matchDatasources": [
-        "ruby-version"
-      ]
-    },
-    {
       "description": "Don't automatically create PRs for non-package manager dependencies (such as Ruby version)",
       "matchManagers": [
         "custom.regex"
@@ -88,6 +81,13 @@
       "matchUpdateTypes": [
         "minor",
         "patch"
+      ]
+    },
+    {
+      "description": "Keep the Ruby version in .ruby-version and the Dockerfile in sync by updating them in the same PR/commit. This must come after the 'group all non-major updates' rule so it wins for groupName, since the bundler manager also extracts the Gemfile ruby directive under the ruby-version datasource.",
+      "groupName": "ruby version",
+      "matchDatasources": [
+        "ruby-version"
       ]
     },
     {
