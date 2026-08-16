@@ -11,6 +11,9 @@
   "separateMultipleMajor": true,
   "minimumReleaseAge": "14 days",
   "prConcurrentLimit": 5,
+  "ignorePaths": [
+    "lib/dtext_rb/Dockerfile"
+  ],
   "customManagers": [
     {
       "description": "Track the Ruby version pinned in the Dockerfile so it can be grouped with .ruby-version",
