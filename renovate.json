@@ -58,6 +58,13 @@
   ],
   "packageRules": [
     {
+      "description": "Force bundler to process gem updates from Gemfile.lock instead of Gemfile.",
+      "matchManagers": [
+        "bundler"
+      ],
+      "rangeStrategy": "update-lockfile"
+    },
+    {
       "description": "Don't automatically create PRs for non-package manager dependencies (such as Ruby version)",
       "matchManagers": [
         "custom.regex"
