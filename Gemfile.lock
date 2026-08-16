@@ -584,7 +584,7 @@ DEPENDENCIES
   abbrev
   activemodel-serializers-xml
   addressable
-  aws-sdk-sqs (~> 1)
+  aws-sdk-sqs
   bcrypt
   bcrypt_pbkdf
   benchmark
