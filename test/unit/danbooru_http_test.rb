@@ -2,7 +2,7 @@ require "test_helper"
 
 class DanbooruHttpTest < ActiveSupport::TestCase
   def httpbin_url(path = "")
-    "https://httpbin.org/#{path}"
+    "https://httpbingo.org/#{path}"
   end
 
   context "Danbooru::Http" do
@@ -32,10 +32,9 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "fail if the request takes too long to download" do
-        # XXX should return status 597 instead
-        assert_raises(HTTP::TimeoutError) do
-          Danbooru::Http.timeout(1).get(httpbin_url("drip?duration=10&numbytes=10")).flush
-        end
+        response = Danbooru::Http.timeout(1).get(httpbin_url("drip?duration=5&numbytes=10")).flush
+        assert_equal(597, response.status)
+        assert_equal("", response.body.to_s)
       end
 
       should "return a 5xx error if the domain can't be resolved" do
@@ -72,8 +71,8 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "track cookies between requests" do
         http = Danbooru::Http.use(:session)
 
-        resp1 = http.get(httpbin_url("cookies/set/abc/1"))
-        resp2 = http.get(httpbin_url("cookies/set/def/2"))
+        resp1 = http.get(httpbin_url("cookies/set?abc=1"))
+        resp2 = http.get(httpbin_url("cookies/set?def=2"))
         resp3 = http.get(httpbin_url("cookies"))
         assert_equal({ abc: "1", def: "2" }, resp3.parse["cookies"].symbolize_keys)
 
@@ -162,8 +161,8 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         http = Danbooru::Http.cache(1.hour)
 
         resp1 = http.get(httpbin_url("cookies"))
-        resp2 = http.get(httpbin_url("cookies/set/abc/1"))
-        resp3 = http.get(httpbin_url("cookies/set/def/2"))
+        resp2 = http.get(httpbin_url("cookies/set?abc=1"))
+        resp3 = http.get(httpbin_url("cookies/set?def=2"))
         resp4 = http.get(httpbin_url("cookies"))
 
         assert_equal(200, resp1.status)
@@ -233,7 +232,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         response = Danbooru::Http.use(:spoof_referrer).get(httpbin_url("anything"))
 
         assert_equal(200, response.status)
-        assert_equal(httpbin_url("anything"), response.parse.dig("headers", "Referer"))
+        assert_equal([httpbin_url("anything")], response.parse.dig("headers", "Referer"))
       end
     end
 
