@@ -238,7 +238,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for an unsupported video file" do
         should "fail for a .mkv file" do
-          create_upload!("test/files/webm/test-512x512.mkv", user: @user)
+          create_upload!("test/files/mkv/test-512x512.mkv", user: @user)
           assert_match("File type is not supported", Upload.last.error)
         end
 
@@ -461,7 +461,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "uploading a .zip file from your computer" do
         should "work" do
-          upload = assert_successful_upload("test/files/archive/ugoira.zip", user: @user)
+          upload = assert_successful_upload("test/files/ugoira/ugoira.zip", user: @user)
 
           assert_equal(5, upload.media_asset_count)
           assert_equal(5, upload.upload_media_assets.size)

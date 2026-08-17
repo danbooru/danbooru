@@ -156,7 +156,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for an invalid metatag value" do
       should "return nothing" do
-        create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
+        create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42)
 
         assert_tag_match([], "score:foo")
         assert_tag_match([], "score:42x")
@@ -811,7 +811,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the ratio:<x:y> metatag" do
-      post = create(:post_with_file, filename: "test.jpg")
+      post = create(:post_with_file, filename: "jpg/test.jpg")
 
       assert_tag_match([post], "ratio:1.49")
       assert_tag_match([post], "ratio:.149e1")
@@ -825,7 +825,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the mpixels:N metatag" do
-      post = create(:post_with_file, filename: "test.jpg")
+      post = create(:post_with_file, filename: "jpg/test.jpg")
 
       assert_tag_match([post], "mpixels:0.1675")
       assert_tag_match([post], "mpixels:+0.1675")
@@ -1101,7 +1101,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the md5:<md5> metatag" do
-      post1 = create(:post_with_file, filename: "test.jpg")
+      post1 = create(:post_with_file, filename: "jpg/test.jpg")
       post2 = create(:post)
 
       assert_tag_match([post1], "md5:ecef68c44edb8a0d6a3070b5f8e8ee76")
@@ -1118,8 +1118,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the pixelhash:<md5> metatag" do
-      post1 = create(:post_with_file, filename: "test.jpg")
-      post2 = create(:post_with_file, filename: "test.png")
+      post1 = create(:post_with_file, filename: "jpg/test.jpg")
+      post2 = create(:post_with_file, filename: "png/test.png")
 
       assert_tag_match([post1], "pixelhash:01cb481ec7730b7cfced57ffa5abd196")
       assert_tag_match([post1], "pixelhash:01CB481EC7730B7CFCED57FFA5ABD196")
@@ -1380,9 +1380,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for an exif:<value> metatag" do
-      jpg = create(:post_with_file, filename: "test.jpg")
-      gif = create(:post_with_file, filename: "test.gif")
-      png = create(:post_with_file, filename: "test.png")
+      jpg = create(:post_with_file, filename: "jpg/test.jpg")
+      gif = create(:post_with_file, filename: "gif/test.gif")
+      png = create(:post_with_file, filename: "png/test.png")
 
       assert_tag_match([jpg], "exif:File:ColorComponents")
       assert_tag_match([jpg], "exif:File:ColorComponents=3")
