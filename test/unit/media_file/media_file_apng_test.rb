@@ -1,95 +1,370 @@
 require "test_helper"
 
 class MediaFileApngTest < ActiveSupport::TestCase
-  context "#dimensions" do
-    should "determine the correct dimensions for a png file" do
-      assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").dimensions)
+  context "Previews" do
+    should "be generated properly" do
+      should_generate_previews(
+        "apng",
+        failures: ["test/files/apng/misaligned_chunks.png"],
+      )
     end
   end
 
-  context "#file_ext" do
-    should "determine the correct extension for a png file" do
-      assert_equal(:png, MediaFile.open("test/files/apng/normal_apng.png").file_ext)
+  context "a normal APNG file" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/normal.png")
+
+      assert_equal(150, file.width)
+      assert_equal(150, file.height)
+      assert_equal(6679, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("0c7758e594a1d9b83d79e03a8709bedf", file.md5)
+      assert_equal("0c7758e594a1d9b83d79e03a8709bedf", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_equal(5.0, file.duration)
+      assert_equal(3, file.frame_count)
+      assert_equal(0.6, file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 150,
+        "PNG:ImageHeight" => 150,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 3,
+        "PNG:AnimationPlays" => "inf",
+      }, file.metadata.to_h)
     end
   end
 
-  context "#preview" do
-    should "generate a preview image for an animated image" do
-      skip unless MediaFile.videos_enabled?
-      assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").preview(150, 150).dimensions)
+  context "a 256x256 animated PNG" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/normal-256x256.png")
+
+      assert_equal(256, file.width)
+      assert_equal(256, file.height)
+      assert_equal(21_213, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("64872dbdc62b6b02e6fc5f468838f674", file.md5)
+      assert_equal("64872dbdc62b6b02e6fc5f468838f674", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_equal(0.75, file.duration)
+      assert_equal(5, file.frame_count)
+      assert_equal(6.666666666666667, file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 256,
+        "PNG:ImageHeight" => 256,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 5,
+        "PNG:AnimationPlays" => "inf",
+      }, file.metadata.to_h)
     end
   end
 
-  context "#duration" do
-    should "get the correct duration for animated files" do
-      assert_equal(5.0, MediaFile.open("test/files/apng/normal_apng.png").duration)
-      assert_nil(MediaFile.open("test/files/apng/normal_apng.png").vips_duration)
-      assert_equal(5.0, MediaFile.open("test/files/apng/normal_apng.png").ffmpeg_duration)
+  context "a non-animated PNG file" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/not_apng.png")
+
+      assert_equal(16, file.width)
+      assert_equal(16, file.height)
+      assert_equal(400, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("0077b918ce8e454bc47f1054d57d6bf7", file.md5)
+      assert_equal("e99d97607fc43861a0b79eb1527e92e8", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(1, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "PNG",
+        "PNG:ImageWidth" => 16,
+        "PNG:ImageHeight" => 16,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:Gamma" => 2.2,
+        "PNG:Software" => "Paint.NET v3.5.11",
+      }, file.metadata.to_h)
     end
   end
 
-  context "a PNG file" do
-    context "that is not animated" do
-      should "not be detected as animated" do
-        file = MediaFile.open("test/files/apng/not_apng.png")
+  context "a single-frame APNG file" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/single_frame.png")
 
-        assert_equal(false, file.is_corrupt?)
-        assert_equal(false, file.is_animated?)
-        assert_nil(file.duration)
-        assert_nil(file.frame_rate)
-        assert_equal(1, file.frame_count)
-      end
+      assert_equal(192, file.width)
+      assert_equal(110, file.height)
+      assert_equal(11_246, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("360fdda16aa9c86bbde8f30e619e4f98", file.md5)
+      assert_equal("c02cf3d1007a7f4a6e42d6b60c3b52f0", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(1, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 192,
+        "PNG:ImageHeight" => 110,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 1,
+        "PNG:AnimationPlays" => "inf",
+      }, file.metadata.to_h)
     end
+  end
+  context "an APNG file with a missing IEND chunk" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/iend_missing.png")
 
-    context "that is animated" do
-      should "be detected as animated" do
-        file = MediaFile.open("test/files/apng/normal_apng.png")
-
-        assert_equal(false, file.is_corrupt?)
-        assert_equal(true, file.is_animated?)
-        assert_equal(5.0, file.duration)
-        assert_nil(file.vips_duration)
-        assert_equal(5.0, file.ffmpeg_duration)
-        assert_equal(0.6, file.frame_rate)
-        assert_equal(3, file.frame_count)
-      end
+      assert_equal(150, file.width)
+      assert_equal(150, file.height)
+      assert_equal(6667, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("0d4172d6c000b4ce5522dd24dcfab8dd", file.md5)
+      assert_equal("0d4172d6c000b4ce5522dd24dcfab8dd", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_equal(5.0, file.duration)
+      assert_equal(3, file.frame_count)
+      assert_equal(0.6, file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 150,
+        "PNG:ImageHeight" => 150,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 3,
+        "PNG:AnimationPlays" => "inf",
+        "ExifTool:Warning" => "Truncated PNG image",
+      }, file.metadata.to_h)
     end
+  end
 
-    context "that is animated but with only one frame" do
-      should "not be detected as animated" do
-        file = MediaFile.open("test/files/apng/single_frame.png")
+  context "an APNG file with misaligned chunks" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/misaligned_chunks.png")
 
-        assert_equal(false, file.is_corrupt?)
-        assert_equal(false, file.is_animated?)
-        assert_nil(file.duration)
-        assert_nil(file.frame_rate)
-        assert_equal(1, file.frame_count)
-      end
+      assert_equal(150, file.width)
+      assert_equal(150, file.height)
+      assert_equal(6679, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("ebfdb8761098f044a5d21fdfce8176ed", file.md5)
+      assert_equal("ebfdb8761098f044a5d21fdfce8176ed", file.pixel_hash)
+      assert_equal(true, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_equal(0.04, file.duration)
+      assert_equal(3, file.frame_count)
+      assert_equal(75.0, file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 150,
+        "PNG:ImageHeight" => 150,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 3,
+        "PNG:AnimationPlays" => "inf",
+        "ExifTool:Warning" => "Invalid PNG chunk size",
+        "Vips:Error" => "libvips error",
+      }, file.metadata.to_h)
     end
+  end
 
-    context "that is animated but malformed" do
-      should "be handled correctly" do
-        file = MediaFile.open("test/files/apng/iend_missing.png")
-        assert_equal(false, file.is_corrupt?)
-        assert_equal(true, file.is_animated?)
+  context "a broken, truncated APNG file" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/broken.png")
 
-        file = MediaFile.open("test/files/apng/misaligned_chunks.png")
-        assert_equal(true, file.is_corrupt?)
-        assert_equal(true, file.is_animated?)
+      assert_equal(150, file.width)
+      assert_equal(150, file.height)
+      assert_equal(400, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("c14cac2d5c1235aa632c9aa9d6cac3b5", file.md5)
+      assert_equal("c14cac2d5c1235aa632c9aa9d6cac3b5", file.pixel_hash)
+      assert_equal(true, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(3, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 150,
+        "PNG:ImageHeight" => 150,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 3,
+        "PNG:AnimationPlays" => "inf",
+        "ExifTool:Warning" => "Truncated PNG image",
+        "Vips:Error" => "libvips error",
+      }, file.metadata.to_h)
+    end
+  end
 
-        file = MediaFile.open("test/files/apng/broken.png")
-        assert_equal(true, file.is_corrupt?)
-        assert_equal(true, file.is_animated?)
+  context "an APNG file with a wrong acTL chunk length" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/actl_wronglen.png")
 
-        file = MediaFile.open("test/files/apng/actl_wronglen.png")
-        assert_equal(false, file.is_corrupt?)
-        assert_equal(true, file.is_animated?)
+      assert_equal(150, file.width)
+      assert_equal(150, file.height)
+      assert_equal(6675, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("73080760e76307d3a91e978d87813bb2", file.md5)
+      assert_equal("73080760e76307d3a91e978d87813bb2", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_equal(0.04, file.duration)
+      assert_equal(3, file.frame_count)
+      assert_equal(75.0, file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 150,
+        "PNG:ImageHeight" => 150,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 3,
+      }, file.metadata.to_h)
+    end
+  end
 
-        file = MediaFile.open("test/files/apng/actl_zero_frames.png")
-        assert_equal(false, file.is_corrupt?)
-        assert_equal(false, file.is_animated?)
-        assert_equal(0, file.frame_count)
-      end
+  context "an APNG file with an acTL chunk specifying zero frames" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/actl_zero_frames.png")
+
+      assert_equal(150, file.width)
+      assert_equal(150, file.height)
+      assert_equal(6679, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("f0e1112e64a8f16bec30b4a58405d201", file.md5)
+      assert_equal("e8e6e1cfb45f15198b5640cf4f1f0ff5", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(0, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 150,
+        "PNG:ImageHeight" => 150,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 0,
+        "PNG:AnimationPlays" => "inf",
+      }, file.metadata.to_h)
+    end
+  end
+
+  context "an APNG file with a missing IEND chunk" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/iend_missing.png")
+
+      assert_equal(150, file.width)
+      assert_equal(150, file.height)
+      assert_equal(6667, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("0d4172d6c000b4ce5522dd24dcfab8dd", file.md5)
+      assert_equal("0d4172d6c000b4ce5522dd24dcfab8dd", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_equal(5.0, file.duration)
+      assert_equal(3, file.frame_count)
+      assert_equal(0.6, file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 150,
+        "PNG:ImageHeight" => 150,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB with Alpha",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 3,
+        "PNG:AnimationPlays" => "inf",
+        "ExifTool:Warning" => "Truncated PNG image",
+      }, file.metadata.to_h)
+    end
+  end
+
+  context "an animated PNG with an unspecified (infinite) frame rate" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/apng/infinite-fps.png")
+
+      assert_equal(640, file.width)
+      assert_equal(480, file.height)
+      assert_equal(217_425, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("8b18b12d212e08d1773f6fd329b63b15", file.md5)
+      assert_equal("8b18b12d212e08d1773f6fd329b63b15", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_equal(0.6, file.duration)
+      assert_equal(2, file.frame_count)
+      assert_equal(3.3333333333333335, file.frame_rate)
+      assert_equal({
+        "File:FileType" => "APNG",
+        "PNG:ImageWidth" => 640,
+        "PNG:ImageHeight" => 480,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "PNG:AnimationFrames" => 2,
+        "PNG:AnimationPlays" => "inf",
+        "PNG:Software" => "APNG Assembler 2.0",
+        "ExifTool:Warning" => "[minor] Text/EXIF chunk(s) found after APNG IDAT (may be ignored by some readers)",
+      }, file.metadata.to_h)
     end
   end
 end
