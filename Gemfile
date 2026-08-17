@@ -9,7 +9,7 @@ gem "sanitize"
 gem "ruby-vips"
 gem "diff-lcs", require: false
 gem "bcrypt", require: "bcrypt"
-gem "aws-sdk-sqs", "~> 1"
+gem "aws-sdk-sqs"
 gem "responders"
 gem "dtext_rb", path: "lib/dtext_rb", require: "dtext"
 gem "memoist"

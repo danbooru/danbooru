@@ -33,9 +33,9 @@ ARG EXIFTOOL_VERSION="13.50"
 # github: openresty/openresty
 ARG OPENRESTY_VERSION="1.29.2.3"
 ARG NODE_VERSION="24.18.1"
-ARG UBUNTU_VERSION="noble-20260217@sha256:186072bba1b2f436cbb91ef2567abca677337cfc786c86e107d25b7072feef0c"
+ARG UBUNTU_VERSION="noble-20260610@sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90"
 # Remember to update the UBUNTU_SNAPSHOT ARG below when UBUNTU_VERSION is updated
-ARG UBUNTU_SNAPSHOT="20260401T000000Z"
+ARG UBUNTU_SNAPSHOT="20260801T000000Z"
 
 
 # The base layer for everything.
@@ -74,9 +74,10 @@ EOF
 
   rm -rf /var/lib/apt/lists/*
   apt-get install --update -y --no-install-recommends \
-    postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre3 libsodium23 \
-    libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4.0t64 liblcms2-2 libpng16-16 libexpat1 \
-    libglib2.0-0 libgif7 libexif12 libheif1 libx264-164 libx265-199 libsvtav1enc1d1 libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13 libyaml-0-2 libffi8 \
+    postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre2-8-0 libsodium23 \
+    libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4-0t64 liblcms2-2 libpng16-16t64 libexpat1 \
+    libglib2.0-0t64 libgif7 libexif12 libheif1 libheif-plugin-dav1d libheif-plugin-libde265 libx264-164 libx265-199 libsvtav1enc1d1 \
+    libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13t64 libyaml-0-2 libffi8 \
     libreadline8t64 libarchive-zip-perl tini busybox less ncdu curl
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs mount procps python3 tzdata
@@ -149,7 +150,7 @@ RUN <<EOS
   apt-get install -y --no-install-recommends $VIPS_BUILD_DEPS
   curl -L "https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz" | tar --strip-components=1 -xJvf -
 
-  meson build --prefix /usr/local --buildtype release --strip -Dcplusplus=false
+  meson setup build --prefix /usr/local --buildtype release --strip -Dcplusplus=false
   meson compile -C build
   meson install -C build
 
@@ -233,7 +234,7 @@ EOS
 FROM build-base AS build-openresty
 ARG JOBS
 ARG OPENRESTY_VERSION
-ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre3-dev zlib1g-dev"
+ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre2-dev zlib1g-dev"
 ARG OPENRESTY_BUILD_OPTIONS="\
  --with-threads --with-compat --with-pcre-jit --with-file-aio \
  --with-http_gunzip_module --with-http_gzip_static_module \
@@ -286,7 +287,7 @@ EOS
 FROM build-ruby AS build-gems
 WORKDIR /danbooru
 
-RUN apt-get install -y --no-install-recommends libpq-dev ragel=6.10-4
+RUN apt-get install -y --no-install-recommends libpq-dev ragel
 
 COPY --chown=danbooru:danbooru lib/dtext_rb/ lib/dtext_rb/
 USER danbooru
@@ -418,7 +419,7 @@ FROM danbooru-base AS development
 
 RUN <<EOS
   apt-get update
-  apt-get install -y --no-install-recommends g++ make ragel=6.10-4 git sudo gpg socat libyaml-dev libpq-dev gh
+  apt-get install -y --no-install-recommends g++ make ragel git sudo gpg socat libyaml-dev libpq-dev gh
 
   groupadd admin -U danbooru
   passwd -d danbooru

@@ -4,8 +4,13 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "mergeConfidence:all-badges"
+    "mergeConfidence:all-badges",
+    "abandonments:recommended",
+    ":configMigration"
   ],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "rangeStrategy": "bump",
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
@@ -57,6 +62,23 @@
     }
   ],
   "packageRules": [
+    {
+      "description": "Force bundler to process gem updates from Gemfile.lock instead of Gemfile.",
+      "matchManagers": [
+        "bundler"
+      ],
+      "rangeStrategy": "update-lockfile"
+    },
+    {
+      "description": "Only run lock file maintenance on package-lock.json. Our Gemfile does not specify max versions, so refreshing Gemfile.lock risks updating everything.",
+      "matchManagers": [
+        "bundler"
+      ],
+      "matchUpdateTypes": [
+        "lockFileMaintenance"
+      ],
+      "enabled": false
+    },
     {
       "description": "Don't automatically create PRs for non-package manager dependencies (such as Ruby version)",
       "matchManagers": [

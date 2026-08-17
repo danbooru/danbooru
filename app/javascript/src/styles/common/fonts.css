@@ -333,7 +333,7 @@
 /*
  * https://github.com/jdecked/twemoji
  * https://github.com/mozilla/twemoji-colr
- * https://github.com/mrdrogdrog/twemoji-color-font
+ * https://github.com/SableClient/twemoji-font
  */
 @font-face {
   font-family: "Twemoji";
@@ -349,6 +349,6 @@
   unicode-range: U+00A9, U+00AE, U+203C-2B55, U+3030, U+303D, U+3297, U+3299, U+1F000-1FFFF;
 
   src:
-    /* url("https://cdn.jsdelivr.net/npm/twemoji-colr-font@15.0.3/twemoji.woff2") format("woff2"); */
-    url("twemoji-colr-font/twemoji.woff2") format("woff2");
+    /* url("https://cdn.jsdelivr.net/npm/@sableclient/twemoji-font@1.0.4/dist/files/twemoji.woff2") format("woff2"); */
+    url("@sableclient/twemoji-font/files/twemoji.woff2") format("woff2");
 }
