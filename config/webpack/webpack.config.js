@@ -1,9 +1,19 @@
+const webpack = require("webpack");
 const { generateWebpackConfig } = require("shakapacker");
 
 module.exports = generateWebpackConfig({
 //  output: {
 //    library: "Danbooru",
 //  },
+  plugins: [
+    // Most of our modules use a bare `$` without importing it. jQuery's packaged
+    // build doesn't define window.$ (only the unbundled src/ build we used to alias
+    // to did), so resolve `$` through the module graph instead of a global.
+    new webpack.ProvidePlugin({
+      $: ["jquery", "default"],
+      jQuery: ["jquery", "default"],
+    }),
+  ],
   module: {
     rules: [{
       test: /\.wasm$/,

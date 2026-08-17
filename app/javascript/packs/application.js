@@ -8,9 +8,6 @@ function importAll(r) {
 import "core-js";
 
 import jQuery from 'jquery';
-// jQuery 4 doesn't define window.jQuery/window.$,
-// but we have a lot of code and userscripts relying on a global $.
-window.jQuery = window.$ = jQuery;
 
 require('hammerjs');
 require('jquery-hotkeys');
