@@ -25,15 +25,15 @@ ARG RUBY_MAJOR_VERSION="4.0"
 # github: mozilla/mozjpeg
 ARG MOZJPEG_VERSION="4.1.5"
 # github: libvips/libvips
-ARG VIPS_VERSION="8.14.2"
+ARG VIPS_VERSION="8.18.5"
 # github: FFmpeg/FFmpeg
-ARG FFMPEG_VERSION="7.1.1"
+ARG FFMPEG_VERSION="9.0.1"
 # github: exiftool/exiftool
-ARG EXIFTOOL_VERSION="13.50"
+ARG EXIFTOOL_VERSION="13.55"
 # github: openresty/openresty
 ARG OPENRESTY_VERSION="1.29.2.3"
 ARG NODE_VERSION="24.18.1"
-ARG UBUNTU_VERSION="noble-20260610@sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90"
+ARG UBUNTU_VERSION="resolute-20260724.1@sha256:678c6550cc43645e08669028bc177f50be4e7c5b8cca677067b1914d4afc7a03"
 # Remember to update the UBUNTU_SNAPSHOT ARG below when UBUNTU_VERSION is updated
 ARG UBUNTU_SNAPSHOT="20260801T000000Z"
 
@@ -74,10 +74,10 @@ EOF
 
   rm -rf /var/lib/apt/lists/*
   apt-get install --update -y --no-install-recommends \
-    postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.38 libpq5 libpcre2-8-0 libsodium23 \
+    postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.40 libpq5 libpcre2-8-0 libsodium23 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4-0t64 liblcms2-2 libpng16-16t64 libexpat1 \
-    libglib2.0-0t64 libgif7 libexif12 libheif1 libheif-plugin-dav1d libheif-plugin-libde265 libx264-164 libx265-199 libsvtav1enc1d1 \
-    libvpx9 libdav1d7 libseccomp-dev libjemalloc2 libarchive13t64 libyaml-0-2 libffi8 \
+    libglib2.0-0t64 libgif7 libexif12 libheif1 libheif-plugin-dav1d libheif-plugin-libde265 libx264-165 libx265-215 libsvtav1enc2 \
+    libvpx12 libdav1d7 libseccomp-dev libjemalloc2 libarchive13t64 libyaml-0-2 libffi8 \
     libreadline8t64 libarchive-zip-perl tini busybox less ncdu curl
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs mount procps python3 tzdata
@@ -124,6 +124,7 @@ EOS
 
 
 # Build MozJPEG. Output is in /usr/local.
+# TODO: remove -DCMAKE_POLICY_VERSION_MINIMUM=3.5 once MozJPEG is updated
 FROM build-base AS build-mozjpeg
 ARG JOBS
 ARG MOZJPEG_VERSION
@@ -132,7 +133,7 @@ RUN <<EOS
   apt-get install -y --no-install-recommends $MOZJPEG_BUILD_DEPS
   curl -L "https://github.com/mozilla/mozjpeg/archive/refs/tags/v${MOZJPEG_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
 
-  cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_STATIC=0 -DWITH_ARITH_ENC=1 -DWITH_ARITH_DEC=1 .
+  cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_STATIC=0 -DWITH_ARITH_ENC=1 -DWITH_ARITH_DEC=1 .
   make -j$JOBS install/strip
 
   rm -rf * /usr/local/share /usr/local/man
@@ -212,7 +213,7 @@ EOS
 FROM build-base AS build-exiftool
 ARG JOBS
 ARG EXIFTOOL_VERSION
-ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.38 libarchive-zip-perl"
+ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.40 libarchive-zip-perl"
 RUN <<EOS
   apt-get install -y --no-install-recommends $EXIFTOOL_BUILD_DEPS
   curl -L "https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
