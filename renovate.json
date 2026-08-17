@@ -118,7 +118,7 @@
     {
       "description": "Better PR titles",
       "commitMessageTopic": "{{manager}} dependency {{depName}}",
-      "commitMessageExtra": "from {{currentVersion}} to {{newVersion}}",
+      "commitMessageExtra": "{{#if displayFrom}}from {{{displayFrom}}} {{/if}}{{#if displayTo}}to {{{displayTo}}}{{/if}}",
       "matchPackageNames": [
         "*"
       ]
