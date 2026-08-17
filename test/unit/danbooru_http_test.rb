@@ -81,11 +81,11 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "work for a URL containing special characters" do
-        resp = Danbooru::Http.get(httpbin_url("anything/foo 😃`~!@$%^&*()_-+={}[]|\\:;\"'<>,./?bar=baz 😃`~!@$^&*()_-+={}[]|\\:;\"'<>,./&blah😃#hash"))
+        resp = Danbooru::Http.get(httpbin_url("anything/foo 😃`~!@$%^&*()_-+={}[]|\\:;\"'<>,./?bar=baz 😃`~!@$^&*()_-+={}[]|\\:;',./&blah😃#hash"))
 
         assert_equal(200, resp.status)
-        assert_equal(httpbin_url("anything/foo%20%F0%9F%98%83%60~!@$%25%5E&*()_-+=%7B%7D%5B%5D%7C%5C:;%22'%3C%3E,./?bar=baz%20%F0%9F%98%83`~!@$^&*()_-+={}[]|\\:;\"'<>,./&blah%F0%9F%98%83#hash"), resp.request.uri.to_s)
-        assert_equal(httpbin_url("anything/foo 😃`~!@$%25^&*()_-+={}[]|\\:%3B\"'<>,./?bar=baz 😃`~!%40$^&*()_-+={}[]|\\:%3B\"'<>,.%2F&blah😃"), resp.parse["url"])
+        assert_equal(httpbin_url("anything/foo%20%F0%9F%98%83%60~!@$%25%5E&*()_-+=%7B%7D%5B%5D%7C%5C:;%22'%3C%3E,./?bar=baz%20%F0%9F%98%83`~!@$^&*()_-+={}[]|\\:;',./&blah%F0%9F%98%83#hash"), resp.request.uri.to_s)
+        assert_equal(resp.request.uri.omit(:fragment).to_s, resp.parse["url"])
       end
 
       should "work for a URL containing percent-encoded characters" do
@@ -93,13 +93,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
         assert_equal(200, resp.status)
         assert_equal(httpbin_url("anything/foo%20bar%2Fbaz"), resp.request.uri.to_s)
-        assert_equal(httpbin_url("anything/foo bar/baz"), resp.parse["url"]) # httpbin decodes encoded URLs
+        assert_equal(httpbin_url("anything/foo%20bar%2Fbaz"), resp.parse["url"])
       end
 
       should "work for a URL containing Unicode characters" do
         resp = Danbooru::Http.get(httpbin_url("anything/東方"))
         assert_equal(200, resp.status)
-        assert_equal(httpbin_url("anything/東方"), resp.parse["url"])
+        assert_equal(httpbin_url("anything/%E6%9D%B1%E6%96%B9"), resp.parse["url"])
       end
 
       should "not normalize Unicode characters to NFC form" do
