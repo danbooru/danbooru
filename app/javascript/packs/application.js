@@ -7,6 +7,11 @@ function importAll(r) {
 // everything. See @babel/preset-env.
 import "core-js";
 
+import jQuery from 'jquery';
+// jQuery 4 doesn't define window.jQuery/window.$,
+// but we have a lot of code and userscripts relying on a global $.
+window.jQuery = window.$ = jQuery;
+
 require('hammerjs');
 require('jquery-hotkeys');
 import Alpine from 'alpinejs';
@@ -16,7 +21,6 @@ import persist from '@alpinejs/persist'
 require.context("../../../public/images", true);
 require.context("../../../public/logos", true, /\.png$/);
 
-import jQuery from 'jquery';
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
 require("jquery-ui/ui/widgets/dialog");

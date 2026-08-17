@@ -4,11 +4,6 @@ module.exports = generateWebpackConfig({
 //  output: {
 //    library: "Danbooru",
 //  },
-  resolve: {
-    alias: {
-      "jquery": "jquery/src/jquery.js",
-    }
-  },
   module: {
     rules: [{
       test: /\.wasm$/,
