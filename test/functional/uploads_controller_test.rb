@@ -134,7 +134,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail if given both a file and source" do
         assert_no_difference("Upload.count") do
-          file = Rack::Test::UploadedFile.new("test/files/test.jpg")
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
           source = "https://files.catbox.moe/om3tcw.webm"
           post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }, source: source }}
         end
@@ -158,7 +158,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for a direct file upload" do
-          create_upload!("test/files/test.jpg", user: @user)
+          create_upload!("test/files/jpg/test.jpg", user: @user)
 
           assert_response 201
           assert_match("File size too large", Upload.last.error)
@@ -181,18 +181,18 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a corrupted file" do
         should "fail for a corrupted jpeg" do
-          create_upload!("test/files/test-corrupt.jpg", user: @user)
+          create_upload!("test/files/jpg/test-corrupt.jpg", user: @user)
           assert_match("corrupt", Upload.last.error)
         end
 
         should "fail for a corrupted gif" do
-          create_upload!("test/files/test-corrupt.gif", user: @user)
+          create_upload!("test/files/gif/test-corrupt.gif", user: @user)
           assert_match("corrupt", Upload.last.error)
         end
 
         # https://schaik.com/pngsuite/pngsuite_xxx_png.html
         should "fail for a corrupted png" do
-          create_upload!("test/files/test-corrupt.png", user: @user)
+          create_upload!("test/files/png/test-corrupt.png", user: @user)
           assert_match("corrupt", Upload.last.error)
         end
 
@@ -330,8 +330,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "when re-uploading a media asset stuck in the 'processing' state" do
         should "mark the asset as failed" do
-          asset = create(:media_asset, file: File.open("test/files/test.jpg"), status: "processing")
-          create_upload!("test/files/test.jpg", user: @user)
+          asset = create(:media_asset, file: File.open("test/files/jpg/test.jpg"), status: "processing")
+          create_upload!("test/files/jpg/test.jpg", user: @user)
 
           upload = Upload.last
           assert_match("Timed out while waiting for file to be processed", upload.reload.error)
@@ -367,7 +367,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       should "save the AI tags" do
         mock_autotagger_evaluate({ "1girl": 0.5 })
-        upload = assert_successful_upload("test/files/test.jpg")
+        upload = assert_successful_upload("test/files/jpg/test.jpg")
 
         assert_equal(1, upload.media_assets.first.ai_tags.count)
       end
@@ -377,7 +377,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, Tag.exists?(name: "rating:g"))
 
         mock_autotagger_evaluate({ "new_tag": 0.542, "rating:g": 0.249 })
-        upload = assert_successful_upload("test/files/test.jpg")
+        upload = assert_successful_upload("test/files/jpg/test.jpg")
         asset = upload.media_assets.first
 
         assert_equal(2, asset.ai_tags.count)
@@ -388,14 +388,14 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail the upload if the autotagger is enabled but isn't functioning" do
         mock_autotagger_failure
-        create_upload!("test/files/test.jpg", user: @user)
+        create_upload!("test/files/jpg/test.jpg", user: @user)
 
         assert_response 201
         assert_match("Autotagger failed", Upload.last.error)
       end
 
       should "save the EXIF metadata" do
-        upload = assert_successful_upload("test/files/test.jpg")
+        upload = assert_successful_upload("test/files/jpg/test.jpg")
 
         assert_equal(true, upload.media_assets.first.media_metadata.present?)
       end
@@ -427,10 +427,10 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "uploading a file from your computer" do
-        should_upload_successfully("test/files/test.jpg")
-        should_upload_successfully("test/files/test.png")
-        should_upload_successfully("test/files/test-static-32x32.gif")
-        should_upload_successfully("test/files/test-animated-86x52.gif")
+        should_upload_successfully("test/files/jpg/test.jpg")
+        should_upload_successfully("test/files/png/test.png")
+        should_upload_successfully("test/files/gif/test-static-32x32.gif")
+        should_upload_successfully("test/files/gif/test-animated-86x52.gif")
         should_upload_successfully("test/files/mp4/test-300x300.mp4")
         should_upload_successfully("test/files/mp4/test-300x300-vp9.mp4")
         should_upload_successfully("test/files/mp4/test-300x300-yuvj420p-h264.mp4")
@@ -442,7 +442,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/mp4/test-iso5.mp4")
         should_upload_successfully("test/files/webm/test-512x512.webm")
         should_upload_successfully("test/files/webm/test-gbrp-vp9.webm")
-        # should_upload_successfully("test/files/compressed.swf")
+        # should_upload_successfully("test/files/swf/compressed.swf")
 
         should_upload_successfully("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif")
         should_upload_successfully("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif")
@@ -546,9 +546,9 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       context "uploading multiple files from your computer" do
         should "work" do
           files = {
-            "0" => Rack::Test::UploadedFile.new("test/files/test.jpg"),
-            "1" => Rack::Test::UploadedFile.new("test/files/test.png"),
-            "2" => Rack::Test::UploadedFile.new("test/files/test.gif"),
+            "0" => Rack::Test::UploadedFile.new("test/files/jpg/test.jpg"),
+            "1" => Rack::Test::UploadedFile.new("test/files/png/test.png"),
+            "2" => Rack::Test::UploadedFile.new("test/files/gif/test.gif"),
           }
 
           post_auth uploads_path(format: :json), @user, params: { upload: { files: files }}

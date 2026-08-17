@@ -212,7 +212,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
             %w[000000.jpg 000001.jpg].each do |name|
               entry = Zip::Entry.new(zip, name)
               entry.extra.create(:zip64)
-              zip.add(entry, "test/files/test.jpg")
+              zip.add(entry, "test/files/jpg/test.jpg")
             end
           end
 

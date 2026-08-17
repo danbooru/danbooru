@@ -3,22 +3,22 @@ require "test_helper"
 class MediaFileImageTest < ActiveSupport::TestCase
   context "#dimensions" do
     should "determine the correct dimensions for a jpeg file" do
-      assert_equal([500, 335], MediaFile.open("test/files/test.jpg").dimensions)
-      assert_equal([668, 996], MediaFile.open("test/files/test-blank.jpg").dimensions)
-      assert_equal([529, 600], MediaFile.open("test/files/test-exif-small.jpg").dimensions)
-      assert_equal([1356, 911], MediaFile.open("test/files/test-large.jpg").dimensions)
+      assert_equal([500, 335], MediaFile.open("test/files/jpg/test.jpg").dimensions)
+      assert_equal([668, 996], MediaFile.open("test/files/jpg/test-blank.jpg").dimensions)
+      assert_equal([529, 600], MediaFile.open("test/files/jpg/test-exif-small.jpg").dimensions)
+      assert_equal([1356, 911], MediaFile.open("test/files/jpg/test-large.jpg").dimensions)
     end
 
     should "determine the correct dimensions for a png file" do
-      assert_equal([768, 1024], MediaFile.open("test/files/test.png").dimensions)
+      assert_equal([768, 1024], MediaFile.open("test/files/png/test.png").dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").dimensions)
-      assert_equal([85, 62], MediaFile.open("test/files/alpha.png").dimensions)
+      assert_equal([85, 62], MediaFile.open("test/files/png/alpha.png").dimensions)
     end
 
     should "determine the correct dimensions for a gif file" do
-      assert_equal([400, 400], MediaFile.open("test/files/test.gif").dimensions)
-      assert_equal([86, 52], MediaFile.open("test/files/test-animated-86x52.gif").dimensions)
-      assert_equal([32, 32], MediaFile.open("test/files/test-static-32x32.gif").dimensions)
+      assert_equal([400, 400], MediaFile.open("test/files/gif/test.gif").dimensions)
+      assert_equal([86, 52], MediaFile.open("test/files/gif/test-animated-86x52.gif").dimensions)
+      assert_equal([32, 32], MediaFile.open("test/files/gif/test-static-32x32.gif").dimensions)
     end
 
     should "determine the correct dimensions for a WebP file" do
@@ -32,22 +32,22 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "#file_ext" do
     should "determine the correct extension for a jpeg file" do
-      assert_equal(:jpg, MediaFile.open("test/files/test.jpg").file_ext)
-      assert_equal(:jpg, MediaFile.open("test/files/test-blank.jpg").file_ext)
-      assert_equal(:jpg, MediaFile.open("test/files/test-exif-small.jpg").file_ext)
-      assert_equal(:jpg, MediaFile.open("test/files/test-large.jpg").file_ext)
+      assert_equal(:jpg, MediaFile.open("test/files/jpg/test.jpg").file_ext)
+      assert_equal(:jpg, MediaFile.open("test/files/jpg/test-blank.jpg").file_ext)
+      assert_equal(:jpg, MediaFile.open("test/files/jpg/test-exif-small.jpg").file_ext)
+      assert_equal(:jpg, MediaFile.open("test/files/jpg/test-large.jpg").file_ext)
     end
 
     should "determine the correct extension for a png file" do
-      assert_equal(:png, MediaFile.open("test/files/test.png").file_ext)
+      assert_equal(:png, MediaFile.open("test/files/png/test.png").file_ext)
       assert_equal(:png, MediaFile.open("test/files/apng/normal_apng.png").file_ext)
-      assert_equal(:png, MediaFile.open("test/files/alpha.png").file_ext)
+      assert_equal(:png, MediaFile.open("test/files/png/alpha.png").file_ext)
     end
 
     should "determine the correct extension for a gif file" do
-      assert_equal(:gif, MediaFile.open("test/files/test.gif").file_ext)
-      assert_equal(:gif, MediaFile.open("test/files/test-animated-86x52.gif").file_ext)
-      assert_equal(:gif, MediaFile.open("test/files/test-static-32x32.gif").file_ext)
+      assert_equal(:gif, MediaFile.open("test/files/gif/test.gif").file_ext)
+      assert_equal(:gif, MediaFile.open("test/files/gif/test-animated-86x52.gif").file_ext)
+      assert_equal(:gif, MediaFile.open("test/files/gif/test-static-32x32.gif").file_ext)
     end
 
     should "determine the correct extension for a WebP file" do
@@ -64,27 +64,27 @@ class MediaFileImageTest < ActiveSupport::TestCase
   end
 
   should "determine the correct md5 for a jpeg file" do
-    assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", MediaFile.open("test/files/test.jpg").md5)
+    assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", MediaFile.open("test/files/jpg/test.jpg").md5)
   end
 
   should "determine the correct filesize for a jpeg file" do
-    assert_equal(28_086, MediaFile.open("test/files/test.jpg").file_size)
+    assert_equal(28_086, MediaFile.open("test/files/jpg/test.jpg").file_size)
   end
 
   context "#preview" do
     should "generate a preview image for a static image" do
-      assert_equal([150, 101], MediaFile.open("test/files/test.jpg").preview(150, 150).dimensions)
-      assert_equal([113, 150], MediaFile.open("test/files/test.png").preview(150, 150).dimensions)
-      assert_equal([150, 150], MediaFile.open("test/files/test.gif").preview(150, 150).dimensions)
+      assert_equal([150, 101], MediaFile.open("test/files/jpg/test.jpg").preview(150, 150).dimensions)
+      assert_equal([113, 150], MediaFile.open("test/files/png/test.png").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/gif/test.gif").preview(150, 150).dimensions)
       assert_equal([150, 100], MediaFile.open("test/files/webp/fjord.webp").preview(150, 150).dimensions)
       assert_equal([150, 63], MediaFile.open("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif").preview(150, 150).dimensions)
     end
 
     should "generate a preview image for an animated image" do
       skip unless MediaFile.videos_enabled?
-      assert_equal([86, 52], MediaFile.open("test/files/test-animated-86x52.gif").preview(150, 150).dimensions)
-      assert_equal([150, 105], MediaFile.open("test/files/test-animated-400x281.gif").preview(150, 150).dimensions)
-      assert_equal([150, 150], MediaFile.open("test/files/test-animated-256x256.png").preview(150, 150).dimensions)
+      assert_equal([86, 52], MediaFile.open("test/files/gif/test-animated-86x52.gif").preview(150, 150).dimensions)
+      assert_equal([150, 105], MediaFile.open("test/files/gif/test-animated-400x281.gif").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/png/test-animated-256x256.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").preview(150, 150).dimensions)
       # assert_equal([150, 150], MediaFile.open("test/files/webp/nyancat.webp").preview(150, 150).dimensions) # XXX not supported by FFmpeg (https://trac.ffmpeg.org/ticket/4907)
       assert_equal([150, 113], MediaFile.open("test/files/avif/sequence-with-pitm.avif").preview(150, 150).dimensions)
@@ -94,19 +94,19 @@ class MediaFileImageTest < ActiveSupport::TestCase
     end
 
     should "be able to fit to width only" do
-      assert_equal([400, 268], MediaFile.open("test/files/test.jpg").preview(400, nil).dimensions)
+      assert_equal([400, 268], MediaFile.open("test/files/jpg/test.jpg").preview(400, nil).dimensions)
     end
 
     should "generate a thumbnail with the correct colors for a CMYK image with no color profile" do
-      assert_equal("4c9515d85842a291f6512c93458dd7b8", MediaFile.open("test/files/test-cmyk-no-profile.jpg").preview(180, 180).pixel_hash)
+      assert_equal("4c9515d85842a291f6512c93458dd7b8", MediaFile.open("test/files/jpg/test-cmyk-no-profile.jpg").preview(180, 180).pixel_hash)
     end
   end
 
   context "#duration" do
     should "get the correct duration for animated files" do
-      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").duration)
-      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").duration)
-      assert_equal(0.75, MediaFile.open("test/files/test-animated-256x256.png").duration)
+      assert_equal(0.4,  MediaFile.open("test/files/gif/test-animated-86x52.gif").duration)
+      assert_equal(1.0,  MediaFile.open("test/files/gif/test-animated-400x281.gif").duration)
+      assert_equal(0.75, MediaFile.open("test/files/png/test-animated-256x256.png").duration)
       assert_equal(3.35, MediaFile.open("test/files/gif/test-animated-3.35s.gif").duration)
       assert_equal(1.2,  MediaFile.open("test/files/gif/test-animated-1.2s.gif").duration)
       assert_equal(5.0,  MediaFile.open("test/files/apng/normal_apng.png").duration)
@@ -116,9 +116,9 @@ class MediaFileImageTest < ActiveSupport::TestCase
       assert_equal(0.5,  MediaFile.open("test/files/avif/star-8bpc.avif").duration)
       assert_equal(1.92, MediaFile.open("test/files/avif/alpha_video.avif").duration)
 
-      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").vips_duration)
-      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").vips_duration)
-      assert_nil(MediaFile.open("test/files/test-animated-256x256.png").vips_duration)
+      assert_equal(0.4,  MediaFile.open("test/files/gif/test-animated-86x52.gif").vips_duration)
+      assert_equal(1.0,  MediaFile.open("test/files/gif/test-animated-400x281.gif").vips_duration)
+      assert_nil(MediaFile.open("test/files/png/test-animated-256x256.png").vips_duration)
       assert_equal(3.35, MediaFile.open("test/files/gif/test-animated-3.35s.gif").vips_duration)
       assert_equal(1.2,  MediaFile.open("test/files/gif/test-animated-1.2s.gif").vips_duration)
       assert_nil(MediaFile.open("test/files/apng/normal_apng.png").vips_duration)
@@ -128,9 +128,9 @@ class MediaFileImageTest < ActiveSupport::TestCase
       assert_nil(MediaFile.open("test/files/avif/star-8bpc.avif").vips_duration)
       assert_nil(MediaFile.open("test/files/avif/alpha_video.avif").vips_duration)
 
-      assert_equal(0.4,  MediaFile.open("test/files/test-animated-86x52.gif").ffmpeg_duration)
-      assert_equal(1.0,  MediaFile.open("test/files/test-animated-400x281.gif").ffmpeg_duration)
-      assert_equal(0.75, MediaFile.open("test/files/test-animated-256x256.png").ffmpeg_duration)
+      assert_equal(0.4,  MediaFile.open("test/files/gif/test-animated-86x52.gif").ffmpeg_duration)
+      assert_equal(1.0,  MediaFile.open("test/files/gif/test-animated-400x281.gif").ffmpeg_duration)
+      assert_equal(0.75, MediaFile.open("test/files/png/test-animated-256x256.png").ffmpeg_duration)
       assert_equal(1.37, MediaFile.open("test/files/gif/test-animated-3.35s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
       assert_equal(0.12, MediaFile.open("test/files/gif/test-animated-1.2s.gif").ffmpeg_duration) # XXX wrong in ffmpeg 7.1
       assert_equal(5.0,  MediaFile.open("test/files/apng/normal_apng.png").ffmpeg_duration)
@@ -144,38 +144,38 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "#pixel_hash" do
     should "return the file's md5 for corrupted files" do
-      assert_equal(MediaFile.md5("test/files/test-blank.jpg"), MediaFile.pixel_hash("test/files/test-blank.jpg"))
-      assert_equal(MediaFile.md5("test/files/test-corrupt.jpg"), MediaFile.pixel_hash("test/files/test-corrupt.jpg"))
-      assert_equal(MediaFile.md5("test/files/test-exif-small.jpg"), MediaFile.pixel_hash("test/files/test-exif-small.jpg"))
-      assert_equal(MediaFile.md5("test/files/test-large.jpg"), MediaFile.pixel_hash("test/files/test-large.jpg"))
-      assert_equal(MediaFile.md5("test/files/test-corrupt.png"), MediaFile.pixel_hash("test/files/test-corrupt.png"))
-      assert_equal(MediaFile.md5("test/files/test-corrupt.gif"), MediaFile.pixel_hash("test/files/test-corrupt.gif"))
+      assert_equal(MediaFile.md5("test/files/jpg/test-blank.jpg"), MediaFile.pixel_hash("test/files/jpg/test-blank.jpg"))
+      assert_equal(MediaFile.md5("test/files/jpg/test-corrupt.jpg"), MediaFile.pixel_hash("test/files/jpg/test-corrupt.jpg"))
+      assert_equal(MediaFile.md5("test/files/jpg/test-exif-small.jpg"), MediaFile.pixel_hash("test/files/jpg/test-exif-small.jpg"))
+      assert_equal(MediaFile.md5("test/files/jpg/test-large.jpg"), MediaFile.pixel_hash("test/files/jpg/test-large.jpg"))
+      assert_equal(MediaFile.md5("test/files/png/test-corrupt.png"), MediaFile.pixel_hash("test/files/png/test-corrupt.png"))
+      assert_equal(MediaFile.md5("test/files/gif/test-corrupt.gif"), MediaFile.pixel_hash("test/files/gif/test-corrupt.gif"))
       assert_equal(MediaFile.md5("test/files/webp/truncated.webp"), MediaFile.pixel_hash("test/files/webp/truncated.webp"))
     end
 
     should "return the file's md5 for animated files" do
-      assert_equal("64872dbdc62b6b02e6fc5f468838f674", MediaFile.pixel_hash("test/files/test-animated-256x256.png"))
-      assert_equal("8b18b12d212e08d1773f6fd329b63b15", MediaFile.pixel_hash("test/files/test-animated-inf-fps.png"))
-      assert_equal("77d89bda37ea3af09158ed3282f8334f", MediaFile.pixel_hash("test/files/test-animated-86x52.gif"))
+      assert_equal("64872dbdc62b6b02e6fc5f468838f674", MediaFile.pixel_hash("test/files/png/test-animated-256x256.png"))
+      assert_equal("8b18b12d212e08d1773f6fd329b63b15", MediaFile.pixel_hash("test/files/png/test-animated-inf-fps.png"))
+      assert_equal("77d89bda37ea3af09158ed3282f8334f", MediaFile.pixel_hash("test/files/gif/test-animated-86x52.gif"))
       assert_equal("f9961d54b2290c36ad3e54995d9d2dcf", MediaFile.pixel_hash("test/files/webp/nyancat.webp"))
       assert_equal("5ad19202d4cd9b0e90587f56ff648c28", MediaFile.pixel_hash("test/files/avif/alpha_video.avif"))
     end
 
     should "work for normal images" do
-      assert_equal("01cb481ec7730b7cfced57ffa5abd196", MediaFile.pixel_hash("test/files/test.jpg"))
-      assert_equal("dfcdf4d8e525ffd7057f103384126cf0", MediaFile.pixel_hash("test/files/test-cmyk-no-profile.jpg"))
-      assert_equal("85e9fde0ba6cc7d4fedf24c71bb6277b", MediaFile.pixel_hash("test/files/test-grey-no-profile.jpg"))
-      assert_equal("7bc62a583c0eb07de4fb7fa0dc9e0851", MediaFile.pixel_hash("test/files/test-rotation-90cw.jpg"))
-      assert_equal("510aa465afbba3d7d818038b7aa7bb6f", MediaFile.pixel_hash("test/files/test-rotation-180.jpg"))
-      assert_equal("ac0220aea5683e3c4ffcb2c7b34078e8", MediaFile.pixel_hash("test/files/test-rotation-270cw.jpg"))
-      assert_equal("0365fdfe0e905167c14c67e2bbdf8110", MediaFile.pixel_hash("test/files/test-weird-profile.jpg"))
+      assert_equal("01cb481ec7730b7cfced57ffa5abd196", MediaFile.pixel_hash("test/files/jpg/test.jpg"))
+      assert_equal("dfcdf4d8e525ffd7057f103384126cf0", MediaFile.pixel_hash("test/files/jpg/test-cmyk-no-profile.jpg"))
+      assert_equal("85e9fde0ba6cc7d4fedf24c71bb6277b", MediaFile.pixel_hash("test/files/jpg/test-grey-no-profile.jpg"))
+      assert_equal("7bc62a583c0eb07de4fb7fa0dc9e0851", MediaFile.pixel_hash("test/files/jpg/test-rotation-90cw.jpg"))
+      assert_equal("510aa465afbba3d7d818038b7aa7bb6f", MediaFile.pixel_hash("test/files/jpg/test-rotation-180.jpg"))
+      assert_equal("ac0220aea5683e3c4ffcb2c7b34078e8", MediaFile.pixel_hash("test/files/jpg/test-rotation-270cw.jpg"))
+      assert_equal("0365fdfe0e905167c14c67e2bbdf8110", MediaFile.pixel_hash("test/files/jpg/test-weird-profile.jpg"))
 
-      assert_equal("5daef1f4d42b97cc5cda14f93867b085", MediaFile.pixel_hash("test/files/alpha.png"))
-      assert_equal("d351db38efb2697d355cf89853099539", MediaFile.pixel_hash("test/files/test.png"))
-      assert_equal("723bce01fcc6b8444ae362467e8628af", MediaFile.pixel_hash("test/files/test-rotation-90cw.png"))
+      assert_equal("5daef1f4d42b97cc5cda14f93867b085", MediaFile.pixel_hash("test/files/png/alpha.png"))
+      assert_equal("d351db38efb2697d355cf89853099539", MediaFile.pixel_hash("test/files/png/test.png"))
+      assert_equal("723bce01fcc6b8444ae362467e8628af", MediaFile.pixel_hash("test/files/png/test-rotation-90cw.png"))
 
-      assert_equal("446ddbb45f40265e565efbc8229d5eea", MediaFile.pixel_hash("test/files/test.gif"))
-      assert_equal("d42cd8553aa008b4ef9bc253ff4f1239", MediaFile.pixel_hash("test/files/test-static-32x32.gif"))
+      assert_equal("446ddbb45f40265e565efbc8229d5eea", MediaFile.pixel_hash("test/files/gif/test.gif"))
+      assert_equal("d42cd8553aa008b4ef9bc253ff4f1239", MediaFile.pixel_hash("test/files/gif/test-static-32x32.gif"))
 
       assert_equal("21e8133c81d6e30cec95127973a1793a", MediaFile.pixel_hash("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif"))
 
@@ -250,7 +250,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "an animated GIF file" do
     should "determine the duration of the animation" do
-      file = MediaFile.open("test/files/test-animated-86x52.gif")
+      file = MediaFile.open("test/files/gif/test-animated-86x52.gif")
       assert_equal(0.4, file.duration)
       assert_equal(0.4, file.vips_duration)
       assert_equal(0.4, file.ffmpeg_duration)
@@ -300,7 +300,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
     context "that is animated but with an unspecified frame rate" do
       should "have an assumed frame rate of ~6.66 FPS" do
-        file = MediaFile.open("test/files/test-animated-inf-fps.png")
+        file = MediaFile.open("test/files/png/test-animated-inf-fps.png")
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
@@ -438,7 +438,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a corrupt GIF" do
     should "still read the metadata" do
-      @file = MediaFile.open("test/files/test-corrupt.gif")
+      @file = MediaFile.open("test/files/gif/test-corrupt.gif")
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
@@ -466,7 +466,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a corrupt PNG" do
     should "still read the metadata" do
-      @file = MediaFile.open("test/files/test-corrupt.png")
+      @file = MediaFile.open("test/files/png/test-corrupt.png")
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
@@ -478,7 +478,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a corrupt JPEG" do
     should "still read the metadata" do
-      @file = MediaFile.open("test/files/test-corrupt.jpg")
+      @file = MediaFile.open("test/files/jpg/test-corrupt.jpg")
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
@@ -503,7 +503,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a greyscale image without an embedded color profile" do
     should "successfully generate a thumbnail" do
-      @image = MediaFile.open("test/files/test-grey-no-profile.jpg")
+      @image = MediaFile.open("test/files/jpg/test-grey-no-profile.jpg")
       @preview = @image.preview(150, 150)
 
       assert_equal(1, @image.channels)
@@ -520,7 +520,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a CMYK image without an embedded color profile" do
     should "successfully generate a thumbnail" do
-      @image = MediaFile.open("test/files/test-cmyk-no-profile.jpg")
+      @image = MediaFile.open("test/files/jpg/test-cmyk-no-profile.jpg")
       @preview = @image.preview(150, 150)
 
       assert_equal(4, @image.channels)
@@ -535,7 +535,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "an image with a weird embedded color profile" do
     should "successfully generate a thumbnail" do
-      @image = MediaFile.open("test/files/test-weird-profile.jpg")
+      @image = MediaFile.open("test/files/jpg/test-weird-profile.jpg")
       @preview = @image.preview(150, 150)
 
       assert_equal(3, @image.channels)
@@ -550,7 +550,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a large JPEG with an orientation flag" do
     should "read the whole image without `out of order read` errors" do
-      @file = MediaFile.open("test/files/test-rotation-270cw-large.jpg")
+      @file = MediaFile.open("test/files/jpg/test-rotation-270cw-large.jpg")
 
       assert_equal([1104, 736], @file.dimensions)
       assert_equal([180, 120], @file.preview(180, 180).dimensions)
@@ -562,7 +562,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a JPEG that is rotated 90 degrees clockwise" do
     should "rotate the image correctly" do
-      @file = MediaFile.open("test/files/test-rotation-90cw.jpg")
+      @file = MediaFile.open("test/files/jpg/test-rotation-90cw.jpg")
 
       assert_equal([96, 128], @file.dimensions)
       assert_equal([48, 64], @file.preview(64, 64).dimensions)
@@ -572,7 +572,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a JPEG that is rotated 270 degrees clockwise" do
     should "rotate the image correctly" do
-      @file = MediaFile.open("test/files/test-rotation-270cw.jpg")
+      @file = MediaFile.open("test/files/jpg/test-rotation-270cw.jpg")
 
       assert_equal([100, 66], @file.dimensions)
       assert_equal([50, 33], @file.preview(50, 50).dimensions)
@@ -582,7 +582,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a JPEG that is rotated 180 degrees" do
     should "rotate the image correctly" do
-      @file = MediaFile.open("test/files/test-rotation-180.jpg")
+      @file = MediaFile.open("test/files/jpg/test-rotation-180.jpg")
 
       assert_equal([66, 100], @file.dimensions)
       assert_equal([33, 50], @file.preview(50, 50).dimensions)
@@ -592,7 +592,7 @@ class MediaFileImageTest < ActiveSupport::TestCase
 
   context "a PNG with an exif orientation flag" do
     should "not rotate the image" do
-      @file = MediaFile.open("test/files/test-rotation-90cw.png")
+      @file = MediaFile.open("test/files/png/test-rotation-90cw.png")
 
       assert_equal([128, 96], @file.dimensions)
       assert_equal([64, 48], @file.preview(64, 64).dimensions)

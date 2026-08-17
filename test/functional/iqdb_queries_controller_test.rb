@@ -72,7 +72,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           mock_iqdb_matches(@matches)
 
           # Make the call to `@post.file(:preview)` work.
-          Post.any_instance.stubs(:file).returns(File.open("test/files/test.jpg"))
+          Post.any_instance.stubs(:file).returns(File.open("test/files/jpg/test.jpg"))
 
           get_auth iqdb_queries_path, @user, params: { post_id: @post.id }
 
@@ -86,7 +86,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           @matches = [{ post_id: @post.id, score: 90.0 }]
           mock_iqdb_matches(@matches)
 
-          file = Rack::Test::UploadedFile.new("test/files/test.jpg")
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
           post_auth iqdb_queries_path(format: :json), @user, params: { search: { file: file }}
 
           assert_response :success

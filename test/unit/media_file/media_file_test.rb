@@ -3,11 +3,11 @@ require "test_helper"
 class MediaFileTest < ActiveSupport::TestCase
   context "#dimensions" do
     should "work if called twice" do
-      mf = MediaFile.open("test/files/test.jpg")
+      mf = MediaFile.open("test/files/jpg/test.jpg")
       assert_equal([500, 335], mf.dimensions)
       assert_equal([500, 335], mf.dimensions)
 
-      mf = MediaFile.open("test/files/compressed.swf")
+      mf = MediaFile.open("test/files/swf/compressed.swf")
       assert_equal([608, 757], mf.dimensions)
       assert_equal([608, 757], mf.dimensions)
     end
@@ -28,7 +28,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
   context "#file_ext" do
     should "not fail for empty files" do
-      assert_equal(:bin, MediaFile.open("test/files/test-empty.bin").file_ext)
+      assert_equal(:bin, MediaFile.open("test/files/bin/test-empty.bin").file_ext)
     end
   end
 end
