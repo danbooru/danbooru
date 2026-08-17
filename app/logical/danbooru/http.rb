@@ -86,7 +86,10 @@ module Danbooru
 
       HTTP::URI.new(
         scheme: parsed_uri.scheme,
-        authority: parsed_uri.authority,
+        user: parsed_uri.user,
+        password: parsed_uri.password,
+        host: parsed_uri.host,
+        port: parsed_uri.port,
         path: normalized_path,
         query: Addressable::URI.encode_component(parsed_uri.query, "[[:ascii:]&&[^ ]]"),
         fragment: parsed_uri.fragment,

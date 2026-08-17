@@ -6,7 +6,7 @@ module Danbooru
       attr_reader :logger
 
       def initialize(logger: ::Logger.new($stderr))
-        super
+        super()
         @logger = logger
       end
 

@@ -14,6 +14,7 @@ module Danbooru
       attr_reader :max_retries, :max_delay
 
       def initialize(max_retries: 2, max_delay: 5.seconds)
+        super()
         @max_retries = max_retries
         @max_delay = max_delay
       end

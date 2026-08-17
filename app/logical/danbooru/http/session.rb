@@ -6,7 +6,7 @@ module Danbooru
       attr_reader :cookie_jar
 
       def initialize(cookie_jar: HTTP::CookieJar.new)
-        super
+        super()
         @cookie_jar = cookie_jar
       end
 

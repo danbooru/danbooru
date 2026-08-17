@@ -6,7 +6,7 @@ module Danbooru
       attr_reader :expires_in, :key, :cache_if
 
       def initialize(expires_in:, key: nil, if: nil)
-        super
+        super()
         @expires_in = expires_in
         @key = key
         @cache_if = binding.local_variable_get(:if)

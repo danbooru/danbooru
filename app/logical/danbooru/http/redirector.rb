@@ -9,6 +9,7 @@ module Danbooru
       attr_reader :max_redirects
 
       def initialize(max_redirects: 5)
+        super()
         @max_redirects = max_redirects
       end
 
