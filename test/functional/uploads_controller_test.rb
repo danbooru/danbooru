@@ -202,13 +202,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "for an unsupported WebP file" do
-        should "fail for an animated WebP" do
-          create_upload!("test/files/webp/nyancat.webp", user: @user)
-          assert_match("File type is not supported", Upload.last.error)
-        end
-      end
-
       context "for an unsupported AVIF file" do
         should "fail for a grid image" do
           create_upload!("test/files/avif/Image grid example.avif", user: @user)
@@ -424,6 +417,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
           assert_nil(media_asset.variant(:sample))
         end
+
+        should "not generate a full variant for an animated WebP" do
+          upload = assert_successful_upload("test/files/webp/nyancat.webp", user: @user)
+          media_asset = upload.media_assets.first
+
+          assert_nil(media_asset.variant(:full))
+        end
       end
 
       context "uploading a file from your computer" do
@@ -457,6 +457,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/webp/Exif2.webp")
         should_upload_successfully("test/files/webp/lossless1.webp")
         should_upload_successfully("test/files/webp/lossy_alpha1.webp")
+        should_upload_successfully("test/files/webp/nyancat.webp")
       end
 
       context "uploading a .zip file from your computer" do

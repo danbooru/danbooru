@@ -5,7 +5,7 @@ class MediaFileMp4Test < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "mp4",
-        failures: ["test/files/mp4/test-corrupt.mp4"]
+        failures: ["test/files/mp4/test-corrupt.mp4"],
       )
     end
   end
@@ -88,7 +88,6 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
-
 
   context "a 3GPP-brand h264 MP4" do
     should "be parsed correctly" do

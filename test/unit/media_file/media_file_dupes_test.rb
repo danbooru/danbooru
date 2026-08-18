@@ -57,10 +57,10 @@ class MediaFileDupesTest < ActiveSupport::TestCase
     end
 
     should "compute different pixel hashes for images with the same pixel values but with different embedded color profiles" do
-      assert_equal("51b5c7fe125eca4048cd963617df5668", MediaFile.pixel_hash("test/files/dupes/countergirl-srgb.jpg"))
-      assert_equal("56092d3fb1e5b803b4f89c039c4e46b4", MediaFile.pixel_hash("test/files/dupes/countergirl-p3.jpg"))
-      assert_equal("ddd8706eb76f051d57bdbab45d7347d5", MediaFile.pixel_hash("test/files/dupes/countergirl-prophoto.jpg"))
-      assert_equal("92df52d799527a96819e8aa52c16967f", MediaFile.pixel_hash("test/files/dupes/countergirl-adobergb.jpg"))
+      assert_equal("b0f7550b021e7eed2f81701b629ea553", MediaFile.pixel_hash("test/files/dupes/countergirl-srgb.jpg"))
+      assert_equal("0d45a5397a9180e66be27cf8abaa1c74", MediaFile.pixel_hash("test/files/dupes/countergirl-p3.jpg"))
+      assert_equal("d55a89f6780cb8d2c630a0909ae67f2b", MediaFile.pixel_hash("test/files/dupes/countergirl-prophoto.jpg"))
+      assert_equal("5248da00038eb4b74b63c79a446775a0", MediaFile.pixel_hash("test/files/dupes/countergirl-adobergb.jpg"))
     end
   end
 end

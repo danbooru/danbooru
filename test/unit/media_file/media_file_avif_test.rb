@@ -7,8 +7,6 @@ class MediaFileAvifTest < ActiveSupport::TestCase
         "avif",
         failures: [
           "test/files/apng/misaligned_chunks.png",
-          "test/files/avif/kimono.crop.avif",
-          "test/files/avif/kimono.rotate90.avif",
         ],
       )
     end
@@ -226,7 +224,7 @@ class MediaFileAvifTest < ActiveSupport::TestCase
       assert_equal(:avif, file.file_ext)
       assert_equal("image/avif", file.mime_type)
       assert_equal("3e7e1e24f500fa7b9a29d7ea115a27fa", file.md5)
-      assert_equal("17ab7b16d754323015fe82fe95d36f6c", file.pixel_hash)
+      assert_equal("8a327310e80d13e1f6ae230fbefa81c6", file.pixel_hash)
       assert_equal(false, file.is_corrupt?)
       assert_equal(false, file.is_supported?)
       assert_equal(false, file.is_animated?)
@@ -427,21 +425,22 @@ class MediaFileAvifTest < ActiveSupport::TestCase
   end
 
   context "an AVIF file with a clean-aperture crop transform applied" do
+    # XXX: if we ever support this we'll have to check if previews are generated properly for crops
     should "be parsed correctly" do
       file = MediaFile.open("test/files/avif/kimono.crop.avif")
 
-      assert_equal(722, file.width)
-      assert_equal(1024, file.height)
+      assert_equal(385, file.width)
+      assert_equal(330, file.height)
       assert_equal(85_486, file.file_size)
       assert_equal(:avif, file.file_ext)
       assert_equal("image/avif", file.mime_type)
       assert_equal("008f35103ff2d4113d4c33e9fca91b8a", file.md5)
-      assert_equal("008f35103ff2d4113d4c33e9fca91b8a", file.pixel_hash)
-      assert_equal(true, file.is_corrupt?)
+      assert_equal("b96a0ff19d76e29cc57f417c7b1582da", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
       assert_equal(false, file.is_supported?)
       assert_equal(false, file.is_animated?)
       assert_nil(file.duration)
-      assert_equal(0, file.frame_count)
+      assert_equal(1, file.frame_count)
       assert_nil(file.frame_rate)
       assert_equal({
         "File:FileType" => "AVIF",
@@ -468,7 +467,6 @@ class MediaFileAvifTest < ActiveSupport::TestCase
         "QuickTime:MediaDataSize" => 85_120,
         "QuickTime:MediaDataOffset" => 366,
         "Meta:PrimaryItemReference" => 1,
-        "Vips:Error" => "libvips error",
       }, file.metadata.to_h)
     end
   end
@@ -523,14 +521,14 @@ class MediaFileAvifTest < ActiveSupport::TestCase
     should "be parsed correctly" do
       file = MediaFile.open("test/files/avif/kimono.rotate90.avif")
 
-      assert_equal(1024, file.width)
-      assert_equal(722, file.height)
+      assert_equal(722, file.width)
+      assert_equal(1024, file.height)
       assert_equal(84_837, file.file_size)
       assert_equal(:avif, file.file_ext)
       assert_equal("image/avif", file.mime_type)
       assert_equal("1ec8cc77c70f62f22651f93b7d8f375b", file.md5)
-      assert_equal("1ec8cc77c70f62f22651f93b7d8f375b", file.pixel_hash)
-      assert_equal(true, file.is_corrupt?)
+      assert_equal("8b8e4fb3720036c15a4e7cf367e838c7", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
       assert_equal(false, file.is_supported?)
       assert_equal(false, file.is_animated?)
       assert_nil(file.duration)
@@ -561,7 +559,6 @@ class MediaFileAvifTest < ActiveSupport::TestCase
         "QuickTime:MediaDataSize" => 84_502,
         "QuickTime:MediaDataOffset" => 335,
         "Meta:PrimaryItemReference" => 1,
-        "Vips:Error" => "libvips error",
       }, file.metadata.to_h)
     end
   end
