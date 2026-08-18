@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Rejects bulk update requests that haven't been approved in 45 days.
-module BulkUpdateRequestPruner
+module BulkUpdateRequest::Pruner
   module_function
 
   # How many days before a bulk update request should be automatically rejected.

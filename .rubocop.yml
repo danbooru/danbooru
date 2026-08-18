@@ -58,6 +58,10 @@ Lint/AmbiguousBlockAssociation:
 Lint/DuplicateBranch:
   Enabled: false
 
+Lint/MissingSuper:
+  AllowedParentClasses:
+    - BulkUpdateRequest::Command
+
 Lint/SymbolConversion:
   EnforcedStyle: consistent
 
