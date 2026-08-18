@@ -30,4 +30,22 @@ class BulkUpdateRequest::Command::CreateImplication < BulkUpdateRequest::Command
       errors.add(:base, "Can't create implication [[#{tag_implication.antecedent_name}]] -> [[#{tag_implication.consequent_name}]] (#{tag_implication.errors.full_messages.join("; ")})")
     end
   end
+
+  def child_tag
+    @child_tag ||= Tag.find_by_name(@antecedent)
+  end
+
+  def parent_tag
+    @parent_tag ||= Tag.find_by_name(@consequent)
+  end
+
+  def approval_level
+    # the antecedent is a small character tag
+    child_is_valid = child_tag.present? && child_tag.character? && child_tag.is_small_tag?
+    # the consequent is also a small character tag
+    parent_is_valid = parent_tag.present? && parent_tag.character? && parent_tag.is_small_tag?
+
+    return User::Levels::MODERATOR if child_is_valid && parent_is_valid
+    User::Levels::ADMIN
+  end
 end

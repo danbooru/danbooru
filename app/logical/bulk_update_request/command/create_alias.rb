@@ -5,9 +5,6 @@
 # @see TagAlias
 # @see TagMover
 class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
-  # Aliases can be approved by non-admins for tags containing up to this amount of posts
-  MAX_NON_ADMIN_APPROVABLE_POST_COUNT = 200
-
   def self.regex
     /\A(?:create alias|alias) (?<old_name>\S+) -> (?<new_name>\S+)\z/i
   end
@@ -47,9 +44,9 @@ class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
 
   def approval_level
     # the old tag is a small artist tag
-    old_allowed = old_tag.present? && old_tag.artist? && old_tag.post_count < BulkUpdateRequest::Processor::MAX_NON_ADMIN_APPROVABLE_POST_COUNT
-    # the new tag doesn't exist or is also a small artist tag
-    new_allowed = new_tag.blank? || (new_tag.artist? && new_tag.post_count < BulkUpdateRequest::Processor::MAX_NON_ADMIN_APPROVABLE_POST_COUNT)
+    old_allowed = old_tag.present? && old_tag.artist? && old_tag.is_small_tag?
+    # the new tag doesn't exist, is empty, or is also a small artist tag
+    new_allowed = new_tag.blank? || new_tag.empty? || (new_tag.artist? && new_tag.is_small_tag?)
 
     return User::Levels::BUILDER if old_allowed && new_allowed
     User::Levels::ADMIN
