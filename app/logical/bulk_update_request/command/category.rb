@@ -8,7 +8,6 @@ class BulkUpdateRequest::Command::Category < BulkUpdateRequest::Command
   end
 
   def initialize(params)
-    super
     @tag_name = Tag.normalize_name(params[:tag_name])
     @category_name = params[:category_name].downcase
   end

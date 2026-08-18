@@ -7,7 +7,6 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   end
 
   def initialize(params)
-    super
     @antecedent = params[:antecedent]
     @consequent = params[:consequent]
 

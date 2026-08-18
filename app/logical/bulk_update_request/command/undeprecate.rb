@@ -7,7 +7,6 @@ class BulkUpdateRequest::Command::Undeprecate < BulkUpdateRequest::Command
   end
 
   def initialize(params)
-    super
     @tag_name = Tag.normalize_name(params[:tag_name])
   end
 

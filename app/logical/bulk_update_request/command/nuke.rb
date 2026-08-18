@@ -7,7 +7,6 @@ class BulkUpdateRequest::Command::Nuke < BulkUpdateRequest::Command
   end
 
   def initialize(params)
-    super
     @tag_or_pool = params[:tag_or_pool]
   end
 

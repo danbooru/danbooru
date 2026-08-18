@@ -6,7 +6,6 @@
 # by `BulkUpdateRequest::Command.parse` when no subclass regex matches.
 class BulkUpdateRequest::Command::InvalidLine < BulkUpdateRequest::Command
   def initialize(params)
-    super
     @line = params[:line]
   end
 

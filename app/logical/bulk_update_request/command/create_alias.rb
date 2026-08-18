@@ -13,7 +13,6 @@ class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
   end
 
   def initialize(params)
-    super
     @old_name = Tag.normalize_name(params[:old_name])
     @new_name = Tag.normalize_name(params[:new_name])
   end

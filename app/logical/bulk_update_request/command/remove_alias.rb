@@ -7,7 +7,6 @@ class BulkUpdateRequest::Command::RemoveAlias < BulkUpdateRequest::Command
   end
 
   def initialize(params)
-    super
     @antecedent = Tag.normalize_name(params[:antecedent])
     @consequent = Tag.normalize_name(params[:consequent])
   end

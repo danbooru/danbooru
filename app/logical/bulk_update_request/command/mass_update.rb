@@ -8,7 +8,6 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
   end
 
   def initialize(params)
-    super
     @first_search = params[:first_search]
     @second_search = params[:second_search]
   end

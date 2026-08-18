@@ -30,6 +30,7 @@ class BulkUpdateRequest::Command
   end
 
   # Validate the command and add any errors to `errors`.
+  #
   # @param context [:request, :approval] `:request` when the BUR is created or edited; `:approval` when it is approved. Some validations only run on `:request`.
   # @param errors [ActiveModel::Errors] error collector to add messages to
   def validate(context:, errors:)
@@ -37,6 +38,7 @@ class BulkUpdateRequest::Command
   end
 
   # Execute the command.
+  #
   # @param approver [User] the user approving the BUR (required by some commands)
   # @param forum_topic [ForumTopic] the forum topic associated with the BUR (required by some commands)
   def process!(**)
@@ -59,6 +61,8 @@ class BulkUpdateRequest::Command
     User::Levels::ADMIN
   end
 
+  # Checks if a line matches any known command by comparing it to its respective regex.
+  #
   # @param line [String] a single line from a BUR script
   # @return [BulkUpdateRequest::Command] a command instance, or InvalidLine if the line doesn't match
   def self.parse(line)
