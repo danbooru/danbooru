@@ -181,14 +181,14 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       should "work" do
         archive = Dir.mktmpdir do |tmpdir|
           # Test normal files work
-          FileUtils.cp "test/files/test.gif", tmpdir
+          FileUtils.cp "test/files/gif/test.gif", tmpdir
 
           # Test utf8 filenames work
-          FileUtils.cp "test/files/test.jpg", File.join(tmpdir, "テスト.jpg")
+          FileUtils.cp "test/files/jpg/test.jpg", File.join(tmpdir, "テスト.jpg")
 
           # Test subdirectories work
           FileUtils.mkdir_p File.join(tmpdir, "subdir")
-          FileUtils.cp "test/files/test.png", File.join(tmpdir, "subdir")
+          FileUtils.cp "test/files/png/test.png", File.join(tmpdir, "subdir")
 
           Danbooru::Archive.create!(tmpdir)
         end

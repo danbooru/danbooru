@@ -24,7 +24,7 @@ class PostTest < ActiveSupport::TestCase
   context "Deletion:" do
     context "Expunging a post" do
       setup do
-        @post = create(:post_with_file, tag_string: "1girl solo", uploader: @user, filename: "test.jpg")
+        @post = create(:post_with_file, tag_string: "1girl solo", uploader: @user, filename: "jpg/test.jpg")
         Favorite.create!(post: @post, user: @user)
         create(:favorite_group, post_ids: [@post.id])
         perform_enqueued_jobs # perform IqdbAddPostJob
@@ -1336,7 +1336,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a static image tagged with animated_gif" do
         should "remove the tag" do
-          @media_asset = create(:media_asset, file: "test/files/test-static-32x32.gif")
+          @media_asset = create(:media_asset, file: "test/files/gif/test-static-32x32.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme animated animated_gif")
           assert_equal("tagme", @post.tag_string)
@@ -1345,7 +1345,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a static image tagged with animated_png" do
         should "remove the tag" do
-          @media_asset = create(:media_asset, file: "test/files/test.png")
+          @media_asset = create(:media_asset, file: "test/files/png/test.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme animated animated_png")
           assert_equal("tagme", @post.tag_string)
@@ -1354,7 +1354,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated gif missing the animated_gif tag" do
         should "automatically add the animated_gif tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52.gif")
+          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif tagme", @post.tag_string)
@@ -1363,7 +1363,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated png missing the animated_png tag" do
         should "automatically add the animated_png tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-animated-256x256.png")
+          @media_asset = MediaAsset.upload!("test/files/png/test-animated-256x256.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_png tagme", @post.tag_string)
@@ -1372,7 +1372,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a greyscale image missing the greyscale tag" do
         should "automatically add the greyscale tag for a monochrome JPEG file" do
-          @media_asset = MediaAsset.upload!("test/files/test-grey-no-profile.jpg")
+          @media_asset = MediaAsset.upload!("test/files/jpg/test-grey-no-profile.jpg")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("greyscale tagme", @post.tag_string)
@@ -1388,7 +1388,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an exif-rotated image missing the exif_rotation tag" do
         should "automatically add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-rotation-90cw.jpg")
+          @media_asset = MediaAsset.upload!("test/files/jpg/test-rotation-90cw.jpg")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("exif_rotation tagme", @post.tag_string)
@@ -1397,7 +1397,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a PNG with the exif orientation flag" do
         should "not add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-rotation-90cw.png")
+          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-90cw.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("tagme", @post.tag_string)
@@ -1406,12 +1406,12 @@ class PostTest < ActiveSupport::TestCase
 
       context "a non-repeating GIF missing the non-repeating_animation tag" do
         should "automatically add the non-repeating_animation tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52-loop-1.gif")
+          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52-loop-1.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
 
-          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52-loop-2.gif")
+          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52-loop-2.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
@@ -2216,7 +2216,7 @@ class PostTest < ActiveSupport::TestCase
 
   context "URLs:" do
     should "generate the correct urls for animated gifs" do
-      @post = create(:post_with_file, filename: "test-animated-86x52.gif")
+      @post = create(:post_with_file, filename: "gif/test-animated-86x52.gif")
 
       assert_equal("https://www.example.com/data/180x180/77/d8/77d89bda37ea3af09158ed3282f8334f.jpg", @post.preview_file_url)
       assert_equal("https://www.example.com/data/original/77/d8/77d89bda37ea3af09158ed3282f8334f.gif", @post.large_file_url)

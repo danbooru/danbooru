@@ -77,7 +77,7 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
     context "destroy action" do
       should "delete the asset's files" do
         @admin = create(:admin_user)
-        @media_asset = MediaAsset.upload!("test/files/test.jpg")
+        @media_asset = MediaAsset.upload!("test/files/jpg/test.jpg")
         delete_auth media_asset_path(@media_asset), @admin
 
         assert_redirected_to @media_asset

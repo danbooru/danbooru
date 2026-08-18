@@ -38,7 +38,7 @@ class FavoriteGroupTest < ActiveSupport::TestCase
 
   context "expunging a post" do
     should "remove it from all favorite groups" do
-      @post = create(:post_with_file, filename: "test.jpg")
+      @post = create(:post_with_file)
 
       @fav_group.add(@post)
       assert_equal([@post.id], @fav_group.post_ids)

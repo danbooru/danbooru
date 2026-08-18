@@ -53,7 +53,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           post_auth post_replacements_path, create(:moderator_user), params: {
             post_id: @post.id,
             post_replacement: {
-              replacement_file: Rack::Test::UploadedFile.new("test/files/test.png"),
+              replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"),
               final_source: "blah",
             },
           }
@@ -72,7 +72,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           post_auth post_replacements_path, create(:moderator_user), params: {
             post_id: @post2.id,
             post_replacement: {
-              replacement_file: Rack::Test::UploadedFile.new("test/files/test.jpg"),
+              replacement_file: Rack::Test::UploadedFile.new("test/files/jpg/test.jpg"),
             },
           }
 
@@ -247,8 +247,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         @admin = create(:admin_user)
         @mod = create(:moderator_user)
 
-        @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"), replacement_file: Rack::Test::UploadedFile.new("test/files/test.png"))
-        @admin_replacement = create(:post_replacement, creator: @admin, replacement_file: Rack::Test::UploadedFile.new("test/files/test.jpg"))
+        @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"), replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        @admin_replacement = create(:post_replacement, creator: @admin, replacement_file: Rack::Test::UploadedFile.new("test/files/jpg/test.jpg"))
       end
 
       should "render" do

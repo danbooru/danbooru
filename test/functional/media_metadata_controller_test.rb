@@ -20,9 +20,9 @@ class MediaMetadataControllerTest < ActionDispatch::IntegrationTest
 
       context "searching" do
         setup do
-          @jpg = create(:media_metadata, file: "test/files/test.jpg")
-          @gif = create(:media_metadata, file: "test/files/test.gif")
-          @png = create(:media_metadata, file: "test/files/test.png")
+          @jpg = create(:media_metadata, file: "test/files/jpg/test.jpg")
+          @gif = create(:media_metadata, file: "test/files/gif/test.gif")
+          @png = create(:media_metadata, file: "test/files/png/test.png")
         end
 
         should respond_to_search(has_metadata: true).with { [@png, @gif, @jpg] }

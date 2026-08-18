@@ -14,15 +14,15 @@ class MediaFileCliTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile::CLI.run!(*%w[test/files], stdout:))
       assert_equal(true, MediaFile::CLI.run!(*%w[test/files -lh -u si -p 3], stdout:))
       assert_equal(true, MediaFile::CLI.run!(*%w[test/files -lR], stdout:))
-      assert_equal(true, MediaFile::CLI.run!(*%w[test/files/test.jpg], stdout:))
-      assert_equal(true, MediaFile::CLI.run!(*%w[test/files/test.jpg -d], stdout:))
-      assert_equal(true, MediaFile::CLI.run!(*%w[test/files/test.jpg -j], stdout:))
+      assert_equal(true, MediaFile::CLI.run!(*%w[test/files/jpg/test.jpg], stdout:))
+      assert_equal(true, MediaFile::CLI.run!(*%w[test/files/jpg/test.jpg -d], stdout:))
+      assert_equal(true, MediaFile::CLI.run!(*%w[test/files/jpg/test.jpg -j], stdout:))
       assert_equal(true, MediaFile::CLI.run!(*%w[test/files/ -c mpixels,name -g type,dimensions -s user,size], stdout:))
     end
 
     should "produce json output" do
       stdout = StringIO.new
-      assert_equal(true, MediaFile::CLI.run!(*%w[test/files/test.jpg -j -c name,size], stdout:))
+      assert_equal(true, MediaFile::CLI.run!(*%w[test/files/jpg/test.jpg -j -c name,size], stdout:))
       assert_equal([{ "name" => "test.jpg", "size" => 28_086 }], stdout.tap(&:rewind).read.parse_json)
     end
   end
