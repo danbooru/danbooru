@@ -463,7 +463,8 @@ class MediaFileAvifTest < ActiveSupport::TestCase
         "QuickTime:TwelveBit" => 0,
         "QuickTime:ChromaFormat" => "YUV 4:2:0",
         "QuickTime:ChromaSamplePosition" => "Unknown",
-        "QuickTime:InitialDelaySamples" => 1, "QuickTime:MediaDataSize" => 85_120,
+        "QuickTime:InitialDelaySamples" => 1,
+        "QuickTime:MediaDataSize" => 85_120,
         "QuickTime:MediaDataOffset" => 366,
         "Meta:PrimaryItemReference" => 1,
       }, file.metadata.to_h)
