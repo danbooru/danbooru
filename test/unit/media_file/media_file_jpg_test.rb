@@ -880,4 +880,88 @@ class MediaFileJpgTest < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
+
+  context "a greyscale image with an incompatible RGB color profile" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/jpg/test-grey-rgb-profile.jpg")
+
+      assert_equal(538, file.width)
+      assert_equal(577, file.height)
+      assert_equal(11_999, file.file_size)
+      assert_equal(:jpg, file.file_ext)
+      assert_equal("image/jpeg", file.mime_type)
+      assert_equal("1237aadb30bdc944238a66ea23fa0b56", file.md5)
+      assert_equal("f568f78e676100c065263b26c57f04c6", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_nil(file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "JPEG",
+        "File:ImageWidth" => 538,
+        "File:ImageHeight" => 577,
+        "File:EncodingProcess" => "Baseline DCT, Huffman coding",
+        "File:BitsPerSample" => 8,
+        "File:ColorComponents" => 1,
+        "JFIF:JFIFVersion" => 1.01,
+        "JFIF:ResolutionUnit" => "inches",
+        "JFIF:XResolution" => 300,
+        "JFIF:YResolution" => 300,
+        "ICC-header:ProfileCMMType" => "Linotronic",
+        "ICC-header:ProfileVersion" => "2.1.0",
+        "ICC-header:ProfileClass" => "Display Device Profile",
+        "ICC-header:ColorSpaceData" => "RGB ",
+        "ICC-header:ProfileConnectionSpace" => "XYZ ",
+        "ICC-header:ProfileDateTime" => "1998:02:09 06:49:00",
+        "ICC-header:ProfileFileSignature" => "acsp",
+        "ICC-header:PrimaryPlatform" => "Microsoft Corporation",
+        "ICC-header:CMMFlags" => "Not Embedded, Independent",
+        "ICC-header:DeviceManufacturer" => "Hewlett-Packard",
+        "ICC-header:DeviceModel" => "sRGB",
+        "ICC-header:DeviceAttributes" => "Reflective, Glossy, Positive, Color",
+        "ICC-header:RenderingIntent" => "Perceptual",
+        "ICC-header:ConnectionSpaceIlluminant" => "0.9642 1 0.82491",
+        "ICC-header:ProfileCreator" => "Hewlett-Packard",
+        "ICC-header:ProfileID" => 0,
+        "ICC_Profile:ProfileCopyright" => "Copyright (c) 1998 Hewlett-Packard Company",
+        "ICC_Profile:ProfileDescription" => "sRGB IEC61966-2.1",
+        "ICC_Profile:MediaWhitePoint" => "0.95045 1 1.08905",
+        "ICC_Profile:MediaBlackPoint" => "0 0 0",
+        "ICC_Profile:RedMatrixColumn" => "0.43607 0.22249 0.01392",
+        "ICC_Profile:GreenMatrixColumn" => "0.38515 0.71687 0.09708",
+        "ICC_Profile:BlueMatrixColumn" => "0.14307 0.06061 0.7141",
+        "ICC_Profile:DeviceMfgDesc" => "IEC http://www.iec.ch",
+        "ICC_Profile:DeviceModelDesc" => "IEC 61966-2.1 Default RGB colour space - sRGB",
+        "ICC_Profile:ViewingCondDesc" => "Reference Viewing Condition in IEC61966-2.1",
+        "ICC_Profile:Luminance" => "76.03647 80 87.12462",
+        "ICC_Profile:Technology" => "Cathode Ray Tube Display",
+        "ICC-view:ViewingCondIlluminant" => "19.6445 20.3718 16.8089",
+        "ICC-view:ViewingCondSurround" => "3.92889 4.07439 3.36179",
+        "ICC-view:ViewingCondIlluminantType" => "D50",
+        "ICC-meas:MeasurementObserver" => "CIE 1931",
+        "ICC-meas:MeasurementBacking" => "0 0 0",
+        "ICC-meas:MeasurementGeometry" => "Unknown",
+        "ICC-meas:MeasurementFlare" => "0.999%",
+        "ICC-meas:MeasurementIlluminant" => "D65",
+        "Photoshop:XResolution" => 300,
+        "Photoshop:DisplayedUnitsX" => "inches",
+        "Photoshop:YResolution" => 300,
+        "Photoshop:DisplayedUnitsY" => "inches",
+        "Photoshop:GlobalAngle" => 120,
+        "Photoshop:PrintFlags" => "(none)",
+        "Photoshop:CopyrightFlag" => false,
+        "Photoshop:PrintFlagsInfo" => "\u0001\u0002",
+        "Photoshop:ColorHalftoningInfo" => "/ff\u0001lff\u0006\u0001/ff\u0001???\u0006\u00012\u0001Z\u0006\u00015\u0001-\u0006\u0001",
+        "Photoshop:ColorTransferFuncs" => "??????????????????????\u0003???????????????????????\u0003???????????????????????\u0003???????????????????????\u0003?",
+        "Photoshop:TargetLayerID" => 21,
+        "Photoshop:LayersGroupInfo" => "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "Photoshop:GridGuidesInfo" => "\u0001\u0002@\u0002@",
+        "Photoshop:IDsBaseValue" => 30,
+        "Photoshop:PhotoshopQuality" => 8,
+        "Photoshop:PhotoshopFormat" => "Standard",
+      }, file.metadata.to_h)
+    end
+  end
 end
