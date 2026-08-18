@@ -264,7 +264,7 @@ module ApplicationHelper
 
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
     search_form_for(url, classes: "quick-search-form one-line-form py-1.5 px-3 md:w-180px w-full") do |f|
-      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { "id": nil, "data-autocomplete": autocomplete }
+      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { "id": nil, "data-autocomplete": autocomplete, "data-shortcut": "q" }
       out += tag.input type: :hidden, name: :redirect, value: redirect
       out += capture { yield f } if block_given?
       out
