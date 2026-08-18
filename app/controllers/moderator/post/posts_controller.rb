@@ -25,15 +25,11 @@ module Moderator
       def ban
         @post = authorize ::Post.find(params[:id])
         @post.ban!(CurrentUser.user)
-
-        respond_with(@post, notice: "Post was banned")
       end
 
       def unban
         @post = authorize ::Post.find(params[:id])
         @post.unban!(CurrentUser.user)
-
-        respond_with(@post, notice: "Post was unbanned")
       end
     end
   end

@@ -164,9 +164,9 @@
         <% end %>
 
         <% if policy(@post).unban? %>
-          <li id="post-option-unban"><%= link_to "Unban", unban_moderator_post_post_path(@post), method: :post, "data-confirm": "Are you sure you want to unban this post?" %></li>
+          <li id="post-option-unban"><%= link_to "Unban", unban_moderator_post_post_path(@post), remote: true, method: :post, "data-confirm": "Are you sure you want to unban this post?" %></li>
         <% elsif policy(@post).ban? %>
-          <li id="post-option-ban"><%= link_to "Ban", ban_moderator_post_post_path(@post), method: :post, "data-confirm": "Are you sure you want to ban this post?" %></li>
+          <li id="post-option-ban"><%= link_to "Ban", ban_moderator_post_post_path(@post), remote: true, method: :post, "data-confirm": "Are you sure you want to ban this post?" %></li>
         <% end %>
 
         <% if policy(@post).expunge? %>
