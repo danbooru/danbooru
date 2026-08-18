@@ -17,8 +17,7 @@ class BulkUpdateRequest::Command::Category < BulkUpdateRequest::Command
   end
 
   def process!(**)
-    tag ||= Tag.new(name: @tag_name)
-    tag.update!(category: category, updater: User.system, is_bulk_update_request: true)
+    Tag.find_or_create_by_name(@tag_name, category: category, current_user: User.system, is_bulk_update_request: true)
   end
 
   def to_dtext
