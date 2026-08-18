@@ -266,7 +266,7 @@ class MediaFileWebpTest < ActiveSupport::TestCase
       assert_equal("f9961d54b2290c36ad3e54995d9d2dcf", file.md5)
       assert_equal("f9961d54b2290c36ad3e54995d9d2dcf", file.pixel_hash)
       assert_equal(false, file.is_corrupt?)
-      assert_equal(false, file.is_supported?)
+      assert_equal(true, file.is_supported?)
       assert_equal(true, file.is_animated?)
       assert_equal(0.84, file.duration)
       assert_equal(12, file.frame_count)

@@ -27,8 +27,6 @@ class MediaFile::Image < MediaFile
     case file_ext
     when :avif
       !metadata.is_rotated? && !metadata.is_mirrored? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.has_auxiliary_image? && !metadata.is_animated_avif?
-    when :webp
-      !is_animated?
     else
       true
     end
