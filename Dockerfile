@@ -18,7 +18,7 @@
 
 # You must also update .ruby-version and the Gemfile when updating the Ruby version.
 # These versions are used by bin/danbooru-dev-entrypoint to detect whether the current installed docker containers are outdated
-ARG RUBY_VERSION="4.0.2"
+ARG RUBY_VERSION="4.0.6"
 ARG RUBY_MAJOR_VERSION="4.0"
 
 # The comments above these ARGs help renovate figure out where to check for new versions of these dependencies.
