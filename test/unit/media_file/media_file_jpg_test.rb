@@ -188,7 +188,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
     end
 
     should "generate a thumbnail with the correct colors" do
-      file = MediaFile.open("test/files/test-cmyk-no-profile.jpg").preview(180, 180)
+      file = MediaFile.open("test/files/jpg/test-cmyk-no-profile.jpg").preview(180, 180)
       assert_equal("4c9515d85842a291f6512c93458dd7b8", file.pixel_hash)
     end
   end

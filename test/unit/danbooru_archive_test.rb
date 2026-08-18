@@ -77,7 +77,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
 
       should "work with a .zip file" do
-        Danbooru::Archive.extract!("test/files/archive/ugoira.zip") do |_dir, filenames|
+        Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip") do |_dir, filenames|
           assert_equal(5, filenames.size)
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
         end
@@ -114,7 +114,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#format method" do
       should "detect the file type" do
-        assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/archive/ugoira.zip").format)
+        assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/ugoira/ugoira.zip").format)
         assert_equal("RAR5", Danbooru::Archive.open("test/files/archive/ugoira.rar").format)
         assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.7z").format)
         assert_equal("GNU tar format", Danbooru::Archive.open("test/files/archive/ugoira.tar").format)
@@ -124,7 +124,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#file_ext method" do
       should "detect the file extension" do
-        assert_equal(:zip, Danbooru::Archive.open("test/files/archive/ugoira.zip").file_ext)
+        assert_equal(:zip, Danbooru::Archive.open("test/files/ugoira/ugoira.zip").file_ext)
         assert_equal(:rar, Danbooru::Archive.open("test/files/archive/ugoira.rar").file_ext)
         assert_equal(:"7z", Danbooru::Archive.open("test/files/archive/ugoira.7z").file_ext)
         assert_equal(:bin, Danbooru::Archive.open("test/files/archive/ugoira.tar").file_ext)
