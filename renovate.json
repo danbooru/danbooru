@@ -80,13 +80,6 @@
       "enabled": false
     },
     {
-      "description": "Don't automatically create PRs for non-package manager dependencies (such as Ruby version)",
-      "matchManagers": [
-        "custom.regex"
-      ],
-      "prCreation": "approval"
-    },
-    {
       "description": "Give highest priority to npm/bundler updates",
       "matchPackageNames": [
         "npm",
