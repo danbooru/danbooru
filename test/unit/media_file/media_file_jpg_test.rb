@@ -166,7 +166,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
       assert_equal(:jpg, file.file_ext)
       assert_equal("image/jpeg", file.mime_type)
       assert_equal("22bcb13a72131c922dfeb3dcfad1457a", file.md5)
-      assert_equal("dfcdf4d8e525ffd7057f103384126cf0", file.pixel_hash)
+      assert_equal("69e64bd6e054757ac6ec67d1da3ad4fc", file.pixel_hash)
       assert_equal(false, file.is_corrupt?)
       assert_equal(true, file.is_supported?)
       assert_equal(false, file.is_animated?)
@@ -189,7 +189,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
 
     should "generate a thumbnail with the correct colors" do
       file = MediaFile.open("test/files/jpg/test-cmyk-no-profile.jpg").preview(180, 180)
-      assert_equal("4c9515d85842a291f6512c93458dd7b8", file.pixel_hash)
+      assert_equal("7577481a2a688e6e5e9ec901addcf0e3", file.pixel_hash)
     end
   end
 

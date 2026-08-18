@@ -465,6 +465,8 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
 
         context "with PNG frames" do
           should "work when converting to a #{codec} #{format}" do
+            # XXX: x265 shipped by ubuntu does not have alpha support out of the box
+            skip "Not supported due to ubuntu x265 compile flags" if format == :mp4 && codec == :hevc
             MediaFile.open("test/files/ugoira/ugoira-100260240-png-danbooru.zip") do |ugoira|
               video = ugoira.convert(format: format, codec: codec)
 
@@ -486,6 +488,8 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
 
         context "with GIF frames" do
           should "work when converting to a #{codec} #{format}" do
+            # XXX: x265 shipped by ubuntu does not have alpha support out of the box
+            skip "Not supported due to ubuntu x265 compile flags" if format == :mp4 && codec == :hevc
             MediaFile.open("test/files/ugoira/ugoira-108469527-gif-danbooru.zip") do |ugoira|
               video = ugoira.convert(format: format, codec: codec)
 

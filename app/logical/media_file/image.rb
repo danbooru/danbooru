@@ -19,7 +19,7 @@ class MediaFile::Image < MediaFile
     image.size
   rescue Vips::Error
     [metadata.width, metadata.height]
-  rescue
+  rescue StandardError
     [0, 0]
   end
 
@@ -149,7 +149,7 @@ class MediaFile::Image < MediaFile
       resized_image = flattened_image
     end
 
-    output_file = Danbooru::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format.to_s}"])
+    output_file = Danbooru::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format}"])
     case format.to_sym
     when :jpeg
       # https://www.libvips.org/API/current/VipsForeignSave.html#vips-jpegsave
@@ -211,26 +211,40 @@ class MediaFile::Image < MediaFile
 
   # @return [MediaFile::Image] The raw image used for computing the pixel hash.
   def pixel_hash_file
-    image = open_image(fail: true)
-    image = image.icc_transform("srgb") if image.get_typeof("icc-profile-data") != 0
-    image = image.colourspace("srgb") if image.interpretation != :srgb
-    image = image.add_alpha unless image.has_alpha?
+    # First we normalize the image to the same colorspace and add an alpha layer if missing,
+    # so that pixel data stays the same even for different profiles
+    img = open_image(fail: true)
+    img = img.icc_transform("srgb") if img.get_typeof("icc-profile-data") != 0
+    img = img.colourspace("srgb") if img.interpretation != :srgb
+    img = img.add_alpha unless img.has_alpha?
 
-    # PAM file format: https://netpbm.sourceforge.net/doc/pam.html
-    output_file = Danbooru::Tempfile.open(["danbooru-pixel-hash-#{md5}-", ".pam"])
-    output_file.puts "P7"
-    output_file.puts "WIDTH #{image.width}"
-    output_file.puts "HEIGHT #{image.height}"
-    output_file.puts "DEPTH #{image.bands}"
-    output_file.puts "MAXVAL 255"
-    output_file.puts "TUPLTYPE RGB_ALPHA"
-    output_file.puts "ENDHDR"
-    output_file.flush
-    image.rawsave_fd(output_file.fileno)
+    # Then we create a pam file: https://netpbm.sourceforge.net/doc/pam.html
+    # It's basically a header followed by raw pixels, so that we strip everything
+    # except the barebone necessary data for pixel hash computation
+    pam_file = Danbooru::Tempfile.open(["danbooru-pixel-hash-#{md5}-", ".pam"])
 
-    MediaFile::Image.new(output_file)
+    pam_file.binmode
+    pam_file.puts "P7"
+    pam_file.puts "WIDTH #{img.width}"
+    pam_file.puts "HEIGHT #{img.height}"
+    pam_file.puts "DEPTH #{img.bands}"
+    pam_file.puts "MAXVAL 255"
+    pam_file.puts "TUPLTYPE RGB_ALPHA"
+    pam_file.puts "ENDHDR"
+
+    # Finally, we write the raw pixel data to the pam file
+    target = Vips::TargetCustom.new
+    target.on_write do |chunk|
+      pam_file.write(chunk)
+      chunk.bytesize
+    end
+
+    img.rawsave_target(target)
+
+    pam_file.flush
+    MediaFile::Image.new(pam_file)
   ensure
-    image&.release
+    img&.release
   end
 
   private
