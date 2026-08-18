@@ -80,13 +80,6 @@
       "enabled": false
     },
     {
-      "description": "Don't automatically create PRs for non-package manager dependencies (such as Ruby version)",
-      "matchManagers": [
-        "custom.regex"
-      ],
-      "prCreation": "approval"
-    },
-    {
       "description": "Give highest priority to npm/bundler updates",
       "matchPackageNames": [
         "npm",
@@ -109,11 +102,12 @@
       ]
     },
     {
-      "description": "Keep the Ruby version in .ruby-version and the Dockerfile in sync by updating them in the same PR/commit. This must come after the 'group all non-major updates' rule so it wins for groupName, since the bundler manager also extracts the Gemfile ruby directive under the ruby-version datasource.",
+      "description": "Keep the Ruby version in .ruby-version, the Dockerfile, and the Gemfile ruby in sync by updating them in the same PR/commit. This must come after the 'Force bundler to process gem updates from Gemfile.lock' rule.",
       "groupName": "ruby version",
       "matchDatasources": [
         "ruby-version"
-      ]
+      ],
+      "rangeStrategy": "bump"
     },
     {
       "description": "Better PR titles",

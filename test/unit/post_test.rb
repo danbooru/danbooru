@@ -1363,7 +1363,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated png missing the animated_png tag" do
         should "automatically add the animated_png tag" do
-          @media_asset = MediaAsset.upload!("test/files/png/test-animated-256x256.png")
+          @media_asset = MediaAsset.upload!("test/files/apng/normal-256x256.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_png tagme", @post.tag_string)

@@ -132,9 +132,9 @@ class MediaFileWebmTest < ActiveSupport::TestCase
         "FFmpeg:AudioLayout" => "stereo",
         "FFmpeg:AudioBitRate" => 27_596,
         "FFmpeg:AudioPeakLoudness" => 0.1273503081016662,
-        "FFmpeg:AudioAverageLoudness" => 0.018407720014689554,
+        "FFmpeg:AudioAverageLoudness" => 0.018620871366628676,
         "FFmpeg:AudioLoudnessRange" => 0.0,
-        "FFmpeg:AudioSilencePercentage" => 0.7567155339805826,
+        "FFmpeg:AudioSilencePercentage" => 0.7360029126213592,
       }, file.metadata.to_h)
     end
   end
