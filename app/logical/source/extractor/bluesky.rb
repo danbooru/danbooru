@@ -14,6 +14,8 @@ class Source::Extractor::Bluesky < Source::Extractor
     case embed["$type"]
     when "app.bsky.embed.images"
       blobs = embed["images"].pluck("image")
+    when "app.bsky.embed.gallery"
+      blobs = embed["items"].pluck("image")
     when "app.bsky.embed.video"
       blobs = [embed["video"]]
     else
@@ -133,7 +135,7 @@ class Source::Extractor::Bluesky < Source::Extractor
 
     text = text.force_encoding("UTF-8")
 
-    alt_tags = embed&.dig("images").to_a.pluck(:alt).presence || [embed&.dig("alt")]
+    alt_tags = embed&.dig("images").to_a.pluck(:alt).presence || embed&.dig("items").to_a.pluck(:alt).presence || [embed&.dig("alt")]
     alt_tags.compact_blank.each do |alt_text|
       text << <<~EOS.chomp
         <blockquote>
