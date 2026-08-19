@@ -14,6 +14,7 @@ module Source::Tests::URL
         "https://danbooru.donmai.us/posts/1",
         "https://danbooru.donmai.us/posts/1.json",
         "https://danbooru.donmai.us/posts?md5=8d819da4871c3ca39f428999df8220ce",
+        "https://danbooru.donmai.us/media_assets/1",
       )
 
       should be_profile_url(

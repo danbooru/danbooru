@@ -136,26 +136,42 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "replacing a post with notes" do
-        should "rescale the notes" do
-          skip "Pixiv credentials not configured" unless Source::Extractor::Pixiv.enabled?
+      context "replacing a post with a danbooru media asset" do
+        should "replace with the full size image" do
+          @post = create(:post)
 
+          post_auth post_replacements_path, create(:moderator_user), params: {
+            post_id: @post.id,
+            post_replacement: {
+              replacement_url: "https://danbooru.donmai.us/media_assets/1",
+            },
+          }
+
+          assert_redirected_to @post
+          assert_equal("Post replaced", flash[:notice])
+          # XXX: this should really change the source to the media_asset instead.
+          assert_equal("https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.replacements.last.replacement_url)
+          assert_equal("https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.reload.source)
+        end
+      end
+
+      context "replacing a post containing notes" do
+        should "rescale the notes" do
           as(create(:user)) do
-            @post = create(:post, image_width: 160, image_height: 164)
+            @post = create(:post, image_width: 918, image_height: 1300)
             @note = @post.notes.create!(x: 80, y: 82, width: 80, height: 82, body: "test", created_at: 1.day.ago)
           end
 
           post_auth post_replacements_path, create(:moderator_user), params: {
             post_id: @post.id,
             post_replacement: {
-              replacement_url: "https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png",
+              replacement_url: "https://danbooru.donmai.us/media_assets/1",
             },
           }
 
           assert_redirected_to @post
           assert_equal("Post replaced", flash[:notice])
 
-          # replacement image is 80x82, so we're downscaling by 50% (160x164 -> 80x82).
           assert_equal([40, 41, 40, 41], [@note.reload.x, @note.y, @note.width, @note.height])
         end
       end

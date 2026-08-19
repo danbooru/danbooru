@@ -20,7 +20,11 @@ module Source
       end
 
       def page_url
-        "https://danbooru.donmai.us/posts/#{post_id}" if post_id.present?
+        if post_id.present?
+          "https://danbooru.donmai.us/posts/#{post_id}"
+        elsif media_asset_id.present?
+          "https://danbooru.donmai.us/media_assets/#{media_asset_id_from_url}"
+        end
       end
 
       def tags
@@ -50,6 +54,11 @@ module Source
           http.cache(1.minute).parsed_get("https://danbooru.donmai.us/posts/#{post_id_from_url}.json?only=#{fields}") || {}
         elsif post_md5_from_url.present?
           http.cache(1.minute).parsed_get("https://danbooru.donmai.us/posts.json?md5=#{post_md5_from_url}&only=#{fields}") || {}
+        elsif media_asset_id_from_url.present?
+          # XXX: we could fetch the post if it exists too, but it's too complex right now
+          # Needs to wait for https://github.com/danbooru/danbooru/issues/5133 to be implemented
+          response = http.cache(1.minute).parsed_get("https://danbooru.donmai.us/media_assets/#{media_asset_id_from_url}.json") || {}
+          response.presence ? { media_asset: response } : {}
         else
           {}
         end
@@ -66,6 +75,14 @@ module Source
 
         def post_md5_from_url
           parsed_url.md5 || parsed_referer&.md5
+        end
+
+        def media_asset_id
+          media_asset_id_from_url || api_response.dig(:media_asset, :id)
+        end
+
+        def media_asset_id_from_url
+          parsed_url.media_asset_id || parsed_referer&.media_asset_id
         end
 
         def sub_extractor
