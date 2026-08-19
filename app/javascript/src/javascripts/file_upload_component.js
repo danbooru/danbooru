@@ -66,9 +66,10 @@ export default class FileUploadComponent {
       this.pollStatus(upload);
     });
 
-    dropzone.on("error", (file, msg) => {
+    dropzone.on("error", (file, response) => {
       this.$dropzone.find(".dropzone-hint").show();
       dropzone.removeFile(file);
+      let msg = uploadError(response);
       Notice.error(msg);
     });
 
