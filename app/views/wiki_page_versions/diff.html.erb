@@ -19,7 +19,7 @@
           <%= link_to_if @otherpage.previous, humanized_time(@otherpage.updated_at), diff_wiki_page_versions_path(thispage: @otherpage.id, otherpage: @otherpage.previous&.id) %> (<%= link_to_user @otherpage.updater %>)
         </p>
 
-        <% if @thispage.other_names.present? %>
+        <% if @thispage.other_names.present? || @otherpage.other_names.present? %>
           <p><%= wiki_version_other_names_diff(@thispage, @otherpage) %></p>
         <% end %>
 

@@ -46,8 +46,9 @@ class ArtistVersion < ApplicationRecord
   def self.status_fields
     {
       name: "Renamed",
-      urls_changed: "URLs",
-      other_names_changed: "OtherNames",
+      urls_changed?: "URLs",
+      other_names_changed?: "OtherNames",
+      other_names_reordered?: "OtherNamesOrder",
       group_name: "GroupName",
       was_deleted: "Deleted",
       was_undeleted: "Undeleted",
@@ -56,14 +57,19 @@ class ArtistVersion < ApplicationRecord
     }
   end
 
-  def other_names_changed(type)
+  def other_names_changed?(type)
     other = send(type)
-    ((other_names - other.other_names) | (other.other_names - other_names)).length.positive?
+    ((other_names - other.other_names) | (other.other_names - other_names)).any?
   end
 
-  def urls_changed(type)
+  def other_names_reordered?(type)
     other = send(type)
-    ((urls - other.urls) | (other.urls - urls)).length.positive?
+    !other_names_changed?(type) && other.other_names != other_names
+  end
+
+  def urls_changed?(type)
+    other = send(type)
+    ((urls - other.urls) | (other.urls - urls)).any?
   end
 
   def was_deleted(type)

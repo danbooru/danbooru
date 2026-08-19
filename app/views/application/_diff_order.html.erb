@@ -1,0 +1,17 @@
+<%# this_list, other_list, ul_class, li_class, show_unchanged %>
+
+<%= tag.ul class: [*ul_class] do %>
+  <% other_list.each_with_index do |item, index| %>
+    <% if this_list[index] != item || show_unchanged %>
+      <%= tag.li item, class: [("removed" if this_list[index] != item), "font-italic", "text-muted", *li_class] %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= tag.ul class: [*ul_class] do %>
+  <% this_list.each_with_index do |item, index| %>
+    <% if other_list[index] != item || show_unchanged %>
+      <%= tag.li item, class: [("added" if other_list[index] != item), *li_class] %>
+    <% end %>
+  <% end %>
+<% end %>

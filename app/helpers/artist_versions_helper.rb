@@ -10,7 +10,13 @@ module ArtistVersionsHelper
       other_names = []
     end
 
-    if type == "previous"
+    if reordered?(this_names, other_names)
+      if type == "previous"
+        diff_list_order_html(this_names, other_names, show_unchanged: show_unchanged)
+      else
+        diff_list_order_html(other_names, this_names, show_unchanged: show_unchanged)
+      end
+    elsif type == "previous"
       diff_list_html(this_names, other_names, show_unchanged: show_unchanged)
     else
       diff_list_html(other_names, this_names, show_unchanged: show_unchanged)
