@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class ForumTopicPolicy < ApplicationPolicy
-  def index?
-    true
-  end
-
   def show?
     user.level >= record.min_level_id
   end

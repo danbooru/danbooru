@@ -2,11 +2,15 @@
 
 class UserPolicy < ApplicationPolicy
   def create?
-    user.is_anonymous?
+    if Danbooru.config.signups_restricted_to_admin?
+      user.is_admin?
+    else
+      user.is_anonymous?
+    end
   end
 
   def new?
-    user.is_anonymous?
+    create?
   end
 
   def custom_style?

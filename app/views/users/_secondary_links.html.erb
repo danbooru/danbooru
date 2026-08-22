@@ -2,7 +2,8 @@
   <%= quick_search_form_for(:name_matches, users_path, "users", autocomplete: "user", redirect: true) %>
   <%= subnav_link_to "Listing", users_path %>
 
-  <% if CurrentUser.user.is_anonymous? %>
+  <%# Show signup link when the current user is able to create an account: anonymous by default, admin only when restricted. %>
+  <% if Danbooru.config.signups_restricted_to_admin? ? CurrentUser.user.is_admin? : CurrentUser.user.is_anonymous? %>
     <%= subnav_link_to "Sign up", new_user_path %>
   <% end %>
 

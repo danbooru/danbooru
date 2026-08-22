@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class MediaAssetPolicy < ApplicationPolicy
-  def index?
-    true
-  end
-
   def destroy?
     user.is_admin?
   end

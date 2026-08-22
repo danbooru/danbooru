@@ -667,6 +667,22 @@ module Danbooru
       false
     end
 
+    # If true, only authenticated users can access the site. Anonymous users will be redirected to the login page.
+    #
+    # This applies to all pages and API endpoints. Authentication routes (login, signup, password reset) are excluded.
+    #
+    # Usage: DANBOORU_FORCE_AUTHENTICATED=true
+    def force_authenticated?
+      false
+    end
+
+    # If true, only admins can create new user accounts. Anonymous signups are disabled.
+    #
+    # Usage: DANBOORU_SIGNUPS_RESTRICTED_TO_ADMIN=true
+    def signups_restricted_to_admin?
+      false
+    end
+
     # Whether to enable API rate limits.
     def rate_limits_enabled?
       true
