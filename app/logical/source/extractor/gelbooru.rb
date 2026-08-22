@@ -68,7 +68,7 @@ module Source
         # https://gelbooru.com//index.php?page=dapi&s=post&q=index&tags=id:7903922
         url = parsed_url.api_url || parsed_referer&.api_url
 
-        if site_name == "Gelbooru"
+        if ["Gelbooru", "Rule34.xxx"].include? site_name
           url = Danbooru::URL.parse(url).with_params(api_key: credentials[:api_key], user_id: credentials[:user_id])
         end
 

@@ -113,6 +113,11 @@ class SiteCredential < ApplicationRecord
       default_credential: { session_cookie: Danbooru.config.reddit_session_cookie },
       help: %{Your "Reddit":https://reddit.com 'reddit_session' cookie.},
     }, {
+      id: 2075,
+      name: "Rule34.xxx",
+      default_credential: { user_id: Danbooru.config.rule34_xxx_user_id, api_key: Danbooru.config.rule34_xxx_api_key },
+      help: %{Your "Rule34.xxx":https://rule34.xxx user ID and API key. Go to https://rule34.xxx/index.php?page=account&s=options to find your API key.},
+    }, {
       id: 2100,
       name: "Tinami",
       default_credential: { session_id: Danbooru.config.tinami_session_id },

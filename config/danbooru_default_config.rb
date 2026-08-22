@@ -642,6 +642,14 @@ module Danbooru
     def gelbooru_api_key
     end
 
+    # Your Rule34.xxx user ID.
+    def rule34_xxx_user_id
+    end
+
+    # Your Rule34.xxx API key. Found at https://rule34.xxx/index.php?page=account&s=options
+    def rule34_xxx_api_key
+    end
+
     # Your Google Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.
     # You can also use gallery-dl's API key, but you might get rate-limited if others are using it.
     # https://github.com/mikf/gallery-dl/blob/07d962d60aed598f0ee8578df914c38e5fc939aa/gallery_dl/extractor/blogger.py#L162
@@ -891,7 +899,7 @@ module Danbooru
         Bluesky: ->(name) { "https://bsky.app/hashtag/#{Danbooru::URL.escape(name)}" },
         Weibo: ->(name) { "https://s.weibo.com/weibo?q=%23#{Danbooru::URL.escape(name)}%23" },
         Lofter: ->(name) { "https://www.lofter.com/tag/#{Danbooru::URL.escape(name)}" },
-        Tumblr: ->(name) { "https://www.tumblr.com/tagged/#{Danbooru::URL.escape(name).tr('_', ' ')}" },
+        Tumblr: ->(name) { "https://www.tumblr.com/tagged/#{Danbooru::URL.escape(name).tr("_", " ")}" },
       }
     end
   end

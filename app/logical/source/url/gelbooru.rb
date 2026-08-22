@@ -7,9 +7,13 @@ class Source::URL::Gelbooru < Source::URL
     credential :api_key, help: %{Your Gelbooru API key. Go to https://gelbooru.com/index.php?page=account&s=options to find your API key.}
   end
 
+  site "Rule34.xxx", url: "https://rule34.xxx" do
+    credential :user_id, help: %{Your Rule34.xxx user ID.}
+    credential :api_key, help: %{Your Rule34.xxx API key. Go to https://rule34.xxx/index.php?page=account&s=options to find your API key.}
+  end
+
   site "Safebooru", url: "https://safebooru.org"
   site "TBIB", url: "https://tbib.org"
-  site "Rule34.xxx", url: "https://rule34.xxx"
 
   attr_reader :post_id, :md5, :image_type, :full_image_url
 
