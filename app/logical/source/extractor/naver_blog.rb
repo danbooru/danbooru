@@ -9,7 +9,7 @@ class Source::Extractor::NaverBlog < Source::Extractor
       [parsed_url.to_s]
     else
       properties["attachimagepathandidinfo"]&.parse_json.to_a.pluck("path").map do |path|
-        "http://blogfiles.naver.net#{path}"
+        "http://blogfiles.naver.net#{to_euckr_path(path)}"
       end
     end
   end
@@ -108,5 +108,14 @@ class Source::Extractor::NaverBlog < Source::Extractor
 
   memoize def page
     http.cache(1.minute).parsed_get("https://m.blog.naver.com/#{username}/#{post_id}") if username.present? && post_id.present?
+  end
+
+  # The `attachimagepathandidinfo` JSON property gives image paths with Korean filenames UTF-8
+  # percent-encoded, but blogfiles.naver.net expects them to be EUC-KR percent-encoded, otherwise
+  # it 404s. Example: https://blog.naver.com/juderland/20057476807
+  def to_euckr_path(path)
+    URI::DEFAULT_PARSER.unescape(path).encode("EUC-KR").b.each_byte.map do |byte|
+      (byte < 0x80) ? byte.chr : "%%%02X" % byte
+    end.join
   end
 end
