@@ -11,6 +11,7 @@ class Source::URL::Postype < Source::URL
   extractors { [Source::Extractor::Postype, Source::Extractor::URLShortener] }
 
   RESERVED_SUBDOMAINS = %w[about blog c3 i www]
+  LOCALES = %w[en ko]
 
   attr_reader :full_image_url, :post_id, :series_id, :blogname, :username, :redirect_id
 
@@ -19,7 +20,9 @@ class Source::URL::Postype < Source::URL
   end
 
   def parse
-    case [subdomain, domain, *path_segments]
+    segments = path_segments.first.in?(LOCALES) ? path_segments.drop(1) : path_segments
+
+    case [subdomain, domain, *segments]
 
     # https://d3mcojo3jv0dbr.cloudfront.net/2021/03/19/20/57/7e8c74bfe4a77f6a037ed8b02194955c.webp?w=240&h=180&q=65 (thumbnail)
     # https://d2ufj6gm1gtdrc.cloudfront.net/2018/09/10/22/49/e91aea7d82404cdfcb12ecbc99ef856f.jpg?w=1200&q=90 (sample)
