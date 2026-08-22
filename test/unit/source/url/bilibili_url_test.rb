@@ -15,6 +15,8 @@ module Source::Tests::URL
         "https://h.bilibili.com/8773541",
         "https://www.bilibili.com/read/cv7360489",
         "https://www.bilibili.com/video/BV1dY4y1u7Vi",
+        "https://manga.bilibili.com/detail/mc33526",
+        "https://www.bilibili.com/blackboard/era/yWPr7A7p6Z2z2LR1.html",
       )
 
       should be_profile_url(
@@ -30,6 +32,8 @@ module Source::Tests::URL
       should_not be_bad_source(
         "https://live.bilibili.com/blackboard/era/VSuE0f27CnXe3VSY.html",
         "https://live.bilibili.com/10049889?from=search&seid=8525275464641122982",
+        "https://manga.bilibili.com/detail/mc33526",
+        "https://www.bilibili.com/blackboard/era/yWPr7A7p6Z2z2LR1.html",
       )
 
       should be_bad_source(
@@ -62,6 +66,21 @@ module Source::Tests::URL
 
       should parse_url("https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg@942w_1334h_progressive.webp").into(
         full_image_url: "https://album.biliimg.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg",
+      )
+
+      should parse_url("https://i0.hdslb.com/bfs/manga-static/27b89c0e99ba868111d9ed6344fb987447d0f6fd.png").into(
+        full_image_url: "https://i0.hdslb.com/bfs/manga-static/27b89c0e99ba868111d9ed6344fb987447d0f6fd.png",
+      )
+
+      should parse_url("https://manga.bilibili.com/detail/mc33526").into(page_url: "https://manga.bilibili.com/detail/mc33526", manga_id: "33526")
+
+      should parse_url("https://www.bilibili.com/blackboard/era/yWPr7A7p6Z2z2LR1.html").into(
+        page_url: "https://www.bilibili.com/blackboard/era/yWPr7A7p6Z2z2LR1.html",
+        blackboard_id: "yWPr7A7p6Z2z2LR1",
+      )
+
+      should parse_url("https://activity.hdslb.com/blackboard/static/d41d8cd98f00b204e9800998ecf8427e/6pvMXulEq2.mp4").into(
+        full_image_url: "https://activity.hdslb.com/blackboard/static/d41d8cd98f00b204e9800998ecf8427e/6pvMXulEq2.mp4",
       )
 
       should parse_url("https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png").into(
