@@ -50,6 +50,10 @@ class Source::URL::AppleMusic < Source::URL
     in /^a\d+/, "mzstatic.com", *path
       @full_image_url = "https://#{subdomain}.mzstatic.com/#{path.join("/")}"
 
+    # https://is1-ssl.mzstatic.com/image/thumb/WNmTtyvl_DbiE8TEAhz_3A/9999x0w.png
+    in /^is(\d+)-ssl/, "mzstatic.com", "image", "thumb", identifier, /\A\d+x\d+/
+      @full_image_url = "https://#{subdomain}.mzstatic.com/image/thumb/#{identifier}/#{basename.sub(/\A\d+x\d+/, "10000x10000")}"
+
     # https://is1-ssl.mzstatic.com/image/thumb/Features221/v4/cd/3d/11/cd3d1170-d972-2fda-0e5f-d2222f85b8d3/mzl.gxpkxsyd.jpg/190x190cc.webp (artist profile picture)
     # https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg/296x296bb.webp (album cover)
     # https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/.../10000x10000.png
