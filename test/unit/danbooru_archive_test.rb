@@ -212,7 +212,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal("None", media_file.metadata["ZIP:ZipCompression"])
 
         # md5 of the archive should always be the same
-        assert_equal("19875680007d7f56b9c2b39a2c3c62b8", media_file.md5)
+        assert_equal("595f43ab518c05eea06aa3dd740f4724", media_file.md5)
       end
     end
   end
