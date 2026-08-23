@@ -2,7 +2,7 @@
 
 class Source::URL::Plurk < Source::URL
   site "Plurk", url: "https://www.plurk.com" do
-    credential :session_cookie, help: %{Your Plurk `plurktokena` cookie.}
+    credential :session_cookie, default: Danbooru.config.plurk_session_cookie, help: %{Your Plurk `plurktokena` cookie.}
   end
 
   RESERVED_USERNAMES = %w[

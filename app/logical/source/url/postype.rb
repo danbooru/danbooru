@@ -5,7 +5,7 @@ class Source::URL::Postype < Source::URL
     url "https://www.postype.com"
     domains %w[postype.com posty.pe cloudfront.net]
 
-    credential :session_cookie, help: %{Your Postype `PSE3` cookie. Go to your settings and enable 'Viewing adult content by foreigners' to see all content.}
+    credential :session_cookie, default: Danbooru.config.postype_session_cookie, help: %{Your Postype `PSE3` cookie. Go to your settings and enable 'Viewing adult content by foreigners' to see all content.}
   end
 
   extractors { [Source::Extractor::Postype, Source::Extractor::URLShortener] }
