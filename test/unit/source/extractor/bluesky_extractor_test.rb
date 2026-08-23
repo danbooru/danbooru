@@ -46,6 +46,108 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A post with a gallery embed" do
+      strategy_should_work(
+        "https://bsky.app/profile/dylanmacri.bsky.social/post/3mqyyhlp6xc2i",
+        image_urls: %w[
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreih7d4rnmo7rqailzn3tw5t525t7h4wjx373sceblufhjspqb66pky
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreigdj3gmbwe5i3gblhuduwokrxihgh32i5hlqxj5cazlbrauaxigk4
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreiete2c365qwby4rah74izswmmkdefukrzkqtjxadieejz7axen2ve
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreiezon3vfn6z3xp4jr5mvtbox34ukcbmicbmh5sbnam6pzkvgsm2ki
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreib3xkrdframosvm7yzdriglpzivu3qfevrmwtanxzvphtcwftrhey
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreid3fn5uy6nynsonstxxdvzz2dmmznxg2e6sezsjt7x4xqrdtmcuxu
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreihxsshpiicqapcnloaoddjbfdnz3rzozxke7aqpkqeeaekowj3fwi
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreihjnn5m5v4cn5uljv7fq5jcb7t5e65vteksoilgkvz7wjnh4s4qca
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreih2wquibq56r76bhh7uy3qypwebkqj4dxv4vkvwebqholvwn5oeo4
+          https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:sadq3gdi5stsufyrkyeutfzq&cid=bafkreiedmmahqrfnwjz5vn5hzytaq7an2rfswtsssfq4luvbrjkqzsdb2m
+        ],
+        media_files: [
+          { file_size: 1_924_951 },
+          { file_size: 1_914_757 },
+          { file_size: 1_463_192 },
+          { file_size: 1_983_586 },
+          { file_size: 1_873_347 },
+          { file_size: 1_834_479 },
+          { file_size: 1_996_281 },
+          { file_size: 1_839_697 },
+          { file_size: 1_887_975 },
+          { file_size: 1_973_744 },
+        ],
+        page_url: "https://bsky.app/profile/did:plc:sadq3gdi5stsufyrkyeutfzq/post/3mqyyhlp6xc2i",
+        profile_url: "https://bsky.app/profile/dylanmacri.bsky.social",
+        profile_urls: %w[https://bsky.app/profile/dylanmacri.bsky.social https://bsky.app/profile/did:plc:sadq3gdi5stsufyrkyeutfzq],
+        display_name: "Dylan Macri, Cadhla182, Commissions Open",
+        username: "dylanmacri",
+        published_at: Time.parse("2026-07-19T14:28:39.106000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Some Fighting Game Gals for the new followers who joined in that starter pack
+
+          [quote]
+          h6. Image Description
+
+          Muscley Morrigan striking a pose showing herself off.
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Sakura from Street Fighter after a fight, she's bruised and bloody and missing a tooth but smiling wide and holding a fist up.
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Yasmine from Street Fighter jumping in victory.
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Juri-Han flipping double birds with a malevolent smile on her face and her tongue ticking out.
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Cammy White adjusting her jacket.
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Angel from King of Fighters doing the horns and smiling
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Morrigan Aensland blowing you a kiss.
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Crimson Viper in a martial arts pose without her coat to show off the guns and the girls.
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Chun-Li throwing a bunch of kicks with after images following her leg movement.
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          Bridget in her pop up shop pink sweater outfit laying on her back with the sweater bunched up to show off her abs, her hair a mess and her glasses falling off her face as she looks at you.
+          [/quote]
+        EOS
+      )
+    end
+
     context "A post url with 'app.bsky.embed.recordWithMedia.view' embed and alt text" do
       setup do
         skip "Deleted post"
