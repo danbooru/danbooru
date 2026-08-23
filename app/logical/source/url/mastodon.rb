@@ -7,7 +7,7 @@
 
 class Source::URL::Mastodon < Source::URL
   site "Pawoo", url: "https://pawoo.net" do
-    credential :access_token, help: %{Your Pawoo access token. Go to https://pawoo.net/settings/applications, create a new application with the 'read' scope, and copy the access token.}
+    credential :access_token, default: Danbooru.config.pawoo_access_token, help: %{Your Pawoo access token. Go to https://pawoo.net/settings/applications, create a new application with the 'read' scope, and copy the access token.}
   end
 
   site "Baraag", url: "https://baraag.net"

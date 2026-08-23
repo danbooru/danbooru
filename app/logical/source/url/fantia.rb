@@ -7,7 +7,7 @@
 
 class Source::URL::Fantia < Source::URL
   site "Fantia", url: "https://fantia.jp" do
-    credential :session_id, help: %{Your Fantia `_session_id` cookie.}
+    credential :session_id, default: Danbooru.config.fantia_session_id, help: %{Your Fantia `_session_id` cookie.}
   end
 
   attr_reader :full_image_url, :candidate_full_image_urls, :download_url, :fanclub_id, :username, :post_id, :product_id
