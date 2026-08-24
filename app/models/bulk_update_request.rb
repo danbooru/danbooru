@@ -47,8 +47,20 @@ class BulkUpdateRequest < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, [:id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver], current_user: current_user)
 
-      if params[:status].present?
-        q = q.where(status: params[:status].split(","))
+      statuses = params[:status].to_s.split(",")
+
+      if statuses.present?
+        q = q.where(status: statuses)
+      end
+
+      if params[:can_approve].present? && statuses.present? && statuses.exclude?("pending")
+        q = q.none
+      elsif params[:can_approve].present?
+        can_approve = ActiveModel::Type::Boolean.new.cast(params[:can_approve])
+        tags = Tag.where(name: q.pending.select(Arel.sql("unnest(tags)"))).to_a
+
+        ids = q.pending.select { |bur| Pundit.policy!(current_user, bur).approve?(tags:) == can_approve }.map(&:id)
+        q = q.where(id: ids)
       end
 
       params[:order] ||= "status_desc"
