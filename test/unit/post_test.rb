@@ -496,6 +496,7 @@ class PostTest < ActiveSupport::TestCase
         should allow_value("touhou pool:foo").for(:tag_string)
         should allow_value("touhou -pool:foo").for(:tag_string)
         should allow_value("touhou newpool:foo").for(:tag_string)
+        should allow_value("touhou newfavgroup:foo").for(:tag_string)
         should allow_value("touhou fav:self").for(:tag_string)
         should allow_value("touhou -fav:self").for(:tag_string)
         should allow_value("touhou upvote:self").for(:tag_string)
@@ -531,6 +532,7 @@ class PostTest < ActiveSupport::TestCase
           assert_invalid_tag("東方")
           assert_invalid_tag("gen:char:foo")
           assert_invalid_tag("general:newpool:a")
+          assert_invalid_tag("general:newfavgroup:a")
           assert_invalid_tag("general:rating:g")
         end
 
@@ -693,6 +695,16 @@ class PostTest < ActiveSupport::TestCase
             assert_match(/Couldn't add tag: 'newpool:blah' cannot begin with 'newpool:'/, post.warnings[:base].join("\n"))
             assert_equal(["tagme"], post.tag_array)
             assert_equal(false, Tag.exists?(name: "newpool:blah"))
+            assert_equal(0, post.tag_count_character)
+            assert_equal(1, post.tag_count_general)
+          end
+
+          should "not raise an exception for char:newfavgroup:blah" do
+            post = create(:post, tag_string: "tagme char:newfavgroup:blah")
+
+            assert_match(/Couldn't add tag: 'newfavgroup:blah' cannot begin with 'newfavgroup:'/i, post.warnings[:base].join("\n"))
+            assert_equal(["tagme"], post.tag_array)
+            assert_equal(false, Tag.exists?(name: "newfavgroup:blah"))
             assert_equal(0, post.tag_count_character)
             assert_equal(1, post.tag_count_general)
           end
@@ -942,6 +954,39 @@ class PostTest < ActiveSupport::TestCase
             @post.update!(tag_string: "a newpool:f123\\")
             assert_equal("a", @post.tag_string)
             assert_equal("f123\\", Pool.last.name)
+          end
+        end
+
+        context "for the newfavgroup: metatag" do
+          should "create a new favgroup and add the post to that favgroup" do
+            @post.update(tag_string: "aaa newfavgroup:abc")
+            @favgroup = FavoriteGroup.find_by_name_or_id("abc", @user)
+
+            assert_not_nil(@favgroup)
+            assert_equal([@post.id], @favgroup.post_ids)
+          end
+
+          should "add the post to an existing favgroup with the same name" do
+            @favgroup = create(:favorite_group, creator: @user, name: "abc")
+
+            @post.update(tag_string: "aaa newfavgroup:abc")
+
+            assert_equal([@post.id], @favgroup.reload.post_ids)
+          end
+
+          should "parse a double-quoted name" do
+            @post.update(tag_string: 'aaa newfavgroup:"foo bar baz" bbb')
+            @favgroup = FavoriteGroup.find_by_name_or_id("foo_bar_baz", @user)
+
+            assert_not_nil(@favgroup)
+            assert_equal([@post.id], @favgroup.post_ids)
+            assert_equal("aaa bbb", @post.tag_string)
+          end
+
+          should "not strip special characters from the name" do
+            @post.update(tag_string: "aaa newfavgroup:ichigo_100%")
+
+            assert_not_nil(FavoriteGroup.find_by_name_or_id("ichigo_100%", @user))
           end
         end
 
