@@ -56,7 +56,7 @@ class BulkUpdateRequest < ApplicationRecord
       if params[:can_approve].present? && statuses.present? && statuses.exclude?("pending")
         q = q.none
       elsif params[:can_approve].present?
-        can_approve = ActiveModel::Type::Boolean.new.cast(params[:can_approve])
+        can_approve = params[:can_approve].to_s.truthy?
         tags = Tag.where(name: q.pending.select(Arel.sql("unnest(tags)"))).to_a
 
         ids = q.pending.select { |bur| Pundit.policy!(current_user, bur).approve?(tags:) == can_approve }.map(&:id)
