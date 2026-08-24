@@ -14,7 +14,7 @@ class PostQuery
   ]
 
   # Metatags that define the order of search results. These metatags can't be used more than once per query.
-  ORDER_METATAGS = %w[order ordfav ordfavgroup ordpool]
+  ORDER_METATAGS = %w[order ordfav ordvote ordfavgroup ordpool]
 
   # Metatags that can't be used more than once per query, and that can't be used with OR or NOT operators.
   SINGLETON_METATAGS = ORDER_METATAGS + %w[limit random]
@@ -165,7 +165,7 @@ class PostQuery
   def is_user_dependent_search?
     metatags.any? do |metatag|
       # XXX date: is user dependent because it depends on the current user's time zone
-      metatag.name.in?(%w[date upvoter upvote downvoter downvote commenter comm search flagger fav ordfav favgroup ordfavgroup]) ||
+      metatag.name.in?(%w[date upvoter upvote downvoter downvote commenter comm search flagger fav ordfav ordvote favgroup ordfavgroup]) ||
       metatag.name == "status" && metatag.value == "unmoderated" ||
       metatag.name == "disapproved" && !metatag.value.downcase.in?(PostDisapproval::REASONS)
     end
