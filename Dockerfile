@@ -29,7 +29,7 @@ ARG VIPS_VERSION="8.18.5"
 # github: FFmpeg/FFmpeg
 ARG FFMPEG_VERSION="9.0.1"
 # github: exiftool/exiftool
-ARG EXIFTOOL_VERSION="13.55"
+ARG EXIFTOOL_VERSION="13.59"
 # github: openresty/openresty
 ARG OPENRESTY_VERSION="1.29.2.3"
 ARG NODE_VERSION="24.19.0"
