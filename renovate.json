@@ -1,5 +1,3 @@
-
-
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
@@ -19,6 +17,8 @@
   "ignorePaths": [
     "lib/dtext_rb/Dockerfile"
   ],
+  "labels": ["Upstream"],
+  "semanticCommits": "enabled",
   "customManagers": [
     {
       "description": "Track the Ruby version pinned in the Dockerfile so it can be grouped with .ruby-version",
@@ -102,52 +102,12 @@
       ]
     },
     {
-      "description": "Keep the Ruby version in .ruby-version, the Dockerfile, and the Gemfile ruby in sync by updating them in the same PR/commit. This must come after the 'Force bundler to process gem updates from Gemfile.lock' rule.",
+      "description": "Keep the Ruby version in .ruby-version, the Dockerfile, and the Gemfile in sync by updating them in the same PR/commit.",
       "groupName": "ruby version",
       "matchDatasources": [
         "ruby-version"
       ],
       "rangeStrategy": "bump"
-    },
-    {
-      "description": "Better PR titles",
-      "commitMessageTopic": "{{manager}} dependency {{depName}}",
-      "commitMessageExtra": "{{#if displayFrom}}from {{{displayFrom}}} {{/if}}{{#if displayTo}}to {{{displayTo}}}{{/if}}",
-      "matchPackageNames": [
-        "*"
-      ]
-    },
-    {
-      "description": "Use the file path instead of just 'dockerfile' in the title for Dockerfiles outside the repo root, since there are multiple Dockerfiles in this repo",
-      "matchManagers": [
-        "dockerfile"
-      ],
-      "matchFileNames": [
-        "!Dockerfile"
-      ],
-      "commitMessageTopic": "{{packageFile}} dependency {{depName}}"
-    },
-    {
-      "description": "Use 'ruby' title for main ruby version updates",
-      "matchDatasources": [
-        "ruby-version"
-      ],
-      "commitMessageTopic": "{{depName}}"
-    },
-    {
-      "description": "Use short names instead of the full repo slur for the misc Dockerfile build tools",
-      "matchDepTypes": [
-        "docker-dependencies"
-      ],
-      "commitMessageTopic": "dockerfile dependency {{depName}}"
-    },
-    {
-      "description": "Groups together shakapacker updates",
-      "matchPackageNames": [
-        "shakapacker"
-      ],
-      "groupName": "shakapacker-bundler-stack"
     }
   ]
 }
-
