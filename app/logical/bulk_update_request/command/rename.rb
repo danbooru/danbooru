@@ -28,6 +28,13 @@ class BulkUpdateRequest::Command::Rename < BulkUpdateRequest::Command::CreateAli
       errors.add(:base, "Can't rename [[#{@old_name}]] -> [[#{@new_name}]] ([[#{@old_name}]] has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)")
     elsif new_tag.invalid?(:name)
       errors.add(:base, "Can't rename [[#{@old_name}]] -> [[#{@new_name}]] (#{new_tag.errors.full_messages.join("; ")})")
+    elsif reversed_alias.present?
+      # Aliases are allowed to be reversed this way, but renames aren't.
+      errors.add(:base, "Can't rename [[#{@old_name}]] -> [[#{@new_name}]] ([[#{@new_name}]] is aliased to [[#{@old_name}]], use an alias to reverse it instead)")
     end
+  end
+
+  def reversed_alias
+    TagAlias.active.find_by(antecedent_name: @new_name, consequent_name: @old_name)
   end
 end

@@ -36,6 +36,27 @@ class RenameCommandTest < ActiveSupport::TestCase
           errors: ["Can't rename [[tag]] -> [[tag_]] ('tag_' cannot end with an underscore)"],
         )
       end
+
+      should "fail if the rename would reverse an existing alias" do
+        create(:tag, name: "aaa")
+        create(:tag, name: "bbb")
+        create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
+
+        assert_invalid_bur(
+          script: "rename bbb -> aaa",
+          errors: ["Can't rename [[bbb]] -> [[aaa]] ([[aaa]] is aliased to [[bbb]], use an alias to reverse it instead)"],
+        )
+      end
+
+      should "fail if the rename would reverse an alias created earlier in the same script" do
+        create(:tag, name: "aaa")
+        create(:tag, name: "bbb")
+
+        assert_invalid_bur(
+          script: "create alias aaa -> bbb\nrename bbb -> aaa",
+          errors: ["Can't rename [[bbb]] -> [[aaa]] ([[aaa]] is aliased to [[bbb]], use an alias to reverse it instead)"],
+        )
+      end
     end
 
     context "on approval" do
