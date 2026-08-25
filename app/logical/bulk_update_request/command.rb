@@ -55,9 +55,10 @@ class BulkUpdateRequest::Command
     raise NotImplementedError
   end
 
+  # @param tags [Array<Tag>, nil] preloaded tags to look up instead of querying individually. Used to filter for approvable BURs by the controller without hitting n+1 issues.
   # @return [Integer] the minimum level that can approve this command
   # @see User::Levels
-  def approval_level
+  def approval_level(tags: nil) # rubocop:disable Lint/UnusedMethodArgument
     User::Levels::ADMIN
   end
 

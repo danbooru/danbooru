@@ -94,9 +94,10 @@ class BulkUpdateRequest::Processor
     commands.map(&:to_dtext).join("\n")
   end
 
+  # @param tags [Array<Tag>, nil] preloaded tags to look up instead of querying individually. Used to filter for approvable BURs by the controller without hitting n+1 issues.
   # @return [Integer] the minimum level required to approve this BUR.
   # @see User::Levels
-  def approval_level
-    commands.map(&:approval_level).max
+  def approval_level(tags: nil)
+    commands.map { |command| command.approval_level(tags:) }.max
   end
 end

@@ -384,6 +384,40 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_search_equals([@bur2, @bur1], order: "score_asc", score: ">-20")
         end
       end
+
+      context "by can_approve" do
+        setup do
+          @artist_tag = create(:artist_tag, name: "some_artist", post_count: 10)
+          @character_tag1 = create(:character_tag, name: "some_character", post_count: 50)
+          @character_tag2 = create(:character_tag, name: "another_character", post_count: 100)
+          create(:wiki_page, title: @character_tag1.name)
+          create(:wiki_page, title: @character_tag2.name)
+
+          @builder = create(:builder_user)
+          @mod = create(:mod_user)
+
+          @bur3 = create(:bulk_update_request, script: "create alias #{@artist_tag.name} -> some_other_artist")
+
+          @bur4 = create(:bulk_update_request, script: "create implication #{@character_tag1.name} -> #{@character_tag2.name}")
+        end
+
+        should "find BURs the user can approve" do
+          assert_search_equals(@bur3, can_approve: "true", current_user: @builder)
+          assert_search_equals([@bur3, @bur4], can_approve: "true", current_user: @mod, order: "id_asc")
+          assert_search_equals([@bur2, @bur3, @bur4], can_approve: "true", current_user: @admin, order: "id_asc")
+        end
+
+        should "find BURs the user can't approve" do
+          assert_search_equals([@bur2, @bur4], can_approve: "false", current_user: @builder, order: "id_asc")
+          assert_search_equals(@bur2, can_approve: "false", current_user: @mod)
+          assert_search_equals([], can_approve: "false", current_user: @admin)
+        end
+
+        should "exclude BURs that aren't pending" do
+          assert_not_includes(BulkUpdateRequest.search({ can_approve: "true" }, @admin).ids, @bur1.id)
+          assert_not_includes(BulkUpdateRequest.search({ can_approve: "false" }, @admin).ids, @bur1.id)
+        end
+      end
     end
   end
 end
