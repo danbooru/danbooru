@@ -366,7 +366,7 @@ GEM
       pry (>= 0.13.0)
     pstore (0.2.1)
     public_suffix (7.0.5)
-    puma (7.2.1)
+    puma (8.0.2)
       nio4r (~> 2.0)
     puma_worker_killer (1.0.0)
       bigdecimal (>= 2.0)
@@ -800,7 +800,7 @@ CHECKSUMS
   pry-rails (0.3.11) sha256=a69e28e24a34d75d1f60bcf241192a54253f8f7ef8a62cba1e75750a9653593d
   pstore (0.2.1) sha256=03904d0f2c66579e96d1e6704cdabc0c88df7ea8ed8782d9f3569f6f6c702c1a
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
-  puma (7.2.1) sha256=d7bf0e9cabd532e0d401e142cd94e3ac531e993610e2d80e6fbf9c26961414b0
+  puma (8.0.2) sha256=c8ed871dfbbe66448ea9ffd46692342d9804d4071522b52b5331b7b6e7b686fb
   puma_worker_killer (1.0.0) sha256=12dc54feecb1758df70d9f4788841423c5416aa370feda4e51e2112a5ff909e9
   pundit (2.5.2) sha256=e374152baa24f90b630428293faf4b4c5468fc3cc010165f7d8fcb44ce108bbd
   raabro (1.5.0) sha256=3f998a7bc84f9c84df3ab580634d2e0a5bda4f0841168d56035f529c9877440a
