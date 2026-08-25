@@ -3,6 +3,9 @@ article.post-preview {
     display: block;
     position: relative;
     margin: 0 auto;
+    // hammer.js defaults to none, disabling long press on mobile
+    // https://hammerjs.github.io/jsdoc/hammer.js.html
+    -webkit-touch-callout: default;
 
     .post-animation-icon {
       color: var(--preview-icon-color);
@@ -20,6 +23,9 @@ article.post-preview {
 .post-preview-image {
   max-width: 100%;
   height: auto;
+  // hammer.js defaults to none, disabling long press on mobile
+  // https://hammerjs.github.io/jsdoc/hammer.js.html
+  -webkit-touch-callout: default;
 }
 
 .post-preview-fit-fixed {
