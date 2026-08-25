@@ -110,7 +110,7 @@ def populate_notes(n)
     w = rand(post.image_width - x).clamp(100..post.image_width)
     h = rand(post.image_height - y).clamp(100..post.image_height)
 
-    note = Note.create(post: post, user: user, x: x, y: y, width: w, height: h, body: Faker::Lorem.paragraph)
+    note = CurrentUser.scoped(user) { Note.create(post: post, x: x, y: y, width: w, height: h, body: Faker::Lorem.paragraph) }
 
     Rails.logger.info "Created note ##{note.id}"
   end
@@ -149,8 +149,10 @@ def populate_pools(n, posts_per_pool: 20)
   Rails.logger.info "*** Creating pools ***"
 
   n.times do
+    user = User.order("random()").first
     posts = Post.order("random()").take(rand(posts_per_pool))
-    pool = Pool.create(name: Faker::Lorem.sentence, description: Faker::Lorem.paragraph, post_ids: posts.pluck(:id))
+
+    pool = CurrentUser.scoped(user) { Pool.create(name: Faker::Lorem.sentence, description: Faker::Lorem.paragraph, post_ids: posts.pluck(:id)) }
     Rails.logger.info "Created pool ##{pool.id}"
   end
 end
