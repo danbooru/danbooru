@@ -231,4 +231,66 @@ class MediaFilePngTest < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
+
+  context "a PNG with a SMPTE ST 2084 (PQ) color profile" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/png/test-smpte-st-2084-profile.png")
+
+      assert_equal(500, file.width)
+      assert_equal(500, file.height)
+      assert_equal(7564, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("6ed0112a3660aabfade57b1a1e09a1dd", file.md5)
+      assert_equal("2414f820b2ec4d91867c10e1a59d493b", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(1, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "PNG",
+        "PNG:ImageWidth" => 500,
+        "PNG:ImageHeight" => 500,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Adam7 Interlace",
+        "PNG:ProfileName" => "ITUR_2100_PQ_FULL",
+        "ICC-header:ProfileCMMType" => "Adobe Systems Inc.",
+        "ICC-header:ProfileVersion" => "4.2.0",
+        "ICC-header:ProfileClass" => "Display Device Profile",
+        "ICC-header:ColorSpaceData" => "RGB ",
+        "ICC-header:ProfileConnectionSpace" => "XYZ ",
+        "ICC-header:ProfileDateTime" => "2015:08:25 21:16:58",
+        "ICC-header:ProfileFileSignature" => "acsp",
+        "ICC-header:PrimaryPlatform" => "Unknown ()",
+        "ICC-header:CMMFlags" => "Not Embedded, Independent",
+        "ICC-header:DeviceManufacturer" => "",
+        "ICC-header:DeviceModel" => "",
+        "ICC-header:DeviceAttributes" => "Reflective, Glossy, Positive, Color",
+        "ICC-header:RenderingIntent" => "Media-Relative Colorimetric",
+        "ICC-header:ConnectionSpaceIlluminant" => "0.9642 1 0.82491",
+        "ICC-header:ProfileCreator" => "Adobe Systems Inc.",
+        "ICC-header:ProfileID" => "eeac2efe66dc8a0fae5fea828f2c4ebc",
+        "ICC_Profile:ProfileDescription" => "High Dynamic Range UHDTV Wide Color Gamut Display (Rec. 2020) - SMPTE ST 2084 PQ EOTF",
+        "ICC_Profile:ProfileCopyright" => "Copyright 2015 Adobe Systems Incorporated",
+        "ICC_Profile:MediaWhitePoint" => "0.9642 1 0.82491",
+        "ICC_Profile:ChromaticAdaptation" => "1.0479 0.02292 -0.05022 0.02959 0.99048 -0.01707 -0.00925 0.01508 0.75168",
+        "ICC_Profile:Technology" => "Video Monitor",
+        "ICC_Profile:Luminance" => "0 100 0",
+        "PNG-pHYs:PixelsPerUnitX" => 11_811,
+        "PNG-pHYs:PixelsPerUnitY" => 11_811,
+        "PNG-pHYs:PixelUnits" => "meters",
+      }, file.metadata.to_h)
+    end
+
+    should "generate a thumbnail with the correct colors" do
+      file = MediaFile.open("test/files/png/test-smpte-st-2084-profile.png").preview(180, 180)
+      # XXX: this is the wrong thumbnail. See issue #5621. When this changes, hopefully it means libvips will have fixed this issue.
+      assert_equal("b133ee75ca930f185a1bf605d7d2460c", file.pixel_hash)
+    end
+  end
 end
