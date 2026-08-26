@@ -26,6 +26,7 @@ module Source::Tests::URL
 
       should be_bad_source(
         "https://xhslink.com/WNd9gI",
+        "https://xhslink.cn/WNd9gI",
         "https://xhslink.com/o/3y3uwYYeyHn",
       )
     end
