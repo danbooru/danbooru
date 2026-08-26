@@ -5,7 +5,7 @@ export default class UploadMediaAsset {
     while ($(".upload-media-asset-loading").length) {
       let ids = $(".upload-media-asset-loading").map((i, el) => $(el).attr("data-id")).toArray().join(",");
       let size = $(".upload-media-asset-gallery").attr("data-size");
-      $.get("/upload_media_assets.js", { search: { status: "active failed", id: ids }, size: size });
+      $.get("/upload_media_assets.js", { search: { status: "active failed", id: ids }, size: size }).done(script => $.globalEval(script));
       await delay(250);
     }
   }
