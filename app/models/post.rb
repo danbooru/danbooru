@@ -837,6 +837,12 @@ class Post < ApplicationRecord
   end
 
   concerning :DeletionMethods do
+    # Schedule the post to be expunged in the background. Expunging is very slow
+    # due to file transfer latency and when it breaks it's hard to recover from.
+    def expunge_later!(user = CurrentUser.user)
+      ExpungePostJob.perform_later(post: self, user: user)
+    end
+
     def expunge!(current_user = CurrentUser.user)
       transaction do
         Post.without_timeout do
