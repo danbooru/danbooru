@@ -2171,4 +2171,97 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
+
+  context "an anamorphic h264 MP4 with non-square pixels" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/mp4/test-300x200-anamorphic.mp4")
+
+      # The video is coded at 300x200 with a 1:2 pixel aspect ratio, so it should display at 150x200, not 300x200
+      assert_equal(150, file.width)
+      assert_equal(200, file.height)
+      assert_equal(1_643, file.file_size)
+      assert_equal(:mp4, file.file_ext)
+      assert_equal("video/mp4", file.mime_type)
+      assert_equal("d179c2292aec5e7c8b2e31ad9ee1210c", file.md5)
+      assert_equal("d179c2292aec5e7c8b2e31ad9ee1210c", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(true, file.is_animated?)
+      assert_equal(2.0, file.duration)
+      assert_equal(2, file.frame_count)
+      assert_equal(1.0, file.frame_rate)
+      assert_equal({
+        "File:FileType" => "MP4",
+        "QuickTime:MajorBrand" => "MP4 Base Media v1 [IS0 14496-12:2003]",
+        "QuickTime:MinorVersion" => "0.2.0",
+        "QuickTime:CompatibleBrands" => ["isom", "iso2", "avc1", "mp41"],
+        "QuickTime:MovieHeaderVersion" => 0,
+        "QuickTime:CreateDate" => "0000:00:00 00:00:00",
+        "QuickTime:ModifyDate" => "0000:00:00 00:00:00",
+        "QuickTime:TimeScale" => 1000,
+        "QuickTime:Duration" => "2.00 s",
+        "QuickTime:PreferredRate" => 1,
+        "QuickTime:PreferredVolume" => "100.00%",
+        "QuickTime:MatrixStructure" => "1 0 0 0 1 0 0 0 1",
+        "QuickTime:PreviewTime" => "0 s",
+        "QuickTime:PreviewDuration" => "0 s",
+        "QuickTime:PosterTime" => "0 s",
+        "QuickTime:SelectionTime" => "0 s",
+        "QuickTime:SelectionDuration" => "0 s",
+        "QuickTime:CurrentTime" => "0 s",
+        "QuickTime:NextTrackID" => 2,
+        "QuickTime:HandlerType" => "Metadata",
+        "QuickTime:HandlerVendorID" => "Apple",
+        "QuickTime:MediaDataSize" => 772,
+        "QuickTime:MediaDataOffset" => 871,
+        "Track1:TrackHeaderVersion" => 0,
+        "Track1:TrackCreateDate" => "0000:00:00 00:00:00",
+        "Track1:TrackModifyDate" => "0000:00:00 00:00:00",
+        "Track1:TrackID" => 1,
+        "Track1:TrackDuration" => "2.00 s",
+        "Track1:TrackLayer" => 0,
+        "Track1:TrackVolume" => "0.00%",
+        "Track1:MatrixStructure" => "1 0 0 0 1 0 0 0 1",
+        "Track1:ImageWidth" => 150,
+        "Track1:ImageHeight" => 200,
+        "Track1:MediaHeaderVersion" => 0,
+        "Track1:MediaCreateDate" => "0000:00:00 00:00:00",
+        "Track1:MediaModifyDate" => "0000:00:00 00:00:00",
+        "Track1:MediaTimeScale" => 16_384,
+        "Track1:MediaDuration" => "2.00 s",
+        "Track1:MediaLanguageCode" => "und",
+        "Track1:HandlerType" => "Video Track",
+        "Track1:HandlerDescription" => "VideoHandler",
+        "Track1:GraphicsMode" => "srcCopy",
+        "Track1:OpColor" => "0 0 0",
+        "Track1:CompressorID" => "avc1",
+        "Track1:SourceImageWidth" => 300,
+        "Track1:SourceImageHeight" => 200,
+        "Track1:XResolution" => 72,
+        "Track1:YResolution" => 72,
+        "Track1:CompressorName" => "Lavc63.1.101 libx264",
+        "Track1:BitDepth" => 24,
+        "Track1:PixelAspectRatio" => "1:2",
+        "Track1:BufferSize" => 0,
+        "Track1:MaxBitrate" => 3088,
+        "Track1:AverageBitrate" => 0,
+        "Track1:VideoFrameRate" => 1,
+        "ItemList:Encoder" => "Lavf63.1.101",
+        "Composite:AvgBitrate" => "3.09 kbps",
+        "Composite:Rotation" => 0,
+        "FFmpeg:MajorBrand" => "isom",
+        "FFmpeg:PixFmt" => "yuv420p",
+        "FFmpeg:FrameCount" => 2,
+        "FFmpeg:VideoCodec" => "h264",
+        "FFmpeg:VideoProfile" => "High",
+        "FFmpeg:VideoBitRate" => 3088,
+      }, file.metadata.to_h)
+    end
+
+    should "generate a correctly-proportioned thumbnail" do
+      file = MediaFile.open("test/files/mp4/test-300x200-anamorphic.mp4")
+
+      assert_equal([113, 150], file.preview!(150, 150).dimensions)
+    end
+  end
 end

@@ -1,10 +1,6 @@
 #!/usr/bin/env ruby
 
-# Fix the width, height, pixel hash, and metadata of PNGs with a real EXIF orientation flag. These used to be
-# calculated from the unrotated image; they're now calculated from the rotated image. This also regenerates the
-# thumbnail and sample files for these assets, since those were generated from the unrotated image too.
-#
-# See MediaFile::Image#open_png.
+# Fix dimensions and samples of MP4/WebM videos with a non-square pixel aspect ratio (PAR).
 
 require_relative "base"
 
@@ -14,10 +10,14 @@ condition = ENV.fetch("COND", "TRUE")
 fix = ENV.fetch("FIX", "false").truthy?
 
 MediaAsset.active
-          .where(file_ext: "png")
+          .where(file_ext: %w[mp4 webm])
           .joins(:media_metadata)
-          .where("media_metadata.metadata->>'IFD0:Orientation' IS NOT NULL")
-          .where.not("media_metadata.metadata->>'IFD0:Orientation' = ?", "Horizontal (normal)")
+          .where(<<~SQL.squish)
+            EXISTS (
+              SELECT 1 FROM jsonb_each_text(media_metadata.metadata) AS tags(name, value)
+              WHERE tags.name LIKE 'Track%:PixelAspectRatio' AND tags.value != '1:1'
+            )
+          SQL
           .where(condition)
           .parallel_find_each(order: :asc) do |asset|
   variant = asset.variant(:original)
@@ -28,12 +28,12 @@ MediaAsset.active
     next
   end
 
-  # Setting `file` recalculates the width, height, pixel hash, and metadata.
+  # Setting `file` recalculates the width and height (among other things, though only the width and height
+  # should actually change here).
   asset.file = media_file
-  asset.media_metadata.file = media_file
   asset.post.assign_attributes(image_width: asset.image_width, image_height: asset.image_height) if asset.post.present?
 
-  needs_fix = asset.changed? || asset.media_metadata.changed?
+  needs_fix = asset.changed?
   puts ({ id: asset.id, needs_fix: needs_fix, **asset.changes }).to_json
 
   if fix && needs_fix
@@ -42,7 +42,6 @@ MediaAsset.active
     ApplicationRecord.transaction do
       asset.post.save! if asset.post&.changed?
       asset.save!
-      asset.media_metadata.save!
     end
 
     asset.regenerate_files!(media_file)
