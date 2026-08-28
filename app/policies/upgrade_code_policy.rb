@@ -2,7 +2,7 @@
 
 class UpgradeCodePolicy < ApplicationPolicy
   def index?
-    user.is_owner?
+    user.is_superadmin?
   end
 
   def redeem?

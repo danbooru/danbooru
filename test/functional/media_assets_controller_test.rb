@@ -188,6 +188,21 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_select "a[href='/uploads/#{@upload1.id}']", count: 1, text: "##{@upload1.id}"
         assert_select "a[href='/uploads/#{@upload2.id}']", count: 1, text: "##{@upload2.id}"
       end
+
+      should "let superadmins resize and reencode the image" do
+        @media_asset = MediaAsset.upload!("test/files/jpg/test.jpg")
+        get_auth media_asset_path(@media_asset, format: :webp, width: 100, height: 67), create(:superadmin_user)
+
+        assert_response :success
+        assert_equal("image/webp", response.media_type)
+      end
+
+      should "not let admins resize and reencode the image" do
+        @media_asset = MediaAsset.upload!("test/files/jpg/test.jpg")
+        get_auth media_asset_path(@media_asset, format: :webp, width: 100, height: 67), create(:admin_user)
+
+        assert_not_equal("image/webp", response.media_type)
+      end
     end
 
     context "destroy action" do

@@ -22,11 +22,11 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_select "#api-key-#{@api_key.id}", count: 0
       end
 
-      should "let the owner see all API keys" do
-        get_auth user_api_keys_path(@user.id), create(:owner_user), reauthenticate: true
+      should "not let the owner see API keys belonging to other users" do
+        get_auth user_api_keys_path(@user.id), create(:superadmin_user), reauthenticate: true
 
         assert_response :success
-        assert_select "#api-key-#{@api_key.id}", count: 1
+        assert_select "#api-key-#{@api_key.id}", count: 0
       end
 
       should "not return the key in the API" do

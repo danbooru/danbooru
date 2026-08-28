@@ -95,7 +95,7 @@ class UserUpgrade < ApplicationRecord
   end
 
   def self.visible(user)
-    if user.is_owner?
+    if user.is_superadmin?
       all
     else
       where(recipient: user).or(where(purchaser: user))

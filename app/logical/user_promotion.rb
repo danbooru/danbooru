@@ -17,11 +17,12 @@ class UserPromotion
     @new_level = new_level.to_i
   end
 
-  def promote!
+  # @param validate [Boolean] if false, skip permission checks. Only for use from the command line.
+  def promote!(validate: true)
     user.with_lock do
       user.level = new_level
 
-      validate!
+      validate! if validate
       create_user_feedback
       create_dmail
       create_mod_actions

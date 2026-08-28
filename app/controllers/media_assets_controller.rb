@@ -19,7 +19,7 @@ class MediaAssetsController < ApplicationController
       @visible_uma = @visible_uma.includes(upload: :uploader)
     end
 
-    if CurrentUser.is_owner? && request.format.symbol.in?(%i[jpeg webp avif])
+    if CurrentUser.is_superadmin? && request.format.symbol.in?(%i[jpeg webp avif])
       width = params.fetch(:width, @media_asset.image_width).to_i
       height = params.fetch(:height, @media_asset.image_height).to_i
       quality = params.fetch(:quality, 85).to_i

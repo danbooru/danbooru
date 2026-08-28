@@ -23,7 +23,7 @@ class UpgradeCode < ApplicationRecord
   }
 
   def self.visible(user)
-    if user.is_owner?
+    if user.is_superadmin?
       all
     elsif user.is_anonymous?
       none

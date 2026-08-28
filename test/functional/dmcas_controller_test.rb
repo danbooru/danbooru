@@ -20,7 +20,7 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
         signature: "John Doe",
       }
 
-      @owner = create(:owner_user)
+      @superadmin = create(:superadmin_user)
     end
 
     should "work" do
@@ -53,12 +53,12 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
       assert_match(%r{https://example\.com/1\.html}, Dmail.last.body)
     end
 
-    should "send the notification to the same owner every time when there are multiple owners" do
-      create(:owner_user)
+    should "send the notification to the same superadmin every time when there are multiple superadmins" do
+      create(:superadmin_user)
 
       10.times { post dmca_path, params: { dmca: @valid_dmca } }
 
-      assert_equal([@owner.id] * 5, Dmail.last(5).map(&:owner_id))
+      assert_equal([@superadmin.id] * 5, Dmail.last(5).map(&:owner_id))
     end
   end
 end

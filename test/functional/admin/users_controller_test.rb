@@ -14,8 +14,8 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "render for the owner" do
-        get_auth edit_admin_user_path(create(:builder_user)), create(:owner_user)
+      should "render for a superadmin" do
+        get_auth edit_admin_user_path(create(:builder_user)), create(:superadmin_user)
         assert_response :success
       end
 
@@ -35,6 +35,13 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#update" do
+      should "not allow the owner to promote a user to superadmin" do
+        put_auth admin_user_path(@user), create(:superadmin_user), params: { user: { level: User::Levels::SUPERADMIN }}
+
+        assert_response 403
+        assert_equal(User::Levels::MEMBER, @user.reload.level)
+      end
+
       context "when a moderator is promoting a basic member" do
         should "allow promoting the user to gold" do
           put_auth admin_user_path(@user), @mod, params: { user: { level: "30" }}

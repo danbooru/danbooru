@@ -112,9 +112,9 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
-        should "render for the site owner" do
+        should "render for superadmins" do
           @user_upgrade = create(:self_gold_upgrade, status: "complete")
-          get_auth user_upgrade_path(@user_upgrade), create(:owner_user)
+          get_auth user_upgrade_path(@user_upgrade), create(:superadmin_user)
 
           assert_response :success
         end
@@ -179,8 +179,8 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
       end
 
       # XXX not supported yet by stripe-ruby-mock
-      should_eventually "allow the site owner to view the receipt" do
-        get_auth receipt_user_upgrade_path(@user_upgrade), create(:owner_user)
+      should_eventually "allow superadmins to view the receipt" do
+        get_auth receipt_user_upgrade_path(@user_upgrade), create(:superadmin_user)
 
         assert_redirected_to "xxx"
       end
@@ -199,8 +199,8 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
       end
 
       # XXX not supported yet by stripe-ruby-mock
-      should_eventually "allow the site owner to view the receipt" do
-        get_auth payment_user_upgrade_path(@user_upgrade), create(:owner_user)
+      should_eventually "allow superadmins to view the receipt" do
+        get_auth payment_user_upgrade_path(@user_upgrade), create(:superadmin_user)
 
         assert_redirected_to "xxx"
       end
@@ -213,7 +213,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
             @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
             @user_upgrade.create_checkout!
 
-            put_auth refund_user_upgrade_path(@user_upgrade), create(:owner_user), xhr: true
+            put_auth refund_user_upgrade_path(@user_upgrade), create(:superadmin_user), xhr: true
 
             assert_response :success
             assert_equal("refunded", @user_upgrade.reload.status)
@@ -228,7 +228,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
             @user_upgrade = create(:gift_platinum_upgrade, recipient: create(:platinum_user), status: "complete")
             @user_upgrade.create_checkout!
 
-            put_auth refund_user_upgrade_path(@user_upgrade), create(:owner_user), xhr: true
+            put_auth refund_user_upgrade_path(@user_upgrade), create(:superadmin_user), xhr: true
 
             assert_response :success
             assert_equal("refunded", @user_upgrade.reload.status)

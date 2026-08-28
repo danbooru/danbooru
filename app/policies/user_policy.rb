@@ -14,7 +14,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def edit?
-    record.id == user.id || user.is_owner?
+    record.id == user.id || user.is_superadmin?
   end
 
   def update?
@@ -22,7 +22,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def deactivate?
-    (record.id == user.id && !user.is_anonymous?) || user.is_owner?
+    (record.id == user.id && !user.is_anonymous?) || user.is_superadmin?
   end
 
   def destroy?
