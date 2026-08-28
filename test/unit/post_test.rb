@@ -1440,9 +1440,18 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      context "a PNG with the exif orientation flag" do
+      context "a PNG with a valid exif orientation flag" do
+        should "automatically add the exif_rotation tag" do
+          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-good-chunk.png")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("exif_rotation tagme", @post.tag_string)
+        end
+      end
+
+      context "a PNG with an invalid exif orientation flag" do
         should "not add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-90cw.png")
+          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-bad-chunk.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("tagme", @post.tag_string)
