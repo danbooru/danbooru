@@ -5,7 +5,17 @@ class MediaFileApngTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "apng",
-        failures: ["test/files/apng/misaligned_chunks.png"],
+        "test/files/apng/actl_wronglen.png" => [150, 150, "4937cb37134a013ebb73b0b3b5585aa3"],
+        "test/files/apng/actl_zero_frames.png" => [150, 150, "4937cb37134a013ebb73b0b3b5585aa3"],
+        "test/files/apng/broken.png" => [150, 150, "d4e0a22e295be9d46e98f2b5e97ba67f"],
+        "test/files/apng/ezgif-apng.png" => [150, 150, "1c8e552ca0301edd28dea9feeeb98709"],
+        "test/files/apng/iend_missing.png" => [150, 150, "4671c4efe129283d31e8f4eeb7a6e552"],
+        "test/files/apng/infinite-fps.png" => [150, 113, "098d982a94a93887dfac4a09d9c55291"],
+        "test/files/apng/misaligned_chunks.png" => nil,
+        "test/files/apng/normal-256x256.png" => [150, 150, "66e519d817ea797a67041c31adaef32d"],
+        "test/files/apng/normal.png" => [150, 150, "4671c4efe129283d31e8f4eeb7a6e552"],
+        "test/files/apng/not_apng.png" => [16, 16, "6f5f3c8ee91b08d61d21712ee1e93d13"],
+        "test/files/apng/single_frame.png" => [150, 86, "70aa74e576f90ee9416681698e593972"],
       )
     end
   end

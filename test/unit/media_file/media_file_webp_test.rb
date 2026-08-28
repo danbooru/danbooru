@@ -5,9 +5,16 @@ class MediaFileWebpTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "webp",
-        failures: [
-          "test/files/webp/truncated.webp",
-        ],
+        "test/files/webp/2_webp_a.webp" => [147, 150, "2a1c65258494c447ea026c04ae85350c"],
+        "test/files/webp/2_webp_ll.webp" => [147, 150, "7a8c8ed338849b36543bdf0d9a2e4230"],
+        "test/files/webp/Exif2.webp" => [150, 100, "91be6db5c38df446e6ab58d4e68bb6f6"],
+        "test/files/webp/Exif6.webp" => [100, 150, "6dd3a521c7f0a5eb2ee6a5434d7f976e"],
+        "test/files/webp/fjord.webp" => [150, 100, "90e2538fc83d51f5ccf84c5887a35e5f"],
+        "test/files/webp/lossless1.webp" => [150, 46, "a28dbaf0962fd276c29921fd044e8a40"],
+        "test/files/webp/lossy_alpha1.webp" => [150, 46, "2c36503197cce0a92d65950a91ad2cae"],
+        "test/files/webp/nyancat.webp" => [150, 150, "93b7e41c7c7c58ff6e597757a5f693f7"],
+        "test/files/webp/test.webp" => [128, 128, "682e1ab8f62b408304402f3a52265764"],
+        "test/files/webp/truncated.webp" => nil,
       )
     end
   end

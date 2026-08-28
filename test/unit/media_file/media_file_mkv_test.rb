@@ -5,7 +5,7 @@ class MediaFileWebmTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "mkv",
-        failures: [],
+        "test/files/mkv/test-512x512.mkv" => [150, 150, "136b63fc719803c2525c74ed5067b6d4"],
       )
     end
   end

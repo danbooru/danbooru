@@ -5,7 +5,21 @@ class MediaFileJpgTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "jpg",
-        failures: ["test/files/jpg/test-cmm-kcms.jpg"],
+        "test/files/jpg/test-blank.jpg" => [101, 150, "5738f4938841ca43e113ab72f5e4ac75"],
+        "test/files/jpg/test-cmm-kcms.jpg" => nil,
+        "test/files/jpg/test-cmyk-no-profile.jpg" => [115, 150, "055ceb66ea27d8e2d0901f920a0dd9b6"],
+        "test/files/jpg/test-corrupt.jpg" => [150, 113, "ed38233fe8da57d68ccc7c071401240c"],
+        "test/files/jpg/test-exif-small.jpg" => [132, 150, "99e9069f5c33fc461e994766351d683c"],
+        "test/files/jpg/test-grey-no-profile.jpg" => [150, 81, "941ef8ee1691dc0d12150bc4477e2bbb"],
+        "test/files/jpg/test-grey-rgb-profile-2.jpg" => [56, 150, "72166c88e8854d681522a579075b5d16"],
+        "test/files/jpg/test-grey-rgb-profile.jpg" => [140, 150, "46f7d7195ef238b69224f2ac4c911855"],
+        "test/files/jpg/test-large.jpg" => [150, 101, "0e1e93a3135003d996e79a44d891836d"],
+        "test/files/jpg/test-rotation-180.jpg" => [66, 100, "51f070c0d4b11bc96e1879f1a27780c6"],
+        "test/files/jpg/test-rotation-270cw-large.jpg" => [150, 100, "8bf63a71b8da0ba8670527480b121d98"],
+        "test/files/jpg/test-rotation-270cw.jpg" => [100, 66, "ab76a88ae2affe7029530a8c0750e5ca"],
+        "test/files/jpg/test-rotation-90cw.jpg" => [96, 128, "fe2e9d2d7c58125ed356132eadf0f3d6"],
+        "test/files/jpg/test-weird-profile.jpg" => [120, 150, "2c0eafeeff5ea5de5c7547792281f617"],
+        "test/files/jpg/test.jpg" => [150, 101, "636a121d505d30531452e6985e8f5b7c"],
       )
     end
   end
@@ -185,11 +199,6 @@ class MediaFileJpgTest < ActiveSupport::TestCase
         "Adobe:APP14Flags1" => "(none)",
         "Adobe:ColorTransform" => "YCCK",
       }, file.metadata.to_h)
-    end
-
-    should "generate a thumbnail with the correct colors" do
-      file = MediaFile.open("test/files/jpg/test-cmyk-no-profile.jpg").preview(180, 180)
-      assert_equal("7577481a2a688e6e5e9ec901addcf0e3", file.pixel_hash)
     end
   end
 

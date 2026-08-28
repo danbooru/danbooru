@@ -5,7 +5,16 @@ class MediaFilePngTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "png",
-        failures: ["test/files/png/empty.png"],
+        "test/files/png/alpha.png" => [85, 62, "97ffccd02f20bde66e9619bf9ac488d8"],
+        "test/files/png/empty.png" => nil,
+        "test/files/png/jpg.png" => [16, 16, "3e965ef667d55e36e999828781cae4dd"],
+        "test/files/png/test-corrupt.png" => nil,
+        "test/files/png/test-rotation-bad-chunk.png" => [128, 96, "f0c3b707b69c92c5f27bf0b4f8100aad"],
+        "test/files/png/test-rotation-good-chunk.png" => [64, 128, "8aea457981c3bac825b50cf64b787398"],
+        "test/files/png/test.png" => [113, 150, "1601c102d365a1de190daec46301aeeb"],
+
+        # XXX: this is the wrong thumbnail. See issue #5621. When this changes, hopefully it means libvips will have fixed this issue.
+        "test/files/png/test-smpte-st-2084-profile.png" => [150, 150, "aae0d2490ff350bf7965e0bcf98959e2"],
       )
     end
   end
@@ -214,12 +223,6 @@ class MediaFilePngTest < ActiveSupport::TestCase
         "PNG-pHYs:PixelUnits" => "meters",
       }, file.metadata.to_h)
     end
-
-    should "generate a rotated thumbnail" do
-      file = MediaFile.open("test/files/png/test-rotation-good-chunk.png")
-
-      assert_equal([32, 64], file.preview(64, 64).dimensions)
-    end
   end
 
   context "an empty file with a .png extension" do
@@ -337,12 +340,6 @@ class MediaFilePngTest < ActiveSupport::TestCase
         "PNG-pHYs:PixelsPerUnitY" => 11_811,
         "PNG-pHYs:PixelUnits" => "meters",
       }, file.metadata.to_h)
-    end
-
-    should "generate a thumbnail with the correct colors" do
-      file = MediaFile.open("test/files/png/test-smpte-st-2084-profile.png").preview(180, 180)
-      # XXX: this is the wrong thumbnail. See issue #5621. When this changes, hopefully it means libvips will have fixed this issue.
-      assert_equal("b133ee75ca930f185a1bf605d7d2460c", file.pixel_hash)
     end
   end
 end

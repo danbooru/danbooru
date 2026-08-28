@@ -5,9 +5,23 @@ class MediaFileAvifTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "avif",
-        failures: [
-          "test/files/apng/misaligned_chunks.png",
-        ],
+        "test/files/avif/Exif0.avif" => [150, 100, "d6ac86ec42fe70c7ee438216a1bf7697"],
+        "test/files/avif/Exif6.avif" => [100, 150, "abc7e22082b2db4e1b074380a08139cc"],
+        "test/files/avif/Image grid example.avif" => [150, 150, "e6fb55dca4c477e114e6d4093ee0486a"],
+        "test/files/avif/alpha_video.avif" => [150, 113, "b15da8342c4648ea704e18f99483669c"],
+        "test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif" => [150, 100, "c1359432392058b8412f74ee12197a37"],
+        "test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif" => [150, 63, "1e40f1925b880b71f9302075f120bb44"],
+        "test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv444_full_qp40.avif" => [150, 63, "6d9e5fd2387a0e9beebdfda5c140d8d9"],
+        "test/files/avif/kimono.crop.avif" => [150, 129, "51b38d6a85ad1367bb8f3bbf9fe8a213"],
+        "test/files/avif/kimono.mirror-horizontal.avif" => [106, 150, "2438bab15ee32e6a6a7a090f3c0fbf84"],
+        "test/files/avif/kimono.rotate90.avif" => [106, 150, "21c22f323e2d7358af61eb63559b8015"],
+        "test/files/avif/paris_icc_exif_xmp.avif" => [150, 112, "2f53c3ec4dea1f763a53c289474e0e03"],
+        "test/files/avif/plum-blossom-small.profile0.8bpc.yuv420.alpha-full.avif" => [128, 128, "a68516ef0b985bef12dd749169387020"],
+        "test/files/avif/sequence-with-pitm-avif-major.avif" => [150, 113, "b15da8342c4648ea704e18f99483669c"],
+        "test/files/avif/sequence-with-pitm.avif" => [150, 113, "b15da8342c4648ea704e18f99483669c"],
+        "test/files/avif/sequence-without-pitm.avif" => [150, 84, "cc1202480d3d0353d11869a0d7304b03"],
+        "test/files/avif/star-8bpc.avif" => [150, 150, "116ff17ae4f8539cc21d1586d080243b"],
+        "test/files/avif/tiger_3layer_1res.avif" => [150, 103, "09b2bb7d7346e6b323934a06444c47be"],
       )
     end
   end

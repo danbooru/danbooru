@@ -5,7 +5,30 @@ class MediaFileMp4Test < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "mp4",
-        failures: ["test/files/mp4/test-corrupt.mp4"],
+        "test/files/mp4/test-300x200-anamorphic.mp4" => [113, 150, "ac09a593a6dd27da474deb9e49779ab0"],
+        "test/files/mp4/test-300x300-3gp5.mp4" => [150, 150, "9d22eaca85f98cff0f39b8a68ea939ec"],
+        "test/files/mp4/test-300x300-av1.mp4" => [150, 150, "b5e8ce8246d425b68540c2cdac4b0837"],
+        "test/files/mp4/test-300x300-h265.mp4" => [150, 150, "69557ba7bee2cea1114df635465b6e6e"],
+        "test/files/mp4/test-300x300-invalid-utf8-metadata.mp4" => [150, 150, "9d22eaca85f98cff0f39b8a68ea939ec"],
+        "test/files/mp4/test-300x300-iso4.mp4" => [150, 150, "0fcbfabb8bb39dd951fa1ed0bb70c10f"],
+        "test/files/mp4/test-300x300-mpeg4.mp4" => [150, 150, "d3a59cae2382c085462c67fe86a6db26"],
+        "test/files/mp4/test-300x300-vp9.mp4" => [150, 150, "9ae2522edd9a7314d138843cd93fcdfd"],
+        "test/files/mp4/test-300x300-yuv444p-h264.mp4" => [150, 150, "10515fe169d8b1f36246339172e1657b"],
+        "test/files/mp4/test-300x300-yuvj420p-h264.mp4" => [150, 150, "f6551fb7583749b17ad1c3e3ac3066c6"],
+        "test/files/mp4/test-300x300.mp4" => [150, 150, "9d22eaca85f98cff0f39b8a68ea939ec"],
+        "test/files/mp4/test-audio-ac3.mp4" => [150, 84, "316e8a5cd06cc5bef9eda8f4f83316f5"],
+        "test/files/mp4/test-audio-mp2.mp4" => [150, 84, "316e8a5cd06cc5bef9eda8f4f83316f5"],
+        "test/files/mp4/test-audio-mp3.mp4" => [150, 84, "316e8a5cd06cc5bef9eda8f4f83316f5"],
+        "test/files/mp4/test-audio-opus.mp4" => [150, 84, "316e8a5cd06cc5bef9eda8f4f83316f5"],
+        "test/files/mp4/test-audio-vorbis.mp4" => [150, 84, "316e8a5cd06cc5bef9eda8f4f83316f5"],
+        "test/files/mp4/test-audio.m4v" => [150, 84, "316e8a5cd06cc5bef9eda8f4f83316f5"],
+        "test/files/mp4/test-audio.mp4" => [150, 84, "316e8a5cd06cc5bef9eda8f4f83316f5"],
+        "test/files/mp4/test-corrupt.mp4" => nil,
+        "test/files/mp4/test-iso5.mp4" => [150, 101, "49b332e4674fbbeda11a4966334f91fe"],
+        "test/files/mp4/test-silent-audio.mp4" => [150, 150, "9d22eaca85f98cff0f39b8a68ea939ec"],
+        "test/files/mp4/test-yuv420p10le-av1.mp4" => [150, 100, "5491fea20125d489b9aa8995d46ef376"],
+        "test/files/mp4/test-yuv420p10le-h264.mp4" => [150, 100, "107efbbb61c77a4a68e491d7b28ab8dc"],
+        "test/files/mp4/test-yuv420p10le-vp9.mp4" => [150, 100, "1acf79da13ceb3072df62e7151968ecc"],
       )
     end
   end
@@ -2256,12 +2279,6 @@ class MediaFileMp4Test < ActiveSupport::TestCase
         "FFmpeg:VideoProfile" => "High",
         "FFmpeg:VideoBitRate" => 3088,
       }, file.metadata.to_h)
-    end
-
-    should "generate a correctly-proportioned thumbnail" do
-      file = MediaFile.open("test/files/mp4/test-300x200-anamorphic.mp4")
-
-      assert_equal([113, 150], file.preview!(150, 150).dimensions)
     end
   end
 end
