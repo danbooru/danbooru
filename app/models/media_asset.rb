@@ -98,8 +98,14 @@ class MediaAsset < ApplicationRecord
     end
 
     def trash_file!
-      storage_service.move(file_path, "/trash/#{file_path}")
-      backup_storage_service.move(file_path, "/trash/#{file_path}")
+      [storage_service, backup_storage_service].each do |service|
+        service.move(file_path, "/trash/#{file_path}")
+      rescue StandardError
+        # If a previous failed attempt already moved the file to the trash, just make sure the original is gone.
+        # Raises (with the original error as the cause) if the file isn't in the trash.
+        service.open("/trash/#{file_path}").close
+        service.delete(file_path)
+      end
     end
 
     def delete_file!

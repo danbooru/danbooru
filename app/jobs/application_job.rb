@@ -10,6 +10,7 @@ class ApplicationJob < ActiveJob::Base
   queue_as :default
 
   # Jobs with lower numbers are processed first. Lower number = higher priority.
+  # ExpungePostJob:             priority -30
   # ProcessUploadJob:           priority -20
   # ProcessUploadMediaAssetJob: priority -10
   # Other jobs:                 priority 0

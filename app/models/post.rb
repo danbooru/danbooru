@@ -853,16 +853,24 @@ class Post < ApplicationRecord
   end
 
   concerning :DeletionMethods do
+    # Schedule the post to be expunged in the background. Expunging is very slow
+    # due to file transfer latency and when it breaks it's hard to recover from.
+    def expunge_later!(user = CurrentUser.user)
+      ExpungePostJob.perform_later(post: self, user: user)
+    end
+
     def expunge!(current_user = CurrentUser.user)
-      transaction do
+      # Lock the post so that two concurrent expunges can't both run. Raises RecordNotFound if the post is already gone.
+      with_lock do
         Post.without_timeout do
           ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete, subject: nil, user: current_user)
 
+          # Move the files before updating tag counts so the tag rows aren't locked during slow file transfers.
+          media_asset.trash!(current_user, log: false)
           update_children_on_destroy
           Tag.decrement_post_counts(tag_array)
           remove_from_all_pools
           remove_from_fav_groups
-          media_asset.trash!(current_user, log: false)
           destroy
           update_parent_on_destroy
         end
