@@ -50,7 +50,7 @@ class PostDisapproval < ApplicationRecord
   end
 
   def validate_disapproval
-    if post.is_active?
+    if post&.is_active?
       errors.add(:post, "is already active and cannot be disapproved")
     end
   end

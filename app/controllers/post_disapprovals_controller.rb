@@ -24,8 +24,8 @@ class PostDisapprovalsController < ApplicationController
   end
 
   def create
-    @post_disapproval = authorize PostDisapproval.new(user: CurrentUser.user, **permitted_attributes(PostDisapproval))
-    @post_disapproval.save
+    @post_disapproval = authorize PostDisapproval.find_or_initialize_by(user: CurrentUser.user, post_id: params.dig(:post_disapproval, :post_id))
+    @post_disapproval.update(permitted_attributes(@post_disapproval))
     respond_with(@post_disapproval)
   end
 
