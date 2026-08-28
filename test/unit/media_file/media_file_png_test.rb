@@ -108,9 +108,9 @@ class MediaFilePngTest < ActiveSupport::TestCase
     end
   end
 
-  context "a PNG with a 90 degree clockwise EXIF orientation flag" do
+  context "a PNG with a non-standard EXIF orientation flag" do
     should "be parsed correctly" do
-      file = MediaFile.open("test/files/png/test-rotation-90cw.png")
+      file = MediaFile.open("test/files/png/test-rotation-bad-chunk.png")
 
       assert_equal(128, file.width)
       assert_equal(96, file.height)
@@ -167,6 +167,58 @@ class MediaFilePngTest < ActiveSupport::TestCase
         "ExifIFD:ExifImageWidth" => 128,
         "ExifIFD:ExifImageHeight" => 96,
       }, file.metadata.to_h)
+    end
+  end
+
+  context "a PNG with a standard EXIF orientation flag" do
+    should "be parsed correctly, with the width and height swapped to match the rotation" do
+      file = MediaFile.open("test/files/png/test-rotation-good-chunk.png")
+
+      assert_equal(64, file.width)
+      assert_equal(128, file.height)
+      assert_equal(21_557, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("af7c636bf780b300a9070ed51accf80e", file.md5)
+      assert_equal("74a09fe28c95001f3ddd251a9fbb5d3a", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(1, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "PNG",
+        "File:ExifByteOrder" => "Little-endian (Intel, II)",
+        "PNG:ImageWidth" => 128,
+        "PNG:ImageHeight" => 64,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "IFD0:Orientation" => "Rotate 90 CW",
+        "IFD0:XResolution" => 144,
+        "IFD0:YResolution" => 144,
+        "IFD0:ResolutionUnit" => "inches",
+        "IFD0:YCbCrPositioning" => "Centered",
+        "ExifIFD:ExifVersion" => "0210",
+        "ExifIFD:ComponentsConfiguration" => "Y, Cb, Cr, -",
+        "ExifIFD:UserComment" => "Sc",
+        "ExifIFD:FlashpixVersion" => "0100",
+        "ExifIFD:ColorSpace" => "sRGB",
+        "ExifIFD:ExifImageWidth" => 128,
+        "ExifIFD:ExifImageHeight" => 64,
+        "PNG-pHYs:PixelsPerUnitX" => 1000,
+        "PNG-pHYs:PixelsPerUnitY" => 1000,
+        "PNG-pHYs:PixelUnits" => "meters",
+      }, file.metadata.to_h)
+    end
+
+    should "generate a rotated thumbnail" do
+      file = MediaFile.open("test/files/png/test-rotation-good-chunk.png")
+
+      assert_equal([32, 64], file.preview(64, 64).dimensions)
     end
   end
 
