@@ -62,6 +62,7 @@ class TimeSeriesComponent < ApplicationComponent
         data: y_axis,
         type: "scroll",
         left: 0,
+        top: 0,
         padding: [8, 200, 0, 15],
         orient: "horizontal",
       },

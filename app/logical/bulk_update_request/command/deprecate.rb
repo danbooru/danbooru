@@ -45,4 +45,13 @@ class BulkUpdateRequest::Command::Deprecate < BulkUpdateRequest::Command
       errors.add(:base, "Can't deprecate [[#{@tag_name}]] (wiki page is deleted)")
     end
   end
+
+  def approval_level(tags: nil)
+    tag = tags.present? ? tags.find { |tag| tag.name == @tag_name } : affected_tag
+
+    tag_is_small = tag.blank? || tag.empty? || tag.is_small_tag?
+
+    return User::Levels::MODERATOR if tag_is_small
+    User::Levels::ADMIN
+  end
 end

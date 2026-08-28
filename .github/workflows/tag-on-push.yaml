@@ -1,0 +1,29 @@
+# .github/workflows/tag-on-push.yml
+name: Tag on push
+
+on:
+  push:
+    branches:
+      - production
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Create and push tag
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          TAG_NAME="${GITHUB_REF_NAME}-$(date -u +'%Y.%m.%d.%H%M%S-utc')"
+          git tag -a "$TAG_NAME" -m "deployed ${GITHUB_SHA} on ${GITHUB_REF_NAME}"
+          git push origin "$TAG_NAME"
+          echo "Created $TAG_NAME"

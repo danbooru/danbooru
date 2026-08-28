@@ -400,7 +400,7 @@ Post.initialize_post_sections = function() {
       $("#comments").hide();
       $("#edit").hide();
       $("#recommended").show();
-      $.get("/recommended_posts.js", { search: { post_id: Utility.meta("post-id") }, limit: Post.MAX_RECOMMENDATIONS });
+      $.get("/recommended_posts.js", { search: { post_id: Utility.meta("post-id") }, limit: Post.MAX_RECOMMENDATIONS }).done(script => $.globalEval(script));
     } else {
       $("#edit").hide();
       $("#comments").hide();
@@ -448,7 +448,8 @@ Post.update = async function(post_id, mode, params) {
     let show_votes = urlParams.get("show_votes");
     let size = urlParams.get("size");
 
-    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js`, data: { mode, show_votes, size, ...params }});
+    let script = await $.ajax({ type: "PUT", url: `/posts/${post_id}.js`, data: { mode, show_votes, size, ...params }});
+    $.globalEval(script);
 
     Post.pending_update_count -= 1;
     Post.show_pending_update_notice();
@@ -487,7 +488,7 @@ Post.initialize_saved_searches = function() {
             "query": $("#tags").val()
           }
         }
-      );
+      ).done(script => $.globalEval(script));
     }
 
     e.preventDefault();
@@ -500,7 +501,8 @@ Post.initialize_recommended = function() {
 
     let post_id = $(this).parents(".post-preview").data("id");
     $("#recommended").addClass("loading-recommended-posts");
-    await $.get("/recommended_posts.js", { search: { post_id: post_id }, limit: Post.MAX_RECOMMENDATIONS });
+    let script = await $.get("/recommended_posts.js", { search: { post_id: post_id }, limit: Post.MAX_RECOMMENDATIONS });
+    $.globalEval(script);
     $("#recommended").removeClass("loading-recommended-posts");
   });
 };
