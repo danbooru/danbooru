@@ -13,13 +13,20 @@ class Source::Extractor::Piapro < Source::Extractor
       [download_url]
     elsif parsed_url.image_url?
       [parsed_url.to_s]
+    elsif sample_image_url.present?
+      [sample_image_url]
     else
       []
     end
   end
 
+  # Fallback for when the image is not downloadable.
+  def sample_image_url
+    page&.at(".contents_illust_img img")&.attr("src")&.then { |url| URI.join("https://piapro.jp", url).to_s }
+  end
+
   memoize def download_url
-    return nil unless content_id.present? && download_token.present? && post_type != "text"
+    return nil unless content_id.present? && download_token.present? && post_type != "text" && downloads_enabled?
 
     http.cache(1.minute).post("https://piapro.jp/download/content/", form: {
       "DownloadContent[contentId]": content_id,
@@ -74,7 +81,7 @@ class Source::Extractor::Piapro < Source::Extractor
   end
 
   def downloads_enabled?
-    page.present? && page.at(".contents_license_list .no_license").nil?
+    page.present? && page.at(".contents_license_list.no_license").nil?
   end
 
   memoize def post_type
