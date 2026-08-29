@@ -1718,6 +1718,17 @@ class PostTest < ActiveSupport::TestCase
           assert_match(/'little_red_riding_hood_\(cosplay\)' is not allowed because 'little_red_riding_hood' is not a character tag/, @post.warnings.full_messages.join)
         end
 
+        should "not add the _(cosplay) tag if the character tag is deprecated" do
+          create(:tag, name: "hijiri_byakuren", category: Tag.categories.character, is_deprecated: true)
+          @post = create(:post, tag_string: "hijiri_byakuren_(cosplay)")
+
+          assert_equal(false, @post.has_tag?("hijiri_byakuren_(cosplay)"))
+          assert_equal(false, @post.has_tag?("hijiri_byakuren"))
+          assert_equal(false, @post.has_tag?("cosplay"))
+          assert_equal(true, @post.warnings[:base].grep(/Couldn't add tag/).present?)
+          assert_match(/'hijiri_byakuren_\(cosplay\)' is not allowed because 'hijiri_byakuren' is deprecated/, @post.warnings.full_messages.join)
+        end
+
         should "allow creating a _(cosplay) tag for an empty general tag" do
           @tag = create(:tag, name: "hatsune_miku", post_count: 0, category: Tag.categories.general)
           @post = create(:post, tag_string: "hatsune_miku_(cosplay)")
