@@ -564,6 +564,12 @@ class Post < ApplicationRecord
         in "downvote", name
           vote!(-1, CurrentUser.user)
 
+        in "-upvote", name
+          unvote!(1, CurrentUser.user)
+
+        in "-downvote", name
+          unvote!(-1, CurrentUser.user)
+
         in "status", "active"
           raise User::PrivilegeError unless CurrentUser.is_approver?
           approvals.create!(user: CurrentUser.user)
@@ -739,6 +745,16 @@ class Post < ApplicationRecord
       with_lock do
         votes.create!(user: voter, score: score) unless votes.active.exists?(user: voter, score: score)
         reload # PostVote.create modifies our score. Reload to get the new score.
+      end
+    end
+
+    def unvote!(score, voter)
+      # Ignore unvote if user doesn't have permission to vote.
+      return unless Pundit.policy!(voter, PostVote).create?
+
+      with_lock do
+        votes.active.find_by(user: voter, score: score)&.soft_delete!(updater: voter)
+        reload # PostVote#soft_delete! modifies our score. Reload to get the new score.
       end
     end
   end

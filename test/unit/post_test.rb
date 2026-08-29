@@ -501,6 +501,8 @@ class PostTest < ActiveSupport::TestCase
         should allow_value("touhou -fav:self").for(:tag_string)
         should allow_value("touhou upvote:self").for(:tag_string)
         should allow_value("touhou downvote:self").for(:tag_string)
+        should allow_value("touhou -upvote:self").for(:tag_string)
+        should allow_value("touhou -downvote:self").for(:tag_string)
         should allow_value("touhou parent:1").for(:tag_string)
         should allow_value("touhou child:1").for(:tag_string)
         should allow_value("touhou source:foo").for(:tag_string)
@@ -1082,6 +1084,52 @@ class PostTest < ActiveSupport::TestCase
 
             @post.update(tag_string: "aaa -fav:self -fav:me")
             assert_equal(0, @post.favorites.count)
+          end
+        end
+
+        context "for an upvote or downvote" do
+          should "remove the current user's upvote with -upvote:self" do
+            @post.update(tag_string: "aaa upvote:self")
+            assert_equal(1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(0, @post.reload.score)
+            assert_equal(0, @post.votes.active.where(user: @user).count)
+          end
+
+          should "remove the current user's downvote with -downvote:self" do
+            @post.update(tag_string: "aaa downvote:self")
+            assert_equal(-1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(0, @post.reload.score)
+            assert_equal(0, @post.votes.active.where(user: @user).count)
+          end
+
+          should "not remove a downvote with -upvote:self" do
+            @post.update(tag_string: "aaa downvote:self")
+            assert_equal(-1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(-1, @post.reload.score)
+            assert_equal(1, @post.votes.active.where(user: @user).count)
+          end
+
+          should "not remove an upvote with -downvote:self" do
+            @post.update(tag_string: "aaa upvote:self")
+            assert_equal(1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(1, @post.reload.score)
+            assert_equal(1, @post.votes.active.where(user: @user).count)
+          end
+
+          should "do nothing if the user hasn't voted" do
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(0, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(0, @post.reload.score)
           end
         end
 
