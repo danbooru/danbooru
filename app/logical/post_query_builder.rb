@@ -116,6 +116,7 @@ class PostQueryBuilder
         relation.metatag_matches(node.name, node.value, current_user, quoted: node.quoted?)
       in :wildcard
         tag_names = Tag.wildcard_matches(node.name).limit(MAX_WILDCARD_TAGS).pluck(:name)
+        tag_names -= post_query.searched_tag_names if node.parent&.not?
         relation.where_array_includes_any("string_to_array(posts.tag_string, ' ')", tag_names)
       in :not
         children.first.negate_relation

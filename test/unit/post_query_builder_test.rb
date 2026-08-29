@@ -133,6 +133,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2], "-*c -a*a")
     end
 
+    should "not exclude a tag that's explicitly searched for from a negated wildcard that would otherwise match it" do
+      post1 = create(:post, tag_string: "aaa")
+      post2 = create(:post, tag_string: "aaa aab")
+
+      assert_tag_match([post1], "aaa -a*")
+      assert_tag_match([post2, post1], "aaa")
+
+      assert_tag_match([], "aaa -a* -aaa")
+    end
+
     should "return posts for a complex search with multiple AND, OR, and NOT tags" do
       post1 = create(:post, tag_string: "original")
       post2 = create(:post, tag_string: "smile")
