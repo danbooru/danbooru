@@ -1235,6 +1235,21 @@ class PostTest < ActiveSupport::TestCase
 
             assert_equal(0, @post.disapprovals.count)
           end
+
+          should "update the reason if the post was already disapproved by the same user with a different reason" do
+            @user = create(:approver)
+
+            as(@user) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa disapproved:disinterest")
+
+              assert_no_difference("@post.disapprovals.count") do
+                @post.update(tag_string: "aaa disapproved:poor_quality")
+              end
+            end
+
+            assert_equal("poor_quality", PostDisapproval.last.reason)
+          end
         end
 
         context "for a source" do

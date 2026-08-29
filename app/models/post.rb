@@ -578,7 +578,7 @@ class Post < ApplicationRecord
 
         in "disapproved", reason
           raise User::PrivilegeError unless CurrentUser.is_approver?
-          disapprovals.create!(user: CurrentUser.user, reason: reason.downcase)
+          disapprovals.find_or_initialize_by(user: CurrentUser.user).update!(reason: reason.downcase)
 
         in "child", "none"
           children.each do |post|
