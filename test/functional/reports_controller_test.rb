@@ -55,6 +55,27 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
         end
+
+        should "show an All Time link that fills in the from field with post #1's creation date" do
+          Post.delete_all
+          post1 = create(:post, id: 1)
+
+          get report_path("posts")
+
+          assert_response :success
+          assert_select "a", text: "All Time" do |links|
+            assert_includes links.first["x-on:click.prevent"], post1.created_at.to_date.iso8601
+          end
+        end
+
+        should "not show an All Time link when post #1 doesn't exist" do
+          Post.where(id: 1).delete_all
+
+          get report_path("posts")
+
+          assert_response :success
+          assert_select "a", text: "All Time", count: 0
+        end
       end
 
       context "post approvals report" do
