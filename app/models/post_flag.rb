@@ -6,13 +6,15 @@ class PostFlag < ApplicationRecord
     REJECTED = "Unapproved in three days after returning to moderation queue%"
   end
 
+  MAX_LENGTH = 140
+
   dtext_attribute :reason, inline: true # defines :dtext_reason
 
   belongs_to :creator, class_name: "User"
   belongs_to :post
 
   before_validation { post.lock! }
-  validates :reason, visible_string: true, length: { in: 1..140 }
+  validates :reason, visible_string: true, length: { in: 1..MAX_LENGTH }
   validate :validate_creator_is_not_limited, on: :create
   validate :validate_post, on: :create
   validates :creator_id, uniqueness: { scope: :post_id, on: :create, unless: :is_deletion, message: "have already flagged this post" }

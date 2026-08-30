@@ -890,7 +890,13 @@ class Post < ApplicationRecord
         flags.pending.update!(status: :succeeded)
         appeals.pending.update!(status: :rejected)
 
-        flags.create!(reason: reason, is_deletion: true, creator: user, status: :succeeded)
+        begin
+          flags.create!(reason: reason, is_deletion: true, creator: user, status: :succeeded)
+        rescue ActiveRecord::RecordInvalid => e
+          errors.add(:base, e.record.errors.full_messages.join("; "))
+          raise ActiveRecord::Rollback
+        end
+
         update!(is_deleted: true, is_pending: false, is_flagged: false)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).

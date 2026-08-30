@@ -2,7 +2,7 @@
   <%= format_text(flag.reason.strip.chomp("."), inline: true) %>
 
   <% if policy(flag).edit? %>
-    (<%= link_to "edit", edit_post_flag_url(flag) %>)
+    (<%= link_to "edit", edit_post_flag_url(flag), remote: true %>)
   <% end %>
 
   <% if policy(flag).can_view_flagger? %>
