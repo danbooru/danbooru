@@ -29,12 +29,15 @@ class BulkUpdateRequest::Command::Category < BulkUpdateRequest::Command
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} ([[#{@tag_name}]] doesn't exist)")
     elsif category.nil?
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} (#{@category_name} is not a valid category)")
-    elsif context == :approval
-      # do nothing
-    elsif category == tag.category
+    elsif context == :request && category == tag.category
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} ([[#{@tag_name}]] is already in that category)")
-    elsif tag.artist.present? && category != Tag.categories.artist
+    elsif context == :request && tag.artist.present? && category != Tag.categories.artist
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} ([[#{@tag_name}]] has an artist entry)")
+    else
+      # Actually apply the category change so that later commands in the same BUR validate
+      # against the tag's new category, instead of the category it had before this line ran.
+      # This change is rolled back after validation; it's only applied for real during approval.
+      tag.update!(category: category, updater: User.system)
     end
   end
 
