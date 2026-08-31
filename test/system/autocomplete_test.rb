@@ -155,4 +155,37 @@ class AutocompleteTest < ApplicationSystemTestCase
       end
     end
   end
+
+  context "DText Autocomplete" do
+    context "for search" do
+      should "preserve tag prefixes when a completion is inserted" do
+        signup "member"
+        create(:tag, name: "1girl", post_count: 42)
+        visit new_forum_post_path
+
+        assert_inserted_completion("{{1girl}} ", "{{1gi", id: "forum_post_body")
+        assert_inserted_completion("{{-1girl}} ", "{{-1gi", id: "forum_post_body")
+        assert_inserted_completion("{{~1girl}} ", "{{~1gi", id: "forum_post_body")
+      end
+    end
+
+    context "for wiki pages" do
+      should "work" do
+        signup "member"
+        create(:tag, name: "1girl", post_count: 42)
+        visit new_forum_post_path
+
+        assert_autocomplete_equals(["1girl"], "[[1gi", id: "forum_post_body")
+      end
+    end
+
+    context "for emojis" do
+      should "work" do
+        signup "member"
+        visit new_forum_post_path
+
+        assert_autocomplete_equals([":smile:"], ":smi", id: "forum_post_body")
+      end
+    end
+  end
 end
