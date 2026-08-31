@@ -68,8 +68,8 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
           end
         end
 
-        should "not show an All Time link when post #1 doesn't exist" do
-          Post.where(id: 1).delete_all
+        should "not show an All Time link when no posts exist" do
+          Post.delete_all
 
           get report_path("posts")
 
