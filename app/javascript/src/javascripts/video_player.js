@@ -203,6 +203,10 @@ export default class VideoPlayer {
   }
 
   onKeypress(event) {
+    if (event.ctrlKey || event.metaKey || event.altKey) {
+      return true;
+    }
+
     // These shortcuts apply to the main video in the page, if there's any.
     // However, if any other video is hovered, they apply to that one instead,
     //   but only for the duration of the hovering.
