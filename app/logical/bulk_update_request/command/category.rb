@@ -34,10 +34,9 @@ class BulkUpdateRequest::Command::Category < BulkUpdateRequest::Command
     elsif context == :request && tag.artist.present? && category != Tag.categories.artist
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} ([[#{@tag_name}]] has an artist entry)")
     else
-      # Actually apply the category change so that later commands in the same BUR validate
-      # against the tag's new category, instead of the category it had before this line ran.
-      # This change is rolled back after validation; it's only applied for real during approval.
-      tag.update!(category: category, updater: User.system)
+      # Simulate the category change while skipping validations.
+      # @see https://github.com/danbooru/danbooru/commit/f672e11160c21c6acb4676e61e09666f9525b7d2#r198302427
+      tag.update_column(:category, category) # rubocop:disable Rails/SkipsModelValidations
     end
   end
 
