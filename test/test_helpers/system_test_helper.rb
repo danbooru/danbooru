@@ -26,6 +26,28 @@ module SystemTestHelper
     page.evaluate_script("navigator.clipboard.readText()")
   end
 
+  # @param value [String, Regexp] an exact string to match, or a pattern to match against.
+  def assert_clipboard(value)
+    if value.is_a?(Regexp)
+      assert_match value, clipboard_text
+    else
+      assert_equal value, clipboard_text
+    end
+  end
+
+  # Asserts that the #notice flash message is showing, optionally matching its text.
+  # @param text [String, Regexp, nil] an exact string to match, a pattern to match against, or nil to just check
+  #   that the notice is showing with some text.
+  def assert_notice(text = nil)
+    return assert_selector "#notice span.prose" if text.nil?
+
+    if text.is_a?(Regexp)
+      assert_selector "#notice span.prose", text: text
+    else
+      assert_selector "#notice span.prose", text: text, exact_text: true
+    end
+  end
+
   def signup(name, password: "password")
     visit new_user_path
     fill_in "Username", with: name

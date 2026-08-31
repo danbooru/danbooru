@@ -38,8 +38,8 @@ module CommentsTests
               click_link "Copy ID"
             end
 
-            assert_selector "#notice span.prose", text: "Copied!"
-            assert_equal "comment ##{@comment.id}", clipboard_text
+            assert_notice "Copied!"
+            assert_clipboard "comment ##{@comment.id}"
           end
 
           should "copy the comment's link when clicking Copy Link" do
@@ -48,10 +48,8 @@ module CommentsTests
               click_link "Copy Link"
             end
 
-            assert_selector "#notice span.prose", text: "Copied!"
-            # Compare paths, not full URLs: default_url_options uses a fixed port that doesn't match the
-            # random port Capybara's test server actually runs on.
-            assert_equal comment_path(@comment), URI(clipboard_text).path
+            assert_notice "Copied!"
+            assert_clipboard(/#{Regexp.escape(comment_path(@comment))}\z/)
           end
         end
 

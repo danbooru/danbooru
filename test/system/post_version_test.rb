@@ -29,7 +29,7 @@ module PostVersionSystemTests
             assert all("td .post-version-select-checkbox:not(:disabled)").all?(&:checked?)
 
             click_link "subnav-undo-selected"
-            assert_selector "#notice span.prose", text: "#{undoable_count}/#{undoable_count} changes undone."
+            assert_notice "#{undoable_count}/#{undoable_count} changes undone."
 
             assert_equal("tagme", @post.reload.tag_string)
           end
