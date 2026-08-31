@@ -47,7 +47,8 @@
         "github.vscode-github-actions",
         "ms-azuretools.vscode-containers",
         "GitHub.copilot-chat",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "FanaticPythoner.better-todo-tree"
       ],
       "mcp": {
         "servers": {
