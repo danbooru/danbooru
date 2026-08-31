@@ -1,33 +1,52 @@
 require "application_system_test_case"
 
-class PostVersionSystemTest < ApplicationSystemTestCase
-  context "Post versions" do
-    setup do
-      @user = create(:builder_user)
+module PostVersionSystemTests
+  extend ActiveSupport::Concern
 
-      as @user do
-        @post = create(:post, tag_string: "tagme")
-        travel 2.hours
-        @post.update!(tag_string: "touhou")
-        travel 2.hours
-        @post.update!(tag_string: "touhou bkub")
-        travel 2.hours
-      end
+  included do
+    context "#{browser_name}:" do
+      context "Post versions" do
+        setup do
+          @user = create(:builder_user)
 
-      signin @user
-      visit post_versions_path
-    end
+          as @user do
+            @post = create(:post, tag_string: "tagme")
+            travel 2.hours
+            @post.update!(tag_string: "touhou")
+            travel 2.hours
+            @post.update!(tag_string: "touhou bkub")
+            travel 2.hours
+          end
 
-    context "clicking the undo selected button" do
-      should "undo all selected post versions" do
-        check id: "post-version-select-all-checkbox"
-        assert all("td .post-version-select-checkbox:not(:disabled)").all?(&:checked?)
+          signin @user
+          visit post_versions_path(search: { post_id: @post.id })
+        end
 
-        click_link "subnav-undo-selected"
-        assert_selector "#notice span.prose", text: "2/2 changes undone."
+        context "clicking the undo selected button" do
+          should "undo all selected post versions" do
+            check id: "post-version-select-all-checkbox"
+            undoable_count = all("td .post-version-select-checkbox:not(:disabled)").size
+            assert all("td .post-version-select-checkbox:not(:disabled)").all?(&:checked?)
 
-        assert_equal("tagme", @post.reload.tag_string)
+            click_link "subnav-undo-selected"
+            assert_selector "#notice span.prose", text: "#{undoable_count}/#{undoable_count} changes undone."
+
+            assert_equal("tagme", @post.reload.tag_string)
+          end
+        end
       end
     end
   end
+end
+
+class PostVersionSystemChromeTest < ChromeSystemTestCase
+  include PostVersionSystemTests
+end
+
+class PostVersionSystemFirefoxTest < FirefoxSystemTestCase
+  include PostVersionSystemTests
+end
+
+class PostVersionSystemWebkitTest < WebkitSystemTestCase
+  include PostVersionSystemTests
 end

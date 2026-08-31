@@ -94,6 +94,6 @@ group :test do
   gem "minitest-reporters", "~> 1", require: "minitest/reporters"
   gem "mock_redis", "~> 0"
   gem "capybara", "~> 3"
-  gem "selenium-webdriver", "~> 4"
+  gem "capybara-playwright-driver", "~> 0.5"
   gem "testcontainers-core", "~> 0", require: false
 end

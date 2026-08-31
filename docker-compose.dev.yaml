@@ -236,6 +236,14 @@ services:
     stdin_open: true
     tty: true
 
+  # Optional services required for e2e testing
+  # These only run when the `--profile test` flag is passed to docker compose.
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.62.1-noble
+    profiles: ["test"]
+    command: "npx -y playwright@1.62.1 run-server --port 3000 --host 0.0.0.0"
+
+
 configs:
   nginx:
     file: config/nginx.conf
