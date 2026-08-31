@@ -36,11 +36,11 @@ module PostsHelper
   end
 
   memoize def first_danbirthday
-    Post.find_by(id: 1)&.created_at
+    Post.first&.created_at
   end
 
   def is_danbirthday?(post)
-    post.id == 1 && first_danbirthday.strftime("%m-%d") == Time.zone.today.strftime("%m-%d") && !first_danbirthday.today?
+    post.id == Post.first.id && first_danbirthday.strftime("%m-%d") == Time.zone.today.strftime("%m-%d") && !first_danbirthday.today?
   end
 
   def image_container_data_attributes(post, current_user)
