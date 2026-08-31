@@ -46,6 +46,7 @@ module.exports = [
       "eqeqeq": "error",
       "init-declarations": "error",
       "no-caller": "error",
+      "no-cond-assign": "off",
       "no-empty-function": "error",
       "no-eval": "error",
       "no-extend-native": "error",
