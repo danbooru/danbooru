@@ -1,19 +1,48 @@
 require "test_helper"
 require "socket"
+require "drb/unix"
 
-Capybara.server = :puma, { silence_fork_callback_warning: true, Threads: "0:1" }
-Capybara.server_host = "0.0.0.0"
-Capybara.app_host = "http://#{Socket.ip_address_list.find { |address| address.ipv4? && !address.ipv4_loopback? }.ip_address}"
-Capybara.always_include_port = true
+Capybara.configure do |config|
+  config.server = :puma, {
+    Silent: true,
+    silence_fork_callback_warning: true,
+    Threads: "0:1",
+    workers: 0,
+  }
+  config.server_host = "0.0.0.0"
+  config.app_host = "http://#{Socket.ip_address_list.find { |address| address.ipv4? && !address.ipv4_loopback? }.ip_address}"
+  config.always_include_port = true
+  config.default_max_wait_time = 5
+end
+
+module IgnoreMissingDrbUnixSocket
+  def close
+    super
+  rescue Errno::ENOENT
+    # Another process/thread already removed the Unix socket.
+  end
+end
+
+DRb::DRbUNIXSocket.prepend(IgnoreMissingDrbUnixSocket)
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   include SystemTestHelper
 
-  self.lock_threads = false
-
   class_attribute :browser_name
 
   PLAYWRIGHT_SERVER_URL = "ws://playwright:3000/"
+
+  # Make Rails serve files to the playwright container
+  setup do
+    data_dir = Rails.public_path.join("data").tap { |dir| FileUtils.mkdir_p(dir) }
+    @media_temp_dir = Dir.mktmpdir("danbooru-uploads-", data_dir)
+    base_url = "#{Capybara.app_host}:#{Capybara.current_session.server.port}/data/#{File.basename(@media_temp_dir)}"
+    Danbooru.config.stubs(:storage_manager).returns(StorageManager::Local.new(base_url: base_url, base_dir: @media_temp_dir))
+  end
+
+  teardown do
+    FileUtils.rm_rf(@media_temp_dir)
+  end
 
   def self.playwright_server_up?
     uri = URI(PLAYWRIGHT_SERVER_URL)

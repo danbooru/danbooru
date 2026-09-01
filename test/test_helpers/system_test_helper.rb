@@ -63,6 +63,11 @@ module SystemTestHelper
     click_button "Login"
   end
 
+  # Send a key press to whatever is currently focused in the page (the <body>, by default)
+  def send_global_key(key)
+    page.driver.with_playwright_page { |playwright_page| playwright_page.keyboard.press(key) }
+  end
+
   def assert_visible(selector, **options)
     assert_selector selector, visible: :visible, **options
   end
