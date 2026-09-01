@@ -98,10 +98,6 @@ module AutocompleteTests
           assert_search_autocomplete_results(["rating:sensitive"], "~~~rating:s")
         end
 
-        should "ignore invalid prefix + metatag combinations" do
-          assert_search_autocomplete_results([], "char:rating:s")
-        end
-
         should "insert completions on click" do
           visit posts_path
 

@@ -43,7 +43,11 @@ module NotesTests
           end
 
           should "preview the note" do
-            find(".note-edit-dialog textarea").set("Preview text")
+            textarea = find(".note-edit-dialog textarea")
+            textarea.hover
+            assert_no_selector ".note-body", visible: true
+
+            textarea.set("Preview text")
             within(".note-edit-dialog") { click_button "Preview" }
 
             assert_selector ".note-body", text: "Preview text"

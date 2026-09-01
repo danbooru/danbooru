@@ -8,7 +8,7 @@ module UploadsTests
       find(".dropzone-container").click
     end
 
-    assert_selector "#p-single-asset-upload", wait: 10
+    assert_selector "#p-single-asset-upload"
   end
 
   included do
