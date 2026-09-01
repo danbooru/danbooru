@@ -17,8 +17,8 @@ class Comment < ApplicationRecord
   validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
   validate :validate_body, if: :body_changed?
 
-  before_create :autoreport_spam
   before_save :handle_reports_on_deletion
+  before_create :autoreport_spam
   after_create :update_last_commented_at_on_create
   after_update(if: ->(comment) { (!comment.is_deleted? || !comment.saved_change_to_is_deleted?) && comment.updater != comment.creator }) do |comment|
     ModAction.log("updated #{comment.dtext_shortlink}", :comment_update, subject: self, user: comment.updater)
@@ -31,7 +31,7 @@ class Comment < ApplicationRecord
 
   deletable
   dtext_attribute :body, media_embeds: { max_embeds: 1, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte } # defines :dtext_body
-
+  has_dtext_links :body
   mentionable(
     message_field: :body,
     title: ->(_user_name) { "#{creator.name} mentioned you in a comment on post ##{post_id}" },

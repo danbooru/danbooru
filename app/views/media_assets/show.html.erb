@@ -145,6 +145,19 @@
               <% end %>
             <% end %>
 
+            <% if @visible_dtext_links.any? %>
+              <tr>
+                <th colspan="2" class="text-center">Embeds</th>
+              </tr>
+
+              <% @visible_dtext_links.each do |link| %>
+                <tr>
+                  <th class="text-left"><%= link.model_type %></th>
+                  <td><%= link_to "##{link.model_id}", link.model %></td>
+                </tr>
+              <% end %>
+            <% end %>
+
             <tr>
               <th colspan="2" class="text-center">Metadata</th>
             </tr>
