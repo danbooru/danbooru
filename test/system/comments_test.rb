@@ -28,6 +28,8 @@ module CommentsTests
 
         context "the comment's dropdown menu" do
           setup do
+            stub_clipboard
+
             @comment = as(@user) { create(:comment, post: @post) }
             visit post_path(@post)
           end
@@ -39,6 +41,7 @@ module CommentsTests
             end
 
             assert_notice "Copied!"
+
             assert_clipboard "comment ##{@comment.id}"
           end
 

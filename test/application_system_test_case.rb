@@ -55,7 +55,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # The playwright container is optional (`bin/dev --profile test up`), so skip instead of hard-crashing when it isn't running.
   def self.driven_by_remote_browser(browser_type)
     setup do
-      skip "#{PLAYWRIGHT_SERVER_URL} is not reachable - is the `playwright` container running? (bin/dev --profile test up)" unless ApplicationSystemTestCase.playwright_server_up?
+      skip "The playwright server (#{PLAYWRIGHT_SERVER_URL}) is not reachable - run `bin/dev --profile test up`" unless ApplicationSystemTestCase.playwright_server_up?
     end
 
     driver_name = :"playwright_#{browser_type}"

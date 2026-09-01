@@ -1,12 +1,6 @@
 module SystemTestHelper
   extend ActiveSupport::Concern
 
-  included do
-    setup do
-      stub_clipboard
-    end
-  end
-
   # XXX: hack. Browsers are annoying about letting us read the clipboard for tests.
   def stub_clipboard
     page.driver.with_playwright_page do |playwright_page|
@@ -22,10 +16,12 @@ module SystemTestHelper
     end
   end
 
+  # This function requires stub_clipboard above to have been run at the start of the test.
   def clipboard_text
     page.evaluate_script("navigator.clipboard.readText()")
   end
 
+  # This function requires stub_clipboard above to have been run at the start of the test.
   # @param value [String, Regexp] exact string to match, or a pattern to match against.
   def assert_clipboard(value)
     if value.is_a?(Regexp)

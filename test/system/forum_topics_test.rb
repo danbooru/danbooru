@@ -31,6 +31,7 @@ module ForumTopicsTests
 
         context "the post's dropdown menu" do
           setup do
+            stub_clipboard
             visit forum_topic_path(@topic)
           end
 
