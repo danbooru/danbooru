@@ -6,13 +6,13 @@ module PostsTests
   included do
     context "#{browser_name}:" do
       setup do
-        @user = create(:user)
+        @user = create(:user, created_at: 1.month.ago)
         @post = create(:post, tag_string: "1girl solo", source: "https://example.com/image.jpg")
       end
 
       context "Posts:" do
         should "show the editing interface" do
-          signin @user
+          fast_signin @user
           visit post_path(@post)
           find("#post-edit-link").click
 
@@ -26,7 +26,7 @@ module PostsTests
         end
 
         should "show the flag modal" do
-          signin @user
+          fast_signin @user
           visit post_path(@post)
 
           click_link "Flag"
@@ -36,7 +36,7 @@ module PostsTests
         end
 
         should "show the appeal modal" do
-          signin @user
+          fast_signin @user
 
           @post = create(:post, is_deleted: true)
           visit post_path(@post)
@@ -47,7 +47,7 @@ module PostsTests
         end
 
         should "show the delete modal" do
-          signin create(:approver_user)
+          fast_signin create(:approver_user)
           visit post_path(@post)
           click_link "Delete"
 
@@ -57,7 +57,7 @@ module PostsTests
         end
 
         should "show the artist commentary modal with the commentary buttons" do
-          signin @user
+          fast_signin @user
           visit post_path(@post)
 
           click_link "Add commentary"

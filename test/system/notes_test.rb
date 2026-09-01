@@ -27,7 +27,7 @@ module NotesTests
         setup do
           @user = create(:user, created_at: 1.month.ago)
           @post = create(:post, tag_string: "tagme")
-          signin @user
+          fast_signin @user
         end
 
         context "creating a note" do

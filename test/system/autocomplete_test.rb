@@ -4,7 +4,7 @@ module AutocompleteTests
   extend ActiveSupport::Concern
 
   def assert_search_autocomplete_results(values, text)
-    visit posts_path unless current_path == posts_path
+    visit_without_reloading posts_path
     assert_autocomplete_results(values, text, selector: "#tags")
   end
 
@@ -120,8 +120,7 @@ module AutocompleteTests
 
       context "DText autocomplete" do
         setup do
-          @user = create(:user, name: "oneuser")
-          signin @user
+          fast_signin create(:user, name: "oneuser")
           create(:tag, name: "1girl", post_count: 42)
 
           visit new_forum_topic_path

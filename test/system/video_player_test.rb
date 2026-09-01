@@ -30,8 +30,6 @@ module VideoComponentTests
           create(:comment, creator: @user, post: @post, body: "!post ##{@embed_post1.id}")
           create(:comment, creator: @user, post: @post, body: "!post ##{@embed_post2.id}")
 
-          signin @user
-
           visit post_path(@post)
 
           assert_selector "#image[data-state='ready']", wait: 10

@@ -50,14 +50,31 @@ module SystemTestHelper
     fill_in "Password", with: password
     fill_in "Confirm password", with: password
     click_button "Sign up"
+
+    assert_no_link "Login"
   end
 
-  # @param user [User] the user to log in as.
-  def signin(user)
+  # @param user [User] the user to log in as, or a fresh one if omitted.
+  def signin(user = create(:user))
     visit new_session_path
     fill_in "Name", with: user.name
     fill_in "Password", with: user.password
     click_button "Login"
+
+    assert_no_link "Login"
+  end
+
+  # Log in as the given user, without going through the login form.
+  # @param user [User] the user to log in as, or a fresh one if omitted.
+  def fast_signin(user = create(:user))
+    session = ActionDispatch::Integration::Session.new(Rails.application)
+    session.post session_path, params: { session: { name: user.name, password: user.password }}
+    raise "login as #{user.name} failed (#{session.response.status})" unless session.response.redirect?
+
+    name, value = session.response.headers["Set-Cookie"].split(";").first.split("=", 2)
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.add_cookies([{ name: name, value: value, domain: URI(Capybara.app_host).host, path: "/" }])
+    end
   end
 
   # Send a key press to whatever is currently focused in the page (the <body>, by default).
@@ -112,5 +129,11 @@ module SystemTestHelper
 
     first("ul.ui-autocomplete li").click
     assert_equal(expected_result, field.value)
+  end
+
+  # Visit a page, only reloading if we're not already there.
+  # @param path [String] the path to visit.
+  def visit_without_reloading(path)
+    visit path unless current_path == path
   end
 end

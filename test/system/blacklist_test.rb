@@ -36,11 +36,13 @@ module BlacklistTests
     context "#{browser_name}:" do
       context "Blacklists:" do
         setup do
-          @user = create(:user, blacklisted_tags: "1girl\n2girls", created_at: 1.month.ago)
+          # Stub the blacklist everyone (including anonymous users) starts out with, so tests don't need to create
+          # and sign in as a user just to control what's blacklisted.
+          User.any_instance.stubs(:blacklisted_tags).returns("1girl\n2girls")
+
+          @user = create(:user)
           @blacklisted_post = create(:post, tag_string: "1girl")
           @safe_post = create(:post, tag_string: "safe")
-
-          signin @user
         end
 
         context "on the /posts page" do
@@ -146,6 +148,7 @@ module BlacklistTests
             create(:post_vote, user: @user, post: @blacklisted_post)
             create(:post_vote, user: @user, post: @safe_post)
 
+            fast_signin @user
             visit post_votes_path
           end
 
@@ -163,6 +166,7 @@ module BlacklistTests
             create(:comment_vote, user: @user, comment: blacklisted_comment)
             create(:comment_vote, user: @user, comment: safe_comment)
 
+            fast_signin @user
             visit comment_votes_path
           end
 

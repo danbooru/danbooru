@@ -61,7 +61,7 @@ module CommentsTests
             @moderator = create(:moderator_user, created_at: 1.month.ago)
             @comment = as(@moderator) { create(:comment, post: @post) }
 
-            signin @moderator
+            fast_signin @moderator
             visit post_path(@post)
           end
 
@@ -92,7 +92,7 @@ module CommentsTests
           setup do
             @comment = as(@user) { create(:comment, creator: @user, post: @post, body: "the original comment") }
 
-            signin @user
+            fast_signin @user
             visit post_path(@post)
           end
 

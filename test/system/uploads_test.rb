@@ -17,7 +17,7 @@ module UploadsTests
         setup do
           create(:tag, name: "1girl")
           @user = create(:user, favorite_tags: "1girl", created_at: 1.month.ago)
-          signin @user
+          fast_signin @user
           visit new_upload_path
         end
 

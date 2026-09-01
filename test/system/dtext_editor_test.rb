@@ -27,7 +27,7 @@ module DtextEditorTests
             @user = create(:user)
             @post = create(:post)
 
-            signin @user
+            fast_signin @user
             visit post_path(@post)
             find(".new-comment .expand-comment-response").click
 
@@ -120,7 +120,7 @@ module DtextEditorTests
           setup do
             @moderator = create(:moderator_user)
 
-            signin @moderator
+            fast_signin @moderator
             visit new_ban_path
           end
 

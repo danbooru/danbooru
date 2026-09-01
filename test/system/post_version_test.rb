@@ -18,7 +18,7 @@ module PostVersionSystemTests
             travel 2.hours
           end
 
-          signin @user
+          fast_signin @user
           visit post_versions_path(search: { post_id: @post.id })
         end
 
