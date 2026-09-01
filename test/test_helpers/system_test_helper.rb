@@ -26,7 +26,7 @@ module SystemTestHelper
     page.evaluate_script("navigator.clipboard.readText()")
   end
 
-  # @param value [String, Regexp] an exact string to match, or a pattern to match against.
+  # @param value [String, Regexp] exact string to match, or a pattern to match against.
   def assert_clipboard(value)
     if value.is_a?(Regexp)
       assert_match value, clipboard_text
@@ -35,9 +35,7 @@ module SystemTestHelper
     end
   end
 
-  # Asserts that the #notice flash message is showing, optionally matching its text.
-  # @param text [String, Regexp, nil] an exact string to match, a pattern to match against, or nil to just check
-  #   that the notice is showing with some text.
+  # @param text [String, Regexp, nil] exact string to match, a pattern to match against, or nil to just check the notice is showing.
   def assert_notice(text = nil)
     return assert_selector "#notice span.prose" if text.nil?
 
@@ -48,6 +46,8 @@ module SystemTestHelper
     end
   end
 
+  # @param name [String] the username.
+  # @param password [String] the password.
   def signup(name, password: "password")
     visit new_user_path
     fill_in "Username", with: name
@@ -56,6 +56,7 @@ module SystemTestHelper
     click_button "Sign up"
   end
 
+  # @param user [User] the user to log in as.
   def signin(user)
     visit new_session_path
     fill_in "Name", with: user.name
@@ -63,20 +64,57 @@ module SystemTestHelper
     click_button "Login"
   end
 
-  # Send a key press to whatever is currently focused in the page (the <body>, by default)
+  # Send a key press to whatever is currently focused in the page (the <body>, by default).
+  # @param key [String] the key to send, e.g. "Escape".
   def send_global_key(key)
     page.driver.with_playwright_page { |playwright_page| playwright_page.keyboard.press(key) }
   end
 
+  # @param selector [String] a CSS selector for the element.
   def assert_visible(selector, **options)
     assert_selector selector, visible: :visible, **options
   end
 
+  # @param selector [String] a CSS selector for the element.
   def assert_hidden(selector, **options)
     assert_selector selector, visible: :hidden, **options
   end
 
+  # @param post [Post] the post.
   def post_selector(post)
     ".post-preview[data-id='#{post.id}']"
+  end
+
+  # @param selector [String] a CSS selector for the field.
+  # @param text [String] the text to type into the field.
+  def autocomplete(selector, text)
+    field = find(selector)
+    field.set("")
+    field.send_keys(text)
+    field
+  end
+
+  # Check that all the autocomplete results we expect from typing something are actually shown.
+  # @param expected_results [Array<String>] the autocomplete values expected to be shown.
+  # @param text [String] the text to type into the field.
+  # @param selector [String] a CSS selector for the field.
+  def assert_autocomplete_results(expected_results, text, selector:)
+    autocomplete(selector, text)
+
+    assert_selector "ul.ui-autocomplete li", count: expected_results.size
+    expected_results.each do |result|
+      assert_selector "li[data-autocomplete-value='#{result}']", count: 1
+    end
+  end
+
+  # Check that the text inserted after clicking the first autocomplete result equals what's expected.
+  # @param expected_result [String] the field's value after clicking the first autocomplete result.
+  # @param text [String] the text to type into the field.
+  # @param selector [String] a CSS selector for the field.
+  def assert_clicked_autocomplete_equals(expected_result, text, selector: "#tags")
+    field = autocomplete(selector, text)
+
+    first("ul.ui-autocomplete li").click
+    assert_equal(expected_result, field.value)
   end
 end

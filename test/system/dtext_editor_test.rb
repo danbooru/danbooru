@@ -11,13 +11,9 @@ module DtextEditorTests
     find(selector).click
   end
 
-  def full_editor_field
-    find(".new-comment textarea.dtext")
-  end
-
-  def select_dtext(start, finish)
+  def select_dtext(start, finish, selector:)
     page.execute_script(<<~JS)
-      var el = document.querySelector(".new-comment textarea.dtext");
+      var el = document.querySelector(#{selector.to_json});
       el.focus();
       el.setSelectionRange(#{start}, #{finish});
     JS
@@ -28,12 +24,15 @@ module DtextEditorTests
       context "DText:" do
         context "the full editor" do
           setup do
-            @user = create(:user, created_at: 1.month.ago)
+            @user = create(:user)
             @post = create(:post)
 
             signin @user
             visit post_path(@post)
             find(".new-comment .expand-comment-response").click
+
+            @full_editor_selector = ".new-comment textarea.dtext"
+            @full_editor_field = find(@full_editor_selector)
           end
 
           should "wrap the selected word in the right markup when clicking each toolbar button" do
@@ -52,12 +51,12 @@ module DtextEditorTests
               "Horizontal rule" => "hello \n[hr]\nworld",
               "No formatting" => "hello \n[nodtext]\nworld\n[/nodtext]\n",
             }.each do |title, expected_markup|
-              full_editor_field.set("hello world")
-              select_dtext(6, 11)
+              @full_editor_field.set("hello world")
+              select_dtext(6, 11, selector: @full_editor_selector)
 
               click_dtext_button(title)
 
-              assert_equal expected_markup, full_editor_field.value, "clicking #{title} should wrap the selected word in #{expected_markup.inspect}"
+              assert_equal expected_markup, @full_editor_field.value, "clicking #{title} should wrap the selected word in #{expected_markup.inspect}"
             end
           end
 
@@ -76,42 +75,42 @@ module DtextEditorTests
                 "q" => "hello \n[quote]\nworld\n[/quote]\n",
                 "m" => "hello \n[code]\nworld\n[/code]\n",
               }.each do |key, expected_markup|
-                full_editor_field.set("hello world")
-                select_dtext(6, 11)
+                @full_editor_field.set("hello world")
+                select_dtext(6, 11, selector: @full_editor_selector)
 
-                full_editor_field.send_keys([:control, key])
+                @full_editor_field.send_keys([:control, key])
 
-                assert_equal expected_markup, full_editor_field.value, "Ctrl+#{key} should wrap the selected word in #{expected_markup.inspect}"
+                assert_equal expected_markup, @full_editor_field.value, "Ctrl+#{key} should wrap the selected word in #{expected_markup.inspect}"
               end
             end
           end
 
           context "the edit/preview toggle" do
             should "work" do
-              full_editor_field.set("[[1girl]]")
+              @full_editor_field.set("[[1girl]]")
 
               find(".new-comment a[title^='Preview']").click
 
-              assert_hidden ".new-comment textarea.dtext"
+              assert_hidden @full_editor_selector
               assert_selector ".new-comment .dtext-preview .dtext-wiki-link", text: "1girl"
 
               find(".new-comment a", text: "Edit").click
 
-              assert_visible ".new-comment textarea.dtext"
-              assert_equal "[[1girl]]", full_editor_field.value
+              assert_visible @full_editor_selector
+              assert_equal "[[1girl]]", @full_editor_field.value
             end
           end
 
           context "the length counter" do
             should "update as text is typed, and turn red past the max length" do
-              full_editor_field.set("x" * 5000)
+              @full_editor_field.set("x" * 5000)
               assert_hidden ".new-comment .dtext-input-counter-text"
 
-              full_editor_field.set("x" * 12_001)
+              @full_editor_field.set("x" * 12_001)
               assert_visible ".new-comment .dtext-input-counter-text", text: "12001/15000"
               assert_no_selector ".new-comment .dtext-input-counter-text.text-error"
 
-              full_editor_field.set("x" * 15_001)
+              @full_editor_field.set("x" * 15_001)
               assert_selector ".new-comment .dtext-input-counter-text.text-error", text: "15001/15000"
             end
           end
