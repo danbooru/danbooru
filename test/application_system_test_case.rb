@@ -12,7 +12,7 @@ Capybara.configure do |config|
   config.server_host = "0.0.0.0"
   config.app_host = "http://#{Socket.ip_address_list.find { |address| address.ipv4? && !address.ipv4_loopback? }.ip_address}"
   config.always_include_port = true
-  config.default_max_wait_time = 10
+  config.default_max_wait_time = 5
 end
 
 module IgnoreMissingDrbUnixSocket
