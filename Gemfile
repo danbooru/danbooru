@@ -95,5 +95,4 @@ group :test do
   gem "mock_redis", "~> 0"
   gem "capybara", "~> 3"
   gem "capybara-playwright-driver", "~> 0.5"
-  gem "testcontainers-core", "~> 0", require: false
 end

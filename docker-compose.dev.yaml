@@ -248,6 +248,11 @@ services:
     ipc: host
     shm_size: 2g
 
+  sftp:
+    # sftp is required to run the storage manager tests @ `test/unit/storage_manager_test.rb`
+    image: atmoz/sftp
+    command: "testuser:testpass:::upload"
+    profiles: ["test"]
 
 configs:
   nginx:

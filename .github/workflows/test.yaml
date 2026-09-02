@@ -114,10 +114,14 @@ jobs:
           --init
           --shm-size=2g
           --ipc=host
+
+      sftp:
+        image: atmoz/sftp
+        command: testuser:testpass:::upload
+
     steps:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 30
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
         with:
           limit-access-to-actor: true
