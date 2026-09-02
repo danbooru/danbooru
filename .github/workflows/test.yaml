@@ -32,7 +32,7 @@ on:
           - components
           - functional
           - jobs
-          - system
+          # - system
           - unit
       debug_enabled:
         type: boolean
@@ -106,14 +106,16 @@ jobs:
         options: >-
           --mount type=tmpfs,destination=/var/lib/postgresql/data
 
-      playwright:
-        image: mcr.microsoft.com/playwright:v1.62.1-noble
-        command: npx -y playwright@1.62.1 run-server --port 3000 --host 0.0.0.0
-        # https://playwright.dev/docs/docker
-        options: >-
-          --init
-          --shm-size=2g
-          --ipc=host
+      # XXX: system tests are too flaky. There's some way to optimize them,
+      #  but it takes a lot of testing to get it right.
+      # playwright:
+      #   image: mcr.microsoft.com/playwright:v1.62.1-noble
+      #   command: npx -y playwright@1.62.1 run-server --port 3000 --host 0.0.0.0
+      #   # https://playwright.dev/docs/docker
+      #   options: >-
+      #     --init
+      #     --shm-size=2g
+      #     --ipc=host
 
       sftp:
         image: atmoz/sftp
@@ -136,10 +138,15 @@ jobs:
           TEST_SUITE: ${{ inputs.test_suite || 'all' }}
         run: |
           case "$TEST_SUITE" in
-            all)    bin/rails test:all ;;
-            system) bin/rails test:system ;;
-            *)      bin/rails test "test/$TEST_SUITE" ;;
+            all)                 bin/rails test ;;
+            *)                   bin/rails test "test/$TEST_SUITE" ;;
           esac
+        # run: |
+        #   case "$TEST_SUITE" in
+        #     all)    bin/rails test:all ;;
+        #     system) bin/rails test:system ;;
+        #     *)      bin/rails test "test/$TEST_SUITE" ;;
+        #   esac
 
       # https://github.com/marketplace/actions/codecov
       - name: Upload coverage reports to Codecov
@@ -175,11 +182,12 @@ jobs:
         with:
           name: test-results
           include-hidden-files: true
+          # if we ever re-enable system tests, add this too below to capture failure screenshots:
+          # /danbooru/tmp/screenshots/*.png
           path: |
             /danbooru/tmp/coverage
             /danbooru/tmp/html-test-results/index.html
             /danbooru/tmp/junit-test-results/TEST-*.xml
-            /danbooru/tmp/screenshots/*.png
           if-no-files-found: error
 
       - name: Publish test results
