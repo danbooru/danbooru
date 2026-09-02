@@ -236,6 +236,24 @@ services:
     stdin_open: true
     tty: true
 
+  # Optional services required for e2e testing
+  # These only run when the `--profile test` flag is passed to docker compose.
+
+  playwright:
+    # playwright is required to run the e2e tests found @ `test/system`
+    image: mcr.microsoft.com/playwright:v1.62.1-noble
+    command: "npx -y playwright@1.62.1 run-server --port 3000 --host 0.0.0.0"
+    profiles: ["test"]
+    init: true
+    ipc: host
+    shm_size: 2g
+
+  sftp:
+    # sftp is required to run the storage manager tests @ `test/unit/storage_manager_test.rb`
+    image: atmoz/sftp
+    command: "testuser:testpass:::upload"
+    profiles: ["test"]
+
 configs:
   nginx:
     file: config/nginx.conf

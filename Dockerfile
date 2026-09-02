@@ -63,6 +63,9 @@ RUN <<EOS
 
     Dir::Log::History "/dev/null";
     Dir::Log::Terminal "/dev/null";
+
+    # Handle snapshot.ubuntu.com timeouts more gracefully
+    Acquire::Retries "5";
 EOF
 
   apt-get install --update -y --no-install-recommends ca-certificates
