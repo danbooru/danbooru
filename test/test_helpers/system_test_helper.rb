@@ -83,6 +83,12 @@ module SystemTestHelper
     page.driver.with_playwright_page { |playwright_page| playwright_page.keyboard.press(key) }
   end
 
+  # @param element [Capybara::Node::Element] the element to click, e.g. from `find`.
+  # @param message [String, nil] the expected confirm message, or nil to accept any.
+  def click_and_accept_confirm(element, message = nil)
+    accept_confirm(message) { element.native.click(noWaitAfter: true) }
+  end
+
   # @param selector [String] a CSS selector for the element.
   def assert_visible(selector, **options)
     assert_selector selector, visible: :visible, **options
@@ -127,7 +133,7 @@ module SystemTestHelper
   def assert_clicked_autocomplete_equals(expected_result, text, selector: "#tags")
     field = autocomplete(selector, text)
 
-    first("ul.ui-autocomplete li").click
+    first("ul.ui-autocomplete li").click(noWaitAfter: true)
     assert_equal(expected_result, field.value)
   end
 
