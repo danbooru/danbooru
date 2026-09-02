@@ -34,6 +34,7 @@ This file provides guidance for coding agents working in this repository. It's m
 - Don't keep old code around as a fallback path. If the old code is wrong, just fix it instead of leaving it in place.
 - Don't introduce unnecessary abstractions, indirections, or helper methods. Don't add methods only used in one place.
 - Avoid loops and mutation. Prefer functional transformations and immutable data instead.
+- Don't add pointless or overly verbose comments. Keep them brief and use plain, simple english.
 
 ## Commands
 
