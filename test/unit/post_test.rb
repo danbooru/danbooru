@@ -220,12 +220,12 @@ class PostTest < ActiveSupport::TestCase
         p1 = create(:post)
         p2 = create(:post)
 
-        # Simulate a race condition in tagging.
+        # Simulate a race condition where two posts end up with each other as parent (see issue #6324).
         p1.update_column(:parent_id, p2.id) # rubocop:disable Rails/SkipsModelValidations
         p2.update_column(:parent_id, p1.id) # rubocop:disable Rails/SkipsModelValidations
 
         assert_nothing_raised do
-          p1.update(tag_string: "abc")
+          p1.update(parent_id: nil)
         end
 
         assert_equal(true, p1.valid?)
