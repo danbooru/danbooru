@@ -497,7 +497,9 @@ class User < ApplicationRecord
 
     module ClassMethods
       def owner
-        User.find_by!(level: Levels::OWNER)
+        # Some downstream boorus have more than one owner-level user.
+        # For them we fall back to the first owner by ID.
+        User.where(level: Levels::OWNER).first!
       end
 
       def system
