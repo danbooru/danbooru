@@ -57,7 +57,7 @@ class StorageManagerTest < ActiveSupport::TestCase
       begin
         TCPSocket.new(SFTP_HOST, SFTP_PORT).close
       rescue StandardError
-        skip "The SFTP server (#{SFTP_HOST}:#{SFTP_PORT}) is not reachable - run `bin/dev --profile test up`"
+        skip "The SFTP server (#{SFTP_HOST}:#{SFTP_PORT}) is not reachable - run `bin/dev --profile test sftp up -d`"
       end
 
       # Use a fresh, randomly-named directory so tests don't collide with leftover files from previous runs against the
