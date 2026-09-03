@@ -795,9 +795,9 @@ class Post < ApplicationRecord
 
     # @return [Integer] The number of levels of child posts this post has. A post with no children has height 0; a post
     # with children but no grandchildren has height 1; a post with grandchildren but no great-grandchildren has height 2; etc.
-    def child_height
-      if children.present?
-        children.map(&:child_height).max + 1
+    def child_height(ancestors = [])
+      if children.present? && !in?(ancestors)
+        children.map { |child| child.child_height(ancestors + [self]) }.max + 1
       else
         0
       end

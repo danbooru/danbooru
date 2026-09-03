@@ -216,6 +216,23 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(["Post cannot have itself as a parent"], p3.errors[:base])
       end
 
+      should "not raise a stack error when editing a post whose parent-child relationship already forms a cycle" do
+        p1 = create(:post)
+        p2 = create(:post)
+
+        # Simulate a race condition in tagging.
+        p1.update_column(:parent_id, p2.id) # rubocop:disable Rails/SkipsModelValidations
+        p2.update_column(:parent_id, p1.id) # rubocop:disable Rails/SkipsModelValidations
+
+        assert_nothing_raised do
+          p1.update(tag_string: "abc")
+        end
+
+        assert_equal(true, p1.valid?)
+        assert_nil(p1.reload.parent_id)
+        assert_equal(p1.id, p2.reload.parent_id)
+      end
+
       should "not allow parent-child relationships more than 4 levels deep" do
         p1 = create(:post, parent: nil)
         p2 = create(:post, parent: p1)
