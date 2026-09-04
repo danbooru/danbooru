@@ -71,7 +71,7 @@ group :development do
   gem "rubocop-rails", "~> 2", require: false
   gem "rubocop-factory_bot", "~> 2", require: false
   # gem 'meta_request'
-  gem "rack-mini-profiler", "~> 4"
+  gem "rack-mini-profiler", "~> 5"
   gem "stackprof", "~> 0.2"
   gem "flamegraph", "~> 0.9"
   gem "memory_profiler", "~> 1"
