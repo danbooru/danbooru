@@ -44,11 +44,11 @@ defaults:
   run:
     working-directory: /danbooru
 
-# Don't run the test suite multiple times for the same commit.
-# For `workflow_run`, github.sha is the head of the default branch, not the commit that was built.
-# Use workflow_run.head_sha, and fall back to github.sha for workflow_dispatch.
+# Don't run the test suite multiple times for the same branch.
+# For `workflow_run`, github.ref_name is the default branch, not the branch that
+# was built, so use workflow_run.head_branch first.
 concurrency:
-  group: "test-${{ github.event.workflow_run.head_sha || github.sha }}"
+  group: "test-${{ github.event.workflow_run.head_branch || github.ref_name }}"
   cancel-in-progress: true
 
 jobs:
@@ -59,8 +59,8 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     container:
-      # Same reason as above. github.sha can point at a newer commit whose
-      # image does not exist yet, which gives a `manifest unknown` failure.
+      # github.sha can point at a newer commit whose image does not exist yet,
+      # which gives a `manifest unknown` failure.
       image: ghcr.io/${{ github.repository }}:development-${{ github.event.workflow_run.head_sha || github.sha }}
       options: --user root -v /var/run/docker.sock:/var/run/docker.sock
 
