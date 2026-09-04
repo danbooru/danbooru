@@ -15,21 +15,21 @@
     <h2>Status</h2>
     <ul>
       <li>
-        <%= link_to "status:pending", current_page_path(search: search_params.merge(tags: "status:pending")) %>
+        <%= link_to "status:pending", current_page_path(search: search_params.merge(tags: "status:pending"), page: nil) %>
         <span class="post-count"><%= @pending_post_count %></span>
       </li>
       <li>
-        <%= link_to "status:flagged", current_page_path(search: search_params.merge(tags: "status:flagged")) %>
+        <%= link_to "status:flagged", current_page_path(search: search_params.merge(tags: "status:flagged"), page: nil) %>
         <span class="post-count"><%= @flagged_post_count %></span>
       </li>
       <li>
-        <%= link_to "status:appealed", current_page_path(search: search_params.merge(tags: "status:appealed")) %>
+        <%= link_to "status:appealed", current_page_path(search: search_params.merge(tags: "status:appealed"), page: nil) %>
         <span class="post-count"><%= @appealed_post_count %></span>
       </li>
 
       <% @disapproval_reasons.each do |reason, count| %>
         <li>
-          <%= link_to "disapproved:#{reason}", current_page_path(search: search_params.merge(tags: "disapproved:#{reason}")) %>
+          <%= link_to "disapproved:#{reason}", current_page_path(search: search_params.merge(tags: "disapproved:#{reason}"), page: nil) %>
           <span class="post-count"><%= count %></span>
         </li>
       <% end %>
@@ -41,7 +41,7 @@
     <ul>
       <% @uploaders.each do |uploader, count| %>
         <li>
-          <%= link_to_user uploader, url: current_page_path(search: search_params.merge(tags: "user:#{uploader.name}")) %>
+          <%= link_to_user uploader, url: current_page_path(search: search_params.merge(tags: "user:#{uploader.name}"), page: nil) %>
           <span class="post-count"><%= count %></span>
         </li>
       <% end %>
