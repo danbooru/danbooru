@@ -11,6 +11,19 @@ class VideoComponentTest < ViewComponent::TestCase
       assert_css(".video-component")
       assert_css(".video-component video.video-variant")
       assert_css(".video-component[data-has-sound='true']")
+      assert_css(".shortcuts-help")
+      assert_text("Mute")
+      assert_text("Volume")
+    end
+
+    should "not render the mute shortcut for soundless videos" do
+      media_asset = create(:media_asset, file_ext: "mp4", duration: 30)
+
+      render_inline(VideoComponent.new(media_asset))
+
+      assert_css(".shortcuts-help")
+      assert_no_text("Mute")
+      assert_no_text("Volume")
     end
 
     should "render ugoira variants" do

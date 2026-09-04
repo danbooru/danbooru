@@ -119,7 +119,7 @@
                   <%= unsticky_icon %> Unsticky
                 <% end %>
               <% else %>
-                <%= link_to comment_path(comment.id), "data-params": { comment: { is_sticky: true }, **component_state }.to_param, method: :put, remote: true do %>
+                <%= link_to comment_path(comment.id), "data-params": { comment: { is_sticky: true }, **component_state }.to_param, "data-confirm": "Are you sure you want to sticky this comment?", method: :put, remote: true do %>
                   <%= sticky_icon %> Sticky
                 <% end %>
               <% end %>

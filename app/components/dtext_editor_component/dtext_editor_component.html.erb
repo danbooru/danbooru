@@ -1,5 +1,13 @@
 <% if inline? %>
-  <%= form.text_field(input_name, input_html) %>
+  <% if input_html[:maxlength].present? %>
+    <% max_length = input_html[:maxlength] %>
+    <span class="dtext-input-counter-text text-xs pointer-events-none select-none"
+          x-text="`${length}/<%= max_length %>`"
+          x-bind:class="{ 'text-error': length > <%= max_length %> }"><%= current_length %>/<%= max_length %></span>
+    <%= form.text_field(input_name, input_html.except(:maxlength).merge("x-on:input": "length = $event.target.value.length")) %>
+  <% else %>
+    <%= form.text_field(input_name, input_html) %>
+  <% end %>
 <% else %>
   <div class="dtext-editor relative w-fit <%= editor_html[:class] %>"
        x-bind:class="{ 'dtext-editor-loading inert': editor.loading }"
@@ -11,8 +19,18 @@
        <% end %>
        spellcheck="true">
     <div class="dtext-editor-menu flex justify-between border-t border-x rounded-t w-full">
-      <a class="p-2 inactive-link cursor-pointer select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
-      <a class="p-2 inactive-link cursor-pointer select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
+      <div class="flex items-center">
+        <a class="p-2 inactive-link cursor-pointer select-none flex items-center gap-1" x-show="editor.editMode" x-on:click="editor.toggleMode()" title="Preview (Ctrl+P)"><%= eye_icon(class: "text-sm") %> Preview</a>
+        <a class="p-2 inactive-link cursor-pointer select-none flex items-center gap-1" x-show="editor.previewMode" x-on:click="editor.toggleMode()" data-shortcut="ctrl+p" title="Edit (Ctrl+P)" x-cloak><%= edit_icon(class: "text-sm") %> Edit</a>
+
+        <% if input_html[:maxlength].present? %>
+          <span class="dtext-input-counter-text ml-4 text-xs pointer-events-none select-none"
+                x-show="editor.dtext.length >= <%= input_html[:maxlength] %> * 0.8"
+                x-text="`${editor.dtext.length}/<%= input_html[:maxlength] %>`"
+                x-bind:class="{ 'text-error': editor.dtext.length > <%= input_html[:maxlength] %> }"
+                x-cloak><%= current_length %>/<%= input_html[:maxlength] %></span>
+        <% end %>
+      </div>
 
       <div class="flex items-center" x-show="editor.editMode">
         <a class="p-2 inactive-link cursor-pointer" x-on:click.prevent="editor.toggleBold()" title="Bold (Ctrl+B)"><%= bold_icon %></a>
@@ -101,7 +119,7 @@
     <div class="dtext-editor-body relative resize overflow-hidden">
       <%= form.text_area(
         input_name,
-        input_html.merge(class: [*input_html[:class], "w-full h-full m-0 p-1 resize-none thin-scrollbar"],
+        input_html.except(:maxlength).merge(class: [*input_html[:class], "w-full h-full m-0 p-1 resize-none thin-scrollbar"],
         "x-model.fill": "editor.dtext",
         "x-show": "editor.editMode",
         "x-on:keydown.capture": "editor.onKeyDown($event)",

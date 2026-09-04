@@ -5,7 +5,21 @@ class MediaFileJpgTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "jpg",
-        failures: [],
+        "test/files/jpg/test-blank.jpg" => [101, 150, "5738f4938841ca43e113ab72f5e4ac75"],
+        "test/files/jpg/test-cmm-kcms.jpg" => nil,
+        "test/files/jpg/test-cmyk-no-profile.jpg" => [115, 150, "055ceb66ea27d8e2d0901f920a0dd9b6"],
+        "test/files/jpg/test-corrupt.jpg" => [150, 113, "ed38233fe8da57d68ccc7c071401240c"],
+        "test/files/jpg/test-exif-small.jpg" => [132, 150, "99e9069f5c33fc461e994766351d683c"],
+        "test/files/jpg/test-grey-no-profile.jpg" => [150, 81, "941ef8ee1691dc0d12150bc4477e2bbb"],
+        "test/files/jpg/test-grey-rgb-profile-2.jpg" => [56, 150, "72166c88e8854d681522a579075b5d16"],
+        "test/files/jpg/test-grey-rgb-profile.jpg" => [140, 150, "46f7d7195ef238b69224f2ac4c911855"],
+        "test/files/jpg/test-large.jpg" => [150, 101, "0e1e93a3135003d996e79a44d891836d"],
+        "test/files/jpg/test-rotation-180.jpg" => [66, 100, "51f070c0d4b11bc96e1879f1a27780c6"],
+        "test/files/jpg/test-rotation-270cw-large.jpg" => [150, 100, "8bf63a71b8da0ba8670527480b121d98"],
+        "test/files/jpg/test-rotation-270cw.jpg" => [100, 66, "ab76a88ae2affe7029530a8c0750e5ca"],
+        "test/files/jpg/test-rotation-90cw.jpg" => [96, 128, "fe2e9d2d7c58125ed356132eadf0f3d6"],
+        "test/files/jpg/test-weird-profile.jpg" => [120, 150, "2c0eafeeff5ea5de5c7547792281f617"],
+        "test/files/jpg/test.jpg" => [150, 101, "636a121d505d30531452e6985e8f5b7c"],
       )
     end
   end
@@ -185,11 +199,6 @@ class MediaFileJpgTest < ActiveSupport::TestCase
         "Adobe:APP14Flags1" => "(none)",
         "Adobe:ColorTransform" => "YCCK",
       }, file.metadata.to_h)
-    end
-
-    should "generate a thumbnail with the correct colors" do
-      file = MediaFile.open("test/files/jpg/test-cmyk-no-profile.jpg").preview(180, 180)
-      assert_equal("7577481a2a688e6e5e9ec901addcf0e3", file.pixel_hash)
     end
   end
 
@@ -877,6 +886,69 @@ class MediaFileJpgTest < ActiveSupport::TestCase
         "ICC_Profile:RedMatrixColumn" => "0.43594 0.22244 0.0139",
         "ICC_Profile:GreenMatrixColumn" => "0.38524 0.71703 0.09709",
         "ICC_Profile:BlueMatrixColumn" => "0.14287 0.06055 0.71329",
+      }, file.metadata.to_h)
+    end
+  end
+
+  context "a JPEG with a KCMS CMM tag" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/jpg/test-cmm-kcms.jpg")
+
+      assert_equal(64, file.width)
+      assert_equal(64, file.height)
+      assert_equal(3529, file.file_size)
+      assert_equal(:jpg, file.file_ext)
+      assert_equal("image/jpeg", file.mime_type)
+      assert_equal("ebdc4b2a5f77344785ded3d1254d07ca", file.md5)
+      assert_equal("ebdc4b2a5f77344785ded3d1254d07ca", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_nil(file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "JPEG",
+        "File:ExifByteOrder" => "Little-endian (Intel, II)",
+        "File:ImageWidth" => 64,
+        "File:ImageHeight" => 64,
+        "File:EncodingProcess" => "Baseline DCT, Huffman coding",
+        "File:BitsPerSample" => 8,
+        "File:ColorComponents" => 3,
+        "File:YCbCrSubSampling" => "YCbCr4:4:4 (1 1)",
+        "IFD0:Orientation" => "Horizontal (normal)",
+        "IFD0:XResolution" => 25.4,
+        "IFD0:YResolution" => 25.4,
+        "IFD0:ResolutionUnit" => "inches",
+        "IFD0:YCbCrPositioning" => "Centered",
+        "ExifIFD:ExifVersion" => "0210",
+        "ExifIFD:ComponentsConfiguration" => "Y, Cb, Cr, -",
+        "ExifIFD:FlashpixVersion" => "0100",
+        "ExifIFD:ColorSpace" => "Uncalibrated",
+        "ExifIFD:ExifImageWidth" => 64,
+        "ExifIFD:ExifImageHeight" => 64,
+        "ICC-header:ProfileCMMType" => "Unknown (KCMS)",
+        "ICC-header:ProfileVersion" => "2.0.0",
+        "ICC-header:ProfileClass" => "Display Device Profile",
+        "ICC-header:ColorSpaceData" => "RGB ",
+        "ICC-header:ProfileConnectionSpace" => "XYZ ",
+        "ICC-header:ProfileDateTime" => "2020:03:02 16:03:16",
+        "ICC-header:ProfileFileSignature" => "acsp",
+        "ICC-header:PrimaryPlatform" => "Microsoft Corporation",
+        "ICC-header:CMMFlags" => "Not Embedded, Independent",
+        "ICC-header:DeviceManufacturer" => "Unknown (ASUS)",
+        "ICC-header:DeviceModel" => "",
+        "ICC-header:DeviceAttributes" => "Reflective, Glossy, Positive, Color",
+        "ICC-header:RenderingIntent" => "Perceptual",
+        "ICC-header:ConnectionSpaceIlluminant" => "0.96419 1 0.82487",
+        "ICC-header:ProfileCreator" => "Kodak",
+        "ICC-header:ProfileID" => 0,
+        "ICC_Profile:ProfileCopyright" => "Copyright (c) 2020 Asus Inc.",
+        "ICC_Profile:MediaWhitePoint" => "0.96419 1 0.82487",
+        "ICC_Profile:ProfileDescription" => "ASUS VG27AQL1A Color Profile,D6500",
+        "ICC_Profile:GreenMatrixColumn" => "0.31316 0.71535 0.06567",
+        "ICC_Profile:BlueMatrixColumn" => "0.14601 0.05434 0.75412",
+        "ICC_Profile:ChromaticAdaptation" => "1.04791 0.02293 -0.0502 0.0296 0.99046 -0.01707 -0.00925 0.01506 0.75179",
       }, file.metadata.to_h)
     end
   end

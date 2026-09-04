@@ -133,6 +133,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2], "-*c -a*a")
     end
 
+    should "not exclude a tag that's explicitly searched for from a negated wildcard that would otherwise match it" do
+      post1 = create(:post, tag_string: "aaa")
+      post2 = create(:post, tag_string: "aaa aab")
+
+      assert_tag_match([post1], "aaa -a*")
+      assert_tag_match([post2, post1], "aaa")
+
+      assert_tag_match([], "aaa -a* -aaa")
+    end
+
     should "return posts for a complex search with multiple AND, OR, and NOT tags" do
       post1 = create(:post, tag_string: "original")
       post2 = create(:post, tag_string: "smile")
@@ -1174,6 +1184,40 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "source:'none'")
       assert_tag_match([], "source:none source:abcde")
       assert_tag_match([], "source:abcde source:xzy")
+    end
+
+    should "return posts for a source search with escaped wildcards (issue #5286)" do
+      post1 = create(:post, source: "* *")
+      post2 = create(:post, source: "*a*")
+      post3 = create(:post, source: "foo bar")
+
+      # unquoted: a backslash-escaped "*" is matched literally, not as a wildcard
+      assert_tag_match([post2], 'source:\*a\*')
+      assert_tag_match([post1], 'source:\*\ \*')
+
+      # quoted: a backslash-escaped "*" is also matched literally, instead of breaking the search
+      assert_tag_match([post2], 'source:"\*a\*"')
+      assert_tag_match([post1], 'source:"\* \*"')
+      assert_tag_match([post2], "source:'\\*a\\*'")
+      assert_tag_match([post1], "source:'\\* \\*'")
+
+      # quoted, unescaped: "*" is still treated as a wildcard
+      assert_tag_match([post3, post1], 'source:"* *"')
+    end
+
+    should "return posts for a source search with escaped backslashes and spaces (issue #5281)" do
+      post = create(:post, source: 'a \b')
+
+      # unquoted: the space has to be escaped to be part of the value
+      assert_tag_match([post], 'source:a\ \b')
+
+      # quoted: spaces don't need escaping, and a single backslash is matched literally
+      assert_tag_match([post], 'source:"a \b"')
+      assert_tag_match([post], "source:'a \\b'")
+
+      # quoted: a doubled backslash is also matched as a single literal backslash
+      assert_tag_match([post], 'source:"a \\\\b"')
+      assert_tag_match([post], "source:'a \\\\b'")
     end
 
     should "return posts for a pixiv source search" do

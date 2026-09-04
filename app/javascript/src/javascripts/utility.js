@@ -45,6 +45,11 @@ Utility.dialog = function(title, html) {
     title: title,
     width: 700,
     modal: true,
+    open: function() {
+      // Move the cursor to the end of the field instead of the jQuery UI default
+      // of leaving it at the start when the field is pre-filled (e.g. when editing).
+      $(this).find("[autofocus]").selectEnd();
+    },
     close: function() {
       // Defer removing the dialog to avoid detaching the <form> tag before the
       // form is submitted (which would prevent the submission from going through).

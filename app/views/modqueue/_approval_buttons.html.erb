@@ -18,7 +18,7 @@
     <% end %>
 
     <% menu.with_item do %>
-      <%= link_to "Detailed Rejection", "#", "data-post-id": post.id, class: "detailed-rejection-link" %>
+      <%= link_to "Detailed Rejection", "#", "data-post-id": post.id, "data-reason": disapproval&.reason, "data-message": disapproval&.message, class: "detailed-rejection-link" %>
     <% end %>
   <% end %>
 </div>

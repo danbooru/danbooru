@@ -695,35 +695,17 @@ module Danbooru
       true
     end
 
+    # Whether to enable auto demotion of inactive approvers.
+    def approver_pruning_enabled?
+      true
+    end
+
     # If defined, Danbooru will automatically post new forum posts to the
     # Discord channel belonging to this webhook.
     def discord_webhook_id
     end
 
     def discord_webhook_secret
-    end
-
-    # Settings used for Discord slash commands.
-    #
-    # * Go to https://discord.com/developers/applications
-    # * Create an application.
-    # * Copy the client ID and public key.
-    # * Create a bot user.
-    # * Copy the bot token.
-    # * Go to the OAuth2 page, select the `bot` and `applications.commands`
-    #   scopes, and the `Administrator` permission, then follow the oauth2
-    #   link to add the bot to the Discord server.
-    def discord_application_client_id
-    end
-
-    def discord_application_public_key
-    end
-
-    def discord_bot_token
-    end
-
-    # The ID of the Discord server to register slash commands for.
-    def discord_guild_id
     end
 
     # you should override this

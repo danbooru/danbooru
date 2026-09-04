@@ -5,7 +5,16 @@ class MediaFilePngTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "png",
-        failures: ["test/files/png/empty.png"],
+        "test/files/png/alpha.png" => [85, 62, "97ffccd02f20bde66e9619bf9ac488d8"],
+        "test/files/png/empty.png" => nil,
+        "test/files/png/jpg.png" => [16, 16, "3e965ef667d55e36e999828781cae4dd"],
+        "test/files/png/test-corrupt.png" => nil,
+        "test/files/png/test-rotation-bad-chunk.png" => [128, 96, "f0c3b707b69c92c5f27bf0b4f8100aad"],
+        "test/files/png/test-rotation-good-chunk.png" => [64, 128, "8aea457981c3bac825b50cf64b787398"],
+        "test/files/png/test.png" => [113, 150, "1601c102d365a1de190daec46301aeeb"],
+
+        # XXX: this is the wrong thumbnail. See issue #5621. When this changes, hopefully it means libvips will have fixed this issue.
+        "test/files/png/test-smpte-st-2084-profile.png" => [150, 150, "aae0d2490ff350bf7965e0bcf98959e2"],
       )
     end
   end
@@ -108,9 +117,9 @@ class MediaFilePngTest < ActiveSupport::TestCase
     end
   end
 
-  context "a PNG with a 90 degree clockwise EXIF orientation flag" do
+  context "a PNG with a non-standard EXIF orientation flag" do
     should "be parsed correctly" do
-      file = MediaFile.open("test/files/png/test-rotation-90cw.png")
+      file = MediaFile.open("test/files/png/test-rotation-bad-chunk.png")
 
       assert_equal(128, file.width)
       assert_equal(96, file.height)
@@ -166,6 +175,52 @@ class MediaFilePngTest < ActiveSupport::TestCase
         "ExifIFD:ColorSpace" => "Uncalibrated",
         "ExifIFD:ExifImageWidth" => 128,
         "ExifIFD:ExifImageHeight" => 96,
+      }, file.metadata.to_h)
+    end
+  end
+
+  context "a PNG with a standard EXIF orientation flag" do
+    should "be parsed correctly, with the width and height swapped to match the rotation" do
+      file = MediaFile.open("test/files/png/test-rotation-good-chunk.png")
+
+      assert_equal(64, file.width)
+      assert_equal(128, file.height)
+      assert_equal(21_557, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("af7c636bf780b300a9070ed51accf80e", file.md5)
+      assert_equal("74a09fe28c95001f3ddd251a9fbb5d3a", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(1, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "PNG",
+        "File:ExifByteOrder" => "Little-endian (Intel, II)",
+        "PNG:ImageWidth" => 128,
+        "PNG:ImageHeight" => 64,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Noninterlaced",
+        "IFD0:Orientation" => "Rotate 90 CW",
+        "IFD0:XResolution" => 144,
+        "IFD0:YResolution" => 144,
+        "IFD0:ResolutionUnit" => "inches",
+        "IFD0:YCbCrPositioning" => "Centered",
+        "ExifIFD:ExifVersion" => "0210",
+        "ExifIFD:ComponentsConfiguration" => "Y, Cb, Cr, -",
+        "ExifIFD:UserComment" => "Sc",
+        "ExifIFD:FlashpixVersion" => "0100",
+        "ExifIFD:ColorSpace" => "sRGB",
+        "ExifIFD:ExifImageWidth" => 128,
+        "ExifIFD:ExifImageHeight" => 64,
+        "PNG-pHYs:PixelsPerUnitX" => 1000,
+        "PNG-pHYs:PixelsPerUnitY" => 1000,
+        "PNG-pHYs:PixelUnits" => "meters",
       }, file.metadata.to_h)
     end
   end
@@ -228,6 +283,62 @@ class MediaFilePngTest < ActiveSupport::TestCase
         "IFD0:ResolutionUnit" => "inches",
         "IFD0:Software" => "Paint.NET v3.5.11",
         "IFD0:Exif_0x0301" => 2.199978,
+      }, file.metadata.to_h)
+    end
+  end
+
+  context "a PNG with a SMPTE ST 2084 (PQ) color profile" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/png/test-smpte-st-2084-profile.png")
+
+      assert_equal(500, file.width)
+      assert_equal(500, file.height)
+      assert_equal(7564, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("6ed0112a3660aabfade57b1a1e09a1dd", file.md5)
+      assert_equal("2414f820b2ec4d91867c10e1a59d493b", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(1, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "PNG",
+        "PNG:ImageWidth" => 500,
+        "PNG:ImageHeight" => 500,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Adam7 Interlace",
+        "PNG:ProfileName" => "ITUR_2100_PQ_FULL",
+        "ICC-header:ProfileCMMType" => "Adobe Systems Inc.",
+        "ICC-header:ProfileVersion" => "4.2.0",
+        "ICC-header:ProfileClass" => "Display Device Profile",
+        "ICC-header:ColorSpaceData" => "RGB ",
+        "ICC-header:ProfileConnectionSpace" => "XYZ ",
+        "ICC-header:ProfileDateTime" => "2015:08:25 21:16:58",
+        "ICC-header:ProfileFileSignature" => "acsp",
+        "ICC-header:PrimaryPlatform" => "Unknown ()",
+        "ICC-header:CMMFlags" => "Not Embedded, Independent",
+        "ICC-header:DeviceManufacturer" => "",
+        "ICC-header:DeviceModel" => "",
+        "ICC-header:DeviceAttributes" => "Reflective, Glossy, Positive, Color",
+        "ICC-header:RenderingIntent" => "Media-Relative Colorimetric",
+        "ICC-header:ConnectionSpaceIlluminant" => "0.9642 1 0.82491",
+        "ICC-header:ProfileCreator" => "Adobe Systems Inc.",
+        "ICC-header:ProfileID" => "eeac2efe66dc8a0fae5fea828f2c4ebc",
+        "ICC_Profile:ProfileDescription" => "High Dynamic Range UHDTV Wide Color Gamut Display (Rec. 2020) - SMPTE ST 2084 PQ EOTF",
+        "ICC_Profile:ProfileCopyright" => "Copyright 2015 Adobe Systems Incorporated",
+        "ICC_Profile:MediaWhitePoint" => "0.9642 1 0.82491",
+        "ICC_Profile:ChromaticAdaptation" => "1.0479 0.02292 -0.05022 0.02959 0.99048 -0.01707 -0.00925 0.01508 0.75168",
+        "ICC_Profile:Technology" => "Video Monitor",
+        "ICC_Profile:Luminance" => "0 100 0",
+        "PNG-pHYs:PixelsPerUnitX" => 11_811,
+        "PNG-pHYs:PixelsPerUnitY" => 11_811,
+        "PNG-pHYs:PixelUnits" => "meters",
       }, file.metadata.to_h)
     end
   end

@@ -564,6 +564,12 @@ class Post < ApplicationRecord
         in "downvote", name
           vote!(-1, CurrentUser.user)
 
+        in "-upvote", name
+          unvote!(1, CurrentUser.user)
+
+        in "-downvote", name
+          unvote!(-1, CurrentUser.user)
+
         in "status", "active"
           raise User::PrivilegeError unless CurrentUser.is_approver?
           approvals.create!(user: CurrentUser.user)
@@ -578,7 +584,7 @@ class Post < ApplicationRecord
 
         in "disapproved", reason
           raise User::PrivilegeError unless CurrentUser.is_approver?
-          disapprovals.create!(user: CurrentUser.user, reason: reason.downcase)
+          disapprovals.find_or_initialize_by(user: CurrentUser.user).update!(reason: reason.downcase)
 
         in "child", "none"
           children.each do |post|
@@ -741,6 +747,16 @@ class Post < ApplicationRecord
         reload # PostVote.create modifies our score. Reload to get the new score.
       end
     end
+
+    def unvote!(score, voter)
+      # Ignore unvote if user doesn't have permission to vote.
+      return unless Pundit.policy!(voter, PostVote).create?
+
+      with_lock do
+        votes.active.find_by(user: voter, score: score)&.soft_delete!(updater: voter)
+        reload # PostVote#soft_delete! modifies our score. Reload to get the new score.
+      end
+    end
   end
 
   concerning :ParentMethods do
@@ -779,9 +795,9 @@ class Post < ApplicationRecord
 
     # @return [Integer] The number of levels of child posts this post has. A post with no children has height 0; a post
     # with children but no grandchildren has height 1; a post with grandchildren but no great-grandchildren has height 2; etc.
-    def child_height
-      if children.present?
-        children.map(&:child_height).max + 1
+    def child_height(ancestors = [])
+      if children.present? && !in?(ancestors)
+        children.map { |child| child.child_height(ancestors + [self]) }.max + 1
       else
         0
       end
@@ -874,7 +890,13 @@ class Post < ApplicationRecord
         flags.pending.update!(status: :succeeded)
         appeals.pending.update!(status: :rejected)
 
-        flags.create!(reason: reason, is_deletion: true, creator: user, status: :succeeded)
+        begin
+          flags.create!(reason: reason, is_deletion: true, creator: user, status: :succeeded)
+        rescue ActiveRecord::RecordInvalid => e
+          errors.add(:base, e.record.errors.full_messages.join("; "))
+          raise ActiveRecord::Rollback
+        end
+
         update!(is_deleted: true, is_pending: false, is_flagged: false)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).

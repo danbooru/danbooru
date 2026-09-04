@@ -51,6 +51,8 @@ class TagNameValidator < ActiveModel::EachValidator
 
       if char_tag.present? && char_tag.antecedent_alias.present?
         record.errors.add(attribute, "'#{value}' is not allowed because '#{tag_name}' is aliased to '#{char_tag.antecedent_alias.consequent_name}'")
+      elsif char_tag.present? && char_tag.is_deprecated?
+        record.errors.add(attribute, "'#{value}' is not allowed because '#{tag_name}' is deprecated")
       elsif char_tag.present? && !char_tag.empty? && !char_tag.character?
         record.errors.add(attribute, "'#{value}' is not allowed because '#{tag_name}' is not a character tag")
       end

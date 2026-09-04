@@ -218,6 +218,18 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, TagAlias.exists?(antecedent_name: "artist1", consequent_name: "artist2"))
         end
+
+        should "fail when deprecating a tag" do
+          create(:tag, name: "small_tag", post_count: 10)
+          create(:wiki_page, title: "small_tag", body: "asd")
+          @bulk_update_request = create(:bulk_update_request, script: "deprecate small_tag")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, Tag.find_by(name: "small_tag").is_deprecated?)
+        end
       end
 
       context "for a mod" do
@@ -250,6 +262,75 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, TagImplication.exists?(antecedent_name: "foo_(summer)", consequent_name: "foo", status: "active"))
+        end
+
+        should "succeed when aliasing two small non-artist tags" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
+          create(:tag, name: "char1b", category: Tag.categories.character, post_count: 20)
+          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+          end
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(@mod, @bulk_update_request.approver)
+          assert_equal(true, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b", status: "active"))
+        end
+
+        should "fail when aliasing a tag that's too large" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
+          create(:tag, name: "char1b", category: Tag.categories.character, post_count: 300)
+          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
+        end
+
+        should "succeed when deprecating an empty tag" do
+          create(:tag, name: "no_tag", post_count: 0)
+          create(:wiki_page, title: "no_tag", body: "asd")
+          @bulk_update_request = create(:bulk_update_request, script: "deprecate no_tag")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+          end
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(@mod, @bulk_update_request.approver)
+          assert_equal(true, Tag.find_by(name: "no_tag").is_deprecated?)
+        end
+
+        should "succeed when deprecating a small tag" do
+          create(:tag, name: "small_tag", post_count: 10)
+          create(:wiki_page, title: "small_tag", body: "asd")
+          @bulk_update_request = create(:bulk_update_request, script: "deprecate small_tag")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+          end
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(@mod, @bulk_update_request.approver)
+          assert_equal(true, Tag.find_by(name: "small_tag").is_deprecated?)
+        end
+
+        should "fail when deprecating a tag that's too large" do
+          create(:tag, name: "large_tag", post_count: 300)
+          create(:wiki_page, title: "large_tag", body: "asd")
+          @bulk_update_request = create(:bulk_update_request, script: "deprecate large_tag")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, Tag.find_by(name: "large_tag").is_deprecated?)
         end
       end
 

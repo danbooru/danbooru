@@ -18,6 +18,7 @@ export default class VideoPlayer {
     this.scrubbingVolume = false;
     this.autoplay = this.$container.data("autoplay");
     this.hasSound = this.$container.data("has-sound");
+    this.isPrimary = this.$container.is("#image, .media-asset-image");
     this.currentTime = this.$container.data("start-time");
 
     this._error = null;
@@ -49,7 +50,7 @@ export default class VideoPlayer {
     this.$container.get(0).videoPlayer = this;
 
     $(document).on("visibilitychange", event => this.onVisibilityChange(event));
-    this.$container.on("keydown", event => this.onKeypress(event));
+    $(document).on("keydown", event => this.onKeypress(event));
     this.$container.on("fullscreenchange", event => this.fullscreen = document.fullscreenElement !== null);
     this.$container.find("canvas, video").on("click", event => this.togglePlaying());
     this.$container.find("canvas, video").on("dblclick", event => this.toggleFullscreen(event));
@@ -202,6 +203,22 @@ export default class VideoPlayer {
   }
 
   onKeypress(event) {
+    if (event.ctrlKey || event.metaKey || event.altKey) {
+      return true;
+    }
+
+    // These shortcuts apply to the main video in the page, if there's any.
+    // However, if any other video is hovered, they apply to that one instead,
+    //   but only for the duration of the hovering.
+    let isHovered = this.$container.is(":hover");
+    let isAnyVideoHovered = $(".video-component:hover").length > 0;
+    let isNonVideoFocused = document.activeElement !== document.body && $(document.activeElement).closest(".video-component").length === 0;
+    let isRelevantVideo = isHovered || (this.isPrimary && !isAnyVideoHovered && !isNonVideoFocused);
+
+    if (!isRelevantVideo) {
+      return true;
+    }
+
     if (event.key === " " && !this.scrubbing) {
       this.togglePlaying();
     } else if (event.key === "ArrowLeft" && !this.scrubbing) {

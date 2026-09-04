@@ -1,34 +1,68 @@
 module MediaFileTestHelper
-  # Test preview generation: those we expect to generate should be generated, those we expect to fail should fail.
-  # This, along with the rest of our media file tests, will alert us in case of library updates that fix our broken cases.
-  def should_generate_previews(file_type, failures: [])
+  # Test thumbnail generation: assert that the 150x150 preview generated for every file in test/files/<file_type>
+  # stays the same across dependency updates, or nil for files that are expected to fail to generate a preview at all.
+  #
+  # This helps us discover changes to thumbnail generation early.
+  #
+  # `hashes` must cover every file in test/files/<file_type>; this is checked so that new fixture files don't
+  # silently go untested. If a file is missing, the failure message prints a ready-to-paste line for it.
+  #
+  # @param file_type [String] the directory under test/files/ to glob (e.g. "png", "mp4")
+  # @param hashes [Hash<String, Array<(Integer, Integer, String)>, nil>] a map of file name to [width, height,
+  #   pixel hash], or nil if the file is expected to fail to generate a preview
+  def should_generate_previews(file_type, hashes)
     call_location = caller_locations.find { |loc| loc.path.end_with?("_test.rb") }&.to_s || caller_locations(1, 1).first.to_s
 
-    Dir.glob("test/files/#{file_type}/*.*").each do |file_name|
-      next if file_name.end_with?(".md", ".json")
+    file_names = Dir.glob("test/files/#{file_type}/*.*").reject { |name| name.end_with?(".md", ".json") }
 
-      begin
-        file = MediaFile.open(file_name)
+    missing_file_names = file_names - hashes.keys
+    if missing_file_names.any?
+      lines = missing_file_names.map { |file_name| "        #{preview_hash_line(file_name)}" }
+      flunk("test/files/#{file_type} has untested files; add these lines to the thumbnail test:\n#{lines.join("\n")}\nDefined at: #{call_location}")
+    end
 
-        begin
-          preview = file.preview(150, 150)
-        rescue NotImplementedError => e
-          assert_includes failures, file_name, "#{file_name} was not expected to fail preview generation"
-          return
-        end
+    extra_file_names = hashes.keys - file_names
+    assert_empty(extra_file_names, "hashes has entries for files that no longer exist: #{extra_file_names}\nDefined at: #{call_location}")
 
-        if failures.include? file_name
-          assert_nil preview&.file_ext
-        else
-          assert_equal :jpg, preview&.file_ext
-          assert_includes 1..file.height, preview.height
-          assert_includes 1..file.width, preview.width
-        end
-      rescue Minitest::Assertion => e
-        raise e.exception("On file: #{file_name}\nDefined at: #{call_location}\n#{e.message}")
-      rescue Exception => e # rubocop:disable Lint/RescueException
-        raise e.exception("On file: #{file_name}\nDefined at: #{call_location}\n#{e.message}")
+    hashes.each do |file_name, expected|
+      preview = generate_preview(file_name)
+
+      if expected.nil?
+        assert_nil(preview, "On file: #{file_name}\nDefined at: #{call_location}")
+      else
+        width, height, hash = expected
+        assert_equal([width, height], preview&.dimensions, "On file: #{file_name}\nDefined at: #{call_location}")
+        assert_equal(hash, preview&.pixel_hash, "On file: #{file_name}\nDefined at: #{call_location}")
       end
+    rescue Minitest::Assertion => e
+      raise e.exception("On file: #{file_name}\nDefined at: #{call_location}\n#{e.message}")
+    ensure
+      preview&.close
+    end
+  end
+
+  # @return [MediaFile, nil] the 150x150 preview of the file, or nil if generating a preview isn't supported
+  #   or fails
+  def generate_preview(file_name)
+    MediaFile.open(file_name) do |file|
+      file.preview(150, 150)
+    rescue NotImplementedError
+      nil
+    end
+  end
+
+  # @return [String] a hash literal line (e.g. `"test/files/png/foo.png" => [16, 16, "abc123"],`) suitable for
+  #   pasting directly into a `should_generate_previews` call, describing the current preview for the file
+  def preview_hash_line(file_name)
+    preview = generate_preview(file_name)
+
+    if preview.nil?
+      "#{file_name.inspect} => nil,"
+    else
+      width, height = preview.dimensions
+      hash = preview.pixel_hash
+      preview.close
+      "#{file_name.inspect} => [#{width}, #{height}, #{hash.inspect}],"
     end
   end
 end

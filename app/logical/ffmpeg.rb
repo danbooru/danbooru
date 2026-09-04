@@ -28,7 +28,11 @@ class FFmpeg
     # https://ffmpeg.org/ffmpeg.html#Main-options
     # https://ffmpeg.org/ffmpeg-filters.html#thumbnail
     # "-vf 'select=eq(n\\,0)+eq(key\\,1)+gt(scene\\,0.015),loop=loop=-1:size=2,trim=start_frame=1' -frames:v 1 -f image2"
-    FFmpeg.shell!("ffmpeg -i #{file.path.shellescape} -vf thumbnail=300 -frames:v 1 -y #{vp.path.shellescape}")
+    #
+    # The `scale=iw*sar:ih` corrects for a non-square pixel aspect ratio (PAR); it's a no-op when the PAR is 1:1
+    # (the vast majority of videos). Without it, the preview would be generated from the raw coded frame, which
+    # doesn't match the video's actual displayed dimensions when the PAR isn't square.
+    FFmpeg.shell!("ffmpeg -i #{file.path.shellescape} -vf thumbnail=300,scale=iw*sar:ih -frames:v 1 -y #{vp.path.shellescape}")
 
     MediaFile.open(vp)
   end

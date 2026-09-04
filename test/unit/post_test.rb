@@ -216,6 +216,23 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(["Post cannot have itself as a parent"], p3.errors[:base])
       end
 
+      should "not raise a stack error when editing a post whose parent-child relationship already forms a cycle" do
+        p1 = create(:post)
+        p2 = create(:post)
+
+        # Simulate a race condition where two posts end up with each other as parent (see issue #6324).
+        p1.update_column(:parent_id, p2.id) # rubocop:disable Rails/SkipsModelValidations
+        p2.update_column(:parent_id, p1.id) # rubocop:disable Rails/SkipsModelValidations
+
+        assert_nothing_raised do
+          p1.update(parent_id: nil)
+        end
+
+        assert_equal(true, p1.valid?)
+        assert_nil(p1.reload.parent_id)
+        assert_equal(p1.id, p2.reload.parent_id)
+      end
+
       should "not allow parent-child relationships more than 4 levels deep" do
         p1 = create(:post, parent: nil)
         p2 = create(:post, parent: p1)
@@ -501,6 +518,8 @@ class PostTest < ActiveSupport::TestCase
         should allow_value("touhou -fav:self").for(:tag_string)
         should allow_value("touhou upvote:self").for(:tag_string)
         should allow_value("touhou downvote:self").for(:tag_string)
+        should allow_value("touhou -upvote:self").for(:tag_string)
+        should allow_value("touhou -downvote:self").for(:tag_string)
         should allow_value("touhou parent:1").for(:tag_string)
         should allow_value("touhou child:1").for(:tag_string)
         should allow_value("touhou source:foo").for(:tag_string)
@@ -1085,6 +1104,52 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
+        context "for an upvote or downvote" do
+          should "remove the current user's upvote with -upvote:self" do
+            @post.update(tag_string: "aaa upvote:self")
+            assert_equal(1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(0, @post.reload.score)
+            assert_equal(0, @post.votes.active.where(user: @user).count)
+          end
+
+          should "remove the current user's downvote with -downvote:self" do
+            @post.update(tag_string: "aaa downvote:self")
+            assert_equal(-1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(0, @post.reload.score)
+            assert_equal(0, @post.votes.active.where(user: @user).count)
+          end
+
+          should "not remove a downvote with -upvote:self" do
+            @post.update(tag_string: "aaa downvote:self")
+            assert_equal(-1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(-1, @post.reload.score)
+            assert_equal(1, @post.votes.active.where(user: @user).count)
+          end
+
+          should "not remove an upvote with -downvote:self" do
+            @post.update(tag_string: "aaa upvote:self")
+            assert_equal(1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(1, @post.reload.score)
+            assert_equal(1, @post.votes.active.where(user: @user).count)
+          end
+
+          should "do nothing if the user hasn't voted" do
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(0, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(0, @post.reload.score)
+          end
+        end
+
         context "for a child" do
           should "add children with child:ids" do
             @children = create_list(:post, 3, parent: nil)
@@ -1234,6 +1299,21 @@ class PostTest < ActiveSupport::TestCase
             end
 
             assert_equal(0, @post.disapprovals.count)
+          end
+
+          should "update the reason if the post was already disapproved by the same user with a different reason" do
+            @user = create(:approver)
+
+            as(@user) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa disapproved:disinterest")
+
+              assert_no_difference("@post.disapprovals.count") do
+                @post.update(tag_string: "aaa disapproved:poor_quality")
+              end
+            end
+
+            assert_equal("poor_quality", PostDisapproval.last.reason)
           end
         end
 
@@ -1440,9 +1520,18 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      context "a PNG with the exif orientation flag" do
+      context "a PNG with a valid exif orientation flag" do
+        should "automatically add the exif_rotation tag" do
+          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-good-chunk.png")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("exif_rotation tagme", @post.tag_string)
+        end
+      end
+
+      context "a PNG with an invalid exif orientation flag" do
         should "not add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-90cw.png")
+          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-bad-chunk.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("tagme", @post.tag_string)
@@ -1692,6 +1781,17 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(false, @post.has_tag?("cosplay"))
           assert_equal(true, @post.warnings[:base].grep(/Couldn't add tag/).present?)
           assert_match(/'little_red_riding_hood_\(cosplay\)' is not allowed because 'little_red_riding_hood' is not a character tag/, @post.warnings.full_messages.join)
+        end
+
+        should "not add the _(cosplay) tag if the character tag is deprecated" do
+          create(:tag, name: "hijiri_byakuren", category: Tag.categories.character, is_deprecated: true)
+          @post = create(:post, tag_string: "hijiri_byakuren_(cosplay)")
+
+          assert_equal(false, @post.has_tag?("hijiri_byakuren_(cosplay)"))
+          assert_equal(false, @post.has_tag?("hijiri_byakuren"))
+          assert_equal(false, @post.has_tag?("cosplay"))
+          assert_equal(true, @post.warnings[:base].grep(/Couldn't add tag/).present?)
+          assert_match(/'hijiri_byakuren_\(cosplay\)' is not allowed because 'hijiri_byakuren' is deprecated/, @post.warnings.full_messages.join)
         end
 
         should "allow creating a _(cosplay) tag for an empty general tag" do
