@@ -46,14 +46,14 @@ class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
     old = tags.present? ? tags.find { |tag| tag.name == @old_name } : old_tag
     new = tags.present? ? tags.find { |tag| tag.name == @new_name } : new_tag
 
-    old_is_small = old.present? && old.is_small_tag?
-    old_is_small_artist = old_is_small && old.artist?
-
-    new_is_small = new.blank? || new.empty? || new.is_small_tag?
+    old_is_small_artist = old.present? && old.artist? && old.is_small_tag?
     new_is_small_artist = new.blank? || new.empty? || (new.artist? && new.is_small_tag?)
-
     return User::Levels::BUILDER if old_is_small_artist && new_is_small_artist
+
+    old_is_small = old.blank? || old.empty? || old.is_small_tag?
+    new_is_small = new.blank? || new.empty? || new.is_small_tag?
     return User::Levels::MODERATOR if old_is_small && new_is_small
+
     User::Levels::ADMIN
   end
 end
