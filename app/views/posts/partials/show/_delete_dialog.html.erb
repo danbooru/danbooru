@@ -3,19 +3,7 @@
 
   <%= edit_form_for(post, method: :delete, remote: true) do |f| %>
     <input type="hidden" name="commit" value="Delete">
-
-    <div class="input" x-data="{ length: 0 }">
-      <div class="flex justify-between">
-        <%= f.label :reason, "Reason" %>
-
-        <span class="dtext-input-counter-text text-xs pointer-events-none select-none"
-              x-text="`${length}/<%= PostFlag::MAX_LENGTH %>`"
-              x-bind:class="{ 'text-error': length > <%= PostFlag::MAX_LENGTH %> }">0/<%= PostFlag::MAX_LENGTH %></span>
-      </div>
-
-      <%= f.input :reason, as: :string, label: false, placeholder: "Briefly explain why you are deleting this post", input_html: { value: "", autofocus: true, "x-on:input": "length = $event.target.value.length" } %>
-    </div>
-
+    <%= f.input :reason, as: :string, input_html: { value: "", autofocus: true } %>
     <% if post.parent_id.present? %>
       <%= f.input :move_favorites, label: "Move favorites to parent", as: :boolean, input_html: { checked: false } %>
     <% end %>

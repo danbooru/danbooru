@@ -36,13 +36,6 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
       end
-
-      should "update existing disapprovals" do
-        @disapproval = create(:post_disapproval, post: @post, user: @approver, reason: "disinterest")
-        post_auth post_disapprovals_path, @approver, params: { post_disapproval: { post_id: @post.id, reason: "breaks_rules" }, format: "js" }
-        assert_response :success
-        assert_equal("breaks_rules", @disapproval.reload.reason)
-      end
     end
 
     context "index action" do

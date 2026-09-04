@@ -92,11 +92,6 @@ class ExifTool
       case file_ext
       when :jpg
         metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"])
-      when :png
-        # PNGs can have EXIF orientation metadata, but it's only valid if it appears before the IDAT chunk
-        # (the actual image data). Metadata found after the IDAT chunk is ignored by most browsers.
-        metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"]) &&
-          !metadata["ExifTool:Warning"].to_s.match?(/found after PNG IDAT/)
       when :avif
         metadata["QuickTime:Rotation"].present?
       else

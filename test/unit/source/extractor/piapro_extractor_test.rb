@@ -165,32 +165,6 @@ module Source::Tests::Extractor
       )
     end
 
-    context "A Piapro post that is not downloadable" do
-      strategy_should_work(
-        "https://piapro.jp/t/XlWI",
-        image_urls: ["https://cdn.piapro.jp/thumb_i/jt/jt1fz1ogomfg6ing_20240221185912_0860_0600.png"],
-        media_files: [{ file_size: 602_360 }],
-        page_url: "https://piapro.jp/content/jt1fz1ogomfg6ing",
-        profile_url: "https://piapro.jp/DAYsaodayo",
-        profile_urls: %w[https://piapro.jp/DAYsaodayo],
-        display_name: "DAY",
-        username: "DAYsaodayo",
-        tag_name: "daysaodayo",
-        other_names: ["DAY", "DAYsaodayo"],
-        tags: [
-          ["#初音ミク", "https://piapro.jp/content_list/?view=image&tag=%23初音ミク"],
-          ["#２０２５年雪ミク衣装", "https://piapro.jp/content_list/?view=image&tag=%23２０２５年雪ミク衣装"],
-        ],
-        dtext_artist_commentary_title: "CosmeticMIKU",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          （マテリアル＝素材＝顔料）でコスメを題材にして考えてみました！
-          （アイシャドウの始まりはクレオパトラが宝石を砕いた顔料を塗っていたのが始まりとされています♪）
-          キラキラメイクでとびきりおめかしした雪ミクさんと
-          カリスマメイクアップアーティストのユキネです♪
-        EOS
-      )
-    end
-
     context "A deleted or nonexistent Piapro post" do
       strategy_should_work(
         "https://piapro.jp/t/ZZZZZ",

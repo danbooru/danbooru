@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module PostsHelper
-  extend Memoist
-
   def reportbooru_enabled?
     Danbooru.config.reportbooru_server.present? && Danbooru.config.reportbooru_key.present?
   end
@@ -35,12 +33,8 @@ module PostsHelper
     end
   end
 
-  memoize def first_danbirthday
-    Post.first&.created_at
-  end
-
   def is_danbirthday?(post)
-    post.id == Post.first.id && first_danbirthday.strftime("%m-%d") == Time.zone.today.strftime("%m-%d") && !first_danbirthday.today?
+    post.id == 1 && post.created_at.strftime("%m-%d") == Time.zone.today.strftime("%m-%d") && !post.created_at.today?
   end
 
   def image_container_data_attributes(post, current_user)

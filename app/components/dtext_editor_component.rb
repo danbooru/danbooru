@@ -39,9 +39,4 @@ class DtextEditorComponent < ApplicationComponent
   def media_embeds?
     dtext.media_embeds
   end
-
-  # @return [Integer] The current length of the field's value, used to initialize the character counter.
-  def current_length
-    form.object.send(input_name).to_s.length
-  end
 end

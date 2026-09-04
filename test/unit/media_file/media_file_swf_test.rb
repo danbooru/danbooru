@@ -5,7 +5,7 @@ class MediaFileFlashTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "swf",
-        "test/files/swf/compressed.swf" => nil,
+        failures: ["test/files/swf/compressed.swf"],
       )
     end
   end

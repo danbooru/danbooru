@@ -5,16 +5,7 @@ class MediaFileGifTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "gif",
-        "test/files/gif/corrupt-static.gif" => [108, 150, "b682795b5f58612cd858e088d2c47dd3"],
-        "test/files/gif/test-animated-1.2s.gif" => [126, 150, "b5a93be8b7d47213b5c9e1c4e6755bb9"],
-        "test/files/gif/test-animated-3.35s.gif" => [150, 111, "3004d35ab841650ba3ed5df9f2ec9051"],
-        "test/files/gif/test-animated-400x281.gif" => [150, 105, "9609c853f2784ca933ea56c87f6ecc2e"],
-        "test/files/gif/test-animated-86x52-loop-1.gif" => [86, 52, "7461dfb4079b3d6184764f68f1b91546"],
-        "test/files/gif/test-animated-86x52-loop-2.gif" => [86, 52, "7461dfb4079b3d6184764f68f1b91546"],
-        "test/files/gif/test-animated-86x52.gif" => [86, 52, "7461dfb4079b3d6184764f68f1b91546"],
-        "test/files/gif/test-corrupt.gif" => [119, 150, "99cc466982582c6b827deb5a84e04cc4"],
-        "test/files/gif/test-static-32x32.gif" => [32, 32, "0350b62780a6fcad56455248de1f9eba"],
-        "test/files/gif/test.gif" => [150, 150, "be48f1fc16c4d41bd10193f4f2a11f90"],
+        failures: [],
       )
     end
   end

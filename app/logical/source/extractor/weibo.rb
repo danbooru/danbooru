@@ -34,7 +34,7 @@ module Source
           # https://www.weibo.com/7817290049/N62KL5MpJ (video with playback_list)
           # https://m.weibo.cn/detail/4142890299009993 (video with empty playback_list)
           media_url = [
-            item[:playback_list]&.max_by { |video| video.dig(:meta, :quality_index) || -1 }&.dig(:play_info, :url),
+            item[:playback_list]&.max_by { |video| video.dig(:meta, :quality_index) }&.dig(:play_info, :url),
             item[:stream_url_hd],
             item[:stream_url],
             item.dig(:largest, :url),

@@ -6,20 +6,17 @@
 # @see https://github.com/streamio/streamio-ffmpeg
 class MediaFile::Video < MediaFile
   delegate :duration, :playback_duration, :frame_durations, :frame_count, :frame_rate, :has_audio?, :is_corrupt?,
-           :major_brand, :pix_fmt, :video_codec, :video_bit_rate, :video_stream, :video_streams, :audio_codec, :audio_bit_rate,
-           :audio_stream, :audio_streams, :silence_duration, :silence_percentage, :average_loudness, :peak_loudness,
-           :loudness_range, :error, to: :video
+    :major_brand, :pix_fmt, :video_codec, :video_bit_rate, :video_stream, :video_streams, :audio_codec, :audio_bit_rate,
+    :audio_stream, :audio_streams, :silence_duration, :silence_percentage, :average_loudness, :peak_loudness,
+    :loudness_range, :error, to: :video
 
   def close
     super
     @preview_frame&.close
   end
 
-  # @return [Array<(Integer, Integer)>] The width and height of the video, as it is displayed.
-  #   We use ExifTool and not the raw ffprobe dimensions because the latter does not support
-  #   anamorphic videos with non-square pixel aspect ratio out of the box.
   def dimensions
-    [exif_metadata.width, exif_metadata.height]
+    [video.width, video.height]
   end
 
   def preview!(max_width, max_height, **options)

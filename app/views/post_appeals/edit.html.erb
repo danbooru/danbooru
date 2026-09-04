@@ -6,6 +6,9 @@
       Editing appeal for <%= link_to "post ##{@post_appeal.post_id}", @post_appeal.post %>.
     </p>
 
-    <%= render "post_appeals/form", post_appeal: @post_appeal %>
+    <%= edit_form_for(@post_appeal) do |f| %>
+      <%= f.input :reason, as: :dtext, input_html: { autofocus: true } %>
+      <%= f.button :submit, "Submit" %>
+    <% end %>
   </div>
 </div>

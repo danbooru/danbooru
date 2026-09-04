@@ -17,7 +17,7 @@ class PostEdit
   PRE_METATAGS = %w[parent -parent rating source status] + CATEGORIZATION_METATAGS
 
   # Post-metatags rely on the post's ID, so they must be applied after the post is saved to ensure the ID has been created.
-  POST_METATAGS = %w[newpool newfavgroup pool -pool favgroup -favgroup fav -fav child -child upvote downvote -upvote -downvote disapproved status -status]
+  POST_METATAGS = %w[newpool newfavgroup pool -pool favgroup -favgroup fav -fav child -child upvote downvote disapproved status -status]
 
   METATAGS = PRE_METATAGS + POST_METATAGS
   METATAG_NAME_REGEX = /(#{METATAGS.join("|")}):/io

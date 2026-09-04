@@ -29,14 +29,12 @@ class BulkUpdateRequest::Command::Category < BulkUpdateRequest::Command
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} ([[#{@tag_name}]] doesn't exist)")
     elsif category.nil?
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} (#{@category_name} is not a valid category)")
-    elsif context == :request && category == tag.category
+    elsif context == :approval
+      # do nothing
+    elsif category == tag.category
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} ([[#{@tag_name}]] is already in that category)")
-    elsif context == :request && tag.artist.present? && category != Tag.categories.artist
+    elsif tag.artist.present? && category != Tag.categories.artist
       errors.add(:base, "Can't change the category of [[#{@tag_name}]] to #{@category_name} ([[#{@tag_name}]] has an artist entry)")
-    else
-      # Simulate the category change while skipping validations.
-      # @see https://github.com/danbooru/danbooru/commit/f672e11160c21c6acb4676e61e09666f9525b7d2#r198302427
-      tag.update_column(:category, category) # rubocop:disable Rails/SkipsModelValidations
     end
   end
 

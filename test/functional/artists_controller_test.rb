@@ -101,16 +101,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "show tag aliases for an artist tag that doesn't have an artist entry" do
-        create(:artist_tag, name: "new_name")
-        as(@user) { create(:tag_alias, antecedent_name: @masao.name, consequent_name: "new_name", status: "active") }
-
-        get_auth show_or_new_artists_path(name: "new_name"), @user
-
-        assert_response :success
-        assert_select ".fineprint", text: /The following tags are aliased to this tag:\s+#{@masao.name}/
-      end
-
       should "redirect to the new artist page for a blank artist" do
         get_auth show_or_new_artists_path, @user
         assert_redirected_to new_artist_path

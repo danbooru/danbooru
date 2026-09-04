@@ -98,24 +98,6 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "edit action" do
-      should "allow the appealer to edit the appeal" do
-        @appealer = create(:user)
-        @post_appeal = create(:post_appeal, creator: @appealer, reason: "xxx")
-        get_auth edit_post_appeal_path(@post_appeal), @appealer
-
-        assert_response :success
-      end
-
-      should "render as a dialog for the javascript format" do
-        @appealer = create(:user)
-        @post_appeal = create(:post_appeal, creator: @appealer, reason: "xxx")
-        get_auth edit_post_appeal_path(@post_appeal), @appealer, as: :javascript
-
-        assert_response :success
-      end
-    end
-
     context "update action" do
       should "allow the appealer to update the appeal" do
         @appealer = create(:user)
@@ -124,24 +106,6 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to @post_appeal.post
         assert_equal("yes", @post_appeal.reload.reason)
-      end
-
-      should "allow the appealer to update the appeal over ajax" do
-        @appealer = create(:user)
-        @post_appeal = create(:post_appeal, creator: @appealer, reason: "xxx")
-        put_auth post_appeal_path(@post_appeal), @appealer, params: { post_appeal: { reason: "yes" }}, as: :javascript
-
-        assert_redirected_to @post_appeal.post
-        assert_equal("yes", @post_appeal.reload.reason)
-      end
-
-      should "return an error over ajax if the appeal is too long" do
-        @appealer = create(:user)
-        @post_appeal = create(:post_appeal, creator: @appealer, reason: "xxx")
-        put_auth post_appeal_path(@post_appeal), @appealer, params: { post_appeal: { reason: "x" * 1000 }}, as: :javascript
-
-        assert_response :success
-        assert_equal("xxx", @post_appeal.reload.reason)
       end
 
       should "return an error if the appeal is too long" do

@@ -26,6 +26,3 @@ lib/dtext_rb/ext/dtext/dtext.cpp
 
 # devcontainer features lock
 .devcontainer/devcontainer-lock.json
-
-# agent local configs
-.claude/settings.local.json

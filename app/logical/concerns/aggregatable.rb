@@ -127,11 +127,7 @@ module Aggregatable
   end
 
   def generate_timeseries(from, to, interval)
-    from = Arel.sql("#{connection.quote(from)}::timestamp")
-    to = Arel.sql("#{connection.quote(to)}::timestamp")
-    step = Arel.sql("#{connection.quote("1 #{interval}")}::interval")
-
-    generate_series(date_trunc(interval, from), date_trunc(interval, to), step)
+    generate_series(from, to, Arel.sql("#{connection.quote("1 #{interval}")}::interval"))
   end
 
   private

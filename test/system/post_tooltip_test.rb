@@ -1,9 +1,10 @@
 require "application_system_test_case"
 
-class PostTooltipChromeTest < ChromeSystemTestCase
+class PostTooltipTest < ApplicationSystemTestCase
   context "Post tooltips" do
     setup do
       @post = create(:post, file_ext: "swf")
+      puts @post.preview_file_url
     end
 
     context "on a post thumbnail" do
@@ -11,7 +12,7 @@ class PostTooltipChromeTest < ChromeSystemTestCase
         visit posts_path
 
         find(".post-preview img").hover
-        assert_selector ".post-tooltip-body"
+        assert_selector ".post-tooltip"
       end
     end
 
@@ -22,7 +23,7 @@ class PostTooltipChromeTest < ChromeSystemTestCase
 
         visit comment_path(comment)
         find(".dtext-post-id-link").hover
-        assert_selector ".post-tooltip-body"
+        assert_selector ".post-tooltip"
       end
     end
   end

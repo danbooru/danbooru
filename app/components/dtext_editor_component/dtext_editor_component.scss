@@ -1,21 +1,3 @@
-.dtext-input-counter-text {
-  color: var(--muted-text-color);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.dtext-input-counter-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-
-  input[type="text"] {
-    flex-basis: 100%;
-    margin-top: 0.25rem;
-  }
-}
-
 .dtext-editor {
   .dtext-editor-menu {
     border-color: var(--form-input-border-color);

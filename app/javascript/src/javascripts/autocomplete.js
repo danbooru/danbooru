@@ -188,8 +188,9 @@ export default class Autocomplete {
         term += "*";
       }
     }
-    let { term: tagTerm } = Autocomplete.parseTerm(term.match(/\S*$/)[0]);
-    return tagTerm.toLowerCase();
+    let regexp = new RegExp(`^[-~(]*(${Autocomplete.tagPrefixes().join("|")})?`);
+    let match = term.match(/\S*$/)[0].replace(regexp, "").toLowerCase();
+    return match;
   }
 
   // Update the input field with the item currently focused in the
@@ -208,9 +209,8 @@ export default class Autocomplete {
       var before_caret_text = input.value.substring(0, caret).replace(/^[ \t]+|[ \t]+$/gm, "");
       var after_caret_text = input.value.substring(caret).replace(/^[ \t]+|[ \t]+$/gm, "");
 
-      let word = before_caret_text.match(/\S*$/)[0];
-      let { operator, category } = Autocomplete.parseTerm(word);
-      before_caret_text = before_caret_text.slice(0, before_caret_text.length - word.length) + operator + category + completion + " ";
+      var regexp = new RegExp(`([-~(]*(?:${Autocomplete.tagPrefixes().join("|")})?)\\S+$`, "g");
+      before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
       if (after_caret_text.length > 0) {
         after_caret_text = " " + after_caret_text;
       }
@@ -372,20 +372,6 @@ export default class Autocomplete {
 
   static tagPrefixes() {
     return JSON.parse($("meta[name=autocomplete-tag-prefixes]").attr("content"));
-  }
-
-  // Split a tag search term into its operator (e.g. `-`, `~`, `(`),
-  // its tag category prefix (e.g. "art:"), and the actual tag name.
-  // @param {String} term - The tag search term (e.g. "-art:1gi").
-  // @returns {Object} The operator, the category prefix, and the remaining tag name (e.g. { operator: "-", category: "art:", term: "1gi" }).
-  static parseTerm(term) {
-    // Pull off any operator characters at the very start (a "-" for negation, "~" for optional, "(" for
-    // grouping), then an optional category prefix right after them, like "art:".
-    // Example: "-art:1gi" -> operator is "-", category is "art:"
-    let regexp = new RegExp(`^(?<operator>[-~(]*)(?<category>${Autocomplete.tagPrefixes().join("|")})?`);
-    let match = term.match(regexp);
-    let { operator = "", category = "" } = match.groups;
-    return { operator, category, term: term.substring(match[0].length) };
   }
 }
 

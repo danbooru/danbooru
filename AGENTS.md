@@ -19,9 +19,8 @@ This file provides guidance for coding agents working in this repository. It's m
 ## General Guidelines
 
 - Do not run destructive git commands (for example: `git reset --hard`, `git checkout --`, `git clean`, etc) unless explicitly requested.
-- Do not run `git commit` or `git push` unless explicitly requested.
 - Use Ruby scripts instead of Python or Bash when possible. Ruby is the language used by this codebase.
-- Prefer `rg` over `grep`. `rg` is faster.
+- Use `grep` instead of `ripgrep` or `rg`. `rg` is not installed in this environment.
 - Use `sudo apt-get` if you need to install a new package in the devcontainer.
 - Use the debugger instead of guessing at the source of a problem.
 - Don't remove tests if the test is failing and you can't fix it.
@@ -34,7 +33,6 @@ This file provides guidance for coding agents working in this repository. It's m
 - Don't keep old code around as a fallback path. If the old code is wrong, just fix it instead of leaving it in place.
 - Don't introduce unnecessary abstractions, indirections, or helper methods. Don't add methods only used in one place.
 - Avoid loops and mutation. Prefer functional transformations and immutable data instead.
-- Don't add pointless or overly verbose comments. Keep them brief and use plain, simple english.
 
 ## Commands
 

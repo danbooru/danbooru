@@ -6,15 +6,9 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "ugoira",
-        "test/files/ugoira/invalid_ugoira.zip" => nil,
-        "test/files/ugoira/ugoira-100260240-png-danbooru.zip" => [150, 150, "36433ece2c131751e20bf3be809a6e1a"],
-        "test/files/ugoira/ugoira-108469527-gif-danbooru.zip" => [150, 150, "6df09b3f91c47146f5c9e633517b67bd"],
-        "test/files/ugoira/ugoira-95239241-danbooru.zip" => [150, 150, "00c0a1bf3fcfa29053b64ac33d2e6920"],
-        "test/files/ugoira/ugoira-95239241-gallery-dl.zip" => [150, 150, "00c0a1bf3fcfa29053b64ac33d2e6920"],
-        "test/files/ugoira/ugoira-95239241-pixiv.zip" => nil,
-        "test/files/ugoira/ugoira-95239241-pixivtoolkit.zip" => [150, 150, "00c0a1bf3fcfa29053b64ac33d2e6920"],
-        "test/files/ugoira/ugoira-95239241-pixivutil2.zip" => [150, 150, "00c0a1bf3fcfa29053b64ac33d2e6920"],
-        "test/files/ugoira/ugoira.zip" => nil,
+        failures: [
+          "test/files/ugoira/invalid_ugoira.zip",
+        ],
       )
     end
   end

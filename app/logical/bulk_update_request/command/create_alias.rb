@@ -43,17 +43,15 @@ class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
   end
 
   def approval_level(tags: nil)
-    old = tags.present? ? tags.find { |tag| tag.name == @old_name } : old_tag
-    new = tags.present? ? tags.find { |tag| tag.name == @new_name } : new_tag
+    old_tag = tags.present? ? tags.find { |tag| tag.name == @old_name } : self.old_tag
+    new_tag = tags.present? ? tags.find { |tag| tag.name == @new_name } : self.new_tag
 
-    old_is_small = old.present? && old.is_small_tag?
-    old_is_small_artist = old_is_small && old.artist?
+    # the old tag is a small artist tag
+    old_allowed = old_tag.present? && old_tag.artist? && old_tag.is_small_tag?
+    # the new tag doesn't exist, is empty, or is also a small artist tag
+    new_allowed = new_tag.blank? || new_tag.empty? || (new_tag.artist? && new_tag.is_small_tag?)
 
-    new_is_small = new.blank? || new.empty? || new.is_small_tag?
-    new_is_small_artist = new.blank? || new.empty? || (new.artist? && new.is_small_tag?)
-
-    return User::Levels::BUILDER if old_is_small_artist && new_is_small_artist
-    return User::Levels::MODERATOR if old_is_small && new_is_small
+    return User::Levels::BUILDER if old_allowed && new_allowed
     User::Levels::ADMIN
   end
 end

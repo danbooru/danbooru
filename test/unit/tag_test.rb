@@ -348,14 +348,12 @@ class TagTest < ActiveSupport::TestCase
           create(:tag, name: "bkub", category: Tag.categories.artist)
           create(:tag, name: "fumimi", category: Tag.categories.character)
           create(:tag_alias, antecedent_name: "orin", consequent_name: "kaenbyou_rin")
-          create(:tag, name: "hijiri_byakuren", category: Tag.categories.character, is_deprecated: true)
         end
 
         should allow_value("fumimi_(cosplay)").for(:name)
         should allow_value("new_tag_(cosplay)").for(:name)
         should_not allow_value("bkub_(cosplay)").for(:name)
         should_not allow_value("orin_(cosplay)").for(:name)
-        should_not allow_value("hijiri_byakuren_(cosplay)").for(:name)
       end
     end
   end

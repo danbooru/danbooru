@@ -255,35 +255,13 @@ class MediaFile::Image < MediaFile
   def open_image(**options)
     case file_ext
     when :jpg
+      # Only JPEG supports the EXIF orientation flag. It may technically be present in other formats, but web browsers
+      # ignore it, so we do too. XXX AVIF also has `irot` and `imir` flags, which browsers support, but libvips doesn't.
+      # https://zpl.fi/exif-orientation-in-different-formats/
       Vips::Image.new_from_file(file.path, access: :sequential, autorotate: true, **options)
-    when :png
-      # pngload cannot rotate the image during load, so we do it after.
-      open_png(**options)
     else
-      # Browser support for WebP/AVIF is not widespread, and vips cannot read some of these flags, so we don't support it either.
       Vips::Image.new_from_file(file.path, access: :sequential, **options)
     end
-  end
-
-  # Open with sequential access when the image does not need rotation, otherwise use the default access mode.
-  #
-  # Sequential access uses much less memory than the default access mode but is not supported by `autorot`,
-  # so we only reopen the picture in default mode if we actually need it.
-  # This results in a higher memory usage for rotated pngs, but they are the rare case, so it's an overall gain.
-  #
-  # Note that only rotation specified before the IDAT chunk (actual image data) is considered valid.
-  # Other types of rotation metadata are ignored by most browsers, so we ignore them too.
-  def open_png(**options)
-    image = Vips::Image.new_from_file(file.path, access: :sequential, **options)
-    orientation = image.get("orientation") if image.get_typeof("orientation") != 0
-
-    if orientation.present? && orientation != 1
-      image.release
-      image = Vips::Image.new_from_file(file.path, **options)
-      image = image.autorot
-    end
-
-    image
   end
 
   def video
@@ -291,10 +269,12 @@ class MediaFile::Image < MediaFile
   end
 
   def preview_frame
-    if is_animated?
-      @preview_frame ||= video.smart_video_preview || self
-    else
-      @preview_frame ||= self
+    @preview_frame ||= begin
+      if is_animated?
+        video.smart_video_preview || self
+      else
+        self
+      end
     end
   end
 

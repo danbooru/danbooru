@@ -74,16 +74,6 @@ class CreateImplicationCommandTest < ActiveSupport::TestCase
         )
       end
 
-      should "succeed for tags that changed category in the same BUR" do
-        create(:tag, name: "voiceroid", category: Tag.categories.general)
-        create(:tag, name: "vocaloid", category: Tag.categories.copyright)
-        create(:wiki_page, title: "voiceroid")
-        create(:wiki_page, title: "vocaloid")
-
-        @bur = build(:bulk_update_request, script: "category voiceroid -> copyright\nimply voiceroid -> vocaloid")
-        assert_equal(true, @bur.valid?)
-      end
-
       should "fail for a child tag that is too small" do
         @t1 = create(:tag, name: "white_shirt", post_count: 9)
         create(:tag, name: "shirt", post_count: 1_000_000)

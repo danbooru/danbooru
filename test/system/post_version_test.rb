@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class PostVersionSystemChromeTest < ChromeSystemTestCase
+class PostVersionSystemTest < ApplicationSystemTestCase
   context "Post versions" do
     setup do
       @user = create(:builder_user)
@@ -14,18 +14,17 @@ class PostVersionSystemChromeTest < ChromeSystemTestCase
         travel 2.hours
       end
 
-      fast_signin @user
-      visit post_versions_path(search: { post_id: @post.id })
+      signin @user
+      visit post_versions_path
     end
 
     context "clicking the undo selected button" do
       should "undo all selected post versions" do
         check id: "post-version-select-all-checkbox"
-        undoable_count = all("td .post-version-select-checkbox:not(:disabled)").size
         assert all("td .post-version-select-checkbox:not(:disabled)").all?(&:checked?)
 
         click_link "subnav-undo-selected"
-        assert_notice "#{undoable_count}/#{undoable_count} changes undone."
+        assert_selector "#notice span.prose", text: "2/2 changes undone."
 
         assert_equal("tagme", @post.reload.tag_string)
       end

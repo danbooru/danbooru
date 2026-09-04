@@ -118,45 +118,6 @@ module Source::Tests::Extractor
       )
     end
 
-    context "A Weibo video with a playback_list entry missing a quality_index" do
-      strategy_should_work(
-        "https://weibo.com/7490923589/R81gVBUfr?pagetype=profilefeed",
-        image_urls: [
-          "https://wx1.sinaimg.cn/large/008aX9qdgy1ieysvuqw7cj31l70wgb2a.jpg",
-          "https://wx4.sinaimg.cn/large/008aX9qdgy1ieysw30j7qj30zk1t842x.jpg",
-          "https://wx1.sinaimg.cn/large/008aX9qdgy1ieysw3d390j30zk1t8q5s.jpg",
-          "https://wx2.sinaimg.cn/large/008aX9qdgy1ieysw3t18pj31cw0u00w5.jpg",
-          "https://wx4.sinaimg.cn/large/008aX9qdgy1ieysw24mnij33js2gwhdv.jpg",
-          "https://wx3.sinaimg.cn/large/008aX9qdgy1ieysvx457kj32t835snpe.jpg",
-          "https://wx4.sinaimg.cn/large/008aX9qdgy1ieysvzitagj32t835skjm.jpg",
-          "https://wx3.sinaimg.cn/large/008aX9qdgy1ieyt0orre3j30v40nc0vx.jpg",
-          %r{https://f.video.weibocdn.com/o0/VZhuZPRElx08z5Iud83601041201KZ8z0E010.mp4\?Expires=.*&ssig=.*&KID=unistore,video},
-        ],
-        media_files: [
-          { file_size: 2_471_977 },
-          { file_size: 173_181 },
-          { file_size: 115_503 },
-          { file_size: 136_210 },
-          { file_size: 3_642_569 },
-          { file_size: 2_854_126 },
-          { file_size: 2_700_308 },
-          { file_size: 128_066 },
-          { file_size: 25_974_439 },
-        ],
-        page_url: "https://www.weibo.com/7490923589/R81gVBUfr",
-        profile_url: "https://www.weibo.com/u/7490923589",
-        profile_urls: %w[https://www.weibo.com/u/7490923589],
-        display_name: "悬浮代码猫",
-        username: nil,
-        updated_at: nil,
-        tags: [],
-        dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          一份独游宣，被夹哭了文本发评论区，这条🔁2个朋友99r或者博主摸鱼小盲盒一份谢谢大家🙇♀️ "抽奖详情":[https://lottery.media.weibo.com/lottery/h5/history/list?mid=5319115179034357]
-        EOS
-      )
-    end
-
     # XXX The video URL returns 404.
     context "A Weibo video with an empty playback_list" do
       setup do

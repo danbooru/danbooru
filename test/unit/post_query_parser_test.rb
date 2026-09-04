@@ -131,32 +131,6 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals(%q{(and source:"don't say \"lazy\"" blah)}, %q{source:don't\ say\ "lazy" blah})
     end
 
-    should "parse escaped wildcards in metatags correctly" do
-      # backslash-escaping a wildcard outside of quotes works
-      assert_parse_equals('source:\*a\*', 'source:\*a\*')
-      assert_parse_equals('source:"\* \*"', 'source:\*\ \*')
-
-      # backslash-escaping a wildcard inside quotes should also work, instead of breaking the parse (issue #5286)
-      assert_parse_equals('source:"\*a\*"', 'source:"\*a\*"')
-      assert_parse_equals('source:"\* \*"', 'source:"\* \*"')
-      assert_parse_equals('source:"\*a\*"', "source:'\\*a\\*'")
-      assert_parse_equals('source:"\* \*"', "source:'\\* \\*'")
-    end
-
-    should "parse escaped backslashes in metatags correctly (issue #5281)" do
-      # a backslash before any other character is preserved literally, and a backslash-escaped
-      # space lets an unquoted value contain a literal space
-      assert_parse_equals('source:"a \b"', 'source:a\ \b')
-
-      # quoting doesn't require escaping spaces, and a lone backslash is preserved literally
-      assert_parse_equals('source:"a \b"', 'source:"a \b"')
-      assert_parse_equals('source:"a \b"', "source:'a \\b'")
-
-      # a doubled backslash is preserved as two literal backslashes
-      assert_parse_equals('source:"a \\\\b"', 'source:"a \\\\b"')
-      assert_parse_equals('source:"a \\\\b"', "source:'a \\\\b'")
-    end
-
     should "parse metatag synonyms correctly" do
       assert_parse_equals("comment_count:0", "comments:0")
       assert_parse_equals("deleted_comment_count:0", "deleted_comments:0")

@@ -22,7 +22,7 @@ class PostQuery
   attr_reader :current_user
   private attr_reader :tag_limit, :safe_mode, :builder
 
-  delegate :tag?, :metatag?, :wildcard?, :metatags, :wildcards, :tag_names, :searched_tag_names, :to_infix, :to_pretty_string, to: :ast
+  delegate :tag?, :metatag?, :wildcard?, :metatags, :wildcards, :tag_names, :to_infix, :to_pretty_string, to: :ast
   alias_method :safe_mode?, :safe_mode
   alias_method :to_s, :to_infix
 

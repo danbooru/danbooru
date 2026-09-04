@@ -405,11 +405,6 @@ class PostQuery
         tags.map(&:name)
       end
 
-      # @return [Array<String>] The names of all tags that are explicitly searched for.
-      def searched_tag_names
-        tags.reject { |tag| tag.parent&.not? }.map(&:name)
-      end
-
       # @return [Array<AST>] The list of all parent nodes of this node.
       def parents
         parents = []
@@ -474,6 +469,6 @@ class PostQuery
       end
     end
 
-    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_pretty_string, :to_tree, :nodes, :tags, :metatags, :tag_names, :searched_tag_names, :parents
+    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_pretty_string, :to_tree, :nodes, :tags, :metatags, :tag_names, :parents
   end
 end

@@ -1,6 +1,4 @@
-<% if @post.errors.any? %>
-  Danbooru.Utility.error("<%= j @post.errors.full_messages.join('; ') %>");
-<% elsif params[:commit] == "Delete" %>
+<% if params[:commit] == "Delete" %>
   location.reload();
 <% else %>
   Danbooru.Utility.dialog("Delete Post", "<%= j render "posts/partials/show/delete_dialog", post: @post %>");

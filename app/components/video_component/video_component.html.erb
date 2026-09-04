@@ -59,20 +59,6 @@
       <%= no_sound_icon class: "flex-none w-6 h-full py-2 text-muted pointer-events-none @max-270px:hidden" %>
     <% end %>
 
-    <div class="shortcuts-help relative h-full @max-120px:hidden">
-      <%= help_icon class: "w-6 h-full py-2 cursor-pointer select-none" %>
-      <ul class="shortcuts-popup absolute p-2 rounded text-sm whitespace-nowrap select-none space-y-1">
-        <li class="flex items-center gap-1"><kbd class="key">Space</kbd> Play/Pause</li>
-        <% if media_asset.has_sound? %>
-          <li class="flex items-center gap-1"><kbd class="key">m</kbd> Mute</li>
-          <li class="flex items-center gap-1"><kbd class="key">&uarr;</kbd> <kbd class="key">&darr;</kbd> Volume</li>
-        <% end %>
-        <li class="flex items-center gap-1"><kbd class="key">&larr;</kbd> <kbd class="key">&rarr;</kbd> Seek</li>
-        <li class="flex items-center gap-1"><kbd class="key">0</kbd>-<kbd class="key">9</kbd> Seek to 0-90%</li>
-        <li class="flex items-center gap-1"><kbd class="key">&lt;</kbd> <kbd class="key">&gt;</kbd> Change speed</li>
-      </ul>
-    </div>
-
     <% if variants.size > 1 %>
       <%= render PopupMenuComponent.new(classes: "h-full", button_classes: "h-full", button_html: { "data-tippy-placement": "top", "data-tippy-arrow": "false" }) do |menu| %>
         <% menu.with_button do %>
