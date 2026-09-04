@@ -92,6 +92,19 @@ class VideoComponentChromeTest < ChromeSystemTestCase
       assert_selector "#image[data-muted='false']"
     end
 
+    should "show the keyboard shortcuts popup when hovering the help button" do
+      assert_no_selector "#image .shortcuts-popup", visible: true
+
+      # Hover the video first so the (normally hidden) controls bar, and the help button inside it, become visible.
+      hover_and_wait(main_video)
+      hover_and_wait(main_video.find(".shortcuts-help"))
+      assert_selector "#image .shortcuts-popup", visible: true, text: "Play/Pause"
+
+      # Move away from the help button, but stay over the video, so the controls bar itself doesn't fade out.
+      hover_and_wait(main_video)
+      assert_no_selector "#image .shortcuts-popup", visible: true
+    end
+
     should "apply the shortcut to the hovered embed instead of the main video" do
       embed_selector = ".dtext-media-embed[data-id='#{@embed_post1.id}'] .video-component"
       other_embed_selector = ".dtext-media-embed[data-id='#{@embed_post2.id}'] .video-component"
