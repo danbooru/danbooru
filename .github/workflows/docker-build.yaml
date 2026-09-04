@@ -17,7 +17,6 @@ name: Docker Build
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
   push:
-  create:
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -26,9 +25,9 @@ on:
         required: false
         default: false
 
-# One build per branch. A new push cancels the running build.
+# One build per branch or tag. A new push cancels the running build.
 concurrency:
-  group: "build-${{ github.event.workflow_run.head_sha || github.sha }}"
+  group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
 
 # https://docs.github.com/en/actions/reference/authentication-in-a-workflow#permissions-for-the-github_token
