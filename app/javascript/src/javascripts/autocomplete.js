@@ -63,6 +63,7 @@ export default class Autocomplete {
 
   initializeFieldAutocomplete() {
     this.$element.autocomplete({
+      appendTo: "body",
       select: (event, ui) => {
         if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
           this.insertCompletion(ui.item.value);
@@ -80,6 +81,7 @@ export default class Autocomplete {
 
   initializeTagAutocomplete() {
     this.$element.autocomplete({
+      appendTo: "body",
       select: (event, ui) => {
         if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
           this.insertCompletion(ui.item.value);
