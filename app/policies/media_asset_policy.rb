@@ -9,6 +9,10 @@ class MediaAssetPolicy < ApplicationPolicy
     user.is_admin?
   end
 
+  def bulk_regenerate?
+    user.is_admin?
+  end
+
   def image?
     can_see_image?
   end

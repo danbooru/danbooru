@@ -58,6 +58,7 @@ class ModAction < ApplicationRecord
     pool_undelete: 63,
     media_asset_delete: 72,
     media_asset_expunge: 76,
+    media_asset_bulk_regenerate: 77,
     artist_ban: 184,
     artist_unban: 185,
     comment_update: 81,
