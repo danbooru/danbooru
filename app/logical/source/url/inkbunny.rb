@@ -5,8 +5,8 @@ class Source::URL::Inkbunny < Source::URL
     url "https://inkbunny.net"
     domains %w[inkbunny.net metapix.net]
 
-    credential :username, help: %{Your Inkbunny username.}
-    credential :password, help: %{Your Inkbunny password. Go to https://inkbunny.net/account.php and enable API access, then go to https://inkbunny.net/userrate.php and enable all ratings.}
+    credential :username, default: Danbooru.config.inkbunny_username, help: %{Your Inkbunny username.}
+    credential :password, default: Danbooru.config.inkbunny_password, help: %{Your Inkbunny password. Go to https://inkbunny.net/account.php and enable API access, then go to https://inkbunny.net/userrate.php and enable all ratings.}
   end
 
   attr_reader :username, :user_id, :submission_id

@@ -20,11 +20,11 @@ module Source
       url "https://www.deviantart.com"
       domains %w[deviantart.com deviantart.net fav.me sta.sh artworkfolio.com daportfolio.com wixmp.com]
 
-      credential :client_id, help: %{Your DeviantArt client ID. Go to https://www.deviantart.com/developers/ to create a new application.}
-      credential :client_secret, help: %{Your DeviantArt client secret. Go to https://www.deviantart.com/developers/ to create a new application.}
-      credential :auth, help: %{Your DeviantArt `auth` cookie.}
-      credential :auth_secure, help: %{Your DeviantArt `auth_secure` cookie.}
-      credential :userinfo, help: %{Your DeviantArt `userinfo` cookie.}
+      credential :client_id, default: Danbooru.config.deviantart_client_id, help: %{Your DeviantArt client ID. Go to https://www.deviantart.com/developers/ to create a new application.}
+      credential :client_secret, default: Danbooru.config.deviantart_client_secret, help: %{Your DeviantArt client secret. Go to https://www.deviantart.com/developers/ to create a new application.}
+      credential :auth, default: Danbooru.config.deviantart_auth_cookie, help: %{Your DeviantArt `auth` cookie.}
+      credential :auth_secure, default: Danbooru.config.deviantart_auth_secure_cookie, help: %{Your DeviantArt `auth_secure` cookie.}
+      credential :userinfo, default: Danbooru.config.deviantart_userinfo_cookie, help: %{Your DeviantArt `userinfo` cookie.}
     end
 
     extractors { [Source::Extractor::DeviantArt, Source::Extractor::URLShortener] }

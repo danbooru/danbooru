@@ -1894,7 +1894,7 @@ CREATE TABLE public.site_credentials (
     id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    site integer NOT NULL,
+    site bigint NOT NULL,
     creator_id bigint NOT NULL,
     is_enabled boolean DEFAULT true NOT NULL,
     is_public boolean DEFAULT true NOT NULL,
@@ -7156,6 +7156,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260823164959'),
 ('20260323172054'),
 ('20260323172053'),
 ('20260323172052'),

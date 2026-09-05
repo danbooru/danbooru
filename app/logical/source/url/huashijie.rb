@@ -7,8 +7,8 @@ module Source
         url "https://www.huashijie.art"
         domains %w[huashijie.art pandapaint.net]
 
-        credential :user_id, help: %{Your Huashijie `userId` cookie.}
-        credential :api_key, help: %{Your Huashijie `token` cookie.}
+        credential :user_id, default: Danbooru.config.huashijie_user_id, help: %{Your Huashijie `userId` cookie.}
+        credential :session_cookie, default: Danbooru.config.huashijie_session_cookie, help: %{Your Huashijie `token` cookie.}
       end
 
       attr_reader :user_id, :work_id, :product_id, :full_image_url
