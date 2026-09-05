@@ -137,8 +137,8 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "destroy action" do
-      should "allow the owner to delete credentials" do
-        @user = create(:owner_user)
+      should "allow a superadmin to delete credentials" do
+        @user = create(:superadmin_user)
         @site_credential = create(:site_credential)
         assert_equal(true, ModAction.exists?(category: "site_credential_create"))
 
