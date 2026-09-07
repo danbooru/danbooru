@@ -34,7 +34,9 @@ class TagTooltipComponent < ApplicationComponent
   end
 
   # @return [Nokogiri::HTML5::Node, nil] The wiki page's first media embed, if any.
+  # Not shown for artist wikis or if the wiki page has no meaningful text.
   def embed
+    return nil if tag.artist? || paragraph.blank?
     excerpt&.dig(:embed)
   end
 
