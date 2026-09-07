@@ -241,7 +241,7 @@ Rails.application.routes.draw do
   end
   resource :source, only: [:show]
   resource :status, only: [:show], controller: "status"
-  resources :tags
+  resources :tags, id: /.+?(?=\.json|\.xml|\.html)|.+/
   resources :tag_aliases, only: [:show, :index, :destroy]
   resources :tag_implications, only: [:show, :index, :destroy]
   resources :tag_versions, only: [:index, :show]

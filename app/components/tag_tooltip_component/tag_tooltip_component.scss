@@ -1,0 +1,43 @@
+.tippy-box[data-theme~="tag-tooltip"] {
+  width: max-content; // needed to keep nested tooltips from squishing down to their parents' size
+  min-width: 200px;
+  max-width: 400px !important;
+
+  .tag-tooltip-header {
+    margin-bottom: 0.5em;
+    align-items: baseline;
+
+    .tag-tooltip-count {
+      font-size: 0.85em;
+    }
+  }
+
+  .tag-tooltip-body {
+    .tag-tooltip-embed img {
+      display: block;
+      max-width: 150px;
+      max-height: 150px;
+      width: auto;
+      height: auto;
+      margin: 0 auto;
+      border-radius: 4px;
+    }
+
+    .tag-tooltip-text {
+      font-size: 0.9em;
+      max-height: 150px;
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+
+  .fineprint {
+    margin: 0.4em 0 0;
+
+    & + .fineprint {
+      margin-top: 0.2em;
+    }
+  }
+}

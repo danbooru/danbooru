@@ -224,11 +224,11 @@ module ApplicationHelper
     link_to text, wiki_page_path(title), class: "wiki-link #{classes}", **options
   end
 
-  def link_to_wiki_or_artist(tag, classes: nil, **options)
+  def link_to_wiki_or_artist(tag, text: tag.name, classes: nil, **options)
     if tag.artist?
-      link_to tag.name, show_or_new_artists_path(name: tag.name), class: "wiki-link #{classes}", **options
+      link_to text, show_or_new_artists_path(name: tag.name), "class": "wiki-link #{tag_class(tag)} #{classes}", "data-tag-name": tag.name, **options
     else
-      link_to_wiki(tag.name, classes: classes, **options)
+      link_to_wiki(text, tag.name, "classes": "#{tag_class(tag)} #{classes}", "data-tag-name": tag.name, **options)
     end
   end
 

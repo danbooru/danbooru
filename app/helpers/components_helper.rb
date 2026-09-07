@@ -47,6 +47,10 @@ module ComponentsHelper
     render FavoritesTooltipComponent.new(post: post, **options)
   end
 
+  def render_tag_tooltip(tag, **options)
+    render TagTooltipComponent.new(tag: tag, **options)
+  end
+
   def render_post_navbar(post, **options)
     render PostNavbarComponent.new(post: post, **options)
   end
