@@ -131,7 +131,7 @@ class DTextTest < ActiveSupport::TestCase
         create(:tag, name: "m&m", category: Tag.categories.artist)
         create(:artist, name: "m&m")
 
-        assert_equal('<p><a class="dtext-link dtext-wiki-link tag-type-1" href="/artists/show_or_new?name=m%26m">m&amp;m</a></p>', format_text("[[m&m]]"))
+        assert_equal('<p><a class="dtext-link dtext-wiki-link tag-type-1" href="/artists/show_or_new?name=m%26m" data-tag-name="m&amp;m">m&amp;m</a></p>', format_text("[[m&m]]"))
       end
 
       should "not link general tags to artist pages" do
@@ -398,6 +398,47 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal([], DText.new("[code]@foo[/code]").mentions)
         assert_equal([], DText.new("foo@bar.com").mentions)
         # assert_equal(["foo"], DText.new("@foo", disable_mentions: true).mentions) # XXX
+      end
+    end
+
+    context "#tooltip_excerpt" do
+      should "return the first paragraph and the first visible embed" do
+        post = create(:post_with_file, filename: "jpg/test.jpg") # a 500x335 landscape image
+        dtext = DText.new("First paragraph.\n\n!post ##{post.id}\n\nSecond paragraph.", media_embeds: true)
+        excerpt = dtext.tooltip_excerpt
+
+        assert_equal("<p>First paragraph.</p>", excerpt[:paragraph].to_html)
+        assert_equal("article", excerpt[:embed].name)
+        assert(excerpt[:embed].at_css("a[href=\"/posts/#{post.id}\"] img").present?)
+      end
+
+      should "render the embed without a caption" do
+        post = create(:post_with_file, filename: "jpg/test.jpg")
+        dtext = DText.new("!post ##{post.id}\n\nCaption text.", media_embeds: true)
+        embed = dtext.tooltip_excerpt[:embed]
+
+        assert_nil(embed.at_css(".media-embed-caption"))
+      end
+
+      should "return nils when there is no paragraph or embed" do
+        excerpt = DText.new("", media_embeds: true).tooltip_excerpt
+
+        assert_nil(excerpt[:paragraph])
+        assert_nil(excerpt[:embed])
+      end
+
+      should "skip embeds that don't resolve to a visible image" do
+        excerpt = DText.new("!post #1234567", media_embeds: true).tooltip_excerpt
+
+        assert_nil(excerpt[:embed])
+      end
+
+      should "skip embeds the current user isn't allowed to see" do
+        post = create(:post_with_file, filename: "jpg/test.jpg", is_banned: true)
+        dtext = DText.new("!post ##{post.id}", media_embeds: true)
+
+        assert_nil(dtext.tooltip_excerpt(current_user: create(:user))[:embed])
+        assert(dtext.tooltip_excerpt(current_user: create(:approver_user))[:embed].present?)
       end
     end
   end
