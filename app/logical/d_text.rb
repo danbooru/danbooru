@@ -15,11 +15,8 @@ class DText
   DEFAULT_EMOJI_LIST = DEFAULT_EMOJI_MAP.keys.map(&:downcase)
 
   # post #1234, pixiv #1234, etc. The canonical list is in lib/dtext_rb/ext/dtext/dtext.cpp.rl.
-  SHORTLINKS = %w[
-    alias appeal artist asset ban bur comment dmail favgroup feedback flag forum implication mod\ action modreport
-    note pool post topic user wiki
-    issue pull commit
-    artstation deviantart gelbooru nijie pawoo pixiv pixiv sankaku seiga twitter yandere
+  SHORTLINKS = [
+    "alias", "appeal", "artist", "asset", "ban", "bur", "comment", "dmail", "favgroup", "feedback", "flag", "forum", "implication", "mod action", "modreport", "note", "pool", "post", "topic", "user", "wiki", "issue", "pull", "commit", "artstation", "deviantart", "gelbooru", "nijie", "pawoo", "pixiv", "pixiv", "sankaku", "seiga", "twitter", "yandere",
   ]
 
   attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emoji_list, :emoji_map, :options
@@ -84,14 +81,15 @@ class DText
   #
   # @param references [Hash<Symbol, Array<ActiveRecord::Base>] The database records needed to render this DText.
   # @param current_user [User] The user viewing the DText (used for determining visibility of media embeds).
+  # @param static [Boolean] If true, render media embeds as static thumbnails instead of playable videos.
   # @return [String, nil] The HTML output
-  def format_text(references: DText.preprocess([dtext]), current_user: User.anonymous)
+  def format_text(references: DText.preprocess([dtext]), current_user: User.anonymous, static: false)
     return nil if dtext.nil?
 
     fragment = parsed_html.dup
 
     fragment.css("media-embed").each do |node|
-      replace_media_embed!(node, posts: references[:posts], media_assets: references[:media_assets], current_user:)
+      replace_media_embed!(node, posts: references[:posts], media_assets: references[:media_assets], current_user:, static:)
     end
 
     fragment.css("tag-request-embed").each do |node|
@@ -114,7 +112,7 @@ class DText
   # Replace an <a class="dtext-wiki-link"> tag with a colorized link.
   def replace_wiki_link!(node, wiki_pages:, tags:, artists:)
     path = Addressable::URI.parse(node["href"]).path
-    name = path[%r!/wiki_pages/(.*)\z!i, 1]
+    name = path[%r{/wiki_pages/(.*)\z}i, 1]
     name = CGI.unescape(name)
     name = WikiPage.normalize_title(name)
     wiki = wiki_pages.find { it.title == name }
@@ -123,6 +121,7 @@ class DText
 
     if tag.present?
       node["class"] += " tag-type-#{tag.category}"
+      node["data-tag-name"] = tag.name
     end
 
     if tag.present? && tag.artist?
@@ -166,10 +165,10 @@ class DText
   #       </div>
   #       <div class="media-embed-caption">Caption.</div>
   #     </article>
-  def replace_media_embed!(node, posts:, media_assets:, current_user:)
+  def replace_media_embed!(node, posts:, media_assets:, current_user:, static: false, caption: true)
     type = node["data-type"]
     id = node["data-id"].to_i
-    caption = node.inner_html.presence
+    caption_text = node.inner_html.presence if caption
 
     if type == "post"
       asset = posts.find { it.id == id }&.media_asset
@@ -187,8 +186,8 @@ class DText
     if asset.nil? || !asset.active? || asset.is_flash? || !asset.policy(current_user).can_see_image?
       link_attributes = %{class="inactive-link flex items-center justify-center border rounded max-w-150px w-full aspect-square"}
       asset_html = %{<a #{link_attributes} href="#{href}">#{ApplicationController.helpers.image_icon}</a>}
-      caption ||= "This #{type} is unavailable."
-    elsif asset.is_image?
+      caption_text ||= "This #{type} is unavailable." if caption
+    elsif asset.is_image? || ((asset.is_ugoira? || asset.is_video?) && static)
       variant = asset.variant(:"720x720")
       asset_html = %{<a class="inline-block" href="#{href}"><img src="#{variant.file_url}" width="#{variant.width}" height="#{variant.height}"></a>}
     elsif asset.is_ugoira?
@@ -198,7 +197,7 @@ class DText
     end
 
     node.inner_html  = %{<div class="media-embed-image">#{asset_html}</div>}
-    node.inner_html += %{<div class="media-embed-caption p-2 text-xs text-center text-muted text-balance">#{caption}</div>} if caption.present?
+    node.inner_html += %{<div class="media-embed-caption p-2 text-xs text-center text-muted text-balance">#{caption_text}</div>} if caption_text.present?
   end
 
   # Replace a <tag-request-embed> node with the contents of the alias, implication, or bulk update request.
@@ -541,7 +540,7 @@ class DText
       when "br"
         "\n"
       when "text"
-        node.text.gsub(/_/, '\_').gsub(/\*/, '\*')
+        node.text.gsub("_", '\_').gsub("*", '\*')
       when "p", "h1", "h2", "h3", "h4", "h5", "h6"
         html_to_markdown(node) + "\n\n"
       else
@@ -754,6 +753,21 @@ class DText
   # @return [String] a plain text string
   def excerpt(length: 160)
     strip_dtext.split(/\r\n|\r|\n/).first.to_s.truncate(length)
+  end
+
+  # Return the first paragraph and first visible media embed in this DText.
+  #
+  # @param current_user [User] The user viewing the DText.
+  # @param references [Hash<Symbol, Array<ActiveRecord::Base>] see {#format_text}
+  # @return [Hash] a hash with :paragraph (a Nokogiri node, or nil) and :embed (the rendered media embed
+  #   node, without a caption, or nil)
+  def tooltip_excerpt(current_user: User.anonymous, references: DText.preprocess([dtext]))
+    fragment = DText.parse_html(format_text(references:, current_user:, static: true))
+
+    embed = fragment.css(".dtext-media-embed").find { |node| node.at_css("img") }
+    embed&.at_css(".media-embed-caption")&.remove
+
+    { paragraph: fragment.at_css("p"), embed: }
   end
 
   # Parse a string of HTML to a document object.
