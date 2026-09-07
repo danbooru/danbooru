@@ -15,11 +15,8 @@ class DText
   DEFAULT_EMOJI_LIST = DEFAULT_EMOJI_MAP.keys.map(&:downcase)
 
   # post #1234, pixiv #1234, etc. The canonical list is in lib/dtext_rb/ext/dtext/dtext.cpp.rl.
-  SHORTLINKS = %w[
-    alias appeal artist asset ban bur comment dmail favgroup feedback flag forum implication mod\ action modreport
-    note pool post topic user wiki
-    issue pull commit
-    artstation deviantart gelbooru nijie pawoo pixiv pixiv sankaku seiga twitter yandere
+  SHORTLINKS = [
+    "alias", "appeal", "artist", "asset", "ban", "bur", "comment", "dmail", "favgroup", "feedback", "flag", "forum", "implication", "mod action", "modreport", "note", "pool", "post", "topic", "user", "wiki", "issue", "pull", "commit", "artstation", "deviantart", "gelbooru", "nijie", "pawoo", "pixiv", "pixiv", "sankaku", "seiga", "twitter", "yandere",
   ]
 
   attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emoji_list, :emoji_map, :options
@@ -114,7 +111,7 @@ class DText
   # Replace an <a class="dtext-wiki-link"> tag with a colorized link.
   def replace_wiki_link!(node, wiki_pages:, tags:, artists:)
     path = Addressable::URI.parse(node["href"]).path
-    name = path[%r!/wiki_pages/(.*)\z!i, 1]
+    name = path[%r{/wiki_pages/(.*)\z}i, 1]
     name = CGI.unescape(name)
     name = WikiPage.normalize_title(name)
     wiki = wiki_pages.find { it.title == name }
@@ -541,7 +538,7 @@ class DText
       when "br"
         "\n"
       when "text"
-        node.text.gsub(/_/, '\_').gsub(/\*/, '\*')
+        node.text.gsub("_", '\_').gsub("*", '\*')
       when "p", "h1", "h2", "h3", "h4", "h5", "h6"
         html_to_markdown(node) + "\n\n"
       else
