@@ -24,7 +24,7 @@
         </p>
       <% elsif artist_without_wiki? %>
         <p class="text-muted">Artist.</p>
-      <% else %>
+      <% elsif visible_wiki_page.blank? %>
         <p class="text-muted">
           This tag doesn't have a wiki page. <%= link_to "Create one now", wiki_page_edit_path %>.
         </p>
