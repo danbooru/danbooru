@@ -21,6 +21,7 @@ TagTooltip.initialize = function () {
     duration: TagTooltip.DURATION,
     touch: false,
 
+    onTrigger: TagTooltip.on_trigger,
     onShow: TagTooltip.on_show,
     onHide: TagTooltip.on_hide,
   }
@@ -37,6 +38,10 @@ TagTooltip.initialize = function () {
 // @return {Boolean} true if this tooltip is inside another tooltip
 TagTooltip.is_nested = function ($target) {
   return $target.closest("[data-tippy-root]").length > 0;
+};
+
+TagTooltip.on_trigger = function (instance) {
+  instance.reference.removeAttribute("title");
 };
 
 TagTooltip.on_show = async function (instance) {
