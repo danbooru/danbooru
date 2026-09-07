@@ -56,6 +56,21 @@ class TagTooltipChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "on a [[tag]] dtext link to a wikiless tag" do
+      should "remove the native title tooltip" do
+        create(:tag, name: "no_wiki", post_count: 1)
+        user = create(:user, created_at: 1.month.ago)
+        comment = as(user) { create(:comment, post: @post, body: "[[no_wiki]]") }
+
+        visit comment_path(comment)
+        assert_selector ".dtext-wiki-link[title='This wiki page does not exist']", text: "no_wiki"
+
+        find(".dtext-wiki-link", text: "no_wiki").hover
+        assert_selector ".tag-tooltip"
+        assert_no_selector ".dtext-wiki-link[title]", text: "no_wiki"
+      end
+    end
+
     context "hovering over multiple tags in a row" do
       should "hide the previous tooltip instead of showing both at once" do
         create(:tag, name: "1girl", post_count: 1)
