@@ -17,6 +17,8 @@ name: Docker Build
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
   push:
+    branches-ignore:
+      - 'renovate/**'
   workflow_dispatch:
     inputs:
       debug_enabled:
