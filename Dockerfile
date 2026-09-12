@@ -25,7 +25,7 @@ ARG RUBY_MAJOR_VERSION="4.0"
 # github: mozilla/mozjpeg
 ARG MOZJPEG_VERSION="4.1.5"
 # github: libvips/libvips
-ARG VIPS_VERSION="8.18.5"
+ARG VIPS_VERSION="8.18.6"
 # github: FFmpeg/FFmpeg
 ARG FFMPEG_VERSION="9.0.1"
 # github: exiftool/exiftool
