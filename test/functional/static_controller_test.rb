@@ -114,7 +114,7 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
 
   context "contact action" do
     should "work" do
-      create(:owner_user)
+      create(:user)
 
       get contact_path
       assert_response :success
