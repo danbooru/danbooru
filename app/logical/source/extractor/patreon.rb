@@ -18,7 +18,11 @@ class Source::Extractor::Patreon < Source::Extractor
     # first image was made the post's cover image. These files have unique URLs despite being MD5-identical, so we
     # filter them out by their name/size/dimensions. Ex: https://www.patreon.com/posts/sailormoonredraw-37219108.
     unique_media = media.uniq { it.values_at(*%w[file_name dimensions size_bytes mimetype]) }
-    unique_media.pluck("display").pluck("url").compact
+    unique_media = unique_media.pluck("display").pluck("url").compact
+
+    teaser_media = teaser["content"].to_a.select { it["type"] == "image" }.pluck("attrs").pluck("src")
+
+    unique_media + teaser_media
   end
 
   memoize def image_url_from_api
@@ -46,6 +50,10 @@ class Source::Extractor::Patreon < Source::Extractor
     api_response["included"].to_a.select { it["type"] == "post_tag" }.pluck("attributes").pluck("value").map do |tag|
       [tag, "#{profile_url}/posts?filters[tag]=#{Danbooru::URL.escape(tag)}"]
     end
+  end
+
+  def published_at
+    Time.iso8601(post["created_at"]).utc if post["created_at"].present?
   end
 
   def artist_commentary_title
@@ -96,34 +104,34 @@ class Source::Extractor::Patreon < Source::Extractor
     in Hash
       children_html = rich_text_to_html(node[:content])
 
-      html = case node[:type]
+      case node[:type]
       in "doc"
-        children_html
+        html = children_html
       in "text"
-        CGI.escapeHTML(node[:text].to_s).gsub("\n", "<br>")
+        html = CGI.escapeHTML(node[:text].to_s).gsub("\n", "<br>")
       in "paragraph"
-        "<p>#{children_html}</p>"
+        html = "<p>#{children_html}</p>"
       in "hardBreak"
-        "<br>"
+        html = "<br>"
       in "heading"
         level = node.dig(:attrs, :level).to_i.clamp(1, 6)
-        "<h#{level}>#{children_html}</h#{level}>"
+        html = "<h#{level}>#{children_html}</h#{level}>"
       in "bulletList"
-        "<ul>#{children_html}</ul>"
+        html = "<ul>#{children_html}</ul>"
       in "orderedList"
-        "<ol>#{children_html}</ol>"
+        html = "<ol>#{children_html}</ol>"
       in "listItem"
-        "<li>#{children_html}</li>"
+        html = "<li>#{children_html}</li>"
       in "blockquote"
-        "<blockquote>#{children_html}</blockquote>"
+        html = "<blockquote>#{children_html}</blockquote>"
       in "image"
         image_url = node.dig(:attrs, :src)
-        image_url.present? ? %{<img src="#{CGI.escapeHTML(image_url)}">} : ""
+        html = image_url.present? ? %{<img src="#{CGI.escapeHTML(image_url)}">} : ""
       in "link"
         href = node.dig(:attrs, :href)
-        href.present? ? %{<a href="#{CGI.escapeHTML(href)}">#{children_html}</a>} : children_html
+        html = href.present? ? %{<a href="#{CGI.escapeHTML(href)}">#{children_html}</a>} : children_html
       else
-        children_html
+        html = children_html
       end
 
       node[:marks].to_a.reduce(html) do |body, mark|
@@ -154,6 +162,12 @@ class Source::Extractor::Patreon < Source::Extractor
 
   def post
     api_response.dig("data", "attributes") || {}
+  end
+
+  def teaser
+    JSON.parse(post["teaser_text_json_string"].to_s)
+  rescue JSON::ParserError
+    {}
   end
 
   def user

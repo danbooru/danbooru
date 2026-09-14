@@ -166,10 +166,10 @@ module Source::Tests::Extractor
         page_url: "https://www.patreon.com/posts/56127163",
         profile_url: "https://www.patreon.com/Rumblekatt",
         profile_urls: %w[https://www.patreon.com/Rumblekatt https://www.patreon.com/user?u=647065],
-        display_name: "Katrina Sass",
+        display_name: "Blake Sass",
         username: "Rumblekatt",
         tag_name: "rumblekatt",
-        other_names: ["Katrina Sass", "Rumblekatt"],
+        other_names: ["Blake Sass", "Rumblekatt"],
         tags: [
           ["poll", "https://www.patreon.com/Rumblekatt/posts?filters[tag]=poll"],
           ["print", "https://www.patreon.com/Rumblekatt/posts?filters[tag]=print"],
@@ -186,9 +186,9 @@ module Source::Tests::Extractor
         image_urls: [],
         page_url: "https://www.patreon.com/posts/october-art-140055441",
         profile_urls: %w[https://www.patreon.com/Minhart https://www.patreon.com/user?u=185721414],
-        display_name: "Min",
+        display_name: "Minhart",
         username: "Minhart",
-        published_at: nil,
+        published_at: Time.parse("2025-09-30 00:59:00 UTC"),
         updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "October Art",
@@ -225,9 +225,9 @@ module Source::Tests::Extractor
         page_url: "https://www.patreon.com/posts/closed-color-139862716",
         profile_url: "https://www.patreon.com/PI_Art314",
         profile_urls: %w[https://www.patreon.com/PI_Art314 https://www.patreon.com/user?u=168690901],
-        display_name: "Pi",
+        display_name: "PI-Art",
         username: "PI_Art314",
-        published_at: nil,
+        published_at: Time.parse("2025-09-27 13:17:23 UTC"),
         updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "(Closed) 🖌 Color Sketch Commissions 🎨✨",
@@ -305,7 +305,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://www.patreon.com/easonx https://www.patreon.com/user?u=9961216],
         display_name: "Easonx",
         username: "easonx",
-        published_at: nil,
+        published_at: Time.parse("2025-11-13 08:52:30 UTC"),
         updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "Ino Yamanaka and  wip..  (October)",
@@ -361,6 +361,28 @@ module Source::Tests::Extractor
           We hope you have a wonderful end of the year and an amazing 12,024.
           Much love from all of us at kurzgesagt ❤
         EOS
+      )
+    end
+
+    context "A post with a valid image in a teaser" do
+      strategy_should_work(
+        "https://www.patreon.com/eliskalti/posts/mabinogi-nao-and-169154049",
+        image_urls: [
+          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/169154049/c3f63f727b574296a6e50e60bce555cf/eyJhIjoxLCJ3Ijo4MjB9/1.jpg},
+        ],
+        media_files: [{ file_size: 327_068 }],
+        page_url: "https://www.patreon.com/eliskalti/posts/mabinogi-nao-and-169154049",
+        profile_url: "https://www.patreon.com/eliskalti",
+        profile_urls: %w[https://www.patreon.com/eliskalti https://www.patreon.com/user?u=2421623],
+        display_name: "ElisKalti",
+        username: "eliskalti",
+        published_at: Time.parse("2026-09-10 15:08:51 UTC"),
+        updated_at: nil,
+        tags: [
+          ["Mabinogi", "https://www.patreon.com/eliskalti/posts?filters[tag]=Mabinogi"],
+        ],
+        dtext_artist_commentary_title: "【Mabinogi】 Nao and Rua",
+        dtext_artist_commentary_desc: "",
       )
     end
 
