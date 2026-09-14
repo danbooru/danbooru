@@ -277,7 +277,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (3.0.2)
+    json (2.21.2)
     jwt (3.3.0)
       base64
     kramdown (2.5.2)
@@ -597,6 +597,7 @@ DEPENDENCIES
   hsluv (~> 1)
   http (~> 6)
   ipaddress_2 (~> 0.14)
+  json (~> 2)
   kramdown (~> 2)
   listen (~> 3)
   mail (~> 2)
@@ -739,7 +740,7 @@ CHECKSUMS
   ipaddress_2 (0.14.0) sha256=2c6c41548c395b8ab20274fab47af125c5679e1d7b8a16b164b6a608d40cbef1
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   jmespath (1.6.2) sha256=238d774a58723d6c090494c8879b5e9918c19485f7e840f2c1c7532cf84ebcb1
-  json (3.0.2) sha256=8e6d7e7b11384c21230430cef90b71f14849a34a1f4452796670f7c981bd19df
+  json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   jwt (3.3.0) sha256=44cc34fbc341c148233cf66641522b4bce0dfb1ce55e8073f05c56f44f4ee546
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
   language_server-protocol (3.17.0.6) sha256=5ef2c0c138f8267e1bc631d3328347d354f96724b0af22f2c79516120443b7f0

@@ -3,6 +3,7 @@ source "https://rubygems.org/"
 ruby "~> 4.0.6"
 
 gem "rails", "~> 8"
+gem "json", "~> 2" # XXX update after Rails releases with https://github.com/rails/rails/pull/58601
 gem "pg", "~> 1"
 gem "simple_form", "~> 5"
 gem "sanitize", "~> 7"
