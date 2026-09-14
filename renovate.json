@@ -13,7 +13,6 @@
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
   "minimumReleaseAge": "14 days",
-  "prConcurrentLimit": 5,
   "ignorePaths": [
     "lib/dtext_rb/Dockerfile"
   ],
