@@ -9,7 +9,7 @@ ModQueue.detailed_rejection_dialog = function() {
 
   $("#post_disapproval_post_id").val($link.data("post-id"));
   $("#post_disapproval_reason").val($link.data("reason") || "disinterest");
-  $("#post_disapproval_message").val($link.data("message") || "");
+  $("#post_disapproval_message").val($link.data("message") || "")[0].dispatchEvent(new Event("input"));
 
   Utility.dialog("Detailed Rejection", "#detailed-rejection-dialog");
   return false;
