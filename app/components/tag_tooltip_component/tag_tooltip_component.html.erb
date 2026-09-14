@@ -5,7 +5,7 @@
 
     <span class="flex-grow-1"></span>
 
-    <% if display_edit_button? && %>
+    <% if display_edit_button? %>
       <%= link_to edit_icon(class: "h-3"), wiki_page_edit_path, class: "tag-tooltip-edit inactive-link", title: wiki_page.present? ? "Edit wiki page" : "Create wiki page" %>
     <% end %>
   </div>
@@ -15,20 +15,27 @@
       <div class="tag-tooltip-embed"><%= embed_html %></div>
     <% end %>
 
-    <div class="tag-tooltip-text prose thin-scrollbar flex-1 min-w-0">
-      <% if paragraph.present? %>
-        <%= paragraph.to_html.html_safe %>
-      <% elsif is_aliased? %>
-        <p class="text-muted">
-          This tag is aliased to <%= link_to_wiki_or_artist(aliased_tag) %>.
-        </p>
-      <% elsif artist_without_wiki? %>
-        <p class="text-muted">Artist.</p>
-      <% elsif visible_wiki_page.blank? %>
-        <p class="text-muted">
-          This tag doesn't have a wiki page. <%= link_to "Create one now", wiki_page_edit_path %>.
-        </p>
-      <% end %>
+    <div class="tag-tooltip-column flex-1 min-w-0">
+      <div class="tag-tooltip-text prose">
+        <% if excerpt_text.present? %>
+          <%= excerpt_text %>
+        <% elsif is_aliased? %>
+          <p class="text-muted">
+            This tag is aliased to <%= link_to_wiki_or_artist(aliased_tag) %>.
+          </p>
+        <% elsif artist_without_wiki? %>
+          <p class="text-muted">Artist.</p>
+        <% elsif no_description? %>
+          <p class="text-muted">
+            This tag has no description.<br>
+            <%= link_to "Add one now", wiki_page_edit_path %>.
+          </p>
+        <% elsif visible_wiki_page.blank? %>
+          <p class="text-muted">
+            This tag doesn't have a wiki page. <%= link_to "Create one now", wiki_page_edit_path %>.
+          </p>
+        <% end %>
+      </div>
     </div>
 
     <% if embed.present? && !horizontal_embed? %>
@@ -36,14 +43,15 @@
     <% end %>
   </div>
 
-  <% if tag.is_deprecated? %>
-    <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %>.</p>
-  <% end %>
+  <% if tag.is_deprecated? || implication_tags.present? %>
+    <div class="tag-tooltip-footer">
+      <% if tag.is_deprecated? %>
+        <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %>.</p>
+      <% end %>
 
-  <% if tag.antecedent_implications.present? %>
-    <p class="fineprint">
-      This tag implicates
-      <%= to_sentence(tag.antecedent_implications.sort_by(&:consequent_name).map { |ti| link_to_wiki_or_artist ti.consequent_tag }) %>.
-    </p>
+      <% if implication_tags.present? %>
+        <p class="fineprint">This tag implicates <%= to_sentence(implication_sentence_items) %>.</p>
+      <% end %>
+    </div>
   <% end %>
 </div>
