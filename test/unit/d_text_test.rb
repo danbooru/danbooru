@@ -402,14 +402,41 @@ class DTextTest < ActiveSupport::TestCase
     end
 
     context "#tooltip_excerpt" do
-      should "return the first paragraph and the first visible embed" do
+      should "return the leading content and the first visible embed" do
         post = create(:post_with_file, filename: "jpg/test.jpg") # a 500x335 landscape image
         dtext = DText.new("First paragraph.\n\n!post ##{post.id}\n\nSecond paragraph.", media_embeds: true)
         excerpt = dtext.tooltip_excerpt
 
-        assert_equal("<p>First paragraph.</p>", excerpt[:paragraph].to_html)
+        assert_equal("<p>First paragraph.</p><p>Second paragraph.</p>", excerpt[:excerpt])
         assert_equal("article", excerpt[:embed].name)
         assert(excerpt[:embed].at_css("a[href=\"/posts/#{post.id}\"] img").present?)
+      end
+
+      should "return all leading paragraphs, not just the first" do
+        dtext = DText.new("First paragraph.\n\nSecond paragraph.\n\nh4. Header\n\nThird paragraph.")
+
+        assert_equal("<p>First paragraph.</p><p>Second paragraph.</p>", dtext.tooltip_excerpt[:excerpt])
+      end
+
+      should "include leading non-paragraph content, like lists or embeds" do
+        dtext = DText.new("First paragraph.\n\n* a list\n* another item\n\nh4. Header\n\nSecond paragraph.")
+
+        assert_equal("<p>First paragraph.</p><ul><li>a list</li><li>another item</li></ul>", dtext.tooltip_excerpt[:excerpt])
+      end
+
+      should "stop at the first header" do
+        dtext = DText.new("First paragraph.\n\nh4. Header\n\nSecond paragraph.")
+
+        assert_equal("<p>First paragraph.</p>", dtext.tooltip_excerpt[:excerpt])
+      end
+
+      should "not duplicate an embed nested inside another element, like a gallery" do
+        post = create(:post_with_file, filename: "jpg/test.jpg")
+        dtext = DText.new("First paragraph.\n\n* !post ##{post.id}\n\nSecond paragraph.", media_embeds: true)
+        excerpt = dtext.tooltip_excerpt
+
+        assert_equal("<p>First paragraph.</p><p>Second paragraph.</p>", excerpt[:excerpt])
+        assert(excerpt[:embed].present?)
       end
 
       should "render the embed without a caption" do
@@ -423,7 +450,7 @@ class DTextTest < ActiveSupport::TestCase
       should "return nils when there is no paragraph or embed" do
         excerpt = DText.new("", media_embeds: true).tooltip_excerpt
 
-        assert_nil(excerpt[:paragraph])
+        assert_nil(excerpt[:excerpt])
         assert_nil(excerpt[:embed])
       end
 

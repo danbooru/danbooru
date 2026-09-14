@@ -755,19 +755,23 @@ class DText
     strip_dtext.split(/\r\n|\r|\n/).first.to_s.truncate(length)
   end
 
-  # Return the first paragraph and first visible media embed in this DText.
+  # Return everything up to the first header, and the first visible media embed in
+  # this DText.
   #
   # @param current_user [User] The user viewing the DText.
   # @param references [Hash<Symbol, Array<ActiveRecord::Base>] see {#format_text}
-  # @return [Hash] a hash with :paragraph (a Nokogiri node, or nil) and :embed (the rendered media embed
+  # @return [Hash] a hash with :excerpt (a HTML-safe string, or nil) and :embed (the rendered media embed
   #   node, without a caption, or nil)
   def tooltip_excerpt(current_user: User.anonymous, references: DText.preprocess([dtext]))
     fragment = DText.parse_html(format_text(references:, current_user:, static: true))
 
+    leading_nodes = fragment.children.select(&:element?).take_while { |node| !node.name.match?(/\Ah[1-6]\z/) }
+    excerpt_nodes = leading_nodes.reject { |node| node.matches?(".dtext-media-embed") || node.at_css(".dtext-media-embed") }
+
     embed = fragment.css(".dtext-media-embed").find { |node| node.at_css("img") }
     embed&.at_css(".media-embed-caption")&.remove
 
-    { paragraph: fragment.at_css("p"), embed: }
+    { excerpt: excerpt_nodes.map(&:to_html).join.presence&.html_safe, embed: }
   end
 
   # Parse a string of HTML to a document object.
