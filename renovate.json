@@ -98,6 +98,17 @@
         "ruby-version"
       ],
       "rangeStrategy": "bump"
+    },
+    {
+      "description": "Don't auto-open pulls for the following packages",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "mcr.microsoft.com/playwright",
+        "redis"
+      ],
+      "dependencyDashboardApproval": true
     }
   ]
 }
