@@ -162,6 +162,30 @@ class UserTest < ActiveSupport::TestCase
       assert_equal(false, user.is_gold?)
     end
 
+    context "#recently_verified_account?" do
+      should "be true within 24 hours of an account_verification event" do
+        create(:user_event, user: @user, category: :account_verification)
+
+        assert_equal(true, @user.recently_verified_account?)
+      end
+
+      should "be false more than 24 hours after an account_verification event" do
+        create(:user_event, user: @user, category: :account_verification, created_at: 25.hours.ago)
+
+        assert_equal(false, @user.recently_verified_account?)
+      end
+
+      should "be false for a plain email_verification event that wasn't a promotion" do
+        create(:user_event, user: @user, category: :email_verification)
+
+        assert_equal(false, @user.recently_verified_account?)
+      end
+
+      should "be false for a user with no verification events" do
+        assert_equal(false, @user.recently_verified_account?)
+      end
+    end
+
     context "name" do
       should "not contain whitespace" do
         # U+2007: https://en.wikipedia.org/wiki/Figure_space

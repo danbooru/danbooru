@@ -23,13 +23,19 @@
 
           <p>Disposable or throwaway email addresses can't be used to verify your account.</p>
         <% end %>
+
+        <% if CurrentUser.user == @user && @user.recently_verified_account? %>
+          <p>You verified your account recently. You must wait <%= User::RECENTLY_PROMOTED_PERIOD.inspect %> before changing or removing your email address.</p>
+        <% end %>
       </div>
 
       <%= edit_form_for(@email_address, url: user_email_path(@user), method: "put", html: { class: "w-full stacked-form" }) do |f| %>
         <%= f.input :address, as: :email, input_html: { autofocus: true } %>
 
         <div>
-          <%= f.submit "Save", class: "button-primary" %>
+          <% if policy(@email_address).update? %>
+            <%= f.submit "Save", class: "button-primary" %>
+          <% end %>
 
           <% if policy(@email_address).destroy? && @email_address.persisted? %>
             <%= f.submit "Delete", class: "button-outline-danger", form: "delete-form", "data-confirm": "Are you sure you want to delete your email address?" %>
