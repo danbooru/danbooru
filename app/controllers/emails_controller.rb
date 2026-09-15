@@ -59,6 +59,7 @@ class EmailsController < ApplicationController
       redirect_to edit_user_email_path(@user)
     elsif params[:email_verification_key].present? && @email_address == EmailAddress.find_signed!(params[:email_verification_key], purpose: "verify")
       skip_authorization
+      @email_address.request = request
       @email_address.verify!
       flash[:notice] = "Email address verified"
       redirect_to @email_address.user

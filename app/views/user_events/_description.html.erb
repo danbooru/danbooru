@@ -29,6 +29,10 @@
   <%= link_to_user user_event.user %> changed their password.
 <% when "email_change" %>
   <%= link_to_user user_event.user %> changed their email address.
+<% when "email_verification" %>
+  <%= link_to_user user_event.user %> verified their email address.
+<% when "account_verification" %>
+  <%= link_to_user user_event.user %> verified their account.
 <% when "totp_enable" %>
   <%= link_to_user user_event.user %> enabled 2FA.
 <% when "totp_disable" %>

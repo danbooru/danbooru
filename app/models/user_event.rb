@@ -12,9 +12,9 @@ class UserEvent < ApplicationRecord
   # include failed login attempts, password reset requests, or other events that may not have been performed by the user.
   AUTHORIZED_EVENTS = %i[
     login login_verification reauthenticate logout user_creation user_deletion user_undeletion
-    password_reset password_change email_change totp_enable totp_update totp_disable
+    password_reset password_change email_change email_verification totp_enable totp_update totp_disable
     totp_login totp_reauthenticate backup_code_generate backup_code_login backup_code_reauthenticate
-    api_key_create api_key_update api_key_delete
+    api_key_create api_key_update api_key_delete account_verification
   ]
 
   attribute :id
@@ -48,6 +48,7 @@ class UserEvent < ApplicationRecord
     password_reset: 450,                  # The user changed their password after requesting a password reset email.
     password_change: 500,                 # The user changed their password.
     email_change: 600,
+    email_verification: 610,
     totp_enable: 700,                     # The user enabled 2FA.
     totp_update: 710,                     # The user changed their 2FA secret.
     totp_disable: 720,                    # The user disabled 2FA.
@@ -62,6 +63,7 @@ class UserEvent < ApplicationRecord
     api_key_create: 900,                  # The user created a new API key.
     api_key_update: 910,                  # The user changed the permissions of an API key.
     api_key_delete: 920,                  # The user deleted an API key.
+    account_verification: 1010,           # The user's account was promoted from Restricted.
   }
 
   normalizes :user_agent, with: ->(user_agent) { user_agent.to_s.truncate(800, separator: " ", omission: " ...") }
