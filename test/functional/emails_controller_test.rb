@@ -79,6 +79,42 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           get_auth edit_user_email_path(@restricted_user), @restricted_user
           assert_response :success
         end
+
+        context "who was recently promoted from Restricted by verifying their email" do
+          should "not show the delete button" do
+            @restricted_user.email_address.update!(address: "test@gmail.com")
+            get email_verification_url(@restricted_user)
+            get_auth edit_user_email_path(@restricted_user), @restricted_user
+
+            assert_response :success
+            assert_select "input[value=Delete]", count: 0
+          end
+        end
+
+        context "who was promoted from Restricted more than a day ago" do
+          should "show the delete button" do
+            @restricted_user.email_address.update!(address: "test@gmail.com")
+            get email_verification_url(@restricted_user)
+
+            travel_to(25.hours.from_now) do
+              get_auth edit_user_email_path(@restricted_user), @restricted_user
+            end
+
+            assert_response :success
+            assert_select "input[value=Delete]", count: 1
+          end
+        end
+
+        context "who verified an untrustworthy email address" do
+          should "show the delete button" do
+            @restricted_user.email_address.update!(address: "test@mailinator.com")
+            get email_verification_url(@restricted_user)
+            get_auth edit_user_email_path(@restricted_user), @restricted_user
+
+            assert_response :success
+            assert_select "input[value=Delete]", count: 1
+          end
+        end
       end
 
       context "for an unauthorized user" do
@@ -251,6 +287,15 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_no_enqueued_jobs
         end
 
+        should "allow a user to change their email address immediately after verifying it, if it didn't promote them from Restricted" do
+          get email_verification_url(@user)
+
+          put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+
+          assert_redirected_to(settings_path)
+          assert_equal("new@danbooru.donmai.us", @user.reload.email_address.address)
+        end
+
         should "fail if the email address is invalid" do
           put_auth user_email_path(@user), @user, params: { email_address: { address: "invalid" }}
 
@@ -273,6 +318,30 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_no_enqueued_jobs
         end
       end
+
+      context "for a restricted user" do
+        should "not allow changing their email address within 24 hours of being verified" do
+          @restricted_user.email_address.update!(address: "test@gmail.com")
+          get email_verification_url(@restricted_user)
+
+          put_auth user_email_path(@restricted_user), @restricted_user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+
+          assert_response 403
+          assert_equal("test@gmail.com", @restricted_user.reload.email_address.address)
+        end
+
+        should "allow changing their email address more than 24 hours after being verified" do
+          @restricted_user.email_address.update!(address: "test@gmail.com")
+          get email_verification_url(@restricted_user)
+
+          travel_to(25.hours.from_now) do
+            put_auth user_email_path(@restricted_user), @restricted_user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+          end
+
+          assert_redirected_to(settings_path)
+          assert_equal("new@danbooru.donmai.us", @restricted_user.reload.email_address.address)
+        end
+      end
     end
 
     context "#destroy" do
@@ -293,6 +362,45 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         end
 
         assert_response 403
+      end
+
+      should "allow a user to remove their email address immediately after verifying it, if it didn't promote them from Restricted" do
+        get email_verification_url(@user)
+
+        assert_difference("EmailAddress.count", -1) do
+          delete_auth user_email_path(@user), @user
+        end
+
+        assert_redirected_to(settings_path)
+        assert_nil(@user.reload.email_address)
+      end
+
+      context "for a restricted user" do
+        should "not allow removing their email address within 24 hours of being verified" do
+          @restricted_user.email_address.update!(address: "test@gmail.com")
+          get email_verification_url(@restricted_user)
+
+          assert_no_difference("EmailAddress.count") do
+            delete_auth user_email_path(@restricted_user), @restricted_user
+          end
+
+          assert_response 403
+          assert_equal(true, @restricted_user.reload.email_address.present?)
+        end
+
+        should "allow removing their email address more than 24 hours after being verified" do
+          @restricted_user.email_address.update!(address: "test@gmail.com")
+          get email_verification_url(@restricted_user)
+
+          travel_to(25.hours.from_now) do
+            assert_difference("EmailAddress.count", -1) do
+              delete_auth user_email_path(@restricted_user), @restricted_user
+            end
+          end
+
+          assert_redirected_to(settings_path)
+          assert_nil(@restricted_user.reload.email_address)
+        end
       end
     end
 
