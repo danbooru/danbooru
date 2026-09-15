@@ -36,6 +36,18 @@
     </ul>
   </p>
 
+  <p id="modqueue-sidebar-ratings" class="sidebar-section">
+    <h2>Ratings</h2>
+    <ul>
+      <% Post::RATINGS.each do |rating, name| %>
+        <li>
+          <%= link_to "rating:#{name.downcase}", current_page_path(search: search_params.merge(tags: "rating:#{name.downcase}"), page: nil) %>
+          <span class="post-count"><%= @rating_counts[rating].to_i %></span>
+        </li>
+      <% end %>
+    </ul>
+  </p>
+
   <p id="modqueue-sidebar-uploaders" class="sidebar-section">
     <h2>Uploaders</h2>
     <ul>
