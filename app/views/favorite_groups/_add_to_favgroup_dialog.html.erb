@@ -1,12 +1,21 @@
 <p>Add this post to a new favorite group (<%= link_to_wiki "help:favorite_groups" %>):</p>
 
-<%= edit_form_for(FavoriteGroup.new, html: { class: "one-line-form" }) do |f| %>
+<% new_favorite_group = FavoriteGroup.new(creator: CurrentUser.user) %>
+<%= edit_form_for(new_favorite_group, html: { class: "one-line-form" }) do |f| %>
   <%= f.input :name, as: :string, required: true, input_html: { style: "width: 20em" } %>
   <%= f.input :post_ids, as: :hidden, input_html: { value: post.id } %>
   <%= f.submit "Create" %>
+
+  <% if policy(new_favorite_group).can_enable_privacy? %>
+    <div>
+      <%= f.input :is_private, label: "Private", as: :boolean, hint: "Don't allow others to view this favgroup." %>
+    </div>
+  <% end %>
 <% end %>
 
 <% if CurrentUser.favorite_groups.present? %>
+  <hr class="border">
+
   <p class="mt-2">Or add it to an existing favorite group:</p>
 
   <% CurrentUser.favorite_groups.each_with_index do |favgroup, i| %>
