@@ -5,7 +5,7 @@ class ForumTopicVisit < ApplicationRecord
   belongs_to :forum_topic
 
   def self.visible(user)
-    if user.is_owner?
+    if user.is_superadmin?
       all
     else
       where(user: user)
