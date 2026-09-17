@@ -156,5 +156,9 @@
         <% end %>
       <% end %>
     </div>
+
+    <% if policy(comment).update? %>
+      <%= render "comments/form", comment: comment, hidden: true %>
+    <% end %>
   </div>
 </article>

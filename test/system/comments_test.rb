@@ -22,6 +22,38 @@ class CommentsChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "the comment's Edit button" do
+      setup do
+        @comment = as(@user) { create(:comment, creator: @user, post: @post, body: "the original comment") }
+
+        fast_signin @user
+        visit post_path(@post)
+      end
+
+      should "reveal the comment's edit form" do
+        within "#comment_#{@comment.id}" do
+          find(".popup-menu-button").click
+          click_link "Edit"
+        end
+
+        assert_visible "#comment_#{@comment.id} .edit_comment"
+        assert_equal @comment.body, find("#comment_#{@comment.id} .edit_comment textarea.dtext").value
+      end
+
+      should "update the comment without navigating to a separate page" do
+        within "#comment_#{@comment.id}" do
+          find(".popup-menu-button").click
+          click_link "Edit"
+
+          find(".edit_comment textarea.dtext").set("the edited comment")
+          click_button "Comment"
+        end
+
+        assert_current_path post_path(@post)
+        assert_text "the edited comment"
+      end
+    end
+
     context "the comment's dropdown menu" do
       setup do
         stub_clipboard
