@@ -12,7 +12,7 @@
   <div class="dtext-editor relative w-fit <%= editor_html[:class] %>"
        x-bind:class="{ 'dtext-editor-loading inert': editor.loading }"
        x-data="{ editor: new Danbooru.DTextEditor($root) }"
-       x-init="editor.initialize(<%= { inline: inline?, mediaEmbeds: media_embeds?, domains: domains }.to_json %>)"
+       x-init="editor.initialize(<%= { inline: inline?, mediaEmbeds: media_embeds?, domains: domains, previewTimeout: PREVIEW_TIMEOUT_MS }.to_json %>)"
        <% if media_embeds? %>
         x-on:dragover.prevent="true"
         x-on:drop="editor.insertImages($event.dataTransfer.files)"

@@ -51,6 +51,7 @@ export default class DTextEditor {
   inline = false; // If true, the editor is in inline mode (only uses a single line <input> field instead of a <textarea>).
   mediaEmbeds = false; // Whether to enable media embeds in the preview.
   domains = []; // The list of the domains for the current site. Used for determining which links belong to the current site.
+  previewTimeout = null; // How long to wait for the preview HTML to load, in milliseconds, before giving up. @see DtextEditorComponent::PREVIEW_TIMEOUT_MS
 
   // @param {HTMLElement} root - The root <div class="dtext-editor"> element of the DText editor.
   constructor(root) {
@@ -63,11 +64,13 @@ export default class DTextEditor {
   // @param {Boolean} inline - Whether the editor is in inline mode.
   // @param {Boolean} mediaEmbeds - Whether to enable media embeds in the preview.
   // @param {String[]} domains - The list of the domains for the current site.
-  initialize({ inline = false, mediaEmbeds = false, domains = [] } = {}) {
+  // @param {Number} previewTimeout - How long to wait for the preview HTML to load, in milliseconds, before giving up.
+  initialize({ inline = false, mediaEmbeds = false, domains = [], previewTimeout } = {}) {
     this.root.editor = this;
     this.inline = inline;
     this.mediaEmbeds = mediaEmbeds;
     this.domains = domains;
+    this.previewTimeout = previewTimeout;
 
     this.initializeAutocomplete();
   }
@@ -618,17 +621,28 @@ export default class DTextEditor {
     }
   }
 
-  // @returns {String} The HTML representation of the DText input.
+  // @returns {String} The HTML representation of the DText input. If the request fails or times out, shows an
+  // error notice and reverts to edit mode.
   async fetchHtml() {
     this.previewLoading = true;
 
-    let html = await $.post("/dtext_preview", {
-      body: this.dtext,
-      inline: this.inline,
-      media_embeds: this.mediaEmbeds,
-    });
-
-    this.previewLoading = false;
-    return html;
+    try {
+      return await $.ajax({
+        type: "POST",
+        url: "/dtext_preview",
+        data: {
+          body: this.dtext,
+          inline: this.inline,
+          media_embeds: this.mediaEmbeds,
+        },
+        timeout: this.previewTimeout,
+      });
+    } catch (error) {
+      Notice.error("Failed to load preview");
+      this.mode = "edit";
+      return "";
+    } finally {
+      this.previewLoading = false;
+    }
   }
 }

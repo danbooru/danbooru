@@ -97,6 +97,23 @@ class DtextEditorChromeTest < ChromeSystemTestCase
         end
       end
 
+      context "when the preview request times out" do
+        should "show an error notice and revert to edit mode" do
+          page.execute_script(<<~JS)
+            $.ajax = function() {
+              return $.Deferred().reject({ statusText: "timeout" }, "timeout").promise();
+            };
+          JS
+
+          @full_editor_field.set("[[1girl]]")
+          find(".new-comment a[title^='Preview']").click
+
+          assert_notice "Failed to load preview"
+          assert_visible @full_editor_selector
+          assert_equal "[[1girl]]", @full_editor_field.value
+        end
+      end
+
       context "the length counter" do
         should "update as text is typed, and turn red past the max length" do
           @full_editor_field.set("x" * 5000)
