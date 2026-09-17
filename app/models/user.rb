@@ -8,6 +8,8 @@ class User < ApplicationRecord
   MAX_BLACKLIST_TAGS = 5_000
   MAX_BLACKLIST_RULES = 5_000
 
+  RECENTLY_PROMOTED_PERIOD = 24.hours
+
   module Levels
     ANONYMOUS = 0
     RESTRICTED = 10
@@ -558,6 +560,10 @@ class User < ApplicationRecord
 
     def is_restricted?
       level == Levels::RESTRICTED
+    end
+
+    def recently_verified_account?
+      user_events.account_verification.exists?(created_at: RECENTLY_PROMOTED_PERIOD.ago..)
     end
 
     def is_member?

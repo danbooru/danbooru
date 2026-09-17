@@ -15,7 +15,7 @@ class EmailAddressPolicy < ApplicationPolicy
     end
   end
 
-  def update?
+  def edit?
     if record.user_id == user.id
       !user.is_banned?
     else
@@ -23,8 +23,16 @@ class EmailAddressPolicy < ApplicationPolicy
     end
   end
 
+  def update?
+    if record.user_id == user.id
+      !user.is_banned? && !user.recently_verified_account?
+    else
+      policy(record.user).can_recover_account?
+    end
+  end
+
   def destroy?
-    record.user_id == user.id
+    record.user_id == user.id && !user.recently_verified_account?
   end
 
   def verify?
