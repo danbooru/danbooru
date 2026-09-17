@@ -12,6 +12,8 @@ export default class Autocomplete {
   static PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.ALL_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.TAG_SEPARATORS}]*$`);
   static NEXT_WORD_REGEXP = new RegExp(`^[^${Autocomplete.ALL_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.TAG_SEPARATORS}]*`);
 
+  static PREV_SLASH_ABBREVIATION_REGEXP = new RegExp(`(?<=^|[${Autocomplete.TAG_SEPARATORS}])/$`);
+
   static initializeAll() {
     $.widget("ui.autocomplete", $.ui.autocomplete, {
       options: {
@@ -118,6 +120,8 @@ export default class Autocomplete {
               }
               return "";
             });
+            // if we're deleting a slash abbreviation, delete the slash too
+            before_caret_text = before_caret_text.replace(Autocomplete.PREV_SLASH_ABBREVIATION_REGEXP, "");
           } else if (event.inputType === "deleteWordForward") {
             after_caret_text = after_caret_text.replace(Autocomplete.NEXT_WORD_REGEXP, function(match) {
               if (!match.startsWith(" ") && match.endsWith(" ")) {

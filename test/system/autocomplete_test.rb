@@ -94,6 +94,23 @@ class AutocompleteChromeTest < ChromeSystemTestCase
       assert_search_autocomplete_results(["rating:sensitive"], "~~~rating:s")
     end
 
+    should "delete the slash when ctrl+backspacing a slash abbreviation" do
+      visit posts_path
+      field = find("#tags")
+
+      field.set("asdf /foo")
+      field.send_keys([:control, :backspace])
+      assert_equal "asdf ", field.value
+
+      field.set("/foo")
+      field.send_keys([:control, :backspace])
+      assert_equal "", field.value
+
+      field.set("foo/bar")
+      field.send_keys([:control, :backspace])
+      assert_equal "foo/", field.value
+    end
+
     should "insert completions on click" do
       visit posts_path
 
