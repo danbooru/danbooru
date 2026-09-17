@@ -57,6 +57,12 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render the post link as dtext so it has a tooltip" do
+        get post_disapprovals_path
+        assert_response :success
+        assert_select "tr#post-disapproval-#{@post_disapproval.id} a.dtext-post-id-link[href=?]", post_path(@post), true
+      end
+
       should respond_to_search.with { [@unrelated_disapproval, @user_disapproval, @post_disapproval] }
       should respond_to_search(message: "bad").with { @unrelated_disapproval }
 
