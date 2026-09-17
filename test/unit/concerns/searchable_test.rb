@@ -50,6 +50,18 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals(@p2, score_gt: 1, score_lt: 3)
         assert_search_equals(@p2, score_eq: 2, score_not: "1,3")
       end
+
+      context "for a nullable numeric attribute" do
+        subject { IpGeolocation }
+
+        should "support the _present operator" do
+          @g1 = create(:ip_geolocation, asn: nil)
+          @g2 = create(:ip_geolocation, asn: 1234)
+
+          assert_search_equals(@g2, asn_present: "true")
+          assert_search_equals(@g1, asn_present: "false")
+        end
+      end
     end
 
     context "for a string attribute" do

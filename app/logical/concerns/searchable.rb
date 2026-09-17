@@ -385,6 +385,14 @@ module Searchable
         relation = visible(relation, attr).where.not(id: visible(relation, attr).where_numeric_matches(attr, params[:"#{key}_not"], type))
       end
 
+      if params[:"#{key}_present"].present? && params[:"#{key}_present"].truthy?
+        relation = visible(relation, attr).where.not(attr => nil)
+      end
+
+      if params[:"#{key}_present"].present? && params[:"#{key}_present"].falsy?
+        relation = visible(relation, attr).where(attr => nil)
+      end
+
       if params[:"#{key}_eq"].present?
         relation = visible(relation, attr).where_operator(attr, :eq, params[:"#{key}_eq"])
       end
