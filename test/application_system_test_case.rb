@@ -54,12 +54,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   # The playwright container is optional (`bin/dev --profile test up playwright`),
   # so skip instead of hard-crashing when it isn't running.
-  def self.driven_by_remote_browser(browser_type)
+  def self.driven_by_remote_browser(browser_type, name: browser_type, **page_options)
     setup do
       skip "The playwright server (#{PLAYWRIGHT_SERVER_URL}) is not reachable - run `bin/dev --profile test up playwright -d`" unless ApplicationSystemTestCase.playwright_server_up?
     end
 
-    driver_name = :"playwright_#{browser_type}"
+    driver_name = :"playwright_#{name}"
 
     Capybara.register_driver(driver_name) do |app|
       Capybara::Playwright::Driver.new(
@@ -68,6 +68,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
         browser_server_endpoint_url: PLAYWRIGHT_SERVER_URL,
         headless: true,
         viewport: { width: 1920, height: 1080 },
+        **page_options,
       )
     end
 
@@ -86,4 +87,16 @@ end
 
 class WebkitSystemTestCase < ApplicationSystemTestCase
   driven_by_remote_browser :webkit
+end
+
+class MobileChromeSystemTestCase < ApplicationSystemTestCase
+  driven_by_remote_browser(
+    :chromium,
+    name: :mobile_chromium,
+    viewport: { width: 412, height: 915 },
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+    userAgent: "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.8010.48 Mobile Safari/537.36",
+  )
 end

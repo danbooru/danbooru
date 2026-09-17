@@ -13,5 +13,15 @@ class NumberedPaginatorComponentTest < ViewComponent::TestCase
       assert_css("a.paginator-prev[rel='prev']")
       assert_css("a.paginator-next[rel='next']")
     end
+
+    should "render clickable ellipsis" do
+      create_list(:tag, 50) # rubocop:disable FactoryBot/ExcessiveCreateList
+      records = Tag.all.paginate(10, limit: 1, page_limit: 100)
+      params = ActionController::Parameters.new(controller: "tags", action: "index")
+
+      html = render_inline(NumberedPaginatorComponent.new(records: records, params: params))
+
+      assert_equal(2, html.css("button.paginator-ellipsis[type=button]").size)
+    end
   end
 end

@@ -14,10 +14,6 @@ class PaginatorComponent < ApplicationComponent
   end
 
   def pages
-    last_page = total_pages.clamp(1..)
-    left = (current_page - window).clamp(2..)
-    right = (current_page + window).clamp(..last_page - 1)
-
     [
       1,
       ("..." unless left == 2),
@@ -25,6 +21,19 @@ class PaginatorComponent < ApplicationComponent
       ("..." unless right == last_page - 1),
       (last_page unless last_page == 1 || last_page.infinite?),
     ].flatten.compact
+  end
+
+  # Mobile only shows the first, current, and last page, so it needs extra ellipses.
+  def mobile_ellipsis_after_first?
+    left == 2 && current_page > 2
+  end
+
+  def mobile_ellipsis_before_last?
+    right == last_page - 1 && current_page < last_page - 1
+  end
+
+  def paginator_ellipsis(mobile_only: false)
+    tag.button ellipsis_icon(class: "text-muted"), "type": "button", "class": ["paginator-ellipsis", ("mobile-only" if mobile_only)], "aria-label": "Jump to page"
   end
 
   def link_to_page(anchor, page = anchor, **options)
@@ -38,5 +47,19 @@ class PaginatorComponent < ApplicationComponent
 
   def url_for_page(page)
     url_for(**params.merge(page: page).except(:z).permit!)
+  end
+
+  private
+
+  def last_page
+    total_pages.clamp(1..)
+  end
+
+  def left
+    (current_page - window).clamp(2..)
+  end
+
+  def right
+    (current_page + window).clamp(..(last_page - 1))
   end
 end
