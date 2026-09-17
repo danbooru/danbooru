@@ -16,6 +16,24 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search.with { @media_asset }
       should respond_to_search(metadata: { "File:ColorComponents" => 3 }).with { @media_asset }
       should respond_to_search(metadata: { "File:ColorComponents" => 4 }).with { [] }
+
+      should "follow the show page's prev/next pagination links" do
+        @asset1, @asset2, @asset3, @asset4, @asset5 = create_list(:media_asset, 5).sort_by(&:id)
+
+        # left arrow (data-shortcut="a"): jumps to the next higher id.
+        get media_assets_path(search: { id: ">#{@asset3.id}", order: "id_asc" }, limit: 1, redirect: true)
+        assert_redirected_to media_asset_path(@asset4)
+
+        follow_redirect!
+        assert_response :success
+
+        # right arrow (data-shortcut="d"): jumps to the next lower id.
+        get media_assets_path(search: { id: "<#{@asset3.id}", order: "id_desc" }, limit: 1, redirect: true)
+        assert_redirected_to media_asset_path(@asset2)
+
+        follow_redirect!
+        assert_response :success
+      end
     end
 
     context "show action" do

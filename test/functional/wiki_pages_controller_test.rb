@@ -44,6 +44,14 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to wiki_pages_path(search: { title_normalize: "tagme" }, redirect: true)
       end
 
+      should "follow the quick search link to the show page" do
+        get wiki_pages_path(redirect: true, search: { title_normalize: "tagme" })
+        assert_redirected_to wiki_page_path(@tagme)
+
+        follow_redirect!
+        assert_response :success
+      end
+
       should respond_to_search.with { [@picasso, @miku, @vocaloid, @deleted, @tagme] }
       should respond_to_search(title: "tagme").with { @tagme }
       should respond_to_search(title: "tagme", order: "post_count").with { @tagme }

@@ -86,9 +86,9 @@ class ApplicationController < ActionController::Base
   # Used to redirect a search directly to the result page when a search returns only one result.
   # Example: /wiki_pages?search[title]=touhou&redirect=true.
   def redirect_to_show(items)
-    if params[:redirect].to_s.truthy? && items.one? && item_matches_params(items.sole)
+    if params[:redirect].to_s.truthy? && items.one? && item_matches_params(items.first)
       format = request.format.symbol unless request.format.html?
-      redirect_to send("#{controller_path.singularize}_path", items.sole, variant: params[:variant], format: format)
+      redirect_to send("#{controller_path.singularize}_path", items.first, variant: params[:variant], format: format)
       true
     else
       false
