@@ -346,6 +346,48 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, Tag.find_by(name: "large_tag").is_deprecated?)
         end
+
+        should "succeed when removing a small artist alias" do
+          create(:tag, name: "artist1", category: Tag.categories.artist, post_count: 0)
+          create(:tag, name: "artist2", category: Tag.categories.artist, post_count: 20)
+          create(:tag_alias, antecedent_name: "artist1", consequent_name: "artist2")
+          @bulk_update_request = create(:bulk_update_request, script: "remove alias artist1 -> artist2")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+          end
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(@mod, @bulk_update_request.approver)
+          assert_equal(true, TagAlias.find_by(antecedent_name: "artist1", consequent_name: "artist2").is_deleted?)
+        end
+
+        should "fail when removing a large artist alias" do
+          create(:tag, name: "artist1", category: Tag.categories.artist, post_count: 0)
+          create(:tag, name: "artist2", category: Tag.categories.artist, post_count: 300)
+          create(:tag_alias, antecedent_name: "artist1", consequent_name: "artist2")
+          @bulk_update_request = create(:bulk_update_request, script: "remove alias artist1 -> artist2")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.find_by(antecedent_name: "artist1", consequent_name: "artist2").is_deleted?)
+        end
+
+        should "fail when removing a non-artist alias" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 0)
+          create(:tag, name: "char1b", category: Tag.categories.character, post_count: 20)
+          create(:tag_alias, antecedent_name: "char1a", consequent_name: "char1b")
+          @bulk_update_request = create(:bulk_update_request, script: "remove alias char1a -> char1b")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.find_by(antecedent_name: "char1a", consequent_name: "char1b").is_deleted?)
+        end
       end
 
       context "for an admin" do

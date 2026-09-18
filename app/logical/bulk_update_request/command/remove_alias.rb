@@ -36,4 +36,12 @@ class BulkUpdateRequest::Command::RemoveAlias < BulkUpdateRequest::Command
       existing_alias.update(status: "deleted")
     end
   end
+
+  def approval_level(tags: nil)
+    consequent = tags.present? ? tags.find { |tag| tag.name == @consequent } : Tag.find_by_name(@consequent)
+
+    return User::Levels::MODERATOR if consequent.blank? || (consequent.artist? && consequent.is_small_tag?)
+
+    User::Levels::ADMIN
+  end
 end
