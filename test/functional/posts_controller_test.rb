@@ -137,6 +137,27 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response 451
         end
 
+        should "not show the takedown artist notice for a non-artist search where all posts are banned" do
+          artist = create(:artist, is_banned: true)
+          create(:post, tag_string: "#{artist.name} character_a")
+
+          get posts_path, params: { tags: "character_a" }
+
+          assert_response :success
+          assert_select "#show-excerpt-link", text: "Artist", count: 0
+          assert_select ".hidden-posts-notice", text: /takedown request/, count: 0
+        end
+
+        should "show the takedown notice for an artist search where all posts are banned" do
+          create(:artist, name: "bkub")
+          as(@user) { create(:post, tag_string: "bkub", is_banned: true) }
+
+          get posts_path, params: { tags: "bkub" }
+
+          assert_response :success
+          assert_select ".hidden-posts-notice", text: /takedown request/, count: 1
+        end
+
         should "render for a tag with a wiki page" do
           as(@user) { create(:post, tag_string: "char:fumimi", rating: "s") }
           get posts_path, params: { tags: "fumimi" }
@@ -222,6 +243,26 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "1girl solo" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
+        end
+
+        should "show the takedown notice for a search that includes a banned artist tag" do
+          artist = create(:artist, is_banned: true)
+          create(:post, tag_string: "#{artist.name} 1girl")
+
+          get posts_path, params: { tags: "#{artist.name} 1girl" }
+
+          assert_response :success
+          assert_select ".hidden-posts-notice", text: /takedown request/, count: 1
+        end
+
+        should "not show the takedown notice when the artist tag in the search is negated" do
+          create(:artist, name: "bkub", is_banned: true)
+          create(:post, tag_string: "1girl", is_banned: true)
+
+          get posts_path, params: { tags: "-bkub 1girl" }
+
+          assert_response :success
+          assert_select ".hidden-posts-notice", text: /takedown request/, count: 0
         end
 
         should "show the wiki excerpt if the search has a tag with a wiki" do

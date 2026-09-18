@@ -146,6 +146,12 @@ module PostSets
       artist.present? && artist.is_banned? && !current_user.is_approver?
     end
 
+    # @return [Boolean] True if every post on the page is banned and the search includes an artist
+    #   tag, so it's not shown for e.g. a character search where the posts are by a banned artist.
+    def show_takedown_notice?
+      banned_posts.size == posts.size && Tag.where(name: post_query.searched_tag_names).any?(&:artist?)
+    end
+
     def includes
       if show_votes?
         [:media_asset, :vote_by_current_user]
