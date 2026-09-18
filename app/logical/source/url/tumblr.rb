@@ -5,7 +5,7 @@ class Source::URL::Tumblr < Source::URL
     url "https://www.tumblr.com"
     domains %w[tumblr.com tmblr.co]
 
-    credential :consumer_key, help: %{Your Tumblr consumer key. Register a new application at https://www.tumblr.com/oauth/register then copy your consumer key from https://www.tumblr.com/oauth/apps.}
+    credential :consumer_key, default: Danbooru.config.tumblr_consumer_key, help: %{Your Tumblr consumer key. Register a new application at https://www.tumblr.com/oauth/register then copy your consumer key from https://www.tumblr.com/oauth/apps.}
   end
 
   extractors { [Source::Extractor::Tumblr, Source::Extractor::URLShortener] }

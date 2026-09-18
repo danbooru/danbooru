@@ -5,8 +5,8 @@ class Source::URL::Furaffinity < Source::URL
     url "https://www.furaffinity.net"
     domains %w[furaffinity.net fxraffinity.net fxfuraffinity.net vxfuraffinity.net xfuraffinity.net]
 
-    credential :cookie_a, help: %{Your Furaffinity `cookie_a` cookie. Warning: logging out of Furaffinity will invalidate these cookies.}
-    credential :cookie_b, help: %{Your Furaffinity `cookie_b` cookie. Warning: logging out of Furaffinity will invalidate these cookies.}
+    credential :cookie_a, default: Danbooru.config.furaffinity_cookie_a, help: %{Your Furaffinity `cookie_a` cookie. Warning: logging out of Furaffinity will invalidate this cookie.}
+    credential :cookie_b, default: Danbooru.config.furaffinity_cookie_b, help: %{Your Furaffinity `cookie_b` cookie. Warning: logging out of Furaffinity will invalidate this cookie.}
   end
 
   attr_reader :work_id, :username, :filename

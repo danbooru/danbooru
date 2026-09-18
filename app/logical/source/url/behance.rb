@@ -3,7 +3,7 @@
 # @see Source::Extractor::Behance
 class Source::URL::Behance < Source::URL
   site "Behance", url: "https://www.behance.net" do
-    credential :session_cookie, help: %{Your Behance `iat0` cookie.}
+    credential :session_cookie, default: Danbooru.config.behance_session_cookie, help: %{Your Behance `iat0` cookie.}
   end
 
   RESERVED_USERNAMES = %w[about assets auth blog careers entries galleries hc hire misc joblist pro search services updates]
