@@ -1,5 +1,6 @@
 require "test_helper"
 require "diff/lcs/array"
+require "nokogiri"
 
 class DiffBuilderTest < ActiveSupport::TestCase
   context "DiffBuilder" do
@@ -142,7 +143,7 @@ class DiffBuilderTest < ActiveSupport::TestCase
         )
       end
 
-      should "stream content analysis for one long token" do
+      should "render a long single-token replacement" do
         old_text = "#{"a" * 79_999}x"
         new_text = "#{"a" * 79_999}y"
 
@@ -191,14 +192,18 @@ class DiffBuilderTest < ActiveSupport::TestCase
         )
       end
 
-      should "send formatting-only changes through the legacy renderer" do
+      should "render formatting-only changes without corrupting either text" do
         assert_equal(
           "hello<del><span class=\"paragraph-mark\">¶</span></del><ins><span class=\"paragraph-mark\">¶</span></ins><br>world",
           DiffBuilder.new(old_text: "hello\nworld", new_text: "hello\r\nworld").body_html,
         )
         assert_equal(
-          "<del>hellohelloworld<span class=\"paragraph-mark\">¶</span><br></del>world",
+          "<del>hello<span class=\"paragraph-mark\">¶</span><br>world</del><ins>helloworld</ins>",
           DiffBuilder.new(old_text: "hello\nworld", new_text: "helloworld").body_html,
+        )
+        assert_equal(
+          "<del>helloworld</del><ins>hello<span class=\"paragraph-mark\">¶</span><br>world</ins>",
+          DiffBuilder.new(old_text: "helloworld", new_text: "hello\nworld").body_html,
         )
         assert_equal(
           "hello<span class=\"paragraph-mark\">¶</span><br><ins><span class=\"paragraph-mark\">¶</span><br></ins>world",
@@ -214,29 +219,125 @@ class DiffBuilderTest < ActiveSupport::TestCase
         )
       end
 
-      should "keep formatting-only changes detailed above the LCS budget" do
-        old_text = "#{"a " * 10_001}z"
-        new_text = "#{"a\t" * 10_001}z"
-        expected = "#{"a<del> </del><ins>\t</ins>" * 10_001}z"
-        old_lines = "#{"a\n" * 10_001}z"
-        new_lines = "#{"a\r\n" * 10_001}z"
-        diffed_line = "a<del><span class=\"paragraph-mark\">¶</span></del><ins><span class=\"paragraph-mark\">¶</span></ins><br>"
-
-        Diff::LCS.expects(:diff).never
-        assert_equal(expected, DiffBuilder.new(old_text:, new_text:).body_html)
-        assert_equal("#{diffed_line * 10_001}z", DiffBuilder.new(old_text: old_lines, new_text: new_lines).body_html)
+      should "preserve matching context for formatting-only edits with low content coverage" do
+        assert_equal(
+          "<del>aaa_bbb</del><ins>aaabbb</ins> &lt;tag&gt; <del>ccc_ddd</del><ins>cccddd</ins>",
+          DiffBuilder.new(old_text: "aaa_bbb <tag> ccc_ddd", new_text: "aaabbb <tag> cccddd").body_html,
+        )
       end
 
-      should "keep formatting-only changes detailed above the LCS work budget" do
+      should "consider content order when deciding whether text is related" do
+        old_text = "ab <b> cd"
+        new_text = "dc <b> ba"
+
+        assert_equal(replacement_html(old_text, new_text), DiffBuilder.new(old_text:, new_text:).body_html)
+      end
+
+      should "preserve both texts without nesting change tags" do
+        texts = ["", "a", "b", "a b", "b a", "a\nb", "a\r\nb", "ab", "a b c", "c b d", "甲乙👩‍💻", "<b>a & \"b\"</b>", "e\u0301 e\u0300"]
+
+        texts.product(texts) do |old_text, new_text|
+          html = DiffBuilder.new(old_text:, new_text:).body_html
+          assert_body_texts_preserved(html, old_text, new_text)
+        end
+      end
+
+      should "preserve formatting detail on both sides of the LCS work budget" do
+        rendered_word = "a<del> </del><ins>\t</ins>"
+        # The work estimates are 997,817 and 1,004,454, respectively.
+        assert_equal(
+          "#{rendered_word * 302}z",
+          DiffBuilder.new(old_text: "#{"a " * 302}z", new_text: "#{"a\t" * 302}z").body_html,
+        )
+
+        Diff::LCS.expects(:diff).never
+        assert_equal(
+          "#{rendered_word * 303}z",
+          DiffBuilder.new(old_text: "#{"a " * 303}z", new_text: "#{"a\t" * 303}z").body_html,
+        )
+      end
+
+      should "preserve formatting-only changes above the LCS token budget and keep common edges" do
+        changes = [
+          ["a ", "a\t", "a<del> </del><ins>\t</ins>"],
+          ["a\n", "a\r\n", 'a<del><span class="paragraph-mark">¶</span></del><ins><span class="paragraph-mark">¶</span></ins><br>'],
+        ]
+
+        Diff::LCS.expects(:diff).never
+        changes.each do |old_segment, new_segment, rendered_segment|
+          old_text = "#{old_segment * 10_001}z"
+          new_text = "#{new_segment * 10_001}z"
+
+          assert_equal(
+            "#{rendered_segment * 10_001}z",
+            DiffBuilder.new(old_text:, new_text:).body_html,
+          )
+        end
+      end
+
+      should "preserve graphemes when formatting changes token boundaries above the LCS budget" do
+        changes = [
+          ["a_b ", "ab ", "a<del>_</del>b "],
+          ["a b ", "ab ", "a<del> </del>b "],
+          ["ab ", "a b ", "a<ins> </ins>b "],
+          ["👩‍💻 e\u0301 ", "👩‍💻\te\u0301\t", "👩‍💻<del> </del><ins>\t</ins>e\u0301<del> </del><ins>\t</ins>"],
+        ]
+
+        Diff::LCS.expects(:diff).never
+        changes.each do |old_segment, new_segment, rendered_segment|
+          old_text = "#{old_segment * 303}z"
+          new_text = "#{new_segment * 303}z"
+          html = DiffBuilder.new(old_text:, new_text:).body_html
+
+          assert_equal("#{rendered_segment * 303}z", html)
+          assert_body_texts_preserved(html, old_text, new_text)
+        end
+      end
+
+      should "preserve individual blank line insertions above the LCS budget" do
+        old_text = "#{"line\n" * 303}end"
+        new_text = "#{"line\n\n" * 303}end"
+
+        Diff::LCS.expects(:diff).never
+        html = DiffBuilder.new(old_text:, new_text:).body_html
+        fragment = Nokogiri::HTML5.fragment(html)
+
+        assert_empty(fragment.css("del"))
+        assert_equal(Array.new(303, '<span class="paragraph-mark">¶</span><br>'), fragment.css("ins").map(&:inner_html))
+        assert_body_texts_preserved(html, old_text, new_text)
+      end
+
+      should "escape formatting changes in SafeBuffers above the LCS work budget" do
         repeated_format = "<x>" * 400
         old_format = "#{repeated_format}<old&>"
         new_format = "_\"'#{repeated_format}"
         old_text = ActiveSupport::SafeBuffer.new("a#{old_format}z")
         new_text = ActiveSupport::SafeBuffer.new("a#{new_format}z")
-        expected = "a<del>#{"&lt;x&gt;" * 400}&lt;old&amp;&gt;</del><ins>_&quot;&#39;#{"&lt;x&gt;" * 400}</ins>z"
+        # "a" is shared content even though the new side starts with the word token "a_".
+        expected = "a#{replacement_html(old_format, new_format)}z"
 
         Diff::LCS.expects(:diff).never
-        assert_equal(expected, DiffBuilder.new(old_text:, new_text:).body_html)
+        html = DiffBuilder.new(old_text:, new_text:).body_html
+
+        assert_equal(expected, html)
+        assert_predicate(html, :html_safe?)
+        assert_body_texts_preserved(html, old_text, new_text)
+      end
+
+      should "discard partial formatting diffs when content differs above the LCS budget" do
+        endings = [["z", "y"], ["z", "zq"], ["zq", "z"], ["ab", "ba"], ["é", "e\u0301"], ["👩‍💻", "👨‍💻"]]
+
+        Diff::LCS.expects(:diff).never
+        endings.each do |old_ending, new_ending|
+          old_middle = " #{"a " * 302}#{old_ending}"
+          new_middle = "\t#{"a\t" * 302}#{new_ending}"
+          old_text = "a#{old_middle}"
+          new_text = "a#{new_middle}"
+          html = DiffBuilder.new(old_text:, new_text:).body_html
+
+          assert_equal("a#{replacement_html(old_middle, new_middle)}", html)
+          assert_body_texts_preserved(html, old_text, new_text)
+        end
       end
 
       should "escape all body paths even for a SafeBuffer input" do
@@ -303,16 +404,32 @@ class DiffBuilderTest < ActiveSupport::TestCase
 
   private
 
-  def replacement_html(old_text, new_text)
-    "<del>#{ERB::Util.html_escape(old_text)}</del><ins>#{ERB::Util.html_escape(new_text)}</ins>"
+  def assert_body_texts_preserved(html, old_text, new_text)
+    fragment = Nokogiri::HTML5.fragment(html)
+    assert_empty(fragment.css("del ins, ins del, del del, ins ins"), [old_text, new_text].inspect)
+
+    [["ins", old_text], ["del", new_text]].each do |removed_tag, expected_text|
+      version = fragment.dup
+      version.css("#{removed_tag}, span.paragraph-mark").remove
+      version.css("br").each { |br| br.replace("\n") }
+
+      assert_equal(expected_text.gsub(/\r?\n/, "\n"), version.text, [old_text, new_text, removed_tag].inspect)
+    end
   end
 
+  def replacement_html(old_text, new_text)
+    html = "<del>#{ERB::Util.html_escape(String.new(old_text))}</del><ins>#{ERB::Util.html_escape(String.new(new_text))}</ins>"
+    html.gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>')
+  end
+
+  # Construct a body with an exact token count and a controlled number of equal-token pairs.
   def repeated_tag_text(total:, x_count:, y_count:, side:)
     unique_count = total - x_count - y_count - 2
     (["<#{side}-start>"] + Array.new(x_count, "<x>") + Array.new(y_count, "<y>") +
       Array.new(unique_count) { |index| "<#{side}-#{index}>" } + ["<#{side}-end>"]).join
   end
 
+  # Construct distinct bodies with one shared token to exercise the LCS token limit.
   def anchored_tag_text(total:, side:)
     unique_count = total - 3
     before_count = unique_count / 2

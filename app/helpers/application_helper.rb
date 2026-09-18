@@ -26,6 +26,7 @@ module ApplicationHelper
 
   def diff_body_html(record, other, field)
     if record.blank? || other.blank?
+      # With no comparison version, show the available text without change markers.
       body = (other.presence || record)&.[](field)
       return DiffBuilder.new(old_text: body, new_text: body).body_html
     end
