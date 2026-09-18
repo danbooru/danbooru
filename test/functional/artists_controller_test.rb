@@ -205,6 +205,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(has_urls: "false").with { [@banned, @deleted, @artist] }
           should respond_to_search(urls: { url: "https://www.pixiv.net/users/32777" }).with { @masao }
         end
+
+        context "using url_count" do
+          should respond_to_search(url_count: "0").with { [@banned, @deleted, @artist] }
+          should respond_to_search(url_count: "1").with { [@artgerm, @masao] }
+          should respond_to_search(url_count: ">0").with { [@artgerm, @masao] }
+        end
       end
     end
 

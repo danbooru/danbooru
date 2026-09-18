@@ -282,6 +282,12 @@ class Artist < ApplicationRecord
       where(id: ArtistURL.normalized_url_equals_any(urls).select(:artist_id))
     end
 
+    def with_url_count
+      subquery = left_outer_joins(:urls).group(:id).select("artists.*")
+      subquery = subquery.select("COUNT(artist_urls.id) AS url_count")
+      from(subquery.arel.as("artists"))
+    end
+
     def any_name_or_url_matches(query)
       query = query.strip
 
@@ -309,6 +315,10 @@ class Artist < ApplicationRecord
 
       if params[:url_matches].present?
         q = q.urls_match(params[:url_matches])
+      end
+
+      if params[:url_count].present?
+        q = q.with_url_count.where_numeric_matches(:url_count, params[:url_count])
       end
 
       case params[:order]
