@@ -21,7 +21,11 @@ module Clockwork
     DanbooruMaintenance.weekly
   end
 
-  every(1.month, "monthly", at: "00:00") do
+  # `every(1.month, ...)` fires `period` after the job's last run,
+  # so a cron container restart resets it and can trigger the monthly
+  # job on any day (danbooru/danbooru#5435).
+  # Run this daily instead and only execute on the first of the month.
+  every(1.day, "monthly", at: "00:00", if: ->(t) { t.day == 1 }) do
     DanbooruMaintenance.monthly
   end
 end

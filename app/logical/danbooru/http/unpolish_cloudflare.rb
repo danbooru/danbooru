@@ -15,7 +15,7 @@ module Danbooru
         response = yield request
 
         if response.headers["CF-Polished"].present?
-          request.uri.query_values = request.uri.query_values.to_h.merge(danbooru_no_polish: SecureRandom.uuid)
+          request.uri.query = [request.uri.query.presence, "danbooru_no_polish=#{SecureRandom.uuid}"].compact.join("&")
           response = yield request
         end
 

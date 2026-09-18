@@ -49,7 +49,7 @@ module Source::Tests::Extractor
         tags: %w[1girl :3 aocoa blonde_hair blue_hat crooked_smile dokibird dokibird_(retro_doki) earrings green_eyes hair_between_eyes hair_ribbon hat highres indie_virtual_youtuber jewelry long_hair portrait ribbon simple_background single_earring smile solo transparent_background twintails virtual_youtuber],
         page_url: "https://danbooru.donmai.us/posts/7392739",
         profile_urls: ["https://x.com/AoCoa"],
-        artist_name: "AoCoa 🐌",
+        artist_name: "AoCoa",
       )
     end
 
@@ -73,6 +73,24 @@ module Source::Tests::Extractor
         profile_url: nil,
         artist_name: nil,
         artist_commentary_title: nil,
+      )
+    end
+
+    context "A media asset" do
+      strategy_should_work(
+        "https://danbooru.donmai.us/media_assets/1",
+        image_urls: %w[https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg],
+        media_files: [{ file_size: 127_238 }],
+        page_url: "https://danbooru.donmai.us/media_assets/1",
+        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: nil,
+        dtext_artist_commentary_desc: nil,
       )
     end
   end

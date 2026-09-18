@@ -4,7 +4,7 @@
 # {DanbooruMaintenance}.
 class PruneBulkUpdateRequestsJob < ApplicationJob
   def perform
-    BulkUpdateRequestPruner.warn_old
-    BulkUpdateRequestPruner.reject_expired
+    BulkUpdateRequest::Pruner.warn_old
+    BulkUpdateRequest::Pruner.reject_expired
   end
 end

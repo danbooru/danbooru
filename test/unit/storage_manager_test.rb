@@ -1,7 +1,10 @@
 require "test_helper"
-require "testcontainers"
+require "socket"
 
 class StorageManagerTest < ActiveSupport::TestCase
+  SFTP_HOST = "sftp"
+  SFTP_PORT = 22
+
   def tempfile(data, &_block)
     file = Danbooru::Tempfile.new
     file.write(data)
@@ -51,33 +54,21 @@ class StorageManagerTest < ActiveSupport::TestCase
 
   context "StorageManager::SFTP" do
     setup do
-      # Work around testcontainers producing `'IO#read': closed stream` warnings when it tries to detect the host's gateway IP.
-      ENV["TC_HOST"] = `ip -4 route show default`.split[2] unless ENV["CI"].present?
+      begin
+        TCPSocket.new(SFTP_HOST, SFTP_PORT).close
+      rescue StandardError
+        skip "The SFTP server (#{SFTP_HOST}:#{SFTP_PORT}) is not reachable - run `bin/dev --profile test sftp up -d`"
+      end
 
-      @sftp_container =
-        Testcontainers::DockerContainer.new("atmoz/sftp")
-        .with_command("testuser:testpass:::upload")
-        .with_exposed_ports("22/tcp")
-        .with_wait_for(:tcp_port, "22")
-
-      @sftp_container.start
-
-      @storage_manager = StorageManager::SFTP.new(@sftp_container.host, base_dir: "/upload", ssh_options: {
-        port: @sftp_container.mapped_port(22),
+      # Use a fresh, randomly-named directory so tests don't collide with leftover files from previous runs against the
+      # same long-lived container.
+      @storage_manager = StorageManager::SFTP.new(SFTP_HOST, base_dir: "/upload/#{SecureRandom.hex(8)}", ssh_options: {
+        port: SFTP_PORT,
         user: "testuser",
         password: "testpass",
         verify_host_key: :never,
         auth_methods: %w[password],
       })
-    rescue Testcontainers::Error => e
-      skip "Docker not available: #{e.message}"
-    end
-
-    teardown do
-      @sftp_container&.stop
-      @sftp_container&.remove
-    rescue Testcontainers::Error
-      nil
     end
 
     context "#store method" do
@@ -152,7 +143,10 @@ class StorageManagerTest < ActiveSupport::TestCase
       end
 
       should "raise an error if the destination directory can't be written" do
-        @sftp_container.exec(["sh", "-lc", "mkdir -p /home/testuser/upload/no_write && chmod 555 /home/testuser/upload/no_write"])
+        @storage_manager.with_connection do |sftp|
+          sftp.mkdir_p!(@storage_manager.full_path("no_write"))
+          sftp.setstat!(@storage_manager.full_path("no_write"), permissions: 0o555)
+        end
 
         assert_raises(Net::SFTP::StatusException) do
           tempfile("data") { |f| @storage_manager.store(f, "no_write/test.txt") }
@@ -173,7 +167,8 @@ class StorageManagerTest < ActiveSupport::TestCase
       end
 
       should "raise an error if the file can't be deleted due to permissions" do
-        @sftp_container.exec(["sh", "-lc", "mkdir -p /home/testuser/upload/no_delete && echo secret > /home/testuser/upload/no_delete/file.txt && chmod 555 /home/testuser/upload/no_delete"])
+        tempfile("secret") { |f| @storage_manager.store(f, "no_delete/file.txt") }
+        @storage_manager.with_connection { |sftp| sftp.setstat!(@storage_manager.full_path("no_delete"), permissions: 0o555) }
 
         assert_raises(Net::SFTP::StatusException) { @storage_manager.delete("no_delete/file.txt") }
       end
@@ -193,7 +188,8 @@ class StorageManagerTest < ActiveSupport::TestCase
       end
 
       should "raise an error if the file can't be opened due to permissions" do
-        @sftp_container.exec(["sh", "-lc", "echo secret > /home/testuser/upload/no_read.txt && chmod 000 /home/testuser/upload/no_read.txt"])
+        tempfile("secret") { |f| @storage_manager.store(f, "no_read.txt") }
+        @storage_manager.with_connection { |sftp| sftp.setstat!(@storage_manager.full_path("no_read.txt"), permissions: 0o000) }
 
         assert_raises(Net::SFTP::StatusException) { @storage_manager.open("no_read.txt") }
       end

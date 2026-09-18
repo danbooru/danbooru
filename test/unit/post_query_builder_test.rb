@@ -133,6 +133,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2], "-*c -a*a")
     end
 
+    should "not exclude a tag that's explicitly searched for from a negated wildcard that would otherwise match it" do
+      post1 = create(:post, tag_string: "aaa")
+      post2 = create(:post, tag_string: "aaa aab")
+
+      assert_tag_match([post1], "aaa -a*")
+      assert_tag_match([post2, post1], "aaa")
+
+      assert_tag_match([], "aaa -a* -aaa")
+    end
+
     should "return posts for a complex search with multiple AND, OR, and NOT tags" do
       post1 = create(:post, tag_string: "original")
       post2 = create(:post, tag_string: "smile")
@@ -156,7 +166,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for an invalid metatag value" do
       should "return nothing" do
-        create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
+        create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42)
 
         assert_tag_match([], "score:foo")
         assert_tag_match([], "score:42x")
@@ -336,6 +346,23 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} mpixels:0.48")
       assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} filesize:1234")
       assert_tag_match([post1], "ordfav:#{CurrentUser.user.name} filetype:jpg")
+    end
+
+    should "return posts for the ordvote:<name> metatag" do
+      post1 = create(:post)
+      post2 = create(:post)
+
+      create(:post_vote, post: post1, user: CurrentUser.user, score: 1)
+      create(:post_vote, post: post2, user: CurrentUser.user, score: -1)
+
+      assert_tag_match([post2, post1], "ordvote:#{CurrentUser.user.name}")
+      assert_tag_match([], "ordvote:does_not_exist")
+
+      assert_tag_match([post2, post1], "ordvote:#{CurrentUser.user.name} commentary:false")
+      assert_tag_match([post1], "ordvote:#{CurrentUser.user.name} upvotes:>0")
+      assert_tag_match([post2], "ordvote:#{CurrentUser.user.name} downvotes:>0")
+      assert_tag_match([post2, post1], "ordvote:#{CurrentUser.user.name} comments:0")
+      assert_tag_match([post2, post1], "ordvote:#{CurrentUser.user.name} -has:comments")
     end
 
     should "return posts for the pool:<name> metatag" do
@@ -811,7 +838,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the ratio:<x:y> metatag" do
-      post = create(:post_with_file, filename: "test.jpg")
+      post = create(:post_with_file, filename: "jpg/test.jpg")
 
       assert_tag_match([post], "ratio:1.49")
       assert_tag_match([post], "ratio:.149e1")
@@ -825,7 +852,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the mpixels:N metatag" do
-      post = create(:post_with_file, filename: "test.jpg")
+      post = create(:post_with_file, filename: "jpg/test.jpg")
 
       assert_tag_match([post], "mpixels:0.1675")
       assert_tag_match([post], "mpixels:+0.1675")
@@ -1101,7 +1128,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the md5:<md5> metatag" do
-      post1 = create(:post_with_file, filename: "test.jpg")
+      post1 = create(:post_with_file, filename: "jpg/test.jpg")
       post2 = create(:post)
 
       assert_tag_match([post1], "md5:ecef68c44edb8a0d6a3070b5f8e8ee76")
@@ -1118,8 +1145,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the pixelhash:<md5> metatag" do
-      post1 = create(:post_with_file, filename: "test.jpg")
-      post2 = create(:post_with_file, filename: "test.png")
+      post1 = create(:post_with_file, filename: "jpg/test.jpg")
+      post2 = create(:post_with_file, filename: "png/test.png")
 
       assert_tag_match([post1], "pixelhash:01cb481ec7730b7cfced57ffa5abd196")
       assert_tag_match([post1], "pixelhash:01CB481EC7730B7CFCED57FFA5ABD196")
@@ -1157,6 +1184,40 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "source:'none'")
       assert_tag_match([], "source:none source:abcde")
       assert_tag_match([], "source:abcde source:xzy")
+    end
+
+    should "return posts for a source search with escaped wildcards (issue #5286)" do
+      post1 = create(:post, source: "* *")
+      post2 = create(:post, source: "*a*")
+      post3 = create(:post, source: "foo bar")
+
+      # unquoted: a backslash-escaped "*" is matched literally, not as a wildcard
+      assert_tag_match([post2], 'source:\*a\*')
+      assert_tag_match([post1], 'source:\*\ \*')
+
+      # quoted: a backslash-escaped "*" is also matched literally, instead of breaking the search
+      assert_tag_match([post2], 'source:"\*a\*"')
+      assert_tag_match([post1], 'source:"\* \*"')
+      assert_tag_match([post2], "source:'\\*a\\*'")
+      assert_tag_match([post1], "source:'\\* \\*'")
+
+      # quoted, unescaped: "*" is still treated as a wildcard
+      assert_tag_match([post3, post1], 'source:"* *"')
+    end
+
+    should "return posts for a source search with escaped backslashes and spaces (issue #5281)" do
+      post = create(:post, source: 'a \b')
+
+      # unquoted: the space has to be escaped to be part of the value
+      assert_tag_match([post], 'source:a\ \b')
+
+      # quoted: spaces don't need escaping, and a single backslash is matched literally
+      assert_tag_match([post], 'source:"a \b"')
+      assert_tag_match([post], "source:'a \\b'")
+
+      # quoted: a doubled backslash is also matched as a single literal backslash
+      assert_tag_match([post], 'source:"a \\\\b"')
+      assert_tag_match([post], "source:'a \\\\b'")
     end
 
     should "return posts for a pixiv source search" do
@@ -1380,9 +1441,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for an exif:<value> metatag" do
-      jpg = create(:post_with_file, filename: "test.jpg")
-      gif = create(:post_with_file, filename: "test.gif")
-      png = create(:post_with_file, filename: "test.png")
+      jpg = create(:post_with_file, filename: "jpg/test.jpg")
+      gif = create(:post_with_file, filename: "gif/test.gif")
+      png = create(:post_with_file, filename: "png/test.png")
 
       assert_tag_match([jpg], "exif:File:ColorComponents")
       assert_tag_match([jpg], "exif:File:ColorComponents=3")
@@ -1657,14 +1718,17 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     should "not allow conflicting order metatags" do
       assert_search_error("order:score ordfav:a")
+      assert_search_error("order:score ordvote:a")
       assert_search_error("order:score ordfavgroup:a")
       assert_search_error("order:score ordpool:a")
       assert_search_error("ordfav:a ordpool:b")
+      assert_search_error("ordvote:a ordpool:b")
     end
 
     should "not allow metatags that can't be used more than once" do
       assert_search_error("order:score order:favcount")
       assert_search_error("ordfav:a ordfav:b")
+      assert_search_error("ordvote:a ordvote:b")
       assert_search_error("ordfavgroup:a ordfavgroup:b")
       assert_search_error("ordpool:a ordpool:b")
       assert_search_error("limit:5 limit:10")
@@ -1674,6 +1738,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "not allow non-negatable metatags to be negated" do
       assert_search_error("-order:score")
       assert_search_error("-ordfav:a")
+      assert_search_error("-ordvote:a")
       assert_search_error("-ordfavgroup:a")
       assert_search_error("-ordpool:a")
       assert_search_error("-limit:20")
@@ -1683,6 +1748,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "not allow non-OR'able metatags to be OR'd" do
       assert_search_error("a or order:score")
       assert_search_error("a or ordfav:a")
+      assert_search_error("a or ordvote:a")
       assert_search_error("a or ordfavgroup:a")
       assert_search_error("a or ordpool:a")
       assert_search_error("a or limit:20")

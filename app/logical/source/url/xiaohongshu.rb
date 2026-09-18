@@ -4,7 +4,7 @@
 class Source::URL::Xiaohongshu < Source::URL
   site "Xiaohongshu" do
     url "https://www.xiaohongshu.com"
-    domains %w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com]
+    domains %w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com xhslink.cn]
 
     credential :api_host, help: %{Your Xiaohongshu site host. Can be either "www.xiaohongshu.com" or "www.rednote.com".}
     credential :session_cookie, help: %{Your Xiaohongshu `gid` cookie.}
@@ -17,7 +17,7 @@ class Source::URL::Xiaohongshu < Source::URL
   attr_reader :user_id, :post_id, :full_image_url, :xsec_token, :redirect_id
 
   def self.match?(url)
-    url.domain.in?(%w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com])
+    url.domain.in?(%w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com xhslink.cn])
   end
 
   def parse
@@ -67,7 +67,8 @@ class Source::URL::Xiaohongshu < Source::URL
     # https://xhslink.com/WNd9gI
     # https://xhslink.com/o/3y3uwYYeyHn
     # https://xhslink.com/a/jqL6B32eU0F7，复制本条信息，打开
-    in _, "xhslink.com", *_subdirs, redirect_id
+    # https://xhslink.cn/m/EXCcWbUXnl
+    in _, ("xhslink.com" | "xhslink.cn"), *_subdirs, redirect_id
       @redirect_id = redirect_id
 
     # http://sns-video-bd.xhscdn.com/stream/110/258/01e62cb7e42033da010370018f1eb04fee_258.mp4 (video sample)

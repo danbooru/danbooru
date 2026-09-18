@@ -66,6 +66,7 @@ class ActiveSupport::TestCase
   include BulkUpdateRequestTestHelper
   include DatabaseTestHelper
   include IqdbTestHelper
+  include MediaFileTestHelper
   include ReportbooruHelper
   include UploadTestHelper
   include UrlTestHelper

@@ -70,9 +70,11 @@ class EmailAddress < ApplicationRecord
   def verify!
     transaction do
       update!(is_verified: true)
+      UserEvent.create_from_request!(user, :email_verification, request) if saved_change_to_is_verified?
 
       if user.is_restricted? && !is_restricted?
         user.update!(level: User::Levels::MEMBER, is_verified: is_verified?)
+        UserEvent.create_from_request!(user, :account_verification, request)
       end
     end
   end

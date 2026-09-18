@@ -41,6 +41,47 @@ class EmailAddressTest < ActiveSupport::TestCase
       end
     end
 
+    context "#verify!" do
+      setup do
+        @request = ActionDispatch::TestRequest.create("REMOTE_ADDR" => Faker::Internet.public_ip_v4_address, "HTTP_USER_AGENT" => Faker::Internet.user_agent)
+        @request.session = { session_id: SecureRandom.hex(16), login_id: create(:login_session).id }
+      end
+
+      should "record a user event" do
+        email_address = create(:email_address, is_verified: false, request: @request)
+        email_address.verify!
+
+        assert_equal(true, email_address.user.user_events.email_verification.exists?)
+      end
+
+      should "not record a duplicate user event" do
+        email_address = create(:email_address, is_verified: false, request: @request)
+        email_address.verify!
+        email_address.verify!
+
+        assert_equal(1, email_address.user.user_events.email_verification.count)
+      end
+
+      should "record an account_verification event for a restricted user" do
+        user = create(:restricted_user)
+        email_address = create(:email_address, user: user, address: "test@gmail.com", is_verified: false, request: @request)
+
+        email_address.verify!
+
+        assert_equal(true, user.user_events.account_verification.exists?)
+        assert_equal(User::Levels::MEMBER, user.reload.level)
+      end
+
+      should "not record an account_verification event for an unrestricted user" do
+        user = create(:builder_user)
+        email_address = create(:email_address, is_verified: false, request: @request)
+
+        email_address.verify!
+
+        assert_equal(false, user.user_events.account_verification.exists?)
+      end
+    end
+
     should "fix typos" do
       assert_equal("foo@gmail.com", EmailAddress.new(address: "foo@gmail.com ").address.to_s)
       assert_equal("foo@gmail.com", EmailAddress.new(address: " foo@gmail.com").address.to_s)

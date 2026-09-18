@@ -16,6 +16,8 @@ class BulkUpdateRequest < ApplicationRecord
 
   has_many :votes, through: :forum_post
 
+  delegate :approval_level, to: :processor
+
   normalizes :script, with: ->(script) { script.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
 
   # XXX these validations must match the forum post validations
@@ -45,8 +47,20 @@ class BulkUpdateRequest < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, [:id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver], current_user: current_user)
 
-      if params[:status].present?
-        q = q.where(status: params[:status].split(","))
+      statuses = params[:status].to_s.split(",")
+
+      if statuses.present?
+        q = q.where(status: statuses)
+      end
+
+      if params[:can_approve].present? && statuses.present? && statuses.exclude?("pending")
+        q = q.none
+      elsif params[:can_approve].present?
+        can_approve = params[:can_approve].to_s.truthy?
+        tags = Tag.where(name: q.pending.select(Arel.sql("unnest(tags)"))).to_a
+
+        ids = q.pending.select { |bur| Pundit.policy!(current_user, bur).approve?(tags:) == can_approve }.map(&:id)
+        q = q.where(id: ids)
       end
 
       params[:order] ||= "status_desc"
@@ -137,11 +151,7 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def processor
-    @processor ||= BulkUpdateRequestProcessor.new(self)
-  end
-
-  def is_tag_move_allowed?
-    processor.is_tag_move_allowed?
+    @processor ||= BulkUpdateRequest::Processor.new(self)
   end
 
   def has_too_many_votes_to_edit?

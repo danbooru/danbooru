@@ -22,6 +22,7 @@ module Source::Tests::URL
         "https://toyhou.se/19108771.june-human-/gallery",
         "https://toyhou.se/19108771.june-human-",
         "https://toyhou.se/427Deer#55232380",
+        "https://toyhou.se/~forums/71.art-marketplace/36671.-c-o-m-m-i-s-s-i-o-n-open-",
       )
 
       should be_profile_url(
@@ -31,12 +32,17 @@ module Source::Tests::URL
       )
 
       should be_bad_source(
-        "https://toyhou.se/2712983.cudlil/19136842.reference-sheet",
-        "https://toyhou.se/19108771.june-human-/gallery",
-        "https://toyhou.se/19108771.june-human-",
-        "https://toyhou.se/427Deer",
+        "https://toyhou.se/~forums/71.art-marketplace",
       )
     end
+
+    should parse_url("https://toyhou.se/~forums/71.art-marketplace/36671.-c-o-m-m-i-s-s-i-o-n-open-").into(
+      board_id: "71",
+      board_name: "art-marketplace",
+      forum_id: "36671",
+      forum_name: "-c-o-m-m-i-s-s-i-o-n-open-",
+      page_url: "https://toyhou.se/~forums/71.art-marketplace/36671.-c-o-m-m-i-s-s-i-o-n-open-",
+    )
 
     should parse_url("https://f2.toyhou.se/file/f2-toyhou-se/thumbnails/58037599_Ov5.png").into(site_name: "Toyhouse")
   end

@@ -169,7 +169,7 @@ module Source
 
         if response.status == 200
           site_credential.success!
-          response.cookies.cookies.to_h { |cookie| [cookie.name, cookie.value] }
+          response.cookies.to_h { |c| [c.name, c.value] }
         else
           DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})"
           site_credential.error!(:invalid)

@@ -5,7 +5,7 @@ class Source::URL::Fanbox < Source::URL
 
   RESERVED_SUBDOMAINS = %w[www downloads]
 
-  attr_reader :username, :user_id, :work_id
+  attr_reader :username, :user_id, :work_id, :plans
 
   def self.match?(url)
     url.domain == "fanbox.cc" || url.host == "fanbox.pixiv.net" || (url.domain.in?(%w[pixiv.net pximg.net]) && url.path.include?("/fanbox/"))
@@ -67,9 +67,13 @@ class Source::URL::Fanbox < Source::URL
       @username = username
       @work_id = work_id
 
+    # https://tanishi-0413.fanbox.cc/plans (contains supporter plan banners)
+    in username, "fanbox.cc", "plans" unless username.in?(RESERVED_SUBDOMAINS)
+      @username = username
+      @plans = true
+
     # https://omu001.fanbox.cc
     # https://omu001.fanbox.cc/posts
-    # https://omu001.fanbox.cc/plans
     in username, "fanbox.cc", *rest unless username.in?(RESERVED_SUBDOMAINS)
       @username = username
 
@@ -102,6 +106,8 @@ class Source::URL::Fanbox < Source::URL
       "https://#{username}.fanbox.cc/posts/#{work_id}"
     elsif user_id.present? && work_id.present?
       "https://www.pixiv.net/fanbox/creator/#{user_id}/post/#{work_id}"
+    elsif username.present? && plans
+      "https://#{username}.fanbox.cc/plans"
     elsif user_id.present? && image_url?
       # Use profile url as page url for cover images (XXX may cause problems with bad_source detection)
       "https://www.pixiv.net/fanbox/creator/#{user_id}"

@@ -75,6 +75,15 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "#post_#{@appeal.post_id}"
       end
+
+      should "not preserve the page parameter in the sidebar links" do
+        create(:post, is_pending: true, uploader: @user)
+        get_auth modqueue_index_path(page: 2), @admin
+
+        assert_response :success
+        assert_select "a[href=?]", modqueue_index_path(search: { tags: "status:pending" })
+        assert_select "a[href=?]", modqueue_index_path(search: { tags: "user:#{@user.name}" })
+      end
     end
   end
 end

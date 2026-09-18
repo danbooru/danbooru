@@ -51,6 +51,7 @@ export default class DTextEditor {
   inline = false; // If true, the editor is in inline mode (only uses a single line <input> field instead of a <textarea>).
   mediaEmbeds = false; // Whether to enable media embeds in the preview.
   domains = []; // The list of the domains for the current site. Used for determining which links belong to the current site.
+  previewTimeout = null; // How long to wait for the preview HTML to load, in milliseconds, before giving up. @see DtextEditorComponent::PREVIEW_TIMEOUT_MS
 
   // @param {HTMLElement} root - The root <div class="dtext-editor"> element of the DText editor.
   constructor(root) {
@@ -63,11 +64,13 @@ export default class DTextEditor {
   // @param {Boolean} inline - Whether the editor is in inline mode.
   // @param {Boolean} mediaEmbeds - Whether to enable media embeds in the preview.
   // @param {String[]} domains - The list of the domains for the current site.
-  initialize({ inline = false, mediaEmbeds = false, domains = [] } = {}) {
+  // @param {Number} previewTimeout - How long to wait for the preview HTML to load, in milliseconds, before giving up.
+  initialize({ inline = false, mediaEmbeds = false, domains = [], previewTimeout } = {}) {
     this.root.editor = this;
     this.inline = inline;
     this.mediaEmbeds = mediaEmbeds;
     this.domains = domains;
+    this.previewTimeout = previewTimeout;
 
     this.initializeAutocomplete();
   }
@@ -385,60 +388,139 @@ export default class DTextEditor {
 
   // @returns {Object} - The autocompletion type and context for the current word, if it's autocompleteable, or nothing if the word can't be autocompleted.
   get autocompletionQuery() {
-    let match = null;
-    let prefix = "";
-    let suffix = "";
-    let fullPrefix = "";
-    let fullSuffix = "";
-    let formatCompletion = word => word;
+    return this.getTag() ??
+           this.getTagQuery() ??
+           this.getEmoji() ??
+           this.getMention() ??
+           {};
+  }
 
-    if (match = this.selectionPrefixLine.match(/(\[\[)([^\[\]\|]+?)$/)) {
-      let label = "";
-      prefix = match[2];
-      fullPrefix = `${match[1]}${prefix}`;
-
-      if (match = this.selectionSuffixLine.match(/^([^\[\]\|]*?)(\|[^\]]*?)?\]\]/)) {
-        suffix = match[1];
-        fullSuffix = match[0];
-        label = match[2] || "";
-      } else if (match = this.selectionSuffixLine.match(/^\S*/)) {
-        suffix = match[0];
-        fullSuffix = suffix;
-      }
-
-      return { type: "tag", term: `${prefix}${suffix}`.toLowerCase(), fullTerm: `${fullPrefix}${fullSuffix}`, prefix, fullPrefix, formatCompletion: (_word, properName) => `[[${properName}${label}]]` };
-    } else if (match = this.selectionPrefixLine.match(/(\{\{[^\{\}\|]*?)(\S*)$/)) {
-      let label = "";
-      let lhs = match[1];
-      prefix = match[2];
-      fullPrefix = `${lhs}${prefix}`;
-
-      if (match = this.selectionSuffixLine.match(/^([^\{\}\|]*?)(\|[^\}]*?)?\}\}/)) {
-        suffix = match[1];
-        fullSuffix = match[0];
-        label = match[2] || "";
-      } else if (match = this.selectionSuffixLine.match(/^\S*/)) {
-        suffix = match[0];
-        fullSuffix = suffix;
-      }
-
-      return { type: "tag_query", term: `${prefix}${suffix}`.toLowerCase(), fullTerm: `${fullPrefix}${fullSuffix}`, prefix, fullPrefix, formatCompletion: word => `${lhs}${word}${label}}}` };
-    } else if (match = this.selectionPrefixLine.match(/([ \r\n/\\()[\]{}<>]|^):([a-zA-Z0-9_]*)$/)) {
-      prefix = match[2];
-      suffix = this.selectionSuffixLine.match(/^\S*/)[0];
-      fullPrefix = `:${prefix}`;
-
-      return { type: "emoji", term: `${prefix}${suffix}`, fullTerm: `${fullPrefix}${suffix}`, prefix, fullPrefix, formatCompletion };
-    // See user_name_validator.rb for the username rules.
-    } else if (match = this.selectionPrefixLine.match(/([^a-zA-Z0-9\[\{]|^)@([a-zA-Z0-9_.\-\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]+)$/u)) {
-      prefix = match[2];
-      suffix = this.selectionSuffixLine.match(/^\S*/)[0];
-      fullPrefix = `@${prefix}`;
-
-      return { type: "mention", term: `${prefix}${suffix}`, fullTerm: `${fullPrefix}${suffix}`, prefix, fullPrefix, formatCompletion };
-    } else {
-      return {};
+  // @returns {Object} - The autocompletion query for a wiki link (e.g. `[[touhou`), or null if the cursor isn't inside one.
+  getTag() {
+    // Look for "[[" right before the cursor, then grab whatever's been typed after it so far.
+    // Example: "foo [[touho" -> lhs is "[[", prefix is "touho"
+    let match = this.selectionPrefixLine.match(/(?<lhs>\[\[)(?<prefix>[^\[\]\|]+?)$/);
+    if (!match) {
+      return null;
     }
+
+    let label = "";
+    let prefix = match.groups.prefix;
+    let fullPrefix = `${match.groups.lhs}${prefix}`;
+    let suffix = "";
+    let fullSuffix = "";
+
+    // Look for the rest of the tag name after the cursor, followed by the closing "]]". There can also be a
+    // "|label" part right before the "]]", for links that show custom text.
+    // Example: "touho]]" -> suffix is "touho"
+    // Example: "touho|Touhou Project]]" -> suffix is "touho", label is "|Touhou Project"
+    if (match = this.selectionSuffixLine.match(/^(?<suffix>[^\[\]\|]*?)(?<label>\|[^\]]*?)?\]\]/)) {
+      suffix = match.groups.suffix;
+      fullSuffix = match[0];
+      label = match.groups.label || "";
+    // There's no closing "]]" on this line, so just grab the rest of the word after the cursor instead.
+    } else if (match = this.selectionSuffixLine.match(/^\S*/)) {
+      suffix = match[0];
+      fullSuffix = suffix;
+    }
+
+    return {
+      type: "tag",
+      term: `${prefix}${suffix}`.toLowerCase(),
+      fullTerm: `${fullPrefix}${fullSuffix}`,
+      prefix,
+      fullPrefix,
+      formatCompletion: (_word, properName) => `[[${properName}${label}]]`
+    };
+  }
+
+  // @returns {Object} - The autocompletion query for a search link (e.g. `{{-1gi`), or null if the cursor isn't inside one.
+  getTagQuery() {
+    // Look for "{{" before the cursor, then everything typed after it. A search link can hold more than one tag
+    // (e.g. "{{tag1 tag2"), so `lhs` keeps any earlier tags as-is, and `word` is just the last one, the one
+    // that's still being typed. Its operator and category prefix get split out from `word` below.
+    // Example: "{{1girl -1gi" -> lhs is "{{1girl ", word is "-1gi"
+    let match = this.selectionPrefixLine.match(/(?<lhs>\{\{[^\{\}\|]*?)(?<word>\S*)$/);
+    if (!match) {
+      return null;
+    }
+
+    let label = "";
+    let lhs = match.groups.lhs;
+    let { operator, category, term: prefix } = Autocomplete.parseTerm(match.groups.word);
+    let fullPrefix = `${lhs}${operator}${category}${prefix}`;
+    let suffix = "";
+    let fullSuffix = "";
+
+    // Look for the rest of the tag name after the cursor, followed by the closing "}}". There can also be a
+    // "|label" part right before the "}}", for links that show custom text.
+    // Example: "1girl}}" -> suffix is "1girl"
+    // Example: "1girl|solo}}" -> suffix is "1girl", label is "|solo"
+    if (match = this.selectionSuffixLine.match(/^(?<suffix>[^\{\}\|]*?)(?<label>\|[^\}]*?)?\}\}/)) {
+      suffix = match.groups.suffix;
+      fullSuffix = match[0];
+      label = match.groups.label || "";
+    // There's no closing "}}" on this line, so just grab the rest of the word after the cursor instead.
+    } else if (match = this.selectionSuffixLine.match(/^\S*/)) {
+      suffix = match[0];
+      fullSuffix = suffix;
+    }
+
+    return {
+      type: "tag_query",
+      term: `${prefix}${suffix}`.toLowerCase(),
+      fullTerm: `${fullPrefix}${fullSuffix}`,
+      prefix,
+      fullPrefix,
+      formatCompletion: word => `${lhs}${operator}${category}${word}${label}}}`
+    };
+  }
+
+  // @returns {Object} - The autocompletion query for an :emoji: reference, or null if the cursor isn't inside one.
+  getEmoji() {
+    // Look for a ":" that's starting a new word, followed by the emoji name typed so far.
+    // Example: "foo :smi" -> prefix is "smi"
+    let match = this.selectionPrefixLine.match(/(?:[ \r\n/\\()[\]{}<>]|^):(?<prefix>[a-zA-Z0-9_]*)$/);
+    if (!match) {
+      return null;
+    }
+
+    let prefix = match.groups.prefix;
+    let suffix = this.selectionSuffixLine.match(/^\S*/)[0];
+    let fullPrefix = `:${prefix}`;
+
+    return {
+      type: "emoji",
+      term: `${prefix}${suffix}`,
+      fullTerm: `${fullPrefix}${suffix}`,
+      prefix,
+      fullPrefix,
+      formatCompletion: word => word
+    };
+  }
+
+  // @returns {Object} - The autocompletion query for an @mention, or null if the cursor isn't inside one.
+  // See user_name_validator.rb for the username rules.
+  getMention() {
+    // Look for an "@" that's starting a new word, followed by the username typed so far.
+    // Example: "hi @evaz" -> prefix is "evaz"
+    let match = this.selectionPrefixLine.match(/(?:[^a-zA-Z0-9\[\{]|^)@(?<prefix>[a-zA-Z0-9_.\-\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]+)$/u);
+    if (!match) {
+      return null;
+    }
+
+    let prefix = match.groups.prefix;
+    let suffix = this.selectionSuffixLine.match(/^\S*/)[0];
+    let fullPrefix = `@${prefix}`;
+
+    return {
+      type: "mention",
+      term: `${prefix}${suffix}`,
+      fullTerm: `${fullPrefix}${suffix}`,
+      prefix,
+      fullPrefix,
+      formatCompletion: word => word
+    };
   }
 
   // @return {Array} - The autocompletions for the currently typed word, or nothing if the word can't be autocompleted.
@@ -539,17 +621,28 @@ export default class DTextEditor {
     }
   }
 
-  // @returns {String} The HTML representation of the DText input.
+  // @returns {String} The HTML representation of the DText input. If the request fails or times out, shows an
+  // error notice and reverts to edit mode.
   async fetchHtml() {
     this.previewLoading = true;
 
-    let html = await $.post("/dtext_preview", {
-      body: this.dtext,
-      inline: this.inline,
-      media_embeds: this.mediaEmbeds,
-    });
-
-    this.previewLoading = false;
-    return html;
+    try {
+      return await $.ajax({
+        type: "POST",
+        url: "/dtext_preview",
+        data: {
+          body: this.dtext,
+          inline: this.inline,
+          media_embeds: this.mediaEmbeds,
+        },
+        timeout: this.previewTimeout,
+      });
+    } catch (error) {
+      Notice.error("Failed to load preview");
+      this.mode = "edit";
+      return "";
+    } finally {
+      this.previewLoading = false;
+    }
   }
 }

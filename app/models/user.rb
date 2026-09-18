@@ -8,6 +8,8 @@ class User < ApplicationRecord
   MAX_BLACKLIST_TAGS = 5_000
   MAX_BLACKLIST_RULES = 5_000
 
+  RECENTLY_PROMOTED_PERIOD = 24.hours
+
   module Levels
     ANONYMOUS = 0
     RESTRICTED = 10
@@ -497,7 +499,9 @@ class User < ApplicationRecord
 
     module ClassMethods
       def owner
-        User.find_by!(level: Levels::OWNER)
+        # Some downstream boorus have more than one owner-level user.
+        # For them we fall back to the first owner by ID.
+        User.where(level: Levels::OWNER).first!
       end
 
       def system
@@ -556,6 +560,10 @@ class User < ApplicationRecord
 
     def is_restricted?
       level == Levels::RESTRICTED
+    end
+
+    def recently_verified_account?
+      user_events.account_verification.exists?(created_at: RECENTLY_PROMOTED_PERIOD.ago..)
     end
 
     def is_member?

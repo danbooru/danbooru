@@ -9,8 +9,8 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
   end
 
   context "create action" do
-    should "work" do
-      dmca = {
+    setup do
+      @valid_dmca = {
         name: "John Doe",
         email: "test@gmail.com",
         address: "123 Fake Street",
@@ -20,8 +20,11 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
         signature: "John Doe",
       }
 
-      create(:owner_user)
-      post dmca_path, params: { dmca: dmca }
+      @owner = create(:owner_user)
+    end
+
+    should "work" do
+      post dmca_path, params: { dmca: @valid_dmca }
 
       assert_response :success
       assert_emails 2
@@ -41,7 +44,6 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
         signature: "John Doe",
       }
 
-      create(:owner_user)
       post dmca_path, params: { dmca: dmca }
 
       assert_response :success
@@ -49,6 +51,14 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
       assert_equal("DMCA Complaint from John Doe", Dmail.last.title)
       assert_match(/fake@example.com/, Dmail.last.body)
       assert_match(%r{https://example\.com/1\.html}, Dmail.last.body)
+    end
+
+    should "send the notification to the same owner every time when there are multiple owners" do
+      create(:owner_user)
+
+      10.times { post dmca_path, params: { dmca: @valid_dmca } }
+
+      assert_equal([@owner.id] * 5, Dmail.last(5).map(&:owner_id))
     end
   end
 end

@@ -4,7 +4,9 @@
     "../docker-compose.dev.yaml"
   ],
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": false
+    }
   },
   "service": "devcontainer",
   "workspaceFolder": "/danbooru",
@@ -45,7 +47,8 @@
         "github.vscode-github-actions",
         "ms-azuretools.vscode-containers",
         "GitHub.copilot-chat",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "FanaticPythoner.better-todo-tree"
       ],
       "mcp": {
         "servers": {

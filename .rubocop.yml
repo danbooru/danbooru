@@ -27,6 +27,9 @@ Bundler/OrderedGems:
 Layout/CaseIndentation:
   EnforcedStyle: end
 
+Layout/CommentIndentation:
+  AllowForAlignment: true
+
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
@@ -57,6 +60,10 @@ Lint/AmbiguousBlockAssociation:
 
 Lint/DuplicateBranch:
   Enabled: false
+
+Lint/MissingSuper:
+  AllowedParentClasses:
+    - BulkUpdateRequest::Command
 
 Lint/SymbolConversion:
   EnforcedStyle: consistent

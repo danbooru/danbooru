@@ -7,6 +7,8 @@ function importAll(r) {
 // everything. See @babel/preset-env.
 import "core-js";
 
+import jQuery from 'jquery';
+
 require('hammerjs');
 require('jquery-hotkeys');
 import Alpine from 'alpinejs';
@@ -16,7 +18,6 @@ import persist from '@alpinejs/persist'
 require.context("../../../public/images", true);
 require.context("../../../public/logos", true, /\.png$/);
 
-import jQuery from 'jquery';
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
 require("jquery-ui/ui/widgets/dialog");
@@ -49,6 +50,7 @@ import Links from "../src/javascripts/links.js";
 import Note from "../src/javascripts/notes.js";
 import Notice from "../src/javascripts/notice.js";
 import MediaAssetComponent from "../src/javascripts/media_asset_component.js";
+import PaginatorComponent from "../src/javascripts/paginator_component.js";
 import PopupMenuComponent from "../src/javascripts/popup_menu_component.js";
 import Post from "../src/javascripts/posts.js";
 import PostModeMenu from "../src/javascripts/post_mode_menu.js";
@@ -85,6 +87,7 @@ Danbooru.Links = Links;
 Danbooru.MediaAssetComponent = MediaAssetComponent;
 Danbooru.Note = Note;
 Danbooru.Notice = Notice;
+Danbooru.PaginatorComponent = PaginatorComponent;
 Danbooru.PopupMenuComponent = PopupMenuComponent;
 Danbooru.Post = Post;
 Danbooru.PostModeMenu = PostModeMenu;

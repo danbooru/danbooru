@@ -13,7 +13,7 @@ module Source
 
       extractors { [Source::Extractor::Bilibili, Source::Extractor::URLShortener] }
 
-      attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id, :redirect_id
+      attr_reader :file, :t_work_id, :h_work_id, :video_id, :article_id, :artist_id, :redirect_id, :manga_id, :blackboard_id
 
       def self.match?(url)
         url.domain.in?(%w[bilibili.com biliimg.com hdslb.com bili2233.cn b23.tv]) && url.host != "live.bilibili.com"
@@ -93,6 +93,18 @@ module Source
         in _, "bili2233.cn" | "b23.tv", redirect_id
           @redirect_id = redirect_id
 
+        # https://manga.bilibili.com/detail/mc33526
+        in "manga", "bilibili.com", "detail", /^mc(\d+)$/
+          @manga_id = $1
+
+        # https://www.bilibili.com/blackboard/era/yWPr7A7p6Z2z2LR1.html
+        in ("www" | ""), "bilibili.com", "blackboard", "era", /^([^.]+)\.html$/
+          @blackboard_id = $1
+
+        # https://activity.hdslb.com/blackboard/static/d41d8cd98f00b204e9800998ecf8427e/6pvMXulEq2.mp4
+        in "activity", "hdslb.com", "blackboard", "static", _hash, /^[^.]+\.\w+$/ => file
+          @file = file
+
         # https://live.bilibili.com/10049889?from=search&seid=8525275464641122982
         # https://live.bilibili.com/blackboard/era/VSuE0f27CnXe3VSY.html
         # https://live.bilibili.com/blackboard/activity-lAFdFMqMOQ.html
@@ -126,6 +138,10 @@ module Source
           "https://www.bilibili.com/read/cv#{article_id}/"
         elsif video_id.present?
           "https://www.bilibili.com/video/#{video_id}/"
+        elsif manga_id.present?
+          "https://manga.bilibili.com/detail/mc#{manga_id}"
+        elsif blackboard_id.present?
+          "https://www.bilibili.com/blackboard/era/#{blackboard_id}.html"
         end
       end
 

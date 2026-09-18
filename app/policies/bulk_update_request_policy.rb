@@ -11,10 +11,10 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
     user.is_admin? || (record.user_id == user.id && !record.has_too_many_votes_to_edit?)
   end
 
-  def approve?
+  def approve?(tags: nil)
     return false if !unbanned? || record.is_approved?
 
-    user.is_admin? || (user.is_builder? && record.is_tag_move_allowed?)
+    user.level >= record.approval_level(tags:)
   end
 
   def destroy?

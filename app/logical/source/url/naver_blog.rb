@@ -11,7 +11,7 @@ class Source::URL::NaverBlog < Source::URL
   attr_reader :username, :post_id, :full_image_url
 
   def self.match?(url)
-    url.domain.in?(%w[naver.com blog.me naver.net pstatic.net]) && !Source::URL::NaverPost.match?(url) && !Source::URL::NaverCafe.match?(url)
+    url.domain.in?(%w[naver.com blog.me naver.net pstatic.net]) && !Source::URL::NaverPost.match?(url) && !Source::URL::NaverCafe.match?(url) && !Source::URL::NaverComic.match?(url)
   end
 
   def parse
@@ -81,10 +81,6 @@ class Source::URL::NaverBlog < Source::URL
     # https://closers.nexon.game.naver.com/Ucc/WebToon/List?emSearchType=WriterName&strSearch=티아셰
     # http://share.naver.com/web/shareView.nhn
     # http://mypage.naver.co.jp/ys0079/
-
-    # https://comic.naver.com/bestChallenge/list.nhn?titleId=717924
-    # https://comic.naver.com/community/u/_rbv5l
-    # https://m.comic.naver.com/webtoon/list?titleId=817631
 
     # https://chzzk.naver.com/6d2681641660b11e483f1d5a645f34ac
 

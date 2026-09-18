@@ -44,6 +44,14 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to wiki_pages_path(search: { title_normalize: "tagme" }, redirect: true)
       end
 
+      should "follow the quick search link to the show page" do
+        get wiki_pages_path(redirect: true, search: { title_normalize: "tagme" })
+        assert_redirected_to wiki_page_path(@tagme)
+
+        follow_redirect!
+        assert_response :success
+      end
+
       should respond_to_search.with { [@picasso, @miku, @vocaloid, @deleted, @tagme] }
       should respond_to_search(title: "tagme").with { @tagme }
       should respond_to_search(title: "tagme", order: "post_count").with { @tagme }
@@ -166,6 +174,30 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         get wiki_page_path(@wiki_page.title)
 
         assert_response 451
+      end
+
+      should "link to aliased artist tags" do
+        create(:artist_tag, name: @wiki_page.title)
+        create(:artist_tag, name: "new_name")
+        as(@user) { create(:tag_alias, antecedent_name: @wiki_page.title, consequent_name: "new_name", status: "active") }
+
+        get wiki_page_path(@wiki_page.title)
+
+        assert_response :success
+        assert_select ".fineprint", text: /This tag has been aliased to new_name/
+        assert_select ".fineprint a.wiki-link[href=?]", show_or_new_artists_path(name: "new_name")
+      end
+
+      should "link to aliased wikis" do
+        create(:general_tag, name: @wiki_page.title)
+        create(:general_tag, name: "new_name")
+        as(@user) { create(:tag_alias, antecedent_name: @wiki_page.title, consequent_name: "new_name", status: "active") }
+
+        get wiki_page_path(@wiki_page.title)
+
+        assert_response :success
+        assert_select ".fineprint", text: /This tag has been aliased to new_name/
+        assert_select ".fineprint a.wiki-link[href=?]", wiki_page_path("new_name")
       end
     end
 

@@ -3,7 +3,8 @@
 class Source::URL::Toyhouse < Source::URL
   site "Toyhouse", url: "https://toyhou.se"
 
-  attr_reader :image_id, :image_hash, :character_id, :character_name, :gallery_id, :gallery_name, :username
+  attr_reader :image_id, :image_hash, :character_id, :character_name, :gallery_id, :gallery_name, :username,
+              :board_id, :board_name, :forum_id, :forum_name
 
   def self.match?(url)
     url.domain == "toyhou.se"
@@ -60,8 +61,16 @@ class Source::URL::Toyhouse < Source::URL
       @username = username
       @image_id = fragment if fragment&.match?(/^\d+$/)
 
-    # https://f2.toyhou.se/file/f2-toyhou-se/users/Missing_teeth?965 (profile picture)
     # https://toyhou.se/~forums/71.art-marketplace/36671.-c-o-m-m-i-s-s-i-o-n-open- (forum post)
+    in _, "toyhou.se", "~forums", /^\d+\./ => board, /^\d+\./ => forum
+      @board_id, _, @board_name = board.partition(".")
+      @forum_id, _, @forum_name = forum.partition(".")
+
+    # https://toyhou.se/~forums/71.art-marketplace (forum board)
+    in _, "toyhou.se", "~forums", /^\d+\./ => board
+      @board_id, _, @board_name = board.partition(".")
+
+    # https://f2.toyhou.se/file/f2-toyhou-se/users/Missing_teeth?965 (profile picture)
     else
       nil
     end
@@ -71,8 +80,9 @@ class Source::URL::Toyhouse < Source::URL
     host.in?(%w[f2.toyhou.se file.toyhou.se])
   end
 
+  # most Toyhouse pages can contain images, so only few urls can be detected as bad_source
   def bad_source?
-    !image_url? && image_id.blank?
+    !image_url? && image_id.blank? && character_id.blank? && username.blank? && forum_id.blank?
   end
 
   def page_url
@@ -86,6 +96,8 @@ class Source::URL::Toyhouse < Source::URL
       "https://toyhou.se/#{character_id}.#{character_name}"
     elsif image_id.present?
       "https://toyhou.se/~images/#{image_id}"
+    elsif board_id.present? && board_name.present? && forum_id.present? && forum_name.present?
+      "https://toyhou.se/~forums/#{board_id}.#{board_name}/#{forum_id}.#{forum_name}"
     end
   end
 

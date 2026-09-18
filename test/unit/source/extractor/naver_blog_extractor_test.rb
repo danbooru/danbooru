@@ -42,16 +42,16 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://blog.naver.com/sjhsh352/223378243886",
         image_urls: %w[
-          http://blogfiles.naver.net/MjAyNjAxMDhfMjM1/MDAxNzY3ODYzMTQ1NzE3.X1uhHyomt-NFXliaDTrfSXRd6U1iRjyng5EH9xCd8PYg.b_ke3PbhwYdz1ONXIDJNpvSX_-GmUmAkJMgLVziZXBog.JPEG/%EA%B0%80%EC%95%BC%EB%B3%B4%EC%A0%95.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfMTUy/MDAxNzY3ODYzMTQ3MzA3.kl7YVWYrh6jfo8cHu-Xrw2buhVl1HinMQl_Zrr_7zFQg.abPpK-w_V_IRVjMx0jlFrXf4InuiecgbU1-O6qF3I0sg.JPEG/%EC%97%B0%EC%8A%B5239.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfOTcg/MDAxNzY3ODYzMTQ3NTAy.MmEFeHnY4mbiq8ApPO_0jlV0-UzvFd5wL79TYWdSYCUg.m6b_L9B4ihohWRGdOcImiwQ3SPPM8H6VtyA8Htz1S3Ag.JPEG/%EC%97%B0%EC%8A%B5241.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfMTU0/MDAxNzY3ODYzMTQ1NjE2.S0qnZOgri3vqcPpecDiwY9S6r3wUt2UnVFSoq230-Jwg.wz6uC8zC-hrSyPPNjD7UfWXFuvtSccdjBTZOCWiLl6wg.JPEG/%EC%97%B0%EC%8A%B5242.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfMTAz/MDAxNzY3ODYzMTQ1Mzc2.kH6_J10yDymCxwJ_0rnKLMGwA81_Zt8hDK00z9ehZRAg.fcfqg2temrCmRvEvhl3KNVQ9IZjELnk5Me0ITD7gzPEg.JPEG/%EC%97%B0%EC%8A%B5244.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfOTIg/MDAxNzY3ODYzMTQ1NTQ0.pWRM-ISlqiwevgyOA5uXffYBvaG_Iwmk00JmOeCywUcg.eZq4AqyunK-bTsm0ibCOx7VzflNmC-pw5kyHE-UNWMog.JPEG/%EC%97%B0%EC%8A%B5245.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfMjI1/MDAxNzY3ODYzMTQ1ODQx.0arV7saoekVZI8s7Js_pHJRrwhoy0ncu4R-FqSC7nlAg.tUzfdP_Mrcco1YM7DUAzodVrt3SRCxrc4EqQPcBLYVkg.JPEG/%EC%97%B0%EC%8A%B5246.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfMjc2/MDAxNzY3ODYzMTQ1NTkz.lXuZBTBUKlvgMfg0oq11TEAFbqZ-WtvnmyPJJNRa7LYg.eljyh-_f7SejWRMxUmAcCyx5dn1z58BKeqKSYfYsersg.JPEG/%EC%97%B0%EC%8A%B5247.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfMTI1/MDAxNzY3ODYzMTQ2OTkx.wGh4JEX2dajD2WoBBwpjr3mY_REf-g9UIA6vX0FBAeog.Yvo-hjsRheX45-dKaN5iewrt8AjBZ0mgCcWqsH_WONIg.JPEG/%EC%97%B0%EC%8A%B5248.jpg
-          http://blogfiles.naver.net/MjAyNjAxMDhfMjE3/MDAxNzY3ODYzMTQ3Mzc3.mmd5jmzIExnA2iCeImmsUvjnYNUqAYQYr_EKAX0LFw8g.YQJlLWb-VW_Vhb14Owce-malQWEsA0T26Z3TQEHjyRwg.JPEG/%EC%97%B0%EC%8A%B5249.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMjM1/MDAxNzY3ODYzMTQ1NzE3.X1uhHyomt-NFXliaDTrfSXRd6U1iRjyng5EH9xCd8PYg.b_ke3PbhwYdz1ONXIDJNpvSX_-GmUmAkJMgLVziZXBog.JPEG/%B0%A1%BE%DF%BA%B8%C1%A4.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMTUy/MDAxNzY3ODYzMTQ3MzA3.kl7YVWYrh6jfo8cHu-Xrw2buhVl1HinMQl_Zrr_7zFQg.abPpK-w_V_IRVjMx0jlFrXf4InuiecgbU1-O6qF3I0sg.JPEG/%BF%AC%BD%C0239.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfOTcg/MDAxNzY3ODYzMTQ3NTAy.MmEFeHnY4mbiq8ApPO_0jlV0-UzvFd5wL79TYWdSYCUg.m6b_L9B4ihohWRGdOcImiwQ3SPPM8H6VtyA8Htz1S3Ag.JPEG/%BF%AC%BD%C0241.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMTU0/MDAxNzY3ODYzMTQ1NjE2.S0qnZOgri3vqcPpecDiwY9S6r3wUt2UnVFSoq230-Jwg.wz6uC8zC-hrSyPPNjD7UfWXFuvtSccdjBTZOCWiLl6wg.JPEG/%BF%AC%BD%C0242.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMTAz/MDAxNzY3ODYzMTQ1Mzc2.kH6_J10yDymCxwJ_0rnKLMGwA81_Zt8hDK00z9ehZRAg.fcfqg2temrCmRvEvhl3KNVQ9IZjELnk5Me0ITD7gzPEg.JPEG/%BF%AC%BD%C0244.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfOTIg/MDAxNzY3ODYzMTQ1NTQ0.pWRM-ISlqiwevgyOA5uXffYBvaG_Iwmk00JmOeCywUcg.eZq4AqyunK-bTsm0ibCOx7VzflNmC-pw5kyHE-UNWMog.JPEG/%BF%AC%BD%C0245.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMjI1/MDAxNzY3ODYzMTQ1ODQx.0arV7saoekVZI8s7Js_pHJRrwhoy0ncu4R-FqSC7nlAg.tUzfdP_Mrcco1YM7DUAzodVrt3SRCxrc4EqQPcBLYVkg.JPEG/%BF%AC%BD%C0246.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMjc2/MDAxNzY3ODYzMTQ1NTkz.lXuZBTBUKlvgMfg0oq11TEAFbqZ-WtvnmyPJJNRa7LYg.eljyh-_f7SejWRMxUmAcCyx5dn1z58BKeqKSYfYsersg.JPEG/%BF%AC%BD%C0247.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMTI1/MDAxNzY3ODYzMTQ2OTkx.wGh4JEX2dajD2WoBBwpjr3mY_REf-g9UIA6vX0FBAeog.Yvo-hjsRheX45-dKaN5iewrt8AjBZ0mgCcWqsH_WONIg.JPEG/%BF%AC%BD%C0248.jpg
+          http://blogfiles.naver.net/MjAyNjAxMDhfMjE3/MDAxNzY3ODYzMTQ3Mzc3.mmd5jmzIExnA2iCeImmsUvjnYNUqAYQYr_EKAX0LFw8g.YQJlLWb-VW_Vhb14Owce-malQWEsA0T26Z3TQEHjyRwg.JPEG/%BF%AC%BD%C0249.jpg
         ],
         media_files: [
           { file_size: 6_478_361 },
@@ -238,11 +238,11 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://m.blog.naver.com/mazingcaizer/40199782739",
         image_urls: %w[
-          http://blogfiles.naver.net/20131028_63/mazingcaizer_13829653348023Lofl_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(1).jpg
-          http://blogfiles.naver.net/20131028_173/mazingcaizer_13829653351091drVF_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(2).jpg
-          http://blogfiles.naver.net/20131028_284/mazingcaizer_13829653354772FnCs_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(3).jpg
-          http://blogfiles.naver.net/20131028_259/mazingcaizer_1382965335948e61kQ_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(4).jpg
-          http://blogfiles.naver.net/20131028_216/mazingcaizer_1382965336298MiSMk_JPEG/%EC%97%94%EC%BF%A4%EC%8A%A4%ED%83%80_(5).jpg
+          http://blogfiles.naver.net/20131028_63/mazingcaizer_13829653348023Lofl_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(1).jpg
+          http://blogfiles.naver.net/20131028_173/mazingcaizer_13829653351091drVF_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(2).jpg
+          http://blogfiles.naver.net/20131028_284/mazingcaizer_13829653354772FnCs_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(3).jpg
+          http://blogfiles.naver.net/20131028_259/mazingcaizer_1382965335948e61kQ_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(4).jpg
+          http://blogfiles.naver.net/20131028_216/mazingcaizer_1382965336298MiSMk_JPEG/%BF%A3%C4%EF%BD%BA%C5%B8_(5).jpg
         ],
         media_files: [
           { file_size: 81_136 },
@@ -299,6 +299,63 @@ module Source::Tests::Extractor
           즐겁게 그렸던 기억이 나네요.
 
           시간나시면 한번쯤 플레이해주시길~~
+        EOS
+      )
+    end
+
+    context "A blog post with a Korean filename that needs EUC-KR percent-encoding" do
+      strategy_should_work(
+        "https://blog.naver.com/juderland/20057476807",
+        image_urls: %w[http://blogfiles.naver.net/data43/2008/11/23/41/11-01%C0%A52_juderland.jpg],
+        media_files: [{ file_size: 896_099 }],
+        page_url: "https://blog.naver.com/juderland/20057476807",
+        profile_url: "https://blog.naver.com/juderland",
+        profile_urls: %w[https://blog.naver.com/juderland],
+        display_name: "쥬더",
+        username: "juderland",
+        tag_name: "juderland",
+        other_names: ["쥬더", "juderland"],
+        tags: [
+          ["만화·애니", "https://m.blog.naver.com/BlogTagView.naver?tagName=만화·애니"],
+          ["일러스트 ", "https://blog.naver.com/PostList.naver?blogId=juderland&categoryName=일러스트 "],
+        ],
+        dtext_artist_commentary_title: "[불멸의레지스&심연의카발리어]디포르 마그나세티아~",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "[image]":[http://blogfiles.naver.net/data43/2008/11/23/41/11-01%C0%A52_juderland.jpg]
+
+          Diffor Magnasethia입니다~
+
+          카레를 매우 좋아하는 D와 기분 전환 겸 어제저녁 동대문의 모 카레 전문점에 갔습니다.
+
+          주인과 종업원이 모두 현지인 같았습니다.
+
+          손님도 외국사람이 매우 많았고 가격도 저렴해서인지 그들과 뒤섞여 20분정도 줄을 서서 기다리는 경험도...
+
+          .
+
+          .
+
+          .
+
+          하지만 저희는 깨달았습니다.
+
+          국내의 음식도 짧은 우리가 외국 현지의 음식을 너무 우습게 생각한 듯.
+
+          가는 동안 너무 배고파 눈에 들어오던 떡볶이 파는 점상과 학생들이 먹고있던 컵라면이 아른아른... (헐...)
+
+          .
+
+          .
+
+          시간이 없음에도 이곳을 강행한 이유는
+
+          가온비님들과 조만간 스토리정리&연말모임을 위해 미리 진지 정찰에 나선 것
+
+          미리 가 보길 잘한 것 같습니다.
+
+          (특히 양고기와 매운맛은 피해야 할 듯)
+
+          저희의 입이 짧다는 것을 다시 상기하게 된 경험이었습니다. ㅠ.ㅠ
         EOS
       )
     end

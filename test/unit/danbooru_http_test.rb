@@ -2,7 +2,7 @@ require "test_helper"
 
 class DanbooruHttpTest < ActiveSupport::TestCase
   def httpbin_url(path = "")
-    "https://httpbin.org/#{path}"
+    "https://httpbingo.org/#{path}"
   end
 
   context "Danbooru::Http" do
@@ -32,10 +32,9 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "fail if the request takes too long to download" do
-        # XXX should return status 597 instead
-        assert_raises(HTTP::TimeoutError) do
-          Danbooru::Http.timeout(1).get(httpbin_url("drip?duration=10&numbytes=10")).flush
-        end
+        response = Danbooru::Http.timeout(1).get(httpbin_url("drip?duration=5&numbytes=10")).flush
+        assert_equal(597, response.status)
+        assert_equal("", response.body.to_s)
       end
 
       should "return a 5xx error if the domain can't be resolved" do
@@ -72,8 +71,8 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "track cookies between requests" do
         http = Danbooru::Http.use(:session)
 
-        resp1 = http.get(httpbin_url("cookies/set/abc/1"))
-        resp2 = http.get(httpbin_url("cookies/set/def/2"))
+        resp1 = http.get(httpbin_url("cookies/set?abc=1"))
+        resp2 = http.get(httpbin_url("cookies/set?def=2"))
         resp3 = http.get(httpbin_url("cookies"))
         assert_equal({ abc: "1", def: "2" }, resp3.parse["cookies"].symbolize_keys)
 
@@ -82,11 +81,11 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "work for a URL containing special characters" do
-        resp = Danbooru::Http.get(httpbin_url("anything/foo 😃`~!@$%^&*()_-+={}[]|\\:;\"'<>,./?bar=baz 😃`~!@$^&*()_-+={}[]|\\:;\"'<>,./&blah😃#hash"))
+        resp = Danbooru::Http.get(httpbin_url("anything/foo 😃`~!@$%^&*()_-+={}[]|\\:;\"'<>,./?bar=baz 😃`~!@$^&*()_-+={}[]|\\:;',./&blah😃#hash"))
 
         assert_equal(200, resp.status)
-        assert_equal(httpbin_url("anything/foo%20%F0%9F%98%83%60~!@$%25%5E&*()_-+=%7B%7D%5B%5D%7C%5C:;%22'%3C%3E,./?bar=baz%20%F0%9F%98%83`~!@$^&*()_-+={}[]|\\:;\"'<>,./&blah%F0%9F%98%83#hash"), resp.request.uri.to_s)
-        assert_equal(httpbin_url("anything/foo 😃`~!@$%25^&*()_-+={}[]|\\:%3B\"'<>,./?bar=baz 😃`~!%40$^&*()_-+={}[]|\\:%3B\"'<>,.%2F&blah😃"), resp.parse["url"])
+        assert_equal(httpbin_url("anything/foo%20%F0%9F%98%83%60~!@$%25%5E&*()_-+=%7B%7D%5B%5D%7C%5C:;%22'%3C%3E,./?bar=baz%20%F0%9F%98%83`~!@$^&*()_-+={}[]|\\:;',./&blah%F0%9F%98%83#hash"), resp.request.uri.to_s)
+        assert_equal(resp.request.uri.omit(:fragment).to_s, resp.parse["url"])
       end
 
       should "work for a URL containing percent-encoded characters" do
@@ -94,13 +93,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
         assert_equal(200, resp.status)
         assert_equal(httpbin_url("anything/foo%20bar%2Fbaz"), resp.request.uri.to_s)
-        assert_equal(httpbin_url("anything/foo bar/baz"), resp.parse["url"]) # httpbin decodes encoded URLs
+        assert_equal(httpbin_url("anything/foo%20bar%2Fbaz"), resp.parse["url"])
       end
 
       should "work for a URL containing Unicode characters" do
         resp = Danbooru::Http.get(httpbin_url("anything/東方"))
         assert_equal(200, resp.status)
-        assert_equal(httpbin_url("anything/東方"), resp.parse["url"])
+        assert_equal(httpbin_url("anything/%E6%9D%B1%E6%96%B9"), resp.parse["url"])
       end
 
       should "not normalize Unicode characters to NFC form" do
@@ -108,7 +107,6 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(httpbin_url("anything/%E3%83%95%E3%82%99"), resp.request.uri.to_s)
 
         resp = Danbooru::Http.with_legacy_ssl.head("https://tuyu-official.jp/wp/wp-content/uploads/2022/09/雨模様［サブスクジャケット］.jpeg")
-        assert_equal(404, resp.status)
         assert_equal("%E9%9B%A8%E6%A8%A1%E6%A7%98%EF%BC%BB%E3%82%B5%E3%83%95%E3%82%99%E3%82%B9%E3%82%AF%E3%82%B7%E3%82%99%E3%83%A3%E3%82%B1%E3%83%83%E3%83%88%EF%BC%BD.jpeg", resp.request.uri.path.split("/").last)
       end
 
@@ -162,8 +160,8 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         http = Danbooru::Http.cache(1.hour)
 
         resp1 = http.get(httpbin_url("cookies"))
-        resp2 = http.get(httpbin_url("cookies/set/abc/1"))
-        resp3 = http.get(httpbin_url("cookies/set/def/2"))
+        resp2 = http.get(httpbin_url("cookies/set?abc=1"))
+        resp3 = http.get(httpbin_url("cookies/set?def=2"))
         resp4 = http.get(httpbin_url("cookies"))
 
         assert_equal(200, resp1.status)
@@ -233,7 +231,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         response = Danbooru::Http.use(:spoof_referrer).get(httpbin_url("anything"))
 
         assert_equal(200, response.status)
-        assert_equal(httpbin_url("anything"), response.parse.dig("headers", "Referer"))
+        assert_equal([httpbin_url("anything")], response.parse.dig("headers", "Referer"))
       end
     end
 

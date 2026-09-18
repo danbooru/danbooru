@@ -12,6 +12,8 @@ export default class Autocomplete {
   static PREV_WORD_REGEXP = new RegExp(`[^${Autocomplete.ALL_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.TAG_SEPARATORS}]*$`);
   static NEXT_WORD_REGEXP = new RegExp(`^[^${Autocomplete.ALL_SEPARATORS}]*[${Autocomplete.WORD_SEPARATORS}]*[${Autocomplete.TAG_SEPARATORS}]*`);
 
+  static PREV_SLASH_ABBREVIATION_REGEXP = new RegExp(`(?<=^|[${Autocomplete.TAG_SEPARATORS}])/$`);
+
   static initializeAll() {
     $.widget("ui.autocomplete", $.ui.autocomplete, {
       options: {
@@ -118,6 +120,8 @@ export default class Autocomplete {
               }
               return "";
             });
+            // if we're deleting a slash abbreviation, delete the slash too
+            before_caret_text = before_caret_text.replace(Autocomplete.PREV_SLASH_ABBREVIATION_REGEXP, "");
           } else if (event.inputType === "deleteWordForward") {
             after_caret_text = after_caret_text.replace(Autocomplete.NEXT_WORD_REGEXP, function(match) {
               if (!match.startsWith(" ") && match.endsWith(" ")) {
@@ -188,9 +192,8 @@ export default class Autocomplete {
         term += "*";
       }
     }
-    let regexp = new RegExp(`^[-~(]*(${Autocomplete.tagPrefixes().join("|")})?`);
-    let match = term.match(/\S*$/)[0].replace(regexp, "").toLowerCase();
-    return match;
+    let { term: tagTerm } = Autocomplete.parseTerm(term.match(/\S*$/)[0]);
+    return tagTerm.toLowerCase();
   }
 
   // Update the input field with the item currently focused in the
@@ -209,8 +212,9 @@ export default class Autocomplete {
       var before_caret_text = input.value.substring(0, caret).replace(/^[ \t]+|[ \t]+$/gm, "");
       var after_caret_text = input.value.substring(caret).replace(/^[ \t]+|[ \t]+$/gm, "");
 
-      var regexp = new RegExp(`([-~(]*(?:${Autocomplete.tagPrefixes().join("|")})?)\\S+$`, "g");
-      before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
+      let word = before_caret_text.match(/\S*$/)[0];
+      let { operator, category } = Autocomplete.parseTerm(word);
+      before_caret_text = before_caret_text.slice(0, before_caret_text.length - word.length) + operator + category + completion + " ";
       if (after_caret_text.length > 0) {
         after_caret_text = " " + after_caret_text;
       }
@@ -372,6 +376,20 @@ export default class Autocomplete {
 
   static tagPrefixes() {
     return JSON.parse($("meta[name=autocomplete-tag-prefixes]").attr("content"));
+  }
+
+  // Split a tag search term into its operator (e.g. `-`, `~`, `(`),
+  // its tag category prefix (e.g. "art:"), and the actual tag name.
+  // @param {String} term - The tag search term (e.g. "-art:1gi").
+  // @returns {Object} The operator, the category prefix, and the remaining tag name (e.g. { operator: "-", category: "art:", term: "1gi" }).
+  static parseTerm(term) {
+    // Pull off any operator characters at the very start (a "-" for negation, "~" for optional, "(" for
+    // grouping), then an optional category prefix right after them, like "art:".
+    // Example: "-art:1gi" -> operator is "-", category is "art:"
+    let regexp = new RegExp(`^(?<operator>[-~(]*)(?<category>${Autocomplete.tagPrefixes().join("|")})?`);
+    let match = term.match(regexp);
+    let { operator = "", category = "" } = match.groups;
+    return { operator, category, term: term.substring(match[0].length) };
   }
 }
 

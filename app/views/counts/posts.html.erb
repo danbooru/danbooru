@@ -6,7 +6,7 @@
     <h1>Post Counts</h1>
 
     <%= search_form_for(posts_counts_path) do |f| %>
-      <%= f.input :tags, label: "Tags", input_html: { value: params[:tags], data: { autocomplete: "tag-query" }, name: "tags" } %>
+      <%= f.input :tags, label: "Tags", input_html: { value: params[:tags], data: { autocomplete: "tag-query", shortcut: "q" }, name: "tags" } %>
       <%= f.submit "Search" %>
     <% end %>
 

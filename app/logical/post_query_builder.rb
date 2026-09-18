@@ -30,7 +30,7 @@ class PostQueryBuilder
 
   METATAGS = %w[
     user approver commenter comm noter noteupdater artcomm commentaryupdater
-    flagger appealer upvote downvote fav ordfav favgroup ordfavgroup reacted pool
+    flagger appealer upvote downvote fav ordvote ordfav favgroup ordfavgroup reacted pool
     ordpool note comment commentary id rating source status filetype
     disapproved parent child search embedded md5 pixelhash width height mpixels ratio
     score upvotes downvotes favcount filesize date age order limit tagcount pixiv_id pixiv
@@ -116,6 +116,7 @@ class PostQueryBuilder
         relation.metatag_matches(node.name, node.value, current_user, quoted: node.quoted?)
       in :wildcard
         tag_names = Tag.wildcard_matches(node.name).limit(MAX_WILDCARD_TAGS).pluck(:name)
+        tag_names -= post_query.searched_tag_names if node.parent&.not?
         relation.where_array_includes_any("string_to_array(posts.tag_string, ' ')", tag_names)
       in :not
         children.first.negate_relation
@@ -151,7 +152,7 @@ class PostQueryBuilder
       else
         relation = relation.none
       end
-    elsif post_query.has_metatag?(:ordfav, :ordpool, :ordfavgroup)
+    elsif post_query.has_metatag?(:ordfav, :ordvote, :ordpool, :ordfavgroup)
       # no-op
     else
       relation = relation.order_matches(post_query.find_metatag(:order))

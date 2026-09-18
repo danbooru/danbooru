@@ -49,6 +49,6 @@ export default class UploadPostComponent {
         similarity: this.IQDB_MIN_SIMILARITY,
         high_similarity: this.IQDB_HIGH_SIMILARITY
       }
-    });
+    }).done(script => $.globalEval(script));
   }
 }

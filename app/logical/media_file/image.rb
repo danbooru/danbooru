@@ -19,7 +19,7 @@ class MediaFile::Image < MediaFile
     image.size
   rescue Vips::Error
     [metadata.width, metadata.height]
-  rescue
+  rescue StandardError
     [0, 0]
   end
 
@@ -27,8 +27,6 @@ class MediaFile::Image < MediaFile
     case file_ext
     when :avif
       !metadata.is_rotated? && !metadata.is_mirrored? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.has_auxiliary_image? && !metadata.is_animated_avif?
-    when :webp
-      !is_animated?
     else
       true
     end
@@ -149,7 +147,7 @@ class MediaFile::Image < MediaFile
       resized_image = flattened_image
     end
 
-    output_file = Danbooru::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format.to_s}"])
+    output_file = Danbooru::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format}"])
     case format.to_sym
     when :jpeg
       # https://www.libvips.org/API/current/VipsForeignSave.html#vips-jpegsave
@@ -211,26 +209,40 @@ class MediaFile::Image < MediaFile
 
   # @return [MediaFile::Image] The raw image used for computing the pixel hash.
   def pixel_hash_file
-    image = open_image(fail: true)
-    image = image.icc_transform("srgb") if image.get_typeof("icc-profile-data") != 0
-    image = image.colourspace("srgb") if image.interpretation != :srgb
-    image = image.add_alpha unless image.has_alpha?
+    # First we normalize the image to the same colorspace and add an alpha layer if missing,
+    # so that pixel data stays the same even for different profiles
+    img = open_image(fail: true)
+    img = img.icc_transform("srgb") if img.get_typeof("icc-profile-data") != 0
+    img = img.colourspace("srgb") if img.interpretation != :srgb
+    img = img.add_alpha unless img.has_alpha?
 
-    # PAM file format: https://netpbm.sourceforge.net/doc/pam.html
-    output_file = Danbooru::Tempfile.open(["danbooru-pixel-hash-#{md5}-", ".pam"])
-    output_file.puts "P7"
-    output_file.puts "WIDTH #{image.width}"
-    output_file.puts "HEIGHT #{image.height}"
-    output_file.puts "DEPTH #{image.bands}"
-    output_file.puts "MAXVAL 255"
-    output_file.puts "TUPLTYPE RGB_ALPHA"
-    output_file.puts "ENDHDR"
-    output_file.flush
-    image.rawsave_fd(output_file.fileno)
+    # Then we create a pam file: https://netpbm.sourceforge.net/doc/pam.html
+    # It's basically a header followed by raw pixels, so that we strip everything
+    # except the barebone necessary data for pixel hash computation
+    pam_file = Danbooru::Tempfile.open(["danbooru-pixel-hash-#{md5}-", ".pam"])
 
-    MediaFile::Image.new(output_file)
+    pam_file.binmode
+    pam_file.puts "P7"
+    pam_file.puts "WIDTH #{img.width}"
+    pam_file.puts "HEIGHT #{img.height}"
+    pam_file.puts "DEPTH #{img.bands}"
+    pam_file.puts "MAXVAL 255"
+    pam_file.puts "TUPLTYPE RGB_ALPHA"
+    pam_file.puts "ENDHDR"
+
+    # Finally, we write the raw pixel data to the pam file
+    target = Vips::TargetCustom.new
+    target.on_write do |chunk|
+      pam_file.write(chunk)
+      chunk.bytesize
+    end
+
+    img.rawsave_target(target)
+
+    pam_file.flush
+    MediaFile::Image.new(pam_file)
   ensure
-    image&.release
+    img&.release
   end
 
   private
@@ -243,13 +255,35 @@ class MediaFile::Image < MediaFile
   def open_image(**options)
     case file_ext
     when :jpg
-      # Only JPEG supports the EXIF orientation flag. It may technically be present in other formats, but web browsers
-      # ignore it, so we do too. XXX AVIF also has `irot` and `imir` flags, which browsers support, but libvips doesn't.
-      # https://zpl.fi/exif-orientation-in-different-formats/
       Vips::Image.new_from_file(file.path, access: :sequential, autorotate: true, **options)
+    when :png
+      # pngload cannot rotate the image during load, so we do it after.
+      open_png(**options)
     else
+      # Browser support for WebP/AVIF is not widespread, and vips cannot read some of these flags, so we don't support it either.
       Vips::Image.new_from_file(file.path, access: :sequential, **options)
     end
+  end
+
+  # Open with sequential access when the image does not need rotation, otherwise use the default access mode.
+  #
+  # Sequential access uses much less memory than the default access mode but is not supported by `autorot`,
+  # so we only reopen the picture in default mode if we actually need it.
+  # This results in a higher memory usage for rotated pngs, but they are the rare case, so it's an overall gain.
+  #
+  # Note that only rotation specified before the IDAT chunk (actual image data) is considered valid.
+  # Other types of rotation metadata are ignored by most browsers, so we ignore them too.
+  def open_png(**options)
+    image = Vips::Image.new_from_file(file.path, access: :sequential, **options)
+    orientation = image.get("orientation") if image.get_typeof("orientation") != 0
+
+    if orientation.present? && orientation != 1
+      image.release
+      image = Vips::Image.new_from_file(file.path, **options)
+      image = image.autorot
+    end
+
+    image
   end
 
   def video
@@ -257,12 +291,10 @@ class MediaFile::Image < MediaFile
   end
 
   def preview_frame
-    @preview_frame ||= begin
-      if is_animated?
-        video.smart_video_preview || self
-      else
-        self
-      end
+    if is_animated?
+      @preview_frame ||= video.smart_video_preview || self
+    else
+      @preview_frame ||= self
     end
   end
 

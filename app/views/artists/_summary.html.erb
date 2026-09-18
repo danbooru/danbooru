@@ -16,67 +16,69 @@
 
 <% if artist.is_banned? && !policy(artist).can_view_banned? %>
   <p>This page has been removed because of a takedown request.</p>
-<% elsif artist.new_record? %>
-  <p>This artist entry does not exist. <%= link_to "Create new artist entry", new_artist_path(artist: { name: artist.name }), rel: "nofollow" %>.</p>
 <% else %>
-  <div class="flex flex-col gap-2">
-    <% if artist.other_names.present? %>
-      <div class="flex flex-wrap gap-1">
-        <% artist.other_names.map do |other_name| %>
-          <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name chip-primary text-sm truncate", rel: "nofollow"%>
-        <% end %>
-      </div>
-    <% end %>
+  <% if artist.new_record? %>
+    <p>This artist entry does not exist. <%= link_to "Create new artist entry", new_artist_path(artist: { name: artist.name }), rel: "nofollow" %>.</p>
+  <% else %>
+    <div class="flex flex-col gap-2">
+      <% if artist.other_names.present? %>
+        <div class="flex flex-wrap gap-1">
+          <% artist.other_names.map do |other_name| %>
+            <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name chip-primary text-sm truncate", rel: "nofollow"%>
+          <% end %>
+        </div>
+      <% end %>
 
-    <% if artist.group_name.present? %>
-      <div>
-        <strong>Group</strong>
-        <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }), class: "artist-other-name chip-primary text-sm truncate" %>
-      </div>
-    <% end %>
+      <% if artist.group_name.present? %>
+        <div>
+          <strong>Group</strong>
+          <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }), class: "artist-other-name chip-primary text-sm truncate" %>
+        </div>
+      <% end %>
 
-    <% if artist.members.present? %>
-      <div>
-        <strong>Members</strong>
-        <% artist.members.each do |member| %>
-          <%= link_to member.name, artists_path(search: { name: member.name }), class: "artist-other-name chip-primary text-sm truncate" %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
-
-  <% if artist.wiki_page.present? && !artist.wiki_page.is_deleted? %>
-    <div class="artist-wiki prose mt-4">
-      <%= artist.wiki_page.dtext_body.format_text %>
+      <% if artist.members.present? %>
+        <div>
+          <strong>Members</strong>
+          <% artist.members.each do |member| %>
+            <%= link_to member.name, artists_path(search: { name: member.name }), class: "artist-other-name chip-primary text-sm truncate" %>
+          <% end %>
+        </div>
+      <% end %>
     </div>
-  <% end %>
 
-  <% if artist.urls.present? %>
-    <div class="my-4">
-      <h6>URLs</h6>
-
-      <ul>
-        <% artist.sorted_urls.each do |url| %>
-          <li>
-            <%= external_link_to url.url, external_site_icon(url.site_name, class: "h-4") %>
-            <% if url.is_active? %>
-              <%= external_link_to url.url %>
-            <% else %>
-              <%= external_link_to url.url, class: "inactive-artist-url underline decoration-dotted" %>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <p>
-    <% if artist.wiki_page.present? %>
-      <%= link_to "Edit wiki", edit_wiki_page_path(artist.wiki_page), id: "view-wiki-link" %> |
+    <% if artist.wiki_page.present? && !artist.wiki_page.is_deleted? %>
+      <div class="artist-wiki prose mt-4">
+        <%= artist.wiki_page.dtext_body.format_text %>
+      </div>
     <% end %>
 
-    <%= link_to "Edit artist", edit_artist_path(artist), id: "view-artist-link" %>
-  </p>
+    <% if artist.urls.present? %>
+      <div class="my-4">
+        <h6>URLs</h6>
+
+        <ul>
+          <% artist.sorted_urls.each do |url| %>
+            <li>
+              <%= external_link_to url.url, external_site_icon(url.site_name, class: "h-4") %>
+              <% if url.is_active? %>
+                <%= external_link_to url.url %>
+              <% else %>
+                <%= external_link_to url.url, class: "inactive-artist-url underline decoration-dotted" %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <p>
+      <% if artist.wiki_page.present? %>
+        <%= link_to "Edit wiki", edit_wiki_page_path(artist.wiki_page), id: "view-wiki-link" %> |
+      <% end %>
+
+      <%= link_to "Edit artist", edit_artist_path(artist), id: "view-artist-link" %>
+    </p>
+  <% end %>
 
   <%= render "tag_relationships/alias_and_implication_list", tag: artist.tag %>
 <% end %>

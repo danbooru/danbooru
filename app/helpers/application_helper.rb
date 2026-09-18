@@ -223,6 +223,14 @@ module ApplicationHelper
     link_to text, wiki_page_path(title), class: "wiki-link #{classes}", **options
   end
 
+  def link_to_wiki_or_artist(tag, classes: nil, **options)
+    if tag.artist?
+      link_to tag.name, show_or_new_artists_path(name: tag.name), class: "wiki-link #{classes}", **options
+    else
+      link_to_wiki(tag.name, classes: classes, **options)
+    end
+  end
+
   def link_to_wikis(*wiki_titles, **options)
     links = wiki_titles.map do |title|
       link_to_wiki title.tr("_", " "), title
@@ -263,7 +271,7 @@ module ApplicationHelper
 
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
     search_form_for(url, classes: "quick-search-form one-line-form py-1.5 px-3 md:w-180px w-full") do |f|
-      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { "id": nil, "data-autocomplete": autocomplete }
+      out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { "id": nil, "data-autocomplete": autocomplete, "data-shortcut": "q" }
       out += tag.input type: :hidden, name: :redirect, value: redirect
       out += capture { yield f } if block_given?
       out

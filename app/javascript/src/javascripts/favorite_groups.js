@@ -1,5 +1,3 @@
-import Rails from "@rails/ujs";
-
 let FavoriteGroup = {};
 
 FavoriteGroup.initialize_all = function() {
@@ -23,13 +21,7 @@ FavoriteGroup.initialize_add_to_favgroup_dialog = function() {
 }
 
 FavoriteGroup.open_favgroup_dialog = function(e) {
-  if ($(".add-to-favgroup").length === 1) {
-    // If the user only has one favorite group we don't need to ask which group to add the post to.
-    let favgroup = $(".add-to-favgroup").get(0);
-    Rails.fire(favgroup, "click");
-  } else {
-    $("#add-to-favgroup-dialog").dialog("open");
-  }
+  $("#add-to-favgroup-dialog").dialog("open");
   e.preventDefault();
 }
 

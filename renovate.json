@@ -1,0 +1,114 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "mergeConfidence:all-badges",
+    "abandonments:recommended",
+    ":configMigration"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "rangeStrategy": "bump",
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true,
+  "minimumReleaseAge": "14 days",
+  "ignorePaths": [
+    "lib/dtext_rb/Dockerfile"
+  ],
+  "labels": ["Upstream"],
+  "semanticCommits": "enabled",
+  "customManagers": [
+    {
+      "description": "Track the Ruby version pinned in the Dockerfile so it can be grouped with .ruby-version",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG RUBY_VERSION=\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "ruby",
+      "datasourceTemplate": "ruby-version"
+    },
+    {
+      "description": "Track the Node version pinned in the Dockerfile. Only LTS versions are suggested",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG NODE_VERSION=\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version",
+      "depTypeTemplate": "docker-dependencies"
+    },
+    {
+      "description": "Track any '# github: owner/repo' comment followed by an 'ARG FOO_VERSION=\"...\"' line in the Dockerfile, checking GitHub tags for new versions.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "#\\s*github:\\s*(?<packageName>[\\w.-]+/[\\w.-]+)\\s*\\n\\s*ARG (?<argName>[A-Z0-9]+)_VERSION=\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "{{lowercase argName}}",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^[a-zA-Z]?(?<version>\\d.*)$",
+      "versioningTemplate": "semver-coerced",
+      "depTypeTemplate": "docker-dependencies"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Force bundler to process gem updates from Gemfile.lock instead of Gemfile.",
+      "matchManagers": [
+        "bundler"
+      ],
+      "rangeStrategy": "update-lockfile"
+    },
+    {
+      "description": "Give highest priority to npm/bundler updates",
+      "matchPackageNames": [
+        "npm",
+        "bundler"
+      ],
+      "prPriority": 100
+    },
+    {
+      "description": "Group all non-major updates together",
+      "groupName": "{{manager}} non-major dependencies",
+      "groupSlug": "{{manager}}-minor-patch",
+      "matchManagers": [
+        "npm",
+        "bundler",
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    },
+    {
+      "description": "Keep the Ruby version in .ruby-version, the Dockerfile, and the Gemfile in sync by updating them in the same PR/commit.",
+      "groupName": "ruby version",
+      "matchDatasources": [
+        "ruby-version"
+      ],
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Don't auto-open pulls for the following packages",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "mcr.microsoft.com/playwright",
+        "redis"
+      ],
+      "dependencyDashboardApproval": true
+    }
+  ]
+}
+

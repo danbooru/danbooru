@@ -6,6 +6,9 @@ class Tag < ApplicationRecord
   # Tags that are permitted to have unbalanced parentheses, as a special exception to the normal rule that parentheses in tags must balanced.
   PERMITTED_UNBALANCED_TAGS = %w[:) :( ;) ;( >:) >:(]
 
+  # The maximum amount of posts for this tag to be considered a small tag. Mostly relevant to BUR approval permissions
+  SMALL_TAG_THRESHOLD = 200
+
   attr_accessor :updater, :skip_name_validation, :is_bulk_update_request
 
   has_one :wiki_page, foreign_key: "title", primary_key: "name"
@@ -493,6 +496,10 @@ class Tag < ApplicationRecord
 
   def rating?
     name.match?(/\Arating:[#{Post::RATINGS.keys.join}]\z/o)
+  end
+
+  def is_small_tag?
+    post_count <= SMALL_TAG_THRESHOLD
   end
 
   def self.model_restriction(table)

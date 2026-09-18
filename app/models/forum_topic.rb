@@ -36,7 +36,7 @@ class ForumTopic < ApplicationRecord
   after_update :update_posts_on_deletion_or_undeletion
   after_update :update_original_post
   after_save(if: ->(topic) { topic.is_locked? && topic.saved_change_to_is_locked? }) do
-    ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock, subject: self, user: updater)
+    ModAction.log("locked forum topic ##{id}", :forum_topic_lock, subject: self, user: updater)
   end
 
   deletable
@@ -158,9 +158,9 @@ class ForumTopic < ApplicationRecord
 
   def create_mod_action
     if is_deleted && !is_deleted_was
-      ModAction.log("deleted forum topic ##{id} (title: #{title})", :forum_topic_delete, subject: self, user: updater)
+      ModAction.log("deleted forum topic ##{id}", :forum_topic_delete, subject: self, user: updater)
     elsif !is_deleted && is_deleted_was
-      ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete, subject: self, user: updater)
+      ModAction.log("undeleted forum topic ##{id}", :forum_topic_undelete, subject: self, user: updater)
     end
   end
 

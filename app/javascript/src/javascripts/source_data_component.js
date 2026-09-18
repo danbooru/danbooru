@@ -11,7 +11,8 @@ class SourceDataComponent {
 
     if (/^https?:\/\//.test(url)) {
       $(".source-data").addClass("loading");
-      await $.get("/source.js", { url: url, ref: ref });
+      let script = await $.get("/source.js", { url: url, ref: ref });
+      $.globalEval(script);
       $(".source-data").removeClass("loading");
     }
   }

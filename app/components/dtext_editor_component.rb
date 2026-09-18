@@ -2,6 +2,9 @@
 
 # This component is used to render a DText editor within a form.
 class DtextEditorComponent < ApplicationComponent
+  # How long to wait for the DText preview to load, in milliseconds, before giving up and reverting to edit mode.
+  PREVIEW_TIMEOUT_MS = 5_000
+
   attr_reader :input_name, :form, :editor_html, :input_html
 
   delegate :eye_icon, :bold_icon, :italic_icon, :strikethrough_icon, :underline_icon, :exclamation_icon, :search_icon,
@@ -38,5 +41,10 @@ class DtextEditorComponent < ApplicationComponent
   # @return [Boolean] Whether media embeds are enabled for the DText field.
   def media_embeds?
     dtext.media_embeds
+  end
+
+  # @return [Integer] The current length of the field's value, used to initialize the character counter.
+  def current_length
+    form.object.send(input_name).to_s.length
   end
 end

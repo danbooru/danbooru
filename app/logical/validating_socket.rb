@@ -11,9 +11,9 @@ require "resolv"
 class ValidatingSocket < TCPSocket
   class ProhibitedIpError < StandardError; end
 
-  def initialize(hostname, port)
+  def initialize(hostname, port, *args, **options)
     ip = validate_hostname!(hostname)
-    super(ip, port)
+    super(ip, port, *args, **options)
   end
 
   def validate_hostname!(hostname)

@@ -4,7 +4,7 @@
 class Source::URL::Danbooru2 < Source::URL
   site "Danbooru", url: "https://danbooru.donmai.us", domains: %w[donmai.us donmai.moe]
 
-  attr_reader :user_id, :post_id, :md5, :image_url, :full_image_url
+  attr_reader :user_id, :post_id, :media_asset_id, :md5, :image_url, :full_image_url
 
   def self.match?(url)
     url.domain.in?(%w[donmai.us donmai.moe])
@@ -22,6 +22,11 @@ class Source::URL::Danbooru2 < Source::URL
     # https://danbooru.donmai.us/posts/1.json
     in _, _, "posts", /\A(\d+)/
       @post_id = $1
+
+    # https://danbooru.donmai.us/media_assets/1
+    # https://danbooru.donmai.us/media_assets/1.json
+    in _, _, "media_assets", /\A(\d+)/
+      @media_asset_id = $1
 
     # https://danbooru.donmai.us/posts?md5=8d819da4871c3ca39f428999df8220ce
     in _, _, "posts" if params[:md5].present? && params[:md5].match?(/\A\h{32}\z/)
@@ -58,6 +63,8 @@ class Source::URL::Danbooru2 < Source::URL
   def page_url
     if post_id.present?
       "https://danbooru.donmai.us/posts/#{post_id}"
+    elsif media_asset_id.present?
+      "https://danbooru.donmai.us/media_assets/#{media_asset_id}"
     elsif md5.present?
       "https://danbooru.donmai.us/posts?md5=#{md5}"
     end

@@ -101,6 +101,16 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "show tag aliases for an artist tag that doesn't have an artist entry" do
+        create(:artist_tag, name: "new_name")
+        as(@user) { create(:tag_alias, antecedent_name: @masao.name, consequent_name: "new_name", status: "active") }
+
+        get_auth show_or_new_artists_path(name: "new_name"), @user
+
+        assert_response :success
+        assert_select ".fineprint", text: /The following tags are aliased to this tag:\s+#{@masao.name}/
+      end
+
       should "redirect to the new artist page for a blank artist" do
         get_auth show_or_new_artists_path, @user
         assert_redirected_to new_artist_path
@@ -194,6 +204,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(has_urls: "true").with { [@artgerm, @masao] }
           should respond_to_search(has_urls: "false").with { [@banned, @deleted, @artist] }
           should respond_to_search(urls: { url: "https://www.pixiv.net/users/32777" }).with { @masao }
+        end
+
+        context "using url_count" do
+          should respond_to_search(url_count: "0").with { [@banned, @deleted, @artist] }
+          should respond_to_search(url_count: "1").with { [@artgerm, @masao] }
+          should respond_to_search(url_count: ">0").with { [@artgerm, @masao] }
         end
       end
     end

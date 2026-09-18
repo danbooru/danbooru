@@ -2,7 +2,7 @@
 
 class PostDisapproval < ApplicationRecord
   DELETION_THRESHOLD = 1.month
-  REASONS = %w[breaks_rules poor_quality disinterest]
+  REASONS = %w[disinterest poor_quality breaks_rules]
 
   dtext_attribute :message, inline: true # defines :dtext_message
 
@@ -50,7 +50,7 @@ class PostDisapproval < ApplicationRecord
   end
 
   def validate_disapproval
-    if post.is_active?
+    if post&.is_active?
       errors.add(:post, "is already active and cannot be disapproved")
     end
   end

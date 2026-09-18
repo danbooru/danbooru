@@ -84,6 +84,20 @@ module Source::Tests::URL
         profile_url: "https://www.deviantart.com/noizave",
       )
 
+      should parse_url("https://www.deviantart.com/bumbledsteak/art/Filia%2C-again-866321359").into(
+        username: "bumbledsteak",
+        title: "Filia,-again",
+        work_id: 866_321_359,
+        page_url: "https://www.deviantart.com/bumbledsteak/art/Filia,-Again-866321359",
+      )
+
+      should parse_url("https://www.deviantart.com/bumbledsteak/art/%5BWarframe%5D-Ivara-again-851084000").into(
+        username: "bumbledsteak",
+        title: "[Warframe]-Ivara-again",
+        work_id: 851_084_000,
+        page_url: "https://www.deviantart.com/bumbledsteak/art/[Warframe]-Ivara-Again-851084000",
+      )
+
       should parse_url("https://sta.sh/zip/21leo8mz87ue").into(
         stash_id: "21leo8mz87ue",
         page_url: "https://sta.sh/21leo8mz87ue",

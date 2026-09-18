@@ -105,8 +105,9 @@ class Source::Extractor::URLShortener < Source::Extractor
       url unless url == "https://www.shorturl.at/"
 
     # curl -v http://xhslink.com/o/3y3uwYYeyHn
+    # curl -v http://xhslink.cn/m/EXCcWbUXnl
     # Returns 307 on success, 307 redirect to https://www.xiaohongshu.com on error, and 500 if id is too long.
-    in "xhslink.com", *rest
+    in "xhslink.com" | "xhslink.cn", *rest
       url = http.redirect_url(https_url, method: "GET")&.to_s
       url unless url == "http://www.xiaohongshu.com"
 

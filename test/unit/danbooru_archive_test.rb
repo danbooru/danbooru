@@ -77,7 +77,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
 
       should "work with a .zip file" do
-        Danbooru::Archive.extract!("test/files/archive/ugoira.zip") do |_dir, filenames|
+        Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip") do |_dir, filenames|
           assert_equal(5, filenames.size)
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
         end
@@ -114,7 +114,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#format method" do
       should "detect the file type" do
-        assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/archive/ugoira.zip").format)
+        assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/ugoira/ugoira.zip").format)
         assert_equal("RAR5", Danbooru::Archive.open("test/files/archive/ugoira.rar").format)
         assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.7z").format)
         assert_equal("GNU tar format", Danbooru::Archive.open("test/files/archive/ugoira.tar").format)
@@ -124,7 +124,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#file_ext method" do
       should "detect the file extension" do
-        assert_equal(:zip, Danbooru::Archive.open("test/files/archive/ugoira.zip").file_ext)
+        assert_equal(:zip, Danbooru::Archive.open("test/files/ugoira/ugoira.zip").file_ext)
         assert_equal(:rar, Danbooru::Archive.open("test/files/archive/ugoira.rar").file_ext)
         assert_equal(:"7z", Danbooru::Archive.open("test/files/archive/ugoira.7z").file_ext)
         assert_equal(:bin, Danbooru::Archive.open("test/files/archive/ugoira.tar").file_ext)
@@ -181,14 +181,14 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       should "work" do
         archive = Dir.mktmpdir do |tmpdir|
           # Test normal files work
-          FileUtils.cp "test/files/test.gif", tmpdir
+          FileUtils.cp "test/files/gif/test.gif", tmpdir
 
           # Test utf8 filenames work
-          FileUtils.cp "test/files/test.jpg", File.join(tmpdir, "テスト.jpg")
+          FileUtils.cp "test/files/jpg/test.jpg", File.join(tmpdir, "テスト.jpg")
 
           # Test subdirectories work
           FileUtils.mkdir_p File.join(tmpdir, "subdir")
-          FileUtils.cp "test/files/test.png", File.join(tmpdir, "subdir")
+          FileUtils.cp "test/files/png/test.png", File.join(tmpdir, "subdir")
 
           Danbooru::Archive.create!(tmpdir)
         end
@@ -212,7 +212,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal("None", media_file.metadata["ZIP:ZipCompression"])
 
         # md5 of the archive should always be the same
-        assert_equal("19875680007d7f56b9c2b39a2c3c62b8", media_file.md5)
+        assert_equal("595f43ab518c05eea06aa3dd740f4724", media_file.md5)
       end
     end
   end

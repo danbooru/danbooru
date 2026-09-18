@@ -16,10 +16,10 @@ FactoryBot.define do
       status { "completed" }
       source { nil }
       media_asset_count { 1 }
-      files { { "0" => Rack::Test::UploadedFile.new(Rails.root.join("test/files/test.jpg").to_s) } }
+      files { { "0" => Rack::Test::UploadedFile.new(Rails.root.join("test/files/jpg/test.jpg").to_s) } }
 
       upload_media_assets do
-        [build(:upload_media_asset, media_asset: build(:media_asset, file: "test/files/test.jpg"), source_url: "file://test.jpg", status: "active")]
+        [build(:upload_media_asset, media_asset: build(:media_asset, file: "test/files/jpg/test.jpg"), source_url: "file://test.jpg", status: "active")]
       end
     end
   end

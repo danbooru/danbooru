@@ -13,6 +13,7 @@ module Source::Tests::URL
         "https://www.fanbox.cc/@tsukiori/posts/1080657",
         "https://www.pixiv.net/fanbox/creator/1566167/post/39714",
         "https://omu001.fanbox.cc/posts/39714",
+        "https://tanishi-0413.fanbox.cc/plans",
       )
 
       should be_profile_url(
@@ -39,6 +40,10 @@ module Source::Tests::URL
         "https://www.fanbox.cc/@tsukiori",
       )
 
+      should_not be_bad_source(
+        "https://tanishi-0413.fanbox.cc/plans",
+      )
+
       should parse_url(
         "https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg",
       ).into(
@@ -52,6 +57,11 @@ module Source::Tests::URL
       should parse_url("https://www.fanbox.cc/@omu001/posts/39714").into(username: "omu001", work_id: "39714")
       should parse_url("https://fanbox.cc/@omu001/posts/39714").into(username: "omu001", work_id: "39714")
       should parse_url("https://omu001.fanbox.cc/posts/39714").into(username: "omu001", work_id: "39714")
+
+      should parse_url("https://tanishi-0413.fanbox.cc/plans").into(
+        username: "tanishi-0413",
+        page_url: "https://tanishi-0413.fanbox.cc/plans",
+      )
     end
 
     should parse_url("https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg").into(site_name: "Fanbox")

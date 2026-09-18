@@ -24,7 +24,7 @@ class PostTest < ActiveSupport::TestCase
   context "Deletion:" do
     context "Expunging a post" do
       setup do
-        @post = create(:post_with_file, tag_string: "1girl solo", uploader: @user, filename: "test.jpg")
+        @post = create(:post_with_file, tag_string: "1girl solo", uploader: @user, filename: "jpg/test.jpg")
         Favorite.create!(post: @post, user: @user)
         create(:favorite_group, post_ids: [@post.id])
         perform_enqueued_jobs # perform IqdbAddPostJob
@@ -214,6 +214,23 @@ class PostTest < ActiveSupport::TestCase
         p3.update(parent: p1)
 
         assert_equal(["Post cannot have itself as a parent"], p3.errors[:base])
+      end
+
+      should "not raise a stack error when editing a post whose parent-child relationship already forms a cycle" do
+        p1 = create(:post)
+        p2 = create(:post)
+
+        # Simulate a race condition where two posts end up with each other as parent (see issue #6324).
+        p1.update_column(:parent_id, p2.id) # rubocop:disable Rails/SkipsModelValidations
+        p2.update_column(:parent_id, p1.id) # rubocop:disable Rails/SkipsModelValidations
+
+        assert_nothing_raised do
+          p1.update(parent_id: nil)
+        end
+
+        assert_equal(true, p1.valid?)
+        assert_nil(p1.reload.parent_id)
+        assert_equal(p1.id, p2.reload.parent_id)
       end
 
       should "not allow parent-child relationships more than 4 levels deep" do
@@ -496,10 +513,13 @@ class PostTest < ActiveSupport::TestCase
         should allow_value("touhou pool:foo").for(:tag_string)
         should allow_value("touhou -pool:foo").for(:tag_string)
         should allow_value("touhou newpool:foo").for(:tag_string)
+        should allow_value("touhou newfavgroup:foo").for(:tag_string)
         should allow_value("touhou fav:self").for(:tag_string)
         should allow_value("touhou -fav:self").for(:tag_string)
         should allow_value("touhou upvote:self").for(:tag_string)
         should allow_value("touhou downvote:self").for(:tag_string)
+        should allow_value("touhou -upvote:self").for(:tag_string)
+        should allow_value("touhou -downvote:self").for(:tag_string)
         should allow_value("touhou parent:1").for(:tag_string)
         should allow_value("touhou child:1").for(:tag_string)
         should allow_value("touhou source:foo").for(:tag_string)
@@ -531,6 +551,7 @@ class PostTest < ActiveSupport::TestCase
           assert_invalid_tag("東方")
           assert_invalid_tag("gen:char:foo")
           assert_invalid_tag("general:newpool:a")
+          assert_invalid_tag("general:newfavgroup:a")
           assert_invalid_tag("general:rating:g")
         end
 
@@ -693,6 +714,16 @@ class PostTest < ActiveSupport::TestCase
             assert_match(/Couldn't add tag: 'newpool:blah' cannot begin with 'newpool:'/, post.warnings[:base].join("\n"))
             assert_equal(["tagme"], post.tag_array)
             assert_equal(false, Tag.exists?(name: "newpool:blah"))
+            assert_equal(0, post.tag_count_character)
+            assert_equal(1, post.tag_count_general)
+          end
+
+          should "not raise an exception for char:newfavgroup:blah" do
+            post = create(:post, tag_string: "tagme char:newfavgroup:blah")
+
+            assert_match(/Couldn't add tag: 'newfavgroup:blah' cannot begin with 'newfavgroup:'/i, post.warnings[:base].join("\n"))
+            assert_equal(["tagme"], post.tag_array)
+            assert_equal(false, Tag.exists?(name: "newfavgroup:blah"))
             assert_equal(0, post.tag_count_character)
             assert_equal(1, post.tag_count_general)
           end
@@ -945,6 +976,39 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
+        context "for the newfavgroup: metatag" do
+          should "create a new favgroup and add the post to that favgroup" do
+            @post.update(tag_string: "aaa newfavgroup:abc")
+            @favgroup = FavoriteGroup.find_by_name_or_id("abc", @user)
+
+            assert_not_nil(@favgroup)
+            assert_equal([@post.id], @favgroup.post_ids)
+          end
+
+          should "add the post to an existing favgroup with the same name" do
+            @favgroup = create(:favorite_group, creator: @user, name: "abc")
+
+            @post.update(tag_string: "aaa newfavgroup:abc")
+
+            assert_equal([@post.id], @favgroup.reload.post_ids)
+          end
+
+          should "parse a double-quoted name" do
+            @post.update(tag_string: 'aaa newfavgroup:"foo bar baz" bbb')
+            @favgroup = FavoriteGroup.find_by_name_or_id("foo_bar_baz", @user)
+
+            assert_not_nil(@favgroup)
+            assert_equal([@post.id], @favgroup.post_ids)
+            assert_equal("aaa bbb", @post.tag_string)
+          end
+
+          should "not strip special characters from the name" do
+            @post.update(tag_string: "aaa newfavgroup:ichigo_100%")
+
+            assert_not_nil(FavoriteGroup.find_by_name_or_id("ichigo_100%", @user))
+          end
+        end
+
         context "for a rating" do
           context "that is valid" do
             should "update the rating" do
@@ -1037,6 +1101,52 @@ class PostTest < ActiveSupport::TestCase
 
             @post.update(tag_string: "aaa -fav:self -fav:me")
             assert_equal(0, @post.favorites.count)
+          end
+        end
+
+        context "for an upvote or downvote" do
+          should "remove the current user's upvote with -upvote:self" do
+            @post.update(tag_string: "aaa upvote:self")
+            assert_equal(1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(0, @post.reload.score)
+            assert_equal(0, @post.votes.active.where(user: @user).count)
+          end
+
+          should "remove the current user's downvote with -downvote:self" do
+            @post.update(tag_string: "aaa downvote:self")
+            assert_equal(-1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(0, @post.reload.score)
+            assert_equal(0, @post.votes.active.where(user: @user).count)
+          end
+
+          should "not remove a downvote with -upvote:self" do
+            @post.update(tag_string: "aaa downvote:self")
+            assert_equal(-1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(-1, @post.reload.score)
+            assert_equal(1, @post.votes.active.where(user: @user).count)
+          end
+
+          should "not remove an upvote with -downvote:self" do
+            @post.update(tag_string: "aaa upvote:self")
+            assert_equal(1, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(1, @post.reload.score)
+            assert_equal(1, @post.votes.active.where(user: @user).count)
+          end
+
+          should "do nothing if the user hasn't voted" do
+            @post.update(tag_string: "aaa -upvote:self")
+            assert_equal(0, @post.reload.score)
+
+            @post.update(tag_string: "aaa -downvote:self")
+            assert_equal(0, @post.reload.score)
           end
         end
 
@@ -1190,6 +1300,21 @@ class PostTest < ActiveSupport::TestCase
 
             assert_equal(0, @post.disapprovals.count)
           end
+
+          should "update the reason if the post was already disapproved by the same user with a different reason" do
+            @user = create(:approver)
+
+            as(@user) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa disapproved:disinterest")
+
+              assert_no_difference("@post.disapprovals.count") do
+                @post.update(tag_string: "aaa disapproved:poor_quality")
+              end
+            end
+
+            assert_equal("poor_quality", PostDisapproval.last.reason)
+          end
         end
 
         context "for a source" do
@@ -1336,7 +1461,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a static image tagged with animated_gif" do
         should "remove the tag" do
-          @media_asset = create(:media_asset, file: "test/files/test-static-32x32.gif")
+          @media_asset = create(:media_asset, file: "test/files/gif/test-static-32x32.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme animated animated_gif")
           assert_equal("tagme", @post.tag_string)
@@ -1345,7 +1470,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a static image tagged with animated_png" do
         should "remove the tag" do
-          @media_asset = create(:media_asset, file: "test/files/test.png")
+          @media_asset = create(:media_asset, file: "test/files/png/test.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme animated animated_png")
           assert_equal("tagme", @post.tag_string)
@@ -1354,7 +1479,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated gif missing the animated_gif tag" do
         should "automatically add the animated_gif tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52.gif")
+          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif tagme", @post.tag_string)
@@ -1363,7 +1488,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated png missing the animated_png tag" do
         should "automatically add the animated_png tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-animated-256x256.png")
+          @media_asset = MediaAsset.upload!("test/files/apng/normal-256x256.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_png tagme", @post.tag_string)
@@ -1372,7 +1497,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a greyscale image missing the greyscale tag" do
         should "automatically add the greyscale tag for a monochrome JPEG file" do
-          @media_asset = MediaAsset.upload!("test/files/test-grey-no-profile.jpg")
+          @media_asset = MediaAsset.upload!("test/files/jpg/test-grey-no-profile.jpg")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("greyscale tagme", @post.tag_string)
@@ -1388,16 +1513,25 @@ class PostTest < ActiveSupport::TestCase
 
       context "an exif-rotated image missing the exif_rotation tag" do
         should "automatically add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-rotation-90cw.jpg")
+          @media_asset = MediaAsset.upload!("test/files/jpg/test-rotation-90cw.jpg")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("exif_rotation tagme", @post.tag_string)
         end
       end
 
-      context "a PNG with the exif orientation flag" do
+      context "a PNG with a valid exif orientation flag" do
+        should "automatically add the exif_rotation tag" do
+          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-good-chunk.png")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("exif_rotation tagme", @post.tag_string)
+        end
+      end
+
+      context "a PNG with an invalid exif orientation flag" do
         should "not add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-rotation-90cw.png")
+          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-bad-chunk.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("tagme", @post.tag_string)
@@ -1406,12 +1540,12 @@ class PostTest < ActiveSupport::TestCase
 
       context "a non-repeating GIF missing the non-repeating_animation tag" do
         should "automatically add the non-repeating_animation tag" do
-          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52-loop-1.gif")
+          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52-loop-1.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
 
-          @media_asset = MediaAsset.upload!("test/files/test-animated-86x52-loop-2.gif")
+          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52-loop-2.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
@@ -1647,6 +1781,17 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(false, @post.has_tag?("cosplay"))
           assert_equal(true, @post.warnings[:base].grep(/Couldn't add tag/).present?)
           assert_match(/'little_red_riding_hood_\(cosplay\)' is not allowed because 'little_red_riding_hood' is not a character tag/, @post.warnings.full_messages.join)
+        end
+
+        should "not add the _(cosplay) tag if the character tag is deprecated" do
+          create(:tag, name: "hijiri_byakuren", category: Tag.categories.character, is_deprecated: true)
+          @post = create(:post, tag_string: "hijiri_byakuren_(cosplay)")
+
+          assert_equal(false, @post.has_tag?("hijiri_byakuren_(cosplay)"))
+          assert_equal(false, @post.has_tag?("hijiri_byakuren"))
+          assert_equal(false, @post.has_tag?("cosplay"))
+          assert_equal(true, @post.warnings[:base].grep(/Couldn't add tag/).present?)
+          assert_match(/'hijiri_byakuren_\(cosplay\)' is not allowed because 'hijiri_byakuren' is deprecated/, @post.warnings.full_messages.join)
         end
 
         should "allow creating a _(cosplay) tag for an empty general tag" do
@@ -2216,7 +2361,7 @@ class PostTest < ActiveSupport::TestCase
 
   context "URLs:" do
     should "generate the correct urls for animated gifs" do
-      @post = create(:post_with_file, filename: "test-animated-86x52.gif")
+      @post = create(:post_with_file, filename: "gif/test-animated-86x52.gif")
 
       assert_equal("https://www.example.com/data/180x180/77/d8/77d89bda37ea3af09158ed3282f8334f.jpg", @post.preview_file_url)
       assert_equal("https://www.example.com/data/original/77/d8/77d89bda37ea3af09158ed3282f8334f.gif", @post.large_file_url)

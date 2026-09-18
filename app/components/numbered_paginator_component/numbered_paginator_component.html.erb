@@ -3,11 +3,13 @@
 
   <% pages.each do |page| %>
     <% if page == "..." %>
-      <span class="paginator-ellipsis desktop-only"><%= ellipsis_icon class: "text-muted" %></span>
+      <%= paginator_ellipsis %>
     <% elsif page == current_page %>
       <%= tag.span page, class: "paginator-current font-bold" %>
     <% else %>
-      <%= link_to_page page, class: "paginator-page desktop-only" %>
+      <%= paginator_ellipsis(mobile_only: true) if page == total_pages && mobile_ellipsis_before_last? %>
+      <%= link_to_page page, class: ["paginator-page", ("desktop-only" unless page == 1 || page == total_pages)] %>
+      <%= paginator_ellipsis(mobile_only: true) if page == 1 && mobile_ellipsis_after_first? %>
     <% end %>
   <% end %>
 

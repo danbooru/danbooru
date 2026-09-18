@@ -158,6 +158,12 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render as a dialog for the javascript format" do
+        get_auth edit_post_flag_path(@post_flag), @flagger, as: :javascript
+
+        assert_response :success
+      end
+
       should "not allow the flagger to edit a resolved flag" do
         @post_flag.update!(status: "rejected")
         get_auth edit_post_flag_path(@post_flag), @flagger
@@ -178,6 +184,20 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to @post_flag.post
         assert_equal("no", @post_flag.reload.reason)
+      end
+
+      should "allow the flagger to update the flag over ajax" do
+        put_auth post_flag_path(@post_flag), @flagger, params: { post_flag: { reason: "no" }}, as: :javascript
+
+        assert_redirected_to @post_flag.post
+        assert_equal("no", @post_flag.reload.reason)
+      end
+
+      should "return an error over ajax if the flag is too long" do
+        put_auth post_flag_path(@post_flag), @flagger, params: { post_flag: { reason: "x" * 1000 }}, as: :javascript
+
+        assert_response :success
+        assert_equal("xxx", @post_flag.reload.reason)
       end
 
       should "return an error if the flag is too long" do

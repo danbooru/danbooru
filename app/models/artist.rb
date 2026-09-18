@@ -60,7 +60,7 @@ class Artist < ApplicationRecord
 
       self.urls = string.to_s.scan(/[^[:space:]]+/).map do |url|
         is_active, url = ArtistURL.parse_prefix(url)
-        self.urls.find_or_initialize_by(url: url, is_active: is_active)
+        urls.find_or_initialize_by(url: url, is_active: is_active)
       end.uniq(&:url)
 
       self.url_string_changed = (url_string_was != url_string)
@@ -217,7 +217,7 @@ class Artist < ApplicationRecord
   module BanMethods
     def unban!(current_user)
       with_lock do
-        BulkUpdateRequestProcessor.mass_update(name, "-status:banned", user: current_user)
+        BulkUpdateRequest::Command::MassUpdate.mass_update(name, "-status:banned", user: current_user)
 
         CurrentUser.scoped(current_user) { update!(is_banned: false) }
         ModAction.log("unbanned artist ##{id}", :artist_unban, subject: self, user: current_user)
@@ -226,7 +226,7 @@ class Artist < ApplicationRecord
 
     def ban!(banner)
       with_lock do
-        BulkUpdateRequestProcessor.mass_update(name, "status:banned", user: banner)
+        BulkUpdateRequest::Command::MassUpdate.mass_update(name, "status:banned", user: banner)
 
         CurrentUser.scoped(banner) { update!(is_banned: true) }
         ModAction.log("banned artist ##{id}", :artist_ban, subject: self, user: banner)
@@ -282,6 +282,12 @@ class Artist < ApplicationRecord
       where(id: ArtistURL.normalized_url_equals_any(urls).select(:artist_id))
     end
 
+    def with_url_count
+      subquery = left_outer_joins(:urls).group(:id).select("artists.*")
+      subquery = subquery.select("COUNT(artist_urls.id) AS url_count")
+      from(subquery.arel.as("artists"))
+    end
+
     def any_name_or_url_matches(query)
       query = query.strip
 
@@ -309,6 +315,10 @@ class Artist < ApplicationRecord
 
       if params[:url_matches].present?
         q = q.urls_match(params[:url_matches])
+      end
+
+      if params[:url_count].present?
+        q = q.with_url_count.where_numeric_matches(:url_count, params[:url_count])
       end
 
       case params[:order]

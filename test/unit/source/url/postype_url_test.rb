@@ -14,6 +14,7 @@ module Source::Tests::URL
       should be_page_url(
         "https://luland.postype.com/post/11659399",
         "https://www.postype.com/@fruitsnoir/post/5316533",
+        "https://www.postype.com/en/@sanoonsnowfield/post/21587023",
       )
 
       should be_profile_url(
@@ -31,5 +32,7 @@ module Source::Tests::URL
     end
 
     should parse_url("https://d3mcojo3jv0dbr.cloudfront.net/2021/03/19/20/57/7e8c74bfe4a77f6a037ed8b02194955c.webp?w=240&h=180&q=65").into(site_name: "Postype")
+
+    should parse_url("https://www.postype.com/en/@sanoonsnowfield/post/21587023").into(blogname: "sanoonsnowfield", post_id: "21587023")
   end
 end

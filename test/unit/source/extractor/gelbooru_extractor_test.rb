@@ -113,7 +113,7 @@ module Source::Tests::Extractor
         strategy_should_work(
           # source: "https://www.pixiv.net/artworks/99176572 [Direct link in description]"
           "https://gelbooru.com/index.php?page=post&s=view&id=7868427",
-          image_urls: [%r{https://video-cdn\d\.gelbooru\.com/images/e7/88/e788470bf83be1e8eba72ca9cca8f738\.mp4}],
+          image_urls: [%r{https://img\d\.gelbooru\.com/images/e7/88/e788470bf83be1e8eba72ca9cca8f738\.mp4}],
           artist_name: nil,
           artist_commentary_title: nil,
           artist_commentary_desc: nil,
@@ -300,9 +300,7 @@ module Source::Tests::Extractor
     end
 
     context "Rule34.xxx:" do
-      setup do
-        skip "rule34.xxx extractor is broken (needs an API key: #6295)"
-      end
+      setup { skip "Rule34.xxx credentials not configured" unless SiteCredential.for_site("Rule34.xxx").present? }
 
       # source: https://twitter.com/marushin_0214/status/1590260107405053954
       context "A https://rule34.xxx/index.php?page=post&s=view&id=$post_id URL" do
@@ -310,7 +308,7 @@ module Source::Tests::Extractor
           "https://rule34.xxx/index.php?page=post&s=view&id=6961597",
           image_urls: ["https://api-cdn.rule34.xxx/images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg"],
           artist_name: "丸新(MaruShin)",
-          profile_url: "https://twitter.com/marushin_0214",
+          profile_url: "https://x.com/marushin_0214",
           tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts buruma check_commentary commentary commentary_request cowboy_shot curvy female gym_uniform halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
           artist_commentary_desc: "いっぱい走ったね… https://t.co/n3ic5BIONP",
           media_files: [{ file_size: 201_643 }],
@@ -323,7 +321,7 @@ module Source::Tests::Extractor
           "https://rule34.xxx/index.php?page=post&s=list&md5=0a8fff70045826d2b39fcde4eed17584",
           image_urls: ["https://api-cdn.rule34.xxx/images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg"],
           artist_name: "丸新(MaruShin)",
-          profile_url: "https://twitter.com/marushin_0214",
+          profile_url: "https://x.com/marushin_0214",
           tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts buruma check_commentary commentary commentary_request cowboy_shot curvy female gym_uniform halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
           artist_commentary_desc: "いっぱい走ったね… https://t.co/n3ic5BIONP",
           media_files: [{ file_size: 201_643 }],
@@ -336,7 +334,7 @@ module Source::Tests::Extractor
           "https://rule34.xxx//images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg?6961597",
           image_urls: ["https://rule34.xxx//images/6120/0a8fff70045826d2b39fcde4eed17584.jpeg?6961597"],
           artist_name: "丸新(MaruShin)",
-          profile_url: "https://twitter.com/marushin_0214",
+          profile_url: "https://x.com/marushin_0214",
           tags: %w[bangs big_breasts black_shirt bloomers blue_archive blue_eyes blue_hair blue_jacket blush breasts buruma check_commentary commentary commentary_request cowboy_shot curvy female gym_uniform halo highres holding hourglass_figure huge_breasts jacket lanyard large_breasts long_hair looking_at_viewer marushin_(denwa0214) millennium_science_school_logo_(blue_archive) millennium_science_school_student official_alternate_costume parted_lips partially_unzipped rating:e seminar_(blue_archive) shirt short_sleeves shorts simple_background solo student_id sweat thick_thighs thigh_gap undressing voluptuous wet wet_clothes wet_shirt white_background yuuka_(blue_archive) yuuka_(gym_uniform)_(blue_archive)],
           artist_commentary_desc: "いっぱい走ったね… https://t.co/n3ic5BIONP",
           media_files: [{ file_size: 201_643 }],

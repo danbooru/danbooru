@@ -268,11 +268,35 @@ class MediaFile
       pixel_hash: pixel_hash,
       is_corrupt?: is_corrupt?,
       is_supported?: is_supported?,
+      is_animated?: is_animated?,
       duration: duration,
       frame_count: frame_count,
       frame_rate: frame_rate,
       metadata: metadata,
     }.stringify_keys
+  end
+
+  memoize def test_case
+    template = Erubi::Engine.new <<~TEST.chomp
+      should "be parsed correctly" do
+        file = MediaFile.open(<%= path.inspect %>)
+
+      <% attributes.except("path").each do |key, value| -%>
+      <% if value.is_a?(ExifTool::Metadata) -%>
+      <% entries = value.to_h.map { |k, v| "    \#{k.inspect} => \#{v.inspect}," }.join("\n") -%>
+        assert_equal({
+      <%= entries %>
+        }, file.<%= key %>.to_h)
+      <% elsif value.nil? -%>
+        assert_nil(file.<%= key %>)
+      <% else -%>
+        assert_equal(<%= value.inspect %>, file.<%= key %>)
+      <% end -%>
+      <% end -%>
+      end
+    TEST
+
+    eval(template.src)
   end
 
   # Scale `width` and `height` to fit within `max_width` and `max_height`.

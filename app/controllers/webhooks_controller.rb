@@ -3,16 +3,11 @@
 class WebhooksController < ApplicationController
   skip_forgery_protection only: [:receive]
 
-  rescue_with DiscordSlashCommand::WebhookVerificationError, status: 401
-
   def receive
     skip_authorization
 
     case params[:source]
-    when "discord"
-      json = DiscordSlashCommand.receive_webhook(request)
-      render json: json
-    else
+    in _
       head 400
     end
   end

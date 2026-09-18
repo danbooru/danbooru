@@ -3,8 +3,16 @@
     padding: 0.25rem 0.75rem;
   }
 
-  > a:hover {
+  > a:hover,
+  > button:hover {
     background: var(--paginator-arrow-color);
     color: var(--paginator-arrow-background-color);
   }
+}
+
+.paginator-ellipsis {
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
 }
