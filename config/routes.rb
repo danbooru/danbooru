@@ -256,9 +256,9 @@ Rails.application.routes.draw do
     collection do
       get :batch, to: redirect(path: "/uploads/new")
     end
-    resources :upload_media_assets, only: [:show, :index], path: "assets"
+    resources :upload_media_assets, only: [:show, :index, :update], path: "assets"
   end
-  resources :upload_media_assets, only: [:show, :index]
+  resources :upload_media_assets, only: [:show, :index, :update]
   resources :user_actions, only: [:index, :show]
   resources :users do
     resources :actions, only: [:index], controller: "user_actions", as: "user_actions"
