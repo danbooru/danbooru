@@ -99,13 +99,13 @@ module Source
       memoize def work
         return {} unless work_id.present?
 
-        http.cache(1.minute).parsed_get(work_api_url)&.dig(:data) || {}
+        parsed_get(work_api_url)&.dig(:data) || {}
       end
 
       memoize def product
         return {} unless product_id.present?
 
-        http.cache(1.minute).parsed_get(product_api_url)&.dig(:data) || {}
+        parsed_get(product_api_url)&.dig(:data) || {}
       end
     end
   end

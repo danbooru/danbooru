@@ -251,13 +251,17 @@ module Source
     # to customize how errors are handled.
     #
     # @param response [HTTP::Response] The response from the HTTP request.
-    def update_credentials!(response)
+    # @param metadata [Hash] Extra metadata to record on the credential.
+    def update_credentials!(response, **metadata)
       return if site_credential.nil?
 
-      if response.status == 429
-        site_credential.error!(:rate_limited)
+      case response.status
+      when 401
+        site_credential.error!(:invalid, **metadata)
+      when 429
+        site_credential.error!(:rate_limited, **metadata)
       else
-        site_credential.success!
+        site_credential.success!(**metadata)
       end
     end
 

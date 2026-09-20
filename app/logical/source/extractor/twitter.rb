@@ -233,8 +233,6 @@ class Source::Extractor
     end
 
     def update_credentials!(response)
-      return if site_credential.blank?
-
       endpoint = response.uri.path.split("/").last # /i/api/graphql/_8aYOgEDz35BrBcBal1-_w/TweetDetail -> TweetDetail
       metadata = {
         rate_limit: {
@@ -247,11 +245,7 @@ class Source::Extractor
       }
 
       # XXX Cached responses still increment the credential usage count, even though it didn't really get used.
-      if response.status == 429
-        site_credential.error!(:rate_limited, **metadata)
-      else
-        site_credential.success!(**metadata)
-      end
+      super(response, **metadata)
     end
 
     def site_credentials

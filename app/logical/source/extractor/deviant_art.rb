@@ -267,7 +267,10 @@ module Source
 
       memoize def page
         auth_http = http.cookies(auth: credentials[:auth], auth_secure: credentials[:auth_secure], userinfo: credentials[:userinfo])
-        auth_http.cache(1.minute).parsed_get(page_url_from_image_url, follow: { max_hops: 1 })
+        response = auth_http.cache(1.minute).get(page_url_from_image_url, follow: { max_hops: 1 })
+        update_credentials!(response)
+
+        response.parse if response.status.success?
       end
 
       memoize def uuid

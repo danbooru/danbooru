@@ -166,15 +166,9 @@ module Source
         }
 
         response = http.post("https://nijie.info/login_int.php", form: form)
+        update_credentials!(response)
 
-        if response.status == 200
-          site_credential.success!
-          response.cookies.to_h { |c| [c.name, c.value] }
-        else
-          DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})"
-          site_credential.error!(:invalid)
-          nil
-        end
+        response.cookies.to_h { |c| [c.name, c.value] } if response.status.success?
       end
 
       memoize :client, :cached_session_cookie

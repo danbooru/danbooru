@@ -162,7 +162,7 @@ module Source
       end
 
       memoize def api_response
-        http.cache(1.minute).parsed_get(api_url)
+        parsed_get(api_url)
       end
 
       def banned?

@@ -88,6 +88,7 @@ module Source
 
         # Note that we have to spoof the Referer here.
         response = http.post(page_url, form: { action_view_original: true, cont_id: work_id, sub_id: sub_id, ethna_csrf: ethna_csrf })
+        update_credentials!(response)
         return nil unless response.status == 200
 
         response.parse.at("body > div > a > img[src^='//img.tinami.com']")&.attr("src")&.prepend("https:")

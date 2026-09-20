@@ -149,10 +149,13 @@ class Source::Extractor
     memoize def api_response
       return {} unless work_type == "post" && csrf_token.present?
 
-      http.cache(1.minute).headers(
+      response = http.cache(1.minute).headers(
         "X-CSRF-Token": csrf_token,
         "X-Requested-With": "XMLHttpRequest",
-      ).parsed_get("https://fantia.jp/api/v1/posts/#{work_id}") || {}
+      ).get("https://fantia.jp/api/v1/posts/#{work_id}")
+      update_credentials!(response)
+
+      (response.parse if response.status.success?) || {}
     end
 
     def http
