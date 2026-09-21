@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A HTTP::Feature that automatically retries requests that return a 429 error
-# or a Retry-After header.
+# or a Retry-After header, or that time out or fail to connect.
 #
 # @example
 #   Danbooru::Http.use(:retriable).get(url)
@@ -39,8 +39,8 @@ module Danbooru
       end
 
       def retriable?(response)
-        # >=597 errors are fake errors returned by us in app/logical/danbooru/http.rb when the HTTP connection fails.
-        response.status == 429 || response.status >= 597
+        # 597 and 598 are fake errors returned when the request times out or the connection fails.
+        response.status.in?([429, 597, 598])
       end
 
       def retry_delay(response, current_time: Time.zone.now)

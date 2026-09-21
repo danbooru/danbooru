@@ -39,6 +39,17 @@ module Danbooru
     DEFAULT_TIMEOUT = 20
     MAX_REDIRECTS = 5
 
+    # The fake status codes returned when a request raises an exception. Ordered from most to least specific.
+    ERROR_STATUSES = {
+      OpenSSL::SSL::SSLError => 590,
+      ValidatingSocket::ProhibitedIpError => 591,
+      HTTP::Redirector::TooManyRedirectsError => 596,
+      HTTP::TimeoutError => 597,
+      HTTP::ConnectionError => 598,
+      Resolv::ResolvError => 598,
+      HTTP::Error => 599,
+    }.freeze
+
     attr_accessor :max_size, :http
 
     class << self
@@ -233,6 +244,15 @@ module Danbooru
       Danbooru::URL.parse(response.headers["Location"])
     end
 
+    # Convert an exception raised by a request into a fake 5xx response.
+    #
+    # @param error [Exception] the exception, one of the keys of {ERROR_STATUSES}
+    # @return [HTTP::Response] a fake response with an empty body
+    def self.error_response(error, method, url)
+      status = ERROR_STATUSES.find { |klass, _| error.is_a?(klass) }.last
+      ::HTTP::Response.new(status: status, version: "1.1", body: "", request: ::HTTP::Request.new(verb: method, uri: url))
+    end
+
     concerning :DownloadMethods do
       # Download a file from `url` and return a {MediaFile}.
       #
@@ -280,18 +300,8 @@ module Danbooru
       end
 
       response
-    rescue OpenSSL::SSL::SSLError
-      fake_response(590, method, url)
-    rescue ValidatingSocket::ProhibitedIpError
-      fake_response(591, method, url)
-    rescue HTTP::Redirector::TooManyRedirectsError
-      fake_response(596, method, url)
-    rescue HTTP::TimeoutError
-      fake_response(597, method, url)
-    rescue HTTP::ConnectionError, Resolv::ResolvError
-      fake_response(598, method, url)
-    rescue HTTP::Error
-      fake_response(599, method, url)
+    rescue *ERROR_STATUSES.keys => e
+      Danbooru::Http.error_response(e, method, url)
     end
 
     # Perform a HTTP request for the given URL, raising an error on 4xx or 5xx
@@ -324,10 +334,6 @@ module Danbooru
       response = request(method, url, **options)
       return nil if response.code != 200
       response.parse
-    end
-
-    def fake_response(status, method, url)
-      ::HTTP::Response.new(status: status, version: "1.1", body: "", request: ::HTTP::Request.new(verb: method, uri: url))
     end
   end
 end

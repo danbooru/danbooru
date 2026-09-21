@@ -156,6 +156,15 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(response2.to_s, response1.to_s)
       end
 
+      should "not cache requests that time out" do
+        HTTP::Client.any_instance.expects(:perform).raises(::HTTP::TimeoutError)
+
+        response = Danbooru::Http.cache(1.hour, key: "timeout-test").get(httpbin_url("uuid"))
+
+        assert_equal(597, response.status)
+        assert_nil(Cache.get("http:timeout-test"))
+      end
+
       should "cache cookies correctly" do
         http = Danbooru::Http.cache(1.hour)
 
@@ -198,13 +207,29 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_includes(1.0..1.1, duration)
       end
 
-      should "retry immediately if the request returns a >=597 error" do
-        response597 = ::HTTP::Response.new(status: 597, version: "1.1", body: "", request: nil)
+      should "retry immediately if the request times out" do
         response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
-        HTTP::Client.any_instance.expects(:perform).times(2).returns(response597, response200)
+        HTTP::Client.any_instance.expects(:perform).times(2).raises(::HTTP::TimeoutError).then.returns(response200)
+        DanbooruLogger.expects(:info).with(regexp_matches(/Retrying .* status=597/)).once
 
-        response = Danbooru::Http.use(:retriable).get(httpbin_url("status/597"))
+        response = Danbooru::Http.use(:retriable).get(httpbin_url("status/200"))
         assert_equal(200, response.status)
+      end
+
+      should "retry immediately if the connection fails" do
+        response200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
+        HTTP::Client.any_instance.expects(:perform).times(2).raises(::HTTP::ConnectionError).then.returns(response200)
+        DanbooruLogger.expects(:info).with(regexp_matches(/Retrying .* status=598/)).once
+
+        response = Danbooru::Http.use(:retriable).get(httpbin_url("status/200"))
+        assert_equal(200, response.status)
+      end
+
+      should "return a 597 error if the request keeps timing out" do
+        DanbooruLogger.expects(:info).with(regexp_matches(/Retrying .* status=597/)).twice
+
+        response = Danbooru::Http.timeout(1).use(:retriable).get(httpbin_url("delay/5"))
+        assert_equal(597, response.status)
       end
 
       should "retry if the Retry-After header is an integer" do
