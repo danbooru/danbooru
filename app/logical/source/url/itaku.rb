@@ -5,7 +5,7 @@ class Source::URL::Itaku < Source::URL
 
   RESERVED_USERNAMES = %w[about help home tags]
 
-  attr_reader :username, :image_id, :post_id, :file_id, :candidate_full_image_urls, :full_image_url
+  attr_reader :username, :image_id, :post_id, :commission_id, :file_id, :candidate_full_image_urls, :full_image_url
 
   def self.match?(url)
     url.domain == "itaku.ee"
@@ -48,6 +48,14 @@ class Source::URL::Itaku < Source::URL
     in _, _, "api", "posts", post_id, *rest
       @post_id = post_id
 
+    # https://itaku.ee/commissions/1755
+    in _, _, "commissions", commission_id
+      @commission_id = commission_id
+
+    # https://itaku.ee/api/commissions/1755/
+    in _, _, "api", "commissions", commission_id, *rest
+      @commission_id = commission_id
+
     # https://itaku.ee/profile/advosart
     # https://itaku.ee/profile/advosart/gallery
     in _, _, "profile", username, *rest unless username.in?(RESERVED_USERNAMES)
@@ -63,6 +71,8 @@ class Source::URL::Itaku < Source::URL
   def page_url
     if post_id.present?
       "https://itaku.ee/posts/#{post_id}"
+    elsif commission_id.present?
+      "https://itaku.ee/commissions/#{commission_id}"
     elsif image_id.present?
       "https://itaku.ee/images/#{image_id}"
     end

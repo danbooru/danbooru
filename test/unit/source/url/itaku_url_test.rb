@@ -15,6 +15,8 @@ module Source::Tests::URL
       should be_page_url(
         "https://itaku.ee/images/812661",
         "https://itaku.ee/posts/130073",
+        "https://itaku.ee/commissions/1755",
+        "https://itaku.ee/api/commissions/1755/",
         "https://itaku.ee/api/galleries/images/812661/comments/",
         "https://itaku.ee/api/posts/130073/comments/",
       )

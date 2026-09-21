@@ -40,6 +40,8 @@ module Source::Tests::Extractor
         image_urls: %w[https://itaku.ee/api/media_2/gallery_imgs/1869351-1.output_1VWokMA.png],
         media_files: [{ file_size: 8_140_744 }],
         page_url: "https://itaku.ee/images/812661",
+        published_at: Time.parse("2024-04-22T12:56:28.013302Z"),
+        updated_at: nil,
         profile_url: "https://itaku.ee/velox",
         profile_urls: %w[https://itaku.ee/velox],
         display_name: "Velox",
@@ -103,20 +105,90 @@ module Source::Tests::Extractor
       )
     end
 
-    # XXX Not implemented
     context "A Itaku /posts/:id post" do
       strategy_should_work(
         "https://itaku.ee/posts/130073",
-        image_urls: %w[],
-        media_files: [],
+        image_urls: %w[
+          https://itaku.ee/api/media_2/gallery_imgs/1869351-1.output_1VWokMA.png
+          https://itaku.ee/api/media_2/gallery_imgs/1846483-1.output_OhAApJ4.png
+          https://itaku.ee/api/media_2/gallery_imgs/kf0212_Q7Z3jzR.png
+          https://itaku.ee/api/media_2/gallery_imgs/1846409-1.output_WC5Md5Y.png
+        ],
+        media_files: [
+          { file_size: 8_140_744 },
+          { file_size: 1_148_847 },
+          { file_size: 572_981 },
+          { file_size: 3_473_969 },
+        ],
         page_url: "https://itaku.ee/posts/130073",
-        profile_url: nil,
-        display_name: nil,
-        username: nil,
-        other_names: [],
+        published_at: Time.parse("2024-04-22T12:56:30.102999Z"),
+        updated_at: nil,
+        profile_url: "https://itaku.ee/velox",
+        profile_urls: %w[https://itaku.ee/velox],
+        display_name: "Velox",
+        username: "velox",
+        other_names: ["Velox"],
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A Itaku /commissions/:id page" do
+      strategy_should_work(
+        "https://itaku.ee/commissions/1755",
+        image_urls: %w[
+          https://itaku.ee/api/media_2/gallery_imgs/3_%D1%81%D0%BB%D0%BE%D1%82%D0%B0_%D0%BF%D0%BE_50_qj8JuBR.png
+          https://itaku.ee/api/media_2/gallery_imgs/3_%D1%81%D0%BB%D0%BE%D1%82%D0%B0_%D0%BF%D0%BE_50_14_1_AXrYDqn.png
+        ],
+        media_files: [
+          { file_size: 4_512_526 },
+          { file_size: 9_824_767 },
+        ],
+        page_url: "https://itaku.ee/commissions/1755",
+        published_at: Time.parse("2024-02-27T20:33:41.780389Z"),
+        updated_at: Time.parse("2024-02-27T20:57:21.080403Z"),
+        profile_url: "https://itaku.ee/kardamoni",
+        profile_urls: %w[https://itaku.ee/kardamoni],
+        display_name: "kardamoni",
+        username: "kardamoni",
+        other_names: ["kardamoni"],
+        tags: [
+          ["sea", "https://itaku.ee/home/images?tags=sea"],
+          ["furry", "https://itaku.ee/home/images?tags=furry"],
+          ["male", "https://itaku.ee/home/images?tags=male"],
+          ["anthro", "https://itaku.ee/home/images?tags=anthro"],
+          ["human", "https://itaku.ee/home/images?tags=human"],
+          ["female", "https://itaku.ee/home/images?tags=female"],
+          ["canine", "https://itaku.ee/home/images?tags=canine"],
+          ["beach", "https://itaku.ee/home/images?tags=beach"],
+          ["any_species", "https://itaku.ee/home/images?tags=any_species"],
+          ["any_gender", "https://itaku.ee/home/images?tags=any_gender"],
+          ["feline", "https://itaku.ee/home/images?tags=feline"],
+        ],
+        dtext_artist_commentary_title: "Lustrous Beach YCH",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Hello everyone~
+
+          I'm new to this place but I'm doing YCHs and commissions for almost two years already on FFA c:
+
+          Contains completed artwork~
+
+          So this is my 1st YCH here!
+          Price 50 USD!
+
+          Rules:
+          Any gender
+          Any species
+          Can draw pregnancy c:
+          Buyer can choose both characters.
+
+          Payment details:
+          Payment through Paypal!
+          Payment must be sent within 48 hours~
+
+          TOS and more gallery - https://kardamoni.carrd.co/
+        EOS
       )
     end
 
