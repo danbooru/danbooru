@@ -36,6 +36,10 @@ This file provides guidance for coding agents working in this repository. It's m
 - Avoid loops and mutation. Prefer functional transformations and immutable data instead.
 - Don't add pointless or overly verbose comments. Keep them brief and use plain, simple english.
 
+## Extractors
+- For extractor tests, always generate full test cases with `.test_case`, don't add half-finished tests.
+- If a new site is missing its logo, add it.
+
 ## Commands
 
 | Command | Description |
