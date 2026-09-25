@@ -99,8 +99,8 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
-      should "show dmails to the site owner" do
-        get_auth dmail_path(@dmail), create(:owner_user)
+      should "show any dmail to a superadmin" do
+        get_auth dmail_path(@dmail), create(:superadmin_user)
         assert_response :success
       end
 
