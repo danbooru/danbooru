@@ -16,12 +16,12 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     PostQuery.new(@first_search)
   end
 
-  def to_query
-    PostQuery.new(@second_search)
+  def tag_edit
+    PostEdit.new(nil, "", "", @second_search)
   end
 
   def affected_tags
-    from_query.tag_names + to_query.tag_names
+    from_query.tag_names + tag_edit.tag_terms.map(&:name) + tag_edit.tag_categorization_terms.map(&:value)
   end
 
   def process!(**)

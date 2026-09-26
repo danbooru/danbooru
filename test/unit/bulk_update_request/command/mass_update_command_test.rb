@@ -31,6 +31,12 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
 
         assert_equal("mass update {{source:imageboard}} -> {{source:Imageboard}}", @bur.processor.to_dtext)
       end
+
+      should "strip category prefixes from tags in the list of affected tags" do
+        @bur = create(:bulk_update_request, script: "mass update aaa -> char:bbb ccc -ddd COPY:Eee rating:s")
+
+        assert_equal(%w[aaa bbb ccc ddd eee], @bur.tags)
+      end
     end
 
     context "on approval" do
