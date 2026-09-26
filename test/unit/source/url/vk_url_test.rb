@@ -17,6 +17,10 @@ module Source::Tests::URL
         "https://vk.com/sgips?z=photo-111670353_457285023%2Fwall-111670353_64279",
         "https://vk.com/the.dark.mangaka?z=video-162468097_456239018%2Fvideos-162468097%2Fpl_-162468097_-2",
         "https://vk.com/@sgips-tri-istorii-o-lovce",
+        "https://vk.ru/album455763461_00?z=photo455763461_457250373%2Falbum455763461_00",
+        "https://vk.ru/wall-185765571_2635",
+        "https://m.vk.ru/wall-221992613_185",
+        "https://vkontakte.ru/photo-185765571_457240497?list=album-185765571_00",
       )
 
       should be_profile_url(
@@ -28,6 +32,8 @@ module Source::Tests::URL
         "https://vk.com/clips/sgips",
         "https://vk.com/@sgips",
         "https://vk.com/id194141788",
+        "https://vk.ru/enigmasblog",
+        "https://vk.ru/id194141788",
       )
 
       should be_bad_source(
@@ -36,5 +42,7 @@ module Source::Tests::URL
     end
 
     should parse_url("https://sun9-69.userapi.com/impg/VJBWV0vYZJLRhFBkQxaVtVo9_givXP6BycJJow/RBoOQ0nHMNc.jpg?size=1200x1600&quality=96&sign=73e562b2f74629cba714f7a348d0e815&type=album").into(site_name: "Vk")
+    should parse_url("https://vk.ru/album455763461_00?z=photo455763461_457250373%2Falbum455763461_00").into(page_url: "https://vk.com/?z=photo455763461_457250373/album455763461_00")
+    should parse_url("https://vk.ru/wall-185765571_2635").into(page_url: "https://vk.com/wall-185765571_2635")
   end
 end

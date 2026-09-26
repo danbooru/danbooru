@@ -41,7 +41,7 @@ class Source::URL::Vk < Source::URL
       @full_image_url = "https://pp.userapi.com#{path}"
 
     # https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com
-    in _, "vk.com", "away.php"
+    in _, "vk.com" | "vk.ru" | "vkontakte.ru", "away.php"
       @redirect_url = params[:to]
 
     # The `z` param opens the page in an overlay over the current page.
@@ -49,7 +49,8 @@ class Source::URL::Vk < Source::URL
     # https://vk.com/sgips?z=photo-111670353_457285023%2Fwall-111670353_64279
     # https://vk.com/the.dark.mangaka?z=video-162468097_456239018%2Fvideos-162468097%2Fpl_-162468097_-2
     # https://vk.com/wall-143305139_11128?z=photo-143305139_457245182%2Fwall-143305139_11133
-    in _, "vk.com", id if params[:z].present?
+    # https://vk.ru/album455763461_00?z=photo455763461_457250373%2Falbum455763461_00
+    in _, "vk.com" | "vk.ru" | "vkontakte.ru", id if params[:z].present?
       @username = id unless id.match?(ID_REGEX)
 
       # https://vk.com/wall-143305139_11128?z=photo-143305139_457245182%2Fwall-143305139_11133
@@ -66,7 +67,7 @@ class Source::URL::Vk < Source::URL
     # https://vk.com/market-111670353?w=product-111670353_9110906
     # https://vk.com/uslugi-191516762?w=product-191516762_8422820
     # https://vk.com/public191516762?w=wall-191516762_2283
-    in _, "vk.com", ID_REGEX if params[:w].present?
+    in _, "vk.com" | "vk.ru" | "vkontakte.ru", ID_REGEX if params[:w].present?
       @id, @page_type, @owner_id, @item_id = parse_id(params[:w])
 
     # https://vk.com/wall-111670353 (wall for https://vk.com/sgips)
@@ -93,28 +94,28 @@ class Source::URL::Vk < Source::URL
     # https://vk.com/videos-111670353 (redirects to https://vk.com/video/@sgips)
     # https://vk.com/video-111670353_456239068
     # https://vk.com/id194141788
-    in _, "vk.com", ID_REGEX => id
+    in _, "vk.com" | "vk.ru" | "vkontakte.ru", ID_REGEX => id
       @doc_hash = params[:hash]
       @id, @page_type, @owner_id, @item_id = parse_id(id)
       @parent_id, @parent_page_type, @parent_owner_id, @parent_item_id = parse_id(params[:list]) if params[:list]&.match?(ID_REGEX)
 
     # https://vk.com/@sgips
     # https://vk.com/@sgips-tri-istorii-o-lovce
-    in _, "vk.com", /^@/ => username
+    in _, "vk.com" | "vk.ru" | "vkontakte.ru", /^@/ => username
       @username, _, @article_slug = username.partition("-")
 
     # https://vk.com/video/@sgips
-    in _, "vk.com", "video", /^@/ => username
+    in _, "vk.com" | "vk.ru" | "vkontakte.ru", "video", /^@/ => username
       @username = username.delete_prefix("@")
 
     # https://vk.com/clips/sgips
-    in _, "vk.com", "clips", username
+    in _, "vk.com" | "vk.ru" | "vkontakte.ru", "clips", username
       @username = username
 
     # https://vk.com/enigmasblog
     # https://vk.com/enigmasblog/Fullart (tag search)
     # https://vk.com/enigmasblog?w=wall-185765571_2636
-    in _, "vk.com", username, *rest unless username.in?(RESERVED_USERNAMES)
+    in _, "vk.com" | "vk.ru" | "vkontakte.ru", username, *rest unless username.in?(RESERVED_USERNAMES)
       @username = username
       @id, @page_type, @owner_id, @item_id = parse_id(params[:w]) if params[:w].present?
 
