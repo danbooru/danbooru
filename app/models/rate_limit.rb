@@ -76,4 +76,49 @@ class RateLimit < ApplicationRecord
 
     RateLimit.find_by_sql([sql, sql_params])
   end
+
+  # A human-readable version of the `action` string. Record-specific suffixes
+  # like ":post-123" or ":wiki-page-45" are stripped; non-id modifiers like
+  # ":invalid" or ":large" are preserved as parenthesized qualifiers.
+  def humanized_action
+    return "Unknown" if action.blank?
+
+    controller, action_name, modifier = parsed_action
+    return action.humanize if controller.blank? || action_name.blank?
+
+    label = "#{controller.humanize}: #{action_name.humanize(capitalize: false)}"
+    label += " (#{modifier.humanize(capitalize: false)})" if modifier.present? && !record_suffix?(modifier)
+    label
+  end
+
+  # Returns the `{ burst:, rate: }` values currently applicable to this rate
+  # limit's action when invoked by `user`, by calling into the corresponding
+  # Pundit policy. Returns nil if the policy/action can't be resolved or the
+  # method raises (e.g. record-dependent branches with no available record).
+  #
+  # Memoized because the view calls this once per column, for the same user.
+  def limit_config(user)
+    return @limit_config if defined?(@limit_config)
+
+    controller, action_name, = parsed_action
+    @limit_config =
+      if controller.present? && action_name.present?
+        dummy_record = controller.classify.safe_constantize&.new
+        policy = dummy_record&.policy(user)
+        config = policy.try(:"rate_limit_for_#{action_name}", request: nil)
+        { burst: config[:burst].to_f, rate: config[:rate].to_f } if config.present? && config[:burst] && config[:rate]
+      end
+  rescue StandardError
+    @limit_config = nil
+  end
+
+  private
+
+  def parsed_action
+    action.split(":", 3)
+  end
+
+  def record_suffix?(modifier)
+    modifier.match?(/\A[a-z-]+-\d+\z/)
+  end
 end
