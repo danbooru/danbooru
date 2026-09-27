@@ -57,6 +57,14 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_select "#notice", /failed with code 591/
         end
 
+        should "return an error if the url is not an image or video" do
+          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "https://example.com" }
+
+          assert_response :success
+          assert_select ".post-gallery", /No posts found/
+          assert_select "#notice", /File is not an image or video/
+        end
+
         should "return an error if the url is not a valid absolute url" do
           get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "/test.jpg" }
 

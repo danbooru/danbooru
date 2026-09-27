@@ -111,6 +111,8 @@ class IqdbClient
     # @param file [File] the image to search
     def query_file(file, limit: 20)
       media_file = MediaFile.open(file)
+      raise Error, "File is not an image or video" if !media_file.mime_type.to_s.in?(MediaAsset::FILE_MIME_TYPES)
+
       preview = media_file.preview!(180, 180)
       file = HTTP::FormData::File.new(preview)
       request(:post, "query", form: { file: file }, params: { limit: limit })
