@@ -80,7 +80,7 @@ export default class FileUploadComponent {
     let url = e.originalEvent.clipboardData.getData("text");
     this.$component.find("input[name='upload[source]']:not([disabled])").val(url);
 
-    if (/^https?:\/\//.test(url)) {
+    if (/^https?:\/\//.test(url) || URL.canParse(`https://${url}`)) {
       this.$component.find("input[type='submit']:not([disabled])").click();
     }
 

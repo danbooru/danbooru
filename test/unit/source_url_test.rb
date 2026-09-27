@@ -27,6 +27,8 @@ class SourceURLTest < ActiveSupport::TestCase
       should "normalize URLs" do
         assert_equal("https://example.com/foo%20%09%0B%0C%0D%0Abar", Source::URL.parse("https://example.com/foo \t\v\f\r\nbar").to_normalized_s)
         assert_equal("https://example.com", Source::URL.parse("https://EXAMPLE.COM").to_normalized_s)
+        assert_equal("https://example.com/foo", Source::URL.parse("example.com/foo").to_normalized_s)
+        assert_equal("http://example.com/foo", Source::URL.parse("http://example.com/foo").to_normalized_s)
       end
 
       should "parse URLs containing invalid UTF-8" do

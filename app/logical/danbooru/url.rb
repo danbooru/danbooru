@@ -48,7 +48,7 @@ module Danbooru
     # @param schemes [Array<String>] The list of allowed URL schemes.
     def initialize(url, schemes: %w[http https])
       @original_url = url.to_s
-      @url = Addressable::URI.heuristic_parse(original_url)
+      @url = Addressable::URI.heuristic_parse(original_url, scheme: "https")
 
       @url.authority = @url.normalized_authority
 

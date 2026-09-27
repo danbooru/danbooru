@@ -24,6 +24,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         get_auth new_upload_path(url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"), @user
         assert_response :success
       end
+
+      should "add https:// to an url without a scheme" do
+        get_auth new_upload_path(url: "danbooru.donmai.us/posts/1"), @user
+
+        assert_response :success
+        assert_select "input[name='upload[source]'][value='https://danbooru.donmai.us/posts/1']"
+      end
     end
 
     context "index action" do
