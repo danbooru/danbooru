@@ -50,6 +50,7 @@ class IqdbClient
     end
 
     def download_file(url)
+      url = Danbooru::URL.parse(url)&.to_normalized_s || url
       extractor = Source::Extractor.find(url)
 
       if extractor.parsed_url.nil?

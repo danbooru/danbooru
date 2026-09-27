@@ -27,6 +27,15 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_select("#post_#{@post.id}")
         end
 
+        should "download the image for a non-image URL without a scheme" do
+          mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
+
+          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "danbooru.donmai.us/posts/7000000" }
+
+          assert_response :success
+          assert_select("#post_#{@post.id}")
+        end
+
         should "return an error if the url has multiple images" do
           skip "Twitter credentials not available" unless Source::Extractor::Twitter.enabled?
 
@@ -59,6 +68,14 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
 
         should "return an error if the url is not an image or video" do
           get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "https://example.com" }
+
+          assert_response :success
+          assert_select ".post-gallery", /No posts found/
+          assert_select "#notice", /File is not an image or video/
+        end
+
+        should "return an error if the url without a scheme is not an image or video" do
+          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "example.com" }
 
           assert_response :success
           assert_select ".post-gallery", /No posts found/
