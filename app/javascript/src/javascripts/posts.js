@@ -429,7 +429,7 @@ Post.show_pending_update_notice = function() {
   if (Post.pending_update_count === 0) {
     Notice.info("Posts updated");
   } else {
-    Notice.info(`Updating posts (${Post.pending_update_count} pending)...`, false);
+    Notice.info(`Updating posts (${Post.pending_update_count} pending)...`);
   }
 }
 
