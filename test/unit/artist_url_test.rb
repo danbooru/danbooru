@@ -38,7 +38,7 @@ class ArtistURLTest < ActiveSupport::TestCase
     end
 
     context "when normalizing URLs" do
-      should normalize_attribute(:url).from("example.com").to("http://example.com")
+      should normalize_attribute(:url).from("example.com").to("https://example.com")
       should normalize_attribute(:url).from("http://example.com").to("http://example.com")
       should normalize_attribute(:url).from("https://example.com").to("https://example.com")
       should normalize_attribute(:url).from("http://example.com/").to("http://example.com")
