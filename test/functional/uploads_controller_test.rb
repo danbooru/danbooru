@@ -488,6 +488,15 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("file://out-of-order.zip/10/10.gif", upload.upload_media_assets[4].source_url)
           assert_equal("file://out-of-order.zip/10/11.gif", upload.upload_media_assets[5].source_url)
         end
+
+        should "work for a .zip file containing directories" do
+          upload = assert_successful_upload("test/files/archive/directory.zip", user: @user)
+
+          assert_equal(2, upload.media_asset_count)
+          assert_equal(2, upload.upload_media_assets.size)
+          assert_equal("file://directory.zip/subdir/test.png", upload.upload_media_assets[0].source_url)
+          assert_equal("file://directory.zip/test.png", upload.upload_media_assets[1].source_url)
+        end
       end
 
       context "uploading a ugoira file from your computer" do

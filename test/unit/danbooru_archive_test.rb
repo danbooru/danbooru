@@ -96,6 +96,13 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
           filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
         end
       end
+
+      should "work with an archive containing directories" do
+        Danbooru::Archive.extract!("test/files/archive/directory.zip") do |dir, filenames|
+          assert_equal(["#{dir}/subdir/test.png", "#{dir}/test.png"], filenames.sort)
+          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+        end
+      end
     end
 
     context "#uncompressed_size method" do
@@ -147,6 +154,13 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
       assert_equal(true, archive.entries.any?(&:directory_traversal?))
       assert_raises(Danbooru::Archive::Error) { archive.extract! }
+    end
+
+    should "detect paths that are too long" do
+      Dir.mktmpdir do |tmpdir|
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!("test/files/archive/long-path.tar.gz", tmpdir) }
+        assert_equal([], Dir.children(tmpdir))
+      end
     end
 
     should "detect symlinks" do

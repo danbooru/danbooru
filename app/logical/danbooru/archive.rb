@@ -168,11 +168,14 @@ module Danbooru
 
     # Extract the archive to a directory. See `extract!` for details.
     def extract_to!(directory, flags: DEFAULT_FLAGS)
-      each_entry.map do |entry|
+      each_entry.filter_map do |entry|
         raise Danbooru::Archive::Error, "Can't extract archive containing absolute path (path: '#{entry.pathname_utf8}')" if entry.pathname_utf8.starts_with?("/")
+        next if entry.directory?
         raise Danbooru::Archive::Error, "'#{entry.pathname_utf8}' is not a regular file" if !entry.file?
 
         path = "#{directory}/#{entry.pathname_utf8}"
+        raise Danbooru::Archive::Error, "Can't extract archive containing paths that are too long" if path.bytesize >= 4096 # Linux PATH_MAX
+
         entry.extract!(path, flags: flags)
       end
     end
@@ -190,7 +193,7 @@ module Danbooru
             e.pathname = pn.relative_path_from(directory).to_s.force_encoding("ASCII-8BIT")
             e.size = pn.size
             e.filetype = ::Archive::Entry::FILE
-            e.perm = 0644
+            e.perm = 0o644
             archive.write_header e
             File.open(pn) do |f|
               until f.eof?
