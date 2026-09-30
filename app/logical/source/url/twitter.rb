@@ -21,8 +21,8 @@ class Source::URL::Twitter < Source::URL
     url "https://x.com"
     domains DOMAINS + %w[poast.org privacydev.net]
 
-    credential :auth_token, help: %{Your Twitter `auth_token` cookie.}
-    credential :csrf_token, help: %{Your Twitter `ct0` cookie.}
+    credential :auth_token, default: Danbooru.config.twitter_auth_token, help: %{Your Twitter `auth_token` cookie.}
+    credential :csrf_token, default: Danbooru.config.twitter_csrf_token, help: %{Your Twitter `ct0` cookie.}
   end
 
   extractors { [Source::Extractor::Twitter, Source::Extractor::URLShortener] }

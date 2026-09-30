@@ -6,7 +6,7 @@ module Source
       url "https://www.pixiv.net"
       domains %w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net]
 
-      credential :phpsessid, help: %{Your Pixiv `PHPSESSID` cookie.}
+      credential :phpsessid, default: Danbooru.config.pixiv_phpsessid, help: %{Your Pixiv `PHPSESSID` cookie.}
     end
 
     extractors { [Source::Extractor::Pixiv, Source::Extractor::URLShortener] }

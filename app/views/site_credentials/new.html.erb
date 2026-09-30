@@ -9,17 +9,17 @@
 
       <% SiteCredential::SITES.each do |site| %>
         <%= f.simple_fields_for :credential do |fa| %>
-          <div x-cloak x-show="site === <%= site[:name].to_json %>">
-            <% site[:default_credential].keys.each do |credential_name| %>
-              <%= fa.input credential_name, label: credential_name.to_s.humanize(keep_id_suffix: true), as: :string, required: false, input_html: { "x-bind:disabled": "site !== '#{site[:name]}'", "x-bind:required": "site === '#{site[:name]}'", value: params.dig(:credential, credential_name) } %>
-            <% end %>
+          <div x-cloak x-show="site === <%= site.name.to_json %>">
+            <% site.credentials.each do |credential| %>
+              <%= fa.input credential.name, label: credential.name.to_s.humanize(keep_id_suffix: true), as: :string, required: false, input_html: { "x-bind:disabled": "site !== '#{site.name}'", "x-bind:required": "site === '#{site.name}'", value: params.dig(:credential, credential.name) } %>
 
-            <div class="prose fineprint mb-4">
-              <%= format_text(site[:help]) %>
-            </div>
-          <% end %>
+              <div class="prose fineprint mb-4">
+                <%= format_text(credential.help) %>
+              </div>
+            <% end %>
           </div>
         <% end %>
+      <% end %>
 
       <%= f.submit "Create", class: "button-primary", disabled: true, "x-bind:disabled": "!valid" %>
     <% end %>

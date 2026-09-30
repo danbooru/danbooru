@@ -14,8 +14,8 @@ class Source::URL::Nijie < Source::URL
     url "https://nijie.info"
     domains %w[nijie.net nijie.info]
 
-    credential :login, help: %{Your Nijie login}
-    credential :password, help: %{Your nijie password}
+    credential :login, default: Danbooru.config.nijie_login, help: %{Your Nijie login}
+    credential :password, default: Danbooru.config.nijie_password, help: %{Your nijie password}
   end
 
   extractors { [Source::Extractor::Nijie, Source::Extractor::URLShortener] }
