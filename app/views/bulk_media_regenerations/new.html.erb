@@ -1,0 +1,42 @@
+<% page_title "Bulk Media Regeneration" %>
+
+<div id="c-bulk-media-regenerations">
+  <div id="a-new">
+    <h1>Bulk Media Regeneration</h1>
+
+    <p class="prose">
+      Regenerate the metadata, thumbnails, samples, and IQDB entries of every media asset matching a search query, along with associated posts' metadata and automatic tags.
+      <br>
+      A preview of affected media assets will be displayed after you hit search. You can use the <%= link_to "media assets index", media_assets_path %> to browse for all the affected files and test your searches.
+      <br>
+      You can chain multiple valid media asset values in the search, including an ID range (e.g. <code>id:1000..2000</code>), <code>filetype:</code>, <code>exif:</code>, and more.
+    </p>
+
+    <% if @error.present? %>
+      <div class="notice notice-error notice-small prose"><%= @error %></div>
+    <% end %>
+
+    <%= search_form_for(new_bulk_media_regeneration_path) do |f| %>
+      <%= f.input :ai_tags_match, label: "Tags", input_html: { value: @query, data: { autocomplete: "tag-query" } } %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <% if @query.present? %>
+      <% count = @media_assets.count %>
+
+      <p>
+        <%= count %> <%= "asset".pluralize(count) %> will be affected. You can view all the affected posts
+        <%= link_to "here", media_assets_path(search: { ai_tags_match: @query }) %>, or see a preview of some below.
+      </p>
+
+      <% if count > 0 %>
+        <p>
+          <%= link_to "Regenerate #{count} #{"asset".pluralize(count)}", bulk_media_regenerations_path(search: { ai_tags_match: @query }), method: :post, class: "button-danger",
+                       "data-confirm": "#{count} #{"asset".pluralize(count)} will be affected. Are you sure you want to regenerate them?" %>
+        </p>
+
+        <%= render "media_assets/gallery", media_assets: @media_assets.limit(60), size: 180 %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
