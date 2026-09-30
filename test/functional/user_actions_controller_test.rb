@@ -47,6 +47,11 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for a superadmin" do
+        get_auth user_actions_path(limit: 1000), create(:superadmin_user)
+        assert_response :success
+      end
+
       should "render for an admin" do
         get_auth user_actions_path(limit: 1000), create(:admin_user)
         assert_response :success

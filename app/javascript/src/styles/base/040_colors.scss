@@ -348,6 +348,7 @@ html, body[data-current-user-theme="light"] {
   --meta-tag-hover-color: var(--orange-2);
 
   --user-owner-color: var(--user-admin-color);
+  --user-superadmin-color: var(--user-admin-color);
   --user-admin-color: var(--red-5);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
@@ -358,6 +359,7 @@ html, body[data-current-user-theme="light"] {
   --user-banned-color: var(--grey-7);
 
   --user-owner-hover-color: var(--user-admin-hover-color);
+  --user-superadmin-hover-color: var(--user-admin-hover-color);
   --user-admin-hover-color: var(--red-4);
   --user-moderator-hover-color: var(--character-tag-hover-color);
   --user-builder-hover-color: var(--copyright-tag-hover-color);
@@ -611,6 +613,7 @@ html, body[data-current-user-theme="light"] {
   --meta-tag-hover-color: var(--yellow-1);
 
   --user-owner-color: var(--user-admin-color);
+  --user-superadmin-color: var(--user-admin-color);
   --user-admin-color: var(--artist-tag-color);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
@@ -621,6 +624,7 @@ html, body[data-current-user-theme="light"] {
   --user-banned-color: var(--grey-5);
 
   --user-owner-hover-color: var(--user-admin-hover-color);
+  --user-superadmin-hover-color: var(--user-admin-hover-color);
   --user-admin-hover-color: var(--artist-tag-hover-color);
   --user-moderator-hover-color: var(--character-tag-hover-color);
   --user-builder-hover-color: var(--copyright-tag-hover-color);

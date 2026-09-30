@@ -121,7 +121,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
 
         should "be inaccessible to other users" do
           @user_upgrade = create(:self_gold_upgrade, status: "complete")
-          get_auth user_upgrade_path(@user_upgrade), create(:user)
+          get_auth user_upgrade_path(@user_upgrade), create(:superadmin_user)
 
           assert_response 403
         end
@@ -153,7 +153,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow unauthorized users to view the receipt" do
-        get_auth receipt_user_upgrade_path(@user_upgrade), create(:user)
+        get_auth receipt_user_upgrade_path(@user_upgrade), create(:superadmin_user)
 
         assert_response 403
       end
@@ -238,7 +238,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow unauthorized users to create a refund" do
-        @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
+        @user_upgrade = create(:self_gold_upgrade, recipient: create(:superadmin_user), status: "complete")
         @user_upgrade.create_checkout!
 
         put_auth refund_user_upgrade_path(@user_upgrade), @user_upgrade.purchaser, xhr: true

@@ -29,7 +29,7 @@ class FavoriteGroup < ApplicationRecord
     end
 
     def visible(user)
-      if user.is_owner?
+      if user.is_superadmin?
         all
       elsif user.is_anonymous?
         is_public

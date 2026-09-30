@@ -27,7 +27,8 @@
         margin-right: 0.25em;
         border-radius: 3px;
 
-        &.user-tooltip-badge-owner { background-color: var(--user-admin-color); }
+        &.user-tooltip-badge-owner { background-color: var(--user-owner-color); }
+        &.user-tooltip-badge-superadmin { background-color: var(--user-superadmin-color); }
         &.user-tooltip-badge-admin { background-color: var(--user-admin-color); }
         &.user-tooltip-badge-moderator { background-color: var(--user-moderator-color); }
         &.user-tooltip-badge-approver { background-color: var(--user-builder-color); }
