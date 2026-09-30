@@ -69,6 +69,14 @@ module Moderator
             post_auth expunge_moderator_post_post_path(@post), @admin, params: { format: "js" }
 
             assert_response :success
+            assert_enqueued_jobs(1, only: ExpungePostJob)
+            assert_equal(true, ::Post.exists?(@post.id))
+          end
+
+          should "expunge the post once the job runs" do
+            post_auth expunge_moderator_post_post_path(@post), @admin, params: { format: "js" }
+            perform_enqueued_jobs
+
             assert_equal(false, ::Post.exists?(@post.id))
           end
         end
