@@ -7,6 +7,7 @@
       <%= f.input :any_source_matches, label: "Source", input_html: { value: params.dig(:search, :any_source_matches) } %>
       <%= f.input :status, collection: %w[pending completed error], include_blank: true, selected: params.dig(:search, :status) %>
       <%= f.input :is_posted, as: :hidden, input_html: { value: params.dig(:search, :is_posted) } %>
+      <%= f.input :is_hidden, as: :hidden, input_html: { value: params.dig(:search, :is_hidden) } %>
       <%= f.input :min_score, as: :hidden, input_html: { value: params.dig(:search, :min_score) } %>
 
       <%= f.input :order, collection: [%w[Newest id], %w[Oldest id_asc], %w[Random random]], include_blank: true, selected: params[:search][:order] %>
@@ -15,9 +16,10 @@
 
     <div class="tab-panel-component horizontal-tab-panel">
       <div class="tab-list">
-        <%= link_to "All", current_page_path(search: search_params.to_h.without("is_posted")), class: [(search_params[:is_posted].nil? ? "tab active-tab" : "tab")] %>
-        <%= link_to "Posted", current_page_path(search: search_params.merge(is_posted: true)), class: [(search_params[:is_posted].to_s.truthy? ? "tab active-tab" : "tab")] %>
-        <%= link_to "Unposted", current_page_path(search: search_params.merge(is_posted: false)), class: [(search_params[:is_posted].to_s.falsy? ? "tab active-tab" : "tab")] %>
+        <%= link_to "All", current_page_path(search: search_params.to_h.without("is_posted", "is_hidden").merge(is_hidden: false)), class: [(search_params[:is_posted].nil? && search_params[:is_hidden].to_s != "true" ? "tab active-tab" : "tab")] %>
+        <%= link_to "Posted", current_page_path(search: search_params.to_h.without("is_hidden").merge(is_posted: true, is_hidden: false)), class: [(search_params[:is_posted].to_s.truthy? ? "tab active-tab" : "tab")] %>
+        <%= link_to "Unposted", current_page_path(search: search_params.to_h.without("is_hidden").merge(is_posted: false, is_hidden: false)), class: [(search_params[:is_posted].to_s.falsy? && search_params[:is_hidden].to_s != "true" ? "tab active-tab" : "tab")] %>
+        <%= link_to "Hidden", current_page_path(search: search_params.to_h.without("is_posted").merge(is_hidden: true)), class: [(search_params[:is_hidden].to_s.truthy? ? "tab active-tab" : "tab")] %>
 
         <span class="flex-1"></span>
 

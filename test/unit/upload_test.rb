@@ -81,6 +81,27 @@ class UploadTest < ActiveSupport::TestCase
         assert_equal([@upload1], Upload.any_source_matches("https://example.com/posts/1"))
         assert_equal([@upload2], Upload.any_source_matches("file://image.png"))
       end
+
+      should "exclude hidden uploads by default" do
+        @uma1.update!(is_hidden: true)
+
+        results = Upload.search({ is_hidden: "false" }, User.anonymous)
+        assert_equal([@upload2.id], results.pluck(:id))
+      end
+
+      should "return only hidden uploads when is_hidden is true" do
+        @uma1.update!(is_hidden: true)
+
+        results = Upload.search({ is_hidden: "true" }, User.anonymous)
+        assert_equal([@upload1.id], results.pluck(:id))
+      end
+
+      should "return all uploads when is_hidden is not specified" do
+        @uma1.update!(is_hidden: true)
+
+        results = Upload.search({}, User.anonymous)
+        assert_equal([@upload1.id, @upload2.id], results.pluck(:id).sort)
+      end
     end
 
     context "during validation" do

@@ -28,5 +28,14 @@
         <%= link_to "#{upload.posts.length}/#{upload.media_asset_count} posted", posts_path(tags: "id:#{upload.posts.map(&:id).join(",")}") %>
       <% end %>
     </div>
+    <div class="text-center text-xs h-4">
+      <% if upload_media_asset.present? %>
+        <% if upload_media_asset.is_hidden? %>
+          <%= link_to "Unhide", upload_media_asset_path(upload_media_asset), method: :put, remote: true, "data-params": "upload_media_asset[is_hidden]=false" %>
+        <% else %>
+          <%= link_to "Hide", upload_media_asset_path(upload_media_asset), method: :put, remote: true, "data-params": "upload_media_asset[is_hidden]=true" %>
+        <% end %>
+      <% end %>
+    </div>
   <% end %>
 <% end %>
