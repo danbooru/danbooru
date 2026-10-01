@@ -75,7 +75,7 @@ module Source::Tests::Extractor
 
     context "A 4chan thread url" do
       strategy_should_work(
-        "https://boards.4chan.org/vt/thread/99394683",
+        "https://boards.4chan.org/vt/thread/99394683/title-slug",
         image_urls: %w[https://i.4cdn.org/vt/1745613423284732.jpg],
         media_files: [{ file_size: 145_602 }],
         page_url: "https://boards.4chan.org/vt/thread/99394683",

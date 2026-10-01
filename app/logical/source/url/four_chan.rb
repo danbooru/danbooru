@@ -17,7 +17,7 @@ class Source::URL::FourChan < Source::URL
     # https://boards.4channel.org/vt/thread/37293562#p37294005
     # http://boards.4chan.org/a/res/41938201
     # http://zip.4chan.org/jp/res/3598845.html
-    in _, ("4channel.org" | "4chan.org"), board, ("thread" | "res"), /\A([0-9]+)(?:\.html)?\z/
+    in _, ("4channel.org" | "4chan.org"), board, route, /\A([0-9]+)(?:\.html)?\z/, *slug if route.in?(%w[thread res]) && (slug.empty? || (route == "thread" && slug.one?))
       @board = board
       @thread_id = $1.to_i
       @post_id = fragment.to_s[/^p([0-9]+)$/, 1]&.to_i
@@ -54,7 +54,7 @@ class Source::URL::FourChan < Source::URL
   end
 
   def page_url
-    if thread_id.present?
+    if thread_id.present? || (domain == "4chan.org" && path_segments.one? && path_segments.first.in?(%w[4channews 4channews.php]))
       url.to_s
     end
   end
