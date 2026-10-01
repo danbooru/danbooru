@@ -1,6 +1,6 @@
 source "https://rubygems.org/"
 
-ruby "~> 4.0.6"
+ruby "~> 4.0.7"
 
 gem "rails", "~> 8"
 gem "json", "~> 2" # XXX update after Rails releases with https://github.com/rails/rails/pull/58601
