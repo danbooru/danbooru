@@ -1,0 +1,19 @@
+@media screen and (width >= 660px) {
+  #sidebar {
+    &[data-dock="left"],
+    &[data-dock="right"] {
+      position: sticky;
+      top: 0.75rem;
+      z-index: 1;
+      align-self: flex-start;
+      max-height: calc(100vh - 1.5rem);
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      padding-right: 0.5rem;
+    }
+
+    &[data-dock="right"] {
+      order: 1;
+    }
+  }
+}
