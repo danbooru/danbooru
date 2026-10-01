@@ -1,6 +1,8 @@
 require "test_helper"
 
 class ApplicationHelperTest < ActionView::TestCase
+  helper TagsHelper
+
   context "The application helper" do
     context "format_text method" do
       should "not raise an exception for invalid DText" do
@@ -8,6 +10,26 @@ class ApplicationHelperTest < ActionView::TestCase
 
         assert_nothing_raised { format_text(dtext) }
         assert_equal("", format_text(dtext))
+      end
+    end
+
+    context "link_to_wiki_or_artist method" do
+      should "render a colorized, tooltip-enabled link for a regular tag" do
+        tag = create(:copyright_tag, name: "touhou")
+        link = link_to_wiki_or_artist(tag)
+
+        assert_match(/#{Regexp.quote(wiki_page_path(tag.name))}/, link)
+        assert_match(/tag-type-#{tag.category}/, link)
+        assert_match(/data-tag-name="touhou"/, link)
+      end
+
+      should "render a colorized, tooltip-enabled link for an artist tag" do
+        tag = create(:artist_tag, name: "some_artist")
+        link = link_to_wiki_or_artist(tag)
+
+        assert_match(/#{Regexp.quote(show_or_new_artists_path(name: tag.name))}/, link)
+        assert_match(/tag-type-#{tag.category}/, link)
+        assert_match(/data-tag-name="some_artist"/, link)
       end
     end
 

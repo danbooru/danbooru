@@ -69,7 +69,7 @@
             <% end %>
             <%= f.input :disable_tagged_filenames, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Don't include tags in image filenames" %>
             <%= f.input :disable_mobile_gestures, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Disable swipe left / swipe right gestures on mobile" %>
-            <%= f.input :disable_post_tooltips, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Disable advanced tooltips when hovering over thumbnails" %>
+            <%= f.input :disable_post_tooltips, label: "Disable tooltips", as: :boolean, wrapper: "stacked-toggle-switch", hint: "Disable advanced tooltips when hovering over posts and tags" %>
             <%= f.input :enable_desktop_mode, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Use the desktop layout on mobile" %>
 
             <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :data => { :autocomplete => "tag-query" } } %>
