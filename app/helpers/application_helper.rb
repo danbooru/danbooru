@@ -21,17 +21,17 @@ module ApplicationHelper
   end
 
   def diff_name_html(this_name, other_name)
-    DiffBuilder.new(this_name, other_name, /./).build
+    DiffBuilder.new(old_text: other_name, new_text: this_name).name_html
   end
 
   def diff_body_html(record, other, field)
     if record.blank? || other.blank?
-      diff_record = other.presence || record
-      return h(diff_record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe
+      # With no comparison version, show the available text without change markers.
+      body = (other.presence || record)&.[](field)
+      return DiffBuilder.new(old_text: body, new_text: body).body_html
     end
 
-    pattern = /(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)/
-    DiffBuilder.new(record[field], other[field], pattern).build
+    DiffBuilder.new(old_text: other[field], new_text: record[field]).body_html
   end
 
   def status_diff_html(record, type)

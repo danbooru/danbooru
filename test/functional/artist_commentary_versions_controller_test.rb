@@ -26,6 +26,20 @@ class ArtistCommentaryVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render previous body comparisons from old to new" do
+        get artist_commentary_versions_path, params: { search: { post_id: @commentary.post_id }, type: "previous" }
+
+        assert_response :success
+        assert_body_diff_direction
+      end
+
+      should "render current body comparisons from old to new" do
+        get artist_commentary_versions_path, params: { search: { post_id: @commentary.post_id }, type: "current" }
+
+        assert_response :success
+        assert_body_diff_direction
+      end
+
       should respond_to_search.with { @other_versions + @versions.reverse }
       should respond_to_search(original_title: "translated").with { @versions[2] }
       should respond_to_search(text_matches: "traslated").with { @versions[1] }
@@ -45,6 +59,16 @@ class ArtistCommentaryVersionsControllerTest < ActionDispatch::IntegrationTest
         get artist_commentary_version_path(@commentary.versions.first), as: :json
         assert_response :success
       end
+    end
+  end
+
+  private
+
+  def assert_body_diff_direction
+    assert_select "p.commentary-body-section" do |paragraphs|
+      assert(paragraphs.any? do |paragraph|
+        paragraph.at_css("del")&.text == "traslated" && paragraph.at_css("ins")&.text == "translated"
+      end)
     end
   end
 end
