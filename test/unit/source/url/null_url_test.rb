@@ -67,7 +67,6 @@ module Source::Tests::URL
         assert_equal("League of Comic Geeks", Source::URL.parse("https://leagueofcomicgeeks.com/profile/artist").site_name)
         assert_equal("Livedoor", Source::URL.parse("https://blog.livedoor.jp/ac370ml").site_name)
         assert_equal("Livedoor", Source::URL.parse("https://livedoor.livedoor.biz/archives/artist.html").site_name)
-        assert_equal("Lit.link", Source::URL.parse("https://lit.link/en/artist").site_name)
         assert_equal("Manga Library Z", Source::URL.parse("https://www.mangaz.com/person/detail/44761").site_name)
         assert_equal("Mangano", Source::URL.parse("https://manga-no.com/artist/123").site_name)
         assert_equal("MarppleShop", Source::URL.parse("https://marpple.shop/kr/@artist").site_name)

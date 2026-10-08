@@ -107,8 +107,6 @@ class Source::URL::Null < Source::URL
       "Livedoor"
     in _, ("2chblog.jp" | "blog.jp" | "bloggeek.jp" | "blogism.jp" | "blogo.jp" | "blogstation.jp" | "blogto.jp" | "cafeblog.jp" | "corpblog.jp" | "diary.to" | "doorblog.jp" | "dreamlog.jp" | "gger.jp" | "golog.jp" | "ldblog.jp" | "liblo.jp" | "livedoor.biz" | "myjournal.jp" | "mynikki.jp" | "officeblog.jp" | "officialblog.jp" | "publog.jp" | "storeblog.jp" | "teamblog.jp" | "techblog.jp" | "weblog.to" | "xxxblog.jp" | "youblog.jp")
       "Livedoor"
-    in _, "lit.link"
-      "Lit.link"
     in _, ("kirbyscomicart.com" | "kirbyscomicartshop.com")
       "Kirby's Comic Art"
     in _, "kirumade.com"
