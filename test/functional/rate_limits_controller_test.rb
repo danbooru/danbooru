@@ -28,6 +28,38 @@ class RateLimitsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "tbody tr", count: 0
       end
+
+      should "render humanized action names and status pills" do
+        create(:rate_limit, action: "posts:create", key: @user.cache_key, points: 40)
+        create(:rate_limit, action: "notes:write:post-1", key: @user.cache_key, points: -1, limited: true)
+
+        get_auth rate_limits_path, @user
+
+        assert_response :success
+        assert_select "td", text: /Posts: create/
+        assert_select "td", text: /Notes: write/
+        assert_select ".chip-green", text: "OK"
+        assert_select ".chip-red", text: "Limited"
+      end
+
+      should "collapse rows that share the same key and humanized action into the most limited one" do
+        create(:rate_limit, action: "notes:write:post-1", key: @user.cache_key, points: 10)
+        create(:rate_limit, action: "notes:write:post-2", key: @user.cache_key, points: -1, limited: true)
+
+        get_auth rate_limits_path, @user
+
+        assert_response :success
+        assert_select "td", text: /Notes: write/, count: 1
+        assert_select ".chip-red", text: "Limited"
+      end
+
+      should "not collapse rows that share the same humanized action but belong to different keys" do
+        create(:rate_limit, action: "test", key: SecureRandom.hex)
+
+        get_auth rate_limits_path, create(:owner_user)
+
+        assert_select "td", text: /Test/, count: 2
+      end
     end
   end
 end
