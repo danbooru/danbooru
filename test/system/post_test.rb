@@ -65,5 +65,18 @@ class PostChromeTest < ChromeSystemTestCase
         assert_button "Cancel"
       end
     end
+
+    should "add the post to a favgroup from the favgroup dialog" do
+      @favgroup = create(:favorite_group, creator: @user)
+      fast_signin @user
+      visit post_path(@post)
+
+      click_link "Add to fav group"
+      assert_link @favgroup.pretty_name, href: favorite_group_path(@favgroup)
+
+      click_link @favgroup.pretty_name
+      assert_selector "#notice", text: "Added post to favorite group #{@favgroup.pretty_name}"
+      assert_equal [@post.id], @favgroup.reload.post_ids
+    end
   end
 end

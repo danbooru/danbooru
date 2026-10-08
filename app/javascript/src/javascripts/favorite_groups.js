@@ -1,3 +1,5 @@
+import Utility from "./utility";
+
 let FavoriteGroup = {};
 
 FavoriteGroup.initialize_all = function() {
@@ -18,6 +20,17 @@ FavoriteGroup.initialize_add_to_favgroup_dialog = function() {
   });
 
   $("#open-favgroup-dialog-link").on("click.danbooru", FavoriteGroup.open_favgroup_dialog);
+  $("#add-to-favgroup-dialog .add-to-favgroup").on("click.danbooru", FavoriteGroup.add_post);
+}
+
+FavoriteGroup.add_post = function(e) {
+  if (e.ctrlKey || e.metaKey || e.shiftKey) {
+    return;
+  }
+
+  e.preventDefault();
+  let favgroup_id = $(e.currentTarget).data("favgroup-id");
+  $.ajax({ type: "PUT", url: `/favorite_groups/${favgroup_id}/add_post.js`, data: { post_id: Utility.meta("post-id") } }).done(script => $.globalEval(script));
 }
 
 FavoriteGroup.open_favgroup_dialog = function(e) {
