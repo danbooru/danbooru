@@ -21,6 +21,14 @@ module Source::Tests::URL
         "https://boards.4channel.org/vt/thread/37293562#p37294005",
         "http://boards.4chan.org/a/res/41938201",
         "http://zip.4chan.org/jp/res/3598845.html",
+        "https://boards.4chan.org/a/thread/289496352/drawthread#p289555853",
+        "https://4chan.org/4channews?all#132",
+        "https://4chan.org/4channews.php?all#132",
+      )
+
+      should_not be_bad_source(
+        "https://4chan.org/4channews?all#132",
+        "https://4chan.org/4channews.php?all#132",
       )
     end
 
