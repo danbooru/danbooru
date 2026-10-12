@@ -6,10 +6,10 @@ class Source::URL::Xiaohongshu < Source::URL
     url "https://www.xiaohongshu.com"
     domains %w[xiaohongshu.com rednote.com xhscdn.com rednotecdn.com xhslink.com xhslink.cn]
 
-    credential :api_host, help: %{Your Xiaohongshu site host. Can be either "www.xiaohongshu.com" or "www.rednote.com".}
-    credential :session_cookie, help: %{Your Xiaohongshu `gid` cookie.}
-    credential :webid_cookie, help: %{Your Xiaohongshu `webId` cookie.}
-    credential :web_session_cookie, help: %{Your Xiaohongshu `web_session` cookie.}
+    credential :api_host, default: Danbooru.config.xiaohongshu_api_host, help: %{Your Xiaohongshu site host. Can be either "www.xiaohongshu.com" or "www.rednote.com".}
+    credential :session_cookie, default: Danbooru.config.xiaohongshu_session_cookie, help: %{Your Xiaohongshu `gid` cookie.}
+    credential :web_id, default: Danbooru.config.xiaohongshu_webid_cookie, help: %{Your Xiaohongshu `webId` cookie.}
+    credential :web_session, default: Danbooru.config.xiaohongshu_web_session_cookie, help: %{Your Xiaohongshu `web_session` cookie.}
   end
 
   extractors { [Source::Extractor::Xiaohongshu, Source::Extractor::URLShortener] }
