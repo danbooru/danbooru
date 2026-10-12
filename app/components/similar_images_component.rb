@@ -8,18 +8,20 @@ class SimilarImagesComponent < ApplicationComponent
   HIGH_SIMILARITY_THRESHOLD = 40.0
   DUPLICATE_THRESHOLD = 85.0
 
-  attr_reader :matches, :current_user, :low_similarity, :high_similarity
+  attr_reader :matches, :current_user, :low_similarity, :high_similarity, :show_blacklist
 
   # @param matches [Array<Hash>] The matches returned by the IQDB search.
   # @param current_user [User] The current user.
   # @param low_similarity [Float, nil] The minimum score threshold to be considered a low similarity match.
   # @param high_similarity [Float, nil] The minimum score threshold to be considered a high similarity match.
-  def initialize(matches:, current_user:, low_similarity: LOW_SIMILARITY_THRESHOLD, high_similarity: HIGH_SIMILARITY_THRESHOLD)
+  # @param show_blacklist [Boolean] Whether to render the inline blacklist controls.
+  def initialize(matches:, current_user:, low_similarity: LOW_SIMILARITY_THRESHOLD, high_similarity: HIGH_SIMILARITY_THRESHOLD, show_blacklist: true)
     super
     @matches = matches.map(&:with_indifferent_access)
     @low_similarity = low_similarity || LOW_SIMILARITY_THRESHOLD
     @high_similarity = high_similarity || HIGH_SIMILARITY_THRESHOLD
     @current_user = current_user
+    @show_blacklist = show_blacklist
   end
 
   memoize def any_similarity_matches

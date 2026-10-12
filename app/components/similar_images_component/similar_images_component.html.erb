@@ -11,7 +11,7 @@
       <%= link_to "Hide #{pluralize(low_similarity_matches.length, "low similarity match")}", "javascript:void(0)", "x-on:click": "showLowSimilarity = false", "x-show": "showLowSimilarity", "x-cloak": true %>
     <% end %>
 
-    <% if any_similarity_matches.any? %>
+    <% if show_blacklist && any_similarity_matches.any? %>
       <%= render BlacklistComponent.new(user: current_user, inline: true) %>
     <% end %>
   </p>
