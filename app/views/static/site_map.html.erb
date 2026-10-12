@@ -190,6 +190,10 @@
         <% if policy(SiteCredential).create? %>
           <li><%= link_to("Site Credentials", site_credentials_path) %></li>
         <% end %>
+
+        <% if policy(MediaAsset).bulk_regenerate? %>
+          <li><%= link_to("Bulk Media Regeneration", new_bulk_media_regeneration_path) %></li>
+        <% end %>
       </ul>
 
       <ul>
