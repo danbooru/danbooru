@@ -1,0 +1,35 @@
+<%= tag.aside id: "sidebar", class: "flex-0 break-words sm:order-2",
+            "x-data": "{ sidebar: new Danbooru.SidebarComponent($el) }",
+            "x-bind:data-dock": "sidebar.dock",
+            "data-dock": dock_position do %>
+  <div class="flex justify-end">
+    <%= render PopupMenuComponent.new(button_classes: "inactive-link", button_html: { title: "Sidebar position" }) do |menu| %>
+      <% menu.with_button do %>
+        <%= dock_position == "default" ? unsticky_icon : sticky_icon %>
+      <% end %>
+
+      <% menu.with_item do %>
+        <%= link_to "javascript:void(0)", "x-on:click": "sidebar.dock = 'default'",
+              class: ("font-bold" if dock_position == "default"), "x-bind:class": "{ 'font-bold': sidebar.dock === 'default' }" do %>
+          <%= unsticky_icon %> Default
+        <% end %>
+      <% end %>
+
+      <% menu.with_item do %>
+        <%= link_to "javascript:void(0)", "x-on:click": "sidebar.dock = 'left'",
+              class: ("font-bold" if dock_position == "left"), "x-bind:class": "{ 'font-bold': sidebar.dock === 'left' }" do %>
+          <%= dock_left_icon %> Pin to Left
+        <% end %>
+      <% end %>
+
+      <% menu.with_item do %>
+        <%= link_to "javascript:void(0)", "x-on:click": "sidebar.dock = 'right'",
+              class: ("font-bold" if dock_position == "right"), "x-bind:class": "{ 'font-bold': sidebar.dock === 'right' }" do %>
+          <%= dock_right_icon %> Pin to Right
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= content %>
+<% end %>
