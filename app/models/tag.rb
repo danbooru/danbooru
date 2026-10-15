@@ -233,7 +233,7 @@ class Tag < ApplicationRecord
 
     class_methods do
       def normalize_name(name)
-        name.to_s.downcase.strip.tr(" ", "_").to_s
+        name.to_s.downcase.strip.delete_prefix("~").tr(" ", "_").to_s
       end
 
       def create_for_list(names)
@@ -373,6 +373,10 @@ class Tag < ApplicationRecord
 
     def find_by_name_or_alias(name)
       find_by_name(TagAlias.to_aliased(normalize_name(name)))
+    end
+
+    def find_by_id_or_name(id)
+      (id =~ /\A\d+\z/) ? find(id) : find_by_name!(normalize_name(id))
     end
 
     def find_by_abbreviation(abbrev)

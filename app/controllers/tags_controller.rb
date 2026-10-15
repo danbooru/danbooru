@@ -15,8 +15,10 @@ class TagsController < ApplicationController
   end
 
   def show
-    @tag = authorize Tag.find(params[:id])
-    respond_with(@tag)
+    @tag = authorize Tag.find_by_id_or_name(params[:id])
+    respond_with(@tag) do |format|
+      format.html.tooltip { render layout: false }
+    end
   end
 
   def edit

@@ -91,6 +91,59 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         get tag_path(@tag)
         assert_response :success
       end
+
+      should "render given a tag name instead of an id" do
+        get tag_path(@tag.name)
+        assert_response :success
+      end
+
+      context "for a tooltip" do
+        should "render the tag's wiki page excerpt" do
+          create(:wiki_page, title: @tag.name, body: "A description of the tag.")
+
+          get tag_path(@tag.name, variant: "tooltip")
+          assert_response :success
+          assert_select ".tag-tooltip-text p", "A description of the tag."
+        end
+
+        should "render a message when the tag doesn't have a wiki page" do
+          get tag_path(@tag, variant: "tooltip")
+          assert_response :success
+          assert_select ".tag-tooltip-text", /doesn't have a wiki page/
+        end
+
+        should "show when the tag is deprecated" do
+          tag = create(:tag, name: "deprecated_tag", is_deprecated: true)
+
+          get tag_path(tag.name, variant: "tooltip")
+          assert_response :success
+          assert_select ".fineprint", /This tag is deprecated/
+        end
+
+        should "show when the tag implies another tag" do
+          implied = create(:tag, name: "implied_tag")
+          create(:tag_implication, antecedent_name: @tag.name, consequent_name: implied.name)
+
+          get tag_path(@tag.name, variant: "tooltip")
+          assert_response :success
+          assert_select ".fineprint", /This tag implicates implied_tag/
+          assert_select ".fineprint a[data-tag-name=?]", "implied_tag"
+        end
+
+        should "show a link to create a wiki page when there's none" do
+          get_auth tag_path(@tag.name, variant: "tooltip"), @user
+          assert_response :success
+          assert_select ".tag-tooltip-edit[href=?]", new_wiki_page_path(wiki_page: { title: @tag.name })
+        end
+
+        should "show a link to edit the existing deleted wiki page instead of creating a new one" do
+          wiki_page = create(:wiki_page, title: @tag.name, body: "A description of the tag.", is_deleted: true)
+
+          get_auth tag_path(@tag.name, variant: "tooltip"), @user
+          assert_response :success
+          assert_select ".tag-tooltip-edit[href=?]", edit_wiki_page_path(wiki_page)
+        end
+      end
     end
 
     context "edit action" do
