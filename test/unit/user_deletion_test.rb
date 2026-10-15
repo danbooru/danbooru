@@ -189,9 +189,9 @@ class UserDeletionTest < ActiveSupport::TestCase
   end
 
   context "deleting another user's account" do
-    should "work for the owner-level user" do
+    should "work for a superadmin" do
       @user = create(:user)
-      @deletion = UserDeletion.new(user: @user, deleter: create(:owner_user))
+      @deletion = UserDeletion.new(user: @user, deleter: create(:superadmin_user))
 
       @deletion.delete!
       assert_equal("user_#{@user.id}", @user.reload.name)
@@ -220,7 +220,7 @@ class UserDeletionTest < ActiveSupport::TestCase
   context "undeleting a user's account" do
     should "restore the user's name and reset their password" do
       @user = create(:user, name: "fumimi", password: "hunter2")
-      @deletion = UserDeletion.new(user: @user, deleter: create(:owner_user), password: "hunter2")
+      @deletion = UserDeletion.new(user: @user, deleter: create(:superadmin_user), password: "hunter2")
 
       @deletion.delete!
       assert_equal("user_#{@user.id}", @user.reload.name)
