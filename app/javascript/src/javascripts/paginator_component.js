@@ -11,7 +11,7 @@ export default class PaginatorComponent {
       return;
     }
 
-    let url = new URL(location.href);
+    let url = new URL($(".paginator a.paginator-page").prop("href"));
     url.searchParams.set("page", page);
     location.href = url.toString();
   }
