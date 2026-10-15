@@ -53,7 +53,7 @@ module Danbooru
       @url.authority = @url.normalized_authority
 
       # Decode percent-encoded paths. Leave percent-encoded if characters are invalid UTF-8 or nonprintable (spaces, control characters).
-      @url.path = Addressable::URI.unencode_component(@url.path, String, "/%")
+      @url.path = Addressable::URI.unencode_component(@url.path, String, "/%?#")
       @url.path.force_encoding("ASCII-8BIT").gsub(/[^[:ascii:]]/) { |c| "%%%02X" % c.ord }.force_encoding("UTF-8") if !@url.path.valid_encoding?
       @url.path = @url.path.gsub(/[^[:graph:]]/) { |c| "%%%02X" % c.ord }
       @url.path = nil if @url.path == "/"
@@ -92,7 +92,7 @@ module Danbooru
     #
     # @return [String] The escaped string
     def self.escape(string)
-      Addressable::URI.encode_component(string.to_s, /[\/?#&+%]/).force_encoding("UTF-8")
+      Addressable::URI.encode_component(string.to_s, %r{[/?#&+%]}).force_encoding("UTF-8")
     end
 
     # Unescape percent-encoded characters in a string.

@@ -29,6 +29,8 @@ class SourceURLTest < ActiveSupport::TestCase
         assert_equal("https://example.com", Source::URL.parse("https://EXAMPLE.COM").to_normalized_s)
         assert_equal("https://example.com/foo", Source::URL.parse("example.com/foo").to_normalized_s)
         assert_equal("http://example.com/foo", Source::URL.parse("http://example.com/foo").to_normalized_s)
+        assert_equal("https://example.com/foo(%3F)%23%2F%25.png?a=b", Source::URL.parse("https://example.com/foo(%3F)%23%2F%25.png?a=b").to_normalized_s)
+        assert_equal("https://example.com/東方(%3F).png", Source::URL.parse("https://example.com/%E6%9D%B1%E6%96%B9(%3F).png").to_normalized_s)
       end
 
       should "parse URLs containing invalid UTF-8" do

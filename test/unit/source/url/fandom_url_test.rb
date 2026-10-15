@@ -70,6 +70,11 @@ module Source::Tests::URL
         page_url: "https://neptunia.fandom.com/wiki/File:Plutia_B%2BNvZ.png",
       )
 
+      should parse_url("https://static.wikia.nocookie.net/zato/images/0/01/Cafe-meeting-halucination(%3F).png/revision/latest?cb=20260507115730").into(
+        full_image_url: "https://static.wikia.nocookie.net/zato/images/0/01/Cafe-meeting-halucination(%3F).png?format=original",
+        page_url: "https://zato.fandom.com/wiki/File:Cafe-meeting-halucination(%3F).png",
+      )
+
       should parse_url("http://img3.wikia.nocookie.net/__cb20130523100711/typemoon/images/9/96/Caster_Extra_Takeuchi_design_1.png").into(
         page_url: "https://typemoon.fandom.com/wiki/File:Caster_Extra_Takeuchi_design_1.png",
       )

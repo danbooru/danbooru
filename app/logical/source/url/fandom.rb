@@ -78,6 +78,7 @@ class Source::URL::Fandom < Source::URL
     # https://static.wikia.nocookie.net/queensblade/images/3/33/WGAIRI1.jpg
     in _, "nocookie.net", *rest
       parse_path
+      @file = Danbooru::URL.unescape(@file)
 
     in wiki, "fandom.com", *segments unless wiki.in?(RESERVED_WIKI_NAMES)
       @wiki = wiki
@@ -159,7 +160,7 @@ class Source::URL::Fandom < Source::URL
   def full_image_url
     if wiki_db_name.present? && file.present?
       subdir = Digest::MD5.hexdigest(file)
-      full_image_path = [wiki_db_name, path_prefix, "images", subdir[0], subdir[0..1], file].compact.join("/")
+      full_image_path = [wiki_db_name, path_prefix, "images", subdir[0], subdir[0..1], Danbooru::URL.escape(file)].compact.join("/")
       URI.join("https://static.wikia.nocookie.net", full_image_path, "?format=original").to_s
     elsif image_uuid.present?
       "https://static.wikia.nocookie.net/#{image_uuid}?format=original"
