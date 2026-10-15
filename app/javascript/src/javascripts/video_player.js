@@ -50,7 +50,14 @@ export default class VideoPlayer {
     this.$container.get(0).videoPlayer = this;
 
     $(document).on("visibilitychange", event => this.onVisibilityChange(event));
-    $(document).on("keydown", event => this.onKeypress(event));
+    $(document).on("keydown", event => {
+      // Ignore keypresses when text fields are selected (like the floating tag edit box, ref: issue #6707).
+      if ($(event.target).is("input, textarea, select")) {
+        return true;
+      }
+
+      return this.onKeypress(event);
+    });
     this.$container.on("fullscreenchange", event => this.fullscreen = document.fullscreenElement !== null);
     this.$container.find("canvas, video").on("click", event => this.togglePlaying());
     this.$container.find("canvas, video").on("dblclick", event => this.toggleFullscreen(event));
