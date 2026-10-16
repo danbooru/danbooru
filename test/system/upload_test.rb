@@ -38,6 +38,15 @@ class UploadsChromeTest < ChromeSystemTestCase
         assert_includes find_field("post_tag_string").value.split, "1girl"
       end
 
+      should "remove a related tag from the tag box when clicked again" do
+        assert_selector "#related-tags-container .frequent-related-tags-column a[data-tag-name='1girl']"
+
+        fill_in "post_tag_string", with: "1girls 1girl solo_1girl"
+        find("#related-tags-container .frequent-related-tags-column a[data-tag-name='1girl']").click
+
+        assert_equal "1girls solo_1girl ", find_field("post_tag_string").value
+      end
+
       should "load the iqdb results" do
         click_link "Similar"
 

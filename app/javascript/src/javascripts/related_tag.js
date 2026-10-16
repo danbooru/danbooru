@@ -135,7 +135,7 @@ RelatedTag.toggle_tag = function(e) {
   var tag = $(e.target).closest("li").find("a").attr("data-tag-name");
 
   if (RelatedTag.current_tags().includes(tag)) {
-    $field.val($field.val().replace(new RegExp(`(?<=^|\\s)${RegExp.escape(tag)}(?=$|\\s)`, "gi"), ""));
+    $field.val($field.val().replace(new RegExp(`(^|\\s)${RegExp.escape(tag)}(?=$|\\s)`, "gi"), "$1"));
   } else {
     $field.val($field.val() + " " + tag);
   }
