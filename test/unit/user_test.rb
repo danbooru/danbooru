@@ -24,6 +24,7 @@ class UserTest < ActiveSupport::TestCase
         @builder = create(:builder_user)
         @mod = create(:moderator_user)
         @admin = create(:admin_user)
+        @superadmin = create(:superadmin_user)
         @owner = create(:owner_user)
       end
 
@@ -36,6 +37,7 @@ class UserTest < ActiveSupport::TestCase
 
         assert_not_promoted_to(User::Levels::MODERATOR, @user, @mod)
         assert_not_promoted_to(User::Levels::ADMIN, @user, @mod)
+        assert_not_promoted_to(User::Levels::SUPERADMIN, @user, @mod)
         assert_not_promoted_to(User::Levels::OWNER, @user, @mod)
       end
 
@@ -43,20 +45,33 @@ class UserTest < ActiveSupport::TestCase
         assert_promoted_to(User::Levels::GOLD, @user, @admin)
         assert_promoted_to(User::Levels::PLATINUM, @user, @admin)
         assert_promoted_to(User::Levels::BUILDER, @user, @admin)
-        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @mod)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @admin)
         assert_promoted_to(User::Levels::APPROVER, @user, @admin)
         assert_promoted_to(User::Levels::MODERATOR, @user, @admin)
 
         assert_not_promoted_to(User::Levels::ADMIN, @user, @admin)
+        assert_not_promoted_to(User::Levels::SUPERADMIN, @user, @admin)
         assert_not_promoted_to(User::Levels::OWNER, @user, @admin)
       end
 
-      should "allow the owner to promote users up to admin level" do
+      should "allow a superadmin to promote users up to admin level" do
+        assert_promoted_to(User::Levels::GOLD, @user, @superadmin)
+        assert_promoted_to(User::Levels::PLATINUM, @user, @superadmin)
+        assert_promoted_to(User::Levels::BUILDER, @user, @superadmin)
+        assert_promoted_to(User::Levels::MODERATOR, @user, @superadmin)
+        assert_promoted_to(User::Levels::ADMIN, @user, @superadmin)
+
+        assert_not_promoted_to(User::Levels::SUPERADMIN, @user, @superadmin)
+        assert_not_promoted_to(User::Levels::OWNER, @user, @superadmin)
+      end
+
+      should "allow the owner to promote users up to superadmin level" do
         assert_promoted_to(User::Levels::GOLD, @user, @owner)
         assert_promoted_to(User::Levels::PLATINUM, @user, @owner)
         assert_promoted_to(User::Levels::BUILDER, @user, @owner)
         assert_promoted_to(User::Levels::MODERATOR, @user, @owner)
         assert_promoted_to(User::Levels::ADMIN, @user, @owner)
+        assert_promoted_to(User::Levels::SUPERADMIN, @user, @owner)
 
         assert_not_promoted_to(User::Levels::OWNER, @user, @owner)
       end
@@ -67,6 +82,7 @@ class UserTest < ActiveSupport::TestCase
         assert_not_promoted_to(User::Levels::BUILDER, @user, @builder)
         assert_not_promoted_to(User::Levels::MODERATOR, @user, @builder)
         assert_not_promoted_to(User::Levels::ADMIN, @user, @builder)
+        assert_not_promoted_to(User::Levels::SUPERADMIN, @user, @builder)
         assert_not_promoted_to(User::Levels::OWNER, @user, @builder)
       end
 
@@ -75,6 +91,7 @@ class UserTest < ActiveSupport::TestCase
         assert_not_promoted_to(User::Levels::BUILDER, create(:moderator_user), @mod)
 
         assert_not_promoted_to(User::Levels::OWNER, create(:admin_user), @admin)
+        assert_not_promoted_to(User::Levels::SUPERADMIN, create(:admin_user), @admin)
         assert_not_promoted_to(User::Levels::MODERATOR, create(:admin_user), @admin)
 
         assert_not_promoted_to(User::Levels::ADMIN, create(:owner_user), @owner)
@@ -82,6 +99,7 @@ class UserTest < ActiveSupport::TestCase
 
       should "not allow users to promote themselves" do
         assert_not_promoted_to(User::Levels::ADMIN, @mod, @mod)
+        assert_not_promoted_to(User::Levels::SUPERADMIN, @admin, @admin)
         assert_not_promoted_to(User::Levels::OWNER, @admin, @admin)
       end
 
@@ -137,26 +155,40 @@ class UserTest < ActiveSupport::TestCase
     should "normalize its level" do
       user = create(:user, level: User::Levels::OWNER)
       assert(user.is_owner?)
+      assert(user.is_superadmin?)
       assert(user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 
+      user = create(:user, level: User::Levels::SUPERADMIN)
+      assert_equal(false, user.is_owner?)
+      assert_equal(true, user.is_superadmin?)
+      assert_equal(true, user.is_moderator?)
+      assert_equal(true, user.is_gold?)
+
       user = create(:user, level: User::Levels::ADMIN)
       assert_equal(false, user.is_owner?)
+      assert_equal(false, user.is_superadmin?)
       assert_equal(true, user.is_moderator?)
       assert_equal(true, user.is_gold?)
 
       user = create(:user, level: User::Levels::MODERATOR)
+      assert_equal(false, user.is_owner?)
+      assert_equal(false, user.is_superadmin?)
       assert_equal(false, user.is_admin?)
       assert_equal(true, user.is_moderator?)
       assert_equal(true, user.is_gold?)
 
       user = create(:user, level: User::Levels::GOLD)
+      assert_equal(false, user.is_owner?)
+      assert_equal(false, user.is_superadmin?)
       assert_equal(false, user.is_admin?)
       assert_equal(false, user.is_moderator?)
       assert_equal(true, user.is_gold?)
 
       user = create(:user)
+      assert_equal(false, user.is_owner?)
+      assert_equal(false, user.is_superadmin?)
       assert_equal(false, user.is_admin?)
       assert_equal(false, user.is_moderator?)
       assert_equal(false, user.is_gold?)

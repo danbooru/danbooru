@@ -21,6 +21,7 @@ class User < ApplicationRecord
     APPROVER = 37
     MODERATOR = 40
     ADMIN = 50
+    SUPERADMIN = 55
     OWNER = 60
   end
 
@@ -525,6 +526,7 @@ class User < ApplicationRecord
           "Approver" => Levels::APPROVER,
           "Moderator" => Levels::MODERATOR,
           "Admin" => Levels::ADMIN,
+          "Superadmin" => Levels::SUPERADMIN,
           "Owner" => Levels::OWNER,
         }
       end
@@ -596,6 +598,10 @@ class User < ApplicationRecord
 
     def is_admin?
       level >= Levels::ADMIN
+    end
+
+    def is_superadmin?
+      level >= Levels::SUPERADMIN
     end
 
     def is_owner?
