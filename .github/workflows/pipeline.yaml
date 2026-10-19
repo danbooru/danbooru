@@ -1,0 +1,93 @@
+# This pipeline aggregates all CI/CD for this repo.
+# On every commit, build and push the Docker images to the GitHub Container registry
+# and to DockerHub (if configured), then run the tests, and tag or deploy depending on the branch.
+#
+# The resulting Docker images are tagged with the full commit hash, the git
+# branch name, the git tag, and the 'latest' tag for the latest commit to
+# master.
+#
+# The production image is built and pushed first, then the development image.
+# We separate these steps in two jobs because development images are less likely to be cached,
+# and our deployment process was blocked several times in the past by the ubuntu snapshot repo
+# being under a DDoS attack exactly when we needed it.
+#
+# On master, the test suite then runs in the development image. See test.yaml.
+# On betabooru and testbooru, the site is then deployed. See deploy.yaml.
+# On production, each push tags the latest commit. See tag-on-push.yaml.
+# The deployment of the production image is only done by hand, there is no automatic deployment.
+#
+# https://github.com/danbooru/danbooru/pkgs/container/danbooru
+# https://hub.docker.com/r/evazion/danbooru
+#
+# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
+# https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions
+# https://docs.github.com/en/actions/guides/publishing-docker-images
+
+name: Pipeline
+
+# https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    branches-ignore:
+      - 'renovate/**'
+  workflow_dispatch:
+    inputs:
+      force_build:
+        type: boolean
+        description: "Build the images even if images for this commit already exist in the registry"
+        required: false
+        default: false
+
+# One build per branch or tag. A new push cancels the running build.
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+# https://docs.github.com/en/actions/reference/authentication-in-a-workflow#permissions-for-the-github_token
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idpermissions
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  production:
+    name: 1. Prod Image
+    uses: ./.github/workflows/docker-build.yaml
+    secrets: inherit
+    with:
+      docker-target: production
+
+  development:
+    name: 2. Dev Image
+    needs: production
+    uses: ./.github/workflows/docker-build.yaml
+    secrets: inherit
+    with:
+      docker-target: development
+
+  # Run the test suite in the development image. Only on master.
+  test:
+    name: 3. Tests
+    needs: development
+    if: github.ref == 'refs/heads/master'
+    permissions: read-all
+    uses: ./.github/workflows/test.yaml
+    secrets: inherit
+
+  # Tag the commit on the production branch.
+  tag:
+    name: 4. Tag
+    needs: production
+    if: github.ref_name == 'production'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/tag-on-push.yaml
+
+  # Deploy to betabooru or testbooru.
+  deploy:
+    name: 5. Deploy
+    needs: production
+    if: github.ref_name == 'betabooru' || github.ref_name == 'testbooru'
+    permissions: read-all
+    uses: ./.github/workflows/deploy.yaml
+    secrets: inherit

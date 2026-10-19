@@ -1,10 +1,13 @@
-# .github/workflows/tag-on-push.yml
+# Tag the commit and push the tag.
+#
+# Called by pipeline.yaml on the production branch,
+# to keep track of what was deployed to production and when.
+
 name: Tag on push
 
 on:
-  push:
-    branches:
-      - production
+  # https://docs.github.com/en/actions/sharing-automations/reusing-workflows
+  workflow_call:
 
 permissions:
   contents: write
