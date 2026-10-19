@@ -3,13 +3,13 @@
 # This covers all Gelbooru-based sites.
 class Source::URL::Gelbooru < Source::URL
   site "Gelbooru", url: "https://gelbooru.com" do
-    credential :user_id, help: %{Your Gelbooru user ID.}
-    credential :api_key, help: %{Your Gelbooru API key. Go to https://gelbooru.com/index.php?page=account&s=options to find your API key.}
+    credential :user_id, default: Danbooru.config.gelbooru_user_id, help: %{Your Gelbooru user ID.}
+    credential :api_key, default: Danbooru.config.gelbooru_api_key, help: %{Your Gelbooru API key. Go to https://gelbooru.com/index.php?page=account&s=options to find your API key.}
   end
 
   site "Rule34.xxx", url: "https://rule34.xxx" do
-    credential :user_id, help: %{Your Rule34.xxx user ID.}
-    credential :api_key, help: %{Your Rule34.xxx API key. Go to https://rule34.xxx/index.php?page=account&s=options to find your API key.}
+    credential :user_id, default: Danbooru.config.rule34_xxx_user_id, help: %{Your Rule34.xxx user ID.}
+    credential :api_key, default: Danbooru.config.rule34_xxx_api_key, help: %{Your Rule34.xxx API key. Go to https://rule34.xxx/index.php?page=account&s=options to find your API key.}
   end
 
   site "Safebooru", url: "https://safebooru.org"

@@ -5,7 +5,7 @@ class Source::URL::Blogger < Source::URL
     url "https://blogger.com"
     domains %w[blogger.com blogspot.com googleusercontent.com]
 
-    credential :api_key, help: %{Your Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.}
+    credential :api_key, default: Danbooru.config.blogger_api_key, help: %{Your Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.}
   end
 
   RESERVED_SUBDOMAINS = %w[bp cdn www]
