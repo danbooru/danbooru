@@ -118,9 +118,9 @@ class User < ApplicationRecord
   validates :name, user_name: true, on: :create
   validates :password, length: { minimum: 5 }, if: ->(rec) { rec.new_record? || rec.password.present? }
   validates :default_image_size, inclusion: { in: %w[large original] }
-  validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
+  validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE), message: "must be between 1 and #{PostSets::Post::MAX_PER_PAGE}" }
   validates :password, confirmation: { message: "Passwords don't match" }
-  validates :comment_threshold, inclusion: { in: (-100..5) }
+  validates :comment_threshold, inclusion: { in: (-100..5), message: "must be between -100 and 5" }
   validates :level, inclusion: { in: User::Levels.constants.map { |c| User::Levels.const_get(c) }}, if: :level_changed?
   validates :level, exclusion: { in: [User::Levels::ANONYMOUS] }, if: :level_changed?
   validate :validate_enable_private_favorites, on: :update
@@ -254,7 +254,7 @@ class User < ApplicationRecord
   concerning :ValidationMethods do
     def validate_enable_private_favorites
       if enable_private_favorites_was == false && enable_private_favorites == true && !Pundit.policy!(self, self).can_enable_private_favorites?
-        errors.add(:base, "Can't enable privacy mode without a Gold account")
+        errors.add(:enable_private_favorites, "require a Gold account")
       end
     end
 

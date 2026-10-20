@@ -370,6 +370,42 @@ class UserTest < ActiveSupport::TestCase
         should_not allow_value(1).for(:level)
       end
 
+      context "of posts per page" do
+        should allow_value(1).for(:per_page)
+        should allow_value(200).for(:per_page)
+
+        should_not allow_value(0).for(:per_page)
+        should_not allow_value(201).for(:per_page)
+
+        should "have a readable error message" do
+          user = build(:user, per_page: 1000).tap(&:validate)
+          assert_includes(user.errors.full_messages, "Posts per page must be between 1 and 200")
+        end
+      end
+
+      context "of comment threshold" do
+        should allow_value(-100).for(:comment_threshold)
+        should allow_value(5).for(:comment_threshold)
+
+        should_not allow_value(-101).for(:comment_threshold)
+        should_not allow_value(6).for(:comment_threshold)
+
+        should "have a readable error message" do
+          user = build(:user, comment_threshold: 6).tap(&:validate)
+          assert_includes(user.errors.full_messages, "Comment threshold must be between -100 and 5")
+        end
+      end
+
+      context "of private favorites" do
+        should "not allow enabling private favorites without a Gold account" do
+          user = create(:user, enable_private_favorites: false)
+          user.enable_private_favorites = true
+
+          assert_equal(false, user.valid?)
+          assert_equal(["Private favorites and votes require a Gold account"], user.errors.full_messages_for(:enable_private_favorites))
+        end
+      end
+
       context "of blacklisted tags" do
         should normalize_attribute(:blacklisted_tags).from(" foo\n bar \n baz ").to("foo\nbar\nbaz")
         should normalize_attribute(:blacklisted_tags).from(" \t\n ").to("")

@@ -7,7 +7,7 @@
 
     <%= render(TabPanelComponent.new(classes: "horizontal-tab-panel fixed-width-container") do |t| %>
       <% t.panel("Basic", active: true) do %>
-        <%= edit_form_for @user do |f| %>
+        <%= edit_form_for @user, formatted_errors: true do |f| %>
           <div id="basic-settings-section">
             <div class="input">
               <label>Name</label>
@@ -46,7 +46,7 @@
       <% end %>
 
       <% t.panel("Advanced") do %>
-        <%= edit_form_for @user do |f| %>
+        <%= edit_form_for @user, formatted_errors: true do |f| %>
           <div id="advanced-settings-section">
             <div class="input">
               <label>Account</label>

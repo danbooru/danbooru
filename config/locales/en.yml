@@ -84,6 +84,8 @@ en:
         uploader_id: "You"
       user:
         password_confirmation: ""
+        per_page: "Posts per page"
+        enable_private_favorites: "Private favorites and votes"
       user/email_address:
         address: "Email address"
         normalized_address: "Email address"
