@@ -405,5 +405,41 @@ module Source::Tests::Extractor
         EOS
       )
     end
+
+    context "A reddit video post" do
+      strategy_should_work(
+        "https://www.reddit.com/r/dogelore/comments/1ctp6pu/pov_its_2011_you_just_discovered_the_kino_der/",
+        image_urls: %w[https://v.redd.it/kpvywqsb2v0d1/DASH_720.mp4?source=fallback],
+        media_files: [{ file_size: 4_232_862 }],
+        page_url: "https://www.reddit.com/r/dogelore/comments/1ctp6pu/pov_its_2011_you_just_discovered_the_kino_der/",
+        profile_url: "https://www.reddit.com/user/MESSYNG",
+        profile_urls: %w[https://www.reddit.com/user/MESSYNG],
+        artist_name: "MESSYNG",
+        tag_name: "messyng",
+        other_names: ["MESSYNG"],
+        tags: [
+          ["Video Post", "https://www.reddit.com/r/dogelore/?f=flair_name:\"Video Post\""],
+        ],
+        dtext_artist_commentary_title: "POV: It's 2011, you just discovered the Kino Der Toten Easter egg with friends",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A reddit video post with a thumbnail preview image" do
+      strategy_should_work(
+        "https://www.reddit.com/r/HRSPRS/comments/1c6v9ee/cadillac_v_seriesr/",
+        image_urls: %w[https://v.redd.it/9lo9gd8n86vc1/DASH_480.mp4?source=fallback],
+        media_files: [{ file_size: 2_834_370 }],
+        page_url: "https://www.reddit.com/r/HRSPRS/comments/1c6v9ee/cadillac_v_seriesr/",
+        profile_url: "https://www.reddit.com/user/PlenitudeOpulence",
+        profile_urls: %w[https://www.reddit.com/user/PlenitudeOpulence],
+        artist_name: "PlenitudeOpulence",
+        tag_name: "plenitudeopulence",
+        other_names: ["PlenitudeOpulence"],
+        tags: [],
+        dtext_artist_commentary_title: "Cadillac V series-R",
+        dtext_artist_commentary_desc: "",
+      )
+    end
   end
 end
