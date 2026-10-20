@@ -1,2 +1,12 @@
 # https://docs.codecov.com/docs/codecovyml-reference
 comment: false
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto      # don't set minimum coverage for project
+        threshold: 1%     # total coverage can drop by at most 1%
+    patch:
+      default:
+        target: 70%       # changed code should have at least 70% coverage
