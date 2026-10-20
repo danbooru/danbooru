@@ -30,6 +30,14 @@
                 x-bind:class="{ 'text-error': editor.dtext.length > <%= input_html[:maxlength] %> }"
                 x-cloak><%= current_length %>/<%= input_html[:maxlength] %></span>
         <% end %>
+
+        <% if max_embeds.present? %>
+          <span class="dtext-embed-counter-text ml-4 text-xs pointer-events-none select-none"
+                x-show="editor.embedCount > 0"
+                x-text="`${editor.embedCount}/<%= max_embeds %> embeds`"
+                x-bind:class="{ 'text-error': editor.embedCount > <%= max_embeds %> }"
+                x-cloak><%= dtext.embedded_media.count %>/<%= max_embeds %> embeds</span>
+        <% end %>
       </div>
 
       <div class="flex items-center" x-show="editor.editMode">

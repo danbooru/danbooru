@@ -43,6 +43,11 @@ class DtextEditorComponent < ApplicationComponent
     dtext.media_embeds
   end
 
+  # @return [Integer, nil] The maximum number of media embeds allowed in the field, or nil if there's no limit.
+  def max_embeds
+    form.object.class.validators_on(input_name).grep(MediaEmbedValidator).first&.max_embeds
+  end
+
   # @return [Integer] The current length of the field's value, used to initialize the character counter.
   def current_length
     form.object.send(input_name).to_s.length

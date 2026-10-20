@@ -56,6 +56,22 @@ class DtextEditorComponentTest < ViewComponent::TestCase
       end
     end
 
+    should "show the embed counter for dtext fields with an embed limit" do
+      vc_test_view_context.simple_form_for(build(:comment, body: "!post #1\n!post #2"), url: "/comments") do |form|
+        render_inline(DtextEditorComponent.new(input_name: :body, form: form))
+
+        assert_css(".dtext-editor-menu .dtext-embed-counter-text[x-show='editor.embedCount > 0']", text: "2/1 embeds")
+      end
+    end
+
+    should "not show the embed counter for dtext fields without an embed limit" do
+      vc_test_view_context.simple_form_for(build(:wiki_page, body: (1..100).map { |id| "!post ##{id}" }.join("\n")), url: "/wiki_pages") do |form|
+        render_inline(DtextEditorComponent.new(input_name: :body, form: form))
+
+        assert_no_css(".dtext-embed-counter-text")
+      end
+    end
+
     should "not show the character counter for multiline dtext fields without a max length" do
       vc_test_view_context.simple_form_for(build(:pool_version), url: "/pool_versions") do |form|
         render_inline(DtextEditorComponent.new(input_name: :description, form: form))

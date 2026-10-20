@@ -102,6 +102,12 @@ export default class DTextEditor {
     return this.mode === "preview";
   }
 
+  // @returns {Number} The number of media embeds in the editor.
+  // @see lib/dtext_rb/ext/dtext/dtext.cpp.rl:247
+  get embedCount() {
+    return this.dtext.match(/^(\* )?!(post|asset) #\d+(:[ \t]+\S.*)?[ \t]*$/gm)?.length ?? 0;
+  }
+
   // Toggle the specified markup around the currently selected text.
   toggleBold()          { this.toggleInline("[b]", "[/b]"); }
   toggleItalic()        { this.toggleInline("[i]", "[/i]"); }
