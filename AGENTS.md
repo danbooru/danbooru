@@ -14,6 +14,7 @@ This file provides guidance for coding agents working in this repository. It's m
 - Use test-driven (red/green) development. Write tests first, then write code to make the tests pass.
 - Always write tests to reproduce a bug before attempting to fix it.
 - Always write tests specifying how new features should work before implementing the feature.
+- When running tests, send their output to a temp file so that they can be reviewed on demand, do not pipe them directly through grep or rg.
 - Lint files after you're done editing them. Fix any lint errors introduced by your changes, but not any lint errors that were already present.
 
 ## General Guidelines
