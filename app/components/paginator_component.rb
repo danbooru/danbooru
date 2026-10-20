@@ -40,7 +40,7 @@ class PaginatorComponent < ApplicationComponent
     if page.nil?
       tag.span anchor, **options
     else
-      hidden = paginator_mode == :numbered && page > paginator_page_limit
+      hidden = page.is_a?(Integer) && page > paginator_page_limit
       link_to anchor, url_for_page(page), **options, hidden: hidden
     end
   end

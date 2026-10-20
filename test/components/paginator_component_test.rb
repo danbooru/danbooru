@@ -70,6 +70,21 @@ class PaginatorComponentTest < ViewComponent::TestCase
         end
       end
 
+      context "for the last page before the page limit" do
+        setup do
+          @tags = create_list(:tag, 10)
+        end
+
+        should "link to the previous page and switch to sequential pagination for the next page" do
+          html = render_numbered_paginator(Tag.order(id: :desc), page: 3, limit: 3, page_limit: 3)
+
+          assert_css("span.paginator-current", text: "3")
+          assert_css("button.paginator-ellipsis")
+          assert_page("2", html.css("a.paginator-prev"))
+          assert_page("b#{@tags[1].id}", html.css("a.paginator-next"))
+        end
+      end
+
       context "for a search with zero results" do
         should "work for page 1" do
           render_numbered_paginator(Tag.none, page: 1, limit: 3)
