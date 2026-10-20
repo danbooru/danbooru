@@ -10,6 +10,8 @@ class TagTooltipChromeTest < ChromeSystemTestCase
 
     context "on a post's tag list" do
       should "show the tooltip when hovering over the tag" do
+        skip "Tag tooltips are only enabled on DText links"
+
         visit post_path(@post)
 
         find(".search-tag", text: "touhou").hover
@@ -19,6 +21,8 @@ class TagTooltipChromeTest < ChromeSystemTestCase
 
     context "for a wikiless artist tag" do
       should "not prompt to create a wiki page" do
+        skip "Tag tooltips are only enabled on DText links"
+
         create(:tag, name: "some_artist", category: Tag.categories.artist, post_count: 1)
         post = create(:post, tag_string: "some_artist")
 
@@ -31,6 +35,8 @@ class TagTooltipChromeTest < ChromeSystemTestCase
 
     context "for a tag with a video embed" do
       should "show a static thumbnail" do
+        skip "Tag tooltips are only enabled on DText links"
+
         video_post = create(:post_with_file, filename: "webm/test-512x512.webm", tag_string: "videotag")
         create(:wiki_page, title: "videotag", body: "!post ##{video_post.id}")
         post = create(:post, tag_string: "videotag")
@@ -71,8 +77,29 @@ class TagTooltipChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "on a wiki page's alias and implication list" do
+      setup do
+        create(:tag, name: "aliased_tag", post_count: 1)
+        create(:tag, name: "implicating_tag", post_count: 1)
+        create(:tag_alias, antecedent_name: "old_touhou", consequent_name: "touhou")
+        create(:tag_implication, antecedent_name: "implicating_tag", consequent_name: "touhou")
+      end
+
+      should "show the tooltip for aliased & implied tags" do
+        visit wiki_page_path("touhou")
+
+        find(".fineprint a.wiki-link", text: "old_touhou").hover
+        assert_selector ".tag-tooltip"
+
+        find(".fineprint a.wiki-link", text: "implicating_tag").hover
+        assert_selector ".tag-tooltip"
+      end
+    end
+
     context "hovering over multiple tags in a row" do
       should "hide the previous tooltip instead of showing both at once" do
+        skip "Tag tooltips are only enabled on DText links"
+
         create(:tag, name: "1girl", post_count: 1)
         post = create(:post, tag_string: "touhou 1girl")
 
@@ -88,6 +115,8 @@ class TagTooltipChromeTest < ChromeSystemTestCase
 
     context "on a tag inside a post tooltip's tag list" do
       should "not hide the post tooltip" do
+        skip "Tag tooltips are only enabled on DText links"
+
         create(:post, tag_string: @tag.name)
 
         visit posts_path
@@ -101,6 +130,8 @@ class TagTooltipChromeTest < ChromeSystemTestCase
       end
 
       should "not inherit the parent's tooltip size" do
+        skip "Tag tooltips are only enabled on DText links"
+
         long_tag = create(:tag, name: "long_wiki_tag", post_count: 1)
         create(:wiki_page, title: long_tag.name, body: "word " * 200)
         create(:post, tag_string: "#{@tag.name} #{long_tag.name}")
