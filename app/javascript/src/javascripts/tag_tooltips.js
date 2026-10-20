@@ -5,7 +5,9 @@ import { hideAll } from 'tippy.js';
 
 let TagTooltip = {};
 
-TagTooltip.SELECTOR = "a.search-tag, a[data-tag-name]";
+// Only enabled on DText links for now.
+// TagTooltip.SELECTOR = "a.search-tag, a[data-tag-name]";
+TagTooltip.SELECTOR = "a.dtext-wiki-link[data-tag-name], a.wiki-link[data-tag-name]";
 TagTooltip.SHOW_DELAY = 500;
 TagTooltip.HIDE_DELAY = 125;
 TagTooltip.DURATION = 250;
