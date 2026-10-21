@@ -13,7 +13,7 @@
 
       <%= edit_form_for(@user, url: admin_user_path(@user)) do |f| %>
         <%= f.input :level, collection: User.level_hash.select { |name, level| level < @user.level }.to_a, include_blank: false %>
-        <%= f.submit "Demote", class: "button-primary", "data-confirm": "Are you sure you want to demote #{@user.name}?" %>
+        <%= f.submit_button "Demote", "data-confirm": "Are you sure you want to demote #{@user.name}?" %>
       <% end %>
     </div>
   </div>

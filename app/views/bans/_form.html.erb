@@ -62,7 +62,7 @@
     <% if @ban.new_record? %>
       <%= f.submit "Ban", class: "button-danger", disabled: @ban.user&.is_banned? %>
     <% else %>
-      <%= f.submit "Update", class: "button-primary", disabled: @ban.expired? %>
+      <%= f.submit_button disabled: @ban.expired? %>
     <% end %>
 
     <% if @ban.persisted? %>

@@ -1,2 +1,2 @@
-Danbooru.Utility.dialog("Replace image", "<%= j render "post_replacements/new", post_replacement: @post_replacement %>");
+Danbooru.Utility.dialog("Replace image", "<%= j render "post_replacements/new", post_replacement: @post_replacement, inline: true %>");
 new Danbooru.Autocomplete($("#post_replacement_tags"), "tag_query");

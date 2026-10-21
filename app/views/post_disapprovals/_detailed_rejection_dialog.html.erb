@@ -4,6 +4,10 @@
   <%= edit_form_for(PostDisapproval.new, remote: true, html: { id: "detailed-rejection-form" }) do |f| %>
     <%= f.hidden_field :post_id, value: "x" %>
     <%= f.input :reason, collection: PostDisapproval::REASONS.map { |x| [x.humanize, x] }, include_blank: false %>
-    <%= f.input :message, as: :dtext, inline: true, input_html: { autofocus: true } %>
+    <%= f.input :message, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), as: :dtext, inline: true, input_html: { autofocus: true } %>
+    <div class="dialog-buttons">
+      <%= f.submit_button "Reject" %>
+      <%= f.cancel_button %>
+    </div>
   <% end %>
 </div>

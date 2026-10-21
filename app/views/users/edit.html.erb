@@ -41,7 +41,7 @@
             <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => { :data => {:autocomplete => "tag-query"}} %>
           </div>
 
-          <%= f.button :submit, "Submit" %>
+          <%= f.submit_button %>
         <% end %>
       <% end %>
 
@@ -75,7 +75,7 @@
             <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :data => { :autocomplete => "tag-query" } } %>
             <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site." %>
           </div>
-          <%= f.button :submit, "Submit" %>
+          <%= f.submit_button %>
         <% end %>
       <% end %>
 

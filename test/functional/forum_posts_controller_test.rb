@@ -153,6 +153,8 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get_auth new_forum_post_path, @user, params: { topic_id: @forum_topic.id }
         assert_response :success
+        assert_select "input.button-primary[type=submit][value=Post]"
+        assert_select "button[name=cancel]", false
       end
 
       should "not allow unauthorized users to quote posts in private forum topics" do

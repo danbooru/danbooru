@@ -13,6 +13,7 @@
       <%= f.input :is_locked, :label => "Locked" %>
     <% end %>
 
-    <%= f.button :submit, "Submit" %>
+    <%= f.submit_button %>
+    <%= f.cancel_button if local_assigns[:inline] %>
   <% end %>
 </div>

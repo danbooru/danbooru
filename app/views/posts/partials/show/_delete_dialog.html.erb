@@ -13,11 +13,16 @@
               x-bind:class="{ 'text-error': length > <%= PostFlag::MAX_LENGTH %> }">0/<%= PostFlag::MAX_LENGTH %></span>
       </div>
 
-      <%= f.input :reason, as: :string, label: false, placeholder: "Briefly explain why you are deleting this post", input_html: { value: "", autofocus: true, "x-on:input": "length = $event.target.value.length" } %>
+      <%= f.input :reason, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), as: :string, label: false, placeholder: "Briefly explain why you are deleting this post", input_html: { value: "", autofocus: true, "x-on:input": "length = $event.target.value.length" } %>
     </div>
 
     <% if post.parent_id.present? %>
       <%= f.input :move_favorites, label: "Move favorites to parent", as: :boolean, input_html: { checked: false } %>
     <% end %>
+
+    <div class="dialog-buttons">
+      <%= f.submit "Delete", class: "button-danger" %>
+      <%= f.cancel_button %>
+    </div>
   <% end %>
 </div>

@@ -27,8 +27,47 @@ class PostChromeTest < ChromeSystemTestCase
 
       click_link "Flag"
       assert_selector ".ui-dialog .ui-dialog-title", text: "Flag post"
-      assert_selector ".ui-dialog", text: "Submit"
-      assert_selector ".ui-dialog", text: "Cancel"
+      within(".ui-dialog") do
+        assert_button "Flag"
+        assert_button "Cancel"
+      end
+    end
+
+    should "flag the post from the flag modal" do
+      fast_signin @user
+      visit post_path(@post)
+
+      click_link "Flag"
+      within(".ui-dialog") do
+        fill_in "post_flag_reason", with: "bad post"
+        click_button "Flag"
+      end
+
+      assert_text "This post was flagged and is pending approval"
+      assert_equal("bad post", @post.flags.last&.reason)
+    end
+
+    should "only submit the flag modal with ctrl+enter" do
+      fast_signin @user
+      visit post_path(@post)
+
+      click_link "Flag"
+      find_field("post_flag_reason").send_keys("bad post", :enter)
+      assert_selector ".ui-dialog"
+      assert_equal(0, @post.flags.count)
+
+      find_field("post_flag_reason").send_keys([:control, :enter])
+      assert_text "This post was flagged and is pending approval"
+      assert_equal("bad post", @post.flags.last&.reason)
+    end
+
+    should "close the flag modal when cancel is clicked" do
+      fast_signin @user
+      visit post_path(@post)
+
+      click_link "Flag"
+      within(".ui-dialog") { click_button "Cancel" }
+      assert_no_selector ".ui-dialog"
     end
 
     should "show the appeal modal" do
@@ -38,8 +77,10 @@ class PostChromeTest < ChromeSystemTestCase
       visit post_path(@post)
       click_link "Appeal"
       assert_selector ".ui-dialog .ui-dialog-title", text: "Appeal post"
-      assert_selector ".ui-dialog", text: "Submit"
-      assert_selector ".ui-dialog", text: "Cancel"
+      within(".ui-dialog") do
+        assert_button "Appeal"
+        assert_button "Cancel"
+      end
     end
 
     should "show the delete modal" do
@@ -48,8 +89,10 @@ class PostChromeTest < ChromeSystemTestCase
       click_link "Delete"
 
       assert_selector ".ui-dialog .ui-dialog-title", text: "Delete Post"
-      assert_selector ".ui-dialog", text: "Submit"
-      assert_selector ".ui-dialog", text: "Cancel"
+      within(".ui-dialog") do
+        assert_button "Delete"
+        assert_button "Cancel"
+      end
     end
 
     should "show the artist commentary modal with the commentary buttons" do
@@ -61,7 +104,7 @@ class PostChromeTest < ChromeSystemTestCase
 
       within(".ui-dialog") do
         assert_button "Fetch"
-        assert_button "Submit"
+        assert_button "Create"
         assert_button "Cancel"
       end
     end

@@ -20,7 +20,7 @@
       <%= f.input :user_name, :label => "User", :input_html => { value: @user_feedback.user.try(:name), data: { autocomplete: "user" } } %>
       <%= f.input :category, :collection => ["positive", "neutral", "negative"], :include_blank => false %>
       <%= f.input :body, as: :dtext %>
-      <%= f.button :submit, "Submit" %>
+      <%= f.submit_button %>
     <% end %>
   </div>
 </div>

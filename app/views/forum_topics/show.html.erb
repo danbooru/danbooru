@@ -34,7 +34,7 @@
       <p><%= link_to "Post reply", new_forum_post_path(topic_id: @forum_topic.id), id: "new-response-link" %></p>
 
       <div style="display: none;" id="topic-response">
-        <%= render "forum_posts/partials/new/form", forum_post: ForumPost.new(topic_id: @forum_topic.id) %>
+        <%= render "forum_posts/partials/new/form", forum_post: ForumPost.new(topic_id: @forum_topic.id), inline: true %>
       </div>
     <% end %>
 

@@ -5,7 +5,6 @@ import Notice from './notice'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
 import Note from './notes'
-import Rails from '@rails/ujs'
 
 let Post = {};
 
@@ -463,16 +462,10 @@ Post.initialize_saved_searches = function() {
     width: 700,
     modal: true,
     autoOpen: false,
-    buttons: {
-      "Submit": function() {
-        let form = $("#save-search-dialog form").get(0);
-        Rails.fire(form, "submit");
-        $(this).dialog("close");
-      },
-      "Cancel": function() {
-        $(this).dialog("close");
-      }
-    }
+  });
+
+  $("#save-search-dialog form").on("submit.danbooru", function() {
+    $("#save-search-dialog").dialog("close");
   });
 
   $("#save-search").on("click.danbooru", function(e) {

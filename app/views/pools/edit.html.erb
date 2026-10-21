@@ -7,7 +7,7 @@
       <%= f.input :description, as: :dtext, input_html: { autofocus: true } %>
       <%= f.input :post_ids_string, as: :text, label: "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
-      <%= f.button :submit %>
+      <%= f.submit_button %>
     <% end %>
   </div>
 </div>
