@@ -46,7 +46,7 @@ class CommentsChromeTest < ChromeSystemTestCase
           click_link "Edit"
 
           find(".edit_comment textarea.dtext").set("the edited comment")
-          click_button "Comment"
+          click_button "Update"
         end
 
         assert_current_path post_path(@post)

@@ -16,7 +16,7 @@
       <%= f.input :ip_addr, label: "IP Address", as: :string, hint: "Add /24 to ban a subnet. Example: 1.2.3.4/24" %>
       <%= f.input :reason, as: :string %>
       <%= f.input :category, as: :select, include_blank: false, collection: [["Full", "full"], ["Partial", "partial"]] %>
-      <%= f.button :submit, "Submit" %>
+      <%= f.submit_button %>
     <% end %>
   </div>
 </div>

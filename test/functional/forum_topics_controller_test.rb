@@ -48,6 +48,16 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "show cancel buttons on the inline forum post forms" do
+        as(@user) { create(:forum_post, creator: @user, topic: @forum_topic) }
+        get_auth forum_topic_path(@forum_topic), @user
+
+        assert_response :success
+        assert_select "#topic-response button[name=cancel]", text: "Cancel"
+        assert_select ".edit_forum_topic button[name=cancel]", text: "Cancel"
+        assert_select ".edit_forum_post button[name=cancel]", text: "Cancel"
+      end
+
       should "record a topic visit for html requests" do
         get_auth forum_topic_path(@forum_topic), @user
         @user.reload

@@ -14,7 +14,7 @@
     <strong><%= @email_address.address %></strong> to verify your email address.</p>
 
     <%= edit_form_for(@user, method: :post, url: send_confirmation_user_email_path(@user)) do |f| %>
-      <%= f.submit "Send confirmation email" %>
+      <%= f.submit_button "Send confirmation email" %>
     <% end %>
   </div>
 </div>

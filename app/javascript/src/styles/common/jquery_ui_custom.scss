@@ -44,6 +44,25 @@ div.ui-dialog {
     padding: 1rem 0.75rem;
   }
 
+  /* Keep the button bar at the bottom of the dialog when it's resized. */
+  .ui-dialog-content:has(.dialog-buttons), .ui-dialog-content :has(.dialog-buttons) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ui-dialog-content :has(.dialog-buttons) {
+    flex-grow: 1;
+  }
+
+  .dialog-buttons {
+    display: flex;
+    justify-content: end;
+    gap: 6px;
+    margin: auto -0.75rem -0.5rem;
+    border-top-width: 1px;
+    padding: 1rem 0.75rem;
+  }
+
   .ui-dialog-buttonset {
     display: flex;
     justify-content: end;

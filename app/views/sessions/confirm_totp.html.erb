@@ -11,7 +11,7 @@
         <%= f.input :user_id, as: :hidden, input_html: { value: @user.signed_id(purpose: :verify_totp, expires_in: 10.minutes) } %>
         <%= f.input :url, as: :hidden, input_html: { value: @url } %>
         <%= f.input :code, placeholder: "123456", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { autofocus: true, value: nil }, hint: "Lost your phone? You can enter a backup code instead." %>
-        <%= f.submit "Continue", class: "button-primary" %>
+        <%= f.submit_button "Continue" %>
       <% end %>
     </div>
   </div>

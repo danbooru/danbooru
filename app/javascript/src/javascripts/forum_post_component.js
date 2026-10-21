@@ -4,6 +4,8 @@ class ForumPostComponent {
       $(document).on("click.danbooru.forum_post", ".edit_forum_post_link", ForumPostComponent.showEditPostForm);
       $(document).on("click.danbooru.forum_post", ".edit_forum_topic_link", ForumPostComponent.showEditTopicForm);
       $(document).on("click.danbooru.forum_post", "#new-response-link", ForumPostComponent.showNewForumPostForm);
+      $(document).on("click.danbooru.forum_post", "#topic-response button[name=cancel]", ForumPostComponent.hideNewForumPostForm);
+      $(document).on("click.danbooru.forum_post", ".edit_forum_post button[name=cancel], .edit_forum_topic button[name=cancel]", ForumPostComponent.hideEditForm);
     }
   }
 
@@ -14,6 +16,10 @@ class ForumPostComponent {
     e.preventDefault();
   }
 
+  static hideNewForumPostForm() {
+    $("#topic-response").hide();
+  }
+
   static showEditPostForm(e) {
     $(this).closest(".forum-post").find(".edit_forum_post").show();
     e.preventDefault();
@@ -22,6 +28,10 @@ class ForumPostComponent {
   static showEditTopicForm(e) {
     $(this).closest(".forum-post").find(".edit_forum_topic").show();
     e.preventDefault();
+  }
+
+  static hideEditForm(e) {
+    $(e.target).closest("form").hide();
   }
 }
 

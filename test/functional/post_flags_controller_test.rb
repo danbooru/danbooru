@@ -15,6 +15,7 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get_auth new_post_flag_path, @flagger
         assert_response :success
+        assert_select ".hint .desktop-only", text: "Ctrl+Enter to submit"
       end
     end
 

@@ -308,7 +308,7 @@
       <%= f.input :q, as: :hidden, input_html: { id: nil, name: "q", value: params[:q] } %>
       <%= f.input :check_translation, as: :boolean, wrapper: "inline-toggle-switch", input_html: { checked: @post.has_tag?("check_translation") } %>
       <%= f.input :partially_translated, as: :boolean, wrapper: "inline-toggle-switch", input_html: { checked: @post.has_tag?("partially_translated") } %>
-      <%= f.submit "Mark as translated" %>
+      <%= f.submit_button "Mark as translated" %>
     <% end %>
   </section>
 

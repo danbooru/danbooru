@@ -18,7 +18,7 @@
         <%= f.input :password_confirmation, label: "Confirm password", input_html: { value: @user.password_confirmation, autocomplete: "new-password" }, required: true %>
 
         <%= captcha_tag class: "mb-4", action: :signup %>
-        <%= f.submit "Sign up", class: "button-primary", disabled: true %>
+        <%= f.submit_button "Sign up", disabled: true %>
       <% end %>
 
       <p class="fineprint">

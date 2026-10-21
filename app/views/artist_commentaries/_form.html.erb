@@ -18,4 +18,9 @@
   <%= f.input :translated_description, input_html: { value: artist_commentary.try(:translated_description) } %>
 
   <%= f.input :commentary_tags, label: false, wrapper_html: { class: "radio-button-group thin-x-scrollbar text-xs m-auto w-fit" }, collection: ArtistCommentary::COMMENTARY_TAGS.map { [it.titleize, it] } + [["None", "none"]], as: :radio_buttons, boolean_style: :inline %>
+
+  <div class="dialog-buttons">
+    <%= f.submit_button %>
+    <%= f.cancel_button %>
+  </div>
 <% end %>

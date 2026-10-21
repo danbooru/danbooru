@@ -1,5 +1,6 @@
 <%= edit_form_for(forum_post, namespace: "forum_post_#{forum_post.id}") do |f| %>
   <%= f.input :body, as: :dtext, editor_html: { class: "dtext-editor-large" } %>
 
-  <%= f.button :submit, "Submit", class: "button-primary" %>
+  <%= f.submit_button %>
+  <%= f.cancel_button if local_assigns[:inline] %>
 <% end %>

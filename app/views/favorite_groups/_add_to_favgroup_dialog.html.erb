@@ -4,7 +4,7 @@
 <%= edit_form_for(new_favorite_group, html: { class: "one-line-form" }) do |f| %>
   <%= f.input :name, as: :string, required: true, input_html: { style: "width: 20em" } %>
   <%= f.input :post_ids, as: :hidden, input_html: { value: post.id } %>
-  <%= f.submit "Create" %>
+  <%= f.submit_button %>
 
   <% if policy(new_favorite_group).can_enable_privacy? %>
     <div>
