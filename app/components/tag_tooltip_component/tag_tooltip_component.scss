@@ -1,0 +1,60 @@
+.tippy-box[data-theme~="tag-tooltip"] {
+  --tag-tooltip-thumbnail-size: 150px;
+
+  width: max-content; // needed to keep nested tooltips from squishing down to their parents' size
+  min-width: 200px;
+  max-width: 400px !important;
+
+  .tag-tooltip-header {
+    margin-bottom: 0.5em;
+    align-items: baseline;
+
+    .tag-tooltip-count {
+      font-size: 0.85em;
+    }
+  }
+
+  .tag-tooltip-body {
+    align-items: flex-start;
+
+    .tag-tooltip-embed img {
+      display: block;
+      max-width: var(--tag-tooltip-thumbnail-size);
+      max-height: var(--tag-tooltip-thumbnail-size);
+      width: auto;
+      height: auto;
+      margin: 0 auto;
+      border-radius: 4px;
+    }
+
+    .tag-tooltip-column {
+      min-width: 150px;
+    }
+
+    .tag-tooltip-text {
+      font-size: 0.9em;
+      line-height: 1.4em;
+      max-height: var(--tag-tooltip-thumbnail-size);
+      overflow: hidden;
+
+      mask-image: linear-gradient(
+        to bottom,
+        black calc(var(--tag-tooltip-thumbnail-size) * 0.7),
+        transparent var(--tag-tooltip-thumbnail-size)
+      );
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .fineprint {
+    margin-bottom: 0;
+  }
+
+  .tag-tooltip-implications-more {
+    text-decoration: underline dotted;
+    cursor: help;
+  }
+}
