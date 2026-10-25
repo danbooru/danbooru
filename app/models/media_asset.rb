@@ -297,7 +297,7 @@ class MediaAsset < ApplicationRecord
         yield media_asset if block_given?
 
         # XXX shouldn't generate thumbnail twice (very slow for ugoira)
-        task1 = Danbooru.async { media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags) }
+        task1 = Danbooru.async { media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags) if media_asset.has_variant?(:"360x360") }
         task2 = Danbooru.async { media_asset.update!(media_metadata: MediaMetadata.new(file: media_file)) }
         media_asset.distribute_files!(media_file)
         task1.wait!
