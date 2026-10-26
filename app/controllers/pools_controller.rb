@@ -36,6 +36,7 @@ class PoolsController < ApplicationController
     search = search_params.presence || ActionController::Parameters.new(category: "series")
 
     @pools = authorize Pool.search(search, CurrentUser.user).paginate(params[:page], limit: limit, search_count: params[:search])
+    @cover_posts = Pool.cover_posts(@pools, CurrentUser.user) if request.format.html?
     respond_with(@pools)
   end
 

@@ -294,4 +294,49 @@ class PoolTest < ActiveSupport::TestCase
       assert_nil(@pool.next_post_id(@p3.id))
     end
   end
+
+  context "The cover posts" do
+    setup do
+      @banned = create(:post, is_banned: true)
+      @visible1 = create(:post)
+      @visible2 = create(:post)
+    end
+
+    should "be the first post of each pool" do
+      @pool1 = create(:pool, post_ids: [@visible2.id, @visible1.id])
+      @pool2 = create(:pool, post_ids: [@visible1.id, @visible2.id])
+
+      assert_equal({ @pool1 => @visible2, @pool2 => @visible1 }, Pool.cover_posts([@pool1, @pool2], @user))
+    end
+
+    should "skip nonexistent posts and posts the user can't see" do
+      @pool = create(:pool, post_ids: [999_999_999, @banned.id, @visible2.id, @visible1.id])
+
+      assert_equal(@visible2, Pool.cover_posts([@pool], @user)[@pool])
+    end
+
+    should "include banned posts for users who can see them" do
+      @pool = create(:pool, post_ids: [@banned.id, @visible1.id])
+
+      assert_equal(@banned, Pool.cover_posts([@pool], create(:approver))[@pool])
+    end
+
+    should "be nil if the user can't see any posts" do
+      @pool = create(:pool, post_ids: [999_999_999, @banned.id])
+
+      assert_nil(Pool.cover_posts([@pool], @user)[@pool])
+    end
+
+    should "only check the first 100 posts" do
+      @pool = create(:pool, post_ids: [*(1..100).map { |n| 999_999_000 + n }, @visible1.id])
+
+      assert_nil(Pool.cover_posts([@pool], @user)[@pool])
+    end
+
+    should "be nil for an empty pool" do
+      @pool = create(:pool)
+
+      assert_nil(Pool.cover_posts([@pool], @user)[@pool])
+    end
+  end
 end
