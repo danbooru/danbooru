@@ -1171,7 +1171,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
+        travel(2.hours)
         as(@user) { @post.update(tag_string: "zzz") }
       end
 

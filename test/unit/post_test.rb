@@ -1860,8 +1860,8 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "increment the updater's post_update_count" do
-          PostVersion.sqs_service.stubs(:merge?).returns(false)
           post = create(:post, tag_string: "aaa bbb ccc")
+          travel(2.hours)
 
           # XXX in the test environment the update count gets bumped twice: and
           # once by Post#post_update_count, and once by the counter cache. in
@@ -2322,12 +2322,14 @@ class PostTest < ActiveSupport::TestCase
   context "Reverting: " do
     context "a post that has been updated" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = create(:post, rating: "q", tag_string: "aaa", source: "")
+        travel(2.hours)
         @post.reload
         @post.update(tag_string: "aaa bbb ccc ddd")
+        travel(2.hours)
         @post.reload
         @post.update(tag_string: "bbb xxx yyy", source: "http://xyz.com")
+        travel(2.hours)
         @post.reload
         @post.update(tag_string: "bbb mmm yyy", source: "http://abc.com")
         @post.reload

@@ -18,7 +18,7 @@ class Pool < ApplicationRecord
   validates :description, length: { maximum: MAX_DESCRIPTION_LENGTH }, if: :description_changed?
   validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted
-  after_save :create_version
+  after_save :create_version, if: :saved_changes?
 
   has_many :mod_actions, as: :subject, dependent: :destroy
   has_many :reactions, as: :model, dependent: :destroy

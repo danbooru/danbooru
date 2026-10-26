@@ -223,6 +223,29 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal(2, @pool.versions.size)
     end
 
+    should "not create a version if nothing changed" do
+      as(create(:user)) { @pool.update!(post_ids: @pool.post_ids, name: @pool.name) }
+      assert_equal(1, @pool.versions.size)
+    end
+
+    should "not create a version when adding a post that was already added by another request" do
+      stale_pool = Pool.find(@pool.id)
+      as(create(:user)) { @pool.add!(@p1) }
+      as(create(:user)) { stale_pool.add!(@p1) }
+
+      assert_equal([@p1.id], @pool.reload.post_ids)
+      assert_equal(2, @pool.versions.size)
+    end
+
+    should "merge versions made by the same user within the same second" do
+      second = 2.hours.from_now.change(usec: 0)
+      travel_to(second + 0.1, with_usec: true) { @pool.update!(post_ids: [@p1.id]) }
+      travel_to(second + 0.5, with_usec: true) { @pool.update!(post_ids: [@p1.id, @p2.id]) }
+
+      assert_equal(2, @pool.versions.size)
+      assert_equal([@p1.id, @p2.id], @pool.versions.last.added_post_ids)
+    end
+
     should "know what its post ids were previously" do
       @pool.post_ids = [@p1.id]
       assert_equal([], @pool.post_ids_was)

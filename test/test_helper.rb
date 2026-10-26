@@ -1,5 +1,14 @@
 ENV["RAILS_ENV"] = "test"
 
+# PoolVersion and PostVersion connect with DATABASE_URL directly, so if it doesn't name a database they would connect
+# to the development database instead of the test database.
+require "uri"
+database_url = URI(ENV["DATABASE_URL"].to_s)
+if database_url.host.present? && database_url.path.blank?
+  database_url.path = "/danbooru_test"
+  ENV["DATABASE_URL"] = database_url.to_s
+end
+
 # Enable coverage only when COVERAGE is set or when running the whole test suite with `bin/rails test`, not when running individual test files.
 if ENV["COVERAGE"].present?
   require "simplecov"
