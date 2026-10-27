@@ -8,6 +8,21 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "show action" do
+      should "not allow anonymous users to search" do
+        get iqdb_queries_path, params: { post_id: @post.id }
+        assert_response 403
+      end
+
+      should "not allow anonymous users to search with the API" do
+        post iqdb_queries_path(format: :json), params: { search: { post_id: @post.id }}
+        assert_response 403
+      end
+
+      should "allow members to view the search page" do
+        get_auth iqdb_queries_path, @user
+        assert_response :success
+      end
+
       context "with a url parameter" do
         should "use the URL as-is for an image URL" do
           mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])

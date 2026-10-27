@@ -15,6 +15,24 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "use the size URL param" do
+        create(:post, is_pending: true)
+        get_auth modqueue_index_path(size: 225), @admin
+
+        assert_response :success
+        assert_select ".post-preview-225"
+        assert_select ".post-votes"
+      end
+
+      should "use the size cookie" do
+        create(:post, is_pending: true)
+        cookies[:post_preview_size] = "225"
+        get_auth modqueue_index_path, @admin
+
+        assert_response :success
+        assert_select ".post-preview-225"
+      end
+
       should "render for a json response" do
         create(:post, is_pending: true)
         get_auth modqueue_index_path, @admin, as: :json

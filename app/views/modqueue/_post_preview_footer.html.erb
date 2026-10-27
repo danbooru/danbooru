@@ -4,7 +4,7 @@
       <%= render "posts/partials/show/preview_source_footer", post: post %>
     </div>
 
-    <% if @preview_size.to_i > 180 %>
+    <% if preview_size.to_i > 180 %>
       <%= render_post_votes post, current_user: CurrentUser.user %>
     <% end %>
   </div>

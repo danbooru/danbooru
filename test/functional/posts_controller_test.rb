@@ -41,6 +41,67 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#quick-edit-form input.button-primary[type=submit][value=Update]"
         assert_select "#quick-edit-form button.button-outline-primary[type=button][name=cancel]", text: "Cancel"
       end
+          
+      context "the limit param" do
+        setup do
+          @user = create(:user, per_page: 2)
+        end
+
+        should "use the user's per page setting for a blank limit param" do
+          get_auth posts_path(limit: ""), @user
+
+          assert_response :success
+          assert_select ".post-preview", count: 2
+        end
+
+        should "use the limit param" do
+          get_auth posts_path(limit: 1), @user
+
+          assert_response :success
+          assert_select ".post-preview", count: 1
+        end
+      end
+
+      context "thumbnail settings" do
+        should "use the default size and hide votes by default" do
+          get posts_path
+
+          assert_response :success
+          assert_select ".post-preview-180"
+          assert_select ".post-preview-score", count: 0
+          assert_select "a.post-preview-show-votes"
+        end
+
+        should "use the size and show_votes URL params" do
+          get posts_path(size: 225, show_votes: true)
+
+          assert_response :success
+          assert_select ".post-preview-225"
+          assert_select ".post-preview-score"
+          assert_select "a.post-preview-hide-votes"
+        end
+
+        should "use the size and show_votes cookies" do
+          cookies[:post_preview_size] = "225"
+          cookies[:post_preview_show_votes] = "true"
+          get posts_path
+
+          assert_response :success
+          assert_select ".post-preview-225"
+          assert_select ".post-preview-score"
+          assert_select "a.post-preview-hide-votes"
+        end
+
+        should "prefer the URL params over the cookies" do
+          cookies[:post_preview_size] = "225"
+          cookies[:post_preview_show_votes] = "true"
+          get posts_path(size: 150, show_votes: false)
+
+          assert_response :success
+          assert_select ".post-preview-150"
+          assert_select ".post-preview-score", count: 0
+        end
+      end
 
       context "when using sequential pagination" do
         should "work with page=a0" do
@@ -1100,6 +1161,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("bbb", @post.tag_string)
       end
 
+      should "redraw the post preview with the size and show_votes params" do
+        put_auth post_path(@post, format: :js), @user, xhr: true, params: { mode: "tag-script", size: 225, show_votes: true, post: { old_tag_string: "", tag_string: "bbb" }}
+
+        assert_response :success
+        assert_match(/post-preview-225/, response.body)
+        assert_match(/post-preview-score/, response.body)
+      end
+
       should "ignore restricted params" do
         put_auth post_path(@post), @user, params: { post: { last_noted_at: 1.minute.ago }}
         assert_nil(@post.reload.last_noted_at)
@@ -1204,7 +1273,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
+        travel(2.hours)
         as(@user) { @post.update(tag_string: "zzz") }
       end
 

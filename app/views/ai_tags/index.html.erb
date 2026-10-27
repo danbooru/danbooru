@@ -20,7 +20,7 @@
 
         <span class="flex-grow-1"></span>
 
-        <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+        <%= render PreviewSizeMenuComponent.new(current_size: preview_size) %>
 
         <% if @mode == "table" %>
           <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "tab" %>
@@ -33,7 +33,7 @@
     <% if params[:mode] == "table" %>
       <%= render "ai_tags/table" %>
     <% else %>
-      <%= render "ai_tags/gallery", ai_tags: @ai_tags, size: @preview_size %>
+      <%= render "ai_tags/gallery", ai_tags: @ai_tags, size: preview_size %>
     <% end %>
 
     <%= numbered_paginator(@ai_tags) %>

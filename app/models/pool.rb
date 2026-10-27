@@ -18,7 +18,7 @@ class Pool < ApplicationRecord
   validates :description, length: { maximum: MAX_DESCRIPTION_LENGTH }, if: :description_changed?
   validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted
-  after_save :create_version
+  after_save :create_version, if: :saved_changes?
 
   has_many :mod_actions, as: :subject, dependent: :destroy
   has_many :reactions, as: :model, dependent: :destroy
@@ -212,8 +212,23 @@ class Pool < ApplicationRecord
     post_ids[n]
   end
 
-  def cover_post
-    (post_count > 0) ? Post.find(post_ids.first) : nil
+  # Get the cover post for each pool. The cover post is the first visible post in the pool
+  # that the user can see.
+  #
+  # @param pools [Array<Pool>] The pools to get the cover posts for.
+  # @param user [User] The user viewing the pools.
+  # @return [Hash<Pool, Post>] A hash of pools to their cover posts, or nil if the user can't see any posts.
+  def self.cover_posts(pools, user)
+    first_posts = Post.includes(:media_asset).where(id: pools.filter_map { |pool| pool.post_ids.first }).index_by(&:id)
+
+    # After we fetched all the first posts, we make sure they're all visible to the current user.
+    # If not, we fetch in batches until we find the first visible post.
+    pools.index_with do |pool|
+      first_post = first_posts[pool.post_ids.first]
+      next first_post if first_post&.visible?(user)
+
+      pool.post_ids.first(100).drop(1).each_slice(20).lazy.flat_map { |ids| Post.includes(:media_asset).where(id: ids).in_order_of(:id, ids).to_a }.find { |post| post.visible?(user) }
+    end
   end
 
   def create_version(updater: CurrentUser.user)

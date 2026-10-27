@@ -4,12 +4,10 @@ class AITagsController < ApplicationController
   respond_to :js, :html, :json, :xml
 
   def index
-    limit = params[:limit].presence || CurrentUser.user.per_page
     @mode = params.fetch(:mode, "gallery")
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || MediaAssetGalleryComponent::DEFAULT_SIZE
     params[:search][:is_posted] ||= "true" if request.format.html?
 
-    @ai_tags = authorize AITag.visible(CurrentUser.user).paginated_search(params, limit: limit, count_pages: false)
+    @ai_tags = authorize AITag.visible(CurrentUser.user).paginated_search(params, limit: per_page, count_pages: false)
     @ai_tags = @ai_tags.includes(:tag, media_asset: :post) if request.format.html?
 
     respond_with(@ai_tags)
@@ -34,7 +32,6 @@ class AITagsController < ApplicationController
     @post.save
     @ai_tag.errors.add(:base, "Couldn't update post ##{@post.id}: #{@post.errors.full_messages.join("; ")}") if @post.invalid?
 
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
     respond_with(@ai_tag, notice: notice)
   end
 end

@@ -21,7 +21,10 @@ class Source::URL::ArcaLive < Source::URL
     #
     # https://ac.namu.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5.jpg?expires=1772297147&key=6plnf6JeClQOi5WusMFl2g&type=orig
     # https://ac.namu.la/20241126sac/b2175d9ef4504945d3d989526120dbb6aded501ddedfba8ecc44a64e7aae9059.gif?expires=1772296984&key=cMqxse9Pkam6AelmOahWkA&type=orig
-    in _, "namu.la", _date, /\A\h{64}/
+    #
+    # https://ac.arca.live/20261009sac/df84f925b752f60cc32a19395f163e33a3587d64d04d424949575bb62e44ad73.png?expires=1793019627&key=3S9u5y5ovTkcBY_-f_4D2g
+    # https://ac-o.arca.live/20261009sac/df84f925b752f60cc32a19395f163e33a3587d64d04d424949575bb62e44ad73.png?expires=1793019627&key=3S9u5y5ovTkcBY_-f_4D2g&type=orig
+    in _, ("namu.la" | "arca.live"), _date, /\A\h{64}/
       @full_image_url = with_params(type: "orig").to_s
 
     # https://arca.live/b/arknights/66031722

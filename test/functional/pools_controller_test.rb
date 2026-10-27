@@ -47,6 +47,14 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         get gallery_pools_path
         assert_response :success
       end
+
+      should "use the first visible post as the cover" do
+        as(@user) { @pool.update!(category: "series", post_ids: [999_999_999, @post.id]) }
+
+        get gallery_pools_path
+        assert_response :success
+        assert_select "article#post_#{@post.id} a[href='#{pool_path(@pool)}']"
+      end
     end
 
     context "new action" do

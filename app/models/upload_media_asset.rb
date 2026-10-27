@@ -89,8 +89,9 @@ class UploadMediaAsset < ApplicationRecord
     source_url.starts_with?("file://") || source_url.blank?
   end
 
+  # Only warn about bad links for sites with an extractor, since otherwise it's not possible to upload the page instead.
   def bad_link?
-    parsed_canonical_url&.bad_link?
+    parsed_canonical_url&.class&.extractors.present? && parsed_canonical_url.bad_link?
   end
 
   def image_sample?

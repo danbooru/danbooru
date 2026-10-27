@@ -29,7 +29,7 @@
 
       <span class="flex-grow-1"></span>
 
-      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+      <%= render PreviewSizeMenuComponent.new(current_size: preview_size) %>
 
       <% if @mode == "gallery" %>
         <%= link_to list_icon, current_page_path(mode: "list"), title: "List", class: "tab" %>
@@ -40,9 +40,9 @@
   </div>
 
   <% if @mode == "gallery" %>
-    <%= render(PostGalleryComponent.new(size: @preview_size)) do |gallery| %>
+    <%= render(PostGalleryComponent.new(size: preview_size)) do |gallery| %>
       <% @posts.each do |post| %>
-        <% gallery.with_post(post: post, size: @preview_size, classes: "card mod-queue-preview p-2", show_deleted: true) do |preview| %>
+        <% gallery.with_post(post: post, size: preview_size, classes: "card mod-queue-preview p-2", show_deleted: true) do |preview| %>
           <% preview.with_footer do %>
             <%= render "modqueue/post_preview_footer", post: post %>
           <% end %>

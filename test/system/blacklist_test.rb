@@ -57,6 +57,29 @@ class BlacklistChromeTest < ChromeSystemTestCase
 
           assert_post_blurred @blacklisted_post
         end
+
+        should "blur posts for newly added rules" do
+          toggle_blacklist_option("Blur images")
+          assert_post_blurred @blacklisted_post
+
+          User.any_instance.stubs(:blacklisted_tags).returns("1girl\n2girls\nsafe")
+          visit posts_path
+
+          assert_post_blurred @blacklisted_post
+          assert_post_blurred @safe_post
+        end
+
+        should "remove the blur setting of rules removed from the blacklist" do
+          toggle_blacklist_option("Blur images")
+          assert_post_blurred @blacklisted_post
+          assert_not_nil page.evaluate_script(%{localStorage.getItem("blacklist.hideMethod:2girls")})
+
+          User.any_instance.stubs(:blacklisted_tags).returns("1girl")
+          visit posts_path
+
+          assert_post_blurred @blacklisted_post
+          assert_nil page.evaluate_script(%{localStorage.getItem("blacklist.hideMethod:2girls")})
+        end
       end
 
       context "blacklist.showall" do
@@ -93,6 +116,24 @@ class BlacklistChromeTest < ChromeSystemTestCase
 
           toggle_blacklist_enabled
           assert_hidden "#blacklist-box a", text: "1girl"
+        end
+      end
+
+      context "toggling the blacklist" do
+        should "toggle all rules, including rules not matching any posts on the current page" do
+          @other_post = create(:post, tag_string: "2girls")
+
+          visit posts_path(tags: "1girl")
+          toggle_blacklist_enabled
+          assert_post_not_blacklisted @blacklisted_post
+
+          visit posts_path(tags: "2girls")
+          assert_post_not_blacklisted @other_post
+          toggle_blacklist_enabled
+          assert_post_hidden @other_post
+
+          visit posts_path(tags: "1girl")
+          assert_post_hidden @blacklisted_post
         end
       end
     end

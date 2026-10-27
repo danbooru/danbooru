@@ -57,6 +57,14 @@ class UploadPostComponentTest < ViewComponent::TestCase
       assert_css(".upload-warning-details .upload-bad-source-warning a[href='#{wiki_page_path("bad_twitter_link")}']")
     end
 
+    should "not show a bad source warning for image URLs from sites without an extractor" do
+      upload = create(:completed_source_upload, upload_media_assets: [build(:upload_media_asset, source_url: "https://kitztqqrsr.hath.network/om/118110641/05c19376ef2e1a56e8b5dbbe97209ca11880c946-4635509-2378-3375-png/x/0/3dtbckd27vd3zu1x8w1/kitikuourance_shokaibon_139.png", status: "active")])
+
+      render_upload_post_component(upload.upload_media_assets.first)
+
+      assert_no_css(".upload-bad-source-warning")
+    end
+
     should "show an ai-generated warning for ai-generated files" do
       media_asset = build(:media_asset, file_ext: "png", media_metadata: build(:media_metadata, metadata: { "PNG:Software" => "NovelAI" }))
       upload = create(:completed_file_upload, upload_media_assets: [build(:upload_media_asset, media_asset: media_asset, status: "active")])

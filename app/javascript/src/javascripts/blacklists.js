@@ -16,6 +16,7 @@ class Blacklist {
     this.root.blacklist = this;
 
     this.rules = rules.map(rule => new Rule(this, rule));
+    this.initializeRulesWithoutHideMethod();
     this.posts = $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview").toArray().map(post => new Post(post, this));
     this.apply();
     this.cleanupStorage();
@@ -39,7 +40,7 @@ class Blacklist {
       this.collapsed = value;
     }
 
-    this.visibleRules.forEach(rule => { rule.enabled = Boolean(value) });
+    this.rules.forEach(rule => { rule.enabled = Boolean(value) });
     this.posts.forEach(post => post.update());
   }
 
@@ -102,14 +103,23 @@ class Blacklist {
     return new Set(this.blacklistedPosts.map(post => post.post.dataset.id)).size;
   }
 
+  // Give newly added rules the same blur setting as the existing rules.
+  initializeRulesWithoutHideMethod() {
+    let hideMethod = this.blurImages ? "blur" : "hide";
+    this.rules
+      .filter(rule => localStorage.getItem(`blacklist.hideMethod:${rule.string}`) === null)
+      .forEach(rule => { rule.hideMethod = hideMethod; });
+  }
+
   // Remove from storage any rules that have been removed from the blacklist.
   cleanupStorage() {
     Cookie.remove("dab");
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith("blacklist.enabled:") && !this.rules.some(rule => key === `blacklist.enabled:${rule.string}`)) {
-        localStorage.removeItem(key);
-      }
-    });
+    let prefixes = ["blacklist.enabled:", "blacklist.hideMethod:"];
+    let keys = new Set(prefixes.flatMap(prefix => this.rules.map(rule => `${prefix}${rule.string}`)));
+
+    Object.keys(localStorage)
+      .filter(key => prefixes.some(prefix => key.startsWith(prefix)) && !keys.has(key))
+      .forEach(key => localStorage.removeItem(key));
   }
 }
 

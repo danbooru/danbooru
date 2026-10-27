@@ -19,7 +19,6 @@ class PostsController < ApplicationController
       redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol)
     else
       @posts = authorize post_set.posts, policy_class: PostPolicy
-      @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
       raise PageRemovedError if request.format.html? && post_set.banned_artist?
 
       respond_with(@posts) do |format|
@@ -80,8 +79,6 @@ class PostsController < ApplicationController
   def update
     @post = authorize Post.find(params[:id])
     @post.update(permitted_attributes(@post))
-    @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
     respond_with_post_after_update(@post)
   end
 
@@ -141,8 +138,7 @@ class PostsController < ApplicationController
   def post_set
     @post_set ||= begin
       tag_query = params[:tags] || params.dig(:post, :tags)
-      show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
-      PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, show_votes: show_votes)
+      PostSets::Post.new(tag_query, params[:page], params[:limit].presence, format: request.format.symbol, show_votes: show_votes?)
     end
   end
 

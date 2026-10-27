@@ -13,6 +13,50 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      context "the limit param" do
+        setup do
+          create_list(:media_asset, 2)
+          @user = create(:user, per_page: 2)
+        end
+
+        should "use the user's per page setting by default" do
+          get_auth media_assets_path, @user, as: :json
+          assert_equal(2, response.parsed_body.size)
+        end
+
+        should "use the limit param" do
+          get_auth media_assets_path(limit: 1), @user, as: :json
+          assert_equal(1, response.parsed_body.size)
+        end
+
+        should "use the user's per page setting for a blank limit param" do
+          get_auth media_assets_path(limit: ""), @user, as: :json
+          assert_equal(2, response.parsed_body.size)
+        end
+      end
+
+      should "use the default size" do
+        get media_assets_path
+
+        assert_response :success
+        assert_select ".media-asset-preview-180"
+      end
+
+      should "use the size URL param" do
+        get media_assets_path(size: 225)
+
+        assert_response :success
+        assert_select ".media-asset-preview-225"
+      end
+
+      should "use the size cookie" do
+        cookies[:post_preview_size] = "225"
+        get media_assets_path
+
+        assert_response :success
+        assert_select ".media-asset-preview-225"
+      end
+
       should respond_to_search.with { @media_asset }
       should respond_to_search(metadata: { "File:ColorComponents" => 3 }).with { @media_asset }
       should respond_to_search(metadata: { "File:ColorComponents" => 4 }).with { [] }

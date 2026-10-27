@@ -23,17 +23,17 @@ class ApplicationRecord < ActiveRecord::Base
       # @param params [Hash] The URL request params from the user
       # @param page [Integer] The page number
       # @param limit [Integer] The number of posts per page
+      # @param max_limit [Integer] The maximum number of posts per page
       # @param count_pages [Boolean] If true, calculate the exact number of pages of
       #   results. If false (the default), don't calculate the exact number of pages
       #   of results; assume there are too many pages to count.
       # @param count [Integer] the precalculated number of search results, or nil to calculate it
       # @param defaults [Hash] The default params for the search
       # @param current_user [User] The user performing the search
-      def paginated_search(params, page: params[:page], limit: params[:limit], count_pages: params[:search].present?, count: nil, defaults: {}, current_user: CurrentUser.user)
+      def paginated_search(params, page: params[:page], limit: params[:limit], max_limit: (params[:format] == "sitemap") ? 10_000 : 1_000, count_pages: params[:search].present?, count: nil, defaults: {}, current_user: CurrentUser.user)
         search_params = params.fetch(:search, {}).permit!
         search_params = defaults.merge(search_params).with_indifferent_access
 
-        max_limit = (params[:format] == "sitemap") ? 10_000 : 1_000
         search(search_params, current_user).paginate(page, limit: limit, max_limit: max_limit, count: count, search_count: count_pages)
       end
     end

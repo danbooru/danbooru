@@ -15,9 +15,10 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has multiple versions: " do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = create(:post, tag_string: "1")
+        travel(2.hours)
         @post.update(tag_string: "1 2")
+        travel(2.hours)
         @post.update(tag_string: "2 3")
       end
 
@@ -31,6 +32,16 @@ class PostVersionTest < ActiveSupport::TestCase
           assert_equal("1 2", @version.previous.tags)
         end
       end
+    end
+
+    should "merge versions made by the same user within the same second" do
+      @post = create(:post, tag_string: "aaa")
+      second = 2.hours.from_now.change(usec: 0)
+      travel_to(second + 0.1, with_usec: true) { @post.update!(tag_string: "aaa bbb") }
+      travel_to(second + 0.5, with_usec: true) { @post.update!(tag_string: "aaa bbb ccc") }
+
+      assert_equal(2, @post.versions.size)
+      assert_equal(%w[bbb ccc], @post.versions.last.added_tags)
     end
 
     context "that has been created" do
@@ -80,8 +91,8 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has been updated" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = create(:post, created_at: 1.minute.ago, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com")
+        travel(2.hours)
         @post.update(tag_string: "bbb ccc xxx", source: "")
       end
 
@@ -134,9 +145,10 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "#undo" do
       setup do
-        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = create(:post, tag_string: "1")
+        travel(2.hours)
         @post.update(tag_string: "1 2")
+        travel(2.hours)
         @post.update(tag_string: "2 3")
       end
 

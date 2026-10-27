@@ -223,6 +223,29 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal(2, @pool.versions.size)
     end
 
+    should "not create a version if nothing changed" do
+      as(create(:user)) { @pool.update!(post_ids: @pool.post_ids, name: @pool.name) }
+      assert_equal(1, @pool.versions.size)
+    end
+
+    should "not create a version when adding a post that was already added by another request" do
+      stale_pool = Pool.find(@pool.id)
+      as(create(:user)) { @pool.add!(@p1) }
+      as(create(:user)) { stale_pool.add!(@p1) }
+
+      assert_equal([@p1.id], @pool.reload.post_ids)
+      assert_equal(2, @pool.versions.size)
+    end
+
+    should "merge versions made by the same user within the same second" do
+      second = 2.hours.from_now.change(usec: 0)
+      travel_to(second + 0.1, with_usec: true) { @pool.update!(post_ids: [@p1.id]) }
+      travel_to(second + 0.5, with_usec: true) { @pool.update!(post_ids: [@p1.id, @p2.id]) }
+
+      assert_equal(2, @pool.versions.size)
+      assert_equal([@p1.id, @p2.id], @pool.versions.last.added_post_ids)
+    end
+
     should "know what its post ids were previously" do
       @pool.post_ids = [@p1.id]
       assert_equal([], @pool.post_ids_was)
@@ -292,6 +315,51 @@ class PoolTest < ActiveSupport::TestCase
     should "find the neighbors for the last post" do
       assert_equal(@p2.id, @pool.previous_post_id(@p3.id))
       assert_nil(@pool.next_post_id(@p3.id))
+    end
+  end
+
+  context "The cover posts" do
+    setup do
+      @banned = create(:post, is_banned: true)
+      @visible1 = create(:post)
+      @visible2 = create(:post)
+    end
+
+    should "be the first post of each pool" do
+      @pool1 = create(:pool, post_ids: [@visible2.id, @visible1.id])
+      @pool2 = create(:pool, post_ids: [@visible1.id, @visible2.id])
+
+      assert_equal({ @pool1 => @visible2, @pool2 => @visible1 }, Pool.cover_posts([@pool1, @pool2], @user))
+    end
+
+    should "skip nonexistent posts and posts the user can't see" do
+      @pool = create(:pool, post_ids: [999_999_999, @banned.id, @visible2.id, @visible1.id])
+
+      assert_equal(@visible2, Pool.cover_posts([@pool], @user)[@pool])
+    end
+
+    should "include banned posts for users who can see them" do
+      @pool = create(:pool, post_ids: [@banned.id, @visible1.id])
+
+      assert_equal(@banned, Pool.cover_posts([@pool], create(:approver))[@pool])
+    end
+
+    should "be nil if the user can't see any posts" do
+      @pool = create(:pool, post_ids: [999_999_999, @banned.id])
+
+      assert_nil(Pool.cover_posts([@pool], @user)[@pool])
+    end
+
+    should "only check the first 100 posts" do
+      @pool = create(:pool, post_ids: [*(1..100).map { |n| 999_999_000 + n }, @visible1.id])
+
+      assert_nil(Pool.cover_posts([@pool], @user)[@pool])
+    end
+
+    should "be nil for an empty pool" do
+      @pool = create(:pool)
+
+      assert_nil(Pool.cover_posts([@pool], @user)[@pool])
     end
   end
 end
