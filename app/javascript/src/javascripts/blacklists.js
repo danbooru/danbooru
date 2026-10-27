@@ -40,7 +40,7 @@ class Blacklist {
       this.collapsed = value;
     }
 
-    this.visibleRules.forEach(rule => { rule.enabled = Boolean(value) });
+    this.rules.forEach(rule => { rule.enabled = Boolean(value) });
     this.posts.forEach(post => post.update());
   }
 

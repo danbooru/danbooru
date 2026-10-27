@@ -106,6 +106,24 @@ class BlacklistChromeTest < ChromeSystemTestCase
           assert_hidden "#blacklist-box a", text: "1girl"
         end
       end
+
+      context "toggling the blacklist" do
+        should "toggle all rules, including rules not matching any posts on the current page" do
+          @other_post = create(:post, tag_string: "2girls")
+
+          visit posts_path(tags: "1girl")
+          toggle_blacklist_enabled
+          assert_post_not_blacklisted @blacklisted_post
+
+          visit posts_path(tags: "2girls")
+          assert_post_not_blacklisted @other_post
+          toggle_blacklist_enabled
+          assert_post_hidden @other_post
+
+          visit posts_path(tags: "1girl")
+          assert_post_hidden @blacklisted_post
+        end
+      end
     end
 
     context "on the /comments page" do
