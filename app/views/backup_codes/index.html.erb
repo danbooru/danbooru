@@ -46,7 +46,7 @@
         <%= link_to "Continue", @url, class: "button-primary" %>
       <% else %>
         <%= edit_form_for(:backup_codes, url: user_backup_codes_path(@user), method: "post") do |f| %>
-          <%= f.submit "Generate new codes", class: "button-primary" %>
+          <%= f.submit_button "Generate new codes" %>
         <% end %>
       <% end %>
     </div>

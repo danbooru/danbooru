@@ -476,6 +476,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         should "show the resend confirmation email page" do
           get_auth verify_user_email_path(@user), @user
           assert_response :success
+          assert_select "input.button-primary[type=submit][value=?]", "Send confirmation email"
         end
       end
 

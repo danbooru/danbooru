@@ -295,7 +295,7 @@ module ApplicationHelper
     options[:html] = { autocomplete: "off", novalidate: !validate, **options[:html].to_h }
     options[:authenticity_token] = true if options[:remote] == true
 
-    simple_form_for(model, **options) do |form|
+    simple_form_for(model, builder: Danbooru::FormBuilder, **options) do |form|
       if error_notice && model.try(:errors).try(:any?)
         error_msg = formatted_errors ? format_errors(model.errors) : model.errors.full_messages.join("; ")
         concat tag.div(format_text(error_msg), class: "notice notice-error notice-small prose")

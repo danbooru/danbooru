@@ -14,7 +14,7 @@
     </ul>
 
     <%= edit_form_for(@favorite_group, :format => :js, :html => {:id => "ordering-form"}) do |f| %>
-      <%= submit_tag "Save" %>
+      <%= f.submit_button %>
     <% end %>
   </div>
 </div>

@@ -129,9 +129,9 @@
 
     <% if policy(forum_post).update? %>
       <% if forum_post.is_original_post?(original_forum_post_id) %>
-        <%= render "forum_topics/form", forum_topic: forum_post.topic %>
+        <%= render "forum_topics/form", forum_topic: forum_post.topic, inline: true %>
       <% else %>
-        <%= render "forum_posts/partials/edit/form", forum_post: forum_post %>
+        <%= render "forum_posts/partials/edit/form", forum_post: forum_post, inline: true %>
       <% end %>
     <% end %>
   </div>

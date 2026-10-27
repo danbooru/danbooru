@@ -7,5 +7,6 @@
 
   <%= f.input :body, as: :dtext, editor_html: { class: "dtext-editor-large" } %>
 
-  <%= f.button :submit, "Submit", class: "button-primary" %>
+  <%= f.submit_button "Post" %>
+  <%= f.cancel_button if local_assigns[:inline] %>
 <% end %>

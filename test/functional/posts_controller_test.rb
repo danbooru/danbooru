@@ -35,6 +35,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         create_list(:post, 2)
       end
 
+      should "render the quick edit form buttons" do
+        get posts_path
+        assert_response :success
+        assert_select "#quick-edit-form input.button-primary[type=submit][value=Update]"
+        assert_select "#quick-edit-form button.button-outline-primary[type=button][name=cancel]", text: "Cancel"
+      end
+          
       context "the limit param" do
         setup do
           @user = create(:user, per_page: 2)
@@ -653,6 +660,32 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get post_path(@post), params: { id: @post.id }
         assert_response :success
+      end
+
+      should "render the add to pool form" do
+        get_auth post_path(@post), @user
+        assert_response :success
+        assert_select "#add-to-pool-dialog form[action=?]", "/pool_element.js" do
+          assert_select "input[type=hidden][name=post_id][value=?]", @post.id.to_s
+          assert_select "input[name=pool_name]"
+          assert_select "input.button-primary[type=submit][value=Add]"
+          assert_select "button[name=cancel]", text: "Cancel"
+        end
+      end
+
+      should "render the mark as translated form" do
+        get_auth post_path(@post), @user
+        assert_response :success
+        assert_select "#mark-as-translated-section input.button-primary[type=submit][value=?]", "Mark as translated"
+      end
+
+      should "show a cancel button on the inline comment forms" do
+        as(@user) { create(:comment, creator: @user, post: @post) }
+        get_auth post_path(@post), @user
+
+        assert_response :success
+        assert_select ".new-comment form button[name=cancel]", text: "Cancel"
+        assert_select "article.comment form button[name=cancel]", text: "Cancel"
       end
 
       context "with everything" do

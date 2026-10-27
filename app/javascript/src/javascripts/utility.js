@@ -1,4 +1,3 @@
-import Rails from '@rails/ujs';
 import { delegate, hideAll } from 'tippy.js';
 import Notice from './notice';
 import capitalize from "lodash/capitalize";
@@ -55,21 +54,6 @@ Utility.dialog = function(title, html) {
       // form is submitted (which would prevent the submission from going through).
       $(() => $dialog.dialog("destroy"));
     },
-    buttons: {
-      "Submit": function() {
-        let form = $dialog.find("form").get(0);
-
-        if (form.requestSubmit) {
-          form.requestSubmit();
-        } else {
-          form.submit();
-          Rails.fire(form, "submit");
-        }
-      },
-      "Cancel": function() {
-        $dialog.dialog("close");
-      }
-    }
   });
 
   $dialog.find("form").on("submit.danbooru", function() {
@@ -79,6 +63,17 @@ Utility.dialog = function(title, html) {
   // XXX hides the popup menu when the Report comment button is clicked.
   hideAll({ duration: 0 });
 }
+
+Utility.closeDialog = function() {
+  $(this).closest(".ui-dialog-content").dialog("close");
+};
+
+// Don't submit dialog forms when Enter is pressed in a text field. Ctrl+Enter submits them instead.
+Utility.preventDialogSubmitOnEnter = function(event) {
+  if (event.key === "Enter" && !event.ctrlKey && !event.metaKey) {
+    event.preventDefault();
+  }
+};
 
 Utility.keydown = function(keys, namespace, handler, selector = document) {
   $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
@@ -259,5 +254,10 @@ $.fn.selectEnd = function() {
 Utility.copyToClipboard = copyToClipboard;
 Utility.printPage = printPage;
 Utility.alpineReady = alpineReady;
+
+$(function() {
+  $(document).on("click.danbooru", ".ui-dialog-content button[name=cancel]", Utility.closeDialog);
+  $(document).on("keydown.danbooru", ".ui-dialog-content form input[type=text]", Utility.preventDialogSubmitOnEnter);
+});
 
 export default Utility

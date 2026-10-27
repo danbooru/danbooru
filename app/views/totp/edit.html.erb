@@ -50,7 +50,7 @@
         <%= edit_form_for(@totp, url: user_totp_path(@user), method: "put", html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
           <%= f.input :signed_secret, as: :hidden, input_html: { value: @totp.signed_secret } %>
           <%= f.input :verification_code, placeholder: "123456", hint: "Enter the 6-digit code from your app", required: true, minlength: 6, maxlength: 6, pattern: '\d+', input_html: { value: nil } %>
-          <%= f.submit "Enable", class: "button-primary", disabled: true %>
+          <%= f.submit_button "Enable", disabled: true %>
         <% end %>
       <% end %>
     </div>

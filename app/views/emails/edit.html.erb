@@ -34,7 +34,7 @@
 
         <div>
           <% if policy(@email_address).update? %>
-            <%= f.submit "Save", class: "button-primary" %>
+            <%= f.submit_button "Save" %>
           <% end %>
 
           <% if policy(@email_address).destroy? && @email_address.persisted? %>

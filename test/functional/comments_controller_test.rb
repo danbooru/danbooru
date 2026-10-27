@@ -281,6 +281,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         get_auth new_comment_path, @user
         assert_response :success
+        assert_select "button[name=cancel]", false
       end
 
       should "work when quoting a post" do

@@ -2,5 +2,5 @@
   <%= f.input :to_name, :label => "To", :input_html => { value: dmail.to.try(:name), data: { autocomplete: "user" } } %>
   <%= f.input :title, :as => :string %>
   <%= f.input :body, as: :dtext %>
-  <%= f.button :submit, "Send", :data => { :disable_with => "Sending..." } %>
+  <%= f.submit_button "Send", data: { disable_with: "Sending..." } %>
 <% end %>

@@ -22,7 +22,7 @@
           <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "deprecate #{@tag.name}" }) %> to mark this tag as deprecated.</p>
         <% end %>
       <% end %>
-      <%= f.button :submit, "Submit" %>
+      <%= f.submit_button %>
     <% end %>
   </div>
 </div>

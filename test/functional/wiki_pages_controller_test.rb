@@ -226,6 +226,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get_auth new_wiki_page_path, @mod, params: { wiki_page: { title: "test" }}
         assert_response :success
+        assert_select "input.button-primary[type=submit][value=Create]"
       end
 
       should "render without a title" do
@@ -239,6 +240,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         @wiki_page = as(@user) { create(:wiki_page) }
         get_auth edit_wiki_page_path(@wiki_page), @user
         assert_response :success
+        assert_select "input.button-primary[type=submit][value=Update]"
       end
     end
 

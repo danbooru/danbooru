@@ -8,5 +8,5 @@
   <% else %>
     <%= f.input :is_private, label: "Private", as: :boolean, hint: link_to("Upgrade to Gold to enable private favgroups", new_user_upgrade_path), input_html: { disabled: true } %>
   <% end %>
-  <%= f.submit "Submit" %>
+  <%= f.submit_button %>
 <% end %>
