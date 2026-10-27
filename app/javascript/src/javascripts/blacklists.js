@@ -114,11 +114,12 @@ class Blacklist {
   // Remove from storage any rules that have been removed from the blacklist.
   cleanupStorage() {
     Cookie.remove("dab");
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith("blacklist.enabled:") && !this.rules.some(rule => key === `blacklist.enabled:${rule.string}`)) {
-        localStorage.removeItem(key);
-      }
-    });
+    let prefixes = ["blacklist.enabled:", "blacklist.hideMethod:"];
+    let keys = new Set(prefixes.flatMap(prefix => this.rules.map(rule => `${prefix}${rule.string}`)));
+
+    Object.keys(localStorage)
+      .filter(key => prefixes.some(prefix => key.startsWith(prefix)) && !keys.has(key))
+      .forEach(key => localStorage.removeItem(key));
   }
 }
 

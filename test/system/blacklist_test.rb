@@ -68,6 +68,18 @@ class BlacklistChromeTest < ChromeSystemTestCase
           assert_post_blurred @blacklisted_post
           assert_post_blurred @safe_post
         end
+
+        should "remove the blur setting of rules removed from the blacklist" do
+          toggle_blacklist_option("Blur images")
+          assert_post_blurred @blacklisted_post
+          assert_not_nil page.evaluate_script(%{localStorage.getItem("blacklist.hideMethod:2girls")})
+
+          User.any_instance.stubs(:blacklisted_tags).returns("1girl")
+          visit posts_path
+
+          assert_post_blurred @blacklisted_post
+          assert_nil page.evaluate_script(%{localStorage.getItem("blacklist.hideMethod:2girls")})
+        end
       end
 
       context "blacklist.showall" do
