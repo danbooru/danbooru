@@ -21,7 +21,7 @@ module PostArchiveTestHelper
         previous = find_previous(previous.post_id, previous.updated_at)
       end
 
-      subject.update!(
+      subject.assign_attributes(
         post_id: json["post_id"],
         tags: tags.join(" "),
         added_tags: tags - (previous&.tag_array || []),
@@ -35,6 +35,8 @@ module PostArchiveTestHelper
         source: json["source"],
         source_changed: previous.nil? || json["source"] != previous.source,
       )
+      # XXX change this to `save!` and fix tests that don't set current user.
+      subject.save
     end
 
     def find_previous(post_id, updated_at)

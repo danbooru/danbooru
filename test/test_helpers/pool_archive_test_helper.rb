@@ -20,7 +20,7 @@ module PoolArchiveTestHelper
         previous = find_previous(previous.pool_id, previous.updated_at)
       end
 
-      subject.update!(
+      subject.assign_attributes(
         **json.symbolize_keys,
         updated_at: updated_at,
         added_post_ids: json["post_ids"] - (previous&.post_ids || []),
@@ -28,6 +28,7 @@ module PoolArchiveTestHelper
         description_changed: previous.nil? || json["description"] != previous.description,
         name_changed: previous.nil? || json["name"] != previous.name,
       )
+      subject.save!
     end
 
     def find_previous(pool_id, updated_at)
