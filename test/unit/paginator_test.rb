@@ -65,4 +65,16 @@ class PaginatorTest < ActiveSupport::TestCase
       assert_equal(true, Post.paginate(6, limit: 1).is_last_page?)
     end
   end
+
+  context "the limit" do
+    should "use the default limit when the limit is blank" do
+      assert_equal(Danbooru.config.posts_per_page, Post.paginate(1, limit: "").records_per_page)
+      assert_equal(Danbooru.config.posts_per_page, Post.paginate(1, limit: nil).records_per_page)
+    end
+
+    should "be clamped between 1 and max_limit" do
+      assert_equal(1, Post.paginate(1, limit: 0).records_per_page)
+      assert_equal(3, Post.paginate(1, limit: 5, max_limit: 3).records_per_page)
+    end
+  end
 end

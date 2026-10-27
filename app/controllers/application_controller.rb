@@ -345,4 +345,12 @@ class ApplicationController < ActionController::Base
   def preview_size
     params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
   end
+
+  # The number of items per page. Taken from the `limit` URL param if present, otherwise from the user's "Posts per
+  # page" setting.
+  #
+  # @return [String, Integer] The number of items per page. The paginator clamps it to its maximum.
+  def per_page
+    params[:limit].presence || CurrentUser.user.per_page
+  end
 end

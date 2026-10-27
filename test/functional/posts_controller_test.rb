@@ -35,6 +35,26 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         create_list(:post, 2)
       end
 
+      context "the limit param" do
+        setup do
+          @user = create(:user, per_page: 2)
+        end
+
+        should "use the user's per page setting for a blank limit param" do
+          get_auth posts_path(limit: ""), @user
+
+          assert_response :success
+          assert_select ".post-preview", count: 2
+        end
+
+        should "use the limit param" do
+          get_auth posts_path(limit: 1), @user
+
+          assert_response :success
+          assert_select ".post-preview", count: 1
+        end
+      end
+
       context "thumbnail settings" do
         should "use the default size and hide votes by default" do
           get posts_path

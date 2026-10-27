@@ -138,7 +138,7 @@ class PostsController < ApplicationController
   def post_set
     @post_set ||= begin
       tag_query = params[:tags] || params.dig(:post, :tags)
-      PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, show_votes: show_votes?)
+      PostSets::Post.new(tag_query, params[:page], params[:limit].presence, format: request.format.symbol, show_votes: show_votes?)
     end
   end
 

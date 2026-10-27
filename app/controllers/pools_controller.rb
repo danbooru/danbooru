@@ -14,10 +14,8 @@ class PoolsController < ApplicationController
   end
 
   def show
-    limit = params[:limit].presence || CurrentUser.user.per_page
-
     @pool = authorize Pool.find(params[:id])
-    @posts = @pool.posts.paginate(params[:page], limit: limit, count: @pool.post_count)
+    @posts = @pool.posts.paginate(params[:page], limit: per_page, count: @pool.post_count)
     respond_with(@pool)
   end
 
@@ -32,10 +30,9 @@ class PoolsController < ApplicationController
   end
 
   def gallery
-    limit = params[:limit].presence || CurrentUser.user.per_page
     search = search_params.presence || ActionController::Parameters.new(category: "series")
 
-    @pools = authorize Pool.search(search, CurrentUser.user).paginate(params[:page], limit: limit, search_count: params[:search])
+    @pools = authorize Pool.search(search, CurrentUser.user).paginate(params[:page], limit: per_page, search_count: params[:search])
     @cover_posts = Pool.cover_posts(@pools, CurrentUser.user) if request.format.html?
     respond_with(@pools)
   end

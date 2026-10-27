@@ -12,10 +12,8 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def show
-    limit = params[:limit].presence || CurrentUser.user.per_page
-
     @favorite_group = authorize FavoriteGroup.find(params[:id])
-    @posts = @favorite_group.posts.paginate(params[:page], limit: limit, count: @favorite_group.post_count)
+    @posts = @favorite_group.posts.paginate(params[:page], limit: per_page, count: @favorite_group.post_count)
 
     respond_with(@favorite_group)
   end

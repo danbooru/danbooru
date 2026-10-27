@@ -26,6 +26,25 @@ class ApplicationRecordTest < ActiveSupport::TestCase
     end
   end
 
+  context "ApplicationRecord#paginated_search" do
+    setup do
+      @user = create(:user)
+    end
+
+    should "allow up to 1000 results per page by default" do
+      assert_equal(1000, as(@user) { Tag.paginated_search(ActionController::Parameters.new, limit: 5000).records_per_page })
+    end
+
+    should "allow up to 10000 results per page for sitemaps" do
+      assert_equal(10_000, as(@user) { Tag.paginated_search(ActionController::Parameters.new(format: "sitemap"), limit: 50_000).records_per_page })
+    end
+
+    should "not allow more than max_limit results per page" do
+      assert_equal(2, as(@user) { Tag.paginated_search(ActionController::Parameters.new, limit: 5, max_limit: 2).records_per_page })
+      assert_equal(2, as(@user) { Tag.paginated_search(ActionController::Parameters.new, limit: 5, max_limit: 2).size })
+    end
+  end
+
   context "ApplicationRecord#destroy_duplicates!" do
     should "destroy all duplicates" do
       @post1 = create(:post, score: 42)

@@ -7,8 +7,7 @@ module Explore
     def popular
       @date, @scale, @min_date, @max_date = parse_date(params)
 
-      limit = params.fetch(:limit, CurrentUser.user.per_page)
-      @posts = popular_posts(@min_date, @max_date).paginate(params[:page], limit: limit, search_count: false)
+      @posts = popular_posts(@min_date, @max_date).paginate(params[:page], limit: per_page, search_count: false)
       authorize @posts, policy_class: ExplorePostPolicy
 
       respond_with(@posts)
