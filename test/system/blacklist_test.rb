@@ -57,6 +57,17 @@ class BlacklistChromeTest < ChromeSystemTestCase
 
           assert_post_blurred @blacklisted_post
         end
+
+        should "blur posts for newly added rules" do
+          toggle_blacklist_option("Blur images")
+          assert_post_blurred @blacklisted_post
+
+          User.any_instance.stubs(:blacklisted_tags).returns("1girl\n2girls\nsafe")
+          visit posts_path
+
+          assert_post_blurred @blacklisted_post
+          assert_post_blurred @safe_post
+        end
       end
 
       context "blacklist.showall" do

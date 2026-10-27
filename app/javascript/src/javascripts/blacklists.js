@@ -16,6 +16,7 @@ class Blacklist {
     this.root.blacklist = this;
 
     this.rules = rules.map(rule => new Rule(this, rule));
+    this.initializeRulesWithoutHideMethod();
     this.posts = $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview").toArray().map(post => new Post(post, this));
     this.apply();
     this.cleanupStorage();
@@ -100,6 +101,14 @@ class Blacklist {
 
   get blacklistedPostCount() {
     return new Set(this.blacklistedPosts.map(post => post.post.dataset.id)).size;
+  }
+
+  // Give newly added rules the same blur setting as the existing rules.
+  initializeRulesWithoutHideMethod() {
+    let hideMethod = this.blurImages ? "blur" : "hide";
+    this.rules
+      .filter(rule => localStorage.getItem(`blacklist.hideMethod:${rule.string}`) === null)
+      .forEach(rule => { rule.hideMethod = hideMethod; });
   }
 
   // Remove from storage any rules that have been removed from the blacklist.
