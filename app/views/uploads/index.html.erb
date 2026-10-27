@@ -21,7 +21,7 @@
 
         <span class="flex-1"></span>
 
-        <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+        <%= render PreviewSizeMenuComponent.new(current_size: preview_size) %>
 
         <% if @mode == "table" %>
           <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "tab" %>
@@ -32,7 +32,7 @@
     </div>
 
     <% if @mode == "gallery" %>
-      <%= render "uploads/gallery", uploads: @uploads, size: @preview_size %>
+      <%= render "uploads/gallery", uploads: @uploads, size: preview_size %>
     <% elsif @mode == "table" %>
       <%= render "uploads/table", uploads: @uploads %>
     <% end %>

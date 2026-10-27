@@ -13,6 +13,28 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "use the default size" do
+        get media_assets_path
+
+        assert_response :success
+        assert_select ".media-asset-preview-180"
+      end
+
+      should "use the size URL param" do
+        get media_assets_path(size: 225)
+
+        assert_response :success
+        assert_select ".media-asset-preview-225"
+      end
+
+      should "use the size cookie" do
+        cookies[:post_preview_size] = "225"
+        get media_assets_path
+
+        assert_response :success
+        assert_select ".media-asset-preview-225"
+      end
+
       should respond_to_search.with { @media_asset }
       should respond_to_search(metadata: { "File:ColorComponents" => 3 }).with { @media_asset }
       should respond_to_search(metadata: { "File:ColorComponents" => 4 }).with { [] }

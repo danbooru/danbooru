@@ -14,11 +14,11 @@
 
         <span class="flex-1"></span>
 
-        <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+        <%= render PreviewSizeMenuComponent.new(current_size: preview_size) %>
       </div>
     </div>
 
-    <%= render "upload_media_assets/gallery", upload_media_assets: @upload_media_assets, size: @preview_size %>
+    <%= render "upload_media_assets/gallery", upload_media_assets: @upload_media_assets, size: preview_size %>
 
     <%= numbered_paginator(@upload_media_assets) %>
   </div>

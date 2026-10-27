@@ -30,14 +30,14 @@
 
         <span class="flex-grow-1"></span>
 
-        <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+        <%= render PreviewSizeMenuComponent.new(current_size: preview_size) %>
       </div>
     </div>
 
     <% if params[:mode] == "table" %>
       <%= render "media_assets/table" %>
     <% else %>
-      <%= render "media_assets/gallery", media_assets: @media_assets, size: @preview_size %>
+      <%= render "media_assets/gallery", media_assets: @media_assets, size: preview_size %>
     <% end %>
 
     <%= numbered_paginator(@media_assets) %>

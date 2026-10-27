@@ -35,6 +35,47 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         create_list(:post, 2)
       end
 
+      context "thumbnail settings" do
+        should "use the default size and hide votes by default" do
+          get posts_path
+
+          assert_response :success
+          assert_select ".post-preview-180"
+          assert_select ".post-preview-score", count: 0
+          assert_select "a.post-preview-show-votes"
+        end
+
+        should "use the size and show_votes URL params" do
+          get posts_path(size: 225, show_votes: true)
+
+          assert_response :success
+          assert_select ".post-preview-225"
+          assert_select ".post-preview-score"
+          assert_select "a.post-preview-hide-votes"
+        end
+
+        should "use the size and show_votes cookies" do
+          cookies[:post_preview_size] = "225"
+          cookies[:post_preview_show_votes] = "true"
+          get posts_path
+
+          assert_response :success
+          assert_select ".post-preview-225"
+          assert_select ".post-preview-score"
+          assert_select "a.post-preview-hide-votes"
+        end
+
+        should "prefer the URL params over the cookies" do
+          cookies[:post_preview_size] = "225"
+          cookies[:post_preview_show_votes] = "true"
+          get posts_path(size: 150, show_votes: false)
+
+          assert_response :success
+          assert_select ".post-preview-150"
+          assert_select ".post-preview-score", count: 0
+        end
+      end
+
       context "when using sequential pagination" do
         should "work with page=a0" do
           get posts_path(page: "a0")
@@ -1065,6 +1106,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         @post.reload
         assert_equal("bbb", @post.tag_string)
+      end
+
+      should "redraw the post preview with the size and show_votes params" do
+        put_auth post_path(@post, format: :js), @user, xhr: true, params: { mode: "tag-script", size: 225, show_votes: true, post: { old_tag_string: "", tag_string: "bbb" }}
+
+        assert_response :success
+        assert_match(/post-preview-225/, response.body)
+        assert_match(/post-preview-score/, response.body)
       end
 
       should "ignore restricted params" do

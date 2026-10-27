@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
 
   include Pundit::Authorization
 
-  helper_method :search_params, :permitted_attributes
+  helper_method :search_params, :permitted_attributes, :show_votes?, :preview_size
 
   self.responder = ApplicationResponder
 
@@ -328,5 +328,21 @@ class ApplicationController < ActionController::Base
 
   def search_params
     params.fetch(:search, {}).permit!
+  end
+
+  # Whether to show the score and vote buttons under post thumbnails. Taken from the `show_votes` URL param if
+  # present, otherwise from the `post_preview_show_votes` cookie set by the "Show scores" option.
+  #
+  # @return [Boolean] True if votes should be shown, false by default.
+  def show_votes?
+    (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
+  end
+
+  # The size of post and media asset thumbnails. Taken from the `size` URL param if present, otherwise from the
+  # `post_preview_size` cookie set by the thumbnail size menu.
+  #
+  # @return [String] The thumbnail size. Defaults to `PostGalleryComponent::DEFAULT_SIZE`.
+  def preview_size
+    params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
   end
 end

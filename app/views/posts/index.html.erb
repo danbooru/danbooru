@@ -83,11 +83,11 @@
     </li>
 
     <li class="flex items-center gap-2">
-      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+      <%= render PreviewSizeMenuComponent.new(current_size: preview_size) %>
 
       <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
         <% menu.with_item do %>
-          <% if @post_set.show_votes %>
+          <% if show_votes? %>
             <%= link_to "Hide scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: nil, size: params[:size]), class: "post-preview-hide-votes", rel: "nofollow" %>
           <% else %>
             <%= link_to "Show scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: true, size: params[:size]), class: "post-preview-show-votes", rel: "nofollow" %>
@@ -187,7 +187,7 @@
   </div>
 
   <div id="posts">
-    <%= render_post_gallery(@post_set.posts, show_deleted: @post_set.show_deleted?, tags: @post_set.tag_string, show_votes: @post_set.show_votes?, size: @preview_size) do |gallery, posts| %>
+    <%= render_post_gallery(@post_set.posts, show_deleted: @post_set.show_deleted?, tags: @post_set.tag_string, show_votes: show_votes?, size: preview_size) do |gallery, posts| %>
       <% gallery.with_footer do %>
         <% if @post_set.hidden_posts.present? %>
           <div class="fineprint hidden-posts-notice">

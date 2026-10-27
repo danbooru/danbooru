@@ -7,7 +7,6 @@ class UploadMediaAssetsController < ApplicationController
     @defaults = { upload_id: params[:upload_id] }
     @defaults[:order] = "id_asc" if params[:upload_id].present?
     @limit = params.fetch(:limit, 200).to_i.clamp(0, PostSets::Post::MAX_PER_PAGE)
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || MediaAssetGalleryComponent::DEFAULT_SIZE
 
     @upload = Upload.find(params[:upload_id]) if params[:upload_id].present?
     @upload_media_assets = authorize UploadMediaAsset.visible(CurrentUser.user).includes(:post, :media_asset, upload: :uploader).paginated_search(params, limit: @limit, count_pages: true, defaults: @defaults)

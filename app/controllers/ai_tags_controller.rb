@@ -6,7 +6,6 @@ class AITagsController < ApplicationController
   def index
     limit = params[:limit].presence || CurrentUser.user.per_page
     @mode = params.fetch(:mode, "gallery")
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || MediaAssetGalleryComponent::DEFAULT_SIZE
     params[:search][:is_posted] ||= "true" if request.format.html?
 
     @ai_tags = authorize AITag.visible(CurrentUser.user).paginated_search(params, limit: limit, count_pages: false)
@@ -34,7 +33,6 @@ class AITagsController < ApplicationController
     @post.save
     @ai_tag.errors.add(:base, "Couldn't update post ##{@post.id}: #{@post.errors.full_messages.join("; ")}") if @post.invalid?
 
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
     respond_with(@ai_tag, notice: notice)
   end
 end
