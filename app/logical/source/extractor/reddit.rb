@@ -15,7 +15,9 @@ module Source
 
           images = []
 
-          if post_data.include?("preview") && post_data["is_reddit_media_domain"]
+          if reddit_video.present?
+            images += [reddit_video["fallback_url"]]
+          elsif post_data.include?("preview") && post_data["is_reddit_media_domain"]
             images += post_data.dig("preview", "images")&.pluck("source")&.pluck("url").to_a
           elsif post_data.include?("media_metadata")
             images += ordered_gallery_images
@@ -25,6 +27,10 @@ module Source
         else
           []
         end
+      end
+
+      def reddit_video
+        post_data.dig("secure_media", "reddit_video") || post_data.dig("media", "reddit_video")
       end
 
       def ordered_gallery_images
