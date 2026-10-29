@@ -22,5 +22,15 @@ class AutocompleteComponentTest < ViewComponent::TestCase
       assert_css(".ui-menu-item[data-autocomplete-value=':smile:']")
       assert_css(".ui-menu-item b", text: "smi")
     end
+
+    should "render autocomplete results for an emoji whose name contains regex metacharacters" do
+      Danbooru.config.stubs(:dtext_emojis).returns({ "a+b" => "✅" })
+      service = AutocompleteService.new("a+b", :emoji)
+
+      render_inline(AutocompleteComponent.new(autocomplete_service: service))
+
+      assert_css(".ui-menu-item[data-autocomplete-value=':a+b:']")
+      assert_css(".ui-menu-item b", text: "a+b")
+    end
   end
 end

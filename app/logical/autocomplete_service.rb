@@ -382,7 +382,7 @@ class AutocompleteService
     normalized_emoji = emoji.downcase.chomp(":")
     emojis = Danbooru.config.dtext_emojis.keys
 
-    results = emojis.grep(/#{normalized_emoji}/i).sort_by do |match|
+    results = emojis.select { |emoji| emoji.downcase.include?(normalized_emoji) }.sort_by do |match|
       exact = match.casecmp?(normalized_emoji) ? 1 : 0
       prefix = match.downcase.starts_with?(normalized_emoji) ? 1 : 0
 
