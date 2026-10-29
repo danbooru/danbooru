@@ -33,5 +33,24 @@ class ApplicationHelperTest < ActionView::TestCase
         assert_match(/#{Regexp.quote(text)}/, link)
       end
     end
+
+    context "diff helpers" do
+      should "pass names and body fields in old-to-new order" do
+        assert_equal("foo_<del>old</del><ins>new</ins>", diff_name_html("foo_new", "foo_old"))
+        assert_equal(
+          "<del>old</del><ins>new</ins> body",
+          diff_body_html({ body: "new body" }, { body: "old body" }, :body),
+        )
+      end
+
+      should "render a missing comparison record without change tags" do
+        html = diff_body_html({ body: %{<b>&"'\n}.html_safe }, nil, :body)
+
+        assert_equal("&lt;b&gt;&amp;&quot;&#39;<span class=\"paragraph-mark\">¶</span><br>", html)
+        assert_predicate(html, :html_safe?)
+        assert_equal("old body", diff_body_html(nil, { body: "old body" }, :body))
+        assert_equal("", diff_body_html(nil, nil, :body))
+      end
+    end
   end
 end
