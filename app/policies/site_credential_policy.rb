@@ -27,7 +27,7 @@ class SiteCredentialPolicy < ApplicationPolicy
 
   def destroy?
     if record.is_public?
-      user.is_owner?
+      user.is_superadmin?
     else
       record.creator_id == user.id
     end
