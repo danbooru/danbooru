@@ -102,6 +102,14 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("(and #{("a".."z").to_a.join(" ")})", ("a".."z").to_a.join(" and ")) # (a and b and c ...) = (and a b c ...)
     end
 
+    should "reject searches whose total term count exceeds the limit" do
+      assert_parse_equals("none", "a b c d", max_terms: 3)
+      assert_parse_equals("none", "a* b* c* d*", max_terms: 3)
+      assert_parse_equals("none", "id:1 id:2 id:3 id:4", max_terms: 3)
+      assert_parse_equals("none", "a or b or c or d", max_terms: 3)
+      assert_parse_equals("none", "a or (b or -(id:1 a*))", max_terms: 3)
+    end
+
     should "parse metatags correctly" do
       assert_parse_equals("fav:a", "fav:a")
       assert_parse_equals("user:a", "user:a")

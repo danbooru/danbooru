@@ -1643,6 +1643,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
     end
 
+    should "silently fail if the search exceeds the post query parser tag limit" do
+      post = create(:post)
+
+      limit = PostQuery::Parser::MAX_TERMS + 1
+      assert_tag_match([], limit.times.map { "-id:#{it}" }.join(" "))
+    end
+
     should "not count free tags against the user's search limit" do
       post1 = create(:post, tag_string: "aaa bbb rating:s")
 

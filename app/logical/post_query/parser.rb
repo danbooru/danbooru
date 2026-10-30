@@ -31,16 +31,20 @@ class PostQuery
     extend Memoist
 
     MAX_NESTING_DEPTH = 5
+    MAX_TERMS = 200
 
-    attr_reader :parser, :metatags, :metatag_regex
+    attr_reader :parser, :metatags, :metatag_regex, :term_count
 
     delegate :error, :rest, :eos?, :accept, :expect, :rewind, :zero_or_more, :one_or_more, :one_of, to: :parser
 
     # @param input [String] The search string to parse.
+    # @param max_terms [Integer] The maximum number of terms (tags, metatags, wildcards) allowed in the search.
     # @param max_nesting_depth [Integer] The maximum number of nested parentheses allowed (e.g. "(((((a)))))" has a depth of 5)
     # @param metatags [Array<String>] The list of metatags supported by the query.
-    def initialize(input, max_nesting_depth: MAX_NESTING_DEPTH, metatags: [])
+    def initialize(input, max_terms: MAX_TERMS, max_nesting_depth: MAX_NESTING_DEPTH, metatags: [])
       @parser = StringParser.new(input, state: 0) # 0 is the initial number of unclosed parens.
+      @term_count = 0
+      @max_terms = max_terms
       @max_nesting_depth = max_nesting_depth
       @metatags = metatags
       @metatag_regex = /(#{metatags.join("|")}):/i
@@ -155,11 +159,16 @@ class PostQuery
 
       # term = metatag | tag | wildcard
       def term
-        one_of [
+        term = one_of [
           method(:tag),
           method(:metatag),
           method(:wildcard),
         ]
+
+        @term_count += 1
+        error("Too many terms (max: #{@max_terms})") if @term_count > @max_terms
+
+        term
       end
 
       # metatag = metatag_name ":" quoted_string
