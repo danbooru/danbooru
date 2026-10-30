@@ -49,7 +49,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
         should "fail for too many timeseries buckets" do
           create(:post)
 
-          get report_path("posts", search: { group: "uploader", period: "day", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 })
+          get report_path("posts", search: { period: "day", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 })
 
           assert_response 500
         end

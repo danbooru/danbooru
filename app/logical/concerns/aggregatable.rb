@@ -11,7 +11,7 @@ module Aggregatable
     raise ArgumentError, "group_limit exceeds #{MAX_GROUP_LIMIT}" if !group_limit.to_i.in?(0..MAX_GROUP_LIMIT)
     raise ArgumentError if all.group_values.present?
 
-    if (to - from).abs > MAX_TIMESERIES_BUCKETS.send(period.pluralize)
+    if (to.to_time - from.to_time).abs > MAX_TIMESERIES_BUCKETS.send(period.pluralize)
       raise ArgumentError, "time range can't exceed #{MAX_TIMESERIES_BUCKETS} #{period.pluralize}"
     end
 
