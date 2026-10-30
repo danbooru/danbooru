@@ -1,8 +1,8 @@
 require "test_helper"
 
 class PostQueryParserTest < ActiveSupport::TestCase
-  def assert_parse_equals(expected, input)
-    assert_equal(expected, PostQuery::Parser.parse(input, metatags: PostQueryBuilder::METATAGS).to_nnf.to_sexp)
+  def assert_parse_equals(expected, input, **options)
+    assert_equal(expected, PostQuery::Parser.parse(input, metatags: PostQueryBuilder::METATAGS, **options).to_nnf.to_sexp)
   end
 
   def to_infix(string)
@@ -89,6 +89,12 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("(not fav:a)", "-fav:a")
 
       assert_parse_equals("(and fav:a fav:b)", "fav:a fav:b")
+    end
+
+    should "reject deeply nested queries" do
+      assert_parse_equals("none", "(((((a)))))", max_nesting_depth: 4)
+      assert_parse_equals("none", "a or (b or (c or (d or (e or (f or g)))))", max_nesting_depth: 4)
+      assert_parse_equals("none", "a (b (c (d (e (f g)))))", max_nesting_depth: 4)
     end
 
     should "parse metatags correctly" do

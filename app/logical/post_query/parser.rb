@@ -30,14 +30,18 @@ class PostQuery
   class Parser
     extend Memoist
 
+    MAX_NESTING_DEPTH = 5
+
     attr_reader :parser, :metatags, :metatag_regex
 
     delegate :error, :rest, :eos?, :accept, :expect, :rewind, :zero_or_more, :one_or_more, :one_of, to: :parser
 
     # @param input [String] The search string to parse.
+    # @param max_nesting_depth [Integer] The maximum number of nested parentheses allowed (e.g. "(((((a)))))" has a depth of 5)
     # @param metatags [Array<String>] The list of metatags supported by the query.
-    def initialize(input, metatags: [])
+    def initialize(input, max_nesting_depth: MAX_NESTING_DEPTH, metatags: [])
       @parser = StringParser.new(input, state: 0) # 0 is the initial number of unclosed parens.
+      @max_nesting_depth = max_nesting_depth
       @metatags = metatags
       @metatag_regex = /(#{metatags.join("|")}):/i
     end
@@ -137,6 +141,7 @@ class PostQuery
 
         if accept("(")
           self.unclosed_parens += 1
+          error("Too many parentheses (max: #{@max_nesting_depth})") if unclosed_parens > @max_nesting_depth
           a = or_clause
           expect(")")
           self.unclosed_parens -= 1
