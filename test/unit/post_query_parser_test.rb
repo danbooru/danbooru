@@ -97,6 +97,11 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("none", "a (b (c (d (e (f g)))))", max_nesting_depth: 4)
     end
 
+    should "flatten long OR and AND chains without nested recursion" do
+      assert_parse_equals("(or #{("a".."z").to_a.join(" ")})", ("a".."z").to_a.join(" or ")) # (a or b or c ...) = (or a b c ...)
+      assert_parse_equals("(and #{("a".."z").to_a.join(" ")})", ("a".."z").to_a.join(" and ")) # (a and b and c ...) = (and a b c ...)
+    end
+
     should "parse metatags correctly" do
       assert_parse_equals("fav:a", "fav:a")
       assert_parse_equals("user:a", "user:a")
@@ -478,12 +483,12 @@ class PostQueryParserTest < ActiveSupport::TestCase
         assert_equal("~a ~(b ~c)", to_infix("~a ~(b ~c)"))
 
         assert_equal("a b", to_infix("a and b"))
-        assert_equal("a (b c)", to_infix("a and b and c"))
-        assert_equal("a (b (c d))", to_infix("a and b and c and d"))
+        assert_equal("a b c", to_infix("a and b and c"))
+        assert_equal("a b c d", to_infix("a and b and c and d"))
 
         assert_equal("a or b", to_infix("a or b"))
-        assert_equal("a or (b or c)", to_infix("a or b or c"))
-        assert_equal("a or (b or (c or d))", to_infix("a or b or c or d"))
+        assert_equal("a or b or c", to_infix("a or b or c"))
+        assert_equal("a or b or c or d", to_infix("a or b or c or d"))
 
         assert_equal("(a b) or (c d)", to_infix("a b or c d"))
         assert_equal("(~a ~b) (~c ~d)", to_infix("~a ~b and ~c ~d"))

@@ -90,30 +90,32 @@ class PostQuery
         end
       end
 
-      # or_clause = and_clause "or" or_clause | and_clause
+      # or_clause = and_clause ("or" and_clause)*
       def or_clause
-        a = and_clause
+        terms = [and_clause]
 
-        space
-        if accept(/or[[:space:]]+/i)
-          b = or_clause
-          AST.new(:or, [a, b])
-        else
-          a
+        loop do
+          space
+          break unless accept(/or[[:space:]]+/i)
+
+          terms << and_clause
         end
+
+        terms.one? ? terms.first : AST.new(:or, terms)
       end
 
-      # and_clause = factor_list "and" and_clause | factor_list
+      # and_clause = factor_list ("and" factor_list)*
       def and_clause
-        a = factor_list
+        terms = [factor_list]
 
-        space
-        if accept(/and[[:space:]]+/i)
-          b = and_clause
-          AST.new(:and, [a, b])
-        else
-          a
+        loop do
+          space
+          break unless accept(/and[[:space:]]+/i)
+
+          terms << factor_list
         end
+
+        terms.one? ? terms.first : AST.new(:and, terms)
       end
 
       # factor_list = factor [factor_list]
