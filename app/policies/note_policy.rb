@@ -2,7 +2,7 @@
 
 class NotePolicy < ApplicationPolicy
   def preview?
-    true
+    create?
   end
 
   def revert?
@@ -35,6 +35,10 @@ class NotePolicy < ApplicationPolicy
 
   def permitted_attributes_for_create
     [:x, :y, :width, :height, :body, :post_id, :html_id]
+  end
+
+  def permitted_attributes_for_preview
+    permitted_attributes_for_create
   end
 
   def permitted_attributes_for_update

@@ -62,8 +62,17 @@ class NotesController < ApplicationController
   end
 
   def preview
-    @note = authorize Note.new(body: params[:body])
+    @note = authorize Note.new(permitted_attributes(Note))
+    @note.validate
 
-    respond_with(@note, methods: [:sanitized_body])
+    respond_with(@note) do |format|
+      format.json do
+        if @note.errors.any?
+          render json: { success: false, reasons: @note.errors.full_messages }.to_json, status: 422
+        else
+          render json: @note.to_json(methods: [:sanitized_body])
+        end
+      end
+    end
   end
 end

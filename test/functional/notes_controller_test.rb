@@ -107,25 +107,34 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "preview action" do
+      should "not work for a logged out user" do
+        note = { x: 0, y: 0, width: 1, height: 1, body: "test", post_id: @note.post_id }
+        post preview_notes_path, params: { note: note, format: "json" }
+
+        assert_response 403
+      end
+
       should "work for a POST method" do
-        post preview_notes_path, params: { body: '<p>test</p> <script>alert("owned")</script>', format: "json" }
+        note = { x: 0, y: 0, width: 1, height: 1, body: '<p>test</p> <script>alert("owned")</script>', post_id: @note.post_id }
+        post_auth preview_notes_path, @user, params: { note: note, format: "json" }
 
         assert_response :success
         assert_equal("<p>test</p> ", response.parsed_body["sanitized_body"])
       end
 
       should "work for a GET method" do
-        get preview_notes_path, params: { body: '<p>test</p> <script>alert("owned")</script>', format: "json" }
+        note = { x: 0, y: 0, width: 1, height: 1, body: '<p>test</p> <script>alert("owned")</script>', post_id: @note.post_id }
+        get_auth preview_notes_path, @user, params: { note: note, format: "json" }
 
         assert_response :success
         assert_equal("<p>test</p> ", response.parsed_body["sanitized_body"])
       end
 
-      should "work for a missing body argument" do
-        post preview_notes_path, params: { format: "json" }
-        assert_response :success
+      should "reject oversized bodies before sanitizing" do
+        note = { x: 0, y: 0, width: 1, height: 1, body: "x" * 10_000, post_id: @note.post_id }
+        post_auth preview_notes_path, @user, params: { note: note, format: "json" }
 
-        assert_equal("", response.parsed_body["sanitized_body"])
+        assert_response 422
       end
     end
   end

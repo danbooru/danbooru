@@ -527,9 +527,17 @@ class Note {
 
     async preview_text(text) {
       this.display_text("Loading...");
-      let response = await $.post("/notes/preview.json", { body: text });
 
-      this.display_text(response.sanitized_body);
+      try {
+        let params = { body: text, x: this.note.x, y: this.note.y, width: this.note.w, height: this.note.h, post_id: this.note.post_id };
+        let response = await $.post("/notes/preview.json", { note: params });
+
+        this.display_text(response.sanitized_body);
+      } catch (xhr) {
+        this.display_text("<em>Preview failed</em>");
+        Notice.error(`Unable to preview note: ${xhr.responseJSON.reasons.join("; ")}`);
+      }
+
       this.initialize();
       this.$note_body.show();
     }
