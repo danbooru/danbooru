@@ -100,7 +100,7 @@ class ApplicationRecord < ActiveRecord::Base
       if options[:only].is_a?(String)
         options.delete(:methods)
         options.delete(:include)
-        options.merge!(ParameterBuilder.serial_parameters(options[:only], self))
+        options.merge!(ParameterBuilder.new(options[:only], self).serial_parameters)
       else
         options[:methods] ||= []
         attributes, methods = api_attributes.partition { |attr| has_attribute?(attr) }

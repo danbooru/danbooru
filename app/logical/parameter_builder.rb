@@ -1,124 +1,132 @@
 # frozen_string_literal: true
 
+# This class parses the `only=` query parameter for API responses.
 class ParameterBuilder
-  def self.serial_parameters(only_string, object)
-    only_array = split_only_string(only_string)
-    get_only_hash(only_array, object)
+  extend Memoist
+
+  class Error < StandardError; end
+
+  MAX_LENGTH = 1_000 # The maximum length of the `only=` string.
+  MAX_DEPTH = 8 # The maximum number of nested fields in the `only=` string.
+
+  attr_reader :only_string, :object
+
+  def initialize(only_string, object)
+    @only_string = only_string.to_s
+    @object = object
   end
 
-  def self.get_only_hash(only_array, object, seen_objects = [])
+  def serial_parameters
+    build_only_hash(only_array, object)
+  end
+
+  def includes_parameters
+    build_includes_array(only_array, object)
+  end
+
+  private
+
+  def build_only_hash(items, object, seen_objects = [])
     return {} if object.nil?
+
     is_root = seen_objects.empty?
-    only_hash = { only: [], include: [], methods: [] }
+    hash = { only: [], include: [], methods: [] }
     available_includes = object.available_includes
     attributes, methods = object.api_attributes.partition { |attr| object.has_attribute?(attr) }
     methods -= available_includes
-    # Attributes and/or methods may be included in the final pass, but not includes
     seen_objects << object.class.name
-    only_array.each do |item|
-      match = item.match(/(\w+)\[(.+?)\]$/)
-      item = (match || [])[1] || item
-      item_sym = item.to_sym
-      was_seen = was_inclusion_seen?(item, object.class, seen_objects)
-      if match && available_includes.include?(item_sym) && (!was_seen || is_root)
-        item_object = object.send(item_sym)
-        next if item_object.nil?
-        item_array = split_only_string(match[2])
-        item_objects = item_object.is_a?(ActiveRecord::Relation) ? item_object : [item_object]
-        item_hash = item_objects.map do |item_object|
-          get_only_hash(item_array, item_object, seen_objects.clone)
-        end.reduce do |memo, item_hash|
-          merge_only_hash(memo, item_hash)
-        end
-        only_hash[:include] << ({ item_sym => item_hash })
-      elsif available_includes.include?(item_sym) && (!was_seen || is_root)
-        only_hash[:include] << item_sym
+
+    items.each do |key, nested|
+      item_sym = key.to_sym
+      seen = inclusion_seen?(item_sym.to_s, object.class, seen_objects)
+
+      if nested.present? && available_includes.include?(item_sym) && (!seen || is_root)
+        child = object.public_send(item_sym)
+        next if child.nil?
+
+        child_records = child.is_a?(ActiveRecord::Relation) ? child.to_a : [child]
+        merged = child_records.map { |record| build_only_hash(nested, record, seen_objects.dup) }
+        merged = merged.reduce { |memo, entry| memo.deep_merge(entry) { |_key, left, right| left | right } }
+        hash[:include] << { item_sym => merged }
       elsif attributes.include?(item_sym)
-        only_hash[:only] << item_sym
+        hash[:only] << item_sym
       elsif methods.include?(item_sym)
-        only_hash[:methods] << item_sym
-        only_hash[:only] << item_sym
+        hash[:methods] << item_sym
+        hash[:only] << item_sym
+      elsif available_includes.include?(item_sym) && (!seen || is_root)
+        hash[:include] << item_sym
       end
     end
-    only_hash.delete(:include) if only_hash[:include].empty?
-    only_hash.delete(:methods) if only_hash[:methods].empty?
-    only_hash
+
+    hash.delete(:include) if hash[:include].empty?
+    hash.delete(:methods) if hash[:methods].empty?
+    hash
   end
 
-  def self.includes_parameters(only_string, model_name)
-    return [] if only_string.blank?
-
-    only_array = split_only_string(only_string)
-    get_includes_array(only_array, model_name)
-  end
-
-  def self.get_includes_array(only_array, model_name, seen_objects = [])
+  def build_includes_array(items, model_name, seen_objects = [])
     is_root = seen_objects.empty?
     include_array = []
-    model = Kernel.const_get(model_name)
+    model = model_name.is_a?(String) ? model_name.constantize : model_name
     available_includes = model.available_includes
-    # Attributes and/or methods may be included in the final pass, but not includes
-    seen_objects << model_name
-    only_array.each do |item|
-      match = item.match(/(\w+)\[(.+?)\]$/)
-      item = (match || [])[1] || item
-      item_sym = item.to_sym
-      was_seen = was_inclusion_seen?(item, model, seen_objects)
-      if match && available_includes.include?(item_sym) && (!was_seen || is_root)
-        item_array = split_only_string(match[2])
-        model.associated_models(item).each do |m|
-          item_array = get_includes_array(item_array, m, seen_objects.clone)
-          include_array << (item_array.empty? ? item_sym : { item_sym => item_array })
+    seen_objects << model_name.to_s
+
+    items.each do |key, nested|
+      item_sym = key.to_sym
+      seen = inclusion_seen?(item_sym.to_s, model, seen_objects)
+
+      if nested.present? && available_includes.include?(item_sym) && (!seen || is_root)
+        model.associated_models(item_sym.to_s).each do |child_model|
+          child_items = build_includes_array(nested, child_model, seen_objects.dup)
+          include_array << (child_items.empty? ? item_sym : { item_sym => child_items })
         end
-      elsif available_includes.include?(item_sym) && (!was_seen || is_root)
+      elsif available_includes.include?(item_sym) && (!seen || is_root)
         include_array << item_sym
       end
     end
+
     include_array
   end
 
-  def self.was_inclusion_seen?(inclusion, class_object, seen_objects)
-    if class_object.reflections[inclusion]
-      inclusion_class = class_object.reflections[inclusion].class_name
-      max_seen = (class_object.multiple_includes.include?(inclusion.to_sym) ? 1 : 0)
-      seen_objects.count(inclusion_class) > max_seen
-    else
-      false
-    end
+  def inclusion_seen?(inclusion, class_object, seen_objects)
+    reflection = class_object.reflections[inclusion]
+    return false if reflection.nil?
+
+    inclusion_class = reflection.class_name
+    max_seen = class_object.multiple_includes.include?(inclusion.to_sym) ? 1 : 0
+    seen_objects.count(inclusion_class) > max_seen
   end
 
-  def self.split_only_string(only_string)
-    only_array = []
-    offset = 0
-    position = 0
-    level = 0
-    loop do
-      str = only_string[Range.new(position, -1)]
-      match = str.match(/[,\[\]]/)
-      break unless match
-      start_pos, end_pos = match.offset(0)
-      if match[0] == "," && level.zero?
-        only_array << only_string[Range.new(offset, position + start_pos - 1)]
-        offset = position + end_pos
-      elsif match[0] == "["
-        level += 1
-      elsif match[0] == "]"
-        level -= 1
-      end
-      position += end_pos
-    end
-    only_array << only_string[Range.new(offset, -1)]
-  end
+  # @return [Hash<Symbol, Hash>] The only= string parsed into nested hashes.
+  # @example `id,comments[body,creator[name]]` becomes: { id: {}, comments: { body: {}, creator: { name: {} } } }
+  memoize def only_array
+    raise Error, "param too long (max #{MAX_LENGTH} characters)" if only_string.size > MAX_LENGTH
 
-  def self.merge_only_hash(h1, h2)
-    h1.merge(h2) do |_key, v1, v2|
-      if v1.is_a?(Hash) && v2.is_a?(Hash)
-        merge_only_hash(v1, v2)
-      elsif v1.is_a?(Array) && v2.is_a?(Array)
-        v1 | v2
+    parser = StringParser.new(only_string)
+    current = {}
+    stack = [current]
+
+    until parser.eos?
+      name = parser.expect(/[a-zA-Z_]+/).to_sym
+      current[name] = {}
+
+      if parser.accept("[")
+        stack << current[name]
+        current = stack.last
+        raise Error, "param is nested too deeply (max #{MAX_DEPTH} levels)" if stack.size > MAX_DEPTH + 1
       else
-        v2
+        while parser.accept("]")
+          stack.pop
+          raise Error, "unbalanced brackets" if stack.empty?
+          current = stack.last
+        end
       end
+
+      parser.skip(/[[:space:],]*/)
     end
+
+    raise Error, "unbalanced brackets" if stack.size != 1
+    stack.pop
+  rescue StandardError => e
+    raise Error, "Invalid only= param: #{e.message}"
   end
 end

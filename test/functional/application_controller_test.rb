@@ -444,5 +444,129 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_equal("tags", response.parsed_body.root.name)
       assert_equal(0, response.parsed_body.root.children.size)
     end
+
+    context "for the only= param" do
+      setup do
+        @post = create(:post)
+      end
+
+      should "support simple fields" do
+        get posts_path(only: "id,rating,score", limit: 1), as: :json
+
+        assert_response :success
+        assert_equal(%w[id rating score].sort, response.parsed_body.sole.keys.sort)
+      end
+
+      should "ignore nil nested includes" do
+        @post = create(:post, parent: nil)
+
+        get posts_path(only: "id,parent[id]", limit: 1), as: :json
+
+        assert_response :success
+        assert_equal(["id"], response.parsed_body.sole.keys)
+      end
+
+      should "support API attributes" do
+        get posts_path(only: "id,file_url", limit: 1), as: :json
+
+        assert_response :success
+        assert_equal(%w[id file_url].sort, response.parsed_body.first.keys.sort)
+      end
+
+      should "ignore unknown fields" do
+        get posts_path(only: "id,bogus", limit: 1), as: :json
+
+        assert_response :success
+        assert_equal(%w[id], response.parsed_body.sole.keys)
+      end
+
+      should "support blank field lists" do
+        get posts_path(only: "", limit: 1), as: :json
+
+        assert_response :success
+        assert_equal([], response.parsed_body.sole.keys)
+      end
+
+      should "return an error for field lists that are too long" do
+        get posts_path(only: "id," * 500, limit: 1), as: :json
+
+        assert_response 422
+        assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
+      end
+
+      should "return an error for field lists that are too long using a POST request with _method=GET" do
+        post posts_path(format: :json), params: { _method: "GET", limit: 1, only: "id," * 500_000 }, as: :url_encoded
+
+        assert_response 422
+        assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
+      end
+
+      should "return an error for field lists that are nested too deeply" do
+        get posts_path(only: "id,#{"parent[" * 9}id#{"]" * 9}", limit: 1), as: :json
+
+        assert_response 422
+        assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
+      end
+
+      should "return an error response for unbalanced opening brackets" do
+        get posts_path(only: "id,comments[body", limit: 1), as: :json
+
+        assert_response 422
+        assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
+      end
+
+      should "return an error response for unbalanced closing brackets" do
+        get posts_path(only: "id,comments[body]]", limit: 1), as: :json
+
+        assert_response 422
+        assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
+      end
+
+      should "support POST requests overridden to GET" do
+        post posts_path(format: :json), params: { _method: "GET", limit: 1, only: "id,rating,score" }, as: :url_encoded
+
+        assert_response :success
+        assert_equal(%w[id rating score].sort, response.parsed_body.sole.keys.sort)
+      end
+
+      should "support nested fields" do
+        create(:comment, post: @post)
+
+        get posts_path(only: "id,rating,comments[body,creator[name]],notes", limit: 1), as: :json
+
+        assert_response :success
+        assert_equal(%w[id rating comments notes].sort, response.parsed_body.sole.keys.sort)
+
+        comments = response.parsed_body.sole["comments"]
+        assert_equal(%w[body creator].sort, comments.sole.keys.sort)
+        assert_equal(%w[name].sort, comments.sole["creator"].keys)
+      end
+
+      should "overwrite duplicate nested includes" do
+        create_list(:comment, 2, post: @post)
+
+        get posts_path(only: "id,comments[body,creator[name]],comments[creator[id]]", limit: 1), as: :json
+
+        assert_response :success
+        comments = response.parsed_body.sole["comments"]
+        assert_equal(2, comments.size)
+        assert_equal(%w[creator].sort, comments.first.keys.sort)
+        assert_equal(%w[id].sort, comments.first["creator"].keys.sort)
+      end
+
+      should "avoid recursive has_many expansion for nested children includes" do
+        parent = create(:post)
+        child = create(:post, parent: parent)
+        create(:post, parent: child)
+
+        get posts_path(tags: "id:#{parent.id}", only: "id,children[id,children[id,children[id]]]", limit: 1), as: :json
+        assert_response :success
+
+        post = response.parsed_body.sole
+        assert_equal(parent.id, post["id"])
+        assert_equal(%w[children id], post.keys.sort)
+        assert_equal(["id"], post["children"].first.keys)
+      end
+    end
   end
 end

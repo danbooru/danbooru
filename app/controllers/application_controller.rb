@@ -59,8 +59,8 @@ class ApplicationController < ActionController::Base
       redirect_to_show(subject) and return
     end
 
-    if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
-      associations = ParameterBuilder.includes_parameters(params[:only], model)
+    if params[:only].present? && subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
+      associations = ParameterBuilder.new(params[:only], model).includes_parameters
       subject = subject.includes(associations)
     end
 
@@ -143,9 +143,7 @@ class ApplicationController < ActionController::Base
         render_error_page(410, exception, template: "static/pagination_error", message: exception.message)
       when PostQuery::TagLimitError
         render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
-      when PostQuery::Error
-        render_error_page(422, exception, message: exception.message)
-      when UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
+      when PostQuery::Error, ParameterBuilder::Error, UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
         render_error_page(422, exception, message: exception.message)
       when RateLimiter::RateLimitError
         render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
