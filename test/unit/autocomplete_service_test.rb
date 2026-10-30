@@ -72,6 +72,13 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
       assert_autocomplete_includes("touhou", "tou", :tag)
     end
 
+    should "clamp oversized autocomplete limits" do
+      4.times { |i| create(:tag, name: "tag_#{i}") }
+
+      results = AutocompleteService.new("tag_*", :tag, limit: 1_000_000, max_limit: 3).autocomplete_results
+      assert_equal(3, results.size)
+    end
+
     context "for a tag search" do
       should "autocomplete tags" do
         create(:tag, name: "touhou")

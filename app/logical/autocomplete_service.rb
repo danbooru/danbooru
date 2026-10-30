@@ -11,6 +11,8 @@ class AutocompleteService
   extend Memoist
 
   POST_STATUSES = %w[active deleted pending flagged appealed banned modqueue unmoderated]
+  DEFAULT_LIMIT = 10 # The default number of results to return
+  MAX_LIMIT = 100 # The max limit on the number of results to return
 
   STATIC_METATAGS = {
     is: %w[parent child sfw nsfw wiki_image] + POST_STATUSES + MediaAsset::FILE_TYPES + Post::RATINGS.values.map(&:downcase),
@@ -46,12 +48,14 @@ class AutocompleteService
   # @param query [String] the string being completed
   # @param type [String] the type of completion being performed
   # @param current_user [User] the user we're performing completion for
-  # @param limit [Integer] the max number of results to return
-  def initialize(query, type, current_user: User.anonymous, limit: 10, enabled: Danbooru.config.autocomplete_enabled?.to_s.truthy?)
+  # @param limit [Integer] the number of results to return
+  # @param max_limit [Integer] the max limit on the number of results to return
+  # @param enabled [Boolean] whether autocomplete is enabled
+  def initialize(query, type, current_user: User.anonymous, limit: DEFAULT_LIMIT, max_limit: MAX_LIMIT, enabled: Danbooru.config.autocomplete_enabled?.to_s.truthy?)
     @query = query.to_s
     @type = type.to_s.to_sym
     @current_user = current_user
-    @limit = limit
+    @limit = (limit || DEFAULT_LIMIT).to_i.clamp(1, max_limit)
     @enabled = enabled
   end
 

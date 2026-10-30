@@ -128,6 +128,15 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
         assert_autocomplete_equals(["original"], "or")
       end
 
+      should "clamp oversized limit values" do
+        101.times { |i| create(:tag, name: "tag_#{i}") }
+
+        get autocomplete_index_path(search: { query: "tag_", type: "tag_query" }, limit: 1_000_000)
+
+        assert_response :success
+        assert_equal(100, response.parsed_body.css("li").count)
+      end
+
       should "not set session cookies when the response is publicly cached" do
         create(:tag, name: "azur_lane")
 
