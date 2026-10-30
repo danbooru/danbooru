@@ -16,12 +16,11 @@
 # * :not (a unary NOT clause)
 # * :opt (the unary `~`, or 'optional' operator)
 #
-# The AST returned by the parser is normally rewritten with `#to_cnf` before
-# it's used. This is for several reasons:
+# The AST returned by the parser is normally rewritten with `#to_nnf` before it's used. This is for several reasons:
 #
 # * To replace the `~` operator with `or` clauses.
 # * To remove redundant `and` and `or` nodes.
-# * To transform the AST to conjunctive normal form.
+# * To remove double negations and push negations down to the leaves (negation normal form).
 # * To sort the AST into alphabetical order.
 #
 # @example
@@ -32,8 +31,8 @@
 #   PostQuery::Parser.parse("cat_girl or (cat_ears tail)").to_sexp
 #   => "(or (and cat_girl) (and (and cat_ears tail)))"
 #
-#   PostQuery::Parser.parse("cat_girl or (cat_ears tail)").to_cnf.to_sexp
-#   => "(and (or cat_ears cat_girl) (or cat_girl tail))"
+#   PostQuery::Parser.parse("cat_girl or (cat_ears tail)").to_nnf.to_sexp
+#   => "(or (and cat_ears tail) cat_girl)"
 
 class PostQuery
   class AST
@@ -126,13 +125,15 @@ class PostQuery
     end
 
     concerning :SimplificationMethods do
-      # Convert the AST to conjunctive normal form, that is, product-of-sums
-      # form, or an AND of ORs. The result is a single top-level AND clause,
-      # containing a series of tags, metatags, and OR clauses, with no deeply
-      # nested subexpressions.
+      # Convert the AST to negation normal form: `~` operators are replaced with `or` clauses, redundant `and` and `or`
+      # nodes are removed, double negations are removed, and negations are pushed down to the leaves, so that `not`
+      # nodes only contain tags, metatags or wildcards. The result is sorted into alphabetical order.
       #
-      # @return [AST] A new AST in conjunctive normal form.
-      def to_cnf
+      # This doesn't distribute `or` over `and` (that is, it doesn't convert to conjunctive normal form), because that
+      # can take exponential time and space: an OR of N ANDs expands into 2^N clauses.
+      #
+      # @return [AST] A new AST in negation normal form.
+      def to_nnf
         rewrite_opts.simplify.sort
       end
 
@@ -153,20 +154,16 @@ class PostQuery
         end
       end
 
-      # Simplify the AST by eliminating unnecessary AND and OR nodes, and by
-      # expanding out deeply nested subexpressions. The result is an AST in
-      # conjunctive normal form.
+      # Simplify the AST by eliminating unnecessary AND and OR nodes, removing double negations, and pushing negations down to the leaves.
       #
-      # @return [AST] A new AST in conjunctive normal form.
+      # @return [AST] A new simplified AST.
       def simplify
         repeat_until_unchanged do |ast|
           ast.trim_once.simplify_once
         end
       end
 
-      # Simplify the AST once in a single top-down pass by applying the double
-      # negation law, DeMorgan's law, and the distributive law. This expands
-      # out deeply nested subexpressions.
+      # Simplify the AST once in a single top-down pass by applying the double negation law and DeMorgan's law.
       #
       # @return [AST] A new simplified AST
       def simplify_once
@@ -187,10 +184,10 @@ class PostQuery
 
           # Distributive law: A or (B and C) = (A or B) and (A or C)
           # (or A (and B C ...) ... = (and (or A B ...) (or A C ...) ...
-          in [:or, *children] if children.any?(&:and?)
-            ands, non_ands = children.partition(&:and?)
-            first_and, rest = ands.first, ands[1..] + non_ands
-            node(:and, *first_and.children.map { node(:or, it, *rest) })
+          # in [:or, *children] if children.any?(&:and?)
+          #   ands, non_ands = children.partition(&:and?)
+          #   first_and, rest = ands.first, ands[1..] + non_ands
+          #   node(:and, *first_and.children.map { node(:or, it, *rest) })
 
           else
             ast
@@ -474,6 +471,6 @@ class PostQuery
       end
     end
 
-    memoize :to_cnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_pretty_string, :to_tree, :nodes, :tags, :metatags, :tag_names, :searched_tag_names, :parents
+    memoize :to_nnf, :simplify, :simplify_once, :rewrite_opts, :trim, :trim_once, :sort, :inquirer, :deconstruct, :inspect, :to_sexp, :to_infix, :to_pretty_string, :to_tree, :nodes, :tags, :metatags, :tag_names, :searched_tag_names, :parents
   end
 end

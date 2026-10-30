@@ -2,7 +2,7 @@ require "test_helper"
 
 class PostQueryParserTest < ActiveSupport::TestCase
   def assert_parse_equals(expected, input)
-    assert_equal(expected, PostQuery::Parser.parse(input, metatags: PostQueryBuilder::METATAGS).to_cnf.to_sexp)
+    assert_equal(expected, PostQuery::Parser.parse(input, metatags: PostQueryBuilder::METATAGS).to_nnf.to_sexp)
   end
 
   def to_infix(string)
@@ -334,8 +334,8 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("(or a b c d)", "~a ~b or ~c ~d")
       assert_parse_equals("(and (or a b) (or c d))", "~a ~b and ~c ~d")
       assert_parse_equals("(and (or a b) (or c d))", "(~a ~b) (~c ~d)")
-      assert_parse_equals("(and (or a c) (or a d) (or b c) (or b d))", "~(a b) ~(c d)")
-      assert_parse_equals("(and (or a c) (or a d) (or b c) (or b d))", "(a b) or (c d)")
+      assert_parse_equals("(or (and a b) (and c d))", "~(a b) ~(c d)")
+      assert_parse_equals("(or (and a b) (and c d))", "(a b) or (c d)")
 
       assert_parse_equals("(and a b c d)",      " a  b  c  d")
       assert_parse_equals("(and a b c d)",      " a  b  c ~d")
@@ -372,6 +372,21 @@ class PostQueryParserTest < ActiveSupport::TestCase
 
       assert_parse_equals("(and a b c)", "a -(-(b)) c")
       assert_parse_equals("(and a b c d)", "a -(-(b -(-c))) d")
+
+      assert_parse_equals("(and a b)", "-(-(a b))")
+      assert_parse_equals("(or a b)", "-(-(a or b))")
+      assert_parse_equals("(and (not b) a)", "-(-(a -b))")
+      assert_parse_equals("(or (not a) (not b))", "-(-(-(a b)))")
+      assert_parse_equals("(or (and a b) (and c d))", "-(-((a b) or (c d)))")
+    end
+
+    should "push negations down to the leaves" do
+      assert_parse_equals("(or (not a) (not b))", "-(a b)")
+      assert_parse_equals("(and (not a) (not b))", "-(a or b)")
+      assert_parse_equals("(or (not rating:s) (not (wildcard a*)))", "-(a* rating:s)")
+      assert_parse_equals("(and (not a) (not b))", "-(~a ~b)")
+      assert_parse_equals("(and (or (not a) (not b)) (or (not c) (not d)))", "-((a b) or (c d))")
+      assert_parse_equals("(or (and (not a) (not b)) (and (not c) (not d)))", "-((a or b) (c or d))")
     end
 
     should "apply DeMorgan's law" do
@@ -384,16 +399,25 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals("(or a b c)", "-(-a -b -c)")
       assert_parse_equals("(and a b c)", "-(-a or -b or -c)")
 
-      assert_parse_equals("(and (or (not a) (not c) (not d)) (or (not a) b))", "-(a -(b -(c d)))")
+      assert_parse_equals("(or (and (or (not c) (not d)) b) (not a))", "-(a -(b -(c d)))")
     end
 
-    should "apply the distributive law" do
-      assert_parse_equals("(and (or a b) (or a c))", "a or (b c)")
-      assert_parse_equals("(and (or a b) (or a c))", "(b c) or a")
+    should "not apply the distributive law" do
+      assert_parse_equals("(or (and b c) a)", "a or (b c)")
+      assert_parse_equals("(or (and b c) a)", "(b c) or a")
 
-      assert_parse_equals("(and (or a c) (or a d) (or b c) (or b d))", "(a b) or (c d)")
+      assert_parse_equals("(or (and a b) (and c d))", "(a b) or (c d)")
 
-      assert_parse_equals("(and (or a c e) (or a c f) (or a d e) (or a d f) (or b c e) (or b c f) (or b d e) (or b d f))", "(a b) or (c d) or (e f)")
+      assert_parse_equals("(or (and a b) (and c d) (and e f))", "(a b) or (c d) or (e f)")
+    end
+
+    should "not blow up on an OR of many ANDs" do
+      query = (1..100).map { |i| "(a#{i} b#{i})" }.join(" or ")
+      ast = PostQuery::Parser.parse(query, metatags: PostQueryBuilder::METATAGS).to_nnf
+
+      assert_equal(:or, ast.type)
+      assert_equal(100, ast.children.size)
+      assert_equal(301, ast.nodes.count)
     end
 
     should "return the empty search for syntax errors" do

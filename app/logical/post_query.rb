@@ -83,12 +83,12 @@ class PostQuery
 
   def posts
     validate_metatags!
-    builder.posts(to_cnf)
+    builder.posts(to_nnf)
   end
 
   def paginated_posts(...)
     validate_metatags!
-    builder.paginated_posts(to_cnf, ...)
+    builder.paginated_posts(to_nnf, ...)
   end
 
   # Perform a search and return N posts, or none if the search times out.
@@ -210,9 +210,9 @@ class PostQuery
     build(ast.sort)
   end
 
-  # Return a new PostQuery converted to conjunctive normal form.
-  def to_cnf
-    build(ast.to_cnf)
+  # Return a new PostQuery converted to negation normal form.
+  def to_nnf
+    build(ast.to_nnf)
   end
 
   # Return a hash mapping aliased tag names to real tag names.
@@ -347,5 +347,5 @@ class PostQuery
     end
   end
 
-  memoize :tags, :replace_aliases, :with_implicit_metatags, :to_cnf, :aliases, :implicit_metatags, :term_count
+  memoize :tags, :replace_aliases, :with_implicit_metatags, :to_nnf, :aliases, :implicit_metatags, :term_count
 end

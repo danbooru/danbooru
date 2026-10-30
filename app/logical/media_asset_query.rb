@@ -24,7 +24,7 @@ class MediaAssetQuery
   end
 
   def normalized_ast
-    @normalized_ast ||= ast.to_cnf.rewrite_opts.trim
+    @normalized_ast ||= ast.to_nnf.rewrite_opts.trim
   end
 
   def search(relation: MediaAsset.all, foreign_key: :id, score_range: (50..))
