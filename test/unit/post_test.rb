@@ -876,6 +876,17 @@ class PostTest < ActiveSupport::TestCase
             assert_equal([@post.id], @pool.reload.post_ids)
           end
 
+          should "not allow a pool to exceed its max post limit when adding via pool:id" do
+            PoolVersion.stubs(:enabled?).returns(false)
+            @pool = create(:pool, post_ids: (1..Pool::MAX_POST_COUNT).map(&:-@))
+            @post = create(:post)
+
+            @post.update(tag_string: "aaa pool:#{@pool.id}")
+
+            assert_equal(Pool::MAX_POST_COUNT, @pool.reload.post_count)
+            assert_not_includes(@pool.reload.post_ids, @post.id)
+          end
+
           should "remove the post from the pool by id" do
             @pool = create(:pool, post_ids: [@post.id])
             @post.update!(tag_string: "aaa -pool:#{@pool.id}")

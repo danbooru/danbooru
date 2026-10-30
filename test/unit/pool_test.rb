@@ -281,6 +281,10 @@ class PoolTest < ActiveSupport::TestCase
       should_not allow_value("x" * 171).for(:name)
     end
 
+    context "when validating post_ids" do
+      should_not allow_value(Pool::MAX_POST_COUNT.succ.times.to_a).for(:post_ids)
+    end
+
     context "when normalizing the description" do
       should normalize_attribute(:description).from(" ").to("")
       should normalize_attribute(:description).from("  \u200B  ").to("")

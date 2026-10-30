@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class FavoriteGroup < ApplicationRecord
+  MAX_POST_COUNT = 10_000
+
   belongs_to :creator, class_name: "User"
 
   normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "") }
@@ -8,7 +10,7 @@ class FavoriteGroup < ApplicationRecord
   validates :name, visible_string: true, uniqueness: { case_sensitive: false, scope: :creator_id }, length: { maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validate :creator_can_create_favorite_groups, on: :create
-  validate :validate_number_of_posts
+  validates :post_ids, length: { maximum: MAX_POST_COUNT, too_long: "can't have more than #{MAX_POST_COUNT} posts" }, if: :post_ids_changed?
   validate :validate_posts
   validate :validate_can_enable_privacy
 
@@ -71,12 +73,6 @@ class FavoriteGroup < ApplicationRecord
         error += " Upgrade your account to create more."
       end
       errors.add(:base, error)
-    end
-  end
-
-  def validate_number_of_posts
-    if post_count > 10_000
-      errors.add(:base, "Favorite groups can have up to 10,000 posts each")
     end
   end
 

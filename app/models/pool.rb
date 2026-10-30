@@ -6,6 +6,7 @@ class Pool < ApplicationRecord
   RESERVED_NAMES = %w[none any series collection]
   POOL_ORDER_LIMIT = 1000
   MAX_DESCRIPTION_LENGTH = 20_000
+  MAX_POST_COUNT = 25_000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
   dtext_attribute :description # defines :dtext_description
@@ -16,6 +17,7 @@ class Pool < ApplicationRecord
   validates :name, visible_string: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 170 }, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validates :description, length: { maximum: MAX_DESCRIPTION_LENGTH }, if: :description_changed?
+  validates :post_ids, length: { maximum: MAX_POST_COUNT, too_long: "can't have more than #{MAX_POST_COUNT} posts" }, if: :post_ids_changed?
   validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted
   after_save :create_version, if: :saved_changes?

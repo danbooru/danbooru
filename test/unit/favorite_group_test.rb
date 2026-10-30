@@ -94,4 +94,10 @@ class FavoriteGroupTest < ActiveSupport::TestCase
     should_not allow_value("\u200B").for(:name)
     should_not allow_value("x" * 171).for(:name)
   end
+
+  context "when validating post_ids" do
+    subject { build(:favorite_group) }
+
+    should_not allow_value(FavoriteGroup::MAX_POST_COUNT.succ.times.to_a).for(:post_ids)
+  end
 end
