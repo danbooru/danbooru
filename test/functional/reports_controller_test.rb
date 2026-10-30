@@ -38,6 +38,22 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
+        should "fail for oversized group limits" do
+          create(:post)
+
+          get report_path("posts", search: { group: "uploader", group_limit: 9_999_999, period: "second", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 })
+
+          assert_response 500
+        end
+
+        should "fail for too many timeseries buckets" do
+          create(:post)
+
+          get report_path("posts", search: { group: "uploader", period: "day", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 })
+
+          assert_response 500
+        end
+
         should "work when filtering by a nested association" do
           get report_path("posts", search: { uploader: { name: @post.uploader.name }})
 

@@ -3,9 +3,17 @@
 module Aggregatable
   extend ActiveSupport::Concern
 
+  MAX_GROUP_LIMIT = 200
+  MAX_TIMESERIES_BUCKETS = 2_000
+
   def timeseries(period: "day", date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], group_limit: 10, columns: { count: "COUNT(*)" })
-    raise ArgumentError, "invalid period: #{period}" if !period.in?(%w[second minute hour day week month quarter year])
+    raise ArgumentError, "invalid period: #{period}" if !period.in?(%w[second minute hour day week month year])
+    raise ArgumentError, "group_limit exceeds #{MAX_GROUP_LIMIT}" if !group_limit.to_i.in?(0..MAX_GROUP_LIMIT)
     raise ArgumentError if all.group_values.present?
+
+    if (to - from).abs > MAX_TIMESERIES_BUCKETS.send(period.pluralize)
+      raise ArgumentError, "time range can't exceed #{MAX_TIMESERIES_BUCKETS} #{period.pluralize}"
+    end
 
     from = from.to_date
     to = to.to_date
@@ -59,7 +67,7 @@ module Aggregatable
     query = query.joins("LEFT OUTER JOIN (#{subquery.to_sql}) AS subquery ON #{on_clause}")
     query = query.reorder("date DESC")
 
-    columns.each do |name, sql|
+    columns.each_key do |name|
       # SELECT dates.date, uploader_ids.uploader_id, COALESCE(subquery.count, 0) AS count FROM ...
       query = query.select(coalesce(Arel.sql("subquery.#{connection.quote_column_name(name)}"), 0).as(name.to_s))
     end
@@ -90,6 +98,8 @@ module Aggregatable
   end
 
   def aggregate(date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], limit: 50, columns: { count: "COUNT(*)" }, order: Arel.sql("#{columns.first.second} DESC"))
+    raise ArgumentError, "limit exceeds #{MAX_GROUP_LIMIT}" if !limit.to_i.in?(0..MAX_GROUP_LIMIT)
+
     group_fields = groups.map { |name| reflections[name.to_s]&.foreign_key || name }
 
     query = where(date_column => (from..to)).reorder(order).limit(limit)
@@ -99,8 +109,8 @@ module Aggregatable
       query = query.select(name).group(name).where.not(name => nil)
     end
 
-    columns.each do |name, sql|
-      query = query.select(Arel.sql(sql).as(name.to_s).to_sql)
+    columns.each_key do |name|
+      query = query.select(Arel.sql(columns[name]).as(name.to_s).to_sql)
     end
 
     build_dataframe(query, groups)
