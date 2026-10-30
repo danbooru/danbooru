@@ -35,8 +35,8 @@ class ApplicationRecordTest < ActiveSupport::TestCase
       assert_equal(1000, as(@user) { Tag.paginated_search(ActionController::Parameters.new, limit: 5000).records_per_page })
     end
 
-    should "allow up to 10000 results per page for sitemaps" do
-      assert_equal(10_000, as(@user) { Tag.paginated_search(ActionController::Parameters.new(format: "sitemap"), limit: 50_000).records_per_page })
+    should "allow up to 1000 results per page for sitemaps" do
+      assert_equal(1000, as(@user) { Tag.paginated_search(ActionController::Parameters.new(format: "sitemap"), limit: 50_000).records_per_page })
     end
 
     should "not allow more than max_limit results per page" do

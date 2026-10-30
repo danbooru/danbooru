@@ -102,7 +102,7 @@ module PostSets
     end
 
     def max_per_page
-      (format.to_sym == :sitemap) ? 10_000 : MAX_PER_PAGE
+      (format.to_sym == :sitemap) ? 1_000 : MAX_PER_PAGE
     end
 
     def posts

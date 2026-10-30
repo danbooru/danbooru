@@ -41,7 +41,7 @@ class StaticController < ApplicationController
 
   def sitemap_index
     @sitemap = params[:sitemap]
-    @limit = params.fetch(:limit, 10_000).to_i
+    @limit = 1000
 
     case @sitemap
     when "artists"

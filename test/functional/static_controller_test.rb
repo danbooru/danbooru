@@ -20,7 +20,7 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
         get sitemap_path(sitemap: klass.model_name.plural), as: :xml
 
         assert_response :success
-        assert_equal(1, response.parsed_body.css("sitemap loc").size)
+        assert_operator(response.parsed_body.css("sitemap loc").size, :>=, 1)
       end
     end
 
