@@ -700,6 +700,11 @@ module Danbooru
       true
     end
 
+    # Whether to enable hidden Easter eggs. Enabled by default, except during testing.
+    def enable_easter_eggs?
+      !Rails.env.test?
+    end
+
     # If defined, Danbooru will automatically post new forum posts to the
     # Discord channel belonging to this webhook.
     def discord_webhook_id

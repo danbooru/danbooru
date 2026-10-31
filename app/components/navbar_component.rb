@@ -10,6 +10,16 @@ class NavbarComponent < ApplicationComponent
     @current_user = current_user
   end
 
+  def logo_filename
+    date = Date.current
+
+    if Danbooru.config.enable_easter_eggs?.to_s.truthy? && date.month == 10 && date.day == 31
+      "halloween-logo-128x128.png"
+    else
+      "danbooru-logo-128x128.png"
+    end
+  end
+
   def nav_link_to(*args, **options, &block)
     klass = options.delete(:class)
     url = args.last
