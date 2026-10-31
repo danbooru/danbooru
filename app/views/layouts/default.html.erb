@@ -57,6 +57,14 @@
 </head>
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
+  <% if halloween? %>
+    <%= javascript_tag do %>
+      if (document.body.dataset.currentUserTheme === "auto") {
+        document.body.dataset.currentUserTheme = matchMedia("(prefers-color-scheme: dark)").matches ? "halloween_night" : "pumpkin";
+      }
+    <% end %>
+  <% end %>
+
   <%= render NewsUpdateComponent.new(cookies: cookies) %>
 
   <%= render NavbarComponent.new(current_user: CurrentUser.user) %>

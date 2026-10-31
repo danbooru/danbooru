@@ -321,6 +321,11 @@ module ApplicationHelper
     render "table_builder/table", table: table
   end
 
+  def halloween?
+    date = Date.current
+    Danbooru.config.enable_easter_eggs?.to_s.truthy? && date.month == 10 && date.day == 31
+  end
+
   def body_attributes(current_user, params, current_item, exception)
     if exception
       controller_param = "static"

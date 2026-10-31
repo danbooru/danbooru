@@ -104,7 +104,9 @@ html {
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
 }
 
-html, body[data-current-user-theme="light"] {
+html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpkin"] {
+  --theme-background: light; /* Indicates whether the current theme is light or dark */
+
   --body-background-color: var(--white);
   --text-color: var(--black);
 
@@ -381,6 +383,8 @@ html, body[data-current-user-theme="light"] {
 
 /* variables that aren't defined in the dark theme fall back to the :root theme */
 @mixin dark-theme {
+  --theme-background: dark;
+
   --body-background-color: var(--grey-9);
   --text-color: var(--grey-2);
 
@@ -642,8 +646,232 @@ html, body[data-current-user-theme="light"] {
   --deleted-artist-label-color: var(--grey-6);
 }
 
-body[data-current-user-theme="dark"] {
+@mixin pumpkin-theme {
+  --body-background-color: var(--yellow-1);
+  --text-color: var(--orange-7);
+
+  --muted-text-color: var(--orange-4);
+  --header-color: var(--orange-8);
+  --link-color: var(--orange-5);
+  --link-hover-color: var(--orange-4);
+
+  --default-border-color: var(--yellow-2);
+
+  --target-background: var(--yellow-2);
+  --target-text-background-color: var(--purple-6);
+
+  --subnav-menu-background-color: var(--orange-1);
+  --responsive-menu-background-color: var(--orange-2);
+  --card-background-color: var(--yellow-0);
+
+  --chip-primary-background-color: var(--orange-1);
+
+  --form-input-background: var(--yellow-0);
+  --form-input-border-color: var(--orange-4);
+  --form-input-placeholder-text-color: var(--orange-5);
+
+  --form-button-background: var(--orange-1);
+  --form-button-border-color: var(--orange-4);
+  --form-button-hover-background: var(--orange-0);
+  --form-button-hover-box-shadow-color: var(--orange-5);
+  --form-button-active-background: var(--orange-2);
+
+  --toggle-switch-unselected-color: var(--yellow-2);
+  --toggle-switch-selected-color: var(--orange-3);
+
+  --dtext-editor-menu-background-color: var(--orange-1);
+
+  --quick-search-form-background: var(--yellow-0);
+
+  --user-upgrade-basic-background-color: var(--orange-1);
+  --user-upgrade-platinum-background-color: var(--purple-1);
+
+  --table-header-border-color: var(--orange-7);
+  --table-row-border-color: var(--yellow-2);
+  --table-row-hover-background: var(--orange-1);
+  --table-even-row-background: var(--orange-0);
+
+  --media-asset-placeholder-background-color: var(--orange-1);
+
+  --uploads-dropzone-background: var(--orange-1);
+  --uploads-dropzone-progress-bar-background-color: var(--orange-2);
+
+  --comment-sticky-background-color: var(--orange-1);
+
+  --post-tooltip-background-color: var(--yellow-0);
+  --post-tooltip-border-color: var(--orange-3);
+  --post-tooltip-header-background-color: var(--orange-1);
+
+  --post-tooltip-scrollbar-background: var(--orange-3);
+  --post-tooltip-scrollbar-thumb-color: var(--orange-5);
+  --post-tooltip-scrollbar-track-background: var(--orange-1);
+
+  --autocomplete-selected-background-color: var(--orange-1);
+  --autocomplete-border-color: var(--orange-3);
+
+  --post-notice-border-color: var(--orange-3);
+  --post-child-notice-background: var(--yellow-2);
+  --post-pending-notice-background: var(--purple-1);
+  --post-search-notice-background: var(--orange-1);
+
+  --post-artist-commentary-container-background: var(--orange-1);
+  --post-artist-commentary-container-border-color: var(--orange-3);
+
+  --keyboard-shortcut-background-color: var(--orange-7);
+
+  --login-link-color: var(--orange-5);
+  --divider-border-color: var(--yellow-2);
+  --divider-border-hover-color: var(--orange-3);
+
+  --jquery-ui-widget-content-background: var(--yellow-0);
+  --dialog-titlebar-background-color: var(--orange-2);
+
+  --notice-info-background: var(--orange-1);
+  --notice-info-border-color: var(--orange-3);
+
+  --dtext-blockquote-border-color: var(--orange-4);
+  --dtext-hr-color: var(--orange-3);
+  --dtext-code-background: var(--orange-1);
+  --dtext-details-background-color: var(--orange-0);
+  --dtext-details-summary-background-color: var(--orange-1);
+  --dtext-details-summary-hover-background-color: var(--orange-2);
+
+  --asset-paginator-background-color: var(--yellow-0);
+  --asset-paginator-background-hover-color: var(--orange-0);
+
+  --copyright-tag-color: var(--purple-6);
+  --copyright-tag-hover-color: var(--purple-5);
+
+  --news-updates-background: var(--orange-0);
+  --news-updates-border-color: var(--orange-2);
+}
+
+@mixin halloween-night-theme {
+  --body-background-color: var(--purple-9);
+  --text-color: var(--orange-1);
+
+  --inverse-text-color: var(--orange-0);
+  --muted-text-color: var(--orange-4);
+  --header-color: var(--orange-0);
+  --link-color: var(--orange-3);
+  --link-hover-color: var(--orange-2);
+
+  --default-border-color: var(--purple-7);
+
+  --target-background: var(--orange-8);
+  --selection-background-color: var(--orange-5);
+  --target-text-background-color: var(--purple-5);
+
+  --subnav-menu-background-color: var(--purple-8);
+  --responsive-menu-background-color: var(--purple-7);
+  --card-background-color: var(--purple-8);
+
+  --chip-primary-background-color: var(--purple-8);
+  --chip-secondary-background-color: var(--purple-7);
+
+  --form-input-background: var(--purple-8);
+  --form-input-border-color: var(--orange-5);
+  --form-input-placeholder-text-color: var(--orange-4);
+
+  --form-button-text-color: var(--purple-9);
+  --form-button-disabled-text-color: var(--orange-6);
+  --form-button-background: var(--orange-2);
+  --form-button-border-color: var(--orange-4);
+  --form-button-hover-background: var(--orange-1);
+  --form-button-hover-box-shadow-color: var(--orange-5);
+  --form-button-active-background: var(--orange-3);
+
+  --checkbox-selected-color: var(--link-color);
+  --toggle-switch-unselected-color: var(--purple-7);
+  --toggle-switch-selected-color: var(--purple-5);
+
+  --dtext-editor-menu-background-color: var(--purple-7);
+
+  --button-disabled-color: var(--purple-6);
+
+  --button-outline-primary-color: var(--link-color);
+
+  --quick-search-form-background: var(--purple-8);
+
+  --user-upgrade-basic-background-color: var(--purple-8);
+  --user-upgrade-gold-background-color: var(--orange-8);
+  --user-upgrade-platinum-background-color: var(--purple-7);
+
+  --table-header-border-color: var(--orange-6);
+  --table-row-border-color: var(--purple-7);
+  --table-row-hover-background: var(--purple-7);
+  --table-even-row-background: var(--purple-8);
+
+  --media-asset-placeholder-background-color: var(--purple-7);
+
+  --uploads-dropzone-background: var(--purple-7);
+  --uploads-dropzone-progress-bar-background-color: var(--purple-6);
+
+  --comment-sticky-background-color: var(--purple-7);
+
+  --post-tooltip-background-color: var(--purple-8);
+  --post-tooltip-border-color: var(--orange-6);
+  --post-tooltip-header-background-color: var(--purple-7);
+  --post-tooltip-info-color: var(--orange-2);
+
+  --post-tooltip-scrollbar-background: var(--orange-6);
+  --post-tooltip-scrollbar-thumb-color: var(--orange-4);
+  --post-tooltip-scrollbar-track-background: var(--purple-7);
+
+  --autocomplete-selected-background-color: var(--purple-7);
+  --autocomplete-border-color: var(--orange-6);
+
+  --post-notice-border-color: var(--orange-6);
+  --post-pending-notice-background: var(--purple-8);
+  --post-search-notice-background: var(--purple-8);
+
+  --post-artist-commentary-container-background: var(--purple-8);
+  --post-artist-commentary-container-border-color: var(--orange-6);
+
+  --keyboard-shortcut-color: var(--orange-0);
+  --keyboard-shortcut-background-color: var(--orange-7);
+
+  --login-link-color: var(--orange-3);
+  --divider-border-color: var(--purple-7);
+  --divider-border-hover-color: var(--orange-5);
+
+  --jquery-ui-widget-content-background: var(--purple-8);
+  --dialog-titlebar-background-color: var(--orange-2);
+  --dialog-titlebar-color: var(--purple-9);
+
+  --notice-info-background: var(--orange-8);
+  --notice-info-border-color: var(--orange-6);
+
+  --dtext-blockquote-border-color: var(--orange-5);
+  --dtext-hr-color: var(--orange-6);
+  --dtext-code-background: var(--purple-7);
+  --dtext-details-background-color: var(--purple-8);
+  --dtext-details-summary-background-color: var(--purple-7);
+  --dtext-details-summary-hover-background-color: var(--purple-6);
+  --dtext-spoiler-hover-color: var(--orange-0);
+
+  --paginator-arrow-background-color: var(--orange-1);
+
+  --asset-paginator-background-color: var(--purple-8);
+  --asset-paginator-background-hover-color: var(--purple-7);
+
+  --general-tag-color: var(--link-color);
+  --general-tag-hover-color: var(--link-hover-color);
+
+  --news-updates-background: var(--purple-8);
+  --news-updates-border-color: var(--purple-6);
+}
+
+body[data-current-user-theme="dark"], body[data-current-user-theme="halloween_night"] {
   @include dark-theme;
+}
+
+body[data-current-user-theme="pumpkin"] {
+  @include pumpkin-theme;
+}
+
+body[data-current-user-theme="halloween_night"] {
+  @include halloween-night-theme;
 }
 
 @media (prefers-color-scheme: dark) {

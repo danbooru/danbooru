@@ -3,7 +3,7 @@
 class NavbarComponent < ApplicationComponent
   attr_reader :current_user
 
-  delegate :li_link_to, :unread_dmail_indicator, :close_icon, :menu_icon, :main_app, :image_pack_tag, to: :helpers
+  delegate :li_link_to, :unread_dmail_indicator, :close_icon, :menu_icon, :main_app, :image_pack_tag, :halloween?, to: :helpers
 
   def initialize(current_user:)
     super
@@ -11,9 +11,7 @@ class NavbarComponent < ApplicationComponent
   end
 
   def logo_filename
-    date = Date.current
-
-    if Danbooru.config.enable_easter_eggs?.to_s.truthy? && date.month == 10 && date.day == 31
+    if halloween?
       "halloween-logo-128x128.png"
     else
       "danbooru-logo-128x128.png"
