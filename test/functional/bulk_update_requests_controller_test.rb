@@ -230,6 +230,17 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, Tag.find_by(name: "small_tag").is_deprecated?)
         end
+
+        should "fail when changing the category of a small tag" do
+          create(:tag, name: "small_tag", post_count: 10)
+          @bulk_update_request = create(:bulk_update_request, script: "category small_tag -> character")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(true, Tag.find_by(name: "small_tag").general?)
+        end
       end
 
       context "for a mod" do
@@ -345,6 +356,31 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, Tag.find_by(name: "large_tag").is_deprecated?)
+        end
+
+        should "succeed when changing the category of a small tag" do
+          create(:tag, name: "small_tag", post_count: 200)
+          @bulk_update_request = create(:bulk_update_request, script: "category small_tag -> character")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+          end
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(@mod, @bulk_update_request.approver)
+          assert_equal(true, Tag.find_by(name: "small_tag").character?)
+        end
+
+        should "fail when changing the category of a tag that's too large" do
+          create(:tag, name: "large_tag", post_count: 201)
+          @bulk_update_request = create(:bulk_update_request, script: "category large_tag -> character")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(true, Tag.find_by(name: "large_tag").general?)
         end
 
         should "succeed when removing a small artist alias" do

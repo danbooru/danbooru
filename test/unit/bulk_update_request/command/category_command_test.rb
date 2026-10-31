@@ -58,6 +58,14 @@ class CategoryCommandTest < ActiveSupport::TestCase
         assert_equal("approved", @bur.reload.status)
       end
 
+      should "change the category of a large tag" do
+        @tag = create(:tag, name: "hello", post_count: 5000)
+        @bur = create_bur!("category hello -> character", @admin)
+
+        assert_equal(true, @tag.reload.character?)
+        assert_equal("approved", @bur.reload.status)
+      end
+
       should "update the tag category counts for all posts with the tag" do
         post1 = create(:post, tag_string: "chen")
         post2 = create(:post, tag_string: "chen")

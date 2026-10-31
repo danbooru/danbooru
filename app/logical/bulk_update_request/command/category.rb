@@ -17,7 +17,7 @@ class BulkUpdateRequest::Command::Category < BulkUpdateRequest::Command
   end
 
   def process!(**)
-    Tag.find_or_create_by_name(@tag_name, category: category, current_user: User.system, is_bulk_update_request: true)
+    Tag.find_or_create_by_name(@tag_name).update!(category: category, updater: User.system, is_bulk_update_request: true)
   end
 
   def to_dtext
@@ -38,6 +38,13 @@ class BulkUpdateRequest::Command::Category < BulkUpdateRequest::Command
       # @see https://github.com/danbooru/danbooru/commit/f672e11160c21c6acb4676e61e09666f9525b7d2#r198302427
       tag.update_column(:category, category) # rubocop:disable Rails/SkipsModelValidations
     end
+  end
+
+  def approval_level(tags: nil)
+    tag = tags.present? ? tags.find { |tag| tag.name == @tag_name } : self.tag
+
+    return User::Levels::MODERATOR if tag.blank? || tag.is_small_tag?
+    User::Levels::ADMIN
   end
 
   def tag

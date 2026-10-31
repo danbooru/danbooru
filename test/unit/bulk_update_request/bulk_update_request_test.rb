@@ -390,6 +390,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @artist_tag = create(:artist_tag, name: "some_artist", post_count: 10)
           @character_tag1 = create(:character_tag, name: "some_character", post_count: 50)
           @character_tag2 = create(:character_tag, name: "another_character", post_count: 100)
+          @small_tag = create(:tag, name: "small_tag", post_count: 200)
+          @large_tag = create(:tag, name: "large_tag", post_count: 201)
           create(:wiki_page, title: @character_tag1.name)
           create(:wiki_page, title: @character_tag2.name)
 
@@ -399,17 +401,21 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur3 = create(:bulk_update_request, script: "create alias #{@artist_tag.name} -> some_other_artist")
 
           @bur4 = create(:bulk_update_request, script: "create implication #{@character_tag1.name} -> #{@character_tag2.name}")
+
+          @bur5 = create(:bulk_update_request, script: "category #{@small_tag.name} -> character")
+
+          @bur6 = create(:bulk_update_request, script: "category #{@large_tag.name} -> character")
         end
 
         should "find BURs the user can approve" do
           assert_search_equals(@bur3, can_approve: "true", current_user: @builder)
-          assert_search_equals([@bur3, @bur4], can_approve: "true", current_user: @mod, order: "id_asc")
-          assert_search_equals([@bur2, @bur3, @bur4], can_approve: "true", current_user: @admin, order: "id_asc")
+          assert_search_equals([@bur3, @bur4, @bur5], can_approve: "true", current_user: @mod, order: "id_asc")
+          assert_search_equals([@bur2, @bur3, @bur4, @bur5, @bur6], can_approve: "true", current_user: @admin, order: "id_asc")
         end
 
         should "find BURs the user can't approve" do
-          assert_search_equals([@bur2, @bur4], can_approve: "false", current_user: @builder, order: "id_asc")
-          assert_search_equals(@bur2, can_approve: "false", current_user: @mod)
+          assert_search_equals([@bur2, @bur4, @bur5, @bur6], can_approve: "false", current_user: @builder, order: "id_asc")
+          assert_search_equals([@bur2, @bur6], can_approve: "false", current_user: @mod, order: "id_asc")
           assert_search_equals([], can_approve: "false", current_user: @admin)
         end
 
