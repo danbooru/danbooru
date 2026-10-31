@@ -666,6 +666,34 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(Tag.categories.character, tag.last_version.category)
           end
 
+          should "not change the category of a tag that's too large for a member" do
+            tag = create(:tag, name: "hoge", post_count: 50)
+            as(create(:member_user)) { create(:post, tag_string: "char:hoge") }
+
+            assert_equal(Tag.categories.general, tag.reload.category)
+          end
+
+          should "change the category of a tag that's small enough for a builder" do
+            tag = create(:tag, name: "hoge", post_count: 200)
+            as(create(:builder_user)) { create(:post, tag_string: "char:hoge") }
+
+            assert_equal(Tag.categories.character, tag.reload.category)
+          end
+
+          should "not change the category of a tag that's too large for a builder" do
+            tag = create(:tag, name: "hoge", post_count: 201)
+            as(create(:builder_user)) { create(:post, tag_string: "char:hoge") }
+
+            assert_equal(Tag.categories.general, tag.reload.category)
+          end
+
+          should "change the category of a large tag for an admin" do
+            tag = create(:tag, name: "hoge", post_count: 201)
+            as(create(:admin_user)) { create(:post, tag_string: "char:hoge") }
+
+            assert_equal(Tag.categories.character, tag.reload.category)
+          end
+
           should "update the tag category counts for all posts with the tag" do
             post1 = create(:post, tag_string: "chen")
             post2 = create(:post, tag_string: "chen")

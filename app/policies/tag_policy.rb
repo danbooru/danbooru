@@ -4,7 +4,7 @@ class TagPolicy < ApplicationPolicy
   def can_change_category?
     return false if record.artist.present? && record.category == Tag.categories.artist
     return true if user.is_admin?
-    return true if user.is_builder? && record.post_count < 1_000
+    return true if user.is_builder? && record.is_small_tag?
     record.post_count < 50
   end
 

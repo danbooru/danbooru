@@ -101,7 +101,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not give the option to change the category for a large tag" do
-        @tag.update!(post_count: 1000)
+        @tag.update!(post_count: 201)
         get_auth edit_tag_path(@tag), @user
         assert_response :success
         assert_not_select("#tag_category")
@@ -170,7 +170,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not change category when the tag is too large to be changed by a builder" do
-        @tag = create(:tag, category: Tag.categories.general, post_count: 1001)
+        @tag = create(:tag, category: Tag.categories.general, post_count: 201)
         put_auth tag_path(@tag), @user, params: { tag: { category: Tag.categories.artist }}
 
         assert_response 403

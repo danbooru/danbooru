@@ -152,8 +152,15 @@ class TagTest < ActiveSupport::TestCase
       end
     end
 
+    should "change category when the tag is small enough to be changed by a builder" do
+      tag = create(:tag, post_count: 200)
+      Tag.find_or_create_by_name(tag.name, category: "artist", current_user: create(:builder_user))
+
+      assert_equal(Tag.categories.artist, tag.reload.category)
+    end
+
     should "not change category when the tag is too large to be changed by a builder" do
-      tag = create(:tag, post_count: 1001)
+      tag = create(:tag, post_count: 201)
       Tag.find_or_create_by_name(tag.name, category: "artist", current_user: create(:builder_user))
 
       assert_equal(0, tag.reload.category)
