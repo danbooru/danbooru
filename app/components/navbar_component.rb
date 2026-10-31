@@ -10,6 +10,14 @@ class NavbarComponent < ApplicationComponent
     @current_user = current_user
   end
 
+  def app_name
+    if halloween? && Danbooru.config.app_name.include?("booru")
+      Danbooru.config.app_name.gsub("booru", "-BOO-ru")
+    else
+      Danbooru.config.app_name
+    end
+  end
+
   def logo_filename
     if halloween?
       "halloween-logo-128x128.png"
