@@ -57,12 +57,21 @@
 </head>
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
-  <% if halloween? %>
-    <%= javascript_tag do %>
-      if (document.body.dataset.currentUserTheme === "auto") {
-        document.body.dataset.currentUserTheme = matchMedia("(prefers-color-scheme: dark)").matches ? "halloween_night" : "pumpkin";
+  <% if CurrentUser.user.theme == "auto" %>
+    <script type="text/javascript">
+      var darkMode = matchMedia("(prefers-color-scheme: dark)");
+
+      function applySystemTheme(darkMode) {
+        <% if halloween? %>
+          document.body.dataset.currentUserTheme = darkMode.matches ? "halloween_night" : "pumpkin";
+        <% else %>
+          document.body.dataset.currentUserTheme = darkMode.matches ? "dark" : "light";
+        <% end %>
       }
-    <% end %>
+
+      applySystemTheme(darkMode);
+      darkMode.addEventListener("change", applySystemTheme);
+    </script>
   <% end %>
 
   <%= render NewsUpdateComponent.new(cookies: cookies) %>

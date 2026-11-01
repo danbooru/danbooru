@@ -104,7 +104,8 @@ html {
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
 }
 
-html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpkin"] {
+/* The light theme is the base for all other themes, including the dark theme. */
+@mixin light-theme {
   --theme-background: light; /* Indicates whether the current theme is light or dark */
 
   --body-background-color: var(--white);
@@ -381,7 +382,7 @@ html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpk
   --deleted-artist-label-color: var(--grey-6);
 }
 
-/* variables that aren't defined in the dark theme fall back to the :root theme */
+/* The dark theme overrides the light theme and is the base for all other dark themes. */
 @mixin dark-theme {
   --theme-background: dark;
 
@@ -395,6 +396,8 @@ html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpk
   --link-hover-color: var(--azure-3);
   --focus-ring-color: var(--link-color);
 
+  --default-border-color: var(--grey-7);
+
   --success-color: var(--green-4);
   --warning-color: var(--yellow-3);
   --error-color: var(--red-4);
@@ -402,8 +405,6 @@ html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpk
   --success-hover-color: var(--green-3);
   --warning-hover-color: var(--yellow-2);
   --error-hover-color: var(--red-3);
-
-  --default-border-color: var(--grey-7);
 
   --error-background-color: var(--red-9);
   --success-background-color: var(--green-9);
@@ -480,6 +481,9 @@ html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpk
   --preview-has-parent-color: var(--orange-3);
   --preview-selected-color: rgb(255 255 255 / 25%);
 
+  // --preview-icon-color: var(--inverse-text-color);
+  // --preview-icon-background: rgb(0 0 0 / 70%);
+
   --media-asset-placeholder-background-color: var(--grey-8);
 
   --modqueue-tag-warning-color: var(--red-7);
@@ -516,6 +520,7 @@ html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpk
 
   --autocomplete-selected-background-color: var(--grey-7);
   --autocomplete-border-color: var(--grey-4);
+  // --autocomplete-tag-autocorrect-underline: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAHElEQVQYV2NkQAL/GRj+M4IJBgY4zQhSABMEsQHMOAgCT5YN9gAAAABJRU5ErkJggg==");
 
   --diff-list-added-color: var(--green-4);
   --diff-list-removed-color: var(--red-4);
@@ -540,10 +545,18 @@ html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpk
   --post-upvote-color: var(--link-color);
   --post-downvote-color: var(--red-4);
 
+  // --note-body-background: #ffffee;
+  // --note-body-text-color: var(--black);
+  // --note-body-border-color: var(--black);
+  // --note-box-border-color: var(--black);
+  // --note-box-shadow: 0 0 0 1px white;
+
   --unsaved-note-box-border-color: var(--red-5);
   --movable-note-box-border-color: var(--blue-5);
   --note-preview-border-color: var(--red-5);
+  // --note-preview-background: var(--note-body-background);
   --note-highlight-color: var(--blue-5);
+  //--note-tn-color: var(--muted-text-color);
 
   --series-pool-color: var(--copyright-tag-color);
   --series-pool-hover-color: var(--copyright-tag-hover-color);
@@ -554,6 +567,7 @@ html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpk
   --post-mode-menu-active-post-outline-color: var(--azure-4);
   --post-mode-menu-translation-background: var(--blue-8);
 
+  // --tag-count-color: var(--muted-text-color);
   --low-post-count-color: var(--red-4);
 
   --remove-favorite-button: var(--red-4);
@@ -862,7 +876,12 @@ html, body[data-current-user-theme="light"], body[data-current-user-theme="pumpk
   --news-updates-border-color: var(--purple-6);
 }
 
-body[data-current-user-theme="dark"], body[data-current-user-theme="halloween_night"] {
+body[data-current-user-theme] {
+  @include light-theme;
+}
+
+body[data-current-user-theme="dark"],
+body[data-current-user-theme="halloween_night"] {
   @include dark-theme;
 }
 
@@ -872,10 +891,4 @@ body[data-current-user-theme="pumpkin"] {
 
 body[data-current-user-theme="halloween_night"] {
   @include halloween-night-theme;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    @include dark-theme;
-  }
 }
