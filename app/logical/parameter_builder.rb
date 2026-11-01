@@ -106,7 +106,7 @@ class ParameterBuilder
     stack = [current]
 
     until parser.eos?
-      name = parser.expect(/[a-zA-Z_]+/).to_sym
+      name = parser.expect(/[a-zA-Z0-9_]+/).to_sym
       current[name] = {}
 
       if parser.accept("[")

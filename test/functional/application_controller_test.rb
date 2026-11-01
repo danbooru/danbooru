@@ -451,10 +451,10 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "support simple fields" do
-        get posts_path(only: "id,rating,score", limit: 1), as: :json
+        get posts_path(only: "id,md5,rating,score", limit: 1), as: :json
 
         assert_response :success
-        assert_equal(%w[id rating score].sort, response.parsed_body.sole.keys.sort)
+        assert_equal(%w[id md5 rating score].sort, response.parsed_body.sole.keys.sort)
       end
 
       should "ignore nil nested includes" do
