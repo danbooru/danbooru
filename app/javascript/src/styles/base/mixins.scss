@@ -1,5 +1,5 @@
 @mixin active-link {
-  color: var(--link-color);
+  color: var(--active-link-color);
 
   &:hover, &:focus {
     background-color: var(--subnav-menu-background-color);
@@ -8,7 +8,7 @@
 }
 
 @mixin inactive-link {
-  color: var(--muted-text-color);
+  color: var(--inactive-link-color);
 
   &:hover {
     color: var(--link-hover-color);
