@@ -107,6 +107,7 @@ html {
 /* The light theme is the base for all other themes, including the dark theme. */
 @mixin light-theme {
   --theme-background: light; /* Indicates whether the current theme is light or dark */
+  --theme-swatch-background: linear-gradient(135deg, var(--blue-0) 0%, var(--grey-1) 60%);
 
   --body-background-color: var(--white);
   --text-color: var(--black);
@@ -385,6 +386,7 @@ html {
 /* The dark theme overrides the light theme and is the base for all other dark themes. */
 @mixin dark-theme {
   --theme-background: dark;
+  --theme-swatch-background: linear-gradient(135deg, var(--grey-9) 0%, var(--grey-9) 60%);
 
   --body-background-color: var(--grey-9);
   --text-color: var(--grey-2);
@@ -661,6 +663,8 @@ html {
 }
 
 @mixin pumpkin-theme {
+  --theme-swatch-background: linear-gradient(135deg, var(--body-background-color) 0%, var(--link-color) 60%);
+
   --body-background-color: var(--yellow-1);
   --text-color: var(--orange-7);
 
@@ -761,6 +765,8 @@ html {
 }
 
 @mixin halloween-night-theme {
+  --theme-swatch-background: linear-gradient(135deg, var(--link-color) 0%, var(--body-background-color) 60%);
+
   --body-background-color: var(--purple-9);
   --text-color: var(--orange-1);
 
@@ -876,19 +882,23 @@ html {
   --news-updates-border-color: var(--purple-6);
 }
 
-body[data-current-user-theme] {
+[data-current-user-theme] {
   @include light-theme;
 }
 
-body[data-current-user-theme="dark"],
-body[data-current-user-theme="halloween_night"] {
+[data-current-user-theme="dark"],
+[data-current-user-theme="halloween_night"] {
   @include dark-theme;
 }
 
-body[data-current-user-theme="pumpkin"] {
+[data-current-user-theme="pumpkin"] {
   @include pumpkin-theme;
 }
 
-body[data-current-user-theme="halloween_night"] {
+[data-current-user-theme="halloween_night"] {
   @include halloween-night-theme;
+}
+
+[data-current-user-theme="auto"] {
+  --theme-swatch-background: linear-gradient(135deg, var(--blue-0) 50%, var(--grey-9) 50%);
 }

@@ -1,18 +1,21 @@
-let CurrentUser = {};
+export default class CurrentUser {
+  static data(key) {
+    return $("body").data(`current-user-${key}`);
+  }
 
-CurrentUser.data = function(key) {
-  return $("body").data(`current-user-${key}`);
-};
+  static update(settings) {
+    return $.ajax(`/users/${CurrentUser.data("id")}.json`, {
+      method: "PUT",
+      data: { user: settings }
+    });
+  }
 
-CurrentUser.update = function(settings) {
-  return $.ajax(`/users/${CurrentUser.data("id")}.json`, {
-    method: "PUT",
-    data: { user: settings }
-  });
-};
+  static set theme(theme) {
+    let autoTheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.body.dataset.currentUserTheme = theme === 'auto' ? autoTheme : theme;
+  }
 
-CurrentUser.darkMode = function() {
-  return getComputedStyle(document.body).getPropertyValue("--theme-background").trim() === "dark";
-};
-
-export default CurrentUser;
+  static darkMode() {
+    return getComputedStyle(document.body).getPropertyValue("--theme-background").trim() === "dark";
+  }
+}
