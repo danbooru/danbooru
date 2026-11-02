@@ -1416,10 +1416,12 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "validate the maximum number of tags" do
-            @post.update(tag_string: (1..(Post::MAX_TAG_COUNT + 1)).to_a.join(" "))
+            stub_const(Post, :MAX_TAG_COUNT, 3) do
+              @post.update(tag_string: "a b c d")
 
-            assert_equal(false, @post.valid?)
-            assert_equal(["Post cannot have more than #{Post::MAX_TAG_COUNT} tags"], @post.errors[:base])
+              assert_equal(false, @post.valid?)
+              assert_equal(["Post cannot have more than 3 tags"], @post.errors[:base])
+            end
           end
         end
 

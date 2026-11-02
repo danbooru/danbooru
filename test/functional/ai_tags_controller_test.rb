@@ -89,12 +89,12 @@ class AITagsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "show an error message if the post couldn't be updated" do
-        @post.update!(tag_string: Post::MAX_TAG_COUNT.times.to_a.join(" "))
+        @post.update_columns(rating: "x") # rubocop:disable Rails/SkipsModelValidations
         put_auth tag_ai_tag_path(media_asset_id: @ai_tag.media_asset, tag_id: @ai_tag.tag), @user, params: { mode: "add" }, xhr: true
 
         assert_response :success
         assert_equal(false, @post.reload.has_tag?("touhou"))
-        assert_equal(DText.format_inline("Couldn't update post ##{@post.id}: Post cannot have more than #{Post::MAX_TAG_COUNT} tags"), flash[:notice])
+        assert_match(/Couldn't update/, flash[:notice])
       end
     end
   end

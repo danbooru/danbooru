@@ -116,14 +116,14 @@ class DtextEditorChromeTest < ChromeSystemTestCase
 
       context "the length counter" do
         should "update as text is typed, and turn red past the max length" do
-          @full_editor_field.set("x" * 5000)
+          @full_editor_field.native.fill("x" * 5000)
           assert_hidden ".new-comment .dtext-input-counter-text"
 
-          @full_editor_field.set("x" * 12_001)
+          @full_editor_field.native.fill("x" * 12_001)
           assert_visible ".new-comment .dtext-input-counter-text", text: "12001/15000"
           assert_no_selector ".new-comment .dtext-input-counter-text.text-error"
 
-          @full_editor_field.set("x" * 15_001)
+          @full_editor_field.native.fill("x" * 15_001)
           assert_selector ".new-comment .dtext-input-counter-text.text-error", text: "15001/15000"
         end
       end
@@ -141,11 +141,11 @@ class DtextEditorChromeTest < ChromeSystemTestCase
         assert_selector ".dtext-input-counter-text", text: "0/600"
         assert_no_selector ".dtext-input-counter-text.text-error"
 
-        fill_in "Reason", with: "x" * 500
+        find_field("Reason").native.fill("x" * 500)
         assert_selector ".dtext-input-counter-text", text: "500/600"
         assert_no_selector ".dtext-input-counter-text.text-error"
 
-        fill_in "Reason", with: "x" * 601
+        find_field("Reason").native.fill("x" * 601)
         assert_selector ".dtext-input-counter-text.text-error", text: "601/600"
       end
     end

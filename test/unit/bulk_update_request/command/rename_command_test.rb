@@ -170,7 +170,8 @@ class RenameCommandTest < ActiveSupport::TestCase
         end
 
         should "not fail if the user has too many blacklisted tags" do
-          user = build(:user, blacklisted_tags: User::MAX_BLACKLIST_TAGS.succ.times.map { |n| create(:tag, name: "tag#{n}").name }.join("\n"))
+          create(:tag, name: "tag0")
+          user = build(:user, blacklisted_tags: User::MAX_BLACKLIST_TAGS.succ.times.map { |n| "tag#{n}" }.join("\n"))
           user.save!(validate: false)
 
           create_bur!("rename tag0 -> new_tag", @admin)
@@ -189,7 +190,8 @@ class RenameCommandTest < ActiveSupport::TestCase
         end
 
         should "not fail if the saved search has too many tags" do
-          ss = build(:saved_search, query: SavedSearch::MAX_TAGS.succ.times.map { |n| create(:tag, name: "tag#{n}").name }.join(" "))
+          create(:tag, name: "tag0")
+          ss = build(:saved_search, query: SavedSearch::MAX_TAGS.succ.times.map { |n| "tag#{n}" }.join(" "))
           ss.save!(validate: false)
 
           create_bur!("rename tag0 -> new_tag", @admin)

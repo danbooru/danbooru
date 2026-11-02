@@ -330,6 +330,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "when re-uploading a media asset stuck in the 'processing' state" do
         should "mark the asset as failed" do
+          MediaAsset.stubs(:sleep)
           asset = create(:media_asset, file: File.open("test/files/jpg/test.jpg"), status: "processing")
           create_upload!("test/files/jpg/test.jpg", user: @user)
 
