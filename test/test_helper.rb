@@ -48,6 +48,9 @@ end
 require_relative "../config/environment"
 require "rails/test_help"
 
+# Use the cheapest bcrypt cost so that creating users in tests is fast.
+BCrypt::Engine.cost = BCrypt::Engine::MIN_COST
+
 Rails.root.glob("test/factories/*.rb").each { |file| require file }
 Rails.root.glob("test/test_helpers/*.rb").each { |file| require file }
 
