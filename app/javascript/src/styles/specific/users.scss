@@ -23,14 +23,12 @@ div#c-users {
     }
 
     .theme-swatch {
-      --swatch-ring-color: var(--link-color);
-
       .theme-swatch-preview {
         background: var(--theme-swatch-background);
       }
 
       input:checked + .theme-swatch-preview {
-        box-shadow: 0 0 0 3px var(--swatch-ring-color);
+        outline: 2px solid var(--focus-ring-color);
       }
     }
   }
