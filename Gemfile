@@ -82,7 +82,6 @@ group :development do
   gem "benchmark-ips", "~> 2", require: "benchmark/ips"
   gem "listen", "~> 3"
   gem "derailed_benchmarks", "~> 2"
-  gem "ruby-lsp-shoulda-context", "~> 0.4", require: false
 end
 
 group :test do
