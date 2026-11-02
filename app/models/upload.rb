@@ -8,7 +8,7 @@ class Upload < ApplicationRecord
   # The list of allowed archive file types.
   ARCHIVE_FILE_TYPES = %i[zip rar 7z]
 
-  # The maximum number of files allowed per upload.
+  # The maximum number of files allowed per upload. If you change this, you should also change `RACK_MULTIPART_FILE_LIMIT` in config/puma.rb.
   MAX_FILES_PER_UPLOAD = 100
 
   # The maximum number of 'pending' or 'processing' media assets a single user can have at once.

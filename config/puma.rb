@@ -78,8 +78,8 @@ max_keep_alive ENV.fetch("PUMA_MAX_KEEP_ALIVE", 1000).to_i
 # The number of seconds to wait for another request within a persistent (keep alive) session.
 persistent_timeout ENV.fetch("PUMA_PERSISTENT_TIMEOUT", 65).to_i
 
-# The number of seconds to wait until we get the first data for the request
-first_data_timeout 30
+# The maximum number of seconds to wait for the first byte of the request
+first_data_timeout 10
 
 # The `environment` that Puma will run in.
 environment rails_env
@@ -89,6 +89,61 @@ pidfile ENV.fetch("PUMA_PIDFILE", "tmp/pids/server.pid")
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
+
+# Set Rack-level limits on requests. These limits come after any limits set by any proxies (Nginx or Cloudflare) in front of us.
+#
+# Cloudflare max URL length: 16KB (https://developers.cloudflare.com/fundamentals/reference/connection-limits/)
+# Nginx max request line length: 8kb (`large_client_header_buffers 4 8k`, https://nginx.org/en/docs/http/ngx_http_core_module.html#large_client_header_buffers)
+# Puma max URL length: 12kb (PUMA_REQUEST_URI_MAX_LENGTH fixed constant)
+# Effective max URL length: 8kb
+#
+# Cloudflare max total header length: 128KB (https://developers.cloudflare.com/fundamentals/reference/connection-limits/)
+# Nginx max total header count: 1000 (https://nginx.org/en/docs/http/ngx_http_core_module.html#max_headers)
+# Nginx max total header length: 32kb (`large_client_header_buffers 4 8k`, https://nginx.org/en/docs/http/ngx_http_core_module.html#large_client_header_buffers)
+# Puma max total header length: 112kb (MAX_HEADER fixed constant)
+# Puma max single header length: 256 bytes per key / 80kb per value (fixed constants)
+# Effective max header length: 1000 lines / 8kb per line / 32kb total header length
+#
+# Cloudflare max body length: 100MB
+# Nginx max body length: 100MB (`client_max_body_size`, https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size)
+# Puma max body length: 100MB (`http_content_length_limit` below)
+# Effective max body length: 100MB
+
+# The maximum size of a request body in bytes (and hence, the max size of file uploads). If you change this, you must
+# also change `client_max_body_size` in nginx.conf. Default: 100 MB.
+# https://puma.io/puma/Puma/DSL.html#http_content_length_limit-instance_method
+http_content_length_limit ENV.fetch("DANBOORU_MAX_FILE_SIZE", 100 * 1024 * 1024).to_i
+
+# The maximum length of the query string in the URL (e.g. `?foo=bar`) and in application/x-www-form-urlencoded form bodies. Default: 1 MB.
+# The URL length is already limited by Puma/Nginx/Cloudflare, so this effectively just limits the form body size.
+# https://rack.github.io/rack/main/index.html#rackqueryparserbytesizelimit
+ENV["RACK_QUERY_PARSER_BYTESIZE_LIMIT"] ||= "1048576"
+
+# The maximum number of parameters in the query string and in application/x-www-form-urlencoded form bodies. Default: 512.
+# Rails parses query strings (see config/initializers/query_parser_limits.rb), so this just limits the number of
+# parameters in form bodies.
+# https://rack.github.io/rack/main/index.html#rackqueryparserparamslimit
+ENV["RACK_QUERY_PARSER_PARAMS_LIMIT"] ||= "512"
+
+# The maximum total length of a multipart form, including files. Default: 100 MB.
+ENV["RACK_MULTIPART_PARSER_BYTESIZE_LIMIT"] ||= ENV.fetch("DANBOORU_MAX_FILE_SIZE", 100 * 1024 * 1024).to_s
+
+# The maximum total length of all non-file parameters in a multipart form. Default: 1 MB.
+# https://rack.github.io/rack/main/index.html#rackmultipartbuffereduploadbytesizelimit
+ENV["RACK_MULTIPART_BUFFERED_UPLOAD_BYTESIZE_LIMIT"] ||= "1048576"
+
+# The maximum amount of nesting allowed in parameters (e.g. `a[b][c][d]=1`). Default: 32.
+# https://rack.github.io/rack/main/index.html#paramdepthlimit
+Rack::Utils.param_depth_limit = ENV.fetch("RACK_PARAM_DEPTH_LIMIT", 32).to_i + 1
+
+# The maximum number of files a multipart form can contain. Default: 100.
+# If you change this, you may also need to change MAX_FILES_PER_UPLOAD in app/models/upload.rb.
+# https://rack.github.io/rack/main/index.html#multipartfilelimit
+Rack::Utils.multipart_file_limit = ENV.fetch("RACK_MULTIPART_FILE_LIMIT", 100).to_i + 1
+
+# The maximum number of form fields (including files) a multipart form can contain. Default: 512.
+# https://rack.github.io/rack/main/index.html#multiparttotalpartlimit
+Rack::Utils.multipart_total_part_limit = ENV.fetch("RACK_MULTIPART_TOTAL_PART_LIMIT", 512).to_i + 1
 
 # Start the Puma control rack application on +url+. This application can
 # be communicated with to control the main server. Additionally, you can

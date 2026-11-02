@@ -245,7 +245,13 @@ module Danbooru
       40
     end
 
-    # Maximum size of an upload. If you change this, you must also change `client_max_body_size` in your nginx.conf.
+    # Maximum size of a direct-file upload in bytes. This doesn't affect files uploaded by URL.
+    #
+    # If you change this, you must also manually change `client_max_body_size` in your nginx.conf. This must be set with
+    # the DANBOORU_MAX_FILE_SIZE environment variable, not in danbooru_local_config.rb, otherwise it won't take effect
+    # in `http_content_length_limit` in `config/puma.rb`.
+    #
+    # Note that Cloudflare's limit is 100MB, so if you're behind Cloudflare it can't be set higher than 100MB.
     def max_file_size
       100.megabytes
     end

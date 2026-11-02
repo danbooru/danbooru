@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
   end
 
   # Mark an action as for anonymous users only. The current user won't be loaded, instead the user will be set to the anonymous user.
-  def self.anonymous_only(*actions, **options)
+  def self.anonymous_only(*_actions, **options)
     skip_before_action :set_current_user, **options
     skip_before_action :redirect_if_name_invalid?, **options
     before_action -> { CurrentUser.user = User.anonymous }, **options
@@ -121,7 +121,7 @@ class ApplicationController < ActionController::Base
         rescue_exception(exception.cause)
       when ActiveRecord::QueryCanceled
         render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
-      when ActionController::BadRequest
+      when ActionController::BadRequest, ActionDispatch::Http::Parameters::ParseError
         render_error_page(400, exception, message: exception.message)
       when RequestBodyNotAllowedError
         render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
