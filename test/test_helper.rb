@@ -48,6 +48,14 @@ end
 require_relative "../config/environment"
 require "rails/test_help"
 
+# Make Shakapacker only compile the packs once, on the first pack lookup. Otherwise Shakapacker hashes every watched
+# file on every lookup, which is slow.
+Shakapacker.compiler.singleton_class.prepend(Module.new do
+  def compile
+    @compile ||= super
+  end
+end)
+
 # Use the cheapest bcrypt cost so that creating users in tests is fast.
 BCrypt::Engine.cost = BCrypt::Engine::MIN_COST
 
