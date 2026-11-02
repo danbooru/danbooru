@@ -3,6 +3,10 @@
 class ApplicationController < ActionController::Base
   class PageRemovedError < StandardError; end
   class RequestBodyNotAllowedError < StandardError; end
+  class ParamTooLongError < StandardError; end
+
+  # Max length of a GET parameter value.
+  MAX_GET_PARAMETER_LENGTH = 16.kilobytes
 
   include Pundit::Authorization
 
@@ -12,6 +16,7 @@ class ApplicationController < ActionController::Base
 
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
   before_action :check_get_body
+  before_action :check_oversized_get_params
   before_action :reset_current_user
   before_action :set_current_user
   before_action :normalize_search
@@ -143,7 +148,7 @@ class ApplicationController < ActionController::Base
         render_error_page(410, exception, template: "static/pagination_error", message: exception.message)
       when PostQuery::TagLimitError
         render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
-      when PostQuery::Error, ParameterBuilder::Error, UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
+      when ParamTooLongError, PostQuery::Error, ParameterBuilder::Error, UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
         render_error_page(422, exception, message: exception.message)
       when RateLimiter::RateLimitError
         render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
@@ -258,9 +263,32 @@ class ApplicationController < ActionController::Base
     request.format = :html if request.format == Mime::ALL
   end
 
+  # Reject GET requests with a request body. Sometimes users write scripts that accidentally send the params in the body
+  # instead of the URL, which is against spec.
   def check_get_body
     if request.body&.size.to_i > 0 && (request.get? || request.head? || request.options?) && request.method == request.request_method
       raise RequestBodyNotAllowedError
+    end
+  end
+
+  # Reject GET parameter values that are too long. Normally GET parameters limited by the overall URL length, but
+  # it's possible to use POST with `X-HTTP-Method-Override: GET` to send oversized parameters in the request body.
+  def check_oversized_get_params
+    return unless request.get? || request.head?
+
+    params.except(:controller, :action, :format).each do |name, value|
+      check_param_length!(name.to_s, value)
+    end
+  end
+
+  def check_param_length!(name, value)
+    case value
+    when String
+      raise ParamTooLongError, "#{name} parameter is too long (max: #{MAX_GET_PARAMETER_LENGTH} bytes)" if value.bytesize > MAX_GET_PARAMETER_LENGTH
+    when ActionController::Parameters
+      value.each_value { |item| check_param_length!(name, item) }
+    when Array
+      value.each { |item| check_param_length!(name, item) }
     end
   end
 

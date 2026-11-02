@@ -33,6 +33,26 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 200
     end
 
+    should "return 422 for an oversized param on a GET request" do
+      get posts_path(foo: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1)), as: :json
+
+      assert_response 422
+      assert_equal("ApplicationController::ParamTooLongError", response.parsed_body["error"])
+    end
+
+    should "return 422 for an oversized param on a POST request overridden to GET" do
+      post posts_path(format: :json), params: { _method: "GET", foo: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1) }
+
+      assert_response 422
+      assert_equal("ApplicationController::ParamTooLongError", response.parsed_body["error"])
+    end
+
+    should "not restrict parameter size for normal POST requests" do
+      post_auth wiki_pages_path, create(:user), params: { wiki_page: attributes_for(:wiki_page, body: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1)) }
+
+      assert_redirected_to wiki_page_path(WikiPage.last)
+    end
+
     should "return 404 Not Found for an unsupported method on the root path" do
       post root_path
       assert_response 404
@@ -494,8 +514,8 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
       end
 
-      should "return an error for field lists that are too long using a POST request with _method=GET" do
-        post posts_path(format: :json), params: { _method: "GET", limit: 1, only: "id," * 500_000 }, as: :url_encoded
+      should "return a param length error for field lists that are too long using a POST request with _method=GET" do
+        post posts_path(format: :json), params: { _method: "GET", limit: 1, only: "id," * ParameterBuilder::MAX_LENGTH }, as: :url_encoded
 
         assert_response 422
         assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
