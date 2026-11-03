@@ -16,7 +16,7 @@ module Source
       end
 
       def username
-        creator["displayName"] || parsed_url.username || parsed_referer&.username
+        creator["username"] || parsed_url.username || parsed_referer&.username
       end
 
       def profile_url
@@ -44,18 +44,42 @@ module Source
       end
 
       memoize def creator
-        asset.dig("collection", "owner") || {}
+        address = collection.dig("owner", "address")
+        account = urql_data(profile_page(address)).filter_map { |data| data.dig("profilesByAccount", "account") }.first if address.present?
+
+        account || { "address" => address }.compact
+      end
+
+      memoize def collection
+        slug = asset.dig("collection", "slug")
+        return {} if slug.blank?
+
+        urql_data(collection_page(slug)).filter_map { |data| data["collectionBySlug"] }.find { |collection| collection["owner"] } || {}
       end
 
       memoize def asset
-        script = page&.css("script")&.grep(/itemByIdentifier/)&.first&.text.to_s
-        json = script[/\.push\((\{.*\})\)\s*\z/m, 1]&.parse_json || {}
-
-        json[:rehydrate]&.values&.first&.dig(:data, :itemByIdentifier) || {}
+        urql_data(page).filter_map { |data| data["itemByIdentifier"] }.first || {}
       end
 
       memoize def page
         http.cache(1.minute).parsed_get(page_url)
+      end
+
+      memoize def collection_page(slug)
+        http.cache(1.minute).parsed_get("https://opensea.io/collection/#{slug}")
+      end
+
+      memoize def profile_page(address)
+        http.cache(1.minute).parsed_get("https://opensea.io/#{address}")
+      end
+
+      def urql_data(document)
+        scripts = document&.css("script")&.grep(/urql_transport/).to_a
+
+        scripts.flat_map do |script|
+          json = script.text[/\.push\((\{.*\})\)\s*\z/m, 1]&.parse_json
+          json&.dig("rehydrate")&.values&.filter_map { |result| result["data"] }.to_a
+        end
       end
     end
   end
