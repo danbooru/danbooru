@@ -94,7 +94,7 @@ module Source
       end
 
       def artist_commentary_desc
-        article_commentary_desc.presence || post_commentary_desc.presence
+        post_commentary_desc.presence || article_commentary_desc.presence
       end
 
       # https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/opus/rich_text_nodes.md
@@ -102,7 +102,11 @@ module Source
         text = CGI.escapeHTML(rich["text"])
         case rich["type"]
         when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_CV", "RICH_TEXT_NODE_TYPE_AV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB", "RICH_TEXT_NODE_TYPE_GOODS"
-          %{<a href="#{CGI.escapeHTML(URI.join("https://", rich["jump_url"]))}">#{text}</a>}
+          if rich["jump_url"].present?
+            %{<a href="#{CGI.escapeHTML(URI.join("https://", rich["jump_url"]))}">#{text}</a>}
+          else
+            text
+          end
         when "RICH_TEXT_NODE_TYPE_EMOJI"
           %{<a href="#{rich.dig("emoji", "icon_url")}">#{text}</a>}
         when "RICH_TEXT_NODE_TYPE_AT"
