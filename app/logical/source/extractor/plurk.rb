@@ -10,7 +10,7 @@ module Source
         if parsed_url.image_url?
           [url]
         else
-          artist_commentary_desc.to_s.parse_html.css("a.pictureservices img").pluck("alt")
+          artist_commentary_desc.to_s.parse_html.css("a.pictureservices img[alt^='https://images.plurk.com/']").pluck("alt")
         end
       end
 
@@ -22,28 +22,36 @@ module Source
         parsed_url.response_id || parsed_referer&.response_id
       end
 
-      memoize def response
-        page&.at("div[data-rid=#{response_id}]") if response_id.present?
+      memoize def page
+        parsed_get("https://www.plurk.com/p/#{illust_id}") if illust_id.present?
       end
 
-      memoize def page
-        parsed_get("https://www.plurk.com/s/p/#{illust_id}") if illust_id.present?
+      memoize def responses
+        http.cache(1.minute).parsed_post("https://www.plurk.com/Responses/get", form: { plurk_id: illust_id.to_i(36), from_response: 0, count: 100 }) if response_id.present?
+      end
+
+      memoize def response
+        responses&.dig(:responses)&.find { |response| response[:id].to_s == response_id }
       end
 
       memoize def plurk_html
-        if response_id.present?
-          response
+        if response.present?
+          response[:content].to_s.parse_html
         else
-          page&.at(".bigplurk")
+          page&.at(".bigplurk .text_holder")
         end
       end
 
+      memoize def user
+        response.present? ? responses.dig(:users, response[:user_id].to_s) : nil
+      end
+
       def display_name
-        plurk_html&.at(".nick")&.text&.strip
+        user ? user[:display_name] : page&.at(".bigplurk .user a.name")&.text
       end
 
       def username
-        plurk_html&.attr("data-nick")
+        user ? user[:nick_name] : page&.at(".bigplurk .user a.name")&.attr("href")&.delete_prefix("/")
       end
 
       def profile_url
@@ -58,7 +66,7 @@ module Source
       end
 
       def artist_commentary_desc
-        plurk_html&.at(".plurk_content")&.to_html
+        plurk_html&.inner_html
       end
 
       def dtext_artist_commentary_desc

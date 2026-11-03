@@ -160,7 +160,9 @@ module Source::Tests::Extractor
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          <https://4.bp.blogspot.com/-HPXVpK9ukb4/USX0700w-uI/AAAAAAAALok/7MSx8yVhR7M/s1600/18_GWTB6.jpg> #隨爆而逝
+          <https://4.bp.blogspot.com/-HPXVpK9ukb4/USX0700w-uI/AAAAAAAALok/7MSx8yVhR7M/s1600/18_GWTB6.jpg>
+
+          #隨爆而逝
           感謝噗友 "emilwu":[http://www.plurk.com/emilwu] 整理:
 
           <https://imgur.com/a/Y8YFV>
