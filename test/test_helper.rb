@@ -27,14 +27,14 @@ if ENV["COVERAGE"].present?
   SimpleCov::SourceFile.prepend(SimpleCov::SourceFileErbWarningPatch)
 
   SimpleCov.start "rails" do
-    add_group "Extractors", "app/logical/source"
-    add_group "Libraries", ["app/logical", "lib"]
-    add_group "Components", "app/components"
-    add_group "Policies", "app/policies"
-    add_group "Views", "app/views"
+    group "Extractors", "app/logical/source"
+    group "Libraries", ["app/logical", "lib"]
+    group "Components", "app/components"
+    group "Policies", "app/policies"
+    group "Views", "app/views"
 
     enable_coverage :branch
-    enable_coverage_for_eval
+    enable_coverage :eval
 
     formatter SimpleCov::Formatter::MultiFormatter.new([
       SimpleCov::Formatter::HTMLFormatter,      # tmp/coverage/index.html
