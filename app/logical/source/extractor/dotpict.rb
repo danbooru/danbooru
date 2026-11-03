@@ -63,6 +63,12 @@ class Source::Extractor::Dotpict < Source::Extractor
 
   memoize def api_response
     # curl "https://api.dotpicko.net/works/4814277/detail" | jq
-    http.cache(1.minute).parsed_get("https://api.dotpicko.net/works/#{work_id}/detail") || {}
+    http.headers(api_headers).cache(1.minute).parsed_get("https://api.dotpicko.net/works/#{work_id}/detail") || {}
+  end
+
+  # The API requires tokens derived from the current minute, as computed by the site's JS.
+  def api_headers
+    minute = 60 * (Time.now.to_i / 60)
+    { "X-TOKEN1": Digest::MD5.hexdigest("aS!e$M#{minute}"), "X-TOKEN2": Digest::MD5.hexdigest("UwY@a3#{minute}") }
   end
 end
