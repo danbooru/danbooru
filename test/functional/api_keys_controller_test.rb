@@ -52,6 +52,13 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "pre-fill the form from the URL params" do
+        get_auth new_user_api_key_path(@user.id, api_key: { name: "MyApp", permissions: ["posts:index"] }), @user
+
+        assert_response :success
+        assert_select "input[name='api_key[name]'][value='MyApp']"
+      end
+
       should "fail for an Anonymous user" do
         get new_user_api_key_path(@user.id)
         assert_response 403

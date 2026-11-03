@@ -195,7 +195,7 @@ class SessionLoader
 
   # @return [Boolean] true if the current request has an API key
   def has_api_authentication?
-    request.authorization.present? || params.key?(:login) || params.key?(:api_key)
+    request.authorization.present? || params.key?(:login) || params[:api_key].is_a?(String)
   end
 
   private
