@@ -84,7 +84,13 @@ module Source
       end
 
       def http
-        super.headers("User-Agent": "Android Mobile").cookies(age_check: 1)
+        cookie_jar = HTTP::CookieJar.new
+
+        %w[fc2.com fc2blog.net fc2blog.us].each do |domain|
+          cookie_jar.add(HTTP::Cookie.new("age_check", "1", domain:, path: "/", for_domain: true))
+        end
+
+        super.headers("User-Agent": "Android Mobile").use(session: { cookie_jar: })
       end
     end
   end
