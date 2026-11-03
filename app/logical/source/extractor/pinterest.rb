@@ -78,8 +78,8 @@ class Source::Extractor::Pinterest < Source::Extractor
 
   memoize def page_pin_data
     # Example: window.__PWS_RELAY_REGISTER_COMPLETED_REQUEST__("...", {"data": {...}});
-    script = page&.at('script[data-relay-completed-request="true"]:contains("__PWS_RELAY_REGISTER_COMPLETED_REQUEST__")')
-    payload = script&.text.to_s[/window\.__PWS_RELAY_REGISTER_COMPLETED_REQUEST__\([^,]+,\s*(\{.*\})\);\s*\z/m, 1]
-    payload&.parse_json&.dig("data", "v3GetPinQueryv2", "data") || {}
+    scripts = page&.css('script[data-relay-completed-request="true"]').to_a.select { |script| script.text.include?("__PWS_RELAY_REGISTER_COMPLETED_REQUEST__") }
+    payloads = scripts.filter_map { |script| script.text[/window\.__PWS_RELAY_REGISTER_COMPLETED_REQUEST__\([^,]+,\s*(\{.*\})\);\s*\z/m, 1] }
+    payloads.map { |payload| payload.parse_json&.dig("data", "v3GetPinQueryv2", "data").to_h }.reduce({}, :merge)
   end
 end
