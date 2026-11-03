@@ -5,7 +5,7 @@ class Source::URL::Foriio < Source::URL
 
   RESERVED_USERNAMES = %w[about benefits business company contests discover keywords legal pro]
 
-  attr_reader :username, :work_id, :file
+  attr_reader :username, :work_id, :file, :image_id
 
   def self.match?(url)
     url.domain.in?(%w[foriio.com fori.io]) ||
@@ -14,6 +14,16 @@ class Source::URL::Foriio < Source::URL
 
   def parse
     case [subdomain, domain, *path_segments]
+
+    # https://img.foriio.com/images/r/im_AT9deWzUD-NWfS8237_Cm4JuoWaq9gc-xQnT7-cTcDS_WJ5xqb4?w=1092 (sample)
+    # https://img.foriio.com/images/r/im_AT9deWzUD-NWfS8237_Cm4JuoWaq9gc-xQnT7-cTcDS_WJ5xqb4?w=10000&fit=max (full)
+    in "img", "foriio.com", "images", "r", image_id
+      @image_id = image_id
+
+    # https://img.foriio.com/images/store/387d11df83ebbb2301041a7f88630bbf.jpg?auto=compress&fit=crop&h=424&w=688 (sample)
+    # https://img.foriio.com/images/store/387d11df83ebbb2301041a7f88630bbf.jpg (full)
+    in "img", "foriio.com", "images", "store", file
+      @file = file
 
     # https://foriio.imgix.net/store/46d77f4f772f191d04c9360180cc907d.jpg?ixlib=rb-4.1.0&w=2184&auto=compress&s=a9a14e871e2f6dbdc28f87c915e8684f (sample)
     # https://foriio.imgix.net/store/46d77f4f772f191d04c9360180cc907d.jpg (full)
@@ -51,11 +61,15 @@ class Source::URL::Foriio < Source::URL
   end
 
   def full_image_url
-    "https://foriio.imgix.net/store/#{file}" if file.present?
+    if image_id.present?
+      "https://img.foriio.com/images/r/#{image_id}?w=10000&fit=max"
+    elsif file.present?
+      "https://img.foriio.com/images/store/#{file}"
+    end
   end
 
   def image_url?
-    domain.in?(%w[imgix.net amazonaws.com cloudfront.net])
+    host == "img.foriio.com" || domain.in?(%w[imgix.net amazonaws.com cloudfront.net])
   end
 
   def page_url

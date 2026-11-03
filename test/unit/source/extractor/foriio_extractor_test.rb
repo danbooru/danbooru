@@ -5,8 +5,8 @@ module Source::Tests::Extractor
     context "A Foriio post with a single image" do
       strategy_should_work(
         "https://www.foriio.com/works/364622",
-        image_urls: %w[https://foriio.imgix.net/store/387d11df83ebbb2301041a7f88630bbf.jpg],
-        media_files: [{ file_size: 2_120_678 }],
+        image_urls: %w[https://img.foriio.com/images/r/im_AT9deWzUD-NWfS8237_Cm4JuoWaq9gc-xQnT7-cTcDS_WJ5xqb4?w=10000&fit=max],
+        media_files: [{ file_size: 419_793 }],
         page_url: "https://www.foriio.com/works/364622",
         profile_url: "https://www.foriio.com/mokoxmoko2",
         profile_urls: %w[https://www.foriio.com/mokoxmoko2 https://twitter.com/gumaguma_m],
@@ -22,14 +22,14 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.foriio.com/works/698354",
         image_urls: %w[
-          https://foriio.imgix.net/store/41024334e0f3ba13b6172ce722950792.png
-          https://foriio.imgix.net/store/a3e79def565b400857c85dafbddb5e19.png
-          https://foriio.imgix.net/store/51d07a9abe73f5bc1cb41db28ecca36f.png
+          https://img.foriio.com/images/r/im_AQq-p4wjfmaQBX5DuPNHZT-UwhPEpSK5pyrlGcpm-Rsl0u9bLDY?w=10000&fit=max
+          https://img.foriio.com/images/r/im_AUkXLry-qE-AqPHveAQFK0zn1XE-_3USHYP7t9sWuaSRFo_Ojls?w=10000&fit=max
+          https://img.foriio.com/images/r/im_AQc3elaEWkM3DitTtgewkNIRyPaWHJXc2ZxgSFZQdkBaFZFe3RU?w=10000&fit=max
         ],
         media_files: [
-          { file_size: 3_500_873 },
-          { file_size: 1_656_158 },
-          { file_size: 2_371_766 },
+          { file_size: 156_873 },
+          { file_size: 286_139 },
+          { file_size: 641_547 },
         ],
         page_url: "https://www.foriio.com/works/698354",
         profile_urls: %w[https://www.foriio.com/yumenkmc https://twitter.com/yumenkmc],
@@ -55,12 +55,12 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.foriio.com/works/508125",
         image_urls: %w[
-          https://foriio.imgix.net/store/01f09d1d779b8e0e7c6727e841e8960e.jpg
-          https://foriio.imgix.net/store/a7d800ca622c7b83ca691bc098ee5430.jpg
+          https://img.foriio.com/images/r/im_AbEYqgtQNMUa1SoezBQI2jFqb3Tl4vzM-v2ooZbrXMFB9vkdeNg?w=10000&fit=max
+          https://img.foriio.com/images/r/im_AdMWQ_hXAlPwTZCcGi7Binv8xxijSYNQ1yczOzNzmNAM7_YP4oA?w=10000&fit=max
         ],
         media_files: [
-          { file_size: 959_217 },
-          { file_size: 1_018_206 },
+          { file_size: 214_821 },
+          { file_size: 230_371 },
         ],
         page_url: "https://www.foriio.com/works/508125",
         profile_url: "https://www.foriio.com/piyu-ruru",
