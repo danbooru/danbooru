@@ -13,7 +13,7 @@ class Source::Extractor::Odaibako < Source::Extractor
   end
 
   def image_urls_from_page
-    page&.css("main > section:nth-child(1) > div > section > div:nth-child(2) > div:nth-child(2) a")&.pluck(:href).to_a
+    page&.css("main > section:nth-child(1) > div > section ul img")&.pluck(:src).to_a.filter_map { |src| Source::URL.parse(src)&.full_image_url }
   end
 
   def profile_url
@@ -43,12 +43,12 @@ class Source::Extractor::Odaibako < Source::Extractor
   end
 
   def odai_id
-    href = page&.css("main > section:nth-child(1) > div > div > div:nth-child(3) > a[href^='/odais/']")&.attr("href")
+    href = page&.at_css("main > section:nth-child(1) > div > div a[href^='/odais/']")&.[](:href)
     Source::URL.parse(URI.join("https://odaibako.net/", href)).odai_id if href.present?
   end
 
   def artist_request
-    page&.css("main > section:nth-child(1) > div > div:nth-child(1) > div:nth-child(2)")&.inner_html&.strip
+    page&.at_css("main > section:nth-child(1) > div > div:nth-child(1) .wrap-break-word")&.inner_html&.strip
   end
 
   def artist_response
