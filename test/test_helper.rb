@@ -4,13 +4,13 @@ ENV["RAILS_ENV"] = "test"
 # to the development database instead of the test database.
 require "uri"
 database_url = URI(ENV["DATABASE_URL"].to_s)
-if database_url.host.present? && database_url.path.blank?
+if !database_url.host.to_s.empty? && database_url.path.to_s.empty?
   database_url.path = "/danbooru_test"
   ENV["DATABASE_URL"] = database_url.to_s
 end
 
 # Enable coverage only when COVERAGE is set or when running the whole test suite with `bin/rails test`, not when running individual test files.
-if ENV["COVERAGE"].present?
+if !ENV["COVERAGE"].to_s.empty?
   require "simplecov"
   require "simplecov-cobertura"
 
