@@ -35,11 +35,9 @@ class SavedSearch < ApplicationRecord
     class_methods do
       extend Memoist
 
-      def redis
-        return nil if Danbooru.config.redis_url.blank?
-        ::Redis.new(url: Danbooru.config.redis_url)
+      memoize def redis
+        ::Redis.new(url: Danbooru.config.redis_url) if Danbooru.config.redis_url.present?
       end
-      memoize :redis
 
       def post_ids_for(user_id, label: nil)
         return [] if redis.nil?
