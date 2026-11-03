@@ -160,15 +160,15 @@ module Source
         form = {
           email: credentials[:login],
           password: credentials[:password],
-          url: login_page.at("input[name='url']")&.fetch("value"),
+          url: login_page.at("input[name='url']")&.attr("value"),
           save: "on",
           ticket: "",
         }
 
-        response = http.post("https://nijie.info/login_int.php", form: form)
+        response = http.no_follow.post("https://nijie.info/login_int.php", form: form)
         update_credentials!(response)
 
-        response.cookies.to_h { |c| [c.name, c.value] } if response.status.success?
+        response.cookies.to_h { |c| [c.name, c.value] } if response.status.redirect?
       end
 
       memoize :client, :cached_session_cookie

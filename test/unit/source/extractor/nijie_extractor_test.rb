@@ -324,7 +324,7 @@ module Source::Tests::Extractor
         Cache.put("nijie-session-cookie", { "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" })
         assert_equal({ "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" }, site.cached_session_cookie)
 
-        site.image_urls
+        site.tags
         assert_nil(Cache.get("nijie-session-cookie"))
       end
     end
