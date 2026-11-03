@@ -117,6 +117,11 @@ module Source
       option(*args, **params, kind: :credential, &block)
     end
 
+    # @return [Array<OptionDefinition>] The credentials defined for this site.
+    def credentials
+      options.values.select { |option| option.kind == :credential }
+    end
+
     # A class for defining an option or credential used by a site. Option definitions have a name, type (string,
     # boolean, etc), default value, a help string, and a kind (whether they're a normal setting or a credential).
     class OptionDefinition

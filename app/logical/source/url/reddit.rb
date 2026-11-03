@@ -7,7 +7,7 @@ module Source
         url "https://www.reddit.com"
         domains %w[reddit.com redd.it redditmedia.com]
 
-        credential :session_cookie, help: %{Your Reddit `reddit_session` cookie.}
+        credential :session_cookie, default: Danbooru.config.reddit_session_cookie, help: %{Your Reddit `reddit_session` cookie.}
       end
 
       extractors do

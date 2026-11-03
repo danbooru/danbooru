@@ -13,7 +13,7 @@ class Source::URL::Tinami < Source::URL
     url "https://www.tinami.com"
     domains %w[tinami.com tinami.jp]
 
-    credential :session_id, help: %{Your Tinami `Tinami2SESSID` cookie.}
+    credential :session_id, default: Danbooru.config.tinami_session_id, help: %{Your Tinami `Tinami2SESSID` cookie.}
   end
 
   attr_reader :user_id, :profile_id, :work_id
