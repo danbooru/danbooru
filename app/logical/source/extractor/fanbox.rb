@@ -106,7 +106,7 @@ module Source
 
       memoize def api_response
         url = "https://api.fanbox.cc/post.info?postId=#{illust_id}" if illust_id.present?
-        parsed_get(url)&.dig(:body) || {}
+        parsed_get(url)&.dig(:body, :post) || {}
       end
 
       memoize def artist_api_response
