@@ -49,7 +49,7 @@ module Source::Tests::Extractor
         tags: %w[1girl :3 aocoa blonde_hair blue_hat crooked_smile dokibird dokibird_(retro_doki) earrings green_eyes hair_between_eyes hair_ribbon hat highres indie_virtual_youtuber jewelry long_hair portrait ribbon simple_background single_earring smile solo transparent_background twintails virtual_youtuber],
         page_url: "https://danbooru.donmai.us/posts/7392739",
         profile_urls: ["https://x.com/AoCoa"],
-        artist_name: "AoCoa",
+        artist_name: "AoCoa 🐌",
       )
     end
 

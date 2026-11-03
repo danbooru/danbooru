@@ -269,15 +269,19 @@ module Source::Tests::Extractor
     # No images
     context "A page url that is list-only" do
       strategy_should_work(
-        "https://poipiku.com/2418562/5254068.html",
+        "https://poipiku.com/5846181/12905174.html",
         image_urls: [],
-        page_url: "https://poipiku.com/2418562/5254068.html",
-        profile_urls: %w[https://poipiku.com/2418562/],
-        display_name: "sauuomateng",
+        page_url: "https://poipiku.com/5846181/12905174.html",
+        profile_urls: %w[https://poipiku.com/5846181/],
+        display_name: "sira5_3",
         username: nil,
         tags: [],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "🇮🇩 x 🇳🇱",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          ⚠️R18（全2枚）
+          吉デン
+          ※濁点喘ぎ、♡喘ぎ、断面図、潮吹きなどの表現があるので閲覧時は自己責任でお願いします🙇‍♀️💦
+        EOS
       )
     end
 

@@ -152,8 +152,10 @@ module Source::Tests::Extractor
         page_url: "http://swordsouls.blog.fc2blog.us/blog-entry-376.html",
         profile_url: "http://swordsouls.blog.fc2blog.us",
         profile_urls: %w[http://swordsouls.blog.fc2blog.us],
+        display_name: nil,
         username: "swordsouls",
-        other_names: ["swordsouls", "深藍侵襲"],
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "看板姫♡",
         dtext_artist_commentary_desc: <<~EOS.chomp,
@@ -180,35 +182,63 @@ module Source::Tests::Extractor
 
     context "A blog post with a ?no=:id param" do
       strategy_should_work(
+        "http://niyamalog.blog.fc2.com/?no=4",
+        image_urls: %w[
+          https://blog-imgs-129.fc2.com/n/i/y/niyamalog/ani1.jpg
+          https://blog-imgs-129.fc2.com/n/i/y/niyamalog/20200307014414a17.jpg
+          https://blog-imgs-129.fc2.com/n/i/y/niyamalog/20200307014416ca3.jpg
+          https://blog-imgs-129.fc2.com/n/i/y/niyamalog/202003070144178bd.jpg
+          https://blog-imgs-129.fc2.com/n/i/y/niyamalog/202003070144198e8.jpg
+        ],
+        media_files: [
+          { file_size: 275_257 },
+          { file_size: 416_830 },
+          { file_size: 409_025 },
+          { file_size: 630_256 },
+          { file_size: 617_191 },
+        ],
+        page_url: "http://niyamalog.blog.fc2.com/blog-entry-4.html",
+        profile_url: "http://niyamalog.blog.fc2.com",
+        profile_urls: %w[http://niyamalog.blog.fc2.com],
+        username: "niyamalog",
+        other_names: ["niyamalog", "おやま"],
+        tags: [],
+        dtext_artist_commentary_title: "僕のおまわりさん2巻　特典",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          僕のおまわりさん2巻発売からもうすぐ1年経つので公開可能の特典だけですがアップします。
+          今回の特典の内容は僕おま2巻のドラマCDでも使用されております～(^.^)
+          ドラマCDお持ちの方は併せて楽しんでいただければと思います
+
+          "[image]":[http://niyamalog.blog.fc2.com/img/ani1.jpg/]
+
+          "[image]":[http://niyamalog.blog.fc2.com/img/20200307014414a17.jpg/]
+          アニメイト特典4Pリーフレット
+
+          "[image]":[http://niyamalog.blog.fc2.com/img/20200307014416ca3.jpg/]
+
+          "[image]":[http://niyamalog.blog.fc2.com/img/202003070144178bd.jpg/]
+          とらのあな特典4Pリーフレット
+
+          "[image]":[http://niyamalog.blog.fc2.com/img/202003070144198e8.jpg/]
+          特約店用描きおろしペーパー
+
+          ※印刷して転売するなどの行為はおやめください。
+        EOS
+      )
+    end
+
+    context "A blog post from a private blog" do
+      strategy_should_work(
         "http://abk00.blog71.fc2.com/?no=3052",
-        image_urls: %w[https://blog-imgs-83-origin.fc2.com/a/b/k/abk00/20150930193800.jpg],
-        media_files: [{ file_size: 141_637 }],
+        image_urls: [],
         page_url: "http://abk00.blog.fc2.com/blog-entry-3052.html",
         profile_url: "http://abk00.blog.fc2.com",
         profile_urls: %w[http://abk00.blog.fc2.com],
         username: "abk00",
-        other_names: ["abk00", "名無しの落書き所"],
+        other_names: ["abk00"],
         tags: [],
-        dtext_artist_commentary_title: "GOD EATER EXTRA[アリサ・イリーニチナ・アミエーラ]",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          "[image]":[https://blog-imgs-83-origin.fc2.com/a/b/k/abk00/20150930193800.jpg]
-          [b]2015/09/30(水) ゴッドイーター エクストラ[アリサ・イリーニチナ・アミエーラ][/b]
-
-          [b]いやぁ…イイ下乳でしたね……(遠い目[/b]
-
-          今期は二人もイイ下乳キャラがいたのに
-          どうしてこうなったｘ２になって残念というか無念というか。
-          [b]なぜ下乳に一切触れぬ･･･触れぬのか･･･ッ！？[/b]
-          いやまあ必要不必要以前に毎回3回以上触れてる健全な性少年育成漫画のアニメ化主人公さんもいたりするわけですが
-
-          [b]やはり時代はエロによって作られる。[/b](今週の格言)  関連記事
-
-          * " ルパン三世[レベッカ・ロッセリーニ] (2015/10/04) ":[http://abk00.blog.fc2.com/blog-entry-3055.html?sp]
-          * " ランスアンドマスクス[鬼堂院真緒] (2015/10/02) ":[http://abk00.blog.fc2.com/blog-entry-3054.html?sp]
-          * GOD EATER EXTRA[アリサ・イリーニチナ・アミエーラ] (2015/09/30)
-          * " GOD EATER EXTRA[雨宮ツバキ] (2015/09/29) ":[http://abk00.blog.fc2.com/blog-entry-3051.html?sp]
-          * " わかば＊ガール[真柴直/小橋若葉] (2015/09/28) ":[http://abk00.blog.fc2.com/blog-entry-3050.html?sp]
-        EOS
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 

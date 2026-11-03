@@ -115,7 +115,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://space.bilibili.com/476720460],
         display_name: "凯迪拉克官方",
         published_at: Time.parse("2022-09-19T09:12:28.000000Z"),
-        updated_at: Time.parse("2022-09-19T09:12:00.000000Z"),
+        updated_at: nil,
         tags: [
           ["一起用原神痛车", "https://search.bilibili.com/all?keyword=一起用原神痛车"],
           ["凯迪拉克原神联名座驾", "https://search.bilibili.com/all?keyword=凯迪拉克原神联名座驾"],
@@ -141,16 +141,16 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.bilibili.com/read/cv7360489",
         image_urls: %w[
-          https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg
-          https://i0.hdslb.com/bfs/article/72de3b6de4465fcb14c719354d8aeb55e93aa022.jpg
-          https://i0.hdslb.com/bfs/article/f6f56a387517ecf3a721228f8da6b21ffbf92210.jpg
-          https://i0.hdslb.com/bfs/article/7ac6fd23295eab8d3f62254187c34ae4867ea889.jpg
-          https://i0.hdslb.com/bfs/article/f90d0110964e3794aca245b1a4b5d934156d231f.jpg
-          https://i0.hdslb.com/bfs/article/b5a85177d15f3c53d06fae45ba53af3e64f7af14.jpg
-          https://i0.hdslb.com/bfs/article/3ca6ec1056eb8dfb6e9fde732146b8244fd605ad.jpg
-          https://i0.hdslb.com/bfs/article/1e860b392bef10f07e5abb7866e82998419f586a.jpg
-          https://i0.hdslb.com/bfs/article/2d392a5ab0676e153355d850c13a93f16d5eb7a0.jpg
-          https://i0.hdslb.com/bfs/article/e19cb5691afbe77c003b535759cda619b2d813cb.jpg
+          http://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg
+          http://i0.hdslb.com/bfs/article/72de3b6de4465fcb14c719354d8aeb55e93aa022.jpg
+          http://i0.hdslb.com/bfs/article/f6f56a387517ecf3a721228f8da6b21ffbf92210.jpg
+          http://i0.hdslb.com/bfs/article/7ac6fd23295eab8d3f62254187c34ae4867ea889.jpg
+          http://i0.hdslb.com/bfs/article/f90d0110964e3794aca245b1a4b5d934156d231f.jpg
+          http://i0.hdslb.com/bfs/article/b5a85177d15f3c53d06fae45ba53af3e64f7af14.jpg
+          http://i0.hdslb.com/bfs/article/3ca6ec1056eb8dfb6e9fde732146b8244fd605ad.jpg
+          http://i0.hdslb.com/bfs/article/1e860b392bef10f07e5abb7866e82998419f586a.jpg
+          http://i0.hdslb.com/bfs/article/2d392a5ab0676e153355d850c13a93f16d5eb7a0.jpg
+          http://i0.hdslb.com/bfs/article/e19cb5691afbe77c003b535759cda619b2d813cb.jpg
         ],
         media_files: [
           { file_size: 493_934 },
@@ -173,43 +173,43 @@ module Source::Tests::Extractor
         tags: [],
         dtext_artist_commentary_title: "斗罗大陆 4，觉醒后的古月娜（第一期）",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          "[Image]":[https://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/48e75b3871fa5ed62b4e3a16bf60f52f96b1b3b1.jpg]
 
           超喜欢
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/72de3b6de4465fcb14c719354d8aeb55e93aa022.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/72de3b6de4465fcb14c719354d8aeb55e93aa022.jpg]
 
           2
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/f6f56a387517ecf3a721228f8da6b21ffbf92210.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/f6f56a387517ecf3a721228f8da6b21ffbf92210.jpg]
 
           3
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/7ac6fd23295eab8d3f62254187c34ae4867ea889.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/7ac6fd23295eab8d3f62254187c34ae4867ea889.jpg]
 
           4
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/f90d0110964e3794aca245b1a4b5d934156d231f.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/f90d0110964e3794aca245b1a4b5d934156d231f.jpg]
 
           5
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/b5a85177d15f3c53d06fae45ba53af3e64f7af14.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/b5a85177d15f3c53d06fae45ba53af3e64f7af14.jpg]
 
           6
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/3ca6ec1056eb8dfb6e9fde732146b8244fd605ad.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/3ca6ec1056eb8dfb6e9fde732146b8244fd605ad.jpg]
 
           7
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/1e860b392bef10f07e5abb7866e82998419f586a.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/1e860b392bef10f07e5abb7866e82998419f586a.jpg]
 
           8
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/2d392a5ab0676e153355d850c13a93f16d5eb7a0.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/2d392a5ab0676e153355d850c13a93f16d5eb7a0.jpg]
 
           9
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/e19cb5691afbe77c003b535759cda619b2d813cb.jpg]
+          "[Image]":[http://i0.hdslb.com/bfs/article/e19cb5691afbe77c003b535759cda619b2d813cb.jpg]
 
           10
 
@@ -222,17 +222,19 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.bilibili.com/read/cv10137473",
         image_urls: %w[
-          https://i0.hdslb.com/bfs/article/watermark/7e52215ee182b02bda3d9f6b6aac4007a5d65171.png
-          https://i0.hdslb.com/bfs/article/watermark/ad00dbd28f53723a0f833a301969a31b5ac0ba06.png
-          https://i0.hdslb.com/bfs/article/watermark/25427e45717c371cc77b2235e4c20151435e5305.png
-          https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png
-          https://i0.hdslb.com/bfs/article/875d230b773b7f4810fdecdd2acc75f2b55f2724.png
+          http://i0.hdslb.com/bfs/article/watermark/7e52215ee182b02bda3d9f6b6aac4007a5d65171.png
+          http://i0.hdslb.com/bfs/article/watermark/ad00dbd28f53723a0f833a301969a31b5ac0ba06.png
+          http://i0.hdslb.com/bfs/article/watermark/25427e45717c371cc77b2235e4c20151435e5305.png
+          http://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png
+          http://i0.hdslb.com/bfs/article/4adb9255ada5b97061e610b682b8636764fe50ed.png
+          http://i0.hdslb.com/bfs/article/875d230b773b7f4810fdecdd2acc75f2b55f2724.png
         ],
         media_files: [
           { file_size: 256_343 },
           { file_size: 173_741 },
           { file_size: 173_201 },
           { file_size: 184_165 },
+          { file_size: 431 },
           { file_size: 1_111_444 },
         ],
         page_url: "https://www.bilibili.com/opus/498661195017002415",
@@ -258,7 +260,7 @@ module Source::Tests::Extractor
 
           * 勾檀Mayumi
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/watermark/7e52215ee182b02bda3d9f6b6aac4007a5d65171.png]
+          "[Image]":[http://i0.hdslb.com/bfs/article/watermark/7e52215ee182b02bda3d9f6b6aac4007a5d65171.png]
 
           勾檀Mayumi
 
@@ -274,7 +276,7 @@ module Source::Tests::Extractor
 
           * 犬童Kendou
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/watermark/ad00dbd28f53723a0f833a301969a31b5ac0ba06.png]
+          "[Image]":[http://i0.hdslb.com/bfs/article/watermark/ad00dbd28f53723a0f833a301969a31b5ac0ba06.png]
 
           犬童Kendou
 
@@ -290,7 +292,7 @@ module Source::Tests::Extractor
 
           * 九十九Tsukumo
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/watermark/25427e45717c371cc77b2235e4c20151435e5305.png]
+          "[Image]":[http://i0.hdslb.com/bfs/article/watermark/25427e45717c371cc77b2235e4c20151435e5305.png]
 
           九十九Tsukumo
 
@@ -304,7 +306,7 @@ module Source::Tests::Extractor
 
           * 蕾米Remi
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png]
+          "[Image]":[http://i0.hdslb.com/bfs/article/watermark/dccf0575ae604b5f96e9593a38241b897e10fc4b.png]
 
           蕾米Remi
 
@@ -316,7 +318,7 @@ module Source::Tests::Extractor
 
           "蕾米Remi":[https://space.bilibili.com/690608687]的个人空间："网页链接":[https://space.bilibili.com/690608687]
 
-          [hr]
+          "[Image]":[http://i0.hdslb.com/bfs/article/4adb9255ada5b97061e610b682b8636764fe50ed.png]
 
           VirtuaReal Project [b]长期开启招募中[/b]！只需要你轻轻扫描以下链接上传答题卡和短视频， 就有机会加入VirtuaReal Project，来经历这场“宛如魔法般的体验“！
 
@@ -333,7 +335,7 @@ module Source::Tests::Extractor
 
           * 请在 vup.link/join 填写答题卡
 
-          "[Image]":[https://i0.hdslb.com/bfs/article/875d230b773b7f4810fdecdd2acc75f2b55f2724.png]
+          "[Image]":[http://i0.hdslb.com/bfs/article/875d230b773b7f4810fdecdd2acc75f2b55f2724.png]
 
           招募方式
 
@@ -398,7 +400,7 @@ module Source::Tests::Extractor
         profile_urls: %w[https://space.bilibili.com/1383815813],
         display_name: "吉诺儿kino",
         published_at: Time.parse("2021-12-07T04:00:04.000000Z"),
-        updated_at: Time.parse("2021-12-07T04:00:00.000000Z"),
+        updated_at: nil,
         tags: [
           ["吉诺儿kino", "https://search.bilibili.com/all?keyword=吉诺儿kino"],
           ["唐九夏", "https://search.bilibili.com/all?keyword=唐九夏"],

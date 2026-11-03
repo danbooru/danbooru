@@ -263,20 +263,10 @@ module Source::Tests::Extractor
         image_urls: [
           %r{https://media\.ci-en\.jp/public/cover/creator/00015496/d9abf3b919895d05a86253172e675dd5307ae7c6667313c20ddc39ab79bdd09f/image-990-c\.jpg},
           %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/763e7e9d7b6180b3b5a96cec735ecfabe993b7b4b4202bd411a471d3b7452a56/upload/1\.png},
-          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/3fa9791b911ba5b829cfe522d1ad0283893aa3d19c43de4663ea5bb9e4ff440b/upload/1\.jpg},
-          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/177e0028ad18cf14d6e7b651f8f6db4c2c7e93914a76dc079ffb1865c4102ee6/upload/2\.jpg},
-          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/775b1249e43702ef746bba5bd2404352844e16d3a45b2de96fb86e8931d1f493/upload/%EF%BC%90%EF%BC%92\.jpg},
-          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/5cf725ab76a4256d5fcb22582f6e2f0343af6e5445b2ca7649ad11024cb0a416/upload/3\.jpg},
-          %r{https://media\.ci-en\.jp/private/attachment/creator/00015496/2799747b90b7f03a61b25e88688de0ef6bfe0ce20b953380eabb7a9fcd05c041/upload/4\.jpg},
         ],
         media_files: [
           { file_size: 40_080 },
           { file_size: 8_432_538 },
-          { file_size: 1_234_094 },
-          { file_size: 1_068_671 },
-          { file_size: 650_843 },
-          { file_size: 552_952 },
-          { file_size: 480_569 },
         ],
         page_url: "https://ci-en.net/creator/15496",
         profile_urls: %w[https://ci-en.net/creator/15496],
@@ -298,24 +288,13 @@ module Source::Tests::Extractor
           販売開始しました！
           <https://www.dlsite.com/maniax/dlaf/=/t/s/link/work/aid/roriruri6/id/RJ01076970.html>
 
-          今までイラストを描いて過ごしておりましたが、昨年からツクールを始め、ゲーム制作にも奮闘している日々を過ごしております。
+          今までイラストを描いて過ごしておりましたが、ゲーム制作にも奮闘している日々を過ごしております。
 
           h2. Ci-enでの活動
 
           Ci-enにはゲーム制作の進捗を公開していきます。
-
-          h3. 作っているゲームに関して
-
-          居候してきたニートちゃんと過ごす、シミュレーションゲームを作っています。
-
-          ２４時間、ニートちゃんと一緒に生活し、お話しして仲良くなったり、スキンシップをとったりするゲームです。おさわり要素もあったりします。
-          引きこもって無知なニートちゃんに人生の楽しさを教えていく要素も入れれたらなぁと思っています。
-
-          アップデート作業も鋭意更新中です！
-
-          h2. 最後に
-
-          頑張ってゲームを作ってまいりますので、御興味がありましたら、どうぞよろしくお願いいたします！
+          <https://ci-en.dlsite.com/creator/15496/article/1777929>
+          新作制作開始の記事はこちらです！
         EOS
       )
     end

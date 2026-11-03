@@ -22,9 +22,9 @@ module Source::Tests::Extractor
 
     context "A channel banner sample image URL" do
       strategy_should_work(
-        "https://yt3.googleusercontent.com/UoIkWN_y0G0Q8GAjnE_zTSNd78MYoWK3ZcsOLb7Yg3puumfVlRtHb-kvpGrdy-JL-OrfH1qa3Q=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj",
-        image_urls: %w[https://yt3.googleusercontent.com/UoIkWN_y0G0Q8GAjnE_zTSNd78MYoWK3ZcsOLb7Yg3puumfVlRtHb-kvpGrdy-JL-OrfH1qa3Q=d],
-        media_files: [{ file_size: 757_033 }],
+        "https://yt3.googleusercontent.com/NsA5K3ie2Xumot_5Eu-VUTG_v-xW5gKplU8aIBDyD0rGjtjzVWcjjG1zI7f0g3RtB-PzWW0s=w1060-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj",
+        image_urls: %w[https://yt3.googleusercontent.com/NsA5K3ie2Xumot_5Eu-VUTG_v-xW5gKplU8aIBDyD0rGjtjzVWcjjG1zI7f0g3RtB-PzWW0s=d],
+        media_files: [{ file_size: 200_454 }],
         page_url: nil,
       )
     end
@@ -43,7 +43,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.youtube.com/channel/UCykMWf8B8I7c_jA8FTy2tGw/community?lb=UgkxWevNfezmf-a7CRIO0haWiaDSjTI8mGsf",
         image_urls: %w[https://yt3.ggpht.com/4aUIQfric9Rg3xy5VqtwWCH6iZgVVKyMnsGJiVp7TQk166jKSSjTKgQyKVEgCz2bhGSAvG43fSgnrg=d],
-        media_files: [{ file_size: 2_350_291 }],
+        media_files: [{ file_size: 2_348_082 }],
         page_url: "https://www.youtube.com/post/UgkxWevNfezmf-a7CRIO0haWiaDSjTI8mGsf",
         profile_url: "https://www.youtube.com/@AmiyaAranha",
         profile_urls: %w[https://www.youtube.com/@AmiyaAranha https://www.youtube.com/channel/UCykMWf8B8I7c_jA8FTy2tGw],
@@ -70,9 +70,9 @@ module Source::Tests::Extractor
           https://yt3.ggpht.com/HazeswOR3AKZiCLMV8cgkI7kQAV7PGKT3iy3wAbmptwSETaWpMbQDzFYTLR2RI-TBZYVtzX8B0TF=d
         ],
         media_files: [
-          { file_size: 2_625_409 },
-          { file_size: 658_842 },
-          { file_size: 725_525 },
+          { file_size: 2_623_200 },
+          { file_size: 656_633 },
+          { file_size: 723_316 },
         ],
         page_url: "https://www.youtube.com/post/UgkxBkJE1Eu_6S9sADZF5IuK5MPRSWf4VVz3",
         profile_url: "https://www.youtube.com/@Mirae_Somang",

@@ -51,15 +51,15 @@ module Source::Tests::Extractor
     context "A https://twitter.com/i/web/status/:id url" do
       strategy_should_work(
         "https://twitter.com/i/web/status/943446161586733056",
-        page_url: "https://x.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/yudai_marumo/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        profile_url: "https://x.com/motty08111213",
+        profile_url: "https://x.com/yudai_marumo",
         display_name: "丸茂",
-        username: "motty08111213",
+        username: "yudai_marumo",
         published_at: Time.parse("2017-12-20T11:41:07.000000Z"),
         updated_at: nil,
         tags: ["岩本町芸能社", "女優部"],
@@ -69,15 +69,15 @@ module Source::Tests::Extractor
     context "A https://twitter.com/i/status/:id url" do
       strategy_should_work(
         "https://twitter.com/i/status/943446161586733056",
-        page_url: "https://x.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/yudai_marumo/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        profile_url: "https://x.com/motty08111213",
+        profile_url: "https://x.com/yudai_marumo",
         display_name: "丸茂",
-        username: "motty08111213",
+        username: "yudai_marumo",
         published_at: Time.parse("2017-12-20T11:41:07.000000Z"),
         updated_at: nil,
         tags: ["岩本町芸能社", "女優部"],
@@ -87,15 +87,15 @@ module Source::Tests::Extractor
     context "A https://x.com/i/status/:id url" do
       strategy_should_work(
         "https://x.com/i/status/943446161586733056",
-        page_url: "https://x.com/motty08111213/status/943446161586733056",
+        page_url: "https://x.com/yudai_marumo/status/943446161586733056",
         image_urls: [
           "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
-        profile_url: "https://x.com/motty08111213",
+        profile_url: "https://x.com/yudai_marumo",
         display_name: "丸茂",
-        username: "motty08111213",
+        username: "yudai_marumo",
         published_at: Time.parse("2017-12-20T11:41:07.000000Z"),
         updated_at: nil,
         tags: ["岩本町芸能社", "女優部"],
@@ -721,7 +721,7 @@ module Source::Tests::Extractor
         page_url: "https://x.com/youjosenki/status/2019697579219681539",
         profile_url: "https://x.com/youjosenki",
         profile_urls: %w[https://x.com/youjosenki https://x.com/i/user/769619180949602304],
-        display_name: "「幼女戦記」アニメ公式【TVシリーズ第2期 2026年7月放送決定！】",
+        display_name: "「幼女戦記Ⅱ」アニメ公式【 2026年7月8日(水)放送開始！】",
         username: "youjosenki",
         published_at: Time.parse("2026-02-06T09:00:01.000000Z"),
         updated_at: nil,

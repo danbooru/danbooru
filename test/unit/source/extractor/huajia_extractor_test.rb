@@ -121,10 +121,6 @@ module Source::Tests::Extractor
         tags: [],
         dtext_artist_commentary_title: "❤️72h会动的小Q人！",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          加价服务清单
-          加一个人人物（双人互动） ¥30
-          商用 x1.5
-
           有时开限量特价，可以蹲蹲捏
           节日的时候会改节日窗但是需要相关主题麻烦说一下，不然我可能就画成日常窗了(♡>𖥦<)/♥
 
@@ -148,10 +144,10 @@ module Source::Tests::Extractor
 
     context "A Huajia commission with only character settings" do
       strategy_should_work(
-        "https://huajia.163.com/main/projects/details/1rxjP93B",
+        "https://huajia.163.com/main/projects/details/V82ZD9z8",
         image_urls: [],
         media_files: [],
-        page_url: "https://huajia.163.com/main/projects/details/1rxjP93B",
+        page_url: "https://huajia.163.com/main/projects/details/V82ZD9z8",
         profile_url: nil,
         profile_urls: [],
         display_name: nil,
@@ -159,17 +155,21 @@ module Source::Tests::Extractor
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "想吃平价小零食😋🤲🏻（拖家带口版）",
-        dtext_artist_commentary_desc: "想要出图快的😭🫳🏻🫳🏻 🥬的😭 预算10~80其实是",
+        dtext_artist_commentary_title: "给小鱼约点图…",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          比较想吃点大头/服设之类的……能画人鱼/双人互动的大大欢迎！
+          当然其他业务也都可，会优先挑比较戳我的画风来吃🥺🙌🏻🙌🏻
+          有两个形态，大人们可以提前说明想画白的/黑的。
+        EOS
       )
     end
 
     context "A Huajjia commission with no images" do
       strategy_should_work(
-        "https://huajia.163.com/main/projects/details/LBpxo0wB",
+        "https://huajia.163.com/main/projects/details/pB01DejE",
         image_urls: [],
         media_files: [],
-        page_url: "https://huajia.163.com/main/projects/details/LBpxo0wB",
+        page_url: "https://huajia.163.com/main/projects/details/pB01DejE",
         profile_url: nil,
         profile_urls: [],
         display_name: nil,
@@ -177,24 +177,17 @@ module Source::Tests::Extractor
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "［文手老师来］我想要建设一个梦女角色",
-        dtext_artist_commentary_desc: <<~EOS.chomp,
-          是1999中阿莱夫的梦女
-          想要约文设，要求尽量贴合我现实中的性格
-          外貌可以随意设计
-          预算无上限，价格合理就好，必须有一定文字与设计功底，拒绝坐地起价
-          希望可以有一点耐心，我打字慢
-          过程流畅，作品高质￼我会狠狠打奶茶钱
-        EOS
+        dtext_artist_commentary_title: "蹲蹲能画黑色哥特长裙oc的小画师",
+        dtext_artist_commentary_desc: "偏好御姐或者成熟冷脸少女类型，更倾向于半身or全身，oc头发和新服设是全身黑，不过服设会一版白色的方便你看清结构，先攒攒小画手，遇到喜欢的会来约ovo",
       )
     end
 
     context "A Huajia commission with a description image" do
       strategy_should_work(
-        "https://huajia.163.com/main/projects/details/K85e1RO8",
-        image_urls: %w[https://huajia.fp.ps.netease.com/file/687273cd28649e056788f746SCrk3M6r06],
-        media_files: [{ file_size: 215_082 }],
-        page_url: "https://huajia.163.com/main/projects/details/K85e1RO8",
+        "https://huajia.163.com/main/projects/details/d8Yz6g0B",
+        image_urls: %w[https://huajia.fp.ps.netease.com/file/6ae93813b0188ed3da81ae8fFHBxw3ld07],
+        media_files: [{ file_size: 143_264 }],
+        page_url: "https://huajia.163.com/main/projects/details/d8Yz6g0B",
         profile_url: nil,
         profile_urls: [],
         display_name: nil,
@@ -202,8 +195,8 @@ module Source::Tests::Extractor
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "我想约古早插",
-        dtext_artist_commentary_desc: "看对眼我就约（不要模版）🥴",
+        dtext_artist_commentary_title: "古风服设",
+        dtext_artist_commentary_desc: "不要太儒雅的版型，想要江湖气或者偏日常的设计，会加毛领子的大欢迎，孩子性格比较跳脱希望衣服也能野一点，超预算也可以例图够牛逼就行，希望花纹和配饰会有一些特色，最好擅长画成男的",
       )
     end
 

@@ -64,7 +64,7 @@ module Source::Tests::Extractor
         ],
         page_url: "https://www.foriio.com/works/508125",
         profile_url: "https://www.foriio.com/piyu-ruru",
-        profile_urls: %w[https://www.foriio.com/piyu-ruru https://twitter.com/piyu_ruru],
+        profile_urls: %w[https://www.foriio.com/piyu-ruru https://www.twitter.com/pi_yururu],
         display_name: "ぴゆるる",
         username: "piyu-ruru",
         other_names: ["ぴゆるる", "piyu-ruru"],

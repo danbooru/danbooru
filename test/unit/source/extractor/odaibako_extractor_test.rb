@@ -6,7 +6,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://odaibako.net/posts/01923bc559bc0fd9ac983610d654ea2d",
         image_urls: %w[https://ccs.odaibako.net/_/post_images/aaaaaariko/c126b4961cea4a1c9ae016e224db2a62.jpeg],
-        media_files: [{ file_size: 696_231 }],
+        media_files: [{ file_size: 1_583_950 }],
         page_url: "https://odaibako.net/odais/d811a8ae-cc45-4922-9652-d2dcfb9d3492",
         profile_urls: %w[https://odaibako.net/u/aaaaaariko],
         display_name: "ARiKo",
@@ -32,7 +32,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://odaibako.net/odais/d811a8ae-cc45-4922-9652-d2dcfb9d3492",
         image_urls: %w[https://ccs.odaibako.net/_/post_images/aaaaaariko/c126b4961cea4a1c9ae016e224db2a62.jpeg],
-        media_files: [{ file_size: 696_231 }],
+        media_files: [{ file_size: 1_583_950 }],
         page_url: "https://odaibako.net/odais/d811a8ae-cc45-4922-9652-d2dcfb9d3492",
         profile_urls: %w[https://odaibako.net/u/aaaaaariko],
         display_name: "ARiKo",
@@ -67,13 +67,13 @@ module Source::Tests::Extractor
           https://ccs.odaibako.net/_/post_images/zn_bi_nh/c94806508f2c48449bde5402cb3f9828.jpeg
         ],
         media_files: [
-          { file_size: 452_758 },
-          { file_size: 480_093 },
-          { file_size: 425_878 },
-          { file_size: 464_286 },
-          { file_size: 451_581 },
-          { file_size: 429_118 },
-          { file_size: 473_379 },
+          { file_size: 1_032_380 },
+          { file_size: 1_026_548 },
+          { file_size: 860_146 },
+          { file_size: 1_055_892 },
+          { file_size: 1_037_438 },
+          { file_size: 829_372 },
+          { file_size: 1_265_082 },
         ],
         page_url: "https://odaibako.net/odais/5260af76-be64-447c-9701-c2d74b104643",
         profile_urls: %w[https://odaibako.net/u/zn_bi_nh],

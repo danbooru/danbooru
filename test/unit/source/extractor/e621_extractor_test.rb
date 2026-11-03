@@ -67,7 +67,7 @@ module Source::Tests::Extractor
         image_urls: %w[https://static1.e621.net/data/94/c3/94c307b4e9c680f99e85f7cc5c212b58.png],
         media_files: [{ file_size: 376_646 }],
         page_url: "https://e621.net/posts/5497488",
-        profile_urls: %w[https://e621.net/users/103838 https://www.deviantart.com/marsminer/ https://inkbunny.net/MarsMiner https://martian-canine.newgrounds.com/ https://twitter.com/MarsMinerNsfw https://marsminersfw.newtumbl.com/ https://marsminernsfw.newtumbl.com/ https://mars-venussfw.tumblr.com/ https://marsminer-venusspring.tumblr.com/ https://foxearedastronaut.tumblr.com/ https://ouremptyworld.tumblr.com/ https://www.furaffinity.net/user/marsminer/ https://beta.furrynetwork.com/otterastronaut/ https://volsk.sofurry.com/ https://twitter.com/xVenusSpringx https://www.facebook.com/marsminervenusspring https://keefkeefthings.tumblr.com/ https://picarto.tv/MarsMiner https://www.twitch.tv/martiancanine https://derpibooru.org/profiles/marsminer https://www.patreon.com/martiancanine https://ko-fi.com/J3J35DMV https://streamlabs.com/MarsMiner https://discord.gg/0zeschOe4893oaue https://www.pillowfort.social/MarsMiner https://bsky.app/profile/marsminernsfw.bsky.social https://x.com/mars_miner https://x.com/i/user/729707557],
+        profile_urls: %w[https://e621.net/users/103838 https://inkbunny.net/MarsMiner https://twitter.com/MarsMinerNsfw https://twitter.com/xVenusSpringx https://www.facebook.com/marsminervenusspring https://picarto.tv/MarsMiner https://www.twitch.tv/martiancanine https://derpibooru.org/profiles/marsminer https://www.patreon.com/martiancanine https://ko-fi.com/J3J35DMV https://streamlabs.com/MarsMiner https://www.pillowfort.social/MarsMiner https://bsky.app/profile/marsminernsfw.bsky.social https://www.deviantart.com/marsminer https://martian-canine.newgrounds.com https://marsminer-venusspring.tumblr.com https://ouremptyworld.tumblr.com https://www.furaffinity.net/user/marsminer https://beta.furrynetwork.com/otterastronaut https://keefkeefthings.tumblr.com https://x.com/mars_miner https://x.com/i/user/729707557],
         display_name: "MarsMiner",
         username: "mars_miner",
         dtext_artist_commentary_title: "",
@@ -84,7 +84,6 @@ module Source::Tests::Extractor
         profile_urls: %w[
           https://e621.net/users/366015
           https://www.furaffinity.net/user/bnbigus
-          https://twitter.com/bnbigus
           https://bnbigus.newgrounds.com
           https://bsky.app/profile/bnbigus.bsky.social
           https://www.patreon.com/Bnbigus
@@ -92,6 +91,7 @@ module Source::Tests::Extractor
           https://discord.com/invite/8kpwCUm
           https://linktr.ee/bnbigus
           https://bnbigus.tumblr.com
+          https://x.com/bnbigus
         ],
         display_name: nil,
         username: "bnbigus",

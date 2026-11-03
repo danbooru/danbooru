@@ -30,7 +30,7 @@ module Source::Tests::Extractor
         "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364",
         image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original"],
         media_files: [
-          { file_size: 33_197, width: 80, height: 82, frame_delays: [125] * 2, pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245", error: nil },
+          { file_size: 33_197, width: 80, height: 82, frame_delays: [125] * 2, pixel_hash: "522f7495b325fcf4a4444f52297ac784", md5: "87ddf73e2c6fccef8dd6870cdfc0f245", error: nil },
         ],
         page_url: "https://www.pixiv.net/artworks/62247364",
         profile_url: "https://www.pixiv.net/users/22252953",
@@ -59,7 +59,7 @@ module Source::Tests::Extractor
         "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip",
         image_urls: ["https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip?original"],
         media_files: [
-          { file_size: 33_197, width: 80, height: 82, frame_delays: [125] * 2, pixel_hash: "417176a630077fdb8f7d32ed31a0d8fe", md5: "87ddf73e2c6fccef8dd6870cdfc0f245", error: nil },
+          { file_size: 33_197, width: 80, height: 82, frame_delays: [125] * 2, pixel_hash: "522f7495b325fcf4a4444f52297ac784", md5: "87ddf73e2c6fccef8dd6870cdfc0f245", error: nil },
         ],
         page_url: "https://www.pixiv.net/artworks/62247364",
         profile_url: "https://www.pixiv.net/users/22252953",
@@ -355,8 +355,8 @@ module Source::Tests::Extractor
 
     context "A work with the isOriginal flag but not tagged オリジナル" do
       strategy_should_work(
-        "https://www.pixiv.net/en/artworks/116168818",
-        tags: %w[むちむち VTuber タンクトップ 褐色 ぽっちゃり BBW chubby pixiv_commission original],
+        "https://www.pixiv.net/en/artworks/151343246",
+        tags: %w[VTuber trpg commission 依頼絵 仕事絵 デジタル skeb original],
       )
     end
 

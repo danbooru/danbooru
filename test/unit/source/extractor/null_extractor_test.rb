@@ -19,9 +19,9 @@ module Source::Tests::Extractor
 
     context "A IP-based source" do
       strategy_should_work(
-        # "http://nghttp2.org/httpbin/image/jpeg",
-        "http://139.162.123.134/httpbin/image/jpeg",
-        image_urls: %w[http://139.162.123.134/httpbin/image/jpeg],
+        # "https://httpbin.org/image/jpeg",
+        "http://18.227.178.96/image/jpeg",
+        image_urls: %w[http://18.227.178.96/image/jpeg],
         media_files: [{ file_size: 35_588 }],
         page_url: nil,
         profile_urls: %w[],
@@ -35,10 +35,9 @@ module Source::Tests::Extractor
 
     context "A null source with a referer" do
       strategy_should_work(
-        # "http://nghttp2.org/httpbin/image/jpeg",
-        "http://139.162.123.134/httpbin/image/jpeg",
+        "https://httpbin.org/image/jpeg",
         referer: "https://discord.com/channels/1234567890/1234567890/1234567890",
-        image_urls: %w[http://139.162.123.134/httpbin/image/jpeg],
+        image_urls: %w[https://httpbin.org/image/jpeg],
         media_files: [{ file_size: 35_588 }],
         page_url: "https://discord.com/channels/1234567890/1234567890/1234567890",
         profile_urls: %w[],

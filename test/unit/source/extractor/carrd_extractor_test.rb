@@ -55,8 +55,8 @@ module Source::Tests::Extractor
     context "A page with a single image" do
       strategy_should_work(
         "https://amyahue.carrd.co/#about",
-        image_urls: %w[https://amyahue.carrd.co/assets/images/gallery01/4a05ad8e.png],
-        media_files: [{ file_size: 153_385 }],
+        image_urls: %w[https://amyahue.carrd.co/assets/images/image05.jpg],
+        media_files: [{ file_size: 67_540 }],
         page_url: "https://amyahue.carrd.co/#about",
         profile_urls: %w[https://amyahue.carrd.co],
         display_name: nil,
@@ -66,13 +66,17 @@ module Source::Tests::Extractor
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          hello !! i'm [b]aya[/b] ⭐
+          h2. [b]Amyahue[/b]  Illustrator & Comic Artist
 
-          * "Untitled":[https://amyahue.carrd.co/assets/images/gallery01/4a05ad8e.png]
+          [hr]
 
-          i'm a 20 year old artist based in california! i've been doing digital art for about 10 years, and am just getting started with selling my work!
+          Hello, my name is Aya! I'm an illustrator and webcomic artist based on California, working full-time as a WEBTOON Originals author.I've been drawing for over eleven years, building up my following through making fanart for various TV shows and comics. I began making webcomics in 2020, getting my start on the Canvas self-publishing side of WEBTOON. Getting picked up as a WEBTOON Originals creator in 2025 was one of my biggest accomplishments to date, and my current series The Egg Project is my successful ongoing BL series! I plan to continue working on comics for the forseeable future.Contact me: [email protected]
+
+          "[image]":[https://amyahue.carrd.co/assets/images/image05.jpg]
+
+          [hr]
         EOS
-      )
+    )
     end
 
     context "A page with multiple images that don't have separate pages" do

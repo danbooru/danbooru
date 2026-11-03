@@ -71,11 +71,13 @@ module Source::Tests::Extractor
           https://d2l930y2yx77uc.cloudfront.net/img/1644650226241-bzIA1lJqZ5.jpg
           https://d2l930y2yx77uc.cloudfront.net/img/1644650226235-KvbOotyDxw.jpg
           https://d2l930y2yx77uc.cloudfront.net/img/1644650226282-CHFfsrvUqu.jpg
+          https://d2l930y2yx77uc.cloudfront.net/img/1780047962-Tw0qFpzGR2UHu6mnLIjZQgYr.png
         ],
         media_files: [
           { file_size: 417_531 },
           { file_size: 345_743 },
           { file_size: 534_977 },
+          { file_size: 309_907 },
         ],
         page_url: "https://note.com/poisongiant/n/n12fc4ec79d24",
         profile_url: "https://note.com/poisongiant",
@@ -95,6 +97,8 @@ module Source::Tests::Extractor
           "[image]":[https://assets.st-note.com/img/1644650226235-KvbOotyDxw.jpg]
 
           "[image]":[https://assets.st-note.com/img/1644650226282-CHFfsrvUqu.jpg]
+
+          "[image]":[https://assets.st-note.com/img/1780047962-Tw0qFpzGR2UHu6mnLIjZQgYr.png]
         EOS
       )
     end

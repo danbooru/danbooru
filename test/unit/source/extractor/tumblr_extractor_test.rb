@@ -10,7 +10,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://78.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_540.jpg",
         image_urls: %w[https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg],
-        media_files: [{ file_size: 14_773 }],
+        media_files: [{ file_size: 10_129 }],
         page_url: "https://noizave.tumblr.com/post/162094447052",
         profile_urls: %w[https://noizave.tumblr.com],
         display_name: nil,
@@ -30,7 +30,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://24.media.tumblr.com/fc328250915434e66e8e6a92773f79d0/tumblr_mf4nshfibc1s0oswoo1_500.jpg",
         image_urls: %w[https://media.tumblr.com/fc328250915434e66e8e6a92773f79d0/tumblr_mf4nshfibc1s0oswoo1_1280.jpg],
-        media_files: [{ file_size: 118_315 }],
+        media_files: [{ file_size: 113_909 }],
         page_url: "https://nagian.tumblr.com/post/38061868112",
         profile_urls: %w[https://nagian.tumblr.com],
         display_name: nil,
@@ -47,7 +47,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://64.media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_400.png",
         image_urls: %w[https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png],
-        media_files: [{ file_size: 3_655 }],
+        media_files: [{ file_size: 3_652 }],
         page_url: "https://noizave.tumblr.com/post/162206271767",
         published_at: nil,
         updated_at: nil,
@@ -102,7 +102,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://25.media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_500.jpg",
         image_urls: %w[https://media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_1280.jpg],
-        media_files: [{ file_size: 42_997 }],
+        media_files: [{ file_size: 41_803 }],
         page_url: nil,
         published_at: nil,
         updated_at: nil,
@@ -113,7 +113,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "http://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_250.jpg",
         image_urls: %w[https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg],
-        media_files: [{ file_size: 105_963 }],
+        media_files: [{ file_size: 101_869 }],
         page_url: nil,
         published_at: nil,
         updated_at: nil,
@@ -124,7 +124,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://25.media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png",
         image_urls: %w[https://media.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_1280.png],
-        media_files: [{ file_size: 62_658 }],
+        media_files: [{ file_size: 64_176 }],
         page_url: nil,
         published_at: nil,
         updated_at: nil,
@@ -135,7 +135,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.pnj",
         image_urls: %w[https://media.tumblr.com/701a535af224f89684d2cfcc097575ef/tumblr_pjsx70RakC1y0gqjko1_1280.png],
-        media_files: [{ file_size: 296_595, file_ext: :jpg }],
+        media_files: [{ file_size: 291_074, file_ext: :jpg }],
         page_url: nil,
         published_at: nil,
         updated_at: nil,
@@ -146,7 +146,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s1280x1920/46f4af7ec94456f8fef380ee6311eb81178ce7e9.jpg",
         image_urls: %w[https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s21000x21000/402eb21f2ae48d0d3822cb2cb943eb247e735f2f.jpg],
-        media_files: [{ file_size: 7_428_704 }],
+        media_files: [{ file_size: 6_724_025 }],
         page_url: "https://make-do5.tumblr.com/post/619663949657423872",
         profile_urls: %w[https://make-do5.tumblr.com],
         display_name: nil,
@@ -166,7 +166,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://64.media.tumblr.com/3da3970775ba820dbc80ef3c5dae479e/dcc12b025632aa86-5f/s540x810/6433414944c280dfd6e8bb482e1d9f6466433901.pnj",
         image_urls: %w[https://64.media.tumblr.com/3da3970775ba820dbc80ef3c5dae479e/dcc12b025632aa86-5f/s21000x21000/05f92acb893af4b0f738f1518b49d624038c9c5e.png],
-        media_files: [{ file_size: 340_827 }],
+        media_files: [{ file_size: 326_871 }],
         page_url: "https://esper-eclipse.tumblr.com/post/686575447718395904",
         profile_urls: %w[https://esper-eclipse.tumblr.com],
         display_name: nil,
@@ -213,7 +213,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://noizave.tumblr.com/post/162206271767",
         image_urls: %w[https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png],
-        media_files: [{ file_size: 3_655 }],
+        media_files: [{ file_size: 3_652 }],
         page_url: "https://noizave.tumblr.com/post/162206271767",
         profile_urls: %w[https://noizave.tumblr.com],
         display_name: nil,
@@ -258,8 +258,8 @@ module Source::Tests::Extractor
           https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_inline_os2zkg02xH1v11u29_1280.jpg
         ],
         media_files: [
-          { file_size: 7_602 },
-          { file_size: 14_773 },
+          { file_size: 7_603 },
+          { file_size: 10_129 },
         ],
         page_url: "https://noizave.tumblr.com/post/162221502947",
         profile_urls: %w[https://noizave.tumblr.com],
@@ -284,7 +284,7 @@ module Source::Tests::Extractor
         ],
         media_files: [
           { file_size: 59_990 },
-          { file_size: 7_602 },
+          { file_size: 7_603 },
         ],
         page_url: "https://noizave.tumblr.com/post/162222617101",
         profile_urls: %w[https://noizave.tumblr.com],
@@ -375,7 +375,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://noizave.tumblr.com/post/171237880542/test-ask",
         image_urls: %w[https://media.tumblr.com/cb481f031010e8ddad564b2150149c9a/tumblr_inline_p4nxoyLrSh1v11u29_1280.png],
-        media_files: [{ file_size: 734 }],
+        media_files: [{ file_size: 724 }],
         page_url: "https://noizave.tumblr.com/post/171237880542",
         profile_urls: %w[https://noizave.tumblr.com],
         display_name: nil,
@@ -400,7 +400,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://tumblr.com/munespice/683613396085719040",
         image_urls: %w[https://64.media.tumblr.com/fd6b4692f6e902af861fbc242736ae61/010fd31ffbc70e84-a8/s21000x21000/e0587516e05bae4cec244921f220b45bed08335c.jpg],
-        media_files: [{ file_size: 365_859 }],
+        media_files: [{ file_size: 349_820 }],
         page_url: "https://munespice.tumblr.com/post/683613396085719040",
         profile_urls: %w[https://munespice.tumblr.com],
         display_name: nil,
@@ -433,7 +433,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://64.media.tumblr.com/591b370b9deb7c6ef33d8c18dc2c8db5/tumblr_ph5huubDdz1w0f6yio1_1280.jpg",
         image_urls: %w[https://media.tumblr.com/591b370b9deb7c6ef33d8c18dc2c8db5/tumblr_ph5huubDdz1w0f6yio1_1280.jpg],
-        media_files: [{ file_size: 346_445 }],
+        media_files: [{ file_size: 332_709 }],
         page_url: "https://compllege.tumblr.com/post/179415753146",
         profile_urls: %w[https://compllege.tumblr.com],
         display_name: nil,
@@ -488,7 +488,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://64.media.tumblr.com/68e6c4db6bac37cf9d6a166c133cf758/b81004325e350a36-c3/s1280x1920/a23c96c128b296219ff41a0178fe3e53f05e6680.png",
         image_urls: %w[https://64.media.tumblr.com/68e6c4db6bac37cf9d6a166c133cf758/b81004325e350a36-c3/s21000x21000/4d7ef161fe11d1395fd86890a3680b6313352d63.png],
-        media_files: [{ file_size: 221_906 }],
+        media_files: [{ file_size: 216_049 }],
         page_url: "https://yraa.tumblr.com/post/188271069189",
         profile_urls: %w[https://yraa.tumblr.com],
         display_name: nil,
@@ -513,7 +513,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://yra.sixc.me/post/188271069189",
         image_urls: %w[https://64.media.tumblr.com/68e6c4db6bac37cf9d6a166c133cf758/b81004325e350a36-c3/s21000x21000/4d7ef161fe11d1395fd86890a3680b6313352d63.png],
-        media_files: [{ file_size: 221_906 }],
+        media_files: [{ file_size: 216_049 }],
         page_url: "https://yraa.tumblr.com/post/188271069189",
         profile_urls: %w[https://yraa.tumblr.com],
         display_name: nil,
@@ -563,7 +563,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://tmblr.co/ZdPV4t2OHwdv5",
         image_urls: %w[https://media.tumblr.com/605632aa2d218410edaa2f9e2f3a1646/tumblr_ots53vjhn61s5nooco1_1280.png],
-        media_files: [{ file_size: 462_572 }],
+        media_files: [{ file_size: 466_730 }],
         page_url: "https://techsupportdog.tumblr.com/post/163509337669",
         profile_urls: %w[https://techsupportdog.tumblr.com],
         display_name: nil,
@@ -621,7 +621,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://dee-toraburu.tumblr.com/post/697041312401309696/fanart-of-alphonse-made-for-the-ee-anthology",
         image_urls: %w[https://64.media.tumblr.com/29f28e784f0c37b28546dddfab759b66/683448bbce5cf754-41/s21000x21000/febb7581082b418f8ced5fa5f3d65eb7d1773680.jpg],
-        media_files: [{ file_size: 359_839 }],
+        media_files: [{ file_size: 350_886 }],
         page_url: "https://dee-toraburu.tumblr.com/post/697041312401309696",
         profile_urls: %w[https://dee-toraburu.tumblr.com],
         display_name: nil,
@@ -677,10 +677,10 @@ module Source::Tests::Extractor
           https://64.media.tumblr.com/eb8a0a4150334a3df969bab389b7ba64/862b6ac896d7b4d7-1d/s21000x21000/a82cdcd150ded8b37f4b013eac91004d617f66a9.png
         ],
         media_files: [
-          { file_size: 1_073_408 },
-          { file_size: 564_740 },
-          { file_size: 608_341 },
-          { file_size: 527_503 },
+          { file_size: 1_061_912 },
+          { file_size: 595_646 },
+          { file_size: 646_992 },
+          { file_size: 523_602 },
         ],
         page_url: "https://timestables.tumblr.com/post/672495082090430464",
         profile_urls: %w[https://timestables.tumblr.com],
@@ -729,7 +729,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://dumpsterf11re.tumblr.com/post/745620363722047488",
         image_urls: %w[https://64.media.tumblr.com/b823b6e057a6cca109a0b081d541b1e2/e6da9f752eeebab0-96/s21000x21000/64688ba897ef51f3928c4e24ac4901531c6f5144.png],
-        media_files: [{ file_size: 541_679 }],
+        media_files: [{ file_size: 543_995 }],
         page_url: "https://dumpsterf11re.tumblr.com/post/745620363722047488",
         profile_urls: %w[https://dumpsterf11re.tumblr.com],
         display_name: nil,
@@ -762,7 +762,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://mokadevs.tumblr.com/post/809014356759248896/so-distant",
         image_urls: %w[https://64.media.tumblr.com/51b05501aa7e3c7aaac9f355b6ce326f/fc3ea454fa03226e-5d/s21000x21000/7f14258a4ebff9531ea85328393f8a991a12d925.png],
-        media_files: [{ file_size: 1_129_239 }],
+        media_files: [{ file_size: 1_098_332 }],
         page_url: "https://mokadevs.tumblr.com/post/809014356759248896",
         profile_urls: %w[https://mokadevs.tumblr.com],
         display_name: nil,

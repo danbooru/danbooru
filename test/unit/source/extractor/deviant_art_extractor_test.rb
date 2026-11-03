@@ -33,7 +33,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.deviantart.com/apollo11v/art/Darth-Vindican-s-lightsaber-Star-Wars-Commission-1222436457#image-8",
         image_urls: [
-          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-027b6096-e45a-4017-8a36-1a4a5ab4cf34\.png\?token=.+&filename=darth_vindican_s_lightsaber__star_wars_commission__by_apollo11v_dk7t209\.png},
+          %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-027b6096-e45a-4017-8a36-1a4a5ab4cf34\.png\?token=.+&filename=darth_vindican_s_lightsaber_star_wars_commission__by_apollo11v_dk7t209\.png},
           %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-ed9fac8d-c33f-443b-94ed-a5cf86d78575\.png\?token=},
           %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-4f29d5ff-ae31-45f9-b424-7a0994360db4\.png\?token=},
           %r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/38da8435-1b7a-46c5-b489-2df91dc95a31/dk7t209-9fd4d537-b7d9-4be3-827f-258bc0b17767\.png\?token=},
@@ -52,7 +52,7 @@ module Source::Tests::Extractor
           { file_size: 7_852_011 },
           { file_size: 8_214_343 },
         ],
-        page_url: "https://www.deviantart.com/apollo11v/art/Darth-Vindican-s-lightsaber-Star-Wars-Commission-1222436457",
+        page_url: "https://www.deviantart.com/apollo11v/art/Darth-Vindican%60s-lightsaber-%28Star-Wars%2CCommission%29-1222436457",
         profile_urls: %w[https://www.deviantart.com/apollo11v],
         display_name: "Apollo11v",
         username: "apollo11v",
@@ -208,7 +208,7 @@ module Source::Tests::Extractor
         "https://noizave.deviantart.com/art/test-no-download-697415967",
         image_urls: ["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7.jpg"],
         media_files: [{ file_size: 40_036, width: 500, height: 500 }],
-        page_url: "https://www.deviantart.com/noizave/art/test-no-download-697415967",
+        page_url: "https://www.deviantart.com/noizave/art/test%2C-no-download-697415967",
         display_name: "noizave",
         username: "noizave",
         profile_url: "https://www.deviantart.com/noizave",
@@ -248,7 +248,7 @@ module Source::Tests::Extractor
         "https://www.deviantart.com/snack20/art/Ophelia-and-Hannah-Commission-1209125284",
         image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/9db3eda4-8fde-4d93-b89b-e3ae7a54d795/djzvr1g-78e3c8b6-7ee2-4d3c-88ca-6843749dfacc\.jpg/v1/fill/w_1280,h_1600,blur_10/ophelia_and_hannah_commission_by_snack20_djzvr1g-fullview\.jpg\?token=}],
         media_files: [{ file_size: 174_266 }],
-        page_url: "https://www.deviantart.com/snack20/art/Ophelia-and-Hannah-Commission-1209125284",
+        page_url: "https://www.deviantart.com/snack20/art/Ophelia-and-Hannah-%7C-Commission-1209125284",
         profile_urls: %w[https://www.deviantart.com/snack20],
         display_name: "snack20",
         username: "snack20",
@@ -419,8 +419,8 @@ module Source::Tests::Extractor
           i finally finished this! gave myself a week and ended up taking 3 months LOL 💦
           thanks for all the support! <3
 
-          available on youtube: "youtu.be/q_ZvkSLZL8Y":[https://youtu.be/q_ZvkSLZL8Y]
-          ♫ : damper – deeper (ft. cookie) - "youtu.be/38gqxMmNo7Q":[https://youtu.be/38gqxMmNo7Q]
+          available on youtube: <https://youtu.be/q_ZvkSLZL8Y>
+          ♫ : damper – deeper (ft. cookie) - <https://youtu.be/38gqxMmNo7Q>
 
           (c) chakra guardians
         EOS
@@ -477,10 +477,10 @@ module Source::Tests::Extractor
           Censored preview:
 
           [/b][i][b]Support my work and access all of my images at best quality on Patreon:
-          "www.patreon.com/BNJacob":[https://www.patreon.com/BNJacob]
+          <https://www.patreon.com/BNJacob>
 
           [/b][/i][b]This image on Patreon:
-          "www.patreon.com/posts/95711276":[https://www.patreon.com/posts/95711276][/b]"Follow me on other sites":[https://linktr.ee/726sHSArt]
+          <https://www.patreon.com/posts/95711276>[/b]"Follow me on other sites":[https://linktr.ee/726sHSArt]
         EOS
       )
     end
@@ -630,7 +630,7 @@ module Source::Tests::Extractor
           Solar sisters
 
           HD images , Psd file and alternative version available on my Patreon :
-          "www.patreon.com/Dishwasher1910":[https://www.patreon.com/Dishwasher1910]
+          <https://www.patreon.com/Dishwasher1910>
           You can buy the print here :
           "www.inprnt.com/gallery/dishwas…":[https://www.inprnt.com/gallery/dishwasher1910/solar-sisters/]
         EOS
@@ -674,7 +674,7 @@ module Source::Tests::Extractor
     context "An AI-generated DeviantArt post" do
       strategy_should_work(
         "https://www.deviantart.com/izzyrozenberg/art/Makima-looks-back-1-1027063213",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/e785a455-56dc-4fbf-8a60-1ed3e6d6dadb/dgzhj1p-7f46a74d-703d-484a-9cf9-65e372810270\.png\?token=.+&filename=makima_looks_back__1_by_izzyrozenberg_dgzhj1p\.png}],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/e785a455-56dc-4fbf-8a60-1ed3e6d6dadb/dgzhj1p-7f46a74d-703d-484a-9cf9-65e372810270\.png\?token=.+&filename=makima_looks_back_1_by_izzyrozenberg_dgzhj1p\.png}],
         media_files: [{ file_size: 2_696_188 }],
         page_url: "https://www.deviantart.com/izzyrozenberg/art/Makima-looks-back-1-1027063213",
         profile_urls: %w[https://www.deviantart.com/izzyrozenberg],
@@ -724,10 +724,10 @@ module Source::Tests::Extractor
 
           ____________________
           Hair voice over tutorial
-          please go: "gumroad.com/l/ojqB":[https://gumroad.com/l/ojqB]
+          please go: <https://gumroad.com/l/ojqB>
           used the promo code: hairy ( unlimited )
 
-          more tutorials here :"gumroad.com/sakimichan":[https://gumroad.com/sakimichan#] if you guys are interested !                                    "www.patreon.com/posts/18431891":[https://www.patreon.com/posts/18431891]
+          more tutorials here :"gumroad.com/sakimichan":[https://gumroad.com/sakimichan#] if you guys are interested !                                    <https://www.patreon.com/posts/18431891>
         EOS
       )
     end
@@ -746,7 +746,7 @@ module Source::Tests::Extractor
 
           ________________________________________________________
 
-          [b]CM info | <http://fav.me/dbaalkv>[/b]
+          [b]CM info | "fav.me/dbaalkv":[http://fav.me/dbaalkv][/b]
         EOS
       )
     end

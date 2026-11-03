@@ -83,7 +83,7 @@ module Source::Tests::Extractor
         published_at: Time.parse("2019-04-30T05:44:44.000000Z"),
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "X. It’s what’s happening",
+        dtext_artist_commentary_title: "Twitter. It's what's happening.",
         dtext_artist_commentary_desc: "From breaking news and entertainment to sports and politics, get the full story with all the live commentary.",
       )
     end

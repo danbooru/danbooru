@@ -10,8 +10,8 @@ module Source::Tests::Extractor
           https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73de885fa1bd62531058478fac3157bc024e4bab3a06677d6d31d4957ed12b900e4a4ba4f8f184a66ea61b10f0d40c538da1e0b8f616cfef11d
         ],
         media_files: [
-          { file_size: 6_297_287 },
-          { file_size: 6_422_384 },
+          { file_size: 1_471_301 },
+          { file_size: 1_367_392 },
         ],
         page_url: "https://gall.dcinside.com/mgallery/board/view/?id=projectmx&no=14994409",
         profile_urls: %w[https://gallog.dcinside.com/wd3h8jz2hdnf],
@@ -36,7 +36,7 @@ module Source::Tests::Extractor
           https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73de885fa1bd62531058478fac3157bc024e4bab3a06677d6d31d4957ed12b900e4a4ba4f8f184a66ea61b10f0d45c16cd41b0a8f6f6cfef1d4
         ],
         media_files: [
-          { file_size: 6_297_287 },
+          { file_size: 1_471_301 },
         ],
         page_url: "https://gall.dcinside.com/mgallery/board/view/?id=projectmx&no=14994409",
         profile_urls: %w[https://gallog.dcinside.com/wd3h8jz2hdnf],
@@ -60,7 +60,7 @@ module Source::Tests::Extractor
           https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73de885fa1bd62531058478fac3157bc024e4bab3a06677d6d31d4957ed12b900e4a4ba4f8f184a66ea61b10f0d45c16cd41b0a8f6f6cfef1d4
         ],
         media_files: [
-          { file_size: 6_297_287 },
+          { file_size: 1_471_301 },
         ],
         page_url: nil,
         profile_urls: %w[],
@@ -76,7 +76,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://gall.dcinside.com/mgallery/board/view/?id=mibj&no=5555447",
         image_urls: %w[https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73ce885fa1bd6253138ca63577cd68a52ea2273d44e23221455bf85eaff50198e86e7556536f8225ec43c51bee7f880553a480c13],
-        media_files: [{ file_size: 1_802_358 }],
+        media_files: [{ file_size: 408_012 }],
         page_url: "https://gall.dcinside.com/mgallery/board/view/?id=mibj&no=5555447",
         profile_urls: %w[],
         display_name: "ㅇㅇ",
@@ -142,20 +142,21 @@ module Source::Tests::Extractor
 
     context "A post without download links" do
       strategy_should_work(
-        "https://gall.dcinside.com/mgallery/board/view?id=projectmx&no=12834101",
-        image_urls: %w[https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c1adb1423abd69b4ca94b482af027fd0f42fa68bbbaaebc],
-        media_files: [{ file_size: 4_949_125 }],
-        page_url: "https://gall.dcinside.com/mgallery/board/view/?id=projectmx&no=12834101",
-        profile_urls: %w[https://gallog.dcinside.com/4756qwer],
-        display_name: "44",
-        username: "4756qwer",
+        "https://gall.dcinside.com/mgallery/board/view?id=projectmx&no=19701120",
+        image_urls: %w[https://dcimg8.dcinside.co.kr/viewimage.php?no=29bcc427b69d39b37ab0ccaf17dd6b6f62b51b91c5c0132c1f5fd1ce90bf3ec38c0d605a87c215edb0a8612d8efac50958f7f6bd59d2db7f1a4f7e0c4a7044caddd1676abbd90536c760c14f262f2d],
+        media_files: [{ file_size: 211_306 }],
+        page_url: "https://gall.dcinside.com/mgallery/board/view/?id=projectmx&no=19701120",
+        profile_urls: %w[https://gallog.dcinside.com/topic1000],
+        display_name: "ㅇㅇ",
+        username: "topic1000",
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "[🎨창작] 아로나 그린거 보실분",
+        dtext_artist_commentary_title: "[일반] 나기사와 혼인하고 경제적 자유를 얻었습니다앱에서 작성",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          "viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c5e8b424ba8d4f071e5f71bb7f51881cd678a6d59e4c5bf7874b906":[https://dcimg1.dcinside.com/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c5e8b424ba8d4f071e5f71bb7f51881cd678a6d59e4c5bf7874b906]
-          "11":[https://dcimg5.dcinside.com/dccon.php?no=62b5df2be09d3ca567b1c5bc12d46b394aa3b1058c6e4d0ca41648b65fe8266eadc328cfdea5b74810026b505984e855639060800d4d06195f505e37f50b07e65e55156664b2e18c4d318c15]
+          "7ee88572bc846ffe3bede9e443d7706f59cc3561bb9d715082519b1cea1c52d2568a0e3eff93ee9d4fba7579796f85e17d9ecd0bdc09cb85823680c8af7ce6a1b6":[https://dcimg8.dcinside.co.kr/viewimage.php?id=3dafdf2ce0d12cab76&no=29bcc427b69d39b37ab0ccaf17dd6b6f62b51b91c5c0132c1f5fd1ce90bf3ec38c0d605a87c215edb0a8612d8efac50958f7f6bd59d2db7f1a4f7e0c4a7044caddd1676abbd90536c760c14f262f2d]
+          재정 조언을 위해 나기나기 하세요
+          "비틱나":[https://dcimg5.dcinside.com/dccon.php?no=62b5df2be09d3ca567b1c5bc12d46b394aa3b1058c6e4d0ca41648b658ec2575e91e802307af066317aa4fa7beda2fc446c4fcfda2d4297ba6eb538b343abf474e548a774e85ebb121400172d652438880c88dfbffc62427]
         EOS
       )
     end

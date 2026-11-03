@@ -5,7 +5,7 @@ module Source::Tests::Extractor
     context "A https://www.duitang.com/blog/?id=:id url" do
       strategy_should_work(
         "https://www.duitang.com/blog/?id=1026135391",
-        image_urls: %w[https://a-ssl.dtstatic.com/uploads/item/201812/02/20181202220613_cqgwb.jpg],
+        image_urls: %w[https://a-ho-img.dtstatic.com/uploads/item/201812/02/20181202220613_cqgwb.jpg],
         media_files: [{ file_size: 463_527 }],
         page_url: "https://www.duitang.com/blog/?id=1026135391",
         profile_url: "https://www.duitang.com/people/?id=9044306",

@@ -150,9 +150,9 @@ module Source::Tests::Extractor
           { file_size: 91_011 },
         ],
         page_url: "https://sdz013.lofter.com/post/1ec04eca_1ccabb5df",
-        profile_urls: %w[https://sdz013.lofter.com https://www.lofter.com/mentionredirect.do?blogId=515919562],
-        display_name: "无人在意的冷门选手",
-        username: "sdz013",
+        profile_urls: %w[https://inazumako.lofter.com https://www.lofter.com/mentionredirect.do?blogId=515919562],
+        display_name: "1N.zmk",
+        username: "inazumako",
         published_at: Time.parse("2021-08-04T18:12:26Z"),
         tags: [
           ["军团要塞2", "https://www.lofter.com/tag/军团要塞2"],

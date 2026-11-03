@@ -6,7 +6,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://arca.live/b/arknights/66031722?p=1",
         image_urls: [
-          %r{https://ac\.namu\.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5\.jpg\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5\.jpg\?expires=\d+&key=[\w_-]+&type=orig},
         ],
         media_files: [{ file_size: 273_206 }],
         profile_urls: %w[https://arca.live/u/@Si리링],
@@ -66,7 +66,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://arca.live/b/breaking/66031722",
         image_urls: [
-          %r{https://ac\.namu\.la/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5\.jpg\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20221225sac2/e06dcf8edd29c597240898a6752c74dbdd0680fc932cfd0ecc898795f1db34b5\.jpg\?expires=\d+&key=[\w_-]+&type=orig},
         ],
         media_files: [{ file_size: 273_206 }],
         profile_urls: %w[https://arca.live/u/@Si리링],
@@ -83,9 +83,9 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://arca.live/b/bluearchive/65031202",
         image_urls: [
-          %r{https://ac\.namu\.la/20221211sac/5ea7fbca5e49ec16beb099fc6fc991690d37552e599b1de8462533908346241e\.png\?expires=\d+&key=[\w_-]+&type=orig},
-          %r{https://ac\.namu\.la/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9\.gif\?expires=\d+&key=[\w_-]+&type=orig},
-          %r{https://ac\.namu\.la/20221211sac2/3e72f9e05ca97c0c3c0fe5f25632b06eb21ab9f211e9ea22816e16468ee241ca\.png\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20221211sac/5ea7fbca5e49ec16beb099fc6fc991690d37552e599b1de8462533908346241e\.png\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20221211sac/7f73beefc4f18a2f986bc4c6821caba706e27f4c94cb828fc16e2af1253402d9\.gif\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20221211sac2/3e72f9e05ca97c0c3c0fe5f25632b06eb21ab9f211e9ea22816e16468ee241ca\.png\?expires=\d+&key=[\w_-]+&type=orig},
         ],
         media_files: [
           { file_size: 28_519 },
@@ -116,8 +116,8 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://arca.live/b/arknights/122263340",
         image_urls: [
-          %r{https://ac\.namu\.la/20241126sac/b2175d9ef4504945d3d989526120dbb6aded501ddedfba8ecc44a64e7aae9059\.gif\?expires=\d+&key=[\w_-]+&type=orig},
-          %r{https://ac\.namu\.la/20241126sac/bc1f3cb388a3a2d099ab67bc09b28f0a93c2c4755152b3ef9190690a9f0a28fb\.webp\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20241126sac/b2175d9ef4504945d3d989526120dbb6aded501ddedfba8ecc44a64e7aae9059\.gif\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20241126sac/bc1f3cb388a3a2d099ab67bc09b28f0a93c2c4755152b3ef9190690a9f0a28fb\.webp\?expires=\d+&key=[\w_-]+&type=orig},
         ],
         media_files: [
           { file_size: 749_653 },
@@ -147,7 +147,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://arca.live/b/bluearchive/117240135",
         image_urls: [
-          %r{https://ac\.namu\.la/20240926sac/16f07778a97f91b935c8a3394ead01a223d96b2a619fdb25c4628ddba88b5fad\.mp4\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac-o\.arca\.live/20240926sac/16f07778a97f91b935c8a3394ead01a223d96b2a619fdb25c4628ddba88b5fad\.mp4\?expires=\d+&key=[\w_-]+&type=orig},
         ],
         media_files: [{ file_size: 1_687_382 }],
         page_url: "https://arca.live/b/bluearchive/117240135",
@@ -171,7 +171,7 @@ module Source::Tests::Extractor
     context "An Arca.live page URL with a fake .mp4 GIF" do
       strategy_should_work(
         "https://arca.live/b/zenlesszonezero/159393370",
-        image_urls: [%r{https://ac\.namu\.la/20260112sac/22f43e42ef9f124d1a917325b284dd5343bca9faf886607a7d81ad083b7db306\.gif\?expires=\d+&key=[\w_-]+&type=orig}],
+        image_urls: [%r{https://ac\.arca\.live/20260112sac/22f43e42ef9f124d1a917325b284dd5343bca9faf886607a7d81ad083b7db306\.gif\?expires=\d+&key=[\w_-]+&type=orig}],
         media_files: [{ file_size: 390_778 }],
         page_url: "https://arca.live/b/zenlesszonezero/159393370",
         profile_url: "https://arca.live/u/@나는야잡초맨",
@@ -198,7 +198,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://arca.live/b/arknights/49406926",
         image_urls: [
-          %r{https://ac\.namu\.la/20220428sac2/41f472adcea674aff75f15f146e81c27032bc4d6c8073bd7c19325bd1c97d335\.png\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20220428sac2/41f472adcea674aff75f15f146e81c27032bc4d6c8073bd7c19325bd1c97d335\.png\?expires=\d+&key=[\w_-]+&type=orig},
         ],
         profile_urls: %w[https://arca.live/u/@유즈비],
         page_url: "https://arca.live/b/arknights/49406926",
@@ -214,8 +214,8 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://arca.live/b/commission/63658702",
         image_urls: [
-          %r{https://ac\.namu\.la/20221123sac2/14925c5e22ab9f17f2923ae60a39b7af0794c43e478ecaba054ab6131e57e022\.png\?expires=\d+&key=[\w_-]+&type=orig},
-          %r{https://ac\.namu\.la/20221123sac2/50c385a4004bca44271a2f6133990f086cfefd29a7968514e9c14d6017d61265\.png\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20221123sac2/14925c5e22ab9f17f2923ae60a39b7af0794c43e478ecaba054ab6131e57e022\.png\?expires=\d+&key=[\w_-]+&type=orig},
+          %r{https://ac\.arca\.live/20221123sac2/50c385a4004bca44271a2f6133990f086cfefd29a7968514e9c14d6017d61265\.png\?expires=\d+&key=[\w_-]+&type=orig},
         ],
         # media_files: [
         #   { file_size: 12_312_152 },
