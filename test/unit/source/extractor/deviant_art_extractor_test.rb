@@ -246,8 +246,8 @@ module Source::Tests::Extractor
     context "A deviantart page with a blurred sample URL" do
       strategy_should_work(
         "https://www.deviantart.com/snack20/art/Ophelia-and-Hannah-Commission-1209125284",
-        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/9db3eda4-8fde-4d93-b89b-e3ae7a54d795/djzvr1g-78e3c8b6-7ee2-4d3c-88ca-6843749dfacc\.jpg/v1/fill/w_1280,h_1600/ophelia_and_hannah___commission_by_snack20_djzvr1g-fullview\.jpg\?token=}],
-        media_files: [{ file_size: 402_216 }],
+        image_urls: [%r{https://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/9db3eda4-8fde-4d93-b89b-e3ae7a54d795/djzvr1g-78e3c8b6-7ee2-4d3c-88ca-6843749dfacc\.jpg/v1/fill/w_1280,h_1600,blur_10/ophelia_and_hannah_commission_by_snack20_djzvr1g-fullview\.jpg\?token=}],
+        media_files: [{ file_size: 174_266 }],
         page_url: "https://www.deviantart.com/snack20/art/Ophelia-and-Hannah-Commission-1209125284",
         profile_urls: %w[https://www.deviantart.com/snack20],
         display_name: "snack20",
