@@ -130,7 +130,7 @@ module NoteSanitizer
   # @param name [String] The CSS property name.
   # @param value [String] The CSS property value.
   def self.allowed_css_property?(name, value)
-    allowed_values = ALLOWED_PROPERTY_VALUES[name]
+    allowed_values = ALLOWED_PROPERTY_VALUES[name.downcase]
     allowed_values.blank? || value.downcase.in?(allowed_values)
   end
 end

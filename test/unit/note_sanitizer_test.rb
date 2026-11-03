@@ -38,6 +38,13 @@ class NoteSanitizerTest < ActiveSupport::TestCase
       assert_equal("<p>test</p>", NoteSanitizer.sanitize('<p style=";">test</p>'))
     end
 
+    should "strip disallowed style values regardless of property name case" do
+      assert_equal("<p>test</p>", NoteSanitizer.sanitize('<p style="POSITION: fixed;">test</p>'))
+      assert_equal("<p>test</p>", NoteSanitizer.sanitize('<p style="Position: Fixed;">test</p>'))
+      assert_equal("<p>test</p>", NoteSanitizer.sanitize('<p style="DISPLAY: none;">test</p>'))
+      assert_equal('<p style="POSITION: absolute;">test</p>', NoteSanitizer.sanitize('<p style="POSITION: absolute;">test</p>'))
+    end
+
     should "mark links as nofollow" do
       body = '<a href="http://www.google.com">google</a>'
       assert_equal('<a href="http://www.google.com" rel="external noreferrer nofollow">google</a>', NoteSanitizer.sanitize(body))
