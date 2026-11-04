@@ -30,14 +30,18 @@ class TOTP
   end
 
   # Create a new TOTP verifier from a signed secret.
-  def self.from_signed_secret(signed_secret, **options)
-    secret = Danbooru::MessageVerifier.new(:totp).verify(signed_secret)
-    TOTP.new(secret, **options)
+  #
+  # @raise [ActiveSupport::MessageVerifier::InvalidSignature] If the secret is invalid, expired, or was signed for a different user.
+  def self.from_signed_secret(signed_secret, username:, **options)
+    secret, signed_username = Danbooru::MessageVerifier.new(:totp).verify(signed_secret)
+    raise ActiveSupport::MessageVerifier::InvalidSignature if signed_username != username
+
+    TOTP.new(secret, username: username, **options)
   end
 
-  # The secret, cryptographically signed so it can't be modified by the user.
+  # The secret, cryptographically signed with the username so it can't be modified or used for another user.
   def signed_secret
-    Danbooru::MessageVerifier.new(:totp).generate(secret, expires_in: 1.hour)
+    Danbooru::MessageVerifier.new(:totp).generate([secret, username], expires_in: 1.hour)
   end
 
   # Verify whether the given 6-digit code is correct.

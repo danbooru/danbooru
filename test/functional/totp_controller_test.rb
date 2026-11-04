@@ -51,7 +51,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
       context "when given the correct verification code" do
         should "allow a user to enable 2FA" do
           @user = create(:user)
-          @totp = TOTP.new
+          @totp = TOTP.new(username: @user.name)
 
           put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
 
@@ -62,9 +62,21 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.user_events.totp_enable.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
+        should "not allow a user to enable 2FA with a secret generated for another user" do
+          @user = create(:user)
+          @totp = TOTP.new(username: create(:user).name)
+
+          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
+
+          assert_response 403
+          assert_equal(false, @user.reload.totp.present?)
+          assert_nil(@user.totp_secret)
+          assert_equal(false, @user.user_events.totp_enable.exists?)
+        end
+
         should "not allow a user to enable 2FA for another user" do
           @user = create(:user)
-          @totp = TOTP.new
+          @totp = TOTP.new(username: @user.name)
 
           put_auth user_totp_path(user_id: @user), create(:user), params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
 
@@ -92,7 +104,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
       context "when given an incorrect verification code" do
         should "not enable 2FA" do
           @user = create(:user)
-          @totp = TOTP.new
+          @totp = TOTP.new(username: @user.name)
 
           put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: "invalid" }}
 
