@@ -5,6 +5,10 @@ class SessionsController < ApplicationController
 
   verify_captcha only: :create
 
+  rescue_from ActiveSupport::MessageVerifier::InvalidSignature do
+    redirect_to login_path, notice: "Login expired. Login again to continue", status: 303
+  end
+
   def new
     @session = authorize SessionLoader.new(request)
     @url = params.dig(:session, :url).presence || params[:url].presence || root_path
@@ -53,7 +57,7 @@ class SessionsController < ApplicationController
 
   # Verify the user's 2FA code after they log in with their password.
   def verify_totp
-    @user = User.find_signed(params.dig(:totp, :user_id), purpose: :verify_totp)
+    @user = User.find_signed!(params.dig(:totp, :user_id), purpose: "verify_totp/#{session[:session_id]}")
     @url = params.dig(:totp, :url).presence || root_url
     @session = authorize SessionLoader.new(request)
 

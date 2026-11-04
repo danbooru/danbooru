@@ -165,7 +165,7 @@ class ActionDispatch::IntegrationTest
     post session_path, params: { session: { name: user.name, password: user.password }}
 
     if user.totp.present?
-      post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: :verify_totp), code: user.totp.code }}
+      post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: "verify_totp/#{session[:session_id]}"), code: user.totp.code }}
     end
   end
 

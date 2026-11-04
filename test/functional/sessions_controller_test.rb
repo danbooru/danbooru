@@ -1,6 +1,12 @@
 require "test_helper"
 
 class SessionsControllerTest < ActionDispatch::IntegrationTest
+  # Start a session and return the token the 2FA page would give the user after they entered their password.
+  def verify_totp_token(user)
+    get login_path
+    user.signed_id(purpose: "verify_totp/#{session[:session_id]}", expires_in: 10.minutes)
+  end
+
   context "the sessions controller" do
     setup do
       @user = create(:user, password: "password", email_address_attributes: { address: "Foo.Bar+nospam@Googlemail.com" })
@@ -464,7 +470,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         @user = create(:user_with_2fa, password: "password")
 
         freeze_time
-        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: @user.totp.code, url: users_path }}
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: @user.totp.code, url: users_path }}
 
         assert_redirected_to users_path
         assert_equal(@user.id, session[:user_id])
@@ -475,11 +481,56 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.user_events.totp_login.exists?(login_session_id: session[:login_id]))
       end
 
+      should "show the 2FA page after the user enters their password, and log them in with the correct 2FA code" do
+        @user = create(:user_with_2fa, password: "password")
+
+        post session_path, params: { session: { name: @user.name, password: "password" }}
+        assert_response :success
+        assert_nil(session[:user_id])
+
+        token = css_select("input[name='totp[user_id]']").first["value"]
+        post verify_totp_session_path, params: { totp: { user_id: token, code: @user.totp.code, url: users_path }}
+
+        assert_redirected_to users_path
+        assert_equal(@user.id, session[:user_id])
+      end
+
+      should "not accept a 2FA token from a different session" do
+        @user = create(:user_with_2fa, password: "password")
+        token = verify_totp_token(@user)
+
+        reset! # start a new session
+        post verify_totp_session_path, params: { totp: { user_id: token, code: @user.totp.code, url: users_path }}
+
+        assert_redirected_to login_path
+        assert_nil(session[:user_id])
+        assert_equal(false, @user.login_sessions.exists?)
+      end
+
+      should "not accept an expired 2FA token" do
+        @user = create(:user_with_2fa, password: "password")
+        token = verify_totp_token(@user)
+
+        travel 11.minutes
+        post verify_totp_session_path, params: { totp: { user_id: token, code: @user.totp.code, url: users_path }}
+
+        assert_redirected_to login_path
+        assert_nil(session[:user_id])
+        assert_equal(false, @user.login_sessions.exists?)
+      end
+
+      should "not accept an invalid 2FA token" do
+        post verify_totp_session_path, params: { totp: { user_id: "invalid", code: "123456", url: users_path }}
+
+        assert_redirected_to login_path
+        assert_nil(session[:user_id])
+      end
+
       should "log the user in if they enter a 2FA code that was generated less than 30 seconds ago" do
         @user = create(:user_with_2fa, password: "password")
         code = travel_to(25.seconds.ago) { @user.totp.code }
 
-        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path }}
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: code, url: users_path }}
 
         assert_redirected_to users_path
         assert_equal(@user.id, session[:user_id])
@@ -492,7 +543,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         @user = create(:user_with_2fa, password: "password")
         code = travel_to(25.seconds.from_now) { @user.totp.code }
 
-        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path }}
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: code, url: users_path }}
 
         assert_redirected_to users_path
         assert_equal(@user.id, session[:user_id])
@@ -504,7 +555,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       should "not log the user in if they enter an incorrect 2FA code" do
         @user = create(:user_with_2fa, password: "password")
 
-        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: "invalid", url: users_path }}
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: "invalid", url: users_path }}
 
         assert_response :success
         assert_nil(session[:user_id])
@@ -518,7 +569,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         @user = create(:user_with_2fa, password: "password")
         code = travel_to(65.seconds.ago) { @user.totp.code }
 
-        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path }}
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: code, url: users_path }}
 
         assert_response :success
         assert_nil(session[:user_id])
@@ -532,7 +583,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         @user = create(:user_with_2fa, password: "password")
         code = travel_to(65.seconds.from_now) { @user.totp.code }
 
-        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: code, url: users_path }}
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: code, url: users_path }}
 
         assert_response :success
         assert_nil(session[:user_id])
@@ -546,7 +597,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         @user = create(:user_with_2fa, password: "password")
         User.any_instance.stubs(:limit_2fa_attempts!).raises(RateLimiter::RateLimitError)
 
-        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: @user.totp.code, url: users_path }}
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: @user.totp.code, url: users_path }}
 
         assert_response 429
         assert_nil(session[:user_id])
@@ -559,7 +610,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           backup_code = @user.backup_codes.first
 
           freeze_time
-          post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path }}
+          post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: backup_code, url: users_path }}
 
           assert_redirected_to users_path
           assert_equal(@user.id, session[:user_id])
@@ -576,7 +627,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user_with_2fa)
           backup_code = "99999999"
 
-          post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path }}
+          post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: backup_code, url: users_path }}
 
           assert_response :success
           assert_nil(session[:user_id])
@@ -590,14 +641,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
           backup_code = 1111_1111
 
-          post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path }}
+          post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: backup_code, url: users_path }}
           assert_redirected_to users_path
           assert_equal(@user.id, session[:user_id])
 
           delete_auth session_path, @user
           assert_nil(session[:user_id])
 
-          post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: backup_code, url: users_path }}
+          post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: backup_code, url: users_path }}
 
           assert_response :success
           assert_nil(session[:user_id])
