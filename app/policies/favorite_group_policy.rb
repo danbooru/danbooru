@@ -2,7 +2,7 @@
 
 class FavoriteGroupPolicy < ApplicationPolicy
   def show?
-    record.creator_id == user.id || record.is_public
+    record.creator_id == user.id || record.is_public || user.is_superadmin?
   end
 
   def create?

@@ -741,8 +741,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "allow the owner to view another user's settings" do
-        get_auth edit_user_path(@user), create(:owner_user)
+      should "allow a superadmin to view another user's settings" do
+        get_auth edit_user_path(@user), create(:superadmin_user)
         assert_response :success
       end
 

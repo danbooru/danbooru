@@ -3,14 +3,14 @@ require "test_helper"
 class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
   context "The favorite groups controller" do
     setup do
-      @user = create(:user)
+      @user = create(:gold_user)
       @favgroup = create(:favorite_group, creator: @user)
+      @private_favgroup = create(:private_favorite_group, creator: @user)
     end
 
     context "index action" do
       setup do
         @mod_favgroup = create(:favorite_group, name: "Beautiful Smile", creator: build(:moderator_user))
-        @private_favgroup = create(:private_favorite_group)
       end
 
       should "render" do
@@ -27,7 +27,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(name_matches: "smiling beauty").with { @mod_favgroup }
 
       should respond_to_search(creator_name: -> { @mod_favgroup.creator.name }).with { @mod_favgroup }
-      should respond_to_search(creator: { level: User::Levels::MEMBER }).with { @favgroup }
+      should respond_to_search(creator: { level: User::Levels::GOLD }).with { @favgroup }
 
       should respond_to_search(is_public: "false").as_user { @private_favgroup.creator }.with { @private_favgroup }
     end
@@ -39,15 +39,17 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "show private favgroups to the creator" do
-        @favgroup.is_public = false
-        @favgroup.save!(validate: false)
-        get_auth favorite_group_path(@favgroup), @user
+        get_auth favorite_group_path(@private_favgroup), @user
+        assert_response :success
+      end
+
+      should "show private favgroups to a superadmin" do
+        get_auth favorite_group_path(@private_favgroup), create(:superadmin_user)
         assert_response :success
       end
 
       should "not show private favgroups to other users" do
-        @favgroup = create(:private_favorite_group)
-        get_auth favorite_group_path(@favgroup), create(:user)
+        get_auth favorite_group_path(@private_favgroup), create(:user)
         assert_response 403
       end
     end
@@ -91,10 +93,12 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow non-Gold users to enable private favgroups" do
-        put_auth favorite_group_path(@favgroup), @user, params: { favorite_group: { is_private: true }}
+        @member = create(:user)
+        @member_favgroup = create(:favorite_group, creator: @member)
+        put_auth favorite_group_path(@member_favgroup), @member, params: { favorite_group: { is_private: true }}
 
         assert_response :success
-        assert_equal(false, @favgroup.is_private?)
+        assert_equal(false, @member_favgroup.is_private?)
       end
     end
 

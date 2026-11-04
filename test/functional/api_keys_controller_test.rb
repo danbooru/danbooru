@@ -22,8 +22,8 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_select "#api-key-#{@api_key.id}", count: 0
       end
 
-      should "let the owner see all API keys" do
-        get_auth user_api_keys_path(@user.id), create(:owner_user)
+      should "let a superadmin see all API keys" do
+        get_auth user_api_keys_path(@user.id), create(:superadmin_user)
 
         assert_response :success
         assert_select "#api-key-#{@api_key.id}", count: 1
