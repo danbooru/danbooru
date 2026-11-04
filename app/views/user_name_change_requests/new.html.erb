@@ -23,7 +23,7 @@
 
         <p>
           Current name: <b><%= @change_request.user.name %></b>.<br>
-          Error: <%= @change_request.user.name_errors.full_messages.join(". ").html_safe %>.
+          Error: <%= @change_request.user.name_errors.full_messages.join(". ") %>.
         </p>
       <% end %>
 

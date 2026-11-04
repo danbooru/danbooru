@@ -158,6 +158,18 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#approve" do
+      should "quote the error message in the .js response" do
+        errors = ActiveModel::Errors.new(@bulk_update_request)
+        errors.add(:base, %{can't approve "alias foo -> bar"})
+        errors.stubs(:clear)
+        BulkUpdateRequest.any_instance.stubs(:approve!)
+        BulkUpdateRequest.any_instance.stubs(:errors).returns(errors)
+
+        post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @admin
+
+        assert_includes(response.body, %{Danbooru.Notice.error("can\\&#39;t approve \\&quot;alias foo -&gt; bar\\&quot;");})
+      end
+
       context "for a member" do
         should "fail" do
           post_auth approve_bulk_update_request_path(@bulk_update_request), @user

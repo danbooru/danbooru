@@ -25,6 +25,14 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "escape the current user's invalid name in the error message" do
+        @user.update_columns(name: "foo<bar") # rubocop:disable Rails/SkipsModelValidations
+        get_auth change_name_user_path(@user), @user
+
+        assert_response :success
+        assert_includes(response.body, "Error: Name can&#39;t contain &#39;&lt;&#39;.")
+      end
+
       should "render for a moderator changing another user's name" do
         get_auth change_name_user_path(@user), create(:moderator_user)
 

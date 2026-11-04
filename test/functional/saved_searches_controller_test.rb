@@ -27,6 +27,14 @@ class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to SavedSearch.last
         assert_equal(true, @user.reload.disable_categorized_saved_searches)
       end
+
+      should "escape HTML in the query in the notice" do
+        post_auth saved_searches_path(format: :js), @user, params: { saved_search: { query: "<img src=x onerror=alert(1)>" }}
+
+        assert_response :success
+        assert_no_match(/<img/, response.body)
+        assert_match(/&lt;img/, response.body)
+      end
     end
 
     context "edit action" do
