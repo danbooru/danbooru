@@ -163,6 +163,22 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 403
       end
+
+      should "not allow unauthorized users to quote deleted posts" do
+        @deleted_post = create(:forum_post, creator: @other_user, topic: @forum_topic, body: "deleted body", is_deleted: true)
+        get_auth new_forum_post_path(format: :json), @user, params: { post_id: @deleted_post.id }
+
+        assert_response 403
+        assert_not_includes(response.body, "deleted body")
+      end
+
+      should "allow moderators to quote deleted posts" do
+        @deleted_post = create(:forum_post, creator: @other_user, topic: @forum_topic, body: "deleted body", is_deleted: true)
+        get_auth new_forum_post_path(format: :json), @mod, params: { post_id: @deleted_post.id }
+
+        assert_response :success
+        assert_includes(response.parsed_body["body"], "deleted body")
+      end
     end
 
     context "create action" do

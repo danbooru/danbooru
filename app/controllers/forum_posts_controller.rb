@@ -23,7 +23,13 @@ class ForumPostsController < ApplicationController
   end
 
   def new
-    @forum_post = authorize ForumPost.new_reply(params)
+    if params[:post_id]
+      quoted_post = authorize ForumPost.find(params.expect(:post_id)), :show?
+      @forum_post = authorize quoted_post.build_response
+    else
+      @forum_post = authorize ForumPost.new(topic_id: params[:topic_id])
+    end
+
     respond_with(@forum_post)
   end
 

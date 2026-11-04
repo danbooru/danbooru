@@ -81,17 +81,6 @@ class ForumPost < ApplicationRecord
 
   extend SearchMethods
 
-  def self.new_reply(params)
-    if params[:topic_id]
-      new(topic_id: params[:topic_id])
-    elsif params[:post_id]
-      forum_post = ForumPost.find(params[:post_id])
-      forum_post.build_response
-    else
-      new
-    end
-  end
-
   def voted?(user, score)
     votes.exists?(creator_id: user.id, score: score)
   end
