@@ -64,9 +64,15 @@ class ApplicationController < ActionController::Base
       redirect_to_show(subject) and return
     end
 
-    if params[:only].present? && subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
-      associations = ParameterBuilder.new(params[:only], model).includes_parameters
-      subject = subject.includes(associations)
+    # Preload the associations included with `only=` and hide the included records the user can't see.
+    if params[:only].present? && (request.format.json? || request.format.xml?)
+      records = subject.is_a?(ActiveRecord::Relation) ? subject.load.to_a : Array.wrap(subject)
+
+      if records.all?(ApplicationRecord)
+        associations = ParameterBuilder.new(params[:only], model).includes_parameters
+        ActiveRecord::Associations::Preloader.new(records: records, associations: associations).call
+        ApplicationRecord.hide_invisible_includes!(records, associations, CurrentUser.user)
+      end
     end
 
     if subject.respond_to?(:errors) && subject.errors.present?

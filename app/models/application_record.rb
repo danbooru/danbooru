@@ -60,9 +60,38 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   concerning :ApiMethods do
+    included do
+      # True if this record is included in an API response but the user isn't allowed to see it.
+      attr_accessor :hidden_from_api
+    end
+
     class_methods do
       def available_includes
         []
+      end
+
+      # Mark the records included in an API response that the user isn't allowed to see, so they're left out of the
+      # response. Uses one `visible` query per model instead of checking each record separately.
+      #
+      # @param records [Array<ApplicationRecord>] The records being returned.
+      # @param includes [Array<Symbol, Hash>] The included associations, as returned by ParameterBuilder#includes_parameters.
+      # @param user [User] The current user.
+      def hide_invisible_includes!(records, includes, user)
+        included_records(records, includes).group_by(&:class).each do |model, children|
+          next if model.visible(user).to_sql == model.all.to_sql # Skip models the user can see everything of.
+
+          visible_ids = model.visible(user).where(id: children.map(&:id)).pluck(:id).to_set
+          children.each { it.hidden_from_api = !it.id.in?(visible_ids) }
+        end
+      end
+
+      # @return [Array<ApplicationRecord>] All the preloaded records in the given (possibly nested) includes.
+      def included_records(records, includes)
+        includes.flat_map do |include|
+          name, nested = include.is_a?(Hash) ? include.first : [include, []]
+          children = records.flat_map { Array.wrap(it.association(name).target) if it.class.reflect_on_association(name) }.compact
+          children + included_records(children, nested)
+        end
       end
 
       def multiple_includes
@@ -130,6 +159,19 @@ class ApplicationRecord < ActiveRecord::Base
 
       hash = super(options)
       hash.transform_keys { |key| key.delete("?") }
+    end
+
+    private
+
+    # Don't include associated records the user isn't allowed to see (see `hide_invisible_includes!`).
+    def serializable_add_includes(options = {})
+      super do |association, records, opts|
+        if records.respond_to?(:to_ary)
+          yield association, records.to_ary.reject(&:hidden_from_api), opts
+        elsif !records.hidden_from_api
+          yield association, records, opts
+        end
+      end
     end
   end
 

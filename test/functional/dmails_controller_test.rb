@@ -47,6 +47,14 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not list reported dmails owned by other users to moderators" do
+        create(:moderation_report, model: @received_dmail, creator: @user)
+
+        get_auth dmails_path(search: { folder: "all" }), @unrelated_user, as: :json
+        assert_response :success
+        assert_not_includes(response.parsed_body.pluck("id"), @received_dmail.id)
+      end
+
       search = respond_to_search.as_user { @user }
       should search.with { [@deleted_dmail, @received_dmail, @system_dmail, @dmail] }
       should search.search_params(folder: "sent").with { @dmail }
@@ -96,6 +104,16 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
       should "not show dmails not owned by the current user when given an invalid key" do
         get_auth dmail_path(@dmail, key: "#{@dmail.key}blah"), @unrelated_user
+        assert_response 403
+      end
+
+      should "show reported dmails to moderators" do
+        create(:moderation_report, model: @dmail, creator: @user)
+
+        get_auth dmail_path(@dmail), @unrelated_user
+        assert_response :success
+
+        get_auth dmail_path(@dmail), create(:user)
         assert_response 403
       end
 

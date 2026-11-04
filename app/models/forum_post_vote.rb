@@ -11,8 +11,8 @@ class ForumPostVote < ApplicationRecord
   scope :up, -> { where(score: 1) }
   scope :down, -> { where(score: -1) }
 
-  def self.visible(_user)
-    all
+  def self.visible(user)
+    where(forum_post: ForumPost.visible(user))
   end
 
   def self.forum_post_matches(params, current_user)

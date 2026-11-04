@@ -84,6 +84,8 @@ class Dmail < ApplicationRecord
     def visible(user)
       if user.is_anonymous?
         none
+      elsif user.is_moderator?
+        where(owner: user).or(where(id: ModerationReport.where(model_type: "Dmail").select(:model_id)))
       else
         where(owner: user)
       end

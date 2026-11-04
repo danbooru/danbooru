@@ -55,6 +55,31 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "including forum posts" do
+      setup do
+        @topic = create(:mod_up_forum_topic)
+        @hidden_alias = create(:tag_alias, forum_topic: @topic, forum_post: create(:forum_post, topic: @topic))
+        @deleted_alias = create(:tag_alias, forum_post: create(:forum_post, is_deleted: true))
+      end
+
+      should "not include forum posts or topics the user can't see" do
+        get_auth tag_aliases_path(search: { id: @hidden_alias.id }, only: "id,forum_topic[title],forum_post[body]"), create(:user), as: :json
+        assert_equal(%w[id], response.parsed_body.sole.keys)
+
+        get_auth tag_alias_path(@hidden_alias, only: "id,forum_topic[title],forum_post[body]"), create(:user), as: :json
+        assert_equal(%w[id], response.parsed_body.keys)
+
+        get_auth tag_aliases_path(search: { id: @deleted_alias.id }, only: "id,forum_post[body]"), create(:user), as: :json
+        assert_equal(%w[id], response.parsed_body.sole.keys)
+      end
+
+      should "include forum posts and topics the user can see" do
+        get_auth tag_aliases_path(search: { id: @hidden_alias.id }, only: "id,forum_topic[title],forum_post[body]"), create(:moderator_user), as: :json
+        assert_equal(@topic.title, response.parsed_body.sole.dig("forum_topic", "title"))
+        assert_equal(@topic.forum_posts.sole.body, response.parsed_body.sole.dig("forum_post", "body"))
+      end
+    end
+
     context "destroy action" do
       should "allow admins to delete aliases" do
         user = create(:admin_user)

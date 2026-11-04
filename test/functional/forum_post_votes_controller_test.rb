@@ -30,6 +30,33 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(creator_name: -> { @vote.creator.name }).with { @vote }
       should respond_to_search(forum_post: { creator_name: -> { @user.name }}).with { [@negative_vote, @vote] }
       should respond_to_search(forum_post: { body_matches: "blah" }).with { [@negative_vote, @vote] }
+
+      should "not show votes on forum posts the user can't see" do
+        hidden_vote = create(:forum_post_vote, forum_post: create(:forum_post, topic: create(:mod_up_forum_topic)))
+
+        get_auth forum_post_votes_path, @user, as: :json
+        assert_response :success
+        assert_not_includes(response.parsed_body.pluck("id"), hidden_vote.id)
+
+        get_auth forum_post_votes_path, create(:moderator_user), as: :json
+        assert_response :success
+        assert_includes(response.parsed_body.pluck("id"), hidden_vote.id)
+      end
+
+      should "not run extra queries for each included forum post" do
+        count_queries = lambda do
+          get_auth forum_post_votes_path(only: "id,forum_post[body]"), @user, as: :json # warm up caches
+          count = 0
+          ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].match?(/\ASELECT/) }, "sql.active_record") do
+            get_auth forum_post_votes_path(only: "id,forum_post[body]"), @user, as: :json
+          end
+          count
+        end
+
+        queries = count_queries.call
+        create_list(:forum_post_vote, 5)
+        assert_equal(queries, count_queries.call)
+      end
     end
 
     context "show action" do
@@ -37,6 +64,13 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
         @forum_post_vote = create(:forum_post_vote, forum_post: @forum_post)
         get forum_post_vote_path(@forum_post_vote), as: :json
         assert_response :success
+      end
+
+      should "not show votes on forum posts the user can't see" do
+        hidden_vote = create(:forum_post_vote, forum_post: create(:forum_post, topic: create(:mod_up_forum_topic)))
+
+        get_auth forum_post_vote_path(hidden_vote), @user, as: :json
+        assert_response 404
       end
     end
 

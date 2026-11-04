@@ -74,6 +74,13 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         should modreports.search_params(model_type: "ForumPost").with { @forum_report }
         should modreports.search_params(ForumPost: { body_matches: "xxx" }).with { @forum_report }
         should modreports.search_params(creator_name: -> { @dmail_report.creator.name }).with { @dmail_report }
+
+        should "include the reported dmail" do
+          get_auth moderation_reports_path(search: { id: @dmail_report.id }, only: "id,model[body]"), @mod, as: :json
+
+          assert_response :success
+          assert_equal(@dmail.body, response.parsed_body.sole.dig("model", "body"))
+        end
       end
     end
 

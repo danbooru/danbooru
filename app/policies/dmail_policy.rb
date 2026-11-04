@@ -19,6 +19,7 @@ class DmailPolicy < ApplicationPolicy
 
   def show?
     return true if user.is_owner?
+    return true if user.is_moderator? && record.moderation_reports.exists?
     !user.is_anonymous? && record.owner_id == user.id
   end
 

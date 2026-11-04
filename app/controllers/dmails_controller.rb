@@ -4,7 +4,7 @@ class DmailsController < ApplicationController
   respond_to :html, :xml, :js, :json
 
   def index
-    @dmails = authorize Dmail.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @dmails = authorize Dmail.where(owner: CurrentUser.user).paginated_search(params, count_pages: true)
     @dmails = @dmails.includes(:owner, :to, :from) if request.format.html?
 
     respond_with(@dmails)

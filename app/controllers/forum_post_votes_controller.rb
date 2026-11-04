@@ -11,7 +11,7 @@ class ForumPostVotesController < ApplicationController
   end
 
   def show
-    @forum_post_vote = authorize ForumPostVote.find(params[:id])
+    @forum_post_vote = authorize ForumPostVote.visible(CurrentUser.user).find(params[:id])
     respond_with(@forum_post_vote)
   end
 
