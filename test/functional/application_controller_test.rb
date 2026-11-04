@@ -587,6 +587,31 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal(%w[children id], post.keys.sort)
         assert_equal(["id"], post["children"].first.keys)
       end
+
+      should "not include associations whose foreign key is hidden" do
+        create(:comment, post: @post, is_deleted: true)
+        create(:post_disapproval, post: create(:post, is_pending: true))
+
+        get comments_path(group_by: :comment, only: "id,creator[name],updater"), as: :json
+        assert_response :success
+        assert_equal(%w[id], response.parsed_body.sole.keys)
+
+        get_auth post_disapprovals_path(only: "id,user[name],post[id]"), create(:user), as: :json
+        assert_response :success
+        assert_equal(%w[id post], response.parsed_body.sole.keys.sort)
+      end
+
+      should "not include hidden associations when only some nested records hide them" do
+        create(:comment, post: @post, is_deleted: false)
+        create(:comment, post: @post, is_deleted: true)
+
+        get posts_path(only: "id,comments[is_deleted,creator[name]]", limit: 1), as: :json
+        assert_response :success
+
+        comments = response.parsed_body.sole["comments"].index_by { it["is_deleted"] }
+        assert_equal(%w[creator is_deleted], comments[false].keys.sort)
+        assert_equal(%w[is_deleted], comments[true].keys)
+      end
     end
   end
 end

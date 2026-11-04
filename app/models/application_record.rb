@@ -88,6 +88,16 @@ class ApplicationRecord < ActiveRecord::Base
       policy.api_attributes
     end
 
+    # The columns hidden from the user in API responses.
+    def hidden_columns
+      self.class.column_names.map(&:to_sym) - api_attributes
+    end
+
+    # The associations hidden from the user in API responses because their foreign key is hidden (e.g. the creator of a deleted comment).
+    def hidden_associations
+      self.class.reflect_on_all_associations(:belongs_to).select { it.foreign_key.to_sym.in?(hidden_columns) }.map(&:name)
+    end
+
     # XXX deprecated, shouldn't expose this as an instance method.
     def html_data_attributes(user: CurrentUser.user)
       policy = Pundit.policy(user, self) || ApplicationPolicy.new(user, self)
@@ -115,6 +125,8 @@ class ApplicationRecord < ActiveRecord::Base
 
         options.delete(:methods) if options[:methods].empty?
       end
+
+      options[:include] = Array.wrap(options[:include]).map { it.is_a?(Hash) ? it : { it => {}} }.reduce({}, :merge).except(*hidden_associations)
 
       hash = super(options)
       hash.transform_keys { |key| key.delete("?") }
