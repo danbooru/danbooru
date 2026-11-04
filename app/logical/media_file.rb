@@ -106,7 +106,7 @@ class MediaFile
 
   # @return [Integer] the resolution of the file
   def resolution
-    width * height
+    width.to_i * height.to_i
   end
 
   # @return [String] The MD5 hash of the file, as a hex string.

@@ -114,13 +114,19 @@ class MediaFile::Ugoira < MediaFile
 
     frames.each do |frame|
       return "file '#{File.basename(frame.path)}' is not an image file" if !frame.file_ext.in?(%i[jpg gif png])
-      return "file '#{File.basename(frame.path)}' is animated" if frame.is_animated?
-      return "file '#{File.basename(frame.path)}' is corrupt" if frame.is_corrupt?
     end
 
     return "must have at least two frames" if frames.size < 2
-    return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
     return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
+
+    # Check the dimensions before decoding the frames, so that a frame can't be larger than the first frame (whose size is
+    # checked by `MediaAsset.validate_media_file!`).
+    return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
+
+    frames.each do |frame|
+      return "file '#{File.basename(frame.path)}' is animated" if frame.is_animated?
+      return "file '#{File.basename(frame.path)}' is corrupt" if frame.is_corrupt?
+    end
     return "zip64 format is not supported" if zip.instance_variable_get(:@cdir).instance_variable_get(:@version_needed_for_extract) == Zip::VERSION_NEEDED_TO_EXTRACT_ZIP64 # XXX hack
 
     nil

@@ -193,6 +193,17 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for an image that is too large" do
+        should "fail before decoding the image" do
+          MediaFile::Image.any_instance.stubs(:dimensions).returns([50_000, 50_000])
+          MediaFile::Image.any_instance.expects(:is_corrupt?).never
+          MediaFile::Image.any_instance.expects(:is_supported?).never
+
+          create_upload!("test/files/png/test.png", user: @user)
+          assert_match("Image resolution is too large", Upload.last.error)
+        end
+      end
+
       context "for a corrupted file" do
         should "fail for a corrupted jpeg" do
           create_upload!("test/files/jpg/test-corrupt.jpg", user: @user)

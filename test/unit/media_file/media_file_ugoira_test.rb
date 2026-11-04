@@ -417,6 +417,17 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     end
   end
 
+  context "a ugoira with frames of different dimensions" do
+    should "be rejected before decoding the frames" do
+      MediaFile::Image.any_instance.stubs(:dimensions).returns([384, 384]).then.returns([50_000, 50_000])
+      MediaFile::Image.any_instance.expects(:is_corrupt?).never
+
+      MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") do |ugoira|
+        assert_equal("frames must have the same dimensions", ugoira.error)
+      end
+    end
+  end
+
   context "Conversion of a ugoira" do
     should "not fail when converting two ugoiras concurrently" do
       a = Thread.new { MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip").convert }
