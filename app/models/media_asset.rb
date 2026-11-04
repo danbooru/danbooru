@@ -341,6 +341,8 @@ class MediaAsset < ApplicationRecord
       def validate_media_file!(media_file, uploader)
         if !media_file.mime_type.to_s.in?(FILE_MIME_TYPES)
           raise Error, "File is not an image or video"
+        elsif media_file.is_flash?
+          raise Error, "Flash files are not supported"
         elsif !media_file.is_supported?
           raise Error, "File type is not supported"
         elsif media_file.is_corrupt?

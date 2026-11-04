@@ -158,6 +158,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("File is not an image or video", Upload.last.error)
       end
 
+      should "fail for a Flash file" do
+        create_upload!("test/files/swf/compressed.swf", user: @user)
+
+        assert_response 201
+        assert_equal("Flash files are not supported", Upload.last.error)
+      end
+
       context "for a file larger than the file size limit" do
         setup do
           skip "flaky test"
@@ -450,7 +457,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/mp4/test-iso5.mp4")
         should_upload_successfully("test/files/webm/test-512x512.webm")
         should_upload_successfully("test/files/webm/test-gbrp-vp9.webm")
-        # should_upload_successfully("test/files/swf/compressed.swf")
 
         should_upload_successfully("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif")
         should_upload_successfully("test/files/avif/hdr_cosmos01000_cicp9-16-9_yuv420_limited_qp40.avif")
