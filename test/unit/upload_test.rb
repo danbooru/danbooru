@@ -91,6 +91,9 @@ class UploadTest < ActiveSupport::TestCase
 
       should_not allow_value("https://example.com/#{"x" * 2000}.jpg").for(:source)
       should_not allow_value("https://example.com/#{"x" * 2000}.jpg").for(:referer_url)
+      should_not allow_value("https://<img src=x onerror=alert(1)>").for(:source)
+      should_not allow_value('https://a"><svg/onload=alert(1)>').for(:source)
+      should allow_value("https://example.com/image.jpg").for(:source)
     end
   end
 end

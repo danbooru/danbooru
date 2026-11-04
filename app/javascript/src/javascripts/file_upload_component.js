@@ -118,7 +118,7 @@ export default class FileUploadComponent {
       this.$dropzone.removeClass("success");
       this.loadingStop();
 
-      Notice.error(`Upload failed: ${upload.error}.`);
+      Notice.error(`Upload failed: ${uploadError(upload)}.`);
     } else {
       let params = new URLSearchParams(window.location.search);
       let isBookmarklet = params.has("url");

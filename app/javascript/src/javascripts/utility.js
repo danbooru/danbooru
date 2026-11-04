@@ -1,6 +1,7 @@
 import { delegate, hideAll } from 'tippy.js';
 import Notice from './notice';
 import capitalize from "lodash/capitalize";
+import escape from "lodash/escape";
 import Alpine from 'alpinejs';
 
 let Utility = {};
@@ -178,21 +179,22 @@ export async function createUpload(params, pollDelay = 250) {
   return upload;
 }
 
-// Return the error message for a failed upload.
+// Return the error message for a failed upload, HTML-escaped because it may contain the user's source URL or text
+// from the source site, and it's shown as HTML by Notice.
 export function uploadError(upload) {
   // The upload failed during processing (normally because the URL didn't contain any images)
   if (upload.status === "error") {
-    return upload.error;
+    return escape(upload.error);
   // The upload failed with a 4xx or 5xx error (normally rate limiting)
   } else if (upload.success === false && upload.message) {
-    return upload.message;
+    return escape(upload.message);
   // The upload failed with a validation error (normally an invalid URL or too many queued assets)
   } else if (upload.errors) {
-    return errorFromResponse(upload);
+    return escape(errorFromResponse(upload));
   } else if (upload.cloudflare_error === true) {
-    return `Cloudflare: ${upload.title}`;
+    return escape(`Cloudflare: ${upload.title}`);
   } else if (typeof upload === "string") {
-    return upload;
+    return escape(upload);
   } else {
     return null;
   }

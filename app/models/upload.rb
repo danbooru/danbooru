@@ -24,7 +24,7 @@ class Upload < ApplicationRecord
   # Decode percent-encoded Unicode characters in the URL
   normalizes :source, with: ->(url) { Danbooru::URL.parse(url)&.to_normalized_s.presence || url }
 
-  validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, length: { maximum: 2000 }, if: -> { source.present? && source_changed? }
+  validate :validate_source, if: -> { source.present? && source_changed? }
   validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, length: { maximum: 2000 }, if: -> { referer_url.present? && referer_url_changed? }
   validates :status, inclusion: { in: %w[pending processing completed error] }
   validate :validate_file_and_source, on: :create
@@ -74,6 +74,14 @@ class Upload < ApplicationRecord
   end
 
   concerning :ValidationMethods do
+    def validate_source
+      if source.length > 2000
+        errors.add(:source, "is too long (maximum is 2000 characters)")
+      elsif !source.match?(%r{\Ahttps?://}i) || Danbooru::URL.parse(source).nil?
+        errors.add(:source, "is not a valid URL")
+      end
+    end
+
     def validate_file_and_source
       if files.present? && source.present?
         errors.add(:base, "Can't give both a file and a source")
