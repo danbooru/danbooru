@@ -359,6 +359,8 @@ class MediaAsset < ApplicationRecord
           raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
         elsif media_file.height.to_i > MAX_IMAGE_HEIGHT
           raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
+        elsif media_file.is_video? && media_file.packet_count > FFmpeg::MAX_PACKET_COUNT
+          raise Error, "Video has too many frames (max: #{FFmpeg::MAX_PACKET_COUNT})"
         elsif !media_file.is_supported?
           raise Error, "File type is not supported"
         elsif media_file.is_corrupt?

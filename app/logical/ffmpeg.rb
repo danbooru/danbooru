@@ -8,6 +8,10 @@ class FFmpeg
 
   class Error < StandardError; end
 
+  # The maximum number of packets in a single stream. Reading the full metadata for each frame and packet uses about
+  # 4.4KB of memory per frame, so this limits it to a few hundred MB. 100k frames is about 28 minutes at 60 FPS.
+  MAX_PACKET_COUNT = 100_000
+
   attr_reader :file
 
   # Operate on a file with FFmpeg.
@@ -51,10 +55,23 @@ class FFmpeg
   #
   # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
   memoize def metadata
+    raise Error, "too many frames (max: #{MAX_PACKET_COUNT})" if packet_count > MAX_PACKET_COUNT
+
     output = FFmpeg.shell!("ffprobe -v quiet -print_format json -show_format -show_streams -show_packets -show_frames #{file.path.shellescape}")
     output.parse_json || {}
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
+  end
+
+  # Count the packets in the largest stream without decoding the file or reading the metadata for each packet. This
+  # is fast and uses little memory, even for files with millions of packets.
+  #
+  # @return [Integer] The number of packets, or 0 if reading the file failed.
+  memoize def packet_count
+    output = FFmpeg.shell!("ffprobe -v quiet -count_packets -show_entries stream=nb_read_packets -print_format json #{file.path.shellescape}")
+    output.parse_json.to_h["streams"].to_a.map { it["nb_read_packets"].to_i }.max.to_i
+  rescue Error
+    0
   end
 
   def width

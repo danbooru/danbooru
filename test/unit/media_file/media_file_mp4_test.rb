@@ -2281,4 +2281,18 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
+
+  context "a video with too many frames" do
+    should "not read the frames" do
+      file = MediaFile.open("test/files/mp4/test-300x300-vp9.mp4")
+      ffmpeg = FFmpeg.new(file)
+
+      assert_operator(ffmpeg.packet_count, :>, 0)
+
+      ffmpeg.stubs(:packet_count).returns(FFmpeg::MAX_PACKET_COUNT + 1)
+      FFmpeg.expects(:shell!).never
+
+      assert_match(/too many frames/, ffmpeg.metadata[:error])
+    end
+  end
 end

@@ -204,6 +204,16 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a video with too many frames" do
+        should "fail before reading the frames" do
+          FFmpeg.any_instance.stubs(:packet_count).returns(FFmpeg::MAX_PACKET_COUNT + 1)
+          FFmpeg.any_instance.expects(:metadata).never
+
+          create_upload!("test/files/mp4/test-300x300-vp9.mp4", user: @user)
+          assert_match("Video has too many frames", Upload.last.error)
+        end
+      end
+
       context "for a corrupted file" do
         should "fail for a corrupted jpeg" do
           create_upload!("test/files/jpg/test-corrupt.jpg", user: @user)
