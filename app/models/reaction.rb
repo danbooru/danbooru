@@ -17,8 +17,8 @@ class Reaction < ApplicationRecord
   scope :comment, -> { where(model_type: "Comment") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
 
-  def self.visible(_user)
-    all
+  def self.visible(user)
+    where.not(model: ForumPost.not_visible(user))
   end
 
   def self.model_types

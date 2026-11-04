@@ -10,7 +10,7 @@ class ReactionsController < ApplicationController
   end
 
   def show
-    @reaction = authorize Reaction.find(params[:id])
+    @reaction = authorize Reaction.visible(CurrentUser.user).find(params[:id])
     respond_with(@reaction)
   end
 
