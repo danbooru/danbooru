@@ -306,6 +306,32 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(@hidden_replacement.md5, response.parsed_body["md5"])
           assert_equal(@hidden_replacement.old_md5, response.parsed_body["old_md5"])
         end
+
+        should "not allow partial md5 searches by non-moderators" do
+          [
+            [@hidden_replacement.md5, ->(prefix) { { md5_like: "#{prefix}*" } }],
+            [@hidden_replacement.old_md5, ->(prefix) { { old_md5_like: "#{prefix}*" } }],
+            [@hidden_replacement.md5, ->(prefix) { { media_asset: { md5_like: "#{prefix}*" }} }],
+          ].each do |md5, search|
+            get post_replacements_path(search: search.call(md5.first(4))), as: :json
+            right_ids = response.parsed_body.pluck("id")
+            get post_replacements_path(search: search.call("!!!!")), as: :json
+
+            assert_equal(right_ids, response.parsed_body.pluck("id"))
+          end
+        end
+
+        should "allow exact md5 searches by non-moderators" do
+          get post_replacements_path(search: { md5: @hidden_replacement.md5 }), as: :json
+
+          assert_equal([@hidden_replacement.id], response.parsed_body.pluck("id"))
+        end
+
+        should "allow partial md5 searches by moderators" do
+          get_auth post_replacements_path(search: { md5_like: "#{@hidden_replacement.md5.first(4)}*" }), @mod, as: :json
+
+          assert_equal([@hidden_replacement.id], response.parsed_body.pluck("id"))
+        end
       end
     end
 

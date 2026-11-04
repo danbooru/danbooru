@@ -13,6 +13,38 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      context "searching for a media asset the user can't see" do
+        setup do
+          @post = create(:post, is_banned: true)
+          @hidden_asset = @post.media_asset
+          @user = create(:user)
+        end
+
+        should "not allow partial searches by non-moderators" do
+          %i[md5 pixel_hash file_key].product(%w[like regex]).each do |attr, op|
+            right, wrong = [@hidden_asset[attr].first(4), "!!!!"].map { |prefix| (op == "like") ? "#{prefix}*" : "^#{prefix}" }
+
+            get_auth media_assets_path(search: { "#{attr}_#{op}": right }), @user, as: :json
+            right_ids = response.parsed_body.pluck("id")
+            get_auth media_assets_path(search: { "#{attr}_#{op}": wrong }), @user, as: :json
+
+            assert_equal(right_ids, response.parsed_body.pluck("id"), "#{attr}_#{op}")
+          end
+        end
+
+        should "allow exact searches by non-moderators" do
+          get_auth media_assets_path(search: { md5: @hidden_asset.md5 }), @user, as: :json
+
+          assert_equal([@hidden_asset.id], response.parsed_body.pluck("id"))
+        end
+
+        should "allow partial searches by moderators" do
+          get_auth media_assets_path(search: { md5_like: "#{@hidden_asset.md5.first(4)}*" }), create(:moderator_user), as: :json
+
+          assert_equal([@hidden_asset.id], response.parsed_body.pluck("id"))
+        end
+      end
+
       context "the limit param" do
         setup do
           create_list(:media_asset, 2)
