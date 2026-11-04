@@ -19,6 +19,10 @@ class MediaFile::Ugoira < MediaFile
   MIN_DELAY = 10 # The mininum delay allowed for a single frame in a ugoira. 10ms is the minimum on Pixiv.
   MAX_DELAY = 30_000 # The maximum delay allowed for a single frame in a ugoira. 30s is the max on Pixiv.
   MAX_FRAME_COUNT = 500 # The maximum number of frames allowed in a ugoira. 500 is the max on Pixiv.
+
+  # The timeout for encoding a ugoira to video. This is longer than the default command timeout,
+  # because two-pass VP9 encoding of a 500-frame 1080p ugoira can take a minute or more.
+  CONVERSION_TIMEOUT = 5.minutes
   MAX_ANIMATION_JSON_SIZE = 50.kilobytes # The maximum size of the animation.json file. This is enough for 500 frames + extra.
 
   # @return [Concurrent::ReentrantReadWriteLock] A lock to make sure we don't extract the .zip file more than once when
@@ -461,9 +465,9 @@ class MediaFile::Ugoira < MediaFile
 
         passlogfile_path = File.join(tmpdir_path, "ffmpeg2pass")
         FFmpeg.shell!("#{ffmpeg_command} -pass 1 -passlogfile #{passlogfile_path.shellescape} -f null /dev/null")
-        FFmpeg.shell!("#{ffmpeg_command} -pass 2 -passlogfile #{passlogfile_path.shellescape} -y #{encoded_output_path.shellescape}")
+        FFmpeg.shell!("#{ffmpeg_command} -pass 2 -passlogfile #{passlogfile_path.shellescape} -y #{encoded_output_path.shellescape}", timeout: CONVERSION_TIMEOUT)
       else
-        FFmpeg.shell!("#{ffmpeg_command} -y #{encoded_output_path.shellescape}")
+        FFmpeg.shell!("#{ffmpeg_command} -y #{encoded_output_path.shellescape}", timeout: CONVERSION_TIMEOUT)
       end
 
       # XXX ffmpeg incorrectly sets the duration of the last frame to 40ms, so here we use mkvmerge to fix it.

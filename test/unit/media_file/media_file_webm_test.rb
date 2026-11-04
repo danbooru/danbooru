@@ -5,14 +5,14 @@ class MediaFileWebmTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "webm",
-        "test/files/webm/test-512x512.webm" => [150, 150, "d8472abfc35059d642042ab9206571a7"],
-        "test/files/webm/test-aac.webm" => [150, 84, "08be8d772555ee4321bf2adc32ad213a"],
-        "test/files/webm/test-audio.webm" => [150, 84, "7b1eb1a0600c0c52f00d1e14bb1d12bd"],
-        "test/files/webm/test-av1.webm" => [150, 150, "d1b26385e19709ad1baf514cd889524a"],
-        "test/files/webm/test-gbrp-vp9.webm" => [150, 150, "2c2c6f5de44fe9da32cc44d8d8b7f682"],
-        "test/files/webm/test-hevc.webm" => [150, 150, "e3a1026bf77c734d781e3403d50f52d1"],
-        "test/files/webm/test-silent-audio.webm" => [150, 150, "d8472abfc35059d642042ab9206571a7"],
-        "test/files/webm/test-yuv420p10le-vp9.webm" => [150, 100, "1acf79da13ceb3072df62e7151968ecc"],
+        "test/files/webm/test-512x512.webm" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
+        "test/files/webm/test-aac.webm" => [150, 84, "511476a470287cd49117078a80d4c6d5"],
+        "test/files/webm/test-audio.webm" => [150, 84, "d6b63cbc01a686c5632189edc3ff23d1"],
+        "test/files/webm/test-av1.webm" => [150, 150, "7c08117771396820b735019653a6c96f"],
+        "test/files/webm/test-gbrp-vp9.webm" => [150, 150, "eb80127d1ae337766fd2dedfecfeb564"],
+        "test/files/webm/test-hevc.webm" => [150, 150, "3f91b80037e13ef44d56d7e65841ee9b"],
+        "test/files/webm/test-silent-audio.webm" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
+        "test/files/webm/test-yuv420p10le-vp9.webm" => [150, 100, "785ed16588ac3c12593db555678705b0"],
       )
     end
   end

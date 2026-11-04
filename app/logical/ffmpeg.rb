@@ -12,6 +12,9 @@ class FFmpeg
   # 4.4KB of memory per frame, so this limits it to a few hundred MB. 100k frames is about 28 minutes at 60 FPS.
   MAX_PACKET_COUNT = 100_000
 
+  # The maximum width and height of video preview images. This is the size of the largest preview generated for videos.
+  PREVIEW_SIZE = 720
+
   attr_reader :file
 
   # Operate on a file with FFmpeg.
@@ -36,7 +39,11 @@ class FFmpeg
     # The `scale=iw*sar:ih` corrects for a non-square pixel aspect ratio (PAR); it's a no-op when the PAR is 1:1
     # (the vast majority of videos). Without it, the preview would be generated from the raw coded frame, which
     # doesn't match the video's actual displayed dimensions when the PAR isn't square.
-    FFmpeg.shell!("ffmpeg -i #{file.path.shellescape} -vf thumbnail=300,scale=iw*sar:ih -frames:v 1 -y #{vp.path.shellescape}")
+    #
+    # The frames are scaled down to fit within 720x720 (the largest preview size) before `thumbnail`, because it keeps
+    # 300 frames in memory to pick the best one. At full size, this would take several GB for a 4K video.
+    filters = "scale=iw*sar:ih,scale=#{PREVIEW_SIZE}:#{PREVIEW_SIZE}:force_original_aspect_ratio=decrease:flags=lanczos,thumbnail=300"
+    FFmpeg.shell!("ffmpeg -i #{file.path.shellescape} -vf #{filters} -frames:v 1 -y #{vp.path.shellescape}")
 
     MediaFile.open(vp)
   end
@@ -381,14 +388,17 @@ class FFmpeg
     { error: e.message.strip }.with_indifferent_access
   end
 
-  def self.shell!(command)
+  def self.shell!(command, **options)
     program = command.shellsplit.first
-    output, status = Open3.capture2e(command)
+    output, status = ExternalCommand.run(command, **options)
+
     if !status.success?
       errors = output.split(/\r?\n/).grep(/^(Error|\[\w+ @ 0x\h+\])/).uniq.join("\n")
       raise Error, "#{program} failed: #{errors}"
     end
 
     output.force_encoding("ASCII-8BIT")
+  rescue ExternalCommand::TimeoutError => e
+    raise Error, e.message
   end
 end
