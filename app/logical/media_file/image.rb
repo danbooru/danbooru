@@ -196,51 +196,40 @@ class MediaFile::Image < MediaFile
     image.get_typeof("icc-profile-data") != 0
   end
 
+  # @return [String] The MD5 hash of the image's pixels, as a PAM file (https://netpbm.sourceforge.net/doc/pam.html). A
+  #   PAM file is a header followed by the raw pixels, so the hash only depends on the pixels, not the file format or
+  #   metadata. The pixels are hashed as they're decoded, without writing the PAM file to disk.
   def pixel_hash
     return md5 if is_animated?
 
-    file = pixel_hash_file
-    file.md5
-  rescue Vips::Error
-    md5
-  ensure
-    file&.close
-  end
-
-  # @return [MediaFile::Image] The raw image used for computing the pixel hash.
-  def pixel_hash_file
-    # First we normalize the image to the same colorspace and add an alpha layer if missing,
-    # so that pixel data stays the same even for different profiles
+    # Normalize the image to the same colorspace and add an alpha layer if missing,
+    # so that the pixel data stays the same even for different profiles.
     img = open_image(fail: true)
     img = img.icc_transform("srgb") if img.get_typeof("icc-profile-data") != 0
     img = img.colourspace("srgb") if img.interpretation != :srgb
     img = img.add_alpha unless img.has_alpha?
 
-    # Then we create a pam file: https://netpbm.sourceforge.net/doc/pam.html
-    # It's basically a header followed by raw pixels, so that we strip everything
-    # except the barebone necessary data for pixel hash computation
-    pam_file = Danbooru::Tempfile.open(["danbooru-pixel-hash-#{md5}-", ".pam"])
+    digest = Digest::MD5.new
+    digest << <<~PAM
+      P7
+      WIDTH #{img.width}
+      HEIGHT #{img.height}
+      DEPTH #{img.bands}
+      MAXVAL 255
+      TUPLTYPE RGB_ALPHA
+      ENDHDR
+    PAM
 
-    pam_file.binmode
-    pam_file.puts "P7"
-    pam_file.puts "WIDTH #{img.width}"
-    pam_file.puts "HEIGHT #{img.height}"
-    pam_file.puts "DEPTH #{img.bands}"
-    pam_file.puts "MAXVAL 255"
-    pam_file.puts "TUPLTYPE RGB_ALPHA"
-    pam_file.puts "ENDHDR"
-
-    # Finally, we write the raw pixel data to the pam file
     target = Vips::TargetCustom.new
     target.on_write do |chunk|
-      pam_file.write(chunk)
+      digest << chunk
       chunk.bytesize
     end
 
     img.rawsave_target(target)
-
-    pam_file.flush
-    MediaFile::Image.new(pam_file)
+    digest.hexdigest
+  rescue Vips::Error
+    md5
   ensure
     img&.release
   end
