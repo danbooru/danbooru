@@ -293,6 +293,16 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_nil(session[:last_authenticated_at])
         end
 
+        should "not change the user's password if the account has made too many 2FA attempts" do
+          User.any_instance.stubs(:limit_2fa_attempts!).raises(RateLimiter::RateLimitError)
+
+          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: @user.totp.code })
+
+          assert_response 429
+          assert_equal(false, @user.reload.authenticate_password("password").present?)
+          assert_nil(session[:user_id])
+        end
+
         should "not spend a backup code when the new password is invalid" do
           backup_code = @user.backup_codes.first
           put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "12345", verification_code: backup_code })

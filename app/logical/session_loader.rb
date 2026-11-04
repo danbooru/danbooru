@@ -84,6 +84,8 @@ class SessionLoader
   # @param code [String] The user's 6-digit 2FA code, or their 8-digit backup code.
   # @return [Boolean] True if the 2FA code is correct, or false if it's incorrect.
   def verify_totp!(user, code)
+    user.limit_2fa_attempts!
+
     if user.totp.verify(code)
       login_user(user, :totp_login)
       true

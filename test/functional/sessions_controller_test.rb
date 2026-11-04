@@ -542,6 +542,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.user_events.totp_failed_login.exists?(login_session_id: nil))
       end
 
+      should "not log the user in if the account has made too many 2FA attempts" do
+        @user = create(:user_with_2fa, password: "password")
+        User.any_instance.stubs(:limit_2fa_attempts!).raises(RateLimiter::RateLimitError)
+
+        post verify_totp_session_path, params: { totp: { user_id: @user.signed_id(purpose: :verify_totp), code: @user.totp.code, url: users_path }}
+
+        assert_response 429
+        assert_nil(session[:user_id])
+        assert_equal(false, @user.login_sessions.exists?)
+      end
+
       context "when given a backup code" do
         should "log the user in if they enter a correct backup code" do
           @user = create(:user_with_2fa)

@@ -162,6 +162,32 @@ class UserTest < ActiveSupport::TestCase
       assert_equal(false, user.is_gold?)
     end
 
+    context "#limit_2fa_attempts! method" do
+      setup do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        freeze_time
+      end
+
+      should "allow 10 attempts, then 1 per 30 minutes" do
+        RateLimit.uncached do
+          10.times { assert_nothing_raised { @user.limit_2fa_attempts! } }
+          assert_raises(RateLimiter::RateLimitError) { @user.limit_2fa_attempts! }
+
+          travel 61.minutes
+          assert_nothing_raised { @user.limit_2fa_attempts! }
+        end
+      end
+
+      should "limit each account separately" do
+        RateLimit.uncached do
+          10.times { @user.limit_2fa_attempts! }
+
+          assert_raises(RateLimiter::RateLimitError) { @user.limit_2fa_attempts! }
+          assert_nothing_raised { create(:user).limit_2fa_attempts! }
+        end
+      end
+    end
+
     context "#recently_verified_account?" do
       should "be true within 24 hours of an account_verification event" do
         create(:user_event, user: @user, category: :account_verification)

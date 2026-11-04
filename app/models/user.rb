@@ -307,6 +307,8 @@ class User < ApplicationRecord
     end
 
     def reset_password(new_password:, password_confirmation:, verification_code:, request:)
+      limit_2fa_attempts! if totp.present?
+
       if is_deleted?
         errors.add(:base, "You can't reset the password of a deleted account")
         false
@@ -433,6 +435,13 @@ class User < ApplicationRecord
           UserEvent.create_from_request!(self, :totp_update, request)
         end
       end
+    end
+
+    # Limit 2FA code attempts per account, so codes can't be brute forced by spreading guesses across many IPs.
+    #
+    # @raise [RateLimiter::RateLimitError] If the account has made too many attempts.
+    def limit_2fa_attempts!
+      RateLimiter.build(action: "users:verify_2fa", user: self, rate: 1.0 / 30.minutes, burst: 10).limit!
     end
 
     # @return [Boolean] True if the user has 2FA enabled.
