@@ -119,6 +119,26 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select("#post_#{@post.id}")
         end
+
+        should "not search for a post the user can't see" do
+          @post.update_columns(is_banned: true) # rubocop:disable Rails/SkipsModelValidations
+          IqdbClient.any_instance.expects(:query_file).never
+
+          get_auth iqdb_queries_path, @user, params: { post_id: @post.id }
+
+          assert_response 403
+        end
+      end
+
+      context "with a media_asset_id parameter" do
+        should "not search for a media asset the user can't see" do
+          @post.update_columns(is_banned: true) # rubocop:disable Rails/SkipsModelValidations
+          IqdbClient.any_instance.expects(:query_file).never
+
+          get_auth iqdb_queries_path, @user, params: { media_asset_id: @post.media_asset.id }
+
+          assert_response 403
+        end
       end
 
       context "with a file parameter" do

@@ -31,9 +31,13 @@ class IqdbClient
       elsif target_url.present?
         file = download_file(target_url)
       elsif post_id.present?
-        file = Post.find(post_id).file(:"180x180")
+        post = Post.find(post_id)
+        raise User::PrivilegeError unless post.visible?(CurrentUser.user)
+        file = post.file(:"180x180")
       elsif media_asset_id.present?
-        file = MediaAsset.find(media_asset_id).variant("360x360").open_file
+        media_asset = MediaAsset.find(media_asset_id)
+        raise User::PrivilegeError unless media_asset.policy(CurrentUser.user).can_see_image?
+        file = media_asset.variant("360x360").open_file
       end
 
       if hash.present?
