@@ -39,7 +39,7 @@ module Maintenance
       def validate_sig
         verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.email_key, digest: "SHA256", serializer: JSON)
         calculated_sig = verifier.generate(params[:user_id].to_s)
-        if calculated_sig != params[:sig]
+        if !ActiveSupport::SecurityUtils.secure_compare(calculated_sig, params[:sig].to_s)
           raise VerificationError, "Invalid signature"
         end
       end

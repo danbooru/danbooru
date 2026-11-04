@@ -38,6 +38,13 @@ module Maintenance
             assert_response 403
             assert_equal(true, @user.reload.receive_email_notifications)
           end
+
+          should "not disable email notifications when given a non-string signature" do
+            delete maintenance_user_email_notification_path(user_id: @user.id, sig: ["foo"])
+
+            assert_response 403
+            assert_equal(true, @user.reload.receive_email_notifications)
+          end
         end
       end
     end
