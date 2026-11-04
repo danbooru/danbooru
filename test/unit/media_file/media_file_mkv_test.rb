@@ -5,6 +5,7 @@ class MediaFileWebmTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "mkv",
+        "test/files/mkv/test-512x512-3-video-streams.mkv" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
         "test/files/mkv/test-512x512.mkv" => [150, 150, "136b63fc719803c2525c74ed5067b6d4"],
       )
     end
@@ -66,6 +67,13 @@ class MediaFileWebmTest < ActiveSupport::TestCase
         "FFmpeg:VideoProfile" => "High",
         "FFmpeg:VideoBitRate" => 140_333,
       }, file.metadata.to_h)
+    end
+  end
+
+  # Three copies of the 10-frame video stream from test-512x512.webm, made with `ffmpeg -i test-512x512.webm -map 0:v -map 0:v -map 0:v -c copy`.
+  context "an MKV file with multiple video streams" do
+    should "count the packets in all streams" do
+      assert_equal(30, FFmpeg.new(MediaFile.open("test/files/mkv/test-512x512-3-video-streams.mkv")).packet_count)
     end
   end
 end

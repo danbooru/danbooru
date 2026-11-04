@@ -353,14 +353,15 @@ class MediaAsset < ApplicationRecord
         # Check the size and dimensions before `is_supported?` and `is_corrupt?`, which decode the whole file.
         elsif media_file.file_size > MAX_FILE_SIZE
           raise Error, "File size too large (size: #{media_file.file_size.to_fs(:human_size)}; max size: #{MAX_FILE_SIZE.to_fs(:human_size)})"
+        # Check the frame count before the dimensions, because getting a video's dimensions requires reading every frame.
+        elsif media_file.is_video? && media_file.packet_count > FFmpeg::MAX_PACKET_COUNT
+          raise Error, "Video has too many frames (max: #{FFmpeg::MAX_PACKET_COUNT})"
         elsif media_file.resolution > MAX_IMAGE_RESOLUTION
           raise Error, "Image resolution is too large (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)"
         elsif media_file.width.to_i > MAX_IMAGE_WIDTH
           raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
         elsif media_file.height.to_i > MAX_IMAGE_HEIGHT
           raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
-        elsif media_file.is_video? && media_file.packet_count > FFmpeg::MAX_PACKET_COUNT
-          raise Error, "Video has too many frames (max: #{FFmpeg::MAX_PACKET_COUNT})"
         elsif !media_file.is_supported?
           raise Error, "File type is not supported"
         elsif media_file.is_corrupt?

@@ -5,6 +5,7 @@ class MediaFileWebmTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "webm",
+        "test/files/webm/test-512x512-fake-dimensions.webm" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
         "test/files/webm/test-512x512.webm" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
         "test/files/webm/test-aac.webm" => [150, 84, "511476a470287cd49117078a80d4c6d5"],
         "test/files/webm/test-audio.webm" => [150, 84, "d6b63cbc01a686c5632189edc3ff23d1"],
@@ -529,6 +530,16 @@ class MediaFileWebmTest < ActiveSupport::TestCase
         "FFmpeg:VideoProfile" => "Profile 2",
         "FFmpeg:VideoBitRate" => 4935,
       }, file.metadata.to_h)
+    end
+  end
+
+  context "a WebM file with fake dimensions in the container metadata" do
+    # A copy of test-512x512.webm with the dimensions changed to 16x16 with `mkvpropedit --edit track:v1 --set pixel-width=16 --set pixel-height=16`.
+    should "not be supported" do
+      file = MediaFile.open("test/files/webm/test-512x512-fake-dimensions.webm")
+
+      assert_equal([512, 512], file.dimensions)
+      assert_equal(false, file.is_supported?)
     end
   end
 end

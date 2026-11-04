@@ -16,10 +16,8 @@ class MediaFile::Video < MediaFile
   end
 
   # @return [Array<(Integer, Integer)>] The width and height of the video, as it is displayed.
-  #   We use ExifTool and not the raw ffprobe dimensions because the latter does not support
-  #   anamorphic videos with non-square pixel aspect ratio out of the box.
   def dimensions
-    [exif_metadata.width, exif_metadata.height]
+    video.display_dimensions || [0, 0]
   end
 
   def preview!(max_width, max_height, **options)
@@ -48,6 +46,8 @@ class MediaFile::Video < MediaFile
 
   def is_supported?
     return false if video_streams.size != 1
+    # Don't allow videos with fake dimensions in the container. If no frames could be decoded, the video is corrupt instead.
+    return false if video.display_dimensions.present? && video.display_dimensions != [exif_metadata.width, exif_metadata.height]
     return false if audio_streams.size > 1
     return false if is_webm? && exif_metadata["Matroska:DocType"] != "webm"
     return false if is_webm? && !video_codec.in?(%w[vp8 vp9 av1])

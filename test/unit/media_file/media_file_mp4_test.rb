@@ -1671,8 +1671,8 @@ class MediaFileMp4Test < ActiveSupport::TestCase
     should "be parsed correctly" do
       file = MediaFile.open("test/files/mp4/test-corrupt.mp4")
 
-      assert_equal(300, file.width)
-      assert_equal(300, file.height)
+      assert_equal(0, file.width)
+      assert_equal(0, file.height)
       assert_equal(10_240, file.file_size)
       assert_equal(:mp4, file.file_ext)
       assert_equal("video/mp4", file.mime_type)
