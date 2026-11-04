@@ -422,7 +422,7 @@ class AutocompleteService
   # Whether the results can be safely cached with `Cache-Control: public`.
   # Queries that don't depend on the current user are safe to cache publicly.
   def cache_publicly?
-    if type == :tag_query && parsed_query.tag_names.one?
+    if type == :tag_query && parsed_query.tag_names.one? && !metatag&.name&.in?(%w[favgroup ordfavgroup search])
       true
     elsif type.in?(%i[tag artist wiki_page pool emoji opensearch])
       true

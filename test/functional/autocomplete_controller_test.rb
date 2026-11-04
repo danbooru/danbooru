@@ -146,6 +146,25 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, response.cache_control[:public])
         assert_equal({}, response.cookies)
       end
+
+      should "not publicly cache user-dependent metatag completions in a query with one tag" do
+        @user = create(:gold_user)
+        create(:favorite_group, creator: @user, name: "private_group", is_public: false)
+
+        get_auth autocomplete_index_path(search: { query: "touhou favgroup:priv", type: "tag_query" }), @user
+
+        assert_response :success
+        assert_equal(["favgroup:private_group"], response.parsed_body.css("li").pluck("data-autocomplete-value"))
+        assert_not_equal(true, response.cache_control[:public])
+      end
+
+      should "publicly cache metatag completions that don't depend on the user in a query with one tag" do
+        get autocomplete_index_path(search: { query: "touhou rating:g", type: "tag_query" })
+
+        assert_response :success
+        assert_equal(["rating:general"], response.parsed_body.css("li").pluck("data-autocomplete-value"))
+        assert_equal(true, response.cache_control[:public])
+      end
     end
   end
 end
