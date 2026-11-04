@@ -768,6 +768,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2, post1], "comment:*ing*")
     end
 
+    should "not return posts with deleted comments for the comment:<query> metatag" do
+      post = create(:post)
+      create(:comment, post: post, body: "secret", is_deleted: true)
+
+      assert_tag_match([], "comment:secret")
+      assert_tag_match([post], "-comment:secret")
+      assert_tag_match([post], "comment:secret", current_user: create(:moderator_user))
+      assert_equal(true, PostQuery.new("comment:secret").is_user_dependent_search?)
+    end
+
     should "return posts for the note:<query> metatag" do
       post1 = create(:post)
       post2 = create(:post)

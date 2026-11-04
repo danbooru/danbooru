@@ -165,7 +165,7 @@ class PostQuery
   def is_user_dependent_search?
     metatags.any? do |metatag|
       # XXX date: is user dependent because it depends on the current user's time zone
-      metatag.name.in?(%w[date upvoter upvote downvoter downvote commenter comm search flagger fav ordfav ordvote favgroup ordfavgroup]) ||
+      metatag.name.in?(%w[date upvoter upvote downvoter downvote commenter comm comment search flagger fav ordfav ordvote favgroup ordfavgroup]) ||
       metatag.name == "status" && metatag.value == "unmoderated" ||
       metatag.name == "disapproved" && !metatag.value.downcase.in?(PostDisapproval::REASONS)
     end
