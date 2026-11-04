@@ -23,4 +23,15 @@ class MediaFileBinTest < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
+
+  context "a zip file smaller than the end of central directory record" do
+    should "be detected as a zip file" do
+      Danbooru::Tempfile.create do |file|
+        file.write("PK\x03\x04xxxxxxxxxx")
+        file.flush
+
+        assert_equal(:zip, MediaFile.open(file.path).file_ext)
+      end
+    end
+  end
 end

@@ -96,6 +96,8 @@ class FileTypeDetector
   # @return [Boolean] True if animation.json is the first or last file of the .zip. MediaFile::Ugoira#is_corrupted? will validate this further later.
   def is_ugoira?
     # 14 bytes for "animation.json", 22 bytes for the end of central directory record, 30 bytes for the file header.
+    return false if file.size < 22 + 14
+
     file.pread(14, file.size - 22 - 14) == "animation.json" || file.pread(14, 30) == "animation.json"
   end
 
