@@ -20,6 +20,18 @@ Vips.vips_cache_set_max(ENV.fetch("VIPS_MAX_CACHE", 0).to_i)
 # https://www.libvips.org/API/current/VipsOperation.html#vips-concurrency-set
 Vips.concurrency_set(ENV.fetch("VIPS_CONCURRENCY", 1).to_i)
 
+# Only allow libvips to load the image formats we support (see `MediaFile.new_from_file`), so that if a file of another
+# type is ever passed to libvips, it won't be parsed by a loader we don't use. This blocks all loaders, then unblocks the
+# file loaders we use. The loaders are looked up by nickname because their class names depend on how libvips was built
+# (e.g. the GIF loader may use libnsgif or giflib).
+#
+# @see `vips_operation_block_set` in vips/operation.h (libvips 8.13+)
+Vips.attach_function :vips_operation_block_set, [:string, :int], :void
+Vips.vips_operation_block_set("VipsForeignLoad", 1)
+%w[jpegload pngload gifload webpload heifload].filter_map { GObject.g_type_name(Vips.type_find("VipsForeignLoad", it)) }.each do |loader|
+  Vips.vips_operation_block_set(loader, 0)
+end
+
 class Vips::Image
   # Release the memory used by this image.
   def release
