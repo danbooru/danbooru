@@ -40,6 +40,40 @@ class JobsControllerTest < ActionDispatch::IntegrationTest
           assert_equal([@user_job.id], response.parsed_body.pluck("id"))
         end
       end
+
+      context "a job with an error" do
+        setup do
+          @failed_job = create(:good_job, error: "Net::SMTPFatalError: 550 <victim@example.com> rejected")
+        end
+
+        should "not show the error to non-admins" do
+          get jobs_path, as: :json
+
+          assert_response :success
+          assert_not_includes(response.body, "victim@example.com")
+        end
+
+        should "show the error to admins" do
+          get_auth jobs_path, @user, as: :json
+
+          assert_response :success
+          assert_includes(response.body, "victim@example.com")
+        end
+
+        should "not allow non-admins to search by the error" do
+          get jobs_path(search: { error_ilike: "*victim@*" }), as: :json
+
+          assert_response :success
+          assert_equal([], response.parsed_body)
+        end
+
+        should "allow admins to search by the error" do
+          get_auth jobs_path(search: { error_ilike: "*victim@*" }), @user, as: :json
+
+          assert_response :success
+          assert_equal([@failed_job.id], response.parsed_body.pluck("id"))
+        end
+      end
     end
 
     context "cancel action" do

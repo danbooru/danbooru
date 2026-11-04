@@ -25,7 +25,7 @@ class BackgroundJobPolicy < ApplicationPolicy
 
   def visible_for_search(jobs, attribute)
     case attribute
-    in :serialized_params unless can_see_params?
+    in :serialized_params | :error unless can_see_params?
       jobs.none
     else
       jobs
@@ -34,7 +34,7 @@ class BackgroundJobPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = super
-    attributes -= [:serialized_params] unless can_see_params?
+    attributes -= [:serialized_params, :error] unless can_see_params?
     attributes + [:runtime_latency, :queue_latency]
   end
 end
