@@ -20,7 +20,7 @@ class PasswordResetsController < ApplicationController
 
   # Show the change password form.
   def edit
-    @user = authorize User.find_signed!(params.dig(:user, :signed_id), purpose: :password_reset), policy_class: PasswordResetPolicy
+    @user = authorize User.find_by_token_for!(:password_reset, params.dig(:user, :signed_id)), policy_class: PasswordResetPolicy
   end
 
   # Send the password reset email.
@@ -41,7 +41,7 @@ class PasswordResetsController < ApplicationController
 
   # Change the user's password.
   def update
-    @user = authorize User.find_signed!(params.dig(:user, :signed_id), purpose: :password_reset), policy_class: PasswordResetPolicy
+    @user = authorize User.find_by_token_for!(:password_reset, params.dig(:user, :signed_id)), policy_class: PasswordResetPolicy
 
     success = @user.reset_password(
       new_password: params.dig(:user, :password),

@@ -291,6 +291,14 @@ class User < ApplicationRecord
   end
 
   concerning :PasswordMethods do
+    included do
+      # The token includes a digest of the password salt, so it stops working once the password changes. The token
+      # isn't encrypted, so it uses a digest instead of the salt itself.
+      generates_token_for :password_reset, expires_in: 30.minutes do
+        Digest::SHA256.hexdigest(BCrypt::Password.new(bcrypt_password_hash).salt).first(16)
+      end
+    end
+
     def password=(new_password)
       @password = new_password
       self.bcrypt_password_hash = BCrypt::Password.create(hash_password(new_password))

@@ -101,14 +101,14 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
     context "edit action" do
       should "show the edit password form when given a valid signed_id" do
         @user = create(:user)
-        get edit_password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset) })
+        get edit_password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset) })
 
         assert_response :success
       end
 
       should "show the edit password form when a user with 2FA gives a valid signed_id" do
         @user = create(:user_with_2fa)
-        get edit_password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset) })
+        get edit_password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset) })
 
         assert_response :success
       end
@@ -122,7 +122,20 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
       should "not show the edit password form when given an expired signed_id" do
         @user = create(:user)
-        get edit_password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset, expires_at: 1.minute.ago) })
+        token = @user.generate_token_for(:password_reset)
+
+        travel 31.minutes
+        get edit_password_reset_path(user: { signed_id: token })
+
+        assert_redirected_to password_reset_path
+      end
+
+      should "not show the edit password form after the user's password has changed" do
+        @user = create(:user)
+        token = @user.generate_token_for(:password_reset)
+        @user.update!(password: "new_password", password_confirmation: "new_password")
+
+        get edit_password_reset_path(user: { signed_id: token })
 
         assert_redirected_to password_reset_path
       end
@@ -136,7 +149,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
       should "not show the edit password form when the user is already logged in as another user" do
         @user = create(:user)
-        get_auth edit_password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset) }), create(:user)
+        get_auth edit_password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset) }), create(:user)
 
         assert_redirected_to profile_path
       end
@@ -150,7 +163,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "change the user's password when given a valid new password" do
           freeze_time
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password" })
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "password" })
 
           assert_redirected_to @user
           assert_equal(@user.id, session[:user_id])
@@ -165,7 +178,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when the passwords don't match" do
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "wrong" })
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "wrong" })
 
           assert_response :success
           assert_nil(session[:user_id])
@@ -195,7 +208,9 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when given an expired signed_id" do
-          put password_reset_path(user: { signed_id: @user.signed_id(expires_at: 1.minute.ago, purpose: :password_reset), password: "password", password_confirmation: "password" })
+          token = @user.generate_token_for(:password_reset)
+          travel 31.minutes
+          put password_reset_path(user: { signed_id: token, password: "password", password_confirmation: "password" })
 
           assert_redirected_to password_reset_path
           assert_nil(session[:user_id])
@@ -207,6 +222,20 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_nil(session[:user_id])
           assert_nil(session[:login_id])
           assert_nil(session[:last_authenticated_at])
+        end
+
+        should "not change the user's password when the reset link was already used" do
+          token = @user.generate_token_for(:password_reset)
+          put password_reset_path(user: { signed_id: token, password: "password", password_confirmation: "password" })
+          assert_redirected_to @user
+
+          reset!
+          put password_reset_path(user: { signed_id: token, password: "password2", password_confirmation: "password2" })
+
+          assert_redirected_to password_reset_path
+          assert_nil(session[:user_id])
+          assert_equal(true, @user.reload.authenticate_password("password").present?)
+          assert_equal(1, @user.user_events.password_reset.count)
         end
 
         should "not change the user's password when given an invalid signed_id" do
@@ -226,7 +255,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "not change the user's password when the user is already logged in as another user" do
           @user2 = create(:user)
-          put_auth password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password" }), @user2
+          put_auth password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "password" }), @user2
 
           assert_redirected_to profile_path
           assert_equal(@user2.id, session[:user_id])
@@ -247,7 +276,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "change the user's password when the verification code is correct" do
           freeze_time
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: @user.totp.code })
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "password", verification_code: @user.totp.code })
 
           assert_redirected_to @user
           assert_equal(true, @user.reload.authenticate_password("password").present?)
@@ -264,7 +293,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           backup_code = @user.backup_codes.first
 
           freeze_time
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: backup_code })
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "password", verification_code: backup_code })
 
           assert_redirected_to @user
           assert_equal(true, @user.reload.authenticate_password("password").present?)
@@ -279,7 +308,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not change the user's password when the verification code is incorrect" do
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: "wrong" })
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "password", verification_code: "wrong" })
 
           assert_response :success
           assert_equal(false, @user.reload.authenticate_password("password").present?)
@@ -296,7 +325,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         should "not change the user's password if the account has made too many 2FA attempts" do
           User.any_instance.stubs(:limit_2fa_attempts!).raises(RateLimiter::RateLimitError)
 
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password", verification_code: @user.totp.code })
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "password", verification_code: @user.totp.code })
 
           assert_response 429
           assert_equal(false, @user.reload.authenticate_password("password").present?)
@@ -305,7 +334,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
 
         should "not spend a backup code when the new password is invalid" do
           backup_code = @user.backup_codes.first
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "12345", verification_code: backup_code })
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "12345", verification_code: backup_code })
 
           assert_response :success
           assert_equal(false, @user.reload.authenticate_password("password").present?)
@@ -323,7 +352,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
       context "for a deleted user" do
         should "not change the user's password" do
           @user = create(:user, is_deleted: true, password: "old_password")
-          put password_reset_path(user: { signed_id: @user.signed_id(purpose: :password_reset), password: "password", password_confirmation: "password" })
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "password" })
 
           assert_response :success
           assert_nil(session[:user_id])
