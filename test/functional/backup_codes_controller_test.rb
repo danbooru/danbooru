@@ -29,6 +29,23 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
           get_auth user_backup_codes_path(@user, url: settings_path), @user
 
           assert_response :success
+          assert_select "a.button-primary[href='#{settings_path}']", text: "Continue"
+        end
+
+        should "not link to a javascript: url" do
+          @user = create(:user_with_2fa)
+          get_auth user_backup_codes_path(@user, url: "javascript:alert(1)"), @user
+
+          assert_response :success
+          assert_select "a[href='javascript:alert(1)']", count: 0
+        end
+
+        should "not link to an external url" do
+          @user = create(:user_with_2fa)
+          get_auth user_backup_codes_path(@user, url: "https://evil.com"), @user
+
+          assert_response :success
+          assert_select "a[href='https://evil.com']", count: 0
         end
       end
 
