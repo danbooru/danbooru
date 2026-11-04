@@ -276,6 +276,37 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(post_tags_match: "touhou").with { @post_replacement }
       should respond_to_search(creator: { level: User::Levels::ADMIN }).with { @admin_replacement }
       should respond_to_search(creator_name: -> { @mod.name }).with { @post_replacement }
+
+      context "for a replacement on a post the user can't see" do
+        setup do
+          @hidden_replacement = create(:post_replacement, creator: @mod, replacement_file: Rack::Test::UploadedFile.new("test/files/gif/test-static-32x32.gif"))
+          @hidden_replacement.post.update!(is_banned: true)
+        end
+
+        should "not show the md5s in the API" do
+          get post_replacement_path(@hidden_replacement), as: :json
+
+          assert_response :success
+          assert_not(response.parsed_body.key?("md5"))
+          assert_not(response.parsed_body.key?("old_md5"))
+        end
+
+        should "not show the md5s in the HTML" do
+          get post_replacements_path(search: { id: @hidden_replacement.id })
+
+          assert_response :success
+          assert_no_match(@hidden_replacement.md5, response.body)
+          assert_no_match(@hidden_replacement.old_md5, response.body)
+        end
+
+        should "show the md5s to users who can see the post" do
+          get_auth post_replacement_path(@hidden_replacement), create(:approver), as: :json
+
+          assert_response :success
+          assert_equal(@hidden_replacement.md5, response.parsed_body["md5"])
+          assert_equal(@hidden_replacement.old_md5, response.parsed_body["old_md5"])
+        end
+      end
     end
 
     context "show action" do

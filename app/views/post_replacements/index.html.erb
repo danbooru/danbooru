@@ -29,7 +29,7 @@
         </dl>
       <% end %>
       <% t.column "MD5" do |post_replacement| %>
-        <% if post_replacement.old_md5.present? && post_replacement.md5.present? %>
+        <% if post_replacement.old_md5.present? && post_replacement.md5.present? && policy(post_replacement).can_see_md5? %>
           <dl>
             <dt>Original MD5</dt>
             <dd><%= link_to_if post_replacement.old_media_asset.present?, post_replacement.old_md5, post_replacement.old_media_asset %></dd>

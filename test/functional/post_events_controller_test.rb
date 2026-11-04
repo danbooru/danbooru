@@ -33,6 +33,16 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not show the old md5 of a replacement on a post the user can't see" do
+        @hidden_replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/gif/test-static-32x32.gif"))
+        @hidden_replacement.post.update!(is_banned: true)
+        @hidden_replacement.update!(old_file_size: nil, old_media_asset: nil)
+        get post_post_events_path(@hidden_replacement.post_id)
+
+        assert_response :success
+        assert_no_match(@hidden_replacement.old_md5, response.body)
+      end
+
       should "render for a single post listing" do
         get post_post_events_path(@post.id)
 

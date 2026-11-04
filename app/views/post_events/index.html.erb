@@ -63,7 +63,7 @@
             <%= model.old_file_size.to_fs(:human_size, precision: 4) %>
             .<%= model.old_file_ext %>
             (<%= model.old_image_width %>x<%= model.old_image_height %>)
-          <% elsif model.old_md5.present? %>
+          <% elsif model.old_md5.present? && policy(model).can_see_md5? %>
             <%= model.old_md5 %>
           <% else %>
             <i>unknown file</i>

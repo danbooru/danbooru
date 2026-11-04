@@ -20,4 +20,14 @@ class PostReplacementPolicy < ApplicationPolicy
       replacement_url
     ]
   end
+
+  def can_see_md5?
+    policy(record.post).visible?
+  end
+
+  def api_attributes
+    attributes = super
+    attributes -= [:md5, :old_md5] unless can_see_md5?
+    attributes
+  end
 end
