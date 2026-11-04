@@ -23,6 +23,15 @@ class BackgroundJobPolicy < ApplicationPolicy
   alias_method :retry?, :update?
   alias_method :run?, :update?
 
+  def visible_for_search(jobs, attribute)
+    case attribute
+    in :serialized_params unless can_see_params?
+      jobs.none
+    else
+      jobs
+    end
+  end
+
   def api_attributes
     attributes = super
     attributes -= [:serialized_params] unless can_see_params?

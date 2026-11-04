@@ -17,6 +17,29 @@ class JobsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(status: "queued").with { [@job] }
       should respond_to_search(status: "finished").with { [] }
       should respond_to_search(status: "discarded").with { [] }
+
+      context "searching by params" do
+        setup do
+          @victim = create(:user)
+          mail_job = MailDeliveryJob.new("UserMailer", "password_reset", "deliver_now", args: [@victim])
+          @user_job = create(:good_job, job: mail_job, serialized_params: mail_job.serialize)
+          @search = { serialized_params: { arguments: [{ args: [{ _aj_globalid: @victim.to_global_id.to_s }] }] }}
+        end
+
+        should "not allow non-admins to search by params" do
+          get jobs_path(search: @search), as: :json
+
+          assert_response :success
+          assert_equal([], response.parsed_body)
+        end
+
+        should "allow admins to search by params" do
+          get_auth jobs_path(search: @search), @user, as: :json
+
+          assert_response :success
+          assert_equal([@user_job.id], response.parsed_body.pluck("id"))
+        end
+      end
     end
 
     context "cancel action" do
