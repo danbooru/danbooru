@@ -57,7 +57,7 @@ class EmailsController < ApplicationController
     if @email_address.blank?
       skip_authorization
       redirect_to edit_user_email_path(@user)
-    elsif params[:email_verification_key].present? && @email_address == EmailAddress.find_signed!(params[:email_verification_key], purpose: "verify")
+    elsif params[:email_verification_key].present? && @email_address == EmailAddress.find_by_token_for!(:verification, params[:email_verification_key])
       skip_authorization
       @email_address.request = request
       @email_address.verify!

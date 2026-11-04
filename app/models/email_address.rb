@@ -97,8 +97,14 @@ class EmailAddress < ApplicationRecord
     end
   end
 
+  # The token includes a digest of the address, so it stops working if the address changes. The token isn't encrypted,
+  # so it uses a digest instead of the address itself.
+  generates_token_for :verification, expires_in: 1.week do
+    Digest::SHA256.hexdigest(address).first(16)
+  end
+
   def verification_key
-    signed_id(purpose: "verify")
+    generate_token_for(:verification)
   end
 
   def self.available_includes

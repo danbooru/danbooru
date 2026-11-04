@@ -415,6 +415,30 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "with a verification key for a previous email address" do
+        should "not mark the new email address as verified" do
+          url = email_verification_url(@user)
+          @user.email_address.update!(address: "new@danbooru.donmai.us")
+
+          get url
+
+          assert_response 403
+          assert_equal(false, @user.reload.email_address.is_verified)
+        end
+      end
+
+      context "with an expired verification key" do
+        should "not mark the email address as verified" do
+          url = email_verification_url(@user)
+
+          travel 8.days
+          get url
+
+          assert_response 403
+          assert_equal(false, @user.reload.email_address.is_verified)
+        end
+      end
+
       context "with an incorrect verification key" do
         should "not mark the email address as verified" do
           get verify_user_email_path(@user, email_verification_key: @other_user.email_address.verification_key)
