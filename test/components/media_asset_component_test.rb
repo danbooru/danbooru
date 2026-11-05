@@ -38,7 +38,9 @@ class MediaAssetComponentTest < ViewComponent::TestCase
         media_asset = create(:media_asset, file_ext: "swf")
         node = render_component(media_asset)
 
-        assert_equal(media_asset.variant(:original).file_url, node.css(".media-asset-component div.ruffle-container").attr("data-swf").value)
+        iframe = node.css(".media-asset-component iframe.flash-player")
+        assert_includes(iframe.attr("srcdoc").value, media_asset.variant(:original).file_url)
+        assert_equal("allow-scripts", iframe.attr("sandbox").value)
       end
     end
 

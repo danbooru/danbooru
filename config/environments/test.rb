@@ -21,6 +21,8 @@ Rails.application.configure do
   config.public_file_server.enabled = true
   config.public_file_server.headers = {
     "Cache-Control": "public, max-age=#{1.hour.to_i}",
+    # Let the sandboxed Flash player in system tests fetch Ruffle's .wasm file and the .swf file (see config/nginx.conf).
+    "Access-Control-Allow-Origin": "*",
   }
 
   # Show full error reports and disable caching.

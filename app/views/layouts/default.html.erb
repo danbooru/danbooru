@@ -16,14 +16,7 @@
 
   <%= tag.meta name: "autocomplete-tag-prefixes", content: AutocompleteService::TAG_PREFIXES.to_json %>
 
-  <%# XXX hack to only load Ruffle on Flash posts %>
-  <% if controller_name == "posts" && action_name == "show" && @post&.is_flash? %>
-    <%= javascript_pack_tag "application", "flash", defer: false %>
-  <% elsif controller_name == "media_assets" && action_name == "show" && @media_asset&.is_flash? %>
-    <%= javascript_pack_tag "application", "flash", defer: false %>
-  <% else %>
-    <%= javascript_pack_tag "application", defer: false %>
-  <% end %>
+  <%= javascript_pack_tag "application", defer: false %>
 
   <%= stylesheet_pack_tag "application" %>
   <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>

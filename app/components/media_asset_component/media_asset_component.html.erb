@@ -19,7 +19,7 @@
     <% elsif is_video? || is_ugoira? %>
       <%= render VideoComponent.new(media_asset, default_quality: (current_user.default_image_size == "original" ? "original" : "sample"), html: { class: "media-asset-image" }) %>
     <% elsif is_flash? %>
-      <%= tag.div "data-swf": variant(:original).file_url, class: "media-asset-image ruffle-container" %>
+      <%= tag.iframe srcdoc: helpers.render("media_assets/flash_player", media_asset: media_asset), sandbox: "allow-scripts", allow: "fullscreen; autoplay", width: image_width, height: image_height, class: "flash-player max-w-full h-auto", style: "border: 0; aspect-ratio: #{image_width} / #{image_height}" %>
     <% end %>
   </div>
 

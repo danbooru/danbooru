@@ -42,8 +42,6 @@ Post.initialize_all = function() {
     this.initialize_edit_dialog();
   }
 
-  this.initialize_ruffle_player();
-
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
   });
@@ -411,18 +409,6 @@ Post.initialize_post_sections = function() {
     e.preventDefault();
   });
 }
-
-Post.initialize_ruffle_player = function() {
-  let $container = $(".ruffle-container[data-swf]");
-
-  if ($container.length) {
-    let ruffle = window.RufflePlayer.newest();
-    let player = ruffle.createPlayer();
-    let src = $container.attr("data-swf");
-    $container.get(0).appendChild(player);
-    player.load(src);
-  }
-};
 
 Post.show_pending_update_notice = function() {
   if (Post.pending_update_count === 0) {

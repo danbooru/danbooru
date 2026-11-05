@@ -138,6 +138,14 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(response.parsed_body[:md5])
       end
 
+      should "embed Flash files in a sandboxed iframe" do
+        @media_asset = create(:media_asset, file_ext: "swf")
+        get media_asset_path(@media_asset)
+
+        assert_response :success
+        assert_select "iframe.flash-player[sandbox=allow-scripts][srcdoc*=?]", @media_asset.variant(:original).file_url
+      end
+
       should "work for a deleted asset" do
         @media_asset = create(:media_asset, status: "deleted", media_metadata: nil)
         get media_asset_path(@media_asset)

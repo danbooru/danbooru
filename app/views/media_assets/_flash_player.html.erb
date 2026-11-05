@@ -1,0 +1,16 @@
+<%# Rendered into a sandboxed iframe's srcdoc, so the Flash file runs with an opaque origin and can't access the user's session. %>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <%# javascript_pack_tag can only be called once per page, and the parent page's layout already calls it. %>
+  <%= javascript_include_tag(*current_shakapacker_instance.manifest.lookup_pack_with_chunks!("flash", type: :javascript)) %>
+  <style>
+    html, body, .ruffle-container { width: 100%; height: 100%; margin: 0; overflow: hidden; background: black; }
+    ruffle-player { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <%= tag.div class: "ruffle-container", "data-swf": media_asset.variant(:original).file_url %>
+</body>
+</html>

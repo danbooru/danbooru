@@ -662,6 +662,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "embed Flash files in a sandboxed iframe" do
+        post = create(:post, file_ext: "swf", media_asset: build(:media_asset, file_ext: "swf"))
+        get post_path(post)
+
+        assert_response :success
+        assert_select "iframe.flash-player[sandbox=allow-scripts][srcdoc*=?]", post.media_asset.variant(:original).file_url
+      end
+
       should "render the add to pool form" do
         get_auth post_path(@post), @user
         assert_response :success
