@@ -15,6 +15,15 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "escape HTML in the error message" do
+        ActiveModel::Errors.any_instance.stubs(:any?).returns(true)
+        ActiveModel::Errors.any_instance.stubs(:full_messages).returns(["<b>bad</b>"])
+        post_auth post_disapprovals_path, @approver, params: { post_disapproval: { post_id: @post.id, reason: "breaks_rules" }, format: "js" }
+
+        assert_response :success
+        assert_no_match(/<b>|\\u003cb/, response.body)
+      end
+
       should "render for json" do
         assert_difference("PostDisapproval.count", 1) do
           post_auth post_disapprovals_path, @approver, params: { post_disapproval: { post_id: @post.id, reason: "breaks_rules" }, format: "json" }

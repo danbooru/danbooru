@@ -3,7 +3,7 @@
     $("#post_<%= @approval.post.id %>").hide();
     Danbooru.Notice.error("<%= j format_text("Error on post ##{@approval.post.id}: #{@approval.errors.full_messages.join("; ")}", inline: true) %>");
   } else {
-    Danbooru.Notice.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
+    Danbooru.Notice.error("Error: <%= j @approval.errors.full_messages.join("; ") %>");
   }
 <% else %>
   if ($("#c-posts #a-show").length) {

@@ -17,6 +17,16 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "escape HTML in the error message" do
+        @post = create(:post, is_pending: true)
+        ActiveModel::Errors.any_instance.stubs(:any?).returns(true)
+        ActiveModel::Errors.any_instance.stubs(:full_messages).returns(["<b>bad</b>"])
+        post_auth post_approvals_path(post_id: @post.id, format: :js), @approver
+
+        assert_response :success
+        assert_no_match(/<b>|\\u003cb/, response.body)
+      end
+
       context "for a deleted post" do
         should "undelete the post" do
           @post = create(:post, is_deleted: true)

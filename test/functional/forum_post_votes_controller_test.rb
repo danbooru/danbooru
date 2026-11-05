@@ -89,6 +89,15 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "escape HTML in the error message" do
+        ForumPostVote.any_instance.stubs(:invalid?).returns(true)
+        ActiveModel::Errors.any_instance.stubs(:full_messages).returns(["<b>bad</b>"])
+        post_auth forum_post_votes_path(format: :js), @user, params: { forum_post_id: @forum_post.id, forum_post_vote: { score: 1 }}
+
+        assert_response :success
+        assert_no_match(/<b>|\\u003cb/, response.body)
+      end
+
       should "not allow privileged users to vote on private forum posts" do
         as(@user) { @forum_post.topic.update!(min_level: User::Levels::ADMIN) }
         assert_difference("ForumPostVote.count", 0) do
