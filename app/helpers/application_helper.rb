@@ -54,6 +54,13 @@ module ApplicationHelper
     end
   end
 
+  # Ignore options like `protocol` or `host` when building a URL from the request params. Otherwise a URL like
+  # `/tags?protocol=javascript&host=...` could change the generated link into a `javascript:` URL.
+  def url_for(options = nil)
+    options = options.except(*ActionDispatch::Routing::RouteSet::RESERVED_OPTIONS) if options.is_a?(ActionController::Parameters)
+    super
+  end
+
   def version_type_links(params)
     html = []
     %w[previous current].each do |type|
@@ -67,7 +74,7 @@ module ApplicationHelper
   end
 
   def current_page_path(**params)
-    url_for(request.query_parameters.merge(params))
+    url_for(ActionController::Parameters.new(request.query_parameters).merge(params).permit!)
   end
 
   def subnav_link_to(*args, **options, &block)
@@ -437,10 +444,9 @@ module ApplicationHelper
     elsif content_for(:seo_canonical_url).present?
       content_for(:seo_canonical_url)
     else
-      request_params = request.params.sort.to_h.with_indifferent_access
+      request_params = ActionController::Parameters.new(request.params.sort.to_h).except(:limit).permit!
       request_params.delete(:page) if request_params[:page].to_i == 1
-      request_params.delete(:limit)
-      root_url.chomp("/") + url_for(**request_params, only_path: true)
+      root_url.chomp("/") + url_for(request_params)
     end
   end
 

@@ -396,6 +396,32 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "when the URL contains reserved url_for options" do
+      setup do
+        @user = create(:user)
+        as(@user) { create(:wiki_page) }
+        create_list(:tag, 3)
+        @query = "protocol=javascript&host=%250aalert(1)%252f%252f&script_name=javascript:alert(1)%2f%2f&port=1337"
+      end
+
+      should "not let them change the URLs of links on the page" do
+        ["/tags?limit=1&#{@query}", "/wiki_page_versions?search[title]=x&#{@query}", "/posts?#{@query}"].each do |path|
+          get_auth path, @user
+
+          assert_response :success
+          hrefs = css_select("a[href], link[rel=canonical]").pluck("href")
+          assert_empty(hrefs.grep(/alert|1337/), "#{path} contains an unsafe link")
+        end
+      end
+
+      should "not let them change the redirect URL when removing blank search params" do
+        get "/tags?search[name]=&#{@query}"
+
+        assert_response :redirect
+        assert_match(%r{\Ahttp://www\.example\.com/tags\?}, response.location)
+      end
+    end
+
     context "when the api limit is exceeded" do
       should "fail with a 429 error" do
         user = create(:user)
