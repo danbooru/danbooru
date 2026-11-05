@@ -70,6 +70,44 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(["Post cannot have notes"], @note.errors.full_messages)
       end
 
+      should "not validate if the post already has the maximum number of active notes" do
+        stub_const(Note, :MAX_NOTES_PER_POST, 2) do
+          create_list(:note, 2, post: @post)
+          @note = build(:note, post: @post)
+
+          assert_equal(false, @note.valid?)
+          assert_equal(["Post can't have more than 2 notes"], @note.errors.full_messages)
+        end
+      end
+
+      should "not count deleted notes towards the maximum" do
+        stub_const(Note, :MAX_NOTES_PER_POST, 2) do
+          create(:note, post: @post)
+          create(:note, post: @post, is_active: false)
+
+          assert_equal(true, build(:note, post: @post).valid?)
+        end
+      end
+
+      should "not allow undeleting a note if the post already has the maximum number of active notes" do
+        stub_const(Note, :MAX_NOTES_PER_POST, 2) do
+          @deleted_note = create(:note, post: @post, is_active: false)
+          create_list(:note, 2, post: @post)
+
+          assert_equal(false, @deleted_note.update(is_active: true))
+          assert_equal(["Post can't have more than 2 notes"], @deleted_note.errors.full_messages)
+        end
+      end
+
+      should "allow editing an active note if the post is at the maximum number of active notes" do
+        stub_const(Note, :MAX_NOTES_PER_POST, 2) do
+          @note = create(:note, post: @post)
+          create(:note, post: @post)
+
+          assert_equal(true, @note.update(body: "edited"))
+        end
+      end
+
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
           travel(1.day) do

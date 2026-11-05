@@ -59,6 +59,18 @@ class NotesChromeTest < ChromeSystemTestCase
         assert_equal 1, @post.notes.count
         assert_equal "This is a note", @post.notes.last.body
       end
+
+      should "show an error if the post has too many notes" do
+        stub_const(Note, :MAX_NOTES_PER_POST, 0) do
+          find(".note-edit-dialog textarea").set("This is a note")
+          within(".note-edit-dialog") { click_button "Save" }
+
+          assert_notice(/Post can't have more than 0 notes/)
+          assert_selector ".note-edit-dialog"
+          assert_selector ".note-box.unsaved"
+          assert_equal 0, @post.notes.count
+        end
+      end
     end
 
     context "an existing note" do

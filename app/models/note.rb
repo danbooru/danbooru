@@ -3,6 +3,8 @@
 class Note < ApplicationRecord
   class RevertError < StandardError; end
 
+  MAX_NOTES_PER_POST = 1200
+
   attr_accessor :html_id
 
   belongs_to :post
@@ -16,6 +18,7 @@ class Note < ApplicationRecord
   validates :body, visible_string: true, length: { maximum: 5000 }, if: :body_changed?
   validate :validate_note_within_image
   validate :validate_post_can_have_notes, on: :create
+  validate :validate_notes_per_post, if: -> { is_active? && (new_record? || is_active_changed?) }
   after_save :update_post
   after_save :create_version
 
@@ -40,6 +43,12 @@ class Note < ApplicationRecord
 
   def validate_post_can_have_notes
     errors.add(:post, "cannot have notes") if post.present? && !post.can_have_notes?
+  end
+
+  def validate_notes_per_post
+    return if post.blank?
+
+    errors.add(:post, "can't have more than #{MAX_NOTES_PER_POST} notes") if post.notes.active.where.not(id: id).count >= MAX_NOTES_PER_POST
   end
 
   def rescale!(x_scale, y_scale)
