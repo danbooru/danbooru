@@ -298,6 +298,30 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("1.2.3.4", response.parsed_body["last_ip_addr"])
       end
 
+      should "not show the last_ip_addr of the owner to admins" do
+        owner = create(:owner_user, last_ip_addr: "1.2.3.4")
+        get_auth user_path(owner), create(:admin_user), as: :json
+
+        assert_response :success
+        assert_nil(response.parsed_body["last_ip_addr"])
+      end
+
+      should "not show the last_ip_addr of users of the same or higher level to mods" do
+        [create(:mod_user, last_ip_addr: "1.2.3.4"), create(:admin_user, last_ip_addr: "1.2.3.4")].each do |user|
+          get_auth user_path(user), create(:mod_user), as: :json
+          assert_response :success
+          assert_nil(response.parsed_body["last_ip_addr"])
+
+          get_auth user_path(user), create(:mod_user)
+          assert_response :success
+          assert_no_match(/1\.2\.3\.4/, response.body)
+
+          get_auth users_path(search: { id: user.id }), create(:mod_user)
+          assert_response :success
+          assert_no_match(/1\.2\.3\.4/, response.body)
+        end
+      end
+
       should "not show hidden attributes to others" do
         @another = create(:user)
 

@@ -20,7 +20,7 @@
 
       <% if policy(:ip_address).show? %>
         <% t.column "IP" do |user| %>
-          <% if user.last_ip_addr.present? %>
+          <% if user.last_ip_addr.present? && policy(user).can_see_last_ip_addr? %>
             <% if user.last_ip_addr.ipv6? %>
               <%= link_to user.last_ip_addr.subnet, user_events_path(search: { ip_addr: user.last_ip_addr.subnet }), title: user.last_ip_addr %>
             <% else %>

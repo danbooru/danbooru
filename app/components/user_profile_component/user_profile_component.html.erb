@@ -21,7 +21,7 @@
           </tr>
         <% end %>
 
-        <% if policy(:ip_address).show? %>
+        <% if policy(user).can_see_last_ip_addr? %>
           <tr>
             <th>Last IP</th>
             <td>
@@ -40,7 +40,7 @@
             <td>
               <%= link_to "Account", user_user_events_path(user.id, mode: "table") %>,
 
-              <% if user.last_ip_addr.present? %>
+              <% if user.last_ip_addr.present? && policy(user).can_see_last_ip_addr? %>
                 <%= link_to "IP", user_events_path(search: { ip_addr: user.last_ip_addr.subnet }) %>,
               <% end %>
 

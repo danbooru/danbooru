@@ -45,6 +45,10 @@ class UserPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def can_see_last_ip_addr?
+    policy(:ip_address).show? && (record.id == user.id || record.level < user.level)
+  end
+
   def can_see_favorites?
     user.is_admin? || record.id == user.id || !record.enable_private_favorites?
   end
@@ -99,7 +103,7 @@ class UserPolicy < ApplicationPolicy
       ]
     end
 
-    attributes += [:last_ip_addr] if policy(:ip_address).show?
+    attributes += [:last_ip_addr] if can_see_last_ip_addr?
 
     attributes
   end

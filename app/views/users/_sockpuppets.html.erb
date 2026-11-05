@@ -1,5 +1,5 @@
 <% if user.present? && CurrentUser.user.is_moderator? && user.level < User::Levels::MODERATOR %>
-  <% sockpuppet_accounts = user.sockpuppet_accounts %>
+  <% sockpuppet_accounts = user.sockpuppet_accounts(CurrentUser.user) %>
 
   <% if sockpuppet_accounts[:session_ids].present? || sockpuppet_accounts[:ip_addresses].present? %>
     <strong>Other Accounts</strong>
