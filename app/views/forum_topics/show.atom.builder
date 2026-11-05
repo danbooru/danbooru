@@ -4,7 +4,7 @@ atom_feed(root_url: forum_topic_url(@forum_topic)) do |feed|
 
   @forum_posts.each do |post|
     feed.entry(post, published: post.created_at, updated: post.updated_at) do |entry|
-      entry.title("@#{post.creator.name}: #{strip_dtext(post.body).truncate(50, separator: /[[:space:]]/)}")
+      entry.title("@#{post.creator.name}: #{post.dtext_body.excerpt(length: 50, separator: /[[:space:]]/)}")
       entry.content(post.dtext_body.format_text, type: "html")
 
       entry.author do |author|

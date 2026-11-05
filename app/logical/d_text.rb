@@ -492,41 +492,44 @@ class DText
     stripped.strip
   end
 
-  # Remove all DText formatting from the string of DText, converting it to plain text.
-  #
-  # @return [String] the plain text output
-  def strip_dtext
-    html = DText.parse_html(format_text)
-    DText.html_to_plaintext(html).strip
-  end
-
   # Convert HTML to plaintext.
   #
   # @param html [Nokogiri::HTML5::DocumentFragment] the HTML input
   # @param depth [Integer] the current nesting depth (used internally)
   # @param max_depth [Integer] the maximum nesting depth to process
+  # @param lines [Integer, nil] if present, stop converting once this many lines have been produced (the output may contain more lines than this)
   # @return [String] the plain text output, or the empty string if the nesting is deeper than max_depth
-  def self.html_to_plaintext(html, depth = 0, max_depth: 20)
+  def self.html_to_plaintext(html, depth = 0, max_depth: 20, lines: nil)
     return "" if depth > max_depth
 
-    html.children.map do |node|
-      case node.name
+    output = +""
+    newlines = 0
+
+    html.children.each do |node|
+      break if lines && newlines >= lines
+
+      text = case node.name
       when "p", "h1", "h2", "h3", "h4", "h5", "h6"
-        "#{html_to_plaintext(node, depth + 1, max_depth:)}\n\n"
+        "#{html_to_plaintext(node, depth + 1, max_depth:, lines:)}\n\n"
       when "li"
-        "* #{html_to_plaintext(node, depth + 1, max_depth:)}\n"
+        "* #{html_to_plaintext(node, depth + 1, max_depth:, lines:)}\n"
       when "br"
         "\n"
       when "blockquote"
-        html_to_plaintext(node, depth + 1, max_depth:).strip.gsub(/^/, "> ")
+        html_to_plaintext(node, depth + 1, max_depth:, lines:).strip.gsub(/^/, "> ")
       when "details"
-        html_to_plaintext(node.css("> div"), depth + 1, max_depth:)
+        html_to_plaintext(node.css("> div"), depth + 1, max_depth:, lines:)
       when "text"
         node.text
       else
-        html_to_plaintext(node, depth + 1, max_depth:)
+        html_to_plaintext(node, depth + 1, max_depth:, lines:)
       end
-    end.join
+
+      output << text
+      newlines += text.count("\n")
+    end
+
+    output
   end
 
   # Convert DText formatting to Markdown.
@@ -759,9 +762,14 @@ class DText
   # Generate a short plain text excerpt from a DText string.
   #
   # @param length [Integer] the max length of the output
+  # @param lines [Integer] the max number of lines in the output
+  # @param separator [String, Regexp, nil] if present, truncate at the last match of this pattern (e.g. a whitespace character) instead of mid-word
   # @return [String] a plain text string
-  def excerpt(length: 160)
-    strip_dtext.split(/\r\n|\r|\n/).first.to_s.truncate(length)
+  def excerpt(length: 160, lines: 1, separator: nil)
+    html = DText.parse_html(format_text)
+    plaintext = DText.html_to_plaintext(html, lines:)
+
+    plaintext.strip.split(/\r\n|\r|\n/).first(lines).join("\n").truncate(length, separator:)
   end
 
   # Parse a string of HTML to a document object.

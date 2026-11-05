@@ -98,10 +98,6 @@ module ApplicationHelper
     DText.new(text, **options).format_text(references:)
   end
 
-  def strip_dtext(text)
-    DText.new(text).strip_dtext
-  end
-
   def time_tag(content, time, **options)
     datetime = time.strftime("%Y-%m-%dT%H:%M%:z")
 

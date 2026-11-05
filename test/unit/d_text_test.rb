@@ -1,8 +1,8 @@
 require "test_helper"
 
 class DTextTest < ActiveSupport::TestCase
-  def assert_strip_dtext(expected, dtext)
-    assert_equal(expected, DText.new(dtext).strip_dtext)
+  def assert_excerpt(expected, dtext, **options)
+    assert_equal(expected, DText.new(dtext).excerpt(**options))
   end
 
   def assert_rewrite_wiki_links(expected, dtext, old, new)
@@ -26,49 +26,64 @@ class DTextTest < ActiveSupport::TestCase
       end
     end
 
-    context "#strip_dtext" do
+    context "#excerpt" do
       should "strip dtext markup from the input" do
-        assert_strip_dtext("x", "[b]x[/b]")
-        assert_strip_dtext("x", "[i]x[/i]")
-        assert_strip_dtext("x", "[tn]x[/tn]")
-        assert_strip_dtext("x", "[spoilers]x[/spoilers]")
+        assert_excerpt("x", "[b]x[/b]")
+        assert_excerpt("x", "[i]x[/i]")
+        assert_excerpt("x", "[tn]x[/tn]")
+        assert_excerpt("x", "[spoilers]x[/spoilers]")
 
-        assert_strip_dtext("post #123", "post #123")
-        assert_strip_dtext("pixiv #123", "pixiv #123")
+        assert_excerpt("post #123", "post #123")
+        assert_excerpt("pixiv #123", "pixiv #123")
 
-        assert_strip_dtext("bkub", "{{bkub}}")
-        assert_strip_dtext("bkub", "[[bkub]]")
-        assert_strip_dtext("Bkub", "[[bkub|Bkub]]")
+        assert_excerpt("bkub", "{{bkub}}")
+        assert_excerpt("bkub", "[[bkub]]")
+        assert_excerpt("Bkub", "[[bkub|Bkub]]")
 
-        assert_strip_dtext("http://www.example.com", "http://www.example.com")
-        assert_strip_dtext("http://www.example.com", "<http://www.example.com>")
-        assert_strip_dtext("x", '"x":/posts')
-        assert_strip_dtext("x", '"x":[/posts]')
+        assert_excerpt("http://www.example.com", "http://www.example.com")
+        assert_excerpt("http://www.example.com", "<http://www.example.com>")
+        assert_excerpt("x", '"x":/posts')
+        assert_excerpt("x", '"x":[/posts]')
 
-        assert_strip_dtext("@bkub", "@bkub")
-        assert_strip_dtext("@bkub", "<@bkub>")
+        assert_excerpt("@bkub", "@bkub")
+        assert_excerpt("@bkub", "<@bkub>")
 
-        assert_strip_dtext("x", "h1. x")
-        assert_strip_dtext("x", "h2. [i]x[/i]")
+        assert_excerpt("x", "h1. x")
+        assert_excerpt("x", "h2. [i]x[/i]")
 
-        assert_strip_dtext("* one\n* two", "* [b]one[/b]\n* [[two]]")
-        assert_strip_dtext("okay", "[expand][u]okay[/u][/expand]")
-        assert_strip_dtext("> chen said:\n> \n> honk honk", "[quote]chen said:\n\nhonk honk[/quote]")
-        assert_strip_dtext("a\n\n> b\n> \n> > c\n> > \n> > d", "a\n\n[quote]b\n\n[quote]c\n\nd[/quote][/quote]")
+        assert_excerpt("* one", "* [b]one[/b]\n* [[two]]")
+        assert_excerpt("okay", "[expand][u]okay[/u][/expand]")
+        assert_excerpt("> chen said:", "[quote]chen said:\n\nhonk honk[/quote]")
+        assert_excerpt("> > c", "[quote][quote]c[/quote][/quote]")
+      end
 
-        assert_strip_dtext("one two three\nfour\n\nfive six", "one [b]two[/b] three\nfour\n\nfive six")
+      should "return only the first line" do
+        assert_excerpt("one two three", "one [b]two[/b] three\nfour\n\nfive six")
+      end
+
+      should "return the first N lines if the lines argument is given" do
+        assert_excerpt("a\nb", "a\nb\nc\nd", lines: 2)
+        assert_excerpt("a\n\nb", "a\n\nb\n\nc\n\nd", lines: 3)
+        assert_excerpt("> a\n> \n> b", "[quote]a\n\nb\n\nc[/quote]", lines: 3)
+        assert_excerpt("* one\n* two", "* one\n* two\n* three", lines: 2)
+        assert_excerpt("a", "a", lines: 5)
+      end
+
+      should "truncate the output to the given length" do
+        assert_excerpt("alpha beta gamma ...", "alpha beta gamma delta epsilon zeta", length: 20)
+        assert_excerpt("alpha beta gamma...", "alpha beta gamma delta epsilon zeta", length: 20, separator: /[[:space:]]/)
       end
 
       should "not duplicate text from nested [expand] tags" do
-        assert_strip_dtext("a\n\nb\n\nc", "[expand]a\n\n[expand]b\n\n[expand]c[/expand][/expand][/expand]")
+        assert_excerpt("x", "[expand][expand][expand]x[/expand][/expand][/expand]")
 
         dtext = "#{"[expand]" * 9}x#{"[/expand]" * 9}"
-        assert_strip_dtext("x", dtext)
+        assert_excerpt("x", dtext)
       end
 
       should "return an empty string if the nesting is too deep" do
         dtext = "#{"[expand]" * 5_000}x#{"[/expand]" * 5_000}"
-        assert_strip_dtext("", dtext)
+        assert_excerpt("", dtext)
       end
     end
 
