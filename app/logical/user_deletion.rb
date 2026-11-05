@@ -33,7 +33,6 @@ class UserDeletion
     user.with_lock do
       rename
       reset_password
-      async_delete_user
 
       if user == deleter
         UserEvent.create_from_request!(user, :user_deletion, request)
@@ -41,6 +40,8 @@ class UserDeletion
       else
         ModAction.log("deleted user ##{user.id}", :user_delete, subject: user, user: deleter)
       end
+
+      async_delete_user
     end
 
     true

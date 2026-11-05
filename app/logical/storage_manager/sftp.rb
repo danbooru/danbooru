@@ -146,7 +146,7 @@ class StorageManager::SFTP < StorageManager
     def directory?(path)
       sftp.stat!(path).directory?
     rescue Net::SFTP::StatusException => e
-      raise unless e.description == "no such file"
+      raise unless e.code == Net::SFTP::Response::FX_NO_SUCH_FILE
       false
     end
 
@@ -154,7 +154,7 @@ class StorageManager::SFTP < StorageManager
     def force
       yield
     rescue Net::SFTP::StatusException => e
-      raise unless e.description == "no such file"
+      raise unless e.code == Net::SFTP::Response::FX_NO_SUCH_FILE
     end
   end
 end
