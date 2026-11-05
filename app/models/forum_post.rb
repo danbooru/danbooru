@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ForumPost < ApplicationRecord
+  # Also used to cap the length of DText previews.
+  MAX_BODY_LENGTH = 200_000
+
   # attr_readonly :topic_id # XXX broken by accepts_nested_attributes_for in ForumTopic
   attr_accessor :creator_ip_addr
 
@@ -20,7 +23,7 @@ class ForumPost < ApplicationRecord
   has_one :tag_implication
   has_one :bulk_update_request
 
-  validates :body, visible_string: true, length: { maximum: 200_000 }, if: :body_changed?
+  validates :body, visible_string: true, length: { maximum: MAX_BODY_LENGTH }, if: :body_changed?
   validate :validate_deletion_of_original_post
   validate :validate_undeletion_of_post
 

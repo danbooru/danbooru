@@ -18,6 +18,14 @@ class DTextTest < ActiveSupport::TestCase
   end
 
   context "DText" do
+    context "#initialize" do
+      should "raise an error if the input is longer than max_length" do
+        assert_raises(DText::Error) { DText.new("abcd", max_length: 3) }
+        assert_nothing_raised { DText.new("abc", max_length: 3) }
+        assert_nothing_raised { DText.new("a" * 1_000_000) }
+      end
+    end
+
     context "#strip_dtext" do
       should "strip dtext markup from the input" do
         assert_strip_dtext("x", "[b]x[/b]")

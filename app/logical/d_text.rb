@@ -63,7 +63,11 @@ class DText
   #   (e.g on betabooru.donmai.us, https://danbooru.donmai.us/posts/1234 is converted to post #1234).
   # @param emoji_map [Hash<String, String>] A hash of emoji (name, value) pairs. The emoji `:name:` is replaced with the value (which may be an HTML <img> or a plaintext emoji).
   # @param emoji_list [Array<String>] The list of valid emoji names.
-  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains, emoji_map: DEFAULT_EMOJI_MAP, emoji_list: DEFAULT_EMOJI_LIST)
+  # @param max_length [Integer, nil] If present, raise a `DText::Error` if the input is longer than this many characters.
+  # @raise [DText::Error] If the input is longer than `max_length`.
+  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains, emoji_map: DEFAULT_EMOJI_MAP, emoji_list: DEFAULT_EMOJI_LIST, max_length: nil)
+    raise Error, "DText is too long (max: #{max_length} characters)" if max_length && dtext.to_s.length > max_length
+
     @dtext = dtext
     @inline = inline
     @disable_mentions = disable_mentions
