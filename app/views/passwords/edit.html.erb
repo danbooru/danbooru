@@ -20,6 +20,7 @@
 
         <%= f.input :password, required: true, label: "New password", input_html: { autocomplete: "new-password" } %>
         <%= f.input :password_confirmation, required: true, label: "Confirm password", input_html: { autocomplete: "new-password" } %>
+        <p class="text-sm text-muted">Changing your password will log you out on all other devices.</p>
         <%= f.submit_button "Save" %>
       <% end %>
     </div>

@@ -154,12 +154,9 @@ class SessionLoader
     return if user.is_anonymous?
 
     user.with_lock do
-      LoginSession.where(login_id: session[:login_id]).update_all(status: :logged_out, last_seen_at: Time.now.utc.inspect) if session[:login_id].present?
+      LoginSession.active.where(login_id: session[:login_id]).update_all(status: :logged_out, last_seen_at: Time.now.utc.inspect) if session[:login_id].present?
       UserEvent.create_from_request!(user, :logout, request)
-
-      session.delete(:user_id)
-      session.delete(:login_id)
-      session.delete(:last_authenticated_at)
+      cleanup_cookies
     end
   end
 
@@ -246,11 +243,21 @@ class SessionLoader
     user = User.find_by_id(session[:user_id])
     return if user.nil?
 
-    if user.is_deleted?
+    # The login session was already ended by a logout or a password change, so just remove it from the cookie.
+    if !user.login_sessions.active.exists?(login_id: session[:login_id])
+      cleanup_cookies
+    elsif user.is_deleted?
       logout(user)
     else
       CurrentUser.user = user
     end
+  end
+
+  # Delete the keys set by `login_user` from the session cookie. Other keys, like the session ID, are kept.
+  def cleanup_cookies
+    session.delete(:user_id)
+    session.delete(:login_id)
+    session.delete(:last_authenticated_at)
   end
 
   def update_last_logged_in_at

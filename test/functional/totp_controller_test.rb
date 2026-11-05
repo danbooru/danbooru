@@ -62,6 +62,19 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, @user.user_events.totp_enable.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
 
+        should "log the user out on all other devices" do
+          @user = create(:user)
+          @totp = TOTP.new(username: @user.name)
+          login_as(@user)
+          @other_session = create(:login_session, user: @user)
+
+          put user_totp_path(user_id: @user), params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
+
+          assert_redirected_to user_backup_codes_path(@user, url: settings_path)
+          assert_equal(true, @other_session.reload.revoked?)
+          assert_equal(true, @user.login_sessions.find_by!(login_id: session[:login_id]).active?)
+        end
+
         should "not allow a user to enable 2FA with a secret generated for another user" do
           @user = create(:user)
           @totp = TOTP.new(username: create(:user).name)

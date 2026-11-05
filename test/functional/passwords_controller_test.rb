@@ -40,6 +40,16 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.user_events.password_change.exists?(login_session_id: @user.login_sessions.last.login_id))
       end
 
+      should "revoke the user's other login sessions" do
+        login_as(@user)
+        @other_session = create(:login_session, user: @user)
+        put user_password_path(@user), params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde" }}
+
+        assert_redirected_to @user
+        assert_equal(true, @other_session.reload.revoked?)
+        assert_equal(true, @user.login_sessions.find_by!(login_id: session[:login_id]).active?)
+      end
+
       should "not allow users to change the password of other users" do
         @owner = create(:owner_user)
         put_auth user_password_path(@user), @owner, params: { user: { current_password: "12345", password: "abcde", password_confirmation: "abcde" }}

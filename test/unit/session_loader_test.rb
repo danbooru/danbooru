@@ -22,6 +22,19 @@ class SessionLoaderTest < ActiveSupport::TestCase
       CurrentUser.safe_mode = nil
     end
 
+    context ".load" do
+      should "not log in a session without a login session" do
+        @user = create(:user)
+        @request.stubs(:session).returns({ user_id: @user.id })
+        UserEvent.expects(:create_from_request!).never
+        User.any_instance.expects(:with_lock).never
+        SessionLoader.new(@request).load
+
+        assert_equal(true, CurrentUser.user.is_anonymous?)
+        assert_nil(@request.session[:user_id])
+      end
+    end
+
     context ".safe_mode?" do
       should "return true if the hostname is safebooru.donmai.us" do
         @request.stubs(:host).returns("safebooru.donmai.us")
@@ -39,7 +52,8 @@ class SessionLoaderTest < ActiveSupport::TestCase
 
       should "return true if the user has enabled the safe mode account setting" do
         @user = create(:user, enable_safe_mode: true)
-        @request.stubs(:session).returns(user_id: @user.id)
+        @login_session = create(:login_session, user: @user)
+        @request.stubs(:session).returns(user_id: @user.id, login_id: @login_session.login_id)
         SessionLoader.new(@request).load
 
         assert_equal(true, CurrentUser.safe_mode?)

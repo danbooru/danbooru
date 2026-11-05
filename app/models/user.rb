@@ -328,6 +328,7 @@ class User < ApplicationRecord
         with_lock do
           success = update(password: new_password, password_confirmation: password_confirmation)
           UserEvent.create_from_request!(self, :password_reset, request) if success
+          login_sessions.active.find_each(&:revoke!) if success
           verify_backup_code!(verification_code) if success
           success
         end
@@ -347,6 +348,8 @@ class User < ApplicationRecord
         with_lock do
           success = update(password: new_password, password_confirmation: password_confirmation)
           UserEvent.create_from_request!(self, :password_change, request) if success
+          login_sessions.active.where.not(login_id: request.session[:login_id]).find_each(&:revoke!) if success
+          success
         end
       end
     end
@@ -436,6 +439,7 @@ class User < ApplicationRecord
         if totp_secret_before_last_save.nil?
           UserEvent.create_from_request!(self, :totp_enable, request)
           generate_backup_codes!(request)
+          login_sessions.active.where.not(login_id: request.session[:login_id]).find_each(&:revoke!)
         elsif secret.nil?
           UserEvent.create_from_request!(self, :totp_disable, request)
           update!(backup_codes: nil)

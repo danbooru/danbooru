@@ -345,6 +345,38 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:user_id])
         assert_equal(true, @user.user_events.exists?(category: :logout))
       end
+
+      should "fail for a session that was logged out" do
+        @user.login_sessions.last.update!(status: :logged_out)
+
+        get profile_path
+
+        assert_redirected_to login_path(url: "/profile")
+        assert_nil(session[:user_id])
+        assert_nil(session[:login_id])
+      end
+
+      should "fail for a session that was revoked" do
+        @user.login_sessions.last.revoke!
+
+        get profile_path
+
+        assert_redirected_to login_path(url: "/profile")
+        assert_nil(session[:user_id])
+        assert_nil(session[:login_id])
+        assert_equal(false, @user.user_events.logout.exists?)
+        assert_equal(true, @user.login_sessions.last.revoked?)
+      end
+
+      should "fail for a session belonging to a different user" do
+        @user.login_sessions.last.update!(user: create(:user))
+
+        get profile_path
+
+        assert_redirected_to login_path(url: "/profile")
+        assert_nil(session[:user_id])
+        assert_nil(session[:login_id])
+      end
     end
 
     context "accessing an unauthorized page" do

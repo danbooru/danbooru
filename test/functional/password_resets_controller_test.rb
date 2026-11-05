@@ -177,6 +177,15 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
         end
 
+        should "revoke the user's existing login sessions" do
+          @old_session = create(:login_session, user: @user)
+          put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "password" })
+
+          assert_redirected_to @user
+          assert_equal(true, @old_session.reload.revoked?)
+          assert_equal(true, @user.login_sessions.find_by!(login_id: session[:login_id]).active?)
+        end
+
         should "not change the user's password when the passwords don't match" do
           put password_reset_path(user: { signed_id: @user.generate_token_for(:password_reset), password: "password", password_confirmation: "wrong" })
 
