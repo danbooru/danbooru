@@ -74,6 +74,14 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
         get_auth site_credentials_path, @member
         assert_response 403
       end
+
+      should "not show personal credentials belonging to other admins" do
+        @personal_credential = create(:site_credential, creator: create(:admin_user), is_public: false, credential: { phpsessid: "secret" })
+        get_auth site_credentials_path, @admin, as: :json
+
+        assert_response :success
+        assert_equal([@site_credential.id], response.parsed_body.pluck("id"))
+      end
     end
 
     context "show action" do

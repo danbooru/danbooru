@@ -4,7 +4,7 @@ class SiteCredentialsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @site_credentials = authorize SiteCredential.paginated_search(params, count_pages: true)
+    @site_credentials = authorize SiteCredential.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     respond_with(@site_credentials)
   end
 
