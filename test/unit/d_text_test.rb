@@ -54,8 +54,21 @@ class DTextTest < ActiveSupport::TestCase
         assert_strip_dtext("* one\n* two", "* [b]one[/b]\n* [[two]]")
         assert_strip_dtext("okay", "[expand][u]okay[/u][/expand]")
         assert_strip_dtext("> chen said:\n> \n> honk honk", "[quote]chen said:\n\nhonk honk[/quote]")
+        assert_strip_dtext("a\n\n> b\n> \n> > c\n> > \n> > d", "a\n\n[quote]b\n\n[quote]c\n\nd[/quote][/quote]")
 
         assert_strip_dtext("one two three\nfour\n\nfive six", "one [b]two[/b] three\nfour\n\nfive six")
+      end
+
+      should "not duplicate text from nested [expand] tags" do
+        assert_strip_dtext("a\n\nb\n\nc", "[expand]a\n\n[expand]b\n\n[expand]c[/expand][/expand][/expand]")
+
+        dtext = "#{"[expand]" * 9}x#{"[/expand]" * 9}"
+        assert_strip_dtext("x", dtext)
+      end
+
+      should "return an empty string if the nesting is too deep" do
+        dtext = "#{"[expand]" * 5_000}x#{"[/expand]" * 5_000}"
+        assert_strip_dtext("", dtext)
       end
     end
 

@@ -503,24 +503,28 @@ class DText
   # Convert HTML to plaintext.
   #
   # @param html [Nokogiri::HTML5::DocumentFragment] the HTML input
-  # @return [String] the plain text output
-  def self.html_to_plaintext(html)
+  # @param depth [Integer] the current nesting depth (used internally)
+  # @param max_depth [Integer] the maximum nesting depth to process
+  # @return [String] the plain text output, or the empty string if the nesting is deeper than max_depth
+  def self.html_to_plaintext(html, depth = 0, max_depth: 20)
+    return "" if depth > max_depth
+
     html.children.map do |node|
       case node.name
       when "p", "h1", "h2", "h3", "h4", "h5", "h6"
-        "#{html_to_plaintext(node)}\n\n"
+        "#{html_to_plaintext(node, depth + 1, max_depth:)}\n\n"
       when "li"
-        "* #{html_to_plaintext(node)}\n"
+        "* #{html_to_plaintext(node, depth + 1, max_depth:)}\n"
       when "br"
         "\n"
       when "blockquote"
-        html_to_plaintext(node).strip.gsub(/^/, "> ")
+        html_to_plaintext(node, depth + 1, max_depth:).strip.gsub(/^/, "> ")
       when "details"
-        html_to_plaintext(node.css("div"))
+        html_to_plaintext(node.css("> div"), depth + 1, max_depth:)
       when "text"
         node.text
       else
-        html_to_plaintext(node)
+        html_to_plaintext(node, depth + 1, max_depth:)
       end
     end.join
   end
