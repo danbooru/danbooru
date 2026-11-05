@@ -255,10 +255,12 @@ class ApplicationController < ActionController::Base
   end
 
   # Skip setting the session cookie if the response is being publicly cached to
-  # prevent the user's session cookie from being leaked to other users.
+  # prevent the user's session cookie from being leaked to other users. Also drop
+  # the rate limit header, which contains the user's ID, IP subnet, and session ID.
   def skip_session_if_publicly_cached
     if response.cache_control[:public] == true
       request.session_options[:skip] = true
+      response.headers.delete("X-Rate-Limit")
     end
   end
 

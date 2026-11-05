@@ -94,4 +94,30 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       assert_equal(["ccc"], @query.related_tags.map(&:name))
     end
   end
+
+  context "the search_sample_size param" do
+    should "default to 5000" do
+      assert_equal(5000, RelatedTagQuery.new(query: "aaa").search_sample_size)
+    end
+
+    should "be capped at 10,000 for anonymous users and members" do
+      assert_equal(10_000, RelatedTagQuery.new(query: "aaa", search_sample_size: 100_000).search_sample_size)
+      assert_equal(10_000, RelatedTagQuery.new(query: "aaa", search_sample_size: 100_000, user: create(:member_user)).search_sample_size)
+    end
+
+    should "be capped at 100,000 for Builder users and above" do
+      assert_equal(100_000, RelatedTagQuery.new(query: "aaa", search_sample_size: 1_000_000, user: create(:builder_user)).search_sample_size)
+    end
+  end
+
+  context "the tag limit" do
+    should "raise an error if the query has more tags than the user is allowed to search for" do
+      assert_raises(PostQuery::TagLimitError) { RelatedTagQuery.new(query: "aaa bbb ccc", user: create(:user)) }
+    end
+
+    should "allow queries within the user's tag limit" do
+      assert_nothing_raised { RelatedTagQuery.new(query: "aaa bbb", user: create(:user)) }
+      assert_nothing_raised { RelatedTagQuery.new(query: "aaa bbb ccc", user: create(:platinum_user)) }
+    end
+  end
 end
