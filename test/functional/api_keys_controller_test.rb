@@ -36,6 +36,20 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_nil response.parsed_body.first["key"]
       end
 
+      should "not allow searching by key" do
+        get_auth user_api_keys_path(@user.id, search: { key_like: "#{@api_key.key[0]}*" }), @user, as: :json
+        assert_response :success
+        assert_equal(1, response.parsed_body.size)
+
+        get_auth user_api_keys_path(@user.id, search: { key_like: "does-not-match*" }), @user, as: :json
+        assert_response :success
+        assert_equal(1, response.parsed_body.size)
+
+        get_auth user_api_keys_path(@user.id, search: { key: "does-not-match" }), @user, as: :json
+        assert_response :success
+        assert_equal(1, response.parsed_body.size)
+      end
+
       should "redirect to the confirm password page if the user hasn't recently authenticated" do
         login_as(@user)
         travel_to 2.hours.from_now do
