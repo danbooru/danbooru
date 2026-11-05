@@ -67,8 +67,15 @@ class PostsController < ApplicationController
       respond_with(@post, notice: notice)
     elsif @post.errors.of_kind?(:md5, :taken)
       @original_post = Post.find_by!(md5: @post.md5)
-      @original_post.update(rating: @post.rating.presence || @original_post.rating, parent_id: @post.parent_id || @original_post.parent_id, tag_string: "#{@original_post.tag_string} #{params.dig(:post, :tag_string)}")
-      flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
+
+      # Don't let users edit posts they can't see, so they can't make them visible by removing restricted tags or changing the rating.
+      if policy(@original_post).update?
+        @original_post.update(rating: @post.rating.presence || @original_post.rating, parent_id: @post.parent_id || @original_post.parent_id, tag_string: "#{@original_post.tag_string} #{params.dig(:post, :tag_string)}")
+        flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
+      else
+        flash[:notice] = "Duplicate of post ##{@original_post.id}"
+      end
+
       redirect_to @original_post
     else
       @post.tag_string = params.dig(:post, :tag_string) # Preserve original tag string on validation error

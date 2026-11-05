@@ -931,6 +931,29 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("e", post1.rating)
       end
 
+      should "not let a user remove restricted tags from a duplicate they can't see" do
+        regex = Post::RESTRICTED_TAGS_REGEX
+        silence_warnings { Post.const_set(:RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) }
+
+        media_asset = create(:media_asset)
+        post1 = create_post!(user: create(:gold_user), rating: "s", tag_string: "restricted_tag", media_asset: media_asset)
+        create_post!(rating: "g", tag_string: "-restricted_tag", media_asset: media_asset)
+
+        assert_equal("restricted_tag", post1.reload.tag_string)
+        assert_equal("s", post1.rating)
+      ensure
+        silence_warnings { Post.const_set(:RESTRICTED_TAGS_REGEX, regex) }
+      end
+
+      should "not let a user in safe mode change the rating of a duplicate they can't see" do
+        media_asset = create(:media_asset)
+        post1 = create_post!(rating: "e", tag_string: "post1", media_asset: media_asset)
+        create_post!(user: create(:user, enable_safe_mode: true), rating: "g", tag_string: "post2", media_asset: media_asset)
+
+        assert_equal("e", post1.reload.rating)
+        assert_equal("post1", post1.tag_string)
+      end
+
       should "not clobber the parent_id of a duplicate" do
         parent_post = create_post!(rating: "s", media_asset: create(:media_asset))
         media_asset = create(:media_asset)
