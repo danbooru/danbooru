@@ -10,7 +10,7 @@ class NotePolicy < ApplicationPolicy
   end
 
   def rate_limit_for_preview(**_options)
-    {}
+    { rate: 2.0 / 1.second, burst: 60 }
   end
 
   def rate_limit_for_write(**_options)

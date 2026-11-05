@@ -33,5 +33,25 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
     end
+
+    should "be rate limited" do
+      user = create(:user)
+      Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+      create(:rate_limit, action: "status:show", key: user.cache_key, limited: true)
+
+      get_auth status_path(format: :json), user
+
+      assert_response 429
+    end
+
+    should "not be rate limited when the database is down" do
+      Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+      RateLimiter.expects(:build).never
+
+      without_database do
+        get status_path
+        assert_response :success
+      end
+    end
   end
 end

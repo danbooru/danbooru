@@ -136,6 +136,16 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 422
       end
+
+      should "be rate limited" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        create(:rate_limit, action: "notes:preview", key: @user.cache_key, limited: true)
+
+        note = { x: 0, y: 0, width: 1, height: 1, body: "test", post_id: @note.post_id }
+        post_auth preview_notes_path, @user, params: { note: note, format: "json" }
+
+        assert_response 429
+      end
     end
   end
 end

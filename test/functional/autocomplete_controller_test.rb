@@ -25,6 +25,16 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
 
   context "Autocomplete controller" do
     context "index action" do
+      should "be rate limited" do
+        user = create(:user)
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        create(:rate_limit, action: "autocomplete:index", key: user.cache_key, limited: true)
+
+        get_auth autocomplete_index_path(search: { query: "azur", type: "tag_query" }), user
+
+        assert_response 429
+      end
+
       should "work for XHR requests" do
         create(:tag, name: "azur_lane")
 

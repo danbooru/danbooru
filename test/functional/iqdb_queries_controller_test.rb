@@ -8,6 +8,24 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "show action" do
+      should "be rate limited" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        create(:rate_limit, action: "iqdb_queries:show", key: @user.cache_key, limited: true)
+
+        get_auth iqdb_queries_path, @user, params: { post_id: @post.id }
+
+        assert_response 429
+      end
+
+      should "rate limit the create action" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        create(:rate_limit, action: "iqdb_queries:create", key: @user.cache_key, limited: true)
+
+        post_auth iqdb_queries_path(format: :json), @user, params: { search: { post_id: @post.id }}
+
+        assert_response 429
+      end
+
       should "not allow anonymous users to search" do
         get iqdb_queries_path, params: { post_id: @post.id }
         assert_response 403
