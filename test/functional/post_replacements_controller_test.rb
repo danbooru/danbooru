@@ -138,6 +138,11 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       context "replacing a post with a danbooru media asset" do
         should "replace with the full size image" do
+          # XXX Stub the https://danbooru.donmai.us/media_assets/:id response.
+          image_url = "https://cdn.donmai.us/original/ec/ef/ecef68c44edb8a0d6a3070b5f8e8ee76.jpg"
+          Source::Extractor::Danbooru2.any_instance.stubs(:api_response).returns({ media_asset: { variants: [{ type: "original", url: image_url }] }})
+          Source::Extractor::Danbooru2.any_instance.stubs(:download_file!).with(image_url).returns(MediaFile.open("test/files/jpg/test.jpg"))
+
           @post = create(:post)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
@@ -149,23 +154,24 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
           assert_redirected_to @post
           assert_equal("Post replaced", flash[:notice])
+          assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @post.reload.md5)
           # XXX: this should really change the source to the media_asset instead.
-          assert_equal("https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.replacements.last.replacement_url)
-          assert_equal("https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.reload.source)
+          assert_equal(image_url, @post.replacements.last.replacement_url)
+          assert_equal(image_url, @post.source)
         end
       end
 
       context "replacing a post containing notes" do
         should "rescale the notes" do
           as(create(:user)) do
-            @post = create(:post, image_width: 918, image_height: 1300)
+            @post = create(:post, image_width: 1000, image_height: 670)
             @note = @post.notes.create!(x: 80, y: 82, width: 80, height: 82, body: "test", created_at: 1.day.ago)
           end
 
           post_auth post_replacements_path, create(:moderator_user), params: {
             post_id: @post.id,
             post_replacement: {
-              replacement_url: "https://danbooru.donmai.us/media_assets/1",
+              replacement_file: Rack::Test::UploadedFile.new("test/files/jpg/test.jpg"),
             },
           }
 

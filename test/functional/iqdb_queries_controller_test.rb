@@ -27,28 +27,30 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         should "use the URL as-is for an image URL" do
           mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
 
-          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "https://cdn.donmai.us/720x720/f2/f4/f2f4c401ebe3e181fbfe7da56b0b2220.webp" }
+          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4" }
 
           assert_response :success
           assert_select("#post_#{@post.id}")
         end
 
-        should "download the image for a non-image URL" do
-          mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
+        context "for a page URL that has a single image" do
+          should "download the image from the page" do
+            mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
 
-          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "https://danbooru.donmai.us/posts/7000000" }
+            get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g" }
 
-          assert_response :success
-          assert_select("#post_#{@post.id}")
-        end
+            assert_response :success
+            assert_select("#post_#{@post.id}")
+          end
 
-        should "download the image for a non-image URL without a scheme" do
-          mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
+          should "download the image from the page for a URL without a scheme" do
+            mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
 
-          get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "danbooru.donmai.us/posts/7000000" }
+            get_auth iqdb_queries_path, @user, as: :javascript, params: { url: "bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g" }
 
-          assert_response :success
-          assert_select("#post_#{@post.id}")
+            assert_response :success
+            assert_select("#post_#{@post.id}")
+          end
         end
 
         should "return an error if the url has multiple images" do
