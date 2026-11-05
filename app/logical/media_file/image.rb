@@ -5,8 +5,6 @@
 # @see https://github.com/libvips/ruby-vips
 # @see https://libvips.github.io/libvips/API/current
 class MediaFile::Image < MediaFile
-  delegate :thumbnail_image, to: :image
-
   def close
     super
     @preview_frame&.close unless @preview_frame == self
@@ -37,7 +35,8 @@ class MediaFile::Image < MediaFile
   end
 
   def error
-    image = open_image(fail: true)
+    # Don't rotate the image, because the orientation doesn't matter for checking if it's corrupt.
+    image = open_image(fail: true, rotate: false)
     stats = image.stats
     stats.release
     image.release
@@ -166,6 +165,16 @@ class MediaFile::Image < MediaFile
     MediaFile::Image.new(output_file)
   end
 
+  # Resize the image to fit within the given width and height.
+  # PNGs are resized first and then rotated after, which takes a lot less memory.
+  def thumbnail_image(width, height:, **options)
+    if file_ext == :png
+      open_png(rotate: false).thumbnail_image(width, height:, **options)
+    else
+      image.thumbnail_image(width, height:, **options)
+    end
+  end
+
   def preview!(max_width, max_height, **options)
     w, h = MediaFile.scale_dimensions(width, height, max_width, max_height)
     MediaFile::Image.new(preview_frame.file).resize!(w, h, **options)
@@ -241,13 +250,14 @@ class MediaFile::Image < MediaFile
     @image ||= open_image(fail: false)
   end
 
-  def open_image(**options)
+  # @param rotate [Boolean] If true, rotate PNGs that have an EXIF orientation flag. This loads the full image into memory.
+  def open_image(rotate: true, **options)
     case file_ext
     when :jpg
       Vips::Image.new_from_file(file.path, access: :sequential, autorotate: true, **options)
     when :png
       # pngload cannot rotate the image during load, so we do it after.
-      open_png(**options)
+      open_png(rotate:, **options)
     else
       # Browser support for WebP/AVIF is not widespread, and vips cannot read some of these flags, so we don't support it either.
       Vips::Image.new_from_file(file.path, access: :sequential, **options)
@@ -262,11 +272,11 @@ class MediaFile::Image < MediaFile
   #
   # Note that only rotation specified before the IDAT chunk (actual image data) is considered valid.
   # Other types of rotation metadata are ignored by most browsers, so we ignore them too.
-  def open_png(**options)
+  def open_png(rotate: true, **options)
     image = Vips::Image.new_from_file(file.path, access: :sequential, **options)
     orientation = image.get("orientation") if image.get_typeof("orientation") != 0
 
-    if orientation.present? && orientation != 1
+    if rotate && orientation.present? && orientation != 1
       image.release
       image = Vips::Image.new_from_file(file.path, **options)
       image = image.autorot
