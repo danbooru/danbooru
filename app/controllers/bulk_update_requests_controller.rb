@@ -31,20 +31,33 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def update
-    @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
-    @bulk_update_request.update(permitted_attributes(@bulk_update_request))
+    # Lock the BUR so it can't be approved and edited at the same time, or approved twice.
+    @bulk_update_request = BulkUpdateRequest.find(params[:id])
+    @bulk_update_request.with_lock do
+      authorize @bulk_update_request
+      @bulk_update_request.update(permitted_attributes(@bulk_update_request))
+    end
+
     respond_with(@bulk_update_request, notice: "BUR ##{@bulk_update_request.id} updated")
   end
 
   def approve
-    @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
-    @bulk_update_request.approve!(CurrentUser.user)
+    @bulk_update_request = BulkUpdateRequest.find(params[:id])
+    @bulk_update_request.with_lock do
+      authorize @bulk_update_request
+      @bulk_update_request.approve!(CurrentUser.user)
+    end
+
     respond_with(@bulk_update_request, notice: "BUR ##{@bulk_update_request.id} approved")
   end
 
   def destroy
-    @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
-    @bulk_update_request.reject!(CurrentUser.user)
+    @bulk_update_request = BulkUpdateRequest.find(params[:id])
+    @bulk_update_request.with_lock do
+      authorize @bulk_update_request
+      @bulk_update_request.reject!(CurrentUser.user)
+    end
+
     respond_with(@bulk_update_request, notice: "BUR ##{@bulk_update_request.id} rejected")
   end
 end

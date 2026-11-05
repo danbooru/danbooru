@@ -88,6 +88,16 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("rejected", @bulk_update_request.reload.status)
       end
 
+      should "not allow users to update their own request if it's approved while updating it" do
+        stale_bur = BulkUpdateRequest.find(@bulk_update_request.id)
+        @bulk_update_request.update!(status: "processing", approver: @admin)
+        BulkUpdateRequest.stubs(:find).with(@bulk_update_request.id.to_s).returns(stale_bur)
+
+        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: { bulk_update_request: { script: "create alias zzz -> 222" }}
+        assert_response 403
+        assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
+      end
+
       should "fail for an invalid script" do
         put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: { bulk_update_request: { script: "create alis gray -> grey" }}
         assert_response :success
@@ -207,6 +217,26 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, TagAlias.exists?(antecedent_name: "test1", consequent_name: "test2"))
+        end
+
+        should "fail if the script is changed to a disallowed script while approving the BUR" do
+          create(:tag, name: "artist1a", category: Tag.categories.artist, post_count: 10)
+          create(:tag, name: "artist1b", category: Tag.categories.general, post_count: 0)
+          create(:tag, name: "artist1c", category: Tag.categories.artist, post_count: 101)
+          create(:tag, name: "artist1d", category: Tag.categories.general, post_count: 300)
+          @bulk_update_request = create(:bulk_update_request, script: "rename artist1a -> artist1b")
+
+          stale_bur = BulkUpdateRequest.find(@bulk_update_request.id)
+          @bulk_update_request.update!(script: "create alias artist1c -> artist1d")
+          BulkUpdateRequest.stubs(:find).with(@bulk_update_request.id.to_s).returns(stale_bur)
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
+          end
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "artist1c", consequent_name: "artist1d"))
         end
 
         should "fail when moving a non-artist tag" do
@@ -446,6 +476,17 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("processing", @bulk_update_request.reload.status)
           perform_enqueued_jobs
           assert_equal("approved", @bulk_update_request.reload.status)
+        end
+
+        should "fail if the BUR is approved by someone else at the same time" do
+          stale_bur = BulkUpdateRequest.find(@bulk_update_request.id)
+          @bulk_update_request.update!(status: "processing", approver: @mod)
+          BulkUpdateRequest.stubs(:find).with(@bulk_update_request.id.to_s).returns(stale_bur)
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @admin
+
+          assert_response 403
+          assert_equal(@mod, @bulk_update_request.reload.approver)
         end
       end
     end
