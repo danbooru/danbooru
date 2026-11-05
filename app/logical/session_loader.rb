@@ -207,7 +207,11 @@ class SessionLoader
   # Sets the current API user based on either the `login` + `api_key` URL params,
   # or HTTP Basic Auth.
   def load_session_for_api
-    if request.authorization
+    # Don't allow API keys in HTML requests. Otherwise an attacker could send someone a link that logs them in as the
+    # attacker, and turn self-XSS in the attacker's own account into XSS against the victim.
+    if !request.format.symbol.in?([:json, :xml, :atom])
+      raise AuthenticationFailure, "API keys can only be used in JSON, XML, or Atom requests"
+    elsif request.authorization
       authenticate_basic_auth
     elsif params[:login].present? && params[:api_key].present?
       authenticate_api_key(params[:login], params[:api_key])

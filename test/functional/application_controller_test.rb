@@ -157,9 +157,10 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       context "using http basic auth" do
         should "succeed for api key matches" do
           basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
-          get edit_user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }
+          get profile_path, as: :json, headers: { HTTP_AUTHORIZATION: basic_auth_string }
 
           assert_response :success
+          assert_equal(@user.id, response.parsed_body["id"])
           assert_equal(1, @api_key.reload.uses)
           assert_not_nil(@api_key.reload.last_used_at)
         end
@@ -167,11 +168,20 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         should "succeed when the user has multiple api keys" do
           @api_key2 = create(:api_key, user: @user)
           basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key2.key}")}"
-          get edit_user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }
+          get profile_path, as: :json, headers: { HTTP_AUTHORIZATION: basic_auth_string }
 
           assert_response :success
+          assert_equal(@user.id, response.parsed_body["id"])
           assert_equal(1, @api_key2.reload.uses)
           assert_not_nil(@api_key2.reload.last_used_at)
+        end
+
+        should "fail for HTML requests" do
+          basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
+          get edit_user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }
+
+          assert_response 401
+          assert_equal(0, @api_key.reload.uses)
         end
 
         should "fail for api key mismatches" do
@@ -199,20 +209,32 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
       context "using the api_key parameter" do
         should "succeed for api key matches" do
-          get edit_user_path(@user), params: { login: @user.name, api_key: @api_key.key }
+          get profile_path(login: @user.name, api_key: @api_key.key), as: :json
 
           assert_response :success
+          assert_equal(@user.id, response.parsed_body["id"])
           assert_equal(1, @api_key.reload.uses)
           assert_not_nil(@api_key.reload.last_used_at)
         end
 
         should "succeed when the user has multiple api keys" do
           @api_key2 = create(:api_key, user: @user)
-          get edit_user_path(@user), params: { login: @user.name, api_key: @api_key2.key }
+          get profile_path(login: @user.name, api_key: @api_key2.key), as: :json
 
           assert_response :success
+          assert_equal(@user.id, response.parsed_body["id"])
           assert_equal(1, @api_key2.reload.uses)
           assert_not_nil(@api_key2.reload.last_used_at)
+        end
+
+        should "fail for HTML requests" do
+          get edit_user_path(@user), params: { login: @user.name, api_key: @api_key.key }
+          assert_response 401
+
+          get edit_user_path(@user, format: :js), params: { login: @user.name, api_key: @api_key.key }
+          assert_response 401
+
+          assert_equal(0, @api_key.reload.uses)
         end
 
         should "fail for api key mismatches" do
@@ -236,7 +258,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
         should "fail for a deleted user" do
           @user.update!(is_deleted: true)
-          get edit_user_path(@user), params: { login: @user.name, api_key: @api_key.key }
+          get profile_path(login: @user.name, api_key: @api_key.key), as: :json
 
           assert_response 401
         end
@@ -254,27 +276,27 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           @api_key = create(:api_key, permitted_ip_addresses: ["1.2.3.4", "2.0.0.1/24", "2600::1/64"])
 
           ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("1.2.3.4")
-          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response :success
 
           ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2.0.0.42")
-          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response :success
 
           ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2600::1234:0:0:1")
-          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response :success
 
           ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("127.0.0.2")
-          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response 403
 
           ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2.0.1.0")
-          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response 403
 
           ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2600:dead:beef::1")
-          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response 403
 
           assert_equal(6, @api_key.reload.uses)
@@ -286,16 +308,16 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           @post = create(:post)
           @api_key = create(:api_key, permissions: ["posts:index", "posts:show"])
 
-          get posts_path(login: @api_key.user.name, api_key: @api_key.key)
+          get posts_path(login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response :success
 
-          get post_path(@post, login: @api_key.user.name, api_key: @api_key.key)
+          get post_path(@post, login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response :success
 
-          get tags_path(login: @api_key.user.name, api_key: @api_key.key)
+          get tags_path(login: @api_key.user.name, api_key: @api_key.key), as: :json
           assert_response 403
 
-          put post_path(@post, login: @api_key.user.name, api_key: @api_key.key), params: { post: { rating: "s" }}
+          put post_path(@post, login: @api_key.user.name, api_key: @api_key.key), params: { post: { rating: "s" }}, as: :json
           assert_response 403
 
           assert_equal(4, @api_key.reload.uses)
