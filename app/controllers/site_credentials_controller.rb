@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class SiteCredentialsController < ApplicationController
+  before_action :requires_reauthentication
   respond_to :html, :xml, :json, :js
 
   def index

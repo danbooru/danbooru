@@ -70,6 +70,22 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "redirect to the confirm password page if the user hasn't recently authenticated" do
+        login_as(@admin)
+        travel_to 2.hours.from_now do
+          get site_credentials_path
+        end
+
+        assert_redirected_to confirm_password_session_path(url: site_credentials_path)
+      end
+
+      should "not be viewable with an API key" do
+        api_key = create(:api_key, user: @admin)
+        get site_credentials_path(login: @admin.name, api_key: api_key.key), as: :json
+
+        assert_redirected_to confirm_password_session_path(url: site_credentials_path(login: @admin.name, api_key: api_key.key))
+      end
+
       should "not be viewable by non-admins" do
         get_auth site_credentials_path, @member
         assert_response 403
@@ -90,6 +106,16 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
         get_auth site_credential_path(@site_credential), @admin
 
         assert_redirected_to site_credentials_path(search: { id: @site_credential.id })
+      end
+
+      should "redirect to the confirm password page if the user hasn't recently authenticated" do
+        @site_credential = create(:site_credential)
+        login_as(@admin)
+        travel_to 2.hours.from_now do
+          get site_credential_path(@site_credential, format: :json)
+        end
+
+        assert_redirected_to confirm_password_session_path(url: site_credential_path(@site_credential, format: :json))
       end
 
       should "not be viewable by non-admins" do
