@@ -512,6 +512,43 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(other_user.id, session[:user_id])
         end
 
+        should "not trust a session the user logged in from before when it's on a new IP" do
+          login(@user.name, "password", "10.9.0.1")
+          delete session_path
+          10.times { |n| open_session.post session_path, params: { session: { name: @user.name, password: "wrong" }}, headers: { REMOTE_ADDR: "10.0.#{n}.1" } }
+
+          post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "10.1.0.1" }
+          assert_response 429
+        end
+
+        context "from an IP the user has logged in from before" do
+          setup do
+            login(@user.name, "password", "10.9.0.1")
+            10.times { |n| login(@user.name, "wrong", "10.0.#{n}.1") }
+          end
+
+          should "not be blocked by attempts from other IPs" do
+            login(@user.name, "password", "10.9.0.1")
+            assert_redirected_to root_path
+            assert_equal(@user.id, session[:user_id])
+          end
+
+          should "be blocked if the IP is a proxy" do
+            Danbooru::IpAddress.any_instance.stubs(:is_proxy?).returns(true)
+
+            login(@user.name, "password", "10.9.0.1")
+            assert_response 429
+          end
+        end
+
+        should "not trust an IP that only had failed logins" do
+          login(@user.name, "wrong", "10.9.0.1")
+          10.times { |n| login(@user.name, "wrong", "10.0.#{n}.1") }
+
+          login(@user.name, "password", "10.9.0.1")
+          assert_response 429
+        end
+
         should "rate limit logins to nonexistent accounts the same way" do
           10.times do |n|
             login("nobody", "wrong", "10.0.#{n}.1")
