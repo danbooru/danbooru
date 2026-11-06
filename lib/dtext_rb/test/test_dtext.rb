@@ -950,7 +950,13 @@ class DTextTest < Minitest::Test
     assert_inline_parse(CGI.escapeHTML('[](test)'), '[](test)')
   end
 
+  def test_many_unclosed_markdown_links
+    assert_fast_parse("[a](/a" * 30_000)
+    assert_fast_parse("[a](http://a" * 20_000)
+  end
+
   def test_markdown_links
+    assert_inline_parse('[a](/a<a class="dtext-link" href="/b">c</a>', "[a](/a[c](/b)")
     assert_inline_parse('[a <a class="dtext-link" href="/posts">c</a>', "[a [c](/posts)")
     assert_inline_parse('[[a <a class="dtext-link" href="/posts">c</a>', "[[a [c](/posts)")
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', "[test](http://example.com)")
