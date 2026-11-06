@@ -254,13 +254,16 @@ class SessionLoader
     user = User.find_by_id(session[:user_id])
     return if user.nil?
 
+    login_session = user.login_sessions.active.find_by(login_id: session[:login_id])
+
     # The login session was already ended by a logout or a password change, so just remove it from the cookie.
-    if !user.login_sessions.active.exists?(login_id: session[:login_id])
+    if login_session.nil?
       cleanup_cookies
     elsif user.is_deleted?
       logout(user)
     else
       CurrentUser.user = user
+      login_session.update!(last_seen_at: Time.zone.now) if !login_session.last_seen_at&.after?(1.hour.ago)
     end
   end
 

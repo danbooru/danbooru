@@ -33,6 +33,31 @@ class SessionLoaderTest < ActiveSupport::TestCase
         assert_equal(true, CurrentUser.user.is_anonymous?)
         assert_nil(@request.session[:user_id])
       end
+
+      context "for a login session" do
+        setup do
+          freeze_time
+          @user = create(:user)
+        end
+
+        should "update when the session was last seen" do
+          login_session = create(:login_session, user: @user, last_seen_at: 2.hours.ago)
+          @request.stubs(:session).returns({ user_id: @user.id, login_id: login_session.login_id })
+          SessionLoader.new(@request).load
+
+          assert_equal(@user, CurrentUser.user)
+          assert_equal(Time.zone.now, login_session.reload.last_seen_at)
+        end
+
+        should "not update when the session was last seen less than an hour ago" do
+          login_session = create(:login_session, user: @user, last_seen_at: 30.minutes.ago)
+          @request.stubs(:session).returns({ user_id: @user.id, login_id: login_session.login_id })
+          SessionLoader.new(@request).load
+
+          assert_equal(@user, CurrentUser.user)
+          assert_equal(30.minutes.ago, login_session.reload.last_seen_at)
+        end
+      end
     end
 
     context ".safe_mode?" do
