@@ -53,6 +53,24 @@ class MediaFile::Image < MediaFile
     "libvips error"
   end
 
+  # Interlaced PNGs and PNGs with an orientation flag can't be decoded as a stream, so the whole image is decoded in
+  # memory. This only reads the header, so it's safe to call before validating the file.
+  def full_decode_size
+    return 0 if file_ext != :png
+
+    png = open_png(rotate: false)
+    interlaced = png.get_typeof("interlaced") != 0 && png.get("interlaced") != 0
+    rotated = png.get_typeof("orientation") != 0 && png.get("orientation") != 1
+    return 0 unless interlaced || rotated
+
+    bytes_per_band = (png.format == :ushort) ? 2 : 1
+    png.width * png.height * png.bands * bytes_per_band
+  rescue Vips::Error
+    0
+  ensure
+    png&.release
+  end
+
   def metadata
     super.merge({ "Vips:Error" => error }.compact_blank)
   end

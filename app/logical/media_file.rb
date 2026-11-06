@@ -129,6 +129,11 @@ class MediaFile
     md5
   end
 
+  # @return [Integer] The number of bytes needed to decode the whole file in memory, or 0 if it can be decoded as a stream.
+  def full_decode_size
+    0
+  end
+
   # @return [Symbol] the detected file extension
   def file_ext
     MediaFile.file_ext(file)

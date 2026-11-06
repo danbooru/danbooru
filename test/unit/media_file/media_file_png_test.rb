@@ -9,6 +9,8 @@ class MediaFilePngTest < ActiveSupport::TestCase
         "test/files/png/empty.png" => nil,
         "test/files/png/jpg.png" => [16, 16, "3e965ef667d55e36e999828781cae4dd"],
         "test/files/png/test-corrupt.png" => nil,
+        "test/files/png/test-interlaced-16bit.png" => [64, 32, "ee7c665158dd66584c9dadf1ca910f00"],
+        "test/files/png/test-interlaced.png" => [64, 32, "ee7c665158dd66584c9dadf1ca910f00"],
         "test/files/png/test-rotation-bad-chunk.png" => [128, 96, "f0c3b707b69c92c5f27bf0b4f8100aad"],
         "test/files/png/test-rotation-good-chunk.png" => [64, 128, "8aea457981c3bac825b50cf64b787398"],
         "test/files/png/test.png" => [113, 150, "1601c102d365a1de190daec46301aeeb"],
@@ -225,6 +227,72 @@ class MediaFilePngTest < ActiveSupport::TestCase
     end
   end
 
+  context "an interlaced PNG" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/png/test-interlaced.png")
+
+      assert_equal(64, file.width)
+      assert_equal(32, file.height)
+      assert_equal(142, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("aac7c156e64d03bc7476c3a601d9b7ad", file.md5)
+      assert_equal("ee7c665158dd66584c9dadf1ca910f00", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(1, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "PNG",
+        "PNG:ImageWidth" => 64,
+        "PNG:ImageHeight" => 32,
+        "PNG:BitDepth" => 8,
+        "PNG:ColorType" => "RGB",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Adam7 Interlace",
+        "PNG-pHYs:PixelsPerUnitX" => 2834,
+        "PNG-pHYs:PixelsPerUnitY" => 2834,
+        "PNG-pHYs:PixelUnits" => "meters",
+      }, file.metadata.to_h)
+    end
+  end
+
+  context "an interlaced 16-bit PNG" do
+    should "be parsed correctly" do
+      file = MediaFile.open("test/files/png/test-interlaced-16bit.png")
+
+      assert_equal(64, file.width)
+      assert_equal(32, file.height)
+      assert_equal(179, file.file_size)
+      assert_equal(:png, file.file_ext)
+      assert_equal("image/png", file.mime_type)
+      assert_equal("6f3284ae6e2a5db799e30de446bc47da", file.md5)
+      assert_equal("ee7c665158dd66584c9dadf1ca910f00", file.pixel_hash)
+      assert_equal(false, file.is_corrupt?)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_animated?)
+      assert_nil(file.duration)
+      assert_equal(1, file.frame_count)
+      assert_nil(file.frame_rate)
+      assert_equal({
+        "File:FileType" => "PNG",
+        "PNG:ImageWidth" => 64,
+        "PNG:ImageHeight" => 32,
+        "PNG:BitDepth" => 16,
+        "PNG:ColorType" => "RGB",
+        "PNG:Compression" => "Deflate/Inflate",
+        "PNG:Filter" => "Adaptive",
+        "PNG:Interlace" => "Adam7 Interlace",
+        "PNG-pHYs:PixelsPerUnitX" => 2834,
+        "PNG-pHYs:PixelsPerUnitY" => 2834,
+        "PNG-pHYs:PixelUnits" => "meters",
+      }, file.metadata.to_h)
+    end
+  end
+
   context "an empty file with a .png extension" do
     should "be parsed correctly" do
       file = MediaFile.open("test/files/png/empty.png")
@@ -340,6 +408,22 @@ class MediaFilePngTest < ActiveSupport::TestCase
         "PNG-pHYs:PixelsPerUnitY" => 11_811,
         "PNG-pHYs:PixelUnits" => "meters",
       }, file.metadata.to_h)
+    end
+  end
+  context "#full_decode_size" do
+    should "be 0 for PNGs that can be decoded as a stream" do
+      assert_equal(0, MediaFile.open("test/files/png/test.png").full_decode_size)
+      assert_equal(0, MediaFile.open("test/files/png/test-rotation-bad-chunk.png").full_decode_size)
+      assert_equal(0, MediaFile.open("test/files/jpg/test-rotation-90cw.jpg").full_decode_size)
+    end
+
+    should "be the size of the decoded image for rotated PNGs" do
+      assert_equal(128 * 64 * 3, MediaFile.open("test/files/png/test-rotation-good-chunk.png").full_decode_size)
+    end
+
+    should "be the size of the decoded image for interlaced PNGs" do
+      assert_equal(64 * 32 * 3, MediaFile.open("test/files/png/test-interlaced.png").full_decode_size)
+      assert_equal(64 * 32 * 3 * 2, MediaFile.open("test/files/png/test-interlaced-16bit.png").full_decode_size)
     end
   end
 end

@@ -12,6 +12,9 @@ class MediaAsset < ApplicationRecord
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
+
+  # The max memory for images that can't be decoded as a stream (see `MediaFile::Image#full_decode_size`).
+  MAX_FULL_DECODE_SIZE = 200.megabytes
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
 
   attribute :id
@@ -362,6 +365,8 @@ class MediaAsset < ApplicationRecord
           raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
         elsif media_file.height.to_i > MAX_IMAGE_HEIGHT
           raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
+        elsif media_file.full_decode_size > MAX_FULL_DECODE_SIZE
+          raise Error, "Image is too large to decode (size: #{media_file.full_decode_size.to_fs(:human_size)}; max size: #{MAX_FULL_DECODE_SIZE.to_fs(:human_size)})"
         elsif !media_file.is_supported?
           raise Error, "File type is not supported"
         elsif media_file.is_corrupt?

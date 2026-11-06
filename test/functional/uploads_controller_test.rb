@@ -204,6 +204,17 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a PNG that is too large to decode in memory" do
+        should "fail before decoding the image" do
+          MediaFile::Image.any_instance.stubs(:full_decode_size).returns(MediaAsset::MAX_FULL_DECODE_SIZE + 1)
+          MediaFile::Image.any_instance.expects(:is_corrupt?).never
+          MediaFile::Image.any_instance.expects(:pixel_hash).never
+
+          create_upload!("test/files/png/test-interlaced.png", user: @user)
+          assert_match("Image is too large to decode", Upload.last.error)
+        end
+      end
+
       context "for a video with too many frames" do
         should "fail before reading the frames" do
           FFmpeg.any_instance.stubs(:packet_count).returns(FFmpeg::MAX_PACKET_COUNT + 1)
