@@ -30,6 +30,8 @@ module DanbooruMaintenance
   end
 
   def queue(job)
+    return if ReadOnlyMode.enabled?
+
     Rails.logger.level = :info if !Rails.env.local?
     DanbooruLogger.info("Queueing #{job.name}")
     ApplicationRecord.connection.verify!
