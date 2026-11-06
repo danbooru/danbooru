@@ -3,6 +3,32 @@
 require "test_helper"
 
 class RangeParserTest < ActiveSupport::TestCase
+  context "RangeParser.parse with a list of items" do
+    should "allow up to MAX_ITEMS items" do
+      ids = (1..RangeParser::MAX_ITEMS).to_a
+
+      assert_equal([:in, ids], RangeParser.parse(ids.join(",")))
+      assert_equal([:in, ids], RangeParser.parse(ids.join(" ")))
+      assert_equal([:union, ids.map { [:gt, it] }], RangeParser.parse(ids.map { ">#{it}" }.join(",")))
+      assert_equal([:in, ids.map(&:to_s)], RangeParser.parse(ids.join(","), :enum))
+      assert_equal([:in, ids], RangeParser.parse(",#{ids.join(",")},"))
+    end
+
+    should "ignore empty items" do
+      assert_equal([:in, [1, 2]], RangeParser.parse("1,2,"))
+      assert_equal([:in, [1, 2]], RangeParser.parse(",1,,2"))
+      assert_equal([:in, [1, 2]], RangeParser.parse("1, 2"))
+    end
+
+    should "raise ParseError when there are more than `max_items` items" do
+      assert_equal([:in, [1, 2]], RangeParser.parse("1,2", max_items: 2))
+      assert_equal([:union, [[:gt, 1], [:lt, 2]]], RangeParser.parse(">1,<2", max_items: 2))
+      assert_raises(RangeParser::ParseError) { RangeParser.parse("1,2,3", max_items: 2) }
+      assert_raises(RangeParser::ParseError) { RangeParser.parse(">1,<2,3", max_items: 2) }
+      assert_raises(RangeParser::ParseError) { RangeParser.parse("a,b,c", :enum, max_items: 2) }
+    end
+  end
+
   context "RangeParser.parse with type :duration" do
     should "parse instants with 5% tolerance" do
       assert_equal([:between, (57.0..63.0)], RangeParser.parse("1min", :duration))

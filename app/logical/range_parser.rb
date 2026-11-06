@@ -22,7 +22,10 @@
 class RangeParser
   class ParseError < StandardError; end
 
-  attr_reader :string, :type
+  # The maximum number of items in a list (e.g. `1,2,3` or `>5,<3`).
+  MAX_ITEMS = 1_000
+
+  attr_reader :string, :type, :max_items
 
   def self.parse(...)
     new(...).parse
@@ -30,9 +33,11 @@ class RangeParser
 
   # @param string [String] The expression to parse
   # @param type [Symbol] The type of the expression (:enum, :integer, :float, :md5, :date, :datetime, :age, :interval, :ratio, or :filesize)
-  def initialize(string, type = :integer)
+  # @param max_items [Integer] The maximum number of items in a list
+  def initialize(string, type = :integer, max_items: MAX_ITEMS)
     @string = string.to_s
     @type = type
+    @max_items = max_items
   end
 
   # Parse a string expression into an operator and value.
@@ -40,11 +45,11 @@ class RangeParser
   def parse
     range = case string
     in _ if type == :enum
-      [:in, string.split(/[, ]+/).map { |x| parse_value(x) }]
+      [:in, items.map { |x| parse_value(x) }]
     in /[, ]/ if string.match?(/<|>|\.\./) # >A,<B,C..D
-      [:union, string.split(/[, ]+/).map { |x| RangeParser.parse(x, type) }]
+      [:union, items.map { |x| RangeParser.parse(x, type) }]
     in /[, ]/ # A,B,C
-      [:in, string.split(/[, ]+/).map { |x| parse_value(x) }]
+      [:in, items.map { |x| parse_value(x) }]
     in /\A(.+?)\.\.\.(.+)/ # A...B
       lo, hi = [parse_value($1), parse_value($2)].sort
       [:between, (lo...hi)]
@@ -78,6 +83,12 @@ class RangeParser
 
     range = reverse_range(range) if type == :age
     range
+  end
+
+  def items
+    items = string.split(/[, ]+/, max_items + 2).compact_blank
+    raise ParseError, "too many items (max: #{max_items})" if items.size > max_items
+    items
   end
 
   def reverse_range(range)
