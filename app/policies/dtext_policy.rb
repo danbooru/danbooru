@@ -2,7 +2,7 @@
 
 class DtextPolicy < ApplicationPolicy
   def create?
-    true
+    !user.is_anonymous?
   end
 
   def rate_limit_for_create(**_options)

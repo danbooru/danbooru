@@ -3,17 +3,26 @@ require "test_helper"
 class DtextPreviewsControllerTest < ActionDispatch::IntegrationTest
   context "The dtext previews controller" do
     context "create action" do
+      setup do
+        @user = create(:user)
+      end
+
       should "render" do
-        post dtext_preview_path, params: { body: "h1. Touhou\n\n* [[touhou]]" }
+        post_auth dtext_preview_path, @user, params: { body: "h1. Touhou\n\n* [[touhou]]" }
         assert_response :success
       end
 
       should "reject an overlong body" do
-        post dtext_preview_path, params: { body: "a" * ForumPost::MAX_BODY_LENGTH }
+        post_auth dtext_preview_path, @user, params: { body: "a" * ForumPost::MAX_BODY_LENGTH }
         assert_response :success
 
-        post dtext_preview_path, params: { body: "a" * (ForumPost::MAX_BODY_LENGTH + 1) }
+        post_auth dtext_preview_path, @user, params: { body: "a" * (ForumPost::MAX_BODY_LENGTH + 1) }
         assert_response 422
+      end
+
+      should "not allow anonymous users" do
+        post dtext_preview_path, params: { body: "test" }
+        assert_response 403
       end
 
       should "be rate limited" do
