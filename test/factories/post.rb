@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :post do
-    md5 { SecureRandom.hex(32) }
+    md5 { SecureRandom.hex(16) }
     uploader
     tag_string { "tag1 tag2" }
     tag_count { 2 }

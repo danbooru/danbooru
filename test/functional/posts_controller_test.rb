@@ -450,6 +450,54 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "searching for the md5 of a post the user can't see" do
+        setup do
+          @hidden_post = create(:post, is_banned: true)
+        end
+
+        should "not allow range searches on the md5: and pixelhash: metatags by non-moderators" do
+          %w[md5 pixelhash].each do |metatag|
+            get posts_path(tags: "id:#{@hidden_post.id} #{metatag}:>=#{"0" * 32}"), as: :json
+            assert_equal([], response.parsed_body.pluck("id"), metatag)
+
+            get posts_path(tags: "id:#{@hidden_post.id} #{metatag}:#{"0" * 32}..#{"f" * 32}"), as: :json
+            assert_equal([], response.parsed_body.pluck("id"), metatag)
+          end
+        end
+
+        should "allow range searches on the md5: metatag by moderators" do
+          get_auth posts_path(tags: "id:#{@hidden_post.id} md5:>=#{"0" * 32}"), create(:moderator_user), as: :json
+          assert_equal([@hidden_post.id], response.parsed_body.pluck("id"))
+        end
+
+        should "allow exact searches on the md5: metatag by non-moderators" do
+          get posts_path(tags: "id:#{@hidden_post.id} md5:#{@hidden_post.md5}"), as: :json
+          assert_equal([@hidden_post.id], response.parsed_body.pluck("id"))
+        end
+
+        should "not allow partial md5 searches through nested searches by non-moderators" do
+          %w[like ilike regex not_like not_ilike not_regex].each do |op|
+            right, wrong = [@hidden_post.md5.first(4), "!!!!"].map { |prefix| op.end_with?("regex") ? "^#{prefix}" : "#{prefix}*" }
+
+            get users_path(search: { posts: { id: @hidden_post.id, "md5_#{op}": right }}), as: :json
+            right_ids = response.parsed_body.pluck("id")
+            get users_path(search: { posts: { id: @hidden_post.id, "md5_#{op}": wrong }}), as: :json
+
+            assert_equal(right_ids, response.parsed_body.pluck("id"), op)
+          end
+        end
+
+        should "allow exact md5 searches through nested searches by non-moderators" do
+          get users_path(search: { posts: { md5: @hidden_post.md5 }}), as: :json
+          assert_equal([@hidden_post.uploader_id], response.parsed_body.pluck("id"))
+        end
+
+        should "allow partial md5 searches through nested searches by moderators" do
+          get_auth users_path(search: { posts: { md5_like: "#{@hidden_post.md5.first(4)}*" }}), create(:moderator_user), as: :json
+          assert_equal([@hidden_post.uploader_id], response.parsed_body.pluck("id"))
+        end
+      end
+
       context "with a random search" do
         should "render" do
           get posts_path, params: { tags: "order:random" }

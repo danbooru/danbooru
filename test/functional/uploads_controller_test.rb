@@ -66,6 +66,16 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should uploads.search_params(status: "completed").with { @upload }
         should uploads.search_params(media_assets: { file_size: 1_000_000 }).with { @upload }
         should uploads.search_params(media_assets: { md5: "blah" }).with { [] }
+
+        should "not allow md5 range searches in ai_tags_match by non-moderators" do
+          get_auth uploads_path(search: { ai_tags_match: "md5:>=#{"0" * 32}" }), @user, as: :json
+          assert_equal([], response.parsed_body.pluck("id"))
+        end
+
+        should "allow md5 range searches in ai_tags_match by moderators" do
+          get_auth uploads_path(search: { ai_tags_match: "md5:>=#{"0" * 32}" }), create(:moderator_user), as: :json
+          assert_equal([@upload.id], response.parsed_body.pluck("id"))
+        end
       end
     end
 

@@ -43,6 +43,20 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal([@hidden_asset.id], response.parsed_body.pluck("id"))
         end
+
+        should "not allow range searches in ai_tags_match by non-moderators" do
+          %w[md5 pixelhash].each do |metatag|
+            get_auth media_assets_path(search: { id: @hidden_asset.id, ai_tags_match: "#{metatag}:>=#{"0" * 32}" }), @user, as: :json
+
+            assert_equal([], response.parsed_body.pluck("id"), metatag)
+          end
+        end
+
+        should "allow range searches in ai_tags_match by moderators" do
+          get_auth media_assets_path(search: { id: @hidden_asset.id, ai_tags_match: "md5:>=#{"0" * 32}" }), create(:moderator_user), as: :json
+
+          assert_equal([@hidden_asset.id], response.parsed_body.pluck("id"))
+        end
       end
 
       context "the limit param" do

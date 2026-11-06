@@ -2,7 +2,7 @@ require "test_helper"
 
 class MediaAssetTest < ActiveSupport::TestCase
   def assert_tag_match(assets, query)
-    assert_equal(assets.map(&:id), MediaAsset.ai_tags_match(query).order(id: :desc).pluck("id"))
+    assert_equal(assets.map(&:id), MediaAsset.ai_tags_match(query, current_user: User.anonymous).order(id: :desc).pluck("id"))
   end
 
   context "MediaAsset" do

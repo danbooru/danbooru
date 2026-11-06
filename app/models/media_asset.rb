@@ -218,8 +218,8 @@ class MediaAsset < ApplicationRecord
 
   concerning :SearchMethods do
     class_methods do
-      def ai_tags_match(tag_string, score_range: (50..))
-        MediaAssetQuery.search(tag_string, relation: self, score_range: score_range)
+      def ai_tags_match(tag_string, current_user:, score_range: (50..))
+        MediaAssetQuery.search(tag_string, relation: self, score_range: score_range, current_user: current_user)
       end
 
       def is_matches(value)
@@ -261,7 +261,7 @@ class MediaAsset < ApplicationRecord
 
         if params[:ai_tags_match].present?
           min_score = params.fetch(:min_score, 50).to_i
-          q = q.ai_tags_match(params[:ai_tags_match], score_range: (min_score..))
+          q = q.ai_tags_match(params[:ai_tags_match], score_range: (min_score..), current_user: current_user)
         end
 
         if params[:is_posted].to_s.truthy?
@@ -595,7 +595,7 @@ class MediaAsset < ApplicationRecord
 
     # @param tags [String] The AI tag query.
     def ai_tags_match?(tags)
-      MediaAsset.where(id: id).ai_tags_match(tags).exists?
+      MediaAsset.where(id: id).ai_tags_match(tags, current_user: User.system).exists?
     end
   end
 

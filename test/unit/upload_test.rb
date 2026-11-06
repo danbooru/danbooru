@@ -2,7 +2,7 @@ require "test_helper"
 
 class UploadTest < ActiveSupport::TestCase
   def assert_tag_match(uploads, query)
-    assert_equal(uploads.map(&:id), Upload.ai_tags_match(query).order(id: :desc).pluck("id"))
+    assert_equal(uploads.map(&:id), Upload.ai_tags_match(query, current_user: User.anonymous).order(id: :desc).pluck("id"))
   end
 
   context "Upload" do
