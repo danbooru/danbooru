@@ -3,7 +3,7 @@
   "dependencies": {
     "@alpinejs/morph": "^3.17.5",
     "@alpinejs/persist": "^3.17.5",
-    "@babel/core": "^8.0.7",
+    "@babel/core": "^8.0.9",
     "@babel/preset-env": "^8.0.7",
     "@floating-ui/dom": "^1.8.0",
     "@fontsource/anton": "^5.3.0",
@@ -41,8 +41,8 @@
     "shakapacker": "^10.3.2",
     "terser-webpack-plugin": "^5.6.1",
     "tippy.js": "^6.3.7",
-    "webpack": "^5.112.0",
-    "webpack-assets-manifest": "^6.5.4",
+    "webpack": "^5.112.2",
+    "webpack-assets-manifest": "^6.5.5",
     "webpack-cli": "^7.2.3",
     "webpack-merge": "^6.0.1"
   },
