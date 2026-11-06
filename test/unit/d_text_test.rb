@@ -98,7 +98,52 @@ class DTextTest < ActiveSupport::TestCase
       end
     end
 
+    context ".preprocess" do
+      should "index the referenced records by name or id" do
+        tag = create(:tag, name: "bkub", category: Tag.categories.artist)
+        wiki_page = create(:wiki_page, title: "bkub")
+        artist = create(:artist, name: "bkub")
+        post = create(:post)
+        media_asset = create(:media_asset)
+        tag_alias = create(:tag_alias)
+        tag_implication = create(:tag_implication)
+        bur = create(:bulk_update_request)
+
+        references = DText.preprocess(["[[bkub]]\n\n!post ##{post.id}", "!asset ##{media_asset.id}\n\n[ta:#{tag_alias.id}]", "[ti:#{tag_implication.id}]\n\n[bur:#{bur.id}]"])
+
+        assert_equal({ "bkub" => tag }, references[:tags].slice("bkub"))
+        assert_equal({ "bkub" => wiki_page }, references[:wiki_pages].slice("bkub"))
+        assert_equal({ "bkub" => artist }, references[:artists])
+        assert_equal({ post.id => post }, references[:posts])
+        assert_equal({ media_asset.id => media_asset }, references[:media_assets])
+        assert_equal({ tag_alias.id => tag_alias }, references[:tag_aliases])
+        assert_equal({ tag_implication.id => tag_implication }, references[:tag_implications])
+        assert_equal({ bur.id => bur }, references[:bulk_update_requests])
+      end
+    end
+
     context "#format_text" do
+      should "render each message correctly when given references shared between messages" do
+        create(:tag, name: "bkub", category: Tag.categories.artist)
+        create(:artist, name: "bkub")
+        create(:tag, name: "cat", post_count: 42)
+        create(:wiki_page, title: "cat")
+        post = create(:post)
+        media_asset = create(:media_asset)
+        tag_alias = create(:tag_alias)
+
+        messages = ["[[bkub]]", "[[cat]] [[no tag]]", "!post ##{post.id}", "!asset ##{media_asset.id}", "[ta:#{tag_alias.id}]"]
+        references = DText.preprocess(messages)
+        html = messages.map { |message| DText.new(message, media_embeds: true).format_text(references:) }
+
+        assert_equal(messages.map { |message| format_text(message, media_embeds: true) }, html)
+        assert_match(%r{href="/artists/show_or_new\?name=bkub"}, html[0])
+        assert_match(/tag-type-0.*dtext-tag-does-not-exist/, html[1])
+        assert_match(/<img src=/, html[2])
+        assert_match(/<img src=/, html[3])
+        assert_match(/alias ##{tag_alias.id}/, html[4])
+      end
+
       should "add tag types to wiki links" do
         create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
         assert_match(/tag-type-#{Tag.categories.artist}/, format_text("[[bkub]]"))
