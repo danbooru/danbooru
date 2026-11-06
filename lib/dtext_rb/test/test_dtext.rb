@@ -1266,7 +1266,13 @@ class DTextTest < Minitest::Test
     assert_parse('<p>* </p>', '* ')
   end
 
+  def test_many_unclosed_post_search_links
+    assert_fast_parse("{{a|" * 50_000)
+    assert_fast_parse("{{a|b " * 40_000)
+  end
+
   def test_post_search_links
+    assert_parse('<p>{{a|b <a class="dtext-link dtext-post-search-link" href="/posts?tags=c">c</a></p>', "{{a|b {{c}}")
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{tag}}")
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{ tag}}")
     assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=tag">tag</a></p>', "{{tag }}")

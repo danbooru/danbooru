@@ -224,7 +224,7 @@ aliased_wiki_link = wiki_prefix '[[' ws* wiki_target ws* :>> ('#' wiki_anchor_id
 
 tag = (nonspace - [|{}])+ | ([~\-]? emoticon_tags);
 tags = (tag (ws+ tag)*) >mark_b1 %mark_b2;
-search_title = ((nonnewline* nonspace) -- '}')? >mark_c1 %mark_c2;
+search_title = ((nonnewline* nonspace) -- ('}' | '{{'))? >mark_c1 %mark_c2;
 search_prefix = alnum* >mark_a1 %mark_a2;
 search_suffix = alnum* >mark_d1 %mark_d2;
 
