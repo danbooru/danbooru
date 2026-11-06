@@ -92,8 +92,14 @@ class ApiKeyTest < ActiveSupport::TestCase
         assert_equal(true, @user.user_events.api_key_delete.exists?)
       end
 
-      should "generate a unique key" do
-        assert_not_nil(@api_key.key)
+      should "generate a key with the expected prefix" do
+        assert_match(/\Adbru_[A-Za-z0-9]+\z/, @api_key.key)
+      end
+
+      should "store only a digest of the key" do
+        assert_equal(ApiKey.digest(@api_key.key), @api_key.reload.key_digest)
+        assert_nil(ApiKey.find(@api_key.id).key)
+        assert_not_includes(ApiKey.column_names, "key")
       end
 
       should "authenticate via api key" do

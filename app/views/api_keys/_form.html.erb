@@ -1,3 +1,7 @@
+<% if api_key.new_record? %>
+  <p>Your API key will be shown once after you create it. Save it somewhere safe.</p>
+<% end %>
+
 <%= edit_form_for(api_key, html: { class: "stacked-hints" }, formatted_errors: true) do |f| %>
   <%= f.input :name, as: :string, hint: "An optional name to help you remember what this key is for." %>
   <%= f.input :permitted_ip_addresses, label: "IP Addresses", as: :string, hint: "An optional list of IPs allowed to use this key. Space separated, subnets allowed. Leave blank to allow all IPs." %>

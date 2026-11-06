@@ -36,6 +36,13 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_nil response.parsed_body.first["key"]
       end
 
+      should "not show the key in HTML" do
+        get_auth user_api_keys_path(@user.id), @user
+
+        assert_response :success
+        assert_not_includes(response.body, @api_key.key)
+      end
+
       should "not allow searching by key" do
         get_auth user_api_keys_path(@user.id, search: { key_like: "#{@api_key.key[0]}*" }), @user, as: :json
         assert_response :success
@@ -90,9 +97,22 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       should "create a new API key" do
         post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah" }}
 
-        assert_redirected_to user_api_keys_path(@user.id)
+        assert_response :success
         assert_equal("blah", @user.api_keys.last.name)
+        assert_match(/dbru_[A-Za-z0-9]+/, response.body)
         assert_equal(true, @user.user_events.api_key_create.exists?(login_session_id: @user.login_sessions.last.login_id))
+      end
+
+      should "return the new key once in API responses" do
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah" }}, as: :json
+
+        assert_response :success
+        assert_match(/\Adbru_[A-Za-z0-9]+\z/, response.parsed_body["key"])
+
+        get_auth user_api_keys_path(@user.id), @user, as: :json
+
+        assert_response :success
+        assert_nil(response.parsed_body.first["key"])
       end
 
       should "not create a new API key using the user's API key with another user's recently authenticated session" do

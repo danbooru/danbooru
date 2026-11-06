@@ -1,0 +1,17 @@
+<%= render "secondary_links" %>
+
+<div id="c-api-keys">
+  <div id="a-create" class="fixed-width-container">
+    <h1>API Key Created</h1>
+
+    <div class="prose">
+      <p>This is the only time your API key will be shown. Save it somewhere safe now.</p>
+
+      <p><strong>Your API key is like your password</strong>. Anyone who has it has full access to your account.</p>
+    </div>
+
+    <pre><%= @api_key.key %></pre>
+
+    <p><%= link_to "Back to API keys", user_api_keys_path(CurrentUser.user.id) %></p>
+  </div>
+</div>

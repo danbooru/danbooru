@@ -30,6 +30,6 @@ class ApiKeyPolicy < ApplicationPolicy
   end
 
   def api_attributes
-    super - [:key]
+    super - [:key_digest]
   end
 end

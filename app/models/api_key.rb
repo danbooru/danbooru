@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 class ApiKey < ApplicationRecord
+  KEY_PREFIX = "dbru_"
+  KEY_LENGTH = 24
+
   # Set to the current HTTP request when creating, updating, or destroying the API key.
   attr_accessor :request
+
+  attr_reader :key
 
   attribute :permitted_ip_addresses, :ip_address, array: true
   attribute :last_ip_address, :ip_address
@@ -19,15 +24,19 @@ class ApiKey < ApplicationRecord
   validate :validate_max_api_keys, on: :create
   validate :validate_permissions, if: :permissions_changed?
   validate :validate_ip_addresses, if: :permitted_ip_addresses_changed?
-  validates :key, uniqueness: true, if: :key_changed?
+  validates :key_digest, uniqueness: true, if: :key_digest_changed?
   validates :name, length: { maximum: 100 }, if: :name_changed?
   validates :name, visible_string: { allow_empty: true }, if: :name_changed?
   validates :permitted_ip_addresses, length: { maximum: 20 }, if: :permitted_ip_addresses_changed?
 
+  before_create :generate_key
+
   after_destroy :create_user_event
   after_save :create_user_event
 
-  has_secure_token :key
+  def self.digest(key)
+    Digest::SHA256.hexdigest(key.to_s)
+  end
 
   def self.visible(user)
     if user.is_owner?
@@ -73,6 +82,15 @@ class ApiKey < ApplicationRecord
       UserEvent.create_from_request!(user, :api_key_delete, request)
     elsif saved_change_to_permissions? || saved_change_to_permitted_ip_addresses?
       UserEvent.create_from_request!(user, :api_key_update, request)
+    end
+  end
+
+  concerning :KeyMethods do
+    private
+
+    def generate_key
+      @key = "#{KEY_PREFIX}#{SecureRandom.base58(KEY_LENGTH)}"
+      self.key_digest = self.class.digest(@key)
     end
   end
 
