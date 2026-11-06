@@ -549,6 +549,14 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "uploading a ugoira file from your computer" do
+        should "fail without extracting a ugoira with compressed files" do
+          Danbooru::Archive.any_instance.expects(:extract!).never
+          create_upload!("test/files/ugoira/ugoira-compressed.zip", user: @user)
+
+          assert_response 201
+          assert_equal("ugoira must not be compressed", Upload.last.error)
+        end
+
         should "work for a ugoira in gallery-dl format" do
           upload = assert_successful_upload("test/files/ugoira/ugoira-95239241-gallery-dl.zip", user: @user)
           media_asset = upload.media_assets.first

@@ -66,6 +66,46 @@ class MediaFile::Ugoira < MediaFile
 
   # @return [String, nil] Return the error message if the ugoira is invalid, or nil if it is valid.
   memoize def error
+    return zip_error if zip_error.present?
+    return "number of files is inconsistent with animation.json" if animation_json.present? && files.size != animation_json_frames.size + 1
+    return "unrecognized animation.json format" if animation_json_format == "unknown"
+
+    Zip::File.open(file.path) do |zip|
+      animation_json_frames.each_with_index do |json, i|
+        # skip animation.json if it's the first entry in the zip file
+        entry = (zip.entries.first.name == "animation.json") ? zip.entries[i + 1] : zip.entries[i]
+
+        return "'#{json["file"]}' in animation.json doesn't match '#{entry.name}' in zip file" if json["file"] != entry.name
+        return "'#{json["file"]}' in animation.json has invalid delay" if !json["delay"].in?(MIN_DELAY..MAX_DELAY)
+      end
+    end
+
+    frames.each do |frame|
+      return "file '#{File.basename(frame.path)}' is not an image file" if !frame.file_ext.in?(%i[jpg gif png])
+    end
+
+    return "must have at least two frames" if frames.size < 2
+    return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
+
+    # Check the dimensions before decoding the frames, so that a frame can't be larger than the first frame (whose size is
+    # checked by `MediaAsset.validate_media_file!`).
+    return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
+
+    frames.each do |frame|
+      return "file '#{File.basename(frame.path)}' is animated" if frame.is_animated?
+      return "file '#{File.basename(frame.path)}' is corrupt" if frame.is_corrupt?
+    end
+
+    nil
+  end
+
+  # Check the structure of the .zip file without extracting it. This makes sure the zip is uncompressed, has at most
+  # MAX_FRAME_COUNT frames, and has no overlapping files, so extracting it can't take more space than the .zip itself.
+  #
+  # @return [String, nil] Return the error message if the .zip file is invalid, or nil if it is valid.
+  memoize def zip_error
+    return nil if file.nil?
+
     zip = Zip::File.open(file.path)
     stream = Zip::InputStream.open(file.path)
     file_n = 0
@@ -86,8 +126,8 @@ class MediaFile::Ugoira < MediaFile
       return "zip64 format is not supported" if entry.zip64?
       return "file '#{entry.name}' cannot have comments" if entry.comment_size > 0
       return "file '#{entry.name}' cannot have extra fields (fields: #{entry.extra.keys.join(", ")})" if entry.extra_size > 0
-      return "file '#{entry.name}' cannot be compressed" if entry.compression_method != Zip::Entry::STORED
-      return "file '#{entry.name}' cannot be compressed" if entry.compressed_size != entry.size
+      return "ugoira must not be compressed" if entry.compression_method != Zip::Entry::STORED
+      return "ugoira must not be compressed" if entry.compressed_size != entry.size
       return "file '#{entry.name}' cannot be a #{entry.ftype}" if entry.ftype != :file
       return "file '#{entry.name}' has unsupported general purpose flags (#{"%.8b" % entry.gp_flags})" if entry.gp_flags != 0
       return "file '#{entry.name}' has unsupported header size (expected #{entry.name.size + 30}, got #{entry.calculate_local_header_size})" if entry.calculate_local_header_size != entry.name.size + 30
@@ -105,32 +145,6 @@ class MediaFile::Ugoira < MediaFile
 
     return "number of files is inconsistent with end-of-central-directory count" if file_n != zip.size
     return "number of files is inconsistent with central directory count" if file_n != zip.entries.size
-    return "number of files is inconsistent with animation.json" if animation_json.present? && file_n != animation_json_frames.size + 1
-    return "unrecognized animation.json format" if animation_json_format == "unknown"
-
-    animation_json_frames.each_with_index do |json, i|
-      # skip animation.json if it's the first entry in the zip file
-      entry = (zip.entries.first.name == "animation.json") ? zip.entries[i + 1] : zip.entries[i]
-
-      return "'#{json["file"]}' in animation.json doesn't match '#{entry.name}' in zip file" if json["file"] != entry.name
-      return "'#{json["file"]}' in animation.json has invalid delay" if !json["delay"].in?(MIN_DELAY..MAX_DELAY)
-    end
-
-    frames.each do |frame|
-      return "file '#{File.basename(frame.path)}' is not an image file" if !frame.file_ext.in?(%i[jpg gif png])
-    end
-
-    return "must have at least two frames" if frames.size < 2
-    return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
-
-    # Check the dimensions before decoding the frames, so that a frame can't be larger than the first frame (whose size is
-    # checked by `MediaAsset.validate_media_file!`).
-    return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
-
-    frames.each do |frame|
-      return "file '#{File.basename(frame.path)}' is animated" if frame.is_animated?
-      return "file '#{File.basename(frame.path)}' is corrupt" if frame.is_corrupt?
-    end
     return "zip64 format is not supported" if zip.instance_variable_get(:@cdir).instance_variable_get(:@version_needed_for_extract) == Zip::VERSION_NEEDED_TO_EXTRACT_ZIP64 # XXX hack
 
     nil
@@ -267,6 +281,8 @@ class MediaFile::Ugoira < MediaFile
   #   delays and metadata (if present).
   def files
     synchronize do
+      raise Error, zip_error if zip_error.present?
+
       @files ||= Danbooru::Archive.extract!(file, tmpdir.path).second.map { |filename| File.open(filename) }
     end
   end
