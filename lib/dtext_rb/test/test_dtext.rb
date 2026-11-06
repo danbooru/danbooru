@@ -744,6 +744,7 @@ class DTextTest < Minitest::Test
     assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="#{path}">#{path}</a></p>}, path)
     assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="#{path}">#{path}</a></p>}, "<#{path}>")
     assert_parse(%{<p><a class="dtext-link" href="#{internal}">#{internal}</a></p>}, internal, domain: "danbooru.donmai.us", internal_domains: ["danbooru.donmai.us"])
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="#{host}">x</a></p>}, %{"x":[#{host}]}, domain: "danbooru.donmai.us")
   end
 
   def test_urls
@@ -830,6 +831,19 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei">http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei</a></p>', 'http://danbooru.donmai.us/post/show/810829/arms_behind_back-ayanami_rei', domain: "danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/post/show/#">http://danbooru.donmai.us/post/show/#</a>###</p>', 'http://danbooru.donmai.us/post/show/####', domain: "danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/posts/#">http://danbooru.donmai.us/posts/#</a>###</p>', 'http://danbooru.donmai.us/posts/####', domain: "danbooru.donmai.us")
+
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us:443/posts">x</a></p>', '"x":[https://danbooru.donmai.us:443/posts]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="HTTPS://danbooru.donmai.us/posts">x</a></p>', '"x":[HTTPS://danbooru.donmai.us/posts]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://DANBOORU.donmai.us/posts">x</a></p>', '"x":[https://DANBOORU.donmai.us/posts]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://user@danbooru.donmai.us/posts">x</a></p>', '"x":[https://user@danbooru.donmai.us/posts]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://user:pass@danbooru.donmai.us/posts">x</a></p>', '"x":[https://user:pass@danbooru.donmai.us/posts]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://evil.com@danbooru.donmai.us/posts">x</a></p>', '"x":[https://evil.com@danbooru.donmai.us/posts]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://danbooru.donmai.us@evil.com/posts">x</a></p>', '"x":[https://danbooru.donmai.us@evil.com/posts]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://danbooru.donmai.us.evil.com/posts">x</a></p>', '"x":[https://danbooru.donmai.us.evil.com/posts]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://evil.com/danbooru.donmai.us">x</a></p>', '"x":[https://evil.com/danbooru.donmai.us]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://evil.com?@danbooru.donmai.us">x</a></p>', '"x":[https://evil.com?@danbooru.donmai.us]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://evil.com#@danbooru.donmai.us">x</a></p>', '"x":[https://evil.com#@danbooru.donmai.us]', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://danbooru.donmai.us@/posts">x</a></p>', '"x":[https://danbooru.donmai.us@/posts]', domain: "danbooru.donmai.us")
   end
 
   def test_internal_link_to_shortlink_conversion

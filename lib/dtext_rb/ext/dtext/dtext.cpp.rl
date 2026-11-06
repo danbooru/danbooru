@@ -880,12 +880,22 @@ bool StateMachine::is_internal_url(const std::string_view url) {
   } else if (options.domain.empty() || url.empty()) {
     return false;
   } else {
-    // Matches the domain name part of a URL.
-    static const std::regex url_regex("^https?://(?:[^/?#]*@)?([^/?#:]+)", std::regex_constants::icase);
+    // Get the domain name part of the URL (`https://user@danbooru.donmai.us:443/posts` => `danbooru.donmai.us`). This is
+    // done by hand instead of with std::regex because std::regex recurses once per character and overflows the stack on long URLs.
+    auto starts_with_ignore_case = [&](std::string_view prefix) {
+      return url.size() >= prefix.size() && std::equal(prefix.begin(), prefix.end(), url.begin(), [](char a, char b) { return a == ascii_tolower(b); });
+    };
 
-    std::match_results<std::string_view::const_iterator> matches;
-    std::regex_search(url.begin(), url.end(), matches, url_regex);
-    return matches[1] == options.domain;
+    size_t scheme_size = starts_with_ignore_case("http://") ? 7 : starts_with_ignore_case("https://") ? 8 : 0;
+    if (scheme_size == 0) {
+      return false;
+    }
+
+    auto authority = url.substr(scheme_size, url.find_first_of("/?#", scheme_size) - scheme_size);
+    auto userinfo_end = authority.find_last_of('@');
+    auto host = userinfo_end == std::string_view::npos ? authority : authority.substr(userinfo_end + 1);
+
+    return host.substr(0, host.find(':')) == options.domain;
   }
 }
 
