@@ -87,6 +87,14 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_equal("blah", @user.api_keys.last.name)
         assert_equal(true, @user.user_events.api_key_create.exists?(login_session_id: @user.login_sessions.last.login_id))
       end
+
+      should "not create a new API key using the user's API key with another user's recently authenticated session" do
+        login_as(create(:user))
+        post user_api_keys_path(@user.id), as: :json, params: { api_key: { name: "blah" }}, headers: { HTTP_AUTHORIZATION: "Basic #{::Base64.strict_encode64("#{@user.name}:#{@api_key.key}")}" }
+
+        assert_redirected_to confirm_password_session_path(url: user_api_keys_path(@user.id))
+        assert_equal([@api_key], @user.api_keys.to_a)
+      end
     end
 
     context "#edit action" do

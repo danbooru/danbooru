@@ -336,7 +336,7 @@ class ApplicationController < ActionController::Base
     return if CurrentUser.user.is_anonymous?
 
     last_authenticated_at = session[:last_authenticated_at]
-    if last_authenticated_at.blank? || Time.zone.parse(last_authenticated_at) < 60.minutes.ago
+    if session[:user_id] != CurrentUser.id || last_authenticated_at.blank? || Time.zone.parse(last_authenticated_at) < 60.minutes.ago
       redirect_to confirm_password_session_path(url: request.fullpath)
     end
   end
