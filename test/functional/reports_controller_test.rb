@@ -256,6 +256,44 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "visibility" do
+        should "not count mod-only mod actions for non-moderators" do
+          create(:mod_action, category: "email_address_update", description: "secret@example.com")
+
+          get report_path("mod_actions", format: :json, search: { category: "email_address_update", description_like: "*secret*" })
+          assert_response :success
+          assert_equal([0], response.parsed_body.pluck("mod_actions"))
+
+          get_auth report_path("mod_actions", format: :json, search: { category: "email_address_update", description_like: "*secret*" }), create(:moderator_user)
+          assert_response :success
+          assert_equal([1], response.parsed_body.pluck("mod_actions"))
+        end
+
+        should "not count private post votes" do
+          vote = create(:post_vote, score: -1)
+
+          get report_path("post_votes", format: :json, search: { user_id: vote.user_id, post_id: vote.post_id, score: -1 })
+          assert_response :success
+          assert_equal([0], response.parsed_body.pluck("votes"))
+        end
+
+        should "not count comment votes for anonymous users" do
+          as(create(:user)) { create(:comment_vote) }
+
+          get report_path("comment_votes", format: :json)
+          assert_response :success
+          assert_equal([0], response.parsed_body.pluck("votes"))
+        end
+
+        should "not count forum posts in restricted topics" do
+          as(create(:user)) { create(:forum_post, topic: create(:mod_up_forum_topic), body: "secret") }
+
+          get report_path("forum_posts", format: :json, search: { body_matches: "secret" })
+          assert_response :success
+          assert_equal([0], response.parsed_body.pluck("forum_posts"))
+        end
+      end
+
       context "users report" do
         should "work" do
           create(:user)

@@ -141,10 +141,10 @@ class ReportsController < ApplicationController
       @columns = [@available_columns.first].to_h if @columns.blank?
 
       if @period.present?
-        @dataframe = @model.search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, groups: [@group].compact_blank, group_limit: @group_limit, columns: @columns)
+        @dataframe = @model.visible(CurrentUser.user).search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, groups: [@group].compact_blank, group_limit: @group_limit, columns: @columns)
         @x_axis = "date"
       else
-        @dataframe = @model.search(params[:search], CurrentUser.user).aggregate(from: @from, to: @to, groups: [@group].compact_blank, limit: @group_limit, columns: @columns)
+        @dataframe = @model.visible(CurrentUser.user).search(params[:search], CurrentUser.user).aggregate(from: @from, to: @to, groups: [@group].compact_blank, limit: @group_limit, columns: @columns)
         @x_axis = @group_column
       end
 
