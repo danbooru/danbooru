@@ -196,7 +196,7 @@ bare_relative_url = (path query? fragment? | fragment) - (char* url_boundary_cha
 delimited_absolute_url = scheme nonspace+;
 delimited_relative_url = [/#] nonspace*;
 
-delimited_url = '<' delimited_absolute_url >mark_a1 %mark_a2 :>> '>';
+delimited_url = '<' (delimited_absolute_url -- ('<' scheme)) >mark_a1 %mark_a2 :>> '>';
 basic_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':' (bare_absolute_url | bare_relative_url) >mark_b1 @mark_b2;
 bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' ((delimited_absolute_url | delimited_relative_url) -- '":[') >mark_b1 %mark_b2 :>> ']';
 

@@ -1910,7 +1910,12 @@ class DTextTest < Minitest::Test
     assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="https://www.example.com/\u0097">\u0097</a></p>}, %{"\u0097":https://www.example.com/\u0097})
   end
 
+  def test_many_unclosed_delimited_links
+    assert_fast_parse("<http://a" * 20_000)
+  end
+
   def test_delimited_links
+    assert_parse('<p>&lt;<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://a.com">http://a.com</a><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://b.com">http://b.com</a></p>', "<http://a.com<http://b.com>")
     dtext = '(blah <https://en.wikipedia.org/wiki/Orange_(fruit)>).'
     html = '<p>(blah <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://en.wikipedia.org/wiki/Orange_(fruit)">https://en.wikipedia.org/wiki/Orange_(fruit)</a>).</p>'
     assert_parse(html, dtext)
