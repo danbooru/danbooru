@@ -34,8 +34,11 @@ class SessionLoader
     # Limit attempts per account, to stop password guessing spread across many IPs. Nonexistent accounts are limited
     # by name, so the limit doesn't reveal which accounts exist. The latter is not a real concern for us but it
     # helps slowing down bots that are not aware that our account list is public.
+    #
+    # Non-proxy IPs the user has logged in from before skip this limit, so attackers can't lock users out by using up
+    # the limit. These are still limited per IP by SessionLoaderPolicy.
     account_key = user&.cache_key || "login/#{name_or_email.to_s.downcase}"
-    RateLimiter.new("sessions:login", [account_key], rate: 1.0 / 5.minutes, burst: 10).limit!
+    RateLimiter.new("sessions:login", [account_key], rate: 1.0 / 5.minutes, burst: 10).limit! unless trusted_ip?(user)
 
     if user.present? && user.authenticate_password(password)
       # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
@@ -204,6 +207,11 @@ class SessionLoader
   end
 
   private
+
+  # @return [Boolean] True if the user has logged in from this IP's subnet before, and the IP isn't a proxy or Tor.
+  def trusted_ip?(user)
+    user.present? && user.authorized_ip?(ip_address) && !ip_address.is_proxy?
+  end
 
   def set_statement_timeout
     timeout = CurrentUser.user.statement_timeout
