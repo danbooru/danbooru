@@ -374,6 +374,8 @@ class MediaAsset < ApplicationRecord
         elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
           raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
         end
+      rescue MediaFile::Ugoira::Error => e
+        raise Error, e.message
       end
     end
 

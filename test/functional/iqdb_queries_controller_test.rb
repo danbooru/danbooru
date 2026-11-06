@@ -172,6 +172,39 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_equal([{ post_id: @post.id, score: 81.0, post: as(@user) { @post.as_json }}.with_indifferent_access], response.parsed_body)
         end
+
+        should "fail for an image that is too large before decoding it" do
+          MediaFile::Image.any_instance.stubs(:dimensions).returns([50_000, 50_000])
+          MediaFile::Image.any_instance.expects(:preview!).never
+          IqdbClient.any_instance.expects(:request).never
+
+          file = Rack::Test::UploadedFile.new("test/files/png/test.png")
+          post_auth iqdb_queries_path, @user, params: { search: { file: file }}
+
+          assert_response :success
+          assert_select "#notice", /Image resolution is too large/
+        end
+
+        should "fail for a corrupt image" do
+          IqdbClient.any_instance.expects(:request).never
+
+          file = Rack::Test::UploadedFile.new("test/files/png/test-corrupt.png")
+          post_auth iqdb_queries_path, @user, params: { search: { file: file }}
+
+          assert_response :success
+          assert_select "#notice", /File is corrupt/
+        end
+
+        should "fail for an invalid ugoira without extracting it" do
+          Danbooru::Archive.any_instance.expects(:extract!).never
+          IqdbClient.any_instance.expects(:request).never
+
+          file = Rack::Test::UploadedFile.new("test/files/ugoira/ugoira-compressed.zip")
+          post_auth iqdb_queries_path, @user, params: { search: { file: file }}
+
+          assert_response :success
+          assert_select "#notice", /ugoira must not be compressed/
+        end
       end
     end
   end
