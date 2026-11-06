@@ -80,6 +80,10 @@ class ApiKeyTest < ActiveSupport::TestCase
         assert_equal(true, @user.user_events.api_key_create.exists?)
       end
 
+      should "send a dmail notification" do
+        assert_equal(true, @user.dmails.received.exists?(from: User.system, title: "API key created"))
+      end
+
       should "expire after one year by default" do
         assert_in_delta(1.year.from_now, @api_key.expires_at, 1.minute)
       end

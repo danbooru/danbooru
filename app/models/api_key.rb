@@ -40,6 +40,7 @@ class ApiKey < ApplicationRecord
   before_validation :set_expires_at, if: :expires_on_changed?
   before_create :generate_key
 
+  after_create :send_dmail_notification
   after_destroy :create_user_event
   after_save :create_user_event
 
@@ -93,6 +94,18 @@ class ApiKey < ApplicationRecord
 
   def expired?
     expires_at <= Time.zone.now
+  end
+
+  def send_dmail_notification
+    details = [
+      "An API key named \"#{name.presence || "(unnamed)"}\" was created for your account.",
+      "Expires: #{expires_at.to_date.to_fs(:long)}",
+    ]
+    details << "IP address: #{request.remote_ip}" if request&.remote_ip.present?
+    details << "If you did not create this key, delete it and change your password."
+
+    dmail = Dmail.create_automated(to: user, title: "API key created", body: details.join("\n\n"))
+    DanbooruLogger.info("Failed to send API key creation dmail: #{dmail.errors.full_messages.to_sentence}") if !dmail.persisted?
   end
 
   def create_user_event
