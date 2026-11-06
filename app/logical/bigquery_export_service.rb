@@ -36,37 +36,39 @@ class BigqueryExportService
     end
   end
 
-  # The list of database tables to dump.
+  # The list of database tables to dump. This is an allow list so that new tables aren't made public by accident. Only
+  # add tables here if their contents are safe to publish.
   def self.models
-    Rails.application.eager_load!
-
-    models = ApplicationRecord.descendants.sort_by(&:name)
-
-    models -= [
-      GoodJob::BaseRecord,
-      GoodJob::Process,
-      GoodJob::Execution,
-      GoodJob::DiscreteExecution,
-      GoodJob::BatchRecord,
-      GoodJob::Job,
-      GoodJob::Setting,
-      TagRelationship,
-      ArtistVersion,
-      ArtistCommentaryVersion,
-      NoteVersion,
-      PoolVersion,
-      PostVersion,
-      WikiPageVersion,
-      Post,
-      PostEvent,
-      PostVote,
-      MediaAsset,
-      Favorite,
-      AITag,
-      UserAction,
+    [
+      Artist,
+      ArtistCommentary,
+      ArtistURL,
+      Ban,
+      BulkUpdateRequest,
+      Comment,
+      DtextLink,
+      FavoriteGroup,
+      ForumPost,
+      ForumPostVote,
+      ForumTopic,
+      MediaMetadata,
+      ModAction,
+      Note,
+      Pool,
+      PostAppeal,
+      PostApproval,
+      PostDisapproval,
+      PostFlag,
+      PostReplacement,
+      Reaction,
+      Tag,
+      TagAlias,
+      TagImplication,
+      TagVersion,
+      User,
+      UserFeedback,
+      WikiPage,
     ]
-
-    models
   end
 
   def enabled?
