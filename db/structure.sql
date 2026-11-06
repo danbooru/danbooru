@@ -152,7 +152,7 @@ CREATE TABLE public.api_keys (
     last_used_at timestamp without time zone,
     last_ip_address inet,
     key_digest character varying NOT NULL,
-    expires_at timestamp without time zone NOT NULL
+    expires_at timestamp without time zone
 );
 
 
@@ -7314,6 +7314,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261107130000'),
 ('20261107120000'),
 ('20261106200000'),
 ('20261104064770'),
