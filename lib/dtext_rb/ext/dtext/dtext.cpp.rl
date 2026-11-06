@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
-#include <regex>
 
 #ifdef DEBUG
 #undef g_debug
@@ -19,7 +18,23 @@
 static const size_t MAX_STACK_DEPTH = 512;
 
 // Strip qualifier from tag: "Artoria Pendragon (Lancer) (Fate)" -> "Artoria Pendragon (Lancer)"
-static const std::regex tag_qualifier_regex("[ _]\\([^)]+?\\)$");
+//
+// The qualifier is the first ` (` or `_(` that's followed by a non-empty string with no `)` in it, then a `)` at the end
+// of the tag. This is done by hand instead of with std::regex because std::regex overflows the stack on long tags.
+static std::string_view strip_tag_qualifier(std::string_view tag) {
+  if (tag.size() < 4 || !tag.ends_with(')')) {
+    return tag;
+  }
+
+  // The qualifier must start after the last `)` before the one at the end, and must end two characters before the end so
+  // that the qualifier isn't empty, i.e. `foo ()` isn't stripped.
+  auto previous_paren = tag.find_last_of(')', tag.size() - 2);
+  auto end = tag.end() - 2;
+  auto start = previous_paren == std::string_view::npos ? tag.begin() : std::min(tag.begin() + previous_paren + 1, end);
+  auto qualifier = std::adjacent_find(start, end, [](char a, char b) { return (a == ' ' || a == '_') && b == '('; });
+
+  return qualifier == end ? tag : tag.substr(0, qualifier - tag.begin());
+}
 
 // Permitted HTML attribute names.
 static const std::unordered_map<std::string_view, const std::unordered_set<std::string_view>> permitted_attribute_names = {
@@ -1127,7 +1142,7 @@ void StateMachine::append_post_search_link(const std::string_view prefix, const 
 
   // {{pokemon_(creature)|}} -> {{pokemon_(creature)|pokemon}}
   if (title.empty()) {
-    std::regex_replace(std::back_inserter(normalized_title), search.begin(), search.end(), tag_qualifier_regex, "");
+    normalized_title.append(strip_tag_qualifier(search));
   }
 
   // {{cat}}s -> {{cat|cats}}
@@ -1155,7 +1170,7 @@ void StateMachine::append_wiki_link(const std::string_view prefix, const std::st
 
   // Pipe trick: [[Kaga (Kantai Collection)|]] -> [[kaga_(kantai_collection)|Kaga]]
   if (title_string.empty()) {
-    std::regex_replace(std::back_inserter(title_string), tag.cbegin(), tag.cend(), tag_qualifier_regex, "");
+    title_string.append(strip_tag_qualifier(tag));
   }
 
   // 19[[60s]] -> [[60s|1960s]]

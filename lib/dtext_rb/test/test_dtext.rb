@@ -356,6 +356,18 @@ class DTextTest < Minitest::Test
 
     assert_parse('<p>[[long hair|<br>long]]</p>', "[[long hair|\nlong]]")
     assert_parse('<p>[[|long hair]]</p>', "[[|long hair]]")
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28b%29_%28c%29">a (b)</a></p>', '[[a (b) (c)|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28b">a (b</a></p>', '[[a (b|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28%29">a ()</a></p>', '[[a ()|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28b%29c">a (b)c</a></p>', '[[a (b)c|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28b_%28c%29">a</a></p>', '[[a (b (c)|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28b%29_c_%28d%29">a (b) c</a></p>', '[[a (b) c (d)|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28b%29%29">a (b))</a></p>', '[[a (b))|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28b%28c%29%29">a (b(c))</a></p>', '[[a (b(c))|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28b%29_%28c%29">a_(b)</a></p>', '[[a_(b)_(c)|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a%28b%29">a(b)</a></p>', '[[a(b)|]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%29_%28b%29">a )</a></p>', '[[a ) (b)|]]')
   end
 
   def test_wiki_links_anchor
@@ -1313,6 +1325,26 @@ class DTextTest < Minitest::Test
   def test_many_unclosed_post_search_links
     assert_fast_parse("{{a|" * 50_000)
     assert_fast_parse("{{a|b " * 40_000)
+  end
+
+  def test_post_search_links_pipe_trick
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28b%29%20%28c%29">a (b)</a></p>', '{{a (b) (c)|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28b">a (b</a></p>', '{{a (b|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28%29">a ()</a></p>', '{{a ()|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28b%29c">a (b)c</a></p>', '{{a (b)c|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28b%20%28c%29">a</a></p>', '{{a (b (c)|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28b%29%20c%20%28d%29">a (b) c</a></p>', '{{a (b) c (d)|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28b%29%29">a (b))</a></p>', '{{a (b))|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28b%28c%29%29">a (b(c))</a></p>', '{{a (b(c))|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a_%28b%29_%28c%29">a_(b)</a></p>', '{{a_(b)_(c)|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%28b%29">a(b)</a></p>', '{{a(b)|}}')
+    assert_parse('<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%29%20%28b%29">a )</a></p>', '{{a ) (b)|}}')
+  end
+
+  def test_long_pipe_trick_links
+    title = "a (#{"b" * 200_000}"
+    assert_parse(%{<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a_%28#{"b" * 200_000}">#{title}</a></p>}, "[[#{title}|]]")
+    assert_parse(%{<p><a class="dtext-link dtext-post-search-link" href="/posts?tags=a%20%28#{"b" * 200_000}">#{title}</a></p>}, "{{#{title}|}}")
   end
 
   def test_post_search_links
