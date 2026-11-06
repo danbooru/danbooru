@@ -47,6 +47,11 @@ class DTextTest < Minitest::Test
     assert_equal(expected.sort, DText.c_parse_wiki_pages(dtext).sort)
   end
 
+  def assert_fast_parse(input, max_time: 0.5)
+    elapsed = Benchmark.realtime { parse(input) }
+    assert_operator(elapsed, :<, max_time, "Parsing #{input[0, 20].inspect}... (#{input.size} chars) took #{elapsed.round(3)}s")
+  end
+
   def test_relative_urls
     assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="http://danbooru.donmai.us/posts/1234">post #1234</a></p>', "post #1234", base_url: "http://danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="http://danbooru.donmai.us/wiki_pages/touhou">touhou</a></p>', "[[touhou]]", base_url: "http://danbooru.donmai.us")
@@ -302,6 +307,19 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7Cd">blah</a></p>', '[[|D|blah]]')
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7C_%7C">blah</a></p>', '[[|_||blah]]')
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%7C%7C_%7C%7C">blah</a></p>', '[[||_|||blah]]')
+
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%5Bfoo">[foo</a>]</p>', '[[[foo]]]')
+    assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/a%5Bb">a[b</a></p>', '[[a[b]]')
+    assert_parse('<p>[[a <a class="dtext-link dtext-wiki-link" href="/wiki_pages/b">b</a></p>', '[[a [[b]]')
+    assert_parse('<p>[[a|b <a class="dtext-link dtext-wiki-link" href="/wiki_pages/c">c</a></p>', '[[a|b [[c]]')
+
+    # An unclosed wiki link followed by a valid one links the valid one.
+    assert_parse('<p>create implication [[hydra_70 -&gt; <a class="dtext-link dtext-wiki-link" href="/wiki_pages/missile">missile</a></p>', 'create implication [[hydra_70 -> [[missile]]')
+    assert_parse('<p>[[original|original character by <a class="dtext-link dtext-wiki-link" href="/wiki_pages/haishiki">Haishiki</a>.</p>', '[[original|original character by [[Haishiki]].')
+    assert_parse('<p>Old blog([[Sonic the Hedgehog): <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a> <a class="dtext-link dtext-wiki-link" href="/wiki_pages/naruto">NARUTO</a></p>', 'Old blog([[Sonic the Hedgehog): http://example.com [[NARUTO]]')
+
+    # Wiki links with doubled brackets link to a title starting with a single '['.
+    assert_parse('<p>create alias [<a class="dtext-link dtext-wiki-link" href="/wiki_pages/%5Bwarship_girls">[warship_girls</a>]] -&gt; [<a class="dtext-link dtext-wiki-link" href="/wiki_pages/%5Bzhan_jian_shao_nyu">[zhan_jian_shao_nyu</a>]]</p>', 'create alias [[[[warship_girls]]]] -> [[[[zhan_jian_shao_nyu]]]]')
 
     #assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%3A%7C">blah</a></p>', '[[:||blah]]') # XXX should work
     #assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/%5C%7C%7C%2F">blah</a></p>', '[[\||/|blah]]') # XXX should work
@@ -927,6 +945,8 @@ class DTextTest < Minitest::Test
   end
 
   def test_markdown_links
+    assert_inline_parse('[a <a class="dtext-link" href="/posts">c</a>', "[a [c](/posts)")
+    assert_inline_parse('[[a <a class="dtext-link" href="/posts">c</a>', "[[a [c](/posts)")
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', "[test](http://example.com)")
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://example.com">test</a>', "[test](Http://example.com)")
 
@@ -2015,12 +2035,16 @@ class DTextTest < Minitest::Test
   end
 
   def test_url_with_many_trailing_parentheses
-    input = "http://a.co/#{")" * 200_000}"
-    elapsed = Benchmark.realtime { parse(input) }
-    assert_operator(elapsed, :<, 0.5)
+    assert_fast_parse("http://a.co/#{")" * 200_000}")
+    assert_fast_parse(%{"a":http://a.co/#{")" * 200_000}})
+  end
 
-    input = %{"a":http://a.co/#{")" * 200_000}}
-    elapsed = Benchmark.realtime { parse(input) }
-    assert_operator(elapsed, :<, 0.5)
+  def test_many_unclosed_brackets
+    assert_fast_parse("[" * 50_000)
+    assert_fast_parse("[[" * 50_000)
+    assert_fast_parse("[a" * 50_000)
+    assert_fast_parse("[[a" * 50_000)
+    assert_fast_parse("[[a|" * 50_000)
+    assert_fast_parse("[[a|b" * 50_000)
   end
 end
