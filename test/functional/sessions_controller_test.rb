@@ -7,6 +7,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     user.signed_id(purpose: "verify_totp/#{session[:session_id]}", expires_in: 10.minutes)
   end
 
+  def login(name, password, ip)
+    reset! # clear session id
+    post session_path, params: { session: { name:, password: }}, headers: { REMOTE_ADDR: ip }
+  end
+
   context "the sessions controller" do
     setup do
       @user = create(:user, password: "password", email_address_attributes: { address: "Foo.Bar+nospam@Googlemail.com" })
@@ -462,6 +467,60 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1:2:3:4:23::1" }
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
+      end
+
+      context "per account" do
+        setup do
+          Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+          freeze_time
+        end
+
+        should "rate limit logins to 10, then 1 per 5 minutes, across all IPs" do
+          10.times do |n|
+            login(@user.name, "wrong", "10.0.#{n}.1")
+            assert_response 401
+          end
+
+          login(@user.name, "password", "10.1.0.1")
+          assert_response 429
+          assert_nil(session[:user_id])
+
+          travel 4.minutes
+          login(@user.name, "password", "10.1.1.1")
+          assert_response 429
+
+          travel 9.minutes
+          login(@user.name, "password", "10.1.2.1")
+          assert_redirected_to root_path
+          assert_equal(@user.id, session[:user_id])
+        end
+
+        should "count logins by email address and by name against the same account" do
+          5.times { |n| login(@user.name, "wrong", "10.0.#{n}.1") }
+          5.times { |n| login("foobar@gmail.com", "wrong", "10.1.#{n}.1") }
+
+          login(@user.name, "password", "10.2.0.1")
+          assert_response 429
+        end
+
+        should "limit each account separately" do
+          10.times { |n| login(@user.name, "wrong", "10.0.#{n}.1") }
+
+          other_user = create(:user, password: "password")
+          login(other_user.name, "password", "10.1.0.1")
+          assert_redirected_to root_path
+          assert_equal(other_user.id, session[:user_id])
+        end
+
+        should "rate limit logins to nonexistent accounts the same way" do
+          10.times do |n|
+            login("nobody", "wrong", "10.0.#{n}.1")
+            assert_response 401
+          end
+
+          login("nobody", "wrong", "10.1.0.1")
+          assert_response 429
+        end
       end
     end
 

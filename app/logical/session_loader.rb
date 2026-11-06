@@ -27,8 +27,15 @@ class SessionLoader
   # @param name_or_email [String] The user's username or email address.
   # @param password [String] the user's password
   # @return [User, nil] the user if the password was correct, otherwise nil
+  # @raise [RateLimiter::RateLimitError] If the account has had too many login attempts.
   def login(name_or_email, password)
     user = User.find_by_name_or_email(name_or_email)
+
+    # Limit attempts per account, to stop password guessing spread across many IPs. Nonexistent accounts are limited
+    # by name, so the limit doesn't reveal which accounts exist. The latter is not a real concern for us but it
+    # helps slowing down bots that are not aware that our account list is public.
+    account_key = user&.cache_key || "login/#{name_or_email.to_s.downcase}"
+    RateLimiter.new("sessions:login", [account_key], rate: 1.0 / 5.minutes, burst: 10).limit!
 
     if user.present? && user.authenticate_password(password)
       # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
