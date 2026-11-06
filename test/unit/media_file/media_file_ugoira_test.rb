@@ -486,6 +486,22 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     end
   end
 
+  context "Conversion of a ugoira with a frame disguised as a playlist" do
+    should "not let the frame make ffmpeg read other files" do
+      Dir.mktmpdir do |dir|
+        FileUtils.cp("test/files/jpg/test.jpg", "#{dir}/0.jpg")
+        File.write("#{dir}/1.jpg", "ffconcat version 1.0\nfile 0.jpg\nfile 0.jpg\nfile 0.jpg\n")
+
+        ugoira = MediaFile::Ugoira.new(["#{dir}/0.jpg", "#{dir}/1.jpg"], frame_delays: [100, 100])
+        ugoira.frames.last.stubs(:file_ext).returns(:jpg)
+
+        error = assert_raises(FFmpeg::Error) { ugoira.convert }
+        assert_match(/\Affmpeg failed/, error.message)
+        ugoira.close
+      end
+    end
+  end
+
   context "Conversion of a ugoira" do
     should "not fail when converting two ugoiras concurrently" do
       a = Thread.new { MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip").convert }
