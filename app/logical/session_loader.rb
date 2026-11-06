@@ -254,9 +254,9 @@ class SessionLoader
     user = User.find_by_id(session[:user_id])
     return if user.nil?
 
-    login_session = user.login_sessions.active.find_by(login_id: session[:login_id])
+    login_session = user.login_sessions.active.where(last_seen_at: LoginSession::MAX_IDLE_PERIOD.ago..).find_by(login_id: session[:login_id])
 
-    # The login session was already ended by a logout or a password change, so just remove it from the cookie.
+    # The login session was already ended by a logout or a password change, or it was idle for too long, so just remove it from the cookie.
     if login_session.nil?
       cleanup_cookies
     elsif user.is_deleted?
