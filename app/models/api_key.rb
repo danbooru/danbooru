@@ -48,6 +48,10 @@ class ApiKey < ApplicationRecord
     Digest::SHA256.hexdigest(key.to_s)
   end
 
+  def self.prune!
+    expired.delete_all
+  end
+
   def self.visible(user)
     if user.is_owner?
       all
