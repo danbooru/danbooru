@@ -169,13 +169,15 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "check the expires checkbox for an expiring key" do
+      should "show the expiration date without editable fields" do
         @api_key.update!(expires: true, expires_on: Date.tomorrow)
 
         get_auth edit_api_key_path(@api_key.id), @user
 
         assert_response :success
-        assert_select "input[name='api_key[expires]'][checked]"
+        assert_select "input[name='api_key[expires]']", count: 0
+        assert_select "input[name='api_key[expires_on]']", count: 0
+        assert_match(@api_key.expires_at.to_date.to_fs(:long), response.body)
       end
 
       should "fail for someone else" do
@@ -192,6 +194,28 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_equal("blah", @api_key.reload.name)
         assert_equal(["1.2.3.4"], @api_key.permitted_ip_addresses.map(&:to_s))
         assert_equal(true, @user.user_events.api_key_update.exists?(login_session_id: @user.login_sessions.last.login_id))
+      end
+
+      should "not change the expiration date" do
+        @api_key.update!(expires: true, expires_on: Date.tomorrow)
+        expires_at = @api_key.expires_at
+        name = @api_key.name
+
+        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah", expires: "0", expires_on: 1.month.from_now.to_date }}
+
+        assert_response 403
+        assert_equal(name, @api_key.reload.name)
+        assert_equal(expires_at.to_i, @api_key.expires_at.to_i)
+      end
+
+      should "update without changing the expiration date" do
+        @api_key.update!(expires: true, expires_on: Date.tomorrow)
+        expires_at = @api_key.expires_at
+
+        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah", permitted_ip_addresses: "1.2.3.4" }}
+
+        assert_redirected_to user_api_keys_path(@user.id)
+        assert_equal(expires_at.to_i, @api_key.reload.expires_at.to_i)
       end
 
       should "fail for someone else" do

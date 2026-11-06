@@ -29,6 +29,10 @@ class ApiKeyPolicy < ApplicationPolicy
     [:name, :expires_on, :expires, :permitted_ip_addresses, { permissions: [] }]
   end
 
+  def permitted_attributes_for_update
+    [:name, :permitted_ip_addresses, { permissions: [] }]
+  end
+
   def api_attributes
     super - [:key_digest]
   end
