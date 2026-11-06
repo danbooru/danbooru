@@ -7,6 +7,7 @@ class User < ApplicationRecord
 
   MAX_BLACKLIST_TAGS = 5_000
   MAX_BLACKLIST_RULES = 5_000
+  MIN_PASSWORD_LENGTH = 8
 
   RECENTLY_PROMOTED_PERIOD = 24.hours
 
@@ -122,7 +123,7 @@ class User < ApplicationRecord
   validates :favorite_tags, visible_string: { allow_empty: true }, length: { maximum: 10_000 }, if: :favorite_tags_changed?
   validates :custom_style, visible_string: { allow_empty: true }, length: { maximum: 40_000 }, if: :custom_style_changed?
   validates :name, user_name: true, on: :create
-  validates :password, length: { minimum: 5 }, if: ->(rec) { rec.new_record? || rec.password.present? }
+  validates :password, length: { minimum: MIN_PASSWORD_LENGTH }, if: ->(rec) { rec.new_record? || rec.password.present? }
   validates :default_image_size, inclusion: { in: %w[large original] }
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE), message: "must be between 1 and #{PostSets::Post::MAX_PER_PAGE}" }
   validates :password, confirmation: { message: "Passwords don't match" }

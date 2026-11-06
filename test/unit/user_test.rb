@@ -134,6 +134,26 @@ class UserTest < ActiveSupport::TestCase
       assert_equal(false, @user.authenticate_password("password2"))
     end
 
+    context "password" do
+      should "be at least 8 characters long for new users" do
+        assert_equal(["Password is too short (minimum is 8 characters)"], build(:user, password: "1234567").tap(&:validate).errors.full_messages)
+        assert_equal(true, build(:user, password: "12345678").valid?)
+      end
+
+      should "be at least 8 characters long when changed" do
+        @user.password = "1234567"
+        assert_equal(["Password is too short (minimum is 8 characters)"], @user.tap(&:validate).errors.full_messages)
+      end
+
+      should "not be revalidated for existing users with short passwords" do
+        @user.update_columns(bcrypt_password_hash: BCrypt::Password.create(@user.hash_password("12345"))) # rubocop:disable Rails/SkipsModelValidations
+        @user.reload
+
+        assert_equal(@user, @user.authenticate_password("12345"))
+        assert_equal(true, @user.update(comment_threshold: -10))
+      end
+    end
+
     should "normalize its level" do
       user = create(:user, level: User::Levels::OWNER)
       assert(user.is_owner?)

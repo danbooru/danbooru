@@ -14,7 +14,7 @@
         <%= f.simple_fields_for(@user.email_address || @user.build_email_address) do |fa| %>
           <%= fa.input :address, label: "Email", required: false, as: :email, input_html: { value: fa.object.address, pattern: Danbooru::EmailAddress::EMAIL_REGEX, placeholder: "your.name@example.com" }, hint: "Optional" %>
         <% end %>
-        <%= f.input :password, input_html: { value: @user.password, autocomplete: "new-password" }, required: true %>
+        <%= f.input :password, input_html: { value: @user.password, autocomplete: "new-password", minlength: User::MIN_PASSWORD_LENGTH }, required: true %>
         <%= f.input :password_confirmation, label: "Confirm password", input_html: { value: @user.password_confirmation, autocomplete: "new-password" }, required: true %>
 
         <%= captcha_tag class: "mb-4", action: :signup %>
