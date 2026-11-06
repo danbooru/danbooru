@@ -167,6 +167,8 @@ class ActionDispatch::IntegrationTest
     if user.totp.present?
       post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: "verify_totp/#{session[:session_id]}"), code: user.totp.code }}
     end
+
+    post reauthenticate_session_path, params: { session: { password: user.password, verification_code: user.totp&.code }}
   end
 
   def method_authenticated(method_name, url, user, **options)

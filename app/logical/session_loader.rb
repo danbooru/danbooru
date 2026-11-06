@@ -120,7 +120,6 @@ class SessionLoader
 
       session[:user_id] = user.id
       session[:login_id] = login_session.login_id
-      session[:last_authenticated_at] = time
 
       login_session
     end

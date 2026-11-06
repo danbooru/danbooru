@@ -486,7 +486,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_no_enqueued_jobs
 
         assert_equal(User.last.id, session[:user_id])
-        assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+        assert_nil(session[:last_authenticated_at])
         assert_equal(User.last.login_sessions.last.login_id, session[:login_id])
         assert_equal(Time.now.utc.inspect, User.last.last_logged_in_at.utc.inspect)
         assert_equal("127.0.0.1", User.last.last_ip_addr.to_s)
@@ -510,7 +510,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_performed_jobs(1, only: MailDeliveryJob)
 
         assert_equal(User.last.id, session[:user_id])
-        assert_equal(Time.now.utc.inspect, session[:last_authenticated_at])
+        assert_nil(session[:last_authenticated_at])
         assert_equal(User.last.login_sessions.last.login_id, session[:login_id])
         assert_equal(Time.now.utc.inspect, User.last.last_logged_in_at.utc.inspect)
         assert_equal("127.0.0.1", User.last.last_ip_addr.to_s)

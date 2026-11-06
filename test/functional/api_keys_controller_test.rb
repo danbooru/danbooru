@@ -58,6 +58,13 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to confirm_password_session_path(url: user_api_keys_path(@user.id))
       end
+
+      should "redirect to the confirm password page if the user has just logged in" do
+        post session_path, params: { session: { name: @user.name, password: "password" }}
+        get user_api_keys_path(@user.id)
+
+        assert_redirected_to confirm_password_session_path(url: user_api_keys_path(@user.id))
+      end
     end
 
     context "#new action" do
