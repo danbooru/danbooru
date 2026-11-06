@@ -46,6 +46,13 @@ class ExternalCommandTest < ActiveSupport::TestCase
     ensure
       ENV.delete("DANBOORU_EXTERNAL_COMMAND_TEST_SECRET")
     end
+
+    should "not let commands read the environment of the Rails process" do
+      output, status = ExternalCommand.run("cat /proc/#{Process.pid}/environ")
+
+      assert_equal(false, status.success?)
+      assert_match(/Permission denied/, output)
+    end
   end
 
   context "FFmpeg.shell!" do
