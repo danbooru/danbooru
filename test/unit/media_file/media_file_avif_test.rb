@@ -1205,4 +1205,23 @@ class MediaFileAvifTest < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
+
+  context "libheif" do
+    should "only be able to decode AV1 images" do
+      libheif = Module.new do
+        extend FFI::Library
+
+        ffi_lib "libheif.so.1"
+
+        error = Class.new(FFI::Struct) { layout :code, :int, :subcode, :int, :message, :pointer }
+        attach_function :heif_init, [:pointer], error.by_value
+        attach_function :heif_have_decoder_for_format, [:int], :int
+      end
+
+      # https://github.com/strukturag/libheif/blob/master/libheif/api/libheif/heif_library.h (enum heif_compression_format)
+      libheif.heif_init(nil)
+      assert_equal(0, libheif.heif_have_decoder_for_format(1), "libheif shouldn't have an HEVC decoder")
+      assert_equal(1, libheif.heif_have_decoder_for_format(4), "libheif should have an AV1 decoder")
+    end
+  end
 end

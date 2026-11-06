@@ -76,10 +76,11 @@ EOF
 EOF
 
   rm -rf /var/lib/apt/lists/*
+  # libheif-plugin-libde265 (HEIC) is left out on purpose. We only accept AVIF, and libde265 has a history of security bugs.
   apt-get install --update -y --no-install-recommends \
     postgresql-client mkvtoolnix rclone openssl perl perl-modules-5.40 libpq5 libpcre2-8-0 libsodium23 \
     libgmpxx4ldbl zlib1g libfftw3-bin libwebp7 libwebpmux3 libwebpdemux2 liborc-0.4-0t64 liblcms2-2 libpng16-16t64 libexpat1 \
-    libglib2.0-0t64 libgif7 libexif12 libheif1 libheif-plugin-dav1d libheif-plugin-libde265 libx264-165 libx265-215 libsvtav1enc2 \
+    libglib2.0-0t64 libgif7 libexif12 libheif1 libheif-plugin-dav1d libx264-165 libx265-215 libsvtav1enc2 \
     libvpx12 libdav1d7 libseccomp-dev libjemalloc2 libarchive13t64 libyaml-0-2 libffi8 \
     libreadline8t64 libarchive-zip-perl tini busybox less ncdu curl
 
