@@ -916,6 +916,9 @@ class DTextTest < Minitest::Test
   end
 
   def test_backwards_markdown_links
+    assert_parse('<p>[/a<a class="dtext-link" href="/c">title</a></p>', "[/a[/c](title)")
+    assert_parse('<p>[<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://a.com">http://a.com</a><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://b.com">title</a></p>', "[http://a.com[http://b.com](title)")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://a.com/x[1]">title</a></p>', "[http://a.com/x[1]](title)")
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', '[http://example.com](test)')
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://example.com">test</a>', '[Http://example.com](test)')
     assert_inline_parse('<em>one</em>(two)', '[i]one[/i](two)')
@@ -2065,5 +2068,12 @@ class DTextTest < Minitest::Test
   def test_many_unclosed_delimited_mentions
     assert_fast_parse("<@" * 100_000)
     assert_fast_parse("<@a " * 50_000)
+  end
+
+  def test_many_unclosed_backwards_markdown_links
+    assert_fast_parse("[/a" * 50_000)
+    assert_fast_parse("[#a" * 50_000)
+    assert_fast_parse("[/quote" * 20_000)
+    assert_fast_parse("[http://a" * 20_000)
   end
 end
