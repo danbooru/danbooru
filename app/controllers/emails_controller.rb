@@ -54,7 +54,11 @@ class EmailsController < ApplicationController
     @user = User.find(params[:user_id])
     @email_address = @user.email_address
 
-    if @email_address.blank?
+    if Danbooru.config.read_only_mode?
+      skip_authorization
+      flash[:notice] = "The site is in read-only mode. Try again later."
+      redirect_to @user
+    elsif @email_address.blank?
       skip_authorization
       redirect_to edit_user_email_path(@user)
     elsif params[:email_verification_key].present? && @email_address == EmailAddress.find_by_token_for!(:verification, params[:email_verification_key])
