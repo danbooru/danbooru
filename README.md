@@ -83,3 +83,7 @@ Post recommendations require the [Recommender service](https://github.com/danboo
 ## Development
 
 See [docs/README.md](docs/README.md) for information on the project structure, development workflow, and how to contribute.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for how to report a security issue.
