@@ -17,6 +17,9 @@
 
 static const size_t MAX_STACK_DEPTH = 512;
 
+// The max number of elements that can be nested inside each other. Tags past this depth are treated as plain text.
+static const size_t MAX_NESTING_DEPTH = 100;
+
 // Strip qualifier from tag: "Artoria Pendragon (Lancer) (Fate)" -> "Artoria Pendragon (Lancer)"
 //
 // The qualifier is the first ` (` or `_(` that's followed by a non-empty string with no `)` in it, then a `)` at the end
@@ -106,6 +109,7 @@ action media_embeds_enabled { options.f_media_embeds }
 action in_quote { dstack_is_open(BLOCK_QUOTE) }
 action in_expand { dstack_is_open(BLOCK_EXPAND) }
 action in_spoiler { dstack_is_open(BLOCK_SPOILER) }
+action below_max_depth { dstack.size() < MAX_NESTING_DEPTH }
 action is_allowed_emoji { options.is_allowed_emoji({ f1, f2 + 1 }) }
 action save_tag_attribute { tag_attributes[{ a1, a2 }] = { b1, b2 }; }
 
@@ -264,8 +268,8 @@ media_embed = '* '? >mark_d1 %mark_d2 ('!' ('post' | 'asset') >mark_b1 %mark_b2 
 header_id = (alnum | [_/#!:&\-])+; # XXX '/', '#', '!', ':', and '&' are grandfathered in for old wiki versions.
 header = 'h'i [123456] >mark_a1 %mark_a2 '.' >mark_b1 >mark_b2 ws*;
 header_with_id = 'h'i [123456] >mark_a1 %mark_a2 '#' header_id >mark_b1 %mark_b2 '.' ws*;
-aliased_expand = ('[expand'i (ws* '=' ws* | ws+) ((nonnewline - ']')* >mark_a1 %mark_a2) ']')
-               | ('<expand'i (ws* '=' ws* | ws+) ((nonnewline - '>')* >mark_a1 %mark_a2) '>');
+aliased_expand = (('[expand'i (ws* '=' ws* | ws+) ((nonnewline - ']')* >mark_a1 %mark_a2) ']')
+               | ('<expand'i (ws* '=' ws* | ws+) ((nonnewline - '>')* >mark_a1 %mark_a2) '>')) when below_max_depth;
 
 list_item = '*'+ >mark_e1 %mark_e2 ws+ nonnewline+ >mark_f1 %mark_f2;
 
@@ -283,27 +287,27 @@ tag_attribute_value = double_quoted_value | single_quoted_value | unquoted_value
 tag_attribute = ws+ (alnum+ >mark_a1 %mark_a2) ws* '=' ws* tag_attribute_value %save_tag_attribute;
 tag_attributes = tag_attribute*;
 
-open_spoilers = ('[spoiler'i 's'i? ']') | ('<spoiler'i 's'i? '>');
-open_nodtext = '[nodtext]'i | '<nodtext>'i;
-open_quote = '[quote]'i | '<quote>'i | '<blockquote>'i;
-open_expand = '[expand]'i | '<expand>'i;
-open_code = '[code]'i | '<code>'i;
-open_code_lang = '[code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) ']' | '<code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) '>';
-open_table = '[table]'i | '<table>'i;
-open_colgroup = '[colgroup'i tag_attributes :>> ']' | '<colgroup'i tag_attributes :>> '>';
-open_col = '[col'i tag_attributes :>> ']' | '<col'i tag_attributes :>> '>';
-open_thead = '[thead'i tag_attributes :>> ']' | '<thead'i tag_attributes :>> '>';
-open_tbody = '[tbody'i tag_attributes :>> ']' | '<tbody'i tag_attributes :>> '>';
-open_tr = '[tr'i tag_attributes :>> ']' | '<tr'i tag_attributes :>> '>';
-open_th = '[th'i tag_attributes :>> ']' | '<th'i tag_attributes :>> '>';
-open_td = '[td'i tag_attributes :>> ']' | '<td'i tag_attributes :>> '>';
+open_spoilers = (('[spoiler'i 's'i? ']') | ('<spoiler'i 's'i? '>')) when below_max_depth;
+open_nodtext = ('[nodtext]'i | '<nodtext>'i) when below_max_depth;
+open_quote = ('[quote]'i | '<quote>'i | '<blockquote>'i) when below_max_depth;
+open_expand = ('[expand]'i | '<expand>'i) when below_max_depth;
+open_code = ('[code]'i | '<code>'i) when below_max_depth;
+open_code_lang = ('[code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) ']' | '<code'i ws* '=' ws* (alnum+ >mark_a1 %mark_a2) '>') when below_max_depth;
+open_table = ('[table]'i | '<table>'i) when below_max_depth;
+open_colgroup = ('[colgroup'i tag_attributes :>> ']' | '<colgroup'i tag_attributes :>> '>') when below_max_depth;
+open_col = ('[col'i tag_attributes :>> ']' | '<col'i tag_attributes :>> '>') when below_max_depth;
+open_thead = ('[thead'i tag_attributes :>> ']' | '<thead'i tag_attributes :>> '>') when below_max_depth;
+open_tbody = ('[tbody'i tag_attributes :>> ']' | '<tbody'i tag_attributes :>> '>') when below_max_depth;
+open_tr = ('[tr'i tag_attributes :>> ']' | '<tr'i tag_attributes :>> '>') when below_max_depth;
+open_th = ('[th'i tag_attributes :>> ']' | '<th'i tag_attributes :>> '>') when below_max_depth;
+open_td = ('[td'i tag_attributes :>> ']' | '<td'i tag_attributes :>> '>') when below_max_depth;
 open_br = '[br]'i | '<br>'i;
 
-open_tn = '[tn]'i | '<tn>'i;
-open_b = '[b]'i | '<b>'i | '<strong>'i;
-open_i = '[i]'i | '<i>'i | '<em>'i;
-open_s = '[s]'i | '<s>'i;
-open_u = '[u]'i | '<u>'i;
+open_tn = ('[tn]'i | '<tn>'i) when below_max_depth;
+open_b = ('[b]'i | '<b>'i | '<strong>'i) when below_max_depth;
+open_i = ('[i]'i | '<i>'i | '<em>'i) when below_max_depth;
+open_s = ('[s]'i | '<s>'i) when below_max_depth;
+open_u = ('[u]'i | '<u>'i) when below_max_depth;
 
 close_spoilers = ('[/spoiler'i 's'i? ']') | ('</spoiler'i 's'i? '>');
 close_nodtext = '[/nodtext]'i | '</nodtext>'i;

@@ -26,6 +26,17 @@ class DTextTest < ActiveSupport::TestCase
       end
     end
 
+    context ".parse_html" do
+      should "parse the most deeply nested HTML that DText can produce" do
+        assert_nothing_raised { format_text("#{"[expand]" * 200}\n#{"*" * 200} a") }
+        assert_nothing_raised { DText.new("#{"[quote]" * 200}\n#{"*" * 200} #{"[b]" * 200}a").excerpt }
+      end
+
+      should "raise an error for HTML nested more deeply than DText can produce" do
+        assert_raises(ArgumentError) { DText.parse_html("<div>" * 1_000) }
+      end
+    end
+
     context "#excerpt" do
       should "strip dtext markup from the input" do
         assert_excerpt("x", "[b]x[/b]")
@@ -82,7 +93,7 @@ class DTextTest < ActiveSupport::TestCase
       end
 
       should "return an empty string if the nesting is too deep" do
-        dtext = "#{"[expand]" * 5_000}x#{"[/expand]" * 5_000}"
+        dtext = "#{"[expand]" * 50}x#{"[/expand]" * 50}"
         assert_excerpt("", dtext)
       end
     end

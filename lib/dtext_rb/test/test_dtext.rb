@@ -604,6 +604,19 @@ class DTextTest < Minitest::Test
     assert_parse("<blockquote><p>a</p><blockquote><p>b</p></blockquote><p>c</p></blockquote>", "[quote]\na\n[quote]\nb\n[/quote]\nc\n[/quote]")
   end
 
+  def test_max_nesting_depth
+    # Tags nested more than 100 levels deep are treated as plain text.
+    assert_parse("<p>#{"<strong>" * 99}#{"[b]" * 51}x#{"</strong>" * 99}</p>", "#{"[b]" * 150}x")
+    assert_parse("#{"<blockquote>" * 100}<p>#{"[quote]" * 50}x</p>#{"</blockquote>" * 100}", "#{"[quote]" * 150}x")
+    assert_parse("#{'<div class="spoiler">' * 100}<p>#{"[spoiler]" * 50}x</p>#{"</div>" * 100}", "#{"[spoiler]" * 150}x")
+    assert_parse("#{"<details><summary>Show</summary><div>" * 100}<p>#{"[expand]" * 50}x</p>#{"</div></details>" * 100}", "#{"[expand]" * 150}x")
+    assert_parse(%{<table class="striped">#{"<tr>" * 99}#{"</tr>" * 99}</table>}, "[table]#{"[tr]" * 150}x")
+
+    # Tags nested less than 100 levels deep still work.
+    assert_parse("<p>#{"<strong>" * 50}x#{"</strong>" * 50}</p>", "#{"[b]" * 50}x#{"[/b]" * 50}")
+    assert_parse("#{"<blockquote>" * 50}<p>x</p>#{"</blockquote>" * 50}", "#{"[quote]" * 50}x#{"[/quote]" * 50}")
+  end
+
   def test_quote_blocks_nested_spoiler
     assert_parse("<blockquote><p>a<br><span class=\"spoiler\">blah</span><br>c</p></blockquote>", "[quote]\na\n[spoiler]blah[/spoiler]\nc[/quote]")
     assert_parse("<blockquote><p>a</p><div class=\"spoiler\"><p>blah</p></div><p>c</p></blockquote>", "[quote]\na\n\n[spoiler]blah[/spoiler]\n\nc[/quote]")

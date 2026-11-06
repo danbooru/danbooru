@@ -586,7 +586,8 @@ class DText
   # @param allowed_shortlinks [Array<String>] The list of shortlinks to allow in the DText (e.g. ["pixiv"] to not escape `pixiv #1234` shortlinks).
   # @return [String] the DText output
   def self.from_html(html, base_url: nil, inline: false, allowed_shortlinks: [], &block)
-    html = parse_html(html) if html.is_a?(String)
+    # HTML from other sites isn't limited to DText's nesting depth.
+    html = parse_html(html, max_tree_depth: -1) if html.is_a?(String)
     dtext = html_to_dtext(html, base_url:, inline:, allowed_shortlinks:, &block)
     dtext.gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").strip
   end
@@ -774,9 +775,10 @@ class DText
 
   # Parse a string of HTML to a document object.
   # @param html [String]
+  # @param max_tree_depth [Integer] The max depth of the HTML tree, or -1 for no limit. Raises an ArgumentError if the HTML is deeper than this.
   # @return [Nokogiri::HTML5::DocumentFragment]
-  def self.parse_html(html)
-    Nokogiri::HTML5.fragment(html, max_tree_depth: -1)
+  def self.parse_html(html, max_tree_depth: 400)
+    Nokogiri::HTML5.fragment(html, max_tree_depth:)
   end
 
   # @param dtext [String] The DText input.
