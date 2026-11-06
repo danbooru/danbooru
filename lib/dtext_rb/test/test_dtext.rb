@@ -916,6 +916,9 @@ class DTextTest < Minitest::Test
   end
 
   def test_backwards_markdown_links
+    assert_parse('<p>[/a](x <a class="dtext-link" href="/c">y</a></p>', "[/a](x [/c](y)")
+    assert_parse('<p><a class="dtext-link" href="/a">x <strong>y</strong> z</a></p>', "[/a](x [b]y[/b] z)")
+    assert_parse('<p><a class="dtext-link" href="/a"><em>x</em></a></p>', "[/a]([i]x[/i])")
     assert_parse('<p>[/a<a class="dtext-link" href="/c">title</a></p>', "[/a[/c](title)")
     assert_parse('<p>[<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://a.com">http://a.com</a><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://b.com">title</a></p>', "[http://a.com[http://b.com](title)")
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://a.com/x[1]">title</a></p>', "[http://a.com/x[1]](title)")
@@ -2075,5 +2078,7 @@ class DTextTest < Minitest::Test
     assert_fast_parse("[#a" * 50_000)
     assert_fast_parse("[/quote" * 20_000)
     assert_fast_parse("[http://a" * 20_000)
+    assert_fast_parse("[/a](" * 40_000)
+    assert_fast_parse("[/a](b " * 30_000)
   end
 end
