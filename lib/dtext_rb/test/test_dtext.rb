@@ -999,7 +999,14 @@ class DTextTest < Minitest::Test
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://foo.com">http://bar.com</a>', "[http://foo.com](http://bar.com)")
   end
 
+  def test_many_unclosed_html_links
+    assert_fast_parse('<a href="/a">' * 15_000)
+    assert_fast_parse('<a href="/a">b ' * 15_000)
+  end
+
   def test_html_links
+    assert_parse('<p>&lt;a href=&quot;/a&quot;&gt;x <a class="dtext-link" href="/b">y</a></p>', '<a href="/a">x <a href="/b">y</a>')
+    assert_parse('<p><a class="dtext-link" href="/a">&lt;abbr&gt;x&lt;/abbr&gt;</a></p>', '<a href="/a"><abbr>x</abbr></a>')
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', '<a href="http://example.com">test</a>')
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://example.com">test</a>', '<a href="Http://example.com">test</a>')
     assert_inline_parse('<a class="dtext-link" href="/x">a <em>b</em> c</a>', '<a href="/x">a [i]b[/i] c</a>')
