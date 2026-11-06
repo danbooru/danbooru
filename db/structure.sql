@@ -151,7 +151,8 @@ CREATE TABLE public.api_keys (
     uses integer DEFAULT 0 NOT NULL,
     last_used_at timestamp without time zone,
     last_ip_address inet,
-    key_digest character varying NOT NULL
+    key_digest character varying NOT NULL,
+    expires_at timestamp without time zone NOT NULL
 );
 
 
@@ -3706,6 +3707,13 @@ CREATE INDEX index_ai_tags_on_score ON public.ai_tags USING btree (score);
 --
 
 CREATE INDEX index_ai_tags_on_tag_id_and_score ON public.ai_tags USING btree (tag_id, score);
+
+
+--
+-- Name: index_api_keys_on_expires_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_api_keys_on_expires_at ON public.api_keys USING btree (expires_at);
 
 
 --
@@ -7306,6 +7314,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261107120000'),
 ('20261106200000'),
 ('20261104064770'),
 ('20261104064769'),
