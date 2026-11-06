@@ -84,29 +84,83 @@ class ApiKeyTest < ActiveSupport::TestCase
         assert_equal(true, @user.dmails.received.exists?(from: User.system, title: "API key created"))
       end
 
-      should "expire after one year by default" do
-        assert_in_delta(1.year.from_now, @api_key.expires_at, 1.minute)
+      should "create a permanent key by default" do
+        api_key = create(:api_key, user: create(:user))
+
+        assert_nil(api_key.expires_at)
+        assert_equal(true, api_key.permanent?)
+        assert_equal(false, api_key.expired?)
       end
 
-      should "use the selected expiration date" do
+      should "use the selected expiration date when expiry is checked" do
         date = 2.weeks.from_now.to_date
-        api_key = create(:api_key, user: create(:user), expires_on: date)
+        api_key = create(:api_key, user: create(:user), expires: true, expires_on: date)
 
         assert_equal(date.end_of_day, api_key.expires_at)
+        assert_equal(false, api_key.permanent?)
+      end
+
+      should "say a permanent key never expires in the dmail" do
+        create(:api_key, user: @user)
+        dmail = @user.dmails.received.where(title: "API key created").reorder(id: :desc).first
+
+        assert_includes(dmail.body, "Expires: Never")
+      end
+
+      should "allow updating an expired key without changing its expiry" do
+        api_key = create(:api_key, user: create(:user), expires_at: 2.days.from_now.change(hour: 12))
+
+        travel_to(2.years.from_now) do
+          expired_key = ApiKey.find(api_key.id)
+          assert_equal(true, expired_key.update(name: "blah", expires: true, expires_on: expired_key.expires_on))
+        end
+      end
+
+      should "include permanent keys in active keys" do
+        api_key = create(:api_key, user: create(:user), expires: false)
+
+        assert_includes(ApiKey.active, api_key)
+        assert_not_includes(ApiKey.expired, api_key)
+      end
+
+      should "not prune permanent keys" do
+        api_key = create(:api_key, user: create(:user), expires: false)
+
+        travel_to(2.years.from_now) { ApiKey.prune! }
+
+        assert_equal(true, ApiKey.exists?(api_key.id))
+      end
+
+      should "authenticate with a permanent key many years later" do
+        user = create(:user)
+        api_key = create(:api_key, user: user, expires: false)
+
+        travel_to(50.years.from_now) do
+          assert_equal([user, api_key], user.authenticate_api_key(api_key.key))
+        end
       end
 
       should "not allow an expiration date in the past" do
-        api_key = build(:api_key, user: create(:user), expires_on: Date.yesterday)
+        api_key = build(:api_key, user: create(:user), expires: true, expires_on: Date.yesterday)
 
         assert_equal(false, api_key.valid?)
         assert_includes(api_key.errors[:expires_at], "must be in the future")
       end
 
       should "not change the expiration time when updating other attributes" do
-        api_key = create(:api_key, user: create(:user))
+        api_key = create(:api_key, user: create(:user), expires: true, expires_on: Date.tomorrow)
         expires_at = api_key.expires_at
 
-        api_key.update!(name: "blah", expires_on: api_key.expires_on)
+        api_key.update!(name: "blah", expires: true, expires_on: api_key.expires_on)
+
+        assert_equal(expires_at.to_i, api_key.reload.expires_at.to_i)
+      end
+
+      should "preserve a non-end-of-day expiration time when updating other attributes" do
+        api_key = create(:api_key, user: create(:user), expires_at: 1.year.from_now.change(hour: 12))
+        expires_at = api_key.expires_at
+
+        api_key.update!(name: "blah", expires: true, expires_on: api_key.expires_on)
 
         assert_equal(expires_at.to_i, api_key.reload.expires_at.to_i)
       end
@@ -138,8 +192,10 @@ class ApiKeyTest < ActiveSupport::TestCase
       end
 
       should "not authenticate via an expired api key" do
+        api_key = create(:api_key, user: @user, expires: true, expires_on: Date.tomorrow)
+
         travel_to(2.years.from_now) do
-          assert_equal(false, @user.authenticate_api_key(@api_key.key))
+          assert_equal(false, @user.authenticate_api_key(api_key.key))
         end
       end
 

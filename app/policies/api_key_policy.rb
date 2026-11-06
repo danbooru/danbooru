@@ -26,7 +26,7 @@ class ApiKeyPolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    [:name, :expires_on, :permitted_ip_addresses, { permissions: [] }]
+    [:name, :expires_on, :expires, :permitted_ip_addresses, { permissions: [] }]
   end
 
   def api_attributes

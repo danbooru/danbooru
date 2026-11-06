@@ -12,8 +12,9 @@ class ApiKey < ApplicationRecord
 
   attribute :permitted_ip_addresses, :ip_address, array: true
   attribute :last_ip_address, :ip_address
-  attribute :expires_at, :datetime, default: -> { DEFAULT_EXPIRATION.from_now }
+  attribute :expires_at, :datetime
   attribute :expires_on, :date
+  attribute :expires, :boolean
 
   array_attribute :permissions
   array_attribute :permitted_ip_addresses
@@ -24,20 +25,19 @@ class ApiKey < ApplicationRecord
 
   belongs_to :user
 
-  scope :active, -> { where(expires_at: Time.zone.now..) }
+  scope :active, -> { where("expires_at IS NULL OR expires_at >= ?", Time.zone.now) }
   scope :expired, -> { where(expires_at: ...Time.zone.now) }
 
   validate :validate_max_api_keys, on: :create
   validate :validate_permissions, if: :permissions_changed?
   validate :validate_ip_addresses, if: :permitted_ip_addresses_changed?
-  validate :validate_expires_at, if: :expires_at_changed?
+  validate :validate_expires_at, if: -> { expires_at_changed? || (expires_changed? && expires && expires_at_was.nil?) }
   validates :key_digest, uniqueness: true, if: :key_digest_changed?
-  validates :expires_at, presence: true
   validates :name, length: { maximum: 100 }, if: :name_changed?
   validates :name, visible_string: { allow_empty: true }, if: :name_changed?
   validates :permitted_ip_addresses, length: { maximum: 20 }, if: :permitted_ip_addresses_changed?
 
-  before_validation :set_expires_at, if: :expires_on_changed?
+  before_validation :set_expires_at, if: -> { expires_on_changed? || expires_changed? }
   before_create :generate_key
 
   after_create :send_dmail_notification
@@ -87,23 +87,37 @@ class ApiKey < ApplicationRecord
   end
 
   def validate_expires_at
-    return if expires_at.blank?
+    return unless expires?
 
-    errors.add(:expires_at, "must be in the future") if expires_at <= Time.zone.now
+    if expires_at.blank?
+      errors.add(:expires_at, "can't be blank")
+    elsif expires_at <= Time.zone.now
+      errors.add(:expires_at, "must be in the future")
+    end
   end
 
   def expires_on
-    super || expires_at&.to_date
+    return super if expires_on_changed?
+
+    super || expires_at&.to_date || DEFAULT_EXPIRATION.from_now.to_date
+  end
+
+  def expires?
+    expires.nil? ? expires_at.present? : expires
+  end
+
+  def permanent?
+    !expires?
   end
 
   def expired?
-    expires_at <= Time.zone.now
+    expires_at.present? && expires_at <= Time.zone.now
   end
 
   def send_dmail_notification
     details = [
       "An API key named \"#{name.presence || "(unnamed)"}\" was created for your account.",
-      "Expires: #{expires_at.to_date.to_fs(:long)}",
+      "Expires: #{expires_at.nil? ? "Never" : expires_at.to_date.to_fs(:long)}",
     ]
     details << "IP address: #{request.remote_ip}" if request&.remote_ip.present?
     details << "If you did not create this key, delete it and change your password."
@@ -134,10 +148,11 @@ class ApiKey < ApplicationRecord
     end
 
     def set_expires_at
-      return if expires_on.blank?
+      return self.expires_at = nil if expires == false
+      return self.expires_at = nil if expires.nil? && expires_on.blank?
       return if expires_at.present? && expires_on == expires_at.to_date
 
-      self.expires_at = expires_on.end_of_day
+      self.expires_at = expires_on&.end_of_day
     end
   end
 

@@ -9,7 +9,11 @@
 
       <p><strong>Your API key is like your password</strong>. Anyone who has it has full access to your account.</p>
 
-      <p>This key expires on <%= @api_key.expires_at.to_date.to_fs(:long) %>.</p>
+      <% if @api_key.permanent? %>
+        <p>This key does not expire.</p>
+      <% else %>
+        <p>This key expires on <%= @api_key.expires_at.to_date.to_fs(:long) %>.</p>
+      <% end %>
     </div>
 
     <pre><%= @api_key.key %></pre>

@@ -36,6 +36,14 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_nil response.parsed_body.first["key"]
       end
 
+      should "show Never for a permanent key" do
+        @api_key.update!(expires: false)
+        get_auth user_api_keys_path(@user.id), @user
+
+        assert_response :success
+        assert_select "#api-key-#{@api_key.id}", text: /Never/
+      end
+
       should "not show the key in HTML" do
         get_auth user_api_keys_path(@user.id), @user
 
@@ -94,6 +102,13 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_select "input[name='api_key[expires_on]']"
       end
 
+      should "render an expiry checkbox" do
+        get_auth new_user_api_key_path(@user.id), @user
+
+        assert_response :success
+        assert_select "input[name='api_key[expires]'][type='checkbox']"
+      end
+
       should "fail for an Anonymous user" do
         get new_user_api_key_path(@user.id)
         assert_response 403
@@ -113,10 +128,18 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
       should "set the expiration date from the form" do
         date = 1.month.from_now.to_date
-        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah", expires_on: date }}
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah", expires: "1", expires_on: date }}
 
         assert_response :success
         assert_in_delta(date.end_of_day, @user.api_keys.last.expires_at, 0.001)
+      end
+
+      should "create a permanent key when expiry is unchecked" do
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah", expires: "0" }}
+
+        assert_response :success
+        assert_nil(@user.api_keys.last.expires_at)
+        assert_match(/This key does not expire/, response.body)
       end
 
       should "return the new key once in API responses" do
@@ -144,6 +167,15 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       should "render for the API key owner" do
         get_auth edit_api_key_path(@api_key.id), @user
         assert_response :success
+      end
+
+      should "check the expires checkbox for an expiring key" do
+        @api_key.update!(expires: true, expires_on: Date.tomorrow)
+
+        get_auth edit_api_key_path(@api_key.id), @user
+
+        assert_response :success
+        assert_select "input[name='api_key[expires]'][checked]"
       end
 
       should "fail for someone else" do

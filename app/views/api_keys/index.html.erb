@@ -60,7 +60,9 @@
         <% end %>
 
         <% t.column "Expires" do |api_key| %>
-          <% if api_key.expired? %>
+          <% if api_key.expires_at.nil? %>
+            Never
+          <% elsif api_key.expired? %>
             <span class="text-error">Expired</span>
           <% else %>
             <%= time_ago_in_words_tagged api_key.expires_at %>
