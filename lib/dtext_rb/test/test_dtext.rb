@@ -1870,6 +1870,7 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="_evazion" href="/users?name=_evazion">@_evazion</a></p>', "<@_evazion>")
     assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="evazion_" href="/users?name=evazion_">@evazion_</a></p>', "<@evazion_>")
     assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="evazion" href="/users?name=evazion">@evazion</a>blah&gt;</p>', "<@evazion>blah>")
+    assert_parse('<p>&lt;@foo <a class="dtext-link dtext-user-mention-link" data-user-name="bar" href="/users?name=bar">@bar</a></p>', "<@foo <@bar>")
 
     assert_parse('<p>&lt;@ evazion&gt;</p>', "<@ evazion>")
     assert_parse('<p>&lt;@<br>evazion&gt;</p>', "<@\nevazion>")
@@ -2059,5 +2060,10 @@ class DTextTest < Minitest::Test
     assert_fast_parse("[url=/a" * 50_000)
     assert_fast_parse("[url]/a" * 50_000)
     assert_fast_parse("[url]http://a.com" * 50_000)
+  end
+
+  def test_many_unclosed_delimited_mentions
+    assert_fast_parse("<@" * 100_000)
+    assert_fast_parse("<@a " * 50_000)
   end
 end

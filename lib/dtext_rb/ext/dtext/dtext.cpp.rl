@@ -163,7 +163,7 @@ mention_char = nonspace - (punct - [._/'\-+!]);
 bare_username = ([_.]? mention_nonboundary_char mention_char* mention_nonboundary_char) - (char '@') - (char* '\'' [sd]);
 
 bare_mention = ('@' when after_mention_boundary) (bare_username >mark_a1 @mark_a2);
-delimited_mention = '<@' (nonspace nonnewline*) >mark_a1 @mark_a2 :>> '>';
+delimited_mention = '<@' ((nonspace nonnewline*) -- '<@') >mark_a1 @mark_a2 :>> '>';
 
 # The list of tags that can appear in brackets (e.g. [quote]).
 bracket_tags = (
