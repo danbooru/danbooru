@@ -87,6 +87,13 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_select "input[name='api_key[name]'][value='MyApp']"
       end
 
+      should "render an expiration date field" do
+        get_auth new_user_api_key_path(@user.id), @user
+
+        assert_response :success
+        assert_select "input[name='api_key[expires_on]']"
+      end
+
       should "fail for an Anonymous user" do
         get new_user_api_key_path(@user.id)
         assert_response 403
@@ -98,9 +105,18 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah" }}
 
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_equal("blah", @user.api_keys.last.name)
         assert_match(/dbru_[A-Za-z0-9]+/, response.body)
         assert_equal(true, @user.user_events.api_key_create.exists?(login_session_id: @user.login_sessions.last.login_id))
+      end
+
+      should "set the expiration date from the form" do
+        date = 1.month.from_now.to_date
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah", expires_on: date }}
+
+        assert_response :success
+        assert_in_delta(date.end_of_day, @user.api_keys.last.expires_at, 0.001)
       end
 
       should "return the new key once in API responses" do

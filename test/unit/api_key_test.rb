@@ -80,6 +80,33 @@ class ApiKeyTest < ActiveSupport::TestCase
         assert_equal(true, @user.user_events.api_key_create.exists?)
       end
 
+      should "expire after one year by default" do
+        assert_in_delta(1.year.from_now, @api_key.expires_at, 1.minute)
+      end
+
+      should "use the selected expiration date" do
+        date = 2.weeks.from_now.to_date
+        api_key = create(:api_key, user: create(:user), expires_on: date)
+
+        assert_equal(date.end_of_day, api_key.expires_at)
+      end
+
+      should "not allow an expiration date in the past" do
+        api_key = build(:api_key, user: create(:user), expires_on: Date.yesterday)
+
+        assert_equal(false, api_key.valid?)
+        assert_includes(api_key.errors[:expires_at], "must be in the future")
+      end
+
+      should "not change the expiration time when updating other attributes" do
+        api_key = create(:api_key, user: create(:user))
+        expires_at = api_key.expires_at
+
+        api_key.update!(name: "blah", expires_on: api_key.expires_on)
+
+        assert_equal(expires_at.to_i, api_key.reload.expires_at.to_i)
+      end
+
       should "record a user event when updating the key" do
         @api_key.update!(permitted_ip_addresses: ["1.2.3.4"])
 
@@ -104,6 +131,12 @@ class ApiKeyTest < ActiveSupport::TestCase
 
       should "authenticate via api key" do
         assert_equal([@user, @api_key], @user.authenticate_api_key(@api_key.key))
+      end
+
+      should "not authenticate via an expired api key" do
+        travel_to(2.years.from_now) do
+          assert_equal(false, @user.authenticate_api_key(@api_key.key))
+        end
       end
 
       should "not authenticate with the wrong api key" do

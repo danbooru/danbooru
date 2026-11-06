@@ -3,6 +3,7 @@
 class ApiKey < ApplicationRecord
   KEY_PREFIX = "dbru_"
   KEY_LENGTH = 24
+  DEFAULT_EXPIRATION = 1.year
 
   # Set to the current HTTP request when creating, updating, or destroying the API key.
   attr_accessor :request
@@ -11,6 +12,8 @@ class ApiKey < ApplicationRecord
 
   attribute :permitted_ip_addresses, :ip_address, array: true
   attribute :last_ip_address, :ip_address
+  attribute :expires_at, :datetime, default: -> { DEFAULT_EXPIRATION.from_now }
+  attribute :expires_on, :date
 
   array_attribute :permissions
   array_attribute :permitted_ip_addresses
@@ -21,14 +24,20 @@ class ApiKey < ApplicationRecord
 
   belongs_to :user
 
+  scope :active, -> { where(expires_at: Time.zone.now..) }
+  scope :expired, -> { where(expires_at: ...Time.zone.now) }
+
   validate :validate_max_api_keys, on: :create
   validate :validate_permissions, if: :permissions_changed?
   validate :validate_ip_addresses, if: :permitted_ip_addresses_changed?
+  validate :validate_expires_at, if: :expires_at_changed?
   validates :key_digest, uniqueness: true, if: :key_digest_changed?
+  validates :expires_at, presence: true
   validates :name, length: { maximum: 100 }, if: :name_changed?
   validates :name, visible_string: { allow_empty: true }, if: :name_changed?
   validates :permitted_ip_addresses, length: { maximum: 20 }, if: :permitted_ip_addresses_changed?
 
+  before_validation :set_expires_at, if: :expires_on_changed?
   before_create :generate_key
 
   after_destroy :create_user_event
@@ -52,7 +61,7 @@ class ApiKey < ApplicationRecord
   end
 
   def validate_max_api_keys
-    if user.api_keys.count >= 20
+    if user.api_keys.active.count >= 20
       errors.add(:base, "You can't have more than 20 API keys.")
     end
   end
@@ -70,6 +79,20 @@ class ApiKey < ApplicationRecord
         end
       end
     end
+  end
+
+  def validate_expires_at
+    return if expires_at.blank?
+
+    errors.add(:expires_at, "must be in the future") if expires_at <= Time.zone.now
+  end
+
+  def expires_on
+    super || expires_at&.to_date
+  end
+
+  def expired?
+    expires_at <= Time.zone.now
   end
 
   def create_user_event
@@ -91,6 +114,13 @@ class ApiKey < ApplicationRecord
     def generate_key
       @key = "#{KEY_PREFIX}#{SecureRandom.base58(KEY_LENGTH)}"
       self.key_digest = self.class.digest(@key)
+    end
+
+    def set_expires_at
+      return if expires_on.blank?
+      return if expires_at.present? && expires_on == expires_at.to_date
+
+      self.expires_at = expires_on.end_of_day
     end
   end
 

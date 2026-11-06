@@ -8,6 +8,8 @@
       <p>This is the only time your API key will be shown. Save it somewhere safe now.</p>
 
       <p><strong>Your API key is like your password</strong>. Anyone who has it has full access to your account.</p>
+
+      <p>This key expires on <%= @api_key.expires_at.to_date.to_fs(:long) %>.</p>
     </div>
 
     <pre><%= @api_key.key %></pre>

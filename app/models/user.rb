@@ -360,7 +360,7 @@ class User < ApplicationRecord
     # @return [Array<(User, ApiKey)>, Boolean] Return a (User, ApiKey) pair if the API key is correct, or false if it isn't.
     def authenticate_api_key(key)
       return false if is_deleted?
-      api_key = api_keys.find_by(key_digest: ApiKey.digest(key))
+      api_key = api_keys.active.find_by(key_digest: ApiKey.digest(key))
       api_key.present? && [self, api_key]
     end
 
