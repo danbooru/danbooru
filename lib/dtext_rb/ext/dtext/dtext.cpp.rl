@@ -204,11 +204,11 @@ backwards_markdown_link = '[' (delimited_absolute_url | ((delimited_relative_url
 markdown_link = (('[' (nonnewline - '[')+ >mark_f1 %mark_f2 :>> ']') - ('[' '/'? bracket_tags ']')) '(' (delimited_absolute_url | delimited_relative_url) >mark_g1 %mark_g2 :>> ')';
 html_link = '<a'i ws+ 'href="'i (delimited_absolute_url | delimited_relative_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
-unquoted_bbcode_url = delimited_absolute_url | delimited_relative_url;
+unquoted_bbcode_url = (delimited_absolute_url | delimited_relative_url) -- '[url'i;
 double_quoted_bbcode_url = '"' unquoted_bbcode_url >mark_b1 %mark_b2 :>> '"';
 single_quoted_bbcode_url = "'" unquoted_bbcode_url >mark_b1 %mark_b2 :>> "'";
 bbcode_url = double_quoted_bbcode_url | single_quoted_bbcode_url | unquoted_bbcode_url >mark_b1 %mark_b2;
-bbcode_title = nonnewline+ - (ws any* | any* ws);
+bbcode_title = (nonnewline+ - (ws any* | any* ws)) -- '[url'i;
 named_bbcode_link   = '[url'i ws* '=' ws* (bbcode_url :>> ws* ']') ws* (bbcode_title >mark_a1 %mark_a2 ws* :>> '[/url]'i);
 unnamed_bbcode_link = '[url]'i ws* unquoted_bbcode_url >mark_a1 %mark_a2 ws* :>> '[/url]'i;
 

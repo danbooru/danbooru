@@ -1029,6 +1029,11 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://buzmon.net">Hentai</a>Story</p>', '[URL=http://buzmon.net]Hentai [/URL]Story')
     assert_parse('<p>foo<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://google.com">foo  bar</a>bar</p>', 'foo[url=http://google.com] foo  bar [/url]bar')
 
+    assert_parse('<p>[url=/a]foo <a class="dtext-link" href="/b">bar</a></p>', '[url=/a]foo [url=/b]bar[/url]')
+    assert_parse('<p>[url=/a]<a class="dtext-link" href="/b">bar</a></p>', '[url=/a][url=/b]bar[/url]')
+    assert_parse('<p>[url=/a]foo <a class="dtext-link" href="/b">/b</a> bar[/url]</p>', '[url=/a]foo [url]/b[/url] bar[/url]')
+    assert_parse('<p>[url]/a<a class="dtext-link" href="/b">/b</a></p>', '[url]/a[url]/b[/url]')
+
     assert_parse('<p>[url]nonurl[/url]</p>', '[url]nonurl[/url]')
     assert_parse('<p>[url=nonurl]blah[/url]</p>', '[url=nonurl]blah[/url]')
     assert_parse('<p>[url][/url]</p>', '[url][/url]')
@@ -2046,5 +2051,13 @@ class DTextTest < Minitest::Test
     assert_fast_parse("[[a" * 50_000)
     assert_fast_parse("[[a|" * 50_000)
     assert_fast_parse("[[a|b" * 50_000)
+  end
+
+  def test_many_unclosed_bbcode_links
+    assert_fast_parse("[url=/a]" * 50_000)
+    assert_fast_parse("[url=/a]b " * 50_000)
+    assert_fast_parse("[url=/a" * 50_000)
+    assert_fast_parse("[url]/a" * 50_000)
+    assert_fast_parse("[url]http://a.com" * 50_000)
   end
 end
