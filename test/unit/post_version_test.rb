@@ -49,8 +49,8 @@ class PostVersionTest < ActiveSupport::TestCase
 
           assert_nothing_raised { PostVersion.changed_tags_include_all(tags.first(100)).to_a }
           assert_nothing_raised { PostVersion.changed_tags_include_any(tags.first(100)).to_a }
-          assert_raises(ArgumentError) { PostVersion.changed_tags_include_all(tags) }
-          assert_raises(ArgumentError) { PostVersion.changed_tags_include_any(tags) }
+          assert_raises(PostVersion::SearchError) { PostVersion.changed_tags_include_all(tags) }
+          assert_raises(PostVersion::SearchError) { PostVersion.changed_tags_include_any(tags) }
         end
       end
     end

@@ -46,13 +46,13 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
 
         get post_versions_path(search: { changed_tags: tags.join(" ") }), as: :json
-        assert_response 400
+        assert_response 422
 
         get post_versions_path(search: { all_changed_tags: tags.join(" ") }), as: :json
-        assert_response 400
+        assert_response 422
 
         get post_versions_path(search: { any_changed_tags: tags.join(" ") }), as: :json
-        assert_response 400
+        assert_response 422
       end
 
       should "list all versions for search[tag_matches]" do

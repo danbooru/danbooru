@@ -9,6 +9,7 @@ class PostVersion < ApplicationRecord
   MAX_CHANGED_TAGS = 100
 
   class RevertError < StandardError; end
+  class SearchError < StandardError; end
   extend Memoist
 
   belongs_to :post
@@ -26,7 +27,7 @@ class PostVersion < ApplicationRecord
 
   module SearchMethods
     def changed_tags_include_all(tags)
-      raise ArgumentError, "You can't search for more than #{MAX_CHANGED_TAGS} changed tags at once" if tags.size > MAX_CHANGED_TAGS
+      raise SearchError, "You can't search for more than #{MAX_CHANGED_TAGS} changed tags at once" if tags.size > MAX_CHANGED_TAGS
 
       conditions = tags.map do |tag|
         arel_node(:added_tags).contains(sql_array([tag])).or(arel_node(:removed_tags).contains(sql_array([tag])))
@@ -36,7 +37,7 @@ class PostVersion < ApplicationRecord
     end
 
     def changed_tags_include_any(tags)
-      raise ArgumentError, "You can't search for more than #{MAX_CHANGED_TAGS} changed tags at once" if tags.size > MAX_CHANGED_TAGS
+      raise SearchError, "You can't search for more than #{MAX_CHANGED_TAGS} changed tags at once" if tags.size > MAX_CHANGED_TAGS
 
       where_array_includes_any(:added_tags, tags).or(where_array_includes_any(:removed_tags, tags))
     end
