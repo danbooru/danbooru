@@ -889,7 +889,13 @@ class DTextTest < Minitest::Test
     assert_parse('<p>&quot;1&quot; <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
   end
 
+  def test_many_unclosed_new_style_links
+    assert_fast_parse('"a":[http://a' * 20_000)
+    assert_fast_parse('"a":[/a' * 30_000)
+  end
+
   def test_new_style_links
+    assert_inline_parse('&quot;a&quot;:[<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://a.com">http://a.com</a><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://b.com">b</a>', '"a":[http://a.com"b":[http://b.com]')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">test</a></p>', '"test":[http://test.com]')
     assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="Http://test.com">test</a></p>', '"test":[Http://test.com]')
 

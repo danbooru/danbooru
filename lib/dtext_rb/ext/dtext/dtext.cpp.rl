@@ -198,7 +198,7 @@ delimited_relative_url = [/#] nonspace*;
 
 delimited_url = '<' delimited_absolute_url >mark_a1 %mark_a2 :>> '>';
 basic_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':' (bare_absolute_url | bare_relative_url) >mark_b1 @mark_b2;
-bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' (delimited_absolute_url | delimited_relative_url) >mark_b1 %mark_b2 :>> ']';
+bracketed_textile_link = '"' ^'"'+ >mark_a1 %mark_a2 '"' ':[' ((delimited_absolute_url | delimited_relative_url) -- '":[') >mark_b1 %mark_b2 :>> ']';
 
 backwards_markdown_link = '[' ((delimited_absolute_url | ((delimited_relative_url -- ']') - '/' bracket_tags)) -- ('[' ([/#] | scheme))) >mark_a1 %mark_a2 :>> '](' (nonnewline+ -- ('[' ([/#] | scheme) nonspace* '](')) >mark_b1 %mark_b2 :>> ')';
 markdown_link = (('[' (nonnewline - '[')+ >mark_f1 %mark_f2 :>> ']') - ('[' '/'? bracket_tags ']')) '(' ((delimited_absolute_url | delimited_relative_url) -- '](') >mark_g1 %mark_g2 :>> ')';
