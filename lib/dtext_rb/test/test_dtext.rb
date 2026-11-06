@@ -1271,6 +1271,19 @@ class DTextTest < Minitest::Test
     assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="mailto:foo_bar.baz+qux@test-mail.example.com">foo_bar.baz+qux@test-mail.example.com</a>', "mailto:foo_bar.baz+qux@test-mail.example.com")
   end
 
+  def test_max_list_depth
+    # Lists nested more than 100 levels deep are flattened to 100 levels.
+    assert_parse("#{"<ul>" * 100}<li>a</li>#{"</ul>" * 100}", "#{"*" * 150} a")
+    assert_parse("#{"<ul>" * 100}<li>a</li>#{"</ul>" * 99}<li>b</li></ul>", "#{"*" * 150} a\n* b")
+    assert_parse("<ul>#{"<ul>" * 49}<li>a</li>#{"</ul>" * 49}<li>b</li></ul>", "#{"*" * 50} a\n* b")
+  end
+
+  def test_deeply_nested_lists
+    assert_fast_parse("#{"*" * 100_000} a")
+    assert_fast_parse("#{"*" * 1_000} a\n" * 100)
+    assert_fast_parse("#{"*" * 100} a\n* b\n" * 2_000)
+  end
+
   def test_lists
     assert_parse('<ul><li>a</li></ul>', '* a')
     assert_parse('<ul><li>a</li><li>b</li></ul>', "* a\n* b")

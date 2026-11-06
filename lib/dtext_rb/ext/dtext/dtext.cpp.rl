@@ -1492,11 +1492,15 @@ void StateMachine::dstack_open_list(int depth) {
     dstack_close_leaf_blocks();
   }
 
-  while (dstack_count(BLOCK_UL) < depth) {
+  // Lists nested more than MAX_NESTING_DEPTH levels deep are flattened.
+  int list_depth = std::min(depth, static_cast<int>(MAX_NESTING_DEPTH));
+  int open_lists = dstack_count(BLOCK_UL);
+
+  for (; open_lists < list_depth; open_lists++) {
     dstack_open_element(BLOCK_UL, "<ul>");
   }
 
-  while (dstack_count(BLOCK_UL) > depth) {
+  for (; open_lists > list_depth; open_lists--) {
     dstack_close_until(BLOCK_UL);
   }
 
