@@ -31,6 +31,21 @@ class ExternalCommandTest < ActiveSupport::TestCase
       assert_equal(false, status.success?)
       assert_match(/NoMemoryError/, output)
     end
+
+    should "not run commands through a shell" do
+      output, _status = ExternalCommand.run("echo hello; echo world")
+
+      assert_equal("hello; echo world\n", output)
+    end
+
+    should "not pass the environment to commands" do
+      ENV["DANBOORU_EXTERNAL_COMMAND_TEST_SECRET"] = "secret"
+      output, _status = ExternalCommand.run("env")
+
+      assert_equal(ENV.slice(*ExternalCommand::ENVIRONMENT).keys.sort, output.lines.map { it.split("=").first }.sort)
+    ensure
+      ENV.delete("DANBOORU_EXTERNAL_COMMAND_TEST_SECRET")
+    end
   end
 
   context "FFmpeg.shell!" do
