@@ -5,6 +5,9 @@ class PostVersion < ApplicationRecord
   # collapsed instead of showing the full list on the post versions page.
   MAX_DISPLAY_TAGS = 300
 
+  # The maximum number of tags that can be searched for at once with `search[changed_tags]`, `search[all_changed_tags]`, or `search[any_changed_tags]`.
+  MAX_CHANGED_TAGS = 100
+
   class RevertError < StandardError; end
   extend Memoist
 
@@ -22,17 +25,19 @@ class PostVersion < ApplicationRecord
   establish_connection database_url if enabled?
 
   module SearchMethods
-    def changed_tags_include(tag)
-      where_array_includes_all(:added_tags, [tag]).or(where_array_includes_all(:removed_tags, [tag]))
-    end
-
     def changed_tags_include_all(tags)
-      tags.reduce(all) do |relation, tag|
-        relation.changed_tags_include(tag)
+      raise ArgumentError, "You can't search for more than #{MAX_CHANGED_TAGS} changed tags at once" if tags.size > MAX_CHANGED_TAGS
+
+      conditions = tags.map do |tag|
+        arel_node(:added_tags).contains(sql_array([tag])).or(arel_node(:removed_tags).contains(sql_array([tag])))
       end
+
+      conditions.empty? ? all : where(Arel::Nodes::And.new(conditions))
     end
 
     def changed_tags_include_any(tags)
+      raise ArgumentError, "You can't search for more than #{MAX_CHANGED_TAGS} changed tags at once" if tags.size > MAX_CHANGED_TAGS
+
       where_array_includes_any(:added_tags, tags).or(where_array_includes_any(:removed_tags, tags))
     end
 

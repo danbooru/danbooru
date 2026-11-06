@@ -32,6 +32,27 @@ class PostVersionTest < ActiveSupport::TestCase
           assert_equal("1 2", @version.previous.tags)
         end
       end
+
+      context "searching for changed tags" do
+        should "find versions that added or removed all of the given tags" do
+          v1, v2, v3 = @post.versions.sort_by(&:id)
+
+          assert_equal([v1, v3], PostVersion.changed_tags_include_all(["1"]).sort_by(&:id))
+          assert_equal([v2], PostVersion.changed_tags_include_all(["2"]).sort_by(&:id))
+          assert_equal([v3], PostVersion.changed_tags_include_all(["1", "3"]).sort_by(&:id))
+          assert_equal([], PostVersion.changed_tags_include_all(["1", "2"]).to_a)
+          assert_equal([v1, v2, v3], PostVersion.changed_tags_include_any(["1", "2"]).sort_by(&:id))
+        end
+
+        should "not allow searching for more than 100 tags" do
+          tags = (1..101).map { |n| "t#{n}" }
+
+          assert_nothing_raised { PostVersion.changed_tags_include_all(tags.first(100)).to_a }
+          assert_nothing_raised { PostVersion.changed_tags_include_any(tags.first(100)).to_a }
+          assert_raises(ArgumentError) { PostVersion.changed_tags_include_all(tags) }
+          assert_raises(ArgumentError) { PostVersion.changed_tags_include_any(tags) }
+        end
+      end
     end
 
     should "merge versions made by the same user within the same second" do
