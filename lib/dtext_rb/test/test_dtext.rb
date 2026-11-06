@@ -735,6 +735,17 @@ class DTextTest < Minitest::Test
     assert_parse('<p>foo <strong>bar</strong></p><pre>blah</pre>', "foo [b]bar\n```\nblah\n```")
   end
 
+  def test_long_urls
+    host = "http://#{"a" * 200_000}.com"
+    path = "http://a.com/#{"b" * 200_000}"
+    internal = "https://danbooru.donmai.us/posts?tags=#{"a" * 200_000}"
+
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="#{host}">#{host}</a></p>}, host)
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="#{path}">#{path}</a></p>}, path)
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="#{path}">#{path}</a></p>}, "<#{path}>")
+    assert_parse(%{<p><a class="dtext-link" href="#{internal}">#{internal}</a></p>}, internal, domain: "danbooru.donmai.us", internal_domains: ["danbooru.donmai.us"])
+  end
+
   def test_urls
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a> b</p>', 'a http://test.com b')
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="Http://test.com">Http://test.com</a> b</p>', 'a Http://test.com b')

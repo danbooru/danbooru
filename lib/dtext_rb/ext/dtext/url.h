@@ -2,7 +2,7 @@
 #define DTEXT_URL_H
 
 #include <string>
-#include <regex>
+#include <algorithm>
 #include <vector>
 
 namespace DText {
@@ -36,18 +36,77 @@ class URL {
 
  private:
 
+  // Parse a URL like `https://danbooru.donmai.us:443/posts/1234?q=touhou#comment-1234`. This is done by hand instead
+  // of with std::regex because std::regex recurses once per character and overflows the stack on long URLs.
   void parse() {
-    // https://danbooru.donmai.us:443/posts/1234?q=touhou#comment-1234
-    static const std::regex url_regex("^([a-z]+):(?://)?([^/?#:]+)(:[0-9]+)?(?:/([^?#]*))?(?:\\?([^#]*))?(?:#(.*))?$", std::regex_constants::icase | std::regex_constants::optimize);
-    std::match_results<std::string_view::const_iterator> matches;
+    auto rest = url;
 
-    if (std::regex_search(url.begin(), url.end(), matches, url_regex)) {
-      scheme = { matches[1].first, matches[1].second };
-      domain = { matches[2].first, matches[2].second };
-      path = { matches[4].first, matches[4].second };
-      query = { matches[5].first, matches[5].second };
-      fragment = { matches[6].first, matches[6].second };
-    };
+    // `https:`
+    auto scheme_end = rest.find(':');
+    if (scheme_end == 0 || scheme_end == std::string_view::npos || !std::all_of(rest.begin(), rest.begin() + scheme_end, [](unsigned char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); })) {
+      return;
+    }
+    auto parsed_scheme = rest.substr(0, scheme_end);
+    rest.remove_prefix(scheme_end + 1);
+
+    // `//`
+    if (rest.starts_with("//")) {
+      rest.remove_prefix(2);
+    }
+
+    // `danbooru.donmai.us`
+    auto domain_end = std::min(rest.find_first_of("/?#:"), rest.size());
+    if (domain_end == 0) {
+      return;
+    }
+    auto parsed_domain = rest.substr(0, domain_end);
+    rest.remove_prefix(domain_end);
+
+    // `:443`
+    if (rest.starts_with(':')) {
+      auto port_end = std::min(rest.find_first_not_of("0123456789", 1), rest.size());
+      if (port_end == 1) {
+        return;
+      }
+      rest.remove_prefix(port_end);
+    }
+
+    // `/posts/1234`
+    std::string_view parsed_path;
+    if (rest.starts_with('/')) {
+      auto path_end = std::min(rest.find_first_of("?#"), rest.size());
+      parsed_path = rest.substr(1, path_end - 1);
+      rest.remove_prefix(path_end);
+    }
+
+    // `?q=touhou`
+    std::string_view parsed_query;
+    if (rest.starts_with('?')) {
+      auto query_end = std::min(rest.find('#'), rest.size());
+      parsed_query = rest.substr(1, query_end - 1);
+      rest.remove_prefix(query_end);
+    }
+
+    // `#comment-1234` (can't contain line breaks, like `.` in a regex)
+    std::string_view parsed_fragment;
+    if (rest.starts_with('#')) {
+      parsed_fragment = rest.substr(1);
+      if (parsed_fragment.find_first_of("\r\n") != std::string_view::npos) {
+        return;
+      }
+      rest = {};
+    }
+
+    // Anything left over (e.g. `:443x`) means the URL is invalid.
+    if (!rest.empty()) {
+      return;
+    }
+
+    scheme = parsed_scheme;
+    domain = parsed_domain;
+    path = parsed_path;
+    query = parsed_query;
+    fragment = parsed_fragment;
   }
 };
 
