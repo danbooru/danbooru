@@ -6,6 +6,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    benchmark (0.5.0)
     benchmark-ips (2.15.1)
     cgi (0.5.2)
     drb (2.2.3)
@@ -19,6 +20,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  benchmark (~> 0.5)
   benchmark-ips (~> 2.10)
   cgi (~> 0.5)
   dtext_rb!
@@ -26,6 +28,7 @@ DEPENDENCIES
   rake (~> 13)
 
 CHECKSUMS
+  benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   benchmark-ips (2.15.1) sha256=07a1a9f3c6105ecaf68c174fc3fbcddd71a0e9ada6236ae03093a0dcfd812d59
   cgi (0.5.2) sha256=61ca30298171190fd4fa0d8018e57ada456eae9b7a2b78526debf7f0a0e6f8bb
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373

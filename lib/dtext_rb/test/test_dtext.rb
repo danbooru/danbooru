@@ -2,6 +2,7 @@
 
 require "dtext"
 require "cgi"
+require "benchmark"
 require "minitest/autorun"
 
 class DTextTest < Minitest::Test
@@ -726,6 +727,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p>a {<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>} b</p>', 'a {http://test.com} b')
     assert_parse('<p>a(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>) b</p>', 'a(http://test.com) b')
     assert_parse('<p>(at <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/1234?page=42">http://test.com/1234?page=42</a>). blah</p>', '(at http://test.com/1234?page=42). blah')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/(a)">http://test.com/(a)</a>)) b</p>', 'a http://test.com/(a))) b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/((a))">http://test.com/((a))</a>) b</p>', 'a http://test.com/((a))) b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/">http://test.com/</a>))) b</p>', 'a http://test.com/))) b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/a)(b">http://test.com/a)(b</a>) b</p>', 'a http://test.com/a)(b) b')
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/~bob/image.jpg">http://test.com/~bob/image.jpg</a> b</p>', 'a http://test.com/~bob/image.jpg b')
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/home.html#toc">http://test.com/home.html#toc</a> b</p>', 'a http://test.com/home.html#toc b')
 
@@ -2007,5 +2012,15 @@ class DTextTest < Minitest::Test
     assert_raises(DText::Error) do
       parse(%("url":/page\xF4">x\xFA<b>xss\xFA</b>))
     end
+  end
+
+  def test_url_with_many_trailing_parentheses
+    input = "http://a.co/#{")" * 200_000}"
+    elapsed = Benchmark.realtime { parse(input) }
+    assert_operator(elapsed, :<, 0.5)
+
+    input = %{"a":http://a.co/#{")" * 200_000}}
+    elapsed = Benchmark.realtime { parse(input) }
+    assert_operator(elapsed, :<, 0.5)
   end
 end

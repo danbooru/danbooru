@@ -1520,9 +1520,12 @@ static bool is_mention_boundary(unsigned char c) {
 // Trim trailing unbalanced ')' characters from the URL.
 std::tuple<std::string_view, std::string_view> StateMachine::trim_url(const std::string_view url) {
   std::string_view trimmed = url;
+  auto open_parens = std::count(url.begin(), url.end(), '(');
+  auto close_parens = std::count(url.begin(), url.end(), ')');
 
-  while (!trimmed.empty() && trimmed.back() == ')' && std::count(trimmed.begin(), trimmed.end(), ')') > std::count(trimmed.begin(), trimmed.end(), '(')) {
+  while (!trimmed.empty() && trimmed.back() == ')' && close_parens > open_parens) {
     trimmed.remove_suffix(1);
+    close_parens--;
   }
 
   return { trimmed, { trimmed.end(), url.end() } };

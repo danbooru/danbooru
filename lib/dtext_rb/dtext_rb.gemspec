@@ -27,5 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency("minitest", ["~> 6"])
   spec.add_development_dependency("rake", ["~> 13"])
   spec.add_development_dependency("cgi", ["~> 0.5"])
+  spec.add_development_dependency("benchmark", ["~> 0.5"])
   spec.add_development_dependency("benchmark-ips", ["~> 2.10"])
 end
