@@ -342,7 +342,14 @@ module Danbooru
         return true if mail_server.blank?
 
         return false if !smtp_enabled?
-        smtp = Net::SMTP.new(mail_server)
+
+        # Connect to the resolved IP, not the hostname, to prevent SSRF and DNS rebinding attacks.
+        dns = Resolv::DNS.new
+        dns.timeouts = timeout
+        ip = Danbooru::IpAddress.new(dns.getaddress(mail_server).to_s)
+        return true if ip.prohibited_for_outgoing?
+
+        smtp = Net::SMTP.new(ip.to_s, tls_hostname: mail_server)
         smtp.read_timeout = timeout
         smtp.open_timeout = timeout
 
