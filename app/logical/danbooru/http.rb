@@ -28,6 +28,7 @@ module Danbooru
     Danbooru::Http::XmlAdapter.register
     Danbooru::Http::Cache.register
     Danbooru::Http::Logger.register
+    Danbooru::Http::MaxSize.register
     Danbooru::Http::Redirector.register
     Danbooru::Http::Retriable.register
     Danbooru::Http::Session.register
@@ -36,6 +37,7 @@ module Danbooru
 
     DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"
 
+    DEFAULT_MAX_SIZE = 10.megabytes # The max size of response bodies, after decompression. Media downloads use a larger limit.
     DEFAULT_TIMEOUT = 20
     MAX_REDIRECTS = 5
 
@@ -43,6 +45,7 @@ module Danbooru
     ERROR_STATUSES = {
       OpenSSL::SSL::SSLError => 590,
       ValidatingSocket::ProhibitedIpError => 591,
+      FileTooLargeError => 595,
       HTTP::Redirector::TooManyRedirectsError => 596,
       HTTP::TimeoutError => 597,
       HTTP::ConnectionError => 598,
@@ -50,7 +53,7 @@ module Danbooru
       HTTP::Error => 599,
     }.freeze
 
-    attr_accessor :max_size, :http
+    attr_accessor :http
 
     class << self
       delegate :get, :head, :put, :post, :delete, :parsed_get, :parsed_post, :redirect_url, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
@@ -62,7 +65,7 @@ module Danbooru
         .timeout(DEFAULT_TIMEOUT)
         .headers("Accept-Encoding": "gzip")
         .use(normalize_uri: { normalizer: method(:normalize_uri) })
-        .use(:auto_inflate)
+        .use(max_size: { max_size: DEFAULT_MAX_SIZE })
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)
     end
@@ -160,7 +163,7 @@ module Danbooru
     end
 
     def max_size(size)
-      dup.tap { |o| o.max_size = size }
+      use(max_size: { max_size: size })
     end
 
     def timeout(*args)
@@ -262,17 +265,10 @@ module Danbooru
       # @raise [FileTooLargeError] if the file exceeds Danbooru's maximum download size.
       # @return [Array<(HTTP::Response, MediaFile)>] the HTTP response and the downloaded file
       def download_media(url, file: Danbooru::Tempfile.new("danbooru-download-#{url.parameterize.truncate(96)}-", binmode: true))
-        response = get(url)
-
+        response = request(:get, url, buffer: false)
         raise DownloadError, "#{url} failed with code #{response.status}" if response.status != 200
-        raise FileTooLargeError, "File size too large (size: #{response.content_length.to_i.to_fs(:human_size)}; max size: #{@max_size.to_fs(:human_size)})" if @max_size && response.content_length.to_i > @max_size
 
-        size = 0
-        response.body.each do |chunk|
-          size += chunk.size
-          raise FileTooLargeError, "File size too large (max size: #{@max_size.to_fs(:human_size)})" if @max_size && size > @max_size
-          file.write(chunk)
-        end
+        response.body.each { |chunk| file.write(chunk) }
 
         file.rewind
         [response, MediaFile.open(file)]
@@ -287,11 +283,14 @@ module Danbooru
     # @param method [String] the HTTP method
     # @param url [String] the URL to request
     # @param format [Symbol] if present, override the response's content type to be this format (:json, :html, or :xml).
+    # @param buffer [Boolean] if true, read the full response body upfront so that errors while reading it
+    #   (including the body being too large) occur now instead of later. If false, the body can be streamed.
     # @param options [Hash] the URL parameters
     # @return [HTTP::Response] the HTTP response
-    def request(method, url, format: nil, **options)
+    def request(method, url, format: nil, buffer: true, **options)
       url = url.to_s
       response = http.send(method, url, **options)
+      response.flush if buffer
 
       if format
         mime_type = Mime::Type.lookup_by_extension(format).to_s

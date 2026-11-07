@@ -5,6 +5,22 @@ class DanbooruHttpTest < ActiveSupport::TestCase
     "https://httpbingo.org/#{path}"
   end
 
+  # Start a local server that returns the given body for every request, and yield its URL.
+  def with_local_server(body, gzip: false, content_type: "text/html")
+    server = WEBrick::HTTPServer.new(BindAddress: "127.0.0.1", Port: 0, Logger: WEBrick::Log.new(File::NULL), AccessLog: [])
+    server.mount_proc("/") do |_request, response|
+      response.content_type = content_type
+      response["Content-Encoding"] = "gzip" if gzip
+      response.body = gzip ? ActiveSupport::Gzip.compress(body) : body
+    end
+    thread = Thread.new { server.start }
+
+    yield "http://127.0.0.1:#{server.config[:Port]}/"
+  ensure
+    server&.shutdown
+    thread&.join
+  end
+
   context "Danbooru::Http" do
     context "#get method" do
       should "work for all basic methods" do
@@ -49,10 +65,55 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal("", response.body.to_s)
       end
 
-      should "automatically decompress gzipped responses" do
-        response = Danbooru::Http.get(httpbin_url("gzip"))
-        assert_equal(200, response.status)
-        assert_equal(true, response.parse["gzipped"])
+      should "decompress gzipped responses under the max size" do
+        with_local_server("<p>hello</p>", gzip: true) do |url|
+          response = Danbooru::Http.max_size(1_000).get(url)
+
+          assert_equal(200, response.status)
+          assert_equal("<p>hello</p>", response.to_s)
+        end
+      end
+
+      should "decompress highly compressed downloads in small chunks" do
+        with_local_server("a" * 50_000_000, gzip: true, content_type: "image/png") do |url|
+          response = Danbooru::Http.max_size(100_000_000).send(:request, :get, url, buffer: false)
+          sizes = response.body.map(&:bytesize)
+
+          assert_equal(50_000_000, sizes.sum)
+          assert_operator(sizes.max, :<=, Danbooru::Http::MaxSize::Stream::INFLATE_SIZE * 1100) # gzip expands data at most about 1032x
+        end
+      end
+
+      should "fail if a gzipped response is too large after decompression" do
+        with_local_server("a" * 10_000, gzip: true) do |url|
+          response = Danbooru::Http.max_size(1_000).get(url)
+
+          assert_equal(595, response.status)
+          assert_equal("", response.body.to_s)
+        end
+      end
+
+      should "fail if an uncompressed response is too large" do
+        with_local_server("a" * 10_000) do |url|
+          response = Danbooru::Http.max_size(1_000).get(url)
+
+          assert_equal(595, response.status)
+          assert_equal("", response.body.to_s)
+        end
+      end
+
+      should "not fail for HEAD requests to large files" do
+        with_local_server("a" * 10_000) do |url|
+          response = Danbooru::Http.max_size(1_000).head(url)
+
+          assert_equal(200, response.status)
+        end
+      end
+
+      should "return nil from parsed_get if the response is too large" do
+        with_local_server("<p>#{"a" * 10_000}</p>", gzip: true) do |url|
+          assert_nil(Danbooru::Http.max_size(1_000).parsed_get(url))
+        end
       end
 
       should "automatically parse html responses" do
@@ -163,6 +224,15 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
         assert_equal(597, response.status)
         assert_nil(Cache.get("http:timeout-test"))
+      end
+
+      should "not cache responses that are too large" do
+        with_local_server("a" * 10_000, gzip: true) do |url|
+          response = Danbooru::Http.max_size(1_000).cache(1.hour, key: "too-large-test").get(url)
+
+          assert_equal(595, response.status)
+          assert_nil(Cache.get("http:too-large-test"))
+        end
       end
 
       should "cache cookies correctly" do
@@ -336,6 +406,14 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "fail if a streaming download is too large" do
         assert_raises(Danbooru::Http::FileTooLargeError) do
           Danbooru::Http.max_size(500).download_media(httpbin_url("stream-bytes/1000"))
+        end
+      end
+
+      should "fail if a gzipped download is too large after decompression" do
+        with_local_server("a" * 10_000_000, gzip: true, content_type: "image/png") do |url|
+          assert_raises(Danbooru::Http::FileTooLargeError) do
+            Danbooru::Http.max_size(1_000_000).download_media(url)
+          end
         end
       end
     end
