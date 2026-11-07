@@ -29,8 +29,15 @@ module IconHelper
   def svg_icon_tag(name, class: nil, **options)
     klass = binding.local_variable_get(:class)
     tag.svg(class: "icon svg-icon #{name}-icon #{klass}".strip, **options) do
-      tag.use(fill: "currentColor", href: asset_pack_path("static/icons.svg") + "##{name}")
+      tag.use(fill: "currentColor", href: "#{svg_icon_path}##{name}")
     end
+  end
+
+  # In development, each `asset_pack_path` call checks whether the webpack dev server is running by opening a new
+  # connection to it, which is slow. Memoize it to avoid this. Note that instance variables in helpers share the same
+  # namespace as instance variables in controllers, and are reset after each request.
+  def svg_icon_path
+    @svg_icon_path ||= asset_pack_path("static/icons.svg")
   end
 
   # Render an image icon from the public/logos directory.
