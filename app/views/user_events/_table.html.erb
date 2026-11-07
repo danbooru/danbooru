@@ -94,6 +94,18 @@
         Logged in with a backup code.
       <% when "backup_code_reauthenticate" %>
         Reauthenticated with a backup code.
+      <% when "passkey_login" %>
+        Logged in with a passkey.
+      <% when "passkey_reauthenticate" %>
+        Reauthenticated with a passkey.
+      <% when "passkey_failed_login" %>
+        Failed to authenticate with a passkey.
+      <% when "passkey_failed_reauthenticate" %>
+        Failed to reauthenticate with a passkey.
+      <% when "passkey_create" %>
+        Added a passkey.
+      <% when "passkey_delete" %>
+        Removed a passkey.
       <% when "api_key_create" %>
         Created a new API key.
       <% when "api_key_update" %>

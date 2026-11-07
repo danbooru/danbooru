@@ -59,6 +59,7 @@ gem "bcrypt_pbkdf", "~> 1"
 gem "connection_pool", "~> 3"
 gem "rotp", "~> 6"
 gem "rqrcode", "~> 3"
+gem "webauthn", "~> 3"
 gem "kramdown", "~> 2"
 gem "abbrev", "~> 0.1"
 gem "rubyzip", "~> 3", require: false

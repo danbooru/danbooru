@@ -130,7 +130,27 @@
             </div>
           </div>
 
-          <% if @user.totp.present? %>
+          <div class="flex justify-between gap-4">
+            <div>
+              <div class="mb-1">
+                <span class="font-bold leading-normal">Passkeys</span>
+
+                <% if @user.passkeys.exists? %>
+                  <span class="chip-green text-success text-xs">Enabled</span>
+                <% else %>
+                  <span class="chip-red text-error text-xs">Disabled</span>
+                <% end %>
+              </div>
+
+              <p class="fineprint max-w-360px">Use your device to sign in and confirm sensitive actions without entering a 2FA code.</p>
+            </div>
+
+            <div>
+              <%= link_to "Manage", passkeys_path, class: "button-primary" %>
+            </div>
+          </div>
+
+          <% if @user.backup_codes.present? %>
             <div class="flex justify-between gap-4">
               <div>
                 <span class="font-bold leading-normal">Backup codes</span>

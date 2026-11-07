@@ -14,6 +14,7 @@ class UserEvent < ApplicationRecord
     login login_verification reauthenticate logout user_creation user_deletion user_undeletion
     password_reset password_change email_change email_verification totp_enable totp_update totp_disable
     totp_login totp_reauthenticate backup_code_generate backup_code_login backup_code_reauthenticate
+    passkey_login passkey_reauthenticate passkey_create passkey_delete
     api_key_create api_key_update api_key_delete account_verification
   ]
 
@@ -60,6 +61,12 @@ class UserEvent < ApplicationRecord
     backup_code_generate: 800,            # The user generated new backup codes.
     backup_code_login: 840,               # The user successfully entered their password and backup code on the login page.
     backup_code_reauthenticate: 845,      # The user successfully entered their password and backup code on the confirm password page.
+    passkey_login: 860,                   # The user successfully logged in with a passkey.
+    passkey_reauthenticate: 865,          # The user successfully reauthenticated with a passkey.
+    passkey_failed_login: 870,            # The user failed to authenticate with a passkey on the login page.
+    passkey_failed_reauthenticate: 875,   # The user failed to reauthenticate with a passkey.
+    passkey_create: 930,                  # The user added a passkey.
+    passkey_delete: 940,                  # The user removed a passkey.
     api_key_create: 900,                  # The user created a new API key.
     api_key_update: 910,                  # The user changed the permissions of an API key.
     api_key_delete: 920,                  # The user deleted an API key.

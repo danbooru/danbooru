@@ -5,8 +5,14 @@
     <div class="card mt-8 p-4 max-w-480px mx-auto flex flex-col items-center">
       <h1 class="pb-4">Change Password</h1>
 
-      <% if @user.totp.present? %>
-        <p class="w-full">Enter your current password and the 6-digit code from your authenticator app to change your password.</p>
+      <% if @user.has_2fa? %>
+        <p class="w-full">
+          <% if @user.totp.present? %>
+            Enter your current password and the 6-digit code from your authenticator app to change your password.
+          <% else %>
+            Enter your current password and a backup code to change your password.
+          <% end %>
+        </p>
       <% end %>
 
       <%= edit_form_for(@user, url: user_password_path(@user), html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
@@ -14,8 +20,8 @@
           <%= f.input :current_password, as: :password, input_html: { autocomplete: "current-password" }, hint: link_to("Forgot password?", password_reset_path) %>
         <% end %>
 
-        <% if @user.totp.present? %>
-          <%= f.input :verification_code, placeholder: "123456", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { value: nil }, hint: "Lost your phone? #{link_to "Disable two-factor authentication", edit_user_totp_path(@user) }.".html_safe %>
+        <% if @user.has_2fa? %>
+          <%= f.input :verification_code, placeholder: @user.totp.present? ? "123456" : "12345678", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { value: nil }, hint: @user.totp.present? ? "Lost your phone? #{link_to "Disable two-factor authentication", edit_user_totp_path(@user) }.".html_safe : nil %>
         <% end %>
 
         <%= f.input :password, required: true, label: "New password", input_html: { autocomplete: "new-password", minlength: User::MIN_PASSWORD_LENGTH } %>

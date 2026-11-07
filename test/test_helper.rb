@@ -90,6 +90,7 @@ class ActiveSupport::TestCase
   include ReportbooruHelper
   include UploadTestHelper
   include UrlTestHelper
+  include PasskeyTestHelper
   extend NormalizeAttributeHelper
 
   mock_post_version_service!

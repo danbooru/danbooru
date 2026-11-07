@@ -1,0 +1,61 @@
+<% page_title "Passkeys" %>
+
+<div id="c-passkeys">
+  <div id="a-index">
+    <h1 class="mb-4">Passkeys</h1>
+
+    <p class="mb-4">
+      Passkeys let you sign in and confirm sensitive actions with your device instead of entering a 2FA code.
+    </p>
+
+    <% if @passkeys.present? %>
+      <div class="space-y-2 mb-4">
+        <% @passkeys.each do |passkey| %>
+          <div class="flex items-center justify-between gap-4 border rounded p-2">
+            <div>
+              <div class="font-bold"><%= passkey.display_name %></div>
+              <div class="fineprint">
+                Added <%= time_ago_in_words_tagged(passkey.created_at) %>
+                <% if passkey.last_used_at.present? %>
+                  &middot; last used <%= time_ago_in_words_tagged(passkey.last_used_at) %>
+                <% end %>
+              </div>
+            </div>
+
+            <%= button_to "Delete", passkey_path(passkey), method: :delete, class: "button-outline-danger", form: { data: { confirm: "Delete this passkey?" } } %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="fineprint mb-4">You don't have any passkeys yet.</p>
+    <% end %>
+
+    <div class="card p-4 max-w-480px">
+      <h2 class="mb-2">Add a passkey</h2>
+
+      <div class="stacked-form">
+        <div class="input">
+          <label for="passkey_nickname">Name</label>
+          <input type="text" id="passkey_nickname" name="passkey_nickname" placeholder="My phone" maxlength="100">
+        </div>
+
+        <button
+          type="button"
+          class="button-primary"
+          data-passkey-register="true"
+          data-options-url="<%= options_passkeys_path %>"
+          data-create-url="<%= passkeys_path %>"
+          data-nickname-input="#passkey_nickname"
+        >Add passkey</button>
+
+        <div class="text-error fineprint mt-2" data-passkey-error></div>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <%= link_to "Back to settings", settings_path %>
+    </div>
+  </div>
+</div>
+
+<%= render "sessions/passkey_script" %>
