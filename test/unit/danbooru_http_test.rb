@@ -361,6 +361,20 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
         response = Danbooru::Http.public_only.get("http://[::ffff:7f00:1]/foo.txt")
         assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://192.0.0.192/foo.txt")
+        assert_equal(591, response.status)
+      end
+
+      should "disallow connections to IPv6 addresses that tunnel to IPv4 addresses" do
+        response = Danbooru::Http.public_only.get("http://[2001:0:4136:e378:8000:63bf:3fff:fdd2]/foo.txt")
+        assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://[2002:7f00:1::]/foo.txt")
+        assert_equal(591, response.status)
+
+        response = Danbooru::Http.public_only.get("http://[64:ff9b::7f00:1]/foo.txt")
+        assert_equal(591, response.status)
       end
 
       should "not raise an exception if the domain doesn't exist" do

@@ -50,20 +50,31 @@ module Danbooru
     def reserved?
       # 0.0.0.0/8, ::/128 - Reserved; on Linux, these are treated as loopback addresses and route to localhost.
       # 100.64.0.0/10 - CGNAT
+      # 192.0.0.0/24 - IETF protocol assignments (includes Oracle Cloud's metadata server at 192.0.0.192)
+      # 198.18.0.0/15 - Benchmarking; sometimes used for internal networks
       # 240.0.0.0/4 - Reserved for future use
       # 255.255.255.255 - Reserved for the broadcast address on the local network segment
-      in?(%w[0.0.0.0/8 ::/128 100.64.0.0/10 240.0.0.0/4 255.255.255.255])
+      # fec0::/10 - Deprecated IPv6 site-local addresses
+      in?(%w[0.0.0.0/8 ::/128 100.64.0.0/10 192.0.0.0/24 198.18.0.0/15 240.0.0.0/4 255.255.255.255 fec0::/10])
     end
 
     # @return [Boolean] True if this is an IPv4-mapped IPv6 address.
     # @see https://en.wikipedia.org/wiki/IPv6_address#Transition_from_IPv4
     def ipv4_mapped?
       # ::ffff:0:0/96 - IPv4-in-IPv6 mappings (e.g. ::ffff:169.254.169.254, ::ffff:a9fe:a9fe in hex)
+      # ::/96 - IPv4-compatible addresses, deprecated (e.g. ::7f00:1 = 127.0.0.1)
+      in?(%w[::ffff:0:0/96 ::/96])
+    end
+
+    # @return [Boolean] True if this is a public IPv6 address that tunnels or translates to an IPv4 address. These are
+    #   real client addresses, but connecting to them may reach a local IPv4 address.
+    # @see https://en.wikipedia.org/wiki/IPv6_address#Transition_from_IPv4
+    def ipv4_tunneled?
       # 2001::/32 - Teredo tunneling
       # 2002::/16 - 6to4, deprecated (e.g. 2002:a9fe:a9fe::/48 = 169.254.169.254).
       # 64:ff9b::/96 - NAT64 translation (e.g. 64:ff9b::169.254.169.254)
       # 64:ff9b:1::/48 - NAT64 local-use
-      in?(%w[::ffff:0:0/96 2002::/16 64:ff9b::/96 64:ff9b:1::/48])
+      in?(%w[2001::/32 2002::/16 64:ff9b::/96 64:ff9b:1::/48])
     end
 
     # If we're being reverse proxied behind Cloudflare, then Tor connections
