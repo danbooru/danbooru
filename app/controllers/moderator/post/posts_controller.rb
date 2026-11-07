@@ -19,7 +19,7 @@ module Moderator
 
       def expunge
         @post = authorize ::Post.find(params[:id])
-        @post.expunge!(CurrentUser.user)
+        @post.expunge_later!(CurrentUser.user)
       end
 
       def ban

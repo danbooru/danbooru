@@ -30,6 +30,17 @@ class PostTest < ActiveSupport::TestCase
         perform_enqueued_jobs # perform IqdbAddPostJob
       end
 
+      should "expunge a post via background job" do
+        assert_enqueued_with(job: ExpungePostJob, args: [{ post: @post, user: @user }]) do
+          @post.expunge_later!(@user)
+        end
+
+        assert_equal(true, Post.exists?(@post.id))
+
+        perform_enqueued_jobs
+        assert_equal(false, Post.exists?(@post.id))
+      end
+
       should "log a modaction" do
         @post.expunge!(@user)
 
