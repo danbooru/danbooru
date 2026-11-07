@@ -143,6 +143,17 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.user_events.totp_disable.exists?(login_session_id: @user.login_sessions.last.login_id))
       end
 
+      should "keep backup codes when the user has a passkey" do
+        @user = create(:user_with_2fa)
+        create_passkey(@user)
+
+        delete_auth user_totp_path(user_id: @user), @user
+
+        assert_redirected_to settings_path
+        assert_nil(@user.reload.totp_secret)
+        assert_equal(true, @user.backup_codes.present?)
+      end
+
       should "not allow a user to disable 2FA for another user" do
         @user = create(:user_with_2fa)
 

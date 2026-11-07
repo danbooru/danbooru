@@ -755,6 +755,135 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "passkey login" do
+      setup do
+        @user = create(:user, password: "password")
+        @passkey, @client = create_passkey(@user)
+      end
+
+      should "show the passkey option after the user enters their password" do
+        post session_path, params: { session: { name: @user.name, password: "password" }}
+
+        assert_response :success
+        assert_select "[data-passkey-login]"
+      end
+
+      should "log the user in with a passkey" do
+        post session_path, params: { session: { name: @user.name, password: "password" }}
+
+        post passkey_options_session_path, as: :json
+        challenge = session[:passkey_login_challenge]
+        credential = passkey_assertion(@user, @client, request, challenge)
+
+        post verify_passkey_session_path, params: { credential: credential, url: users_path }, as: :json
+
+        assert_response :success
+        assert_equal(users_path, response.parsed_body["redirect_url"])
+        assert_equal(@user.id, session[:user_id])
+        assert_equal(@user.login_sessions.last.login_id, session[:login_id])
+        assert_nil(session[:last_authenticated_at])
+        assert_equal(true, @user.user_events.passkey_login.exists?(login_session_id: session[:login_id]))
+      end
+
+      should "not redirect to an external URL after passkey login" do
+        post session_path, params: { session: { name: @user.name, password: "password" }}
+
+        post passkey_options_session_path, as: :json
+        challenge = session[:passkey_login_challenge]
+        credential = passkey_assertion(@user, @client, request, challenge)
+
+        post verify_passkey_session_path, params: { credential: credential, url: "http://evil.example.com" }, as: :json
+
+        assert_response :success
+        assert_equal(root_url, response.parsed_body["redirect_url"])
+      end
+
+      should "not log the user in with an invalid passkey" do
+        post session_path, params: { session: { name: @user.name, password: "password" }}
+        post passkey_options_session_path, as: :json
+
+        post verify_passkey_session_path, params: { credential: { id: "invalid" }, url: users_path }, as: :json
+
+        assert_response 422
+        assert_nil(session[:user_id])
+        assert_equal(true, @user.user_events.passkey_failed_login.exists?)
+      end
+
+      should "not accept a passkey login after the pending login expires" do
+        post session_path, params: { session: { name: @user.name, password: "password" }}
+        travel 11.minutes
+
+        post passkey_options_session_path, as: :json
+
+        assert_redirected_to login_path
+        assert_nil(session[:user_id])
+      end
+
+      should "not verify an expired passkey challenge" do
+        post session_path, params: { session: { name: @user.name, password: "password" }}
+        post passkey_options_session_path, as: :json
+        challenge = session[:passkey_login_challenge]
+        credential = passkey_assertion(@user, @client, request, challenge)
+        travel 6.minutes
+
+        post verify_passkey_session_path, params: { credential: credential, url: users_path }, as: :json
+
+        assert_response 422
+        assert_nil(session[:user_id])
+      end
+    end
+
+    context "passkey reauthentication" do
+      setup do
+        @user = create(:user, password: "password")
+        login_as(@user)
+        @passkey, @client = create_passkey(@user)
+      end
+
+      should "show the passkey option on the confirm password page" do
+        travel 2.hours
+        get confirm_password_session_path
+
+        assert_response :success
+        assert_select "[data-passkey-reauthenticate]"
+      end
+
+      should "reauthenticate with a passkey" do
+        travel 2.hours
+
+        post reauthenticate_passkey_options_session_path, as: :json
+        challenge = session[:passkey_reauth_challenge]
+        credential = passkey_assertion(@user, @client, request, challenge)
+
+        post reauthenticate_passkey_session_path, params: { credential: credential, url: users_path }, as: :json
+
+        assert_response :success
+        assert_equal(users_path, response.parsed_body["redirect_url"])
+        assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) > 1.second.ago)
+        assert_equal(true, @user.user_events.passkey_reauthenticate.exists?)
+      end
+
+      should "not reauthenticate with an invalid passkey" do
+        travel 2.hours
+
+        post reauthenticate_passkey_options_session_path, as: :json
+        post reauthenticate_passkey_session_path, params: { credential: { id: "invalid" }, url: users_path }, as: :json
+
+        assert_response 422
+        assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
+        assert_equal(true, @user.user_events.passkey_failed_reauthenticate.exists?)
+      end
+
+      should "not reauthenticate with only a password when the user has a passkey" do
+        travel 2.hours
+
+        post reauthenticate_session_path, params: { session: { password: "password", url: users_path }}
+
+        assert_response :success
+        assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
+      end
+    end
+
     context "confirm_password action" do
       should "render for a logged in user" do
         get_auth confirm_password_session_path, @user

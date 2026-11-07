@@ -168,6 +168,7 @@ class User < ApplicationRecord
   has_one :active_ban, -> { active }, class_name: "Ban"
   has_one :email_address, dependent: :destroy
   has_many :api_keys, dependent: :destroy
+  has_many :passkeys, dependent: :destroy
   has_many :note_versions, foreign_key: "updater_id"
   has_many :dmails, -> { order("dmails.id desc") }, foreign_key: "owner_id"
   has_many :saved_searches
@@ -316,12 +317,12 @@ class User < ApplicationRecord
     end
 
     def reset_password(new_password:, password_confirmation:, verification_code:, request:)
-      limit_2fa_attempts! if totp.present?
+      limit_2fa_attempts! if has_2fa?
 
       if is_deleted?
         errors.add(:base, "You can't reset the password of a deleted account")
         false
-      elsif totp.present? && !totp.verify(verification_code) && !has_backup_code?(verification_code)
+      elsif has_2fa? && !totp&.verify(verification_code) && !has_backup_code?(verification_code)
         UserEvent.create_from_request!(self, :totp_failed_reauthenticate, request)
         errors.add(:verification_code, "is incorrect")
         false
@@ -341,7 +342,7 @@ class User < ApplicationRecord
         UserEvent.create_from_request!(self, :failed_reauthenticate, request)
         errors.add(:current_password, "is incorrect")
         false
-      elsif totp.present? && !totp.verify(verification_code)
+      elsif has_2fa? && !totp&.verify(verification_code) && !has_backup_code?(verification_code)
         UserEvent.create_from_request!(self, :totp_failed_reauthenticate, request)
         errors.add(:verification_code, "is incorrect")
         false
@@ -350,6 +351,7 @@ class User < ApplicationRecord
           success = update(password: new_password, password_confirmation: password_confirmation)
           UserEvent.create_from_request!(self, :password_change, request) if success
           login_sessions.active.where.not(login_id: request.session[:login_id]).find_each(&:revoke!) if success
+          verify_backup_code!(verification_code) if success
           success
         end
       end
@@ -444,7 +446,7 @@ class User < ApplicationRecord
           login_sessions.active.where.not(login_id: request.session[:login_id]).find_each(&:revoke!)
         elsif secret.nil?
           UserEvent.create_from_request!(self, :totp_disable, request)
-          update!(backup_codes: nil)
+          update!(backup_codes: nil) if passkeys.empty?
         else
           UserEvent.create_from_request!(self, :totp_update, request)
         end
@@ -460,7 +462,14 @@ class User < ApplicationRecord
 
     # @return [Boolean] True if the user has 2FA enabled.
     def has_2fa?
-      totp_secret.present?
+      totp_secret.present? || (passkeys.loaded? ? passkeys.any? : passkeys.exists?)
+    end
+  end
+
+  concerning :PasskeyMethods do
+    # @return [String] A stable, non-identifying user handle for WebAuthn.
+    def passkey_user_id
+      Base64.urlsafe_encode64(OpenSSL::HMAC.digest("SHA256", Rails.application.secret_key_base, "passkey-user-#{id}"), padding: false)
     end
   end
 
@@ -480,7 +489,7 @@ class User < ApplicationRecord
     # Return true if the given backup code is correct.
     def has_backup_code?(backup_code)
       return false unless backup_code.to_s.strip.match?(/\A[0-9]+\z/)
-      backup_codes.include?(backup_code.to_s.strip.to_i)
+      backup_codes.to_a.include?(backup_code.to_s.strip.to_i)
     end
 
     # Replace the given backup code with a new one.

@@ -1,0 +1,191 @@
+<script type="text/javascript">
+  (function () {
+    function csrfToken() {
+      var meta = document.querySelector("meta[name='csrf-token']");
+      return meta ? meta.content : "";
+    }
+
+    function base64UrlToBuffer(value) {
+      var base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+      var padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, "=");
+      var binary = atob(padded);
+      return Uint8Array.from(binary, function (char) { return char.charCodeAt(0); }).buffer;
+    }
+
+    function bufferToBase64Url(buffer) {
+      var bytes = new Uint8Array(buffer);
+      var binary = "";
+      bytes.forEach(function (byte) { binary += String.fromCharCode(byte); });
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function prepareCreationOptions(options) {
+      var publicKey = options.publicKey || options;
+      publicKey.challenge = base64UrlToBuffer(publicKey.challenge);
+      publicKey.user.id = base64UrlToBuffer(publicKey.user.id);
+      (publicKey.excludeCredentials || []).forEach(function (credential) {
+        credential.id = base64UrlToBuffer(credential.id);
+      });
+      return publicKey;
+    }
+
+    function prepareRequestOptions(options) {
+      var publicKey = options.publicKey || options;
+      publicKey.challenge = base64UrlToBuffer(publicKey.challenge);
+      (publicKey.allowCredentials || []).forEach(function (credential) {
+        credential.id = base64UrlToBuffer(credential.id);
+      });
+      return publicKey;
+    }
+
+    function serializeCredential(credential) {
+      var response = credential.response;
+      var result = {
+        id: credential.id,
+        rawId: bufferToBase64Url(credential.rawId),
+        type: credential.type,
+        clientExtensionResults: credential.getClientExtensionResults ? credential.getClientExtensionResults() : {},
+        authenticatorAttachment: credential.authenticatorAttachment,
+        response: {}
+      };
+
+      if (response.attestationObject) {
+        result.response.attestationObject = bufferToBase64Url(response.attestationObject);
+        result.response.clientDataJSON = bufferToBase64Url(response.clientDataJSON);
+        result.response.transports = response.getTransports ? response.getTransports() : [];
+      } else {
+        result.response.clientDataJSON = bufferToBase64Url(response.clientDataJSON);
+        result.response.authenticatorData = bufferToBase64Url(response.authenticatorData);
+        result.response.signature = bufferToBase64Url(response.signature);
+        result.response.userHandle = response.userHandle ? bufferToBase64Url(response.userHandle) : null;
+      }
+
+      return result;
+    }
+
+    async function postJSON(url, body) {
+      var response = await fetch(url, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken()
+        },
+        body: JSON.stringify(body || {})
+      });
+
+      if (response.redirected) {
+        window.location = response.url;
+        return null;
+      }
+
+      var data = await response.json().catch(function () { return {}; });
+
+      if (!response.ok) {
+        throw new Error(data.error || "Passkey verification failed");
+      }
+
+      return data;
+    }
+
+    function showError(error) {
+      var element = document.querySelector("[data-passkey-error]");
+      if (element) {
+        element.textContent = error.message || "Passkey verification failed";
+      }
+    }
+
+    function clearError() {
+      var element = document.querySelector("[data-passkey-error]");
+      if (element) {
+        element.textContent = "";
+      }
+    }
+
+    async function login(button) {
+      clearError();
+      button.disabled = true;
+
+      try {
+        var options = await postJSON(button.dataset.optionsUrl, {});
+        if (!options) return;
+
+        var credential = await navigator.credentials.get({ publicKey: prepareRequestOptions(options) });
+        var data = await postJSON(button.dataset.verifyUrl, {
+          credential: serializeCredential(credential),
+          url: button.dataset.url
+        });
+
+        if (data) {
+          window.location = data.redirect_url || "/";
+        }
+      } catch (error) {
+        showError(error);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function reauthenticate(button) {
+      clearError();
+      button.disabled = true;
+
+      try {
+        var options = await postJSON(button.dataset.optionsUrl, {});
+        if (!options) return;
+
+        var credential = await navigator.credentials.get({ publicKey: prepareRequestOptions(options) });
+        var data = await postJSON(button.dataset.verifyUrl, {
+          credential: serializeCredential(credential),
+          url: button.dataset.url
+        });
+
+        if (data) {
+          window.location = data.redirect_url || "/";
+        }
+      } catch (error) {
+        showError(error);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    async function register(button) {
+      clearError();
+      button.disabled = true;
+
+      try {
+        var nicknameInput = document.querySelector(button.dataset.nicknameInput);
+        var nickname = nicknameInput ? nicknameInput.value : "";
+        var options = await postJSON(button.dataset.optionsUrl, { nickname: nickname });
+        if (!options) return;
+
+        var credential = await navigator.credentials.create({ publicKey: prepareCreationOptions(options) });
+        var data = await postJSON(button.dataset.createUrl, {
+          credential: serializeCredential(credential),
+          nickname: nickname
+        });
+
+        if (data) {
+          window.location = data.redirect_url || "/passkeys";
+        }
+      } catch (error) {
+        showError(error);
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-passkey-login]");
+      if (button) return login(button);
+
+      button = event.target.closest("[data-passkey-reauthenticate]");
+      if (button) return reauthenticate(button);
+
+      button = event.target.closest("[data-passkey-register]");
+      if (button) return register(button);
+    });
+  })();
+</script>

@@ -28,8 +28,28 @@ class SessionLoaderPolicy < ApplicationPolicy
     { rate: 1.0 / 30.minutes, burst: 50 }
   end
 
+  def rate_limit_for_passkey_options(**_options)
+    { rate: 1.0 / 5.minutes, burst: 5, action: "sessions:create" }
+  end
+
+  def rate_limit_for_verify_passkey(**_options)
+    { rate: 1.0 / 30.minutes, burst: 50 }
+  end
+
+  def rate_limit_for_reauthenticate_passkey_options(**_options)
+    { rate: 1.0 / 5.minutes, burst: 5, action: "sessions:create" }
+  end
+
+  def rate_limit_for_reauthenticate_passkey(**_options)
+    { rate: 1.0 / 30.minutes, burst: 50 }
+  end
+
   alias_method :new?, :create?
   alias_method :verify_totp?, :create?
+  alias_method :passkey_options?, :create?
+  alias_method :verify_passkey?, :create?
   alias_method :logout?, :destroy?
   alias_method :confirm_password?, :reauthenticate?
+  alias_method :reauthenticate_passkey_options?, :reauthenticate?
+  alias_method :reauthenticate_passkey?, :reauthenticate?
 end

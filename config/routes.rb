@@ -52,6 +52,9 @@ Rails.application.routes.draw do
   end
 
   resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
+  resources :passkeys, only: [:index, :create, :destroy] do
+    post :options, on: :collection
+  end
 
   resources :artists do
     member do
@@ -236,7 +239,11 @@ Rails.application.routes.draw do
   resources :saved_searches, except: [:show]
   resource :session, only: [:new, :create, :destroy] do
     post :verify_totp, on: :collection
+    post :passkey_options, on: :collection
+    post :verify_passkey, on: :collection
     post :reauthenticate, on: :collection
+    post :reauthenticate_passkey_options, on: :collection
+    post :reauthenticate_passkey, on: :collection
     get :confirm_password, on: :collection
   end
   resource :source, only: [:show]

@@ -42,12 +42,12 @@ class SessionLoader
 
     if user.present? && user.authenticate_password(password)
       # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
-      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy? && user.totp.nil?
+      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy? && !user.has_2fa?
         UserEvent.create_from_request!(user, :failed_login, request)
         errors.add(:base, "You cannot login from a proxy unless you have 2FA enabled")
 
         nil
-      elsif user.totp.present?
+      elsif user.has_2fa?
         UserEvent.create_from_request!(user, :totp_login_pending_verification, request)
 
         user
@@ -96,7 +96,7 @@ class SessionLoader
   def verify_totp!(user, code)
     user.limit_2fa_attempts!
 
-    if user.totp.verify(code)
+    if user.totp&.verify(code)
       login_user(user, :totp_login)
       true
     elsif user.verify_backup_code!(code)
@@ -106,6 +106,30 @@ class SessionLoader
       UserEvent.create_from_request!(user, :totp_failed_login, request)
       false
     end
+  end
+
+  # Verify a passkey assertion after the user has entered their password.
+  #
+  # @param user [User] The user to authenticate.
+  # @param credential [Hash] The credential returned by the browser.
+  # @param challenge [String] The challenge from the authentication options.
+  # @return [Boolean] True if the passkey is correct, or false if it's incorrect.
+  def verify_passkey!(user, credential, challenge)
+    user.limit_2fa_attempts!
+
+    passkey = find_passkey(user, credential)
+    passkey&.verify!(credential, challenge, request)
+
+    if passkey.present?
+      login_user(user, :passkey_login)
+      true
+    else
+      UserEvent.create_from_request!(user, :passkey_failed_login, request)
+      false
+    end
+  rescue WebAuthn::Error, ArgumentError, TypeError, NoMethodError, KeyError, JSON::ParserError, CBOR::MalformedFormatError, EOFError
+    UserEvent.create_from_request!(user, :passkey_failed_login, request)
+    false
   end
 
   # Log a user in and create a new login session.
@@ -123,6 +147,8 @@ class SessionLoader
 
       session[:user_id] = user.id
       session[:login_id] = login_session.login_id
+      session.delete(:passkey_login_user_id)
+      session.delete(:passkey_login_started_at)
 
       login_session
     end
@@ -139,11 +165,11 @@ class SessionLoader
       UserEvent.create_from_request!(user, :failed_reauthenticate, request)
       errors.add(:password, "is incorrect")
       false
-    elsif user.totp.blank? # right password and user doesn't have 2FA
+    elsif !user.has_2fa? # right password and user doesn't have 2FA
       UserEvent.create_from_request!(user, :reauthenticate, request)
       session[:last_authenticated_at] = Time.now.utc.inspect
       true
-    elsif user.totp.verify(verification_code) # right password and right 2FA code
+    elsif user.totp&.verify(verification_code) # right password and right 2FA code
       UserEvent.create_from_request!(user, :totp_reauthenticate, request)
       session[:last_authenticated_at] = Time.now.utc.inspect
       true
@@ -156,6 +182,38 @@ class SessionLoader
       errors.add(:verification_code, "is incorrect")
       false
     end
+  end
+
+  # Verify a passkey before a sensitive action.
+  #
+  # @param user [User] The user to reauthenticate.
+  # @param credential [Hash] The credential returned by the browser.
+  # @param challenge [String] The challenge from the authentication options.
+  # @return [Boolean] True if the passkey is correct, or false if it's incorrect.
+  def reauthenticate_passkey(user, credential, challenge)
+    user.limit_2fa_attempts!
+
+    passkey = find_passkey(user, credential)
+    passkey&.verify!(credential, challenge, request)
+
+    if passkey.present?
+      UserEvent.create_from_request!(user, :passkey_reauthenticate, request)
+      session[:last_authenticated_at] = Time.now.utc.inspect
+      true
+    else
+      UserEvent.create_from_request!(user, :passkey_failed_reauthenticate, request)
+      errors.add(:base, "Passkey verification failed")
+      false
+    end
+  rescue WebAuthn::Error, ArgumentError, TypeError, NoMethodError, KeyError, JSON::ParserError, CBOR::MalformedFormatError, EOFError
+    UserEvent.create_from_request!(user, :passkey_failed_reauthenticate, request)
+    errors.add(:base, "Passkey verification failed")
+    false
+  end
+
+  def find_passkey(user, credential)
+    credential_id = credential["id"]
+    user.passkeys.find_by(external_id: credential_id) if credential_id.is_a?(String)
   end
 
   # Log the current user out. Deletes their session cookie, invalidates their login session, and records a logout event.
@@ -279,6 +337,8 @@ class SessionLoader
     session.delete(:user_id)
     session.delete(:login_id)
     session.delete(:last_authenticated_at)
+    session.delete(:passkey_login_user_id)
+    session.delete(:passkey_login_started_at)
   end
 
   def update_last_logged_in_at

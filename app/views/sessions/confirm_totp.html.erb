@@ -5,14 +5,45 @@
     <div class="card mt-8 p-4 max-w-540px mx-auto flex flex-col items-center">
       <h1 class="pb-4">Verify Login</h1>
 
-      <p class="w-full">Enter the 6-digit code from your authenticator app to continue.</p>
+      <% if @passkeys.present? %>
+        <p class="w-full">Use your passkey to continue.</p>
 
-      <%= edit_form_for(@user.totp, url: verify_totp_session_path, method: "post", html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
-        <%= f.input :user_id, as: :hidden, input_html: { value: @user.signed_id(purpose: "verify_totp/#{session[:session_id]}", expires_in: 10.minutes) } %>
-        <%= f.input :url, as: :hidden, input_html: { value: @url } %>
-        <%= f.input :code, placeholder: "123456", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { autofocus: true, value: nil }, hint: "Lost your phone? You can enter a backup code instead." %>
-        <%= f.submit_button "Continue" %>
+        <button
+          type="button"
+          class="button-primary w-full"
+          data-passkey-login="true"
+          data-options-url="<%= passkey_options_session_path %>"
+          data-verify-url="<%= verify_passkey_session_path %>"
+          data-url="<%= @url %>"
+        >Use a passkey</button>
+
+        <div class="text-error fineprint mt-2" data-passkey-error></div>
+      <% end %>
+
+      <% if @passkeys.present? && (@user.totp.present? || @user.backup_codes.present?) %>
+        <div class="w-full text-center fineprint my-4">or</div>
+      <% end %>
+
+      <% if @user.totp.present? || @user.backup_codes.present? %>
+        <% if @user.totp.present? %>
+          <p class="w-full">Enter the 6-digit code from your authenticator app to continue.</p>
+        <% else %>
+          <p class="w-full">Enter a backup code to continue.</p>
+        <% end %>
+
+        <%= edit_form_for(@user.totp || TOTP.new(username: @user.name), url: verify_totp_session_path, method: "post", html: { class: "w-full stacked-form stacked-hints", "data-validate-form": "true" }) do |f| %>
+          <%= f.input :user_id, as: :hidden, input_html: { value: @user.signed_id(purpose: "verify_totp/#{session[:session_id]}", expires_in: 10.minutes) } %>
+          <%= f.input :url, as: :hidden, input_html: { value: @url } %>
+          <%= f.input :code, placeholder: @user.totp.present? ? "123456" : "12345678", required: true, minlength: 6, maxlength: User::BACKUP_CODE_LENGTH, pattern: '\d+', input_html: { autofocus: true, value: nil }, hint: @user.totp.present? ? "Lost your phone? You can enter a backup code instead." : nil %>
+          <%= f.submit_button "Continue" %>
+        <% end %>
+      <% end %>
+
+      <% if flash[:alert].present? %>
+        <p class="text-error mt-4"><%= flash[:alert] %></p>
       <% end %>
     </div>
   </div>
 </div>
+
+<%= render "sessions/passkey_script" %>

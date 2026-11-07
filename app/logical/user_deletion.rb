@@ -68,6 +68,7 @@ class UserDeletion
 
   def delete_user_data
     user.api_keys.destroy_all
+    user.passkeys.destroy_all
     user.forum_topic_visits.destroy_all
     user.saved_searches.destroy_all
     user.favorite_groups.is_private.destroy_all
