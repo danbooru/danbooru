@@ -212,6 +212,15 @@ module Danbooru
       true
     end
 
+    # If true, the site is in read-only mode. Users can browse the site, but
+    # all write requests are blocked and the database is protected from writes.
+    #
+    # This is intended for maintenance or emergencies. Set it to true with
+    # `DANBOORU_READ_ONLY_MODE=true`.
+    def read_only_mode?
+      false
+    end
+
     # If true, new accounts will require email verification if they seem
     # suspicious (they were created using a proxy, multiple accounts were
     # created by the same IP, etc).
@@ -898,6 +907,14 @@ module Danbooru
   end
 
   EnvironmentConfiguration = Struct.new(:config) do
+    def read_only_mode?
+      if ENV.key?("DANBOORU_READ_ONLY_MODE")
+        ENV["DANBOORU_READ_ONLY_MODE"].to_s.truthy?
+      else
+        config.read_only_mode?
+      end
+    end
+
     def method_missing(method, *args)
       var = ENV["DANBOORU_#{method.to_s.upcase.chomp("?")}"]
 

@@ -72,6 +72,13 @@
   <%= render NavbarComponent.new(current_user: CurrentUser.user) %>
 
   <div id="page" class="relative flex-1 mx-8 mt-4 sm:mx-2 sm:mt-2">
+    <% if Danbooru.config.read_only_mode? %>
+      <div class="notice notice-info notice-large" id="read-only-mode-notice">
+        <h2>Read-only mode</h2>
+        <div>You can browse the site, but changes are disabled right now.</div>
+      </div>
+    <% end %>
+
     <% if CurrentUser.user.is_restricted? && (params[:controller] == "users" || cookies[:hide_verify_account_notice].blank?) %>
       <div class="notice notice-info notice-large" id="verify-account-notice">
         <h2>Your account is restricted.</h2>

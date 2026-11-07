@@ -18,7 +18,7 @@ class DmailsController < ApplicationController
       @dmail = authorize Dmail.find(params[:id])
     end
 
-    if request.format.html? && @dmail.owner == CurrentUser.user
+    if request.format.html? && @dmail.owner == CurrentUser.user && !Danbooru.config.read_only_mode?
       @dmail.update!(is_read: true)
     end
 

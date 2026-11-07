@@ -166,6 +166,8 @@ class ApplicationController < ActionController::Base
         render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
       when ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
         render_error_page(503, exception, message: "The database is unavailable. Try again later.", layout: "blank")
+      when ActiveRecord::ReadOnlyError
+        render_error_page(503, exception, message: "The site is in read-only mode.")
       else
         raise exception if Rails.env.development? || Danbooru.config.debug_mode
         render_error_page(500, exception)
@@ -234,6 +236,8 @@ class ApplicationController < ActionController::Base
     #
     # @raise [RateLimiter::RateLimitError] If the rate limit is exceeded.
     def check_rate_limit(record, policy_class: nil)
+      return if Danbooru.config.read_only_mode?
+
       policy = find_policy(record, policy_class: policy_class)
       rate_limit = policy.rate_limit(action_name, request)
       return if rate_limit.blank?

@@ -68,6 +68,10 @@ class ApplicationJob < ActiveJob::Base
     { job: self.class.name, queue: queue_name, priority: priority, job_type: background_job? ? "background" : "foreground" }
   end
 
+  def good_job_labels
+    [ReadOnlyMode::LABEL]
+  end
+
   # @return [Boolean] True if the job is a background job (enqueued with `perform_later`); false if the job is a
   #   foreground job (enqueued with `perform_now`).
   def background_job?
