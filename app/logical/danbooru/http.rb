@@ -231,6 +231,7 @@ module Danbooru
       dup.tap do |o|
         o.http = o.http.dup.tap do |http|
           ctx = OpenSSL::SSL::SSLContext.new
+          ctx.set_params # enable certificate verification; it's disabled by default for a new SSLContext
           ctx.options |= OpenSSL::SSL::OP_LEGACY_SERVER_CONNECT
           http.default_options = http.default_options.with_ssl_context(ctx)
         end

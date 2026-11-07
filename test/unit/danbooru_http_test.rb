@@ -65,6 +65,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal("", response.body.to_s)
       end
 
+      should "verify SSL certificates when legacy SSL is enabled" do
+        assert_equal(590, Danbooru::Http.with_legacy_ssl.get("https://expired.badssl.com").status)
+        assert_equal(590, Danbooru::Http.with_legacy_ssl.get("https://self-signed.badssl.com").status)
+        assert_equal(590, Danbooru::Http.with_legacy_ssl.get("https://wrong.host.badssl.com").status)
+        assert_equal(200, Danbooru::Http.with_legacy_ssl.get("https://badssl.com").status)
+      end
+
       should "decompress gzipped responses under the max size" do
         with_local_server("<p>hello</p>", gzip: true) do |url|
           response = Danbooru::Http.max_size(1_000).get(url)
