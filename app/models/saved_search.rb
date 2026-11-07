@@ -50,7 +50,7 @@ class SavedSearch < ApplicationRecord
             sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
           else
-            PopulateSavedSearchJob.perform_later(query) unless ReadOnlyMode.enabled?
+            PopulateSavedSearchJob.perform_later(query) unless Danbooru.config.read_only_mode?
           end
         end
         post_ids.to_a.sort.last(QUERY_LIMIT)

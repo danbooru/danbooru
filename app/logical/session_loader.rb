@@ -77,6 +77,8 @@ class SessionLoader
   # @param signed_login_event [String] The signed login event from the login verification email.
   # @return [Boolean] True if the location was authorized, false otherwise.
   def authorize_login_event!(signed_login_event)
+    return false if Danbooru.config.read_only_mode?
+
     user_event = UserEvent.find_signed(signed_login_event, purpose: :login_verification)
 
     if user_event.present?

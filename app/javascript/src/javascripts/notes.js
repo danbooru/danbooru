@@ -645,7 +645,7 @@ class Note {
         $dialog.dialog("close");
         $note_box.removeClass("unsaved");
       } catch (xhr) {
-        Notice.error("Error: " + (xhr.responseJSON.reason || xhr.responseJSON.reasons.join("; ")));
+        Notice.error("Error: " + (xhr.responseJSON?.reason || xhr.responseJSON?.reasons?.join("; ") || xhr.responseJSON?.message || "Unknown error"));
       }
     }
 

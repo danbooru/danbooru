@@ -7,6 +7,8 @@
 class ApplicationJob < ActiveJob::Base
   class JobTimeoutError < StandardError; end
 
+  READ_ONLY_LABEL = "danbooru"
+
   queue_as :default
 
   # Jobs with lower numbers are processed first. Lower number = higher priority.
@@ -69,7 +71,17 @@ class ApplicationJob < ActiveJob::Base
   end
 
   def good_job_labels
-    [ReadOnlyMode::LABEL]
+    [READ_ONLY_LABEL]
+  end
+
+  # Pause all jobs while the site is in read-only mode.
+  def self.pause_jobs!
+    GoodJob::Setting.pause(label: READ_ONLY_LABEL) unless GoodJob::Setting.paused?(label: READ_ONLY_LABEL)
+  end
+
+  # Unpause all jobs after read-only mode is disabled.
+  def self.unpause_jobs!
+    GoodJob::Setting.unpause(label: READ_ONLY_LABEL) if GoodJob::Setting.paused?(label: READ_ONLY_LABEL)
   end
 
   # @return [Boolean] True if the job is a background job (enqueued with `perform_later`); false if the job is a
