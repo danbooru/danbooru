@@ -142,6 +142,7 @@ Rails.application.routes.draw do
     get "/:variant", to: "media_assets#image", as: :image
   end
   resources :media_metadata, only: [:index]
+  resources :bulk_media_regenerations, only: [:new, :create]
 
   resources :metrics, only: [:index], defaults: { format: :text } do
     get "/statistics", on: :collection, to: "metrics#statistics", as: :statistics
