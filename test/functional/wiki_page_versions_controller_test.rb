@@ -5,7 +5,7 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:user)
       @builder = create(:builder_user)
-      as(@user) { @wiki_page = create(:wiki_page) }
+      as(@user) { @wiki_page = create(:wiki_page, title: "old_name_x") }
       as(@builder) { @wiki_page.update(title: "supreme", body: "blah", other_names: ["not_this"]) }
       as(@user) { @wiki_page.update(body: "blah blah") }
     end
@@ -18,6 +18,20 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get wiki_page_versions_path
         assert_response :success
+      end
+
+      should "render previous title comparisons from old to new" do
+        get wiki_page_versions_path, params: { search: { wiki_page_id: @wiki_page.id }, type: "previous" }
+
+        assert_response :success
+        assert_title_diff_direction
+      end
+
+      should "render current title comparisons from old to new" do
+        get wiki_page_versions_path, params: { search: { wiki_page_id: @wiki_page.id }, type: "current" }
+
+        assert_response :success
+        assert_title_diff_direction
       end
 
       should respond_to_search.with { @versions.reverse }
@@ -56,6 +70,16 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
         get diff_wiki_page_versions_path
         assert_redirected_to wiki_pages_path
       end
+    end
+  end
+
+  private
+
+  def assert_title_diff_direction
+    assert_select "td.diff-body" do |cells|
+      assert(cells.any? do |cell|
+        cell.at_css("del")&.text == "old_name_x" && cell.at_css("ins")&.text == "supreme"
+      end)
     end
   end
 end
