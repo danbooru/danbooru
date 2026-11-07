@@ -34,6 +34,7 @@ export default class FileUploadComponent {
 
     let dropzone = new Dropzone(this.$dropTarget.get(0), {
       url: "/uploads.json",
+      headers: { "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").content },
       paramName: "upload[files]",
       clickable: this.$dropzone.get(0),
       previewsContainer: this.$dropzone.get(0),

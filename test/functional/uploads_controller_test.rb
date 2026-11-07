@@ -140,6 +140,39 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      context "with forgery protection enabled" do
+        setup do
+          login_as(@user)
+          ActionController::Base.allow_forgery_protection = true
+        end
+
+        teardown do
+          ActionController::Base.allow_forgery_protection = false
+        end
+
+        should "fail for an XHR request without a CSRF token" do
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
+
+          assert_no_difference("Upload.count") do
+            post uploads_path(format: :json), xhr: true, params: { upload: { files: { "0" => file }}}
+          end
+
+          assert_response 403
+        end
+
+        should "succeed for an XHR request with a CSRF token" do
+          get new_upload_path
+          csrf_token = response.parsed_body.at("meta[name='csrf-token']")["content"]
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
+
+          assert_difference("Upload.count", 1) do
+            post uploads_path(format: :json), xhr: true, headers: { "X-CSRF-Token": csrf_token }, params: { upload: { files: { "0" => file }}}
+          end
+
+          assert_response 201
+        end
+      end
+
       should "fail if not given a file or a source" do
         assert_no_difference("Upload.count") do
           post_auth uploads_path(format: :json), @user
