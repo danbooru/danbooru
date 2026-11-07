@@ -18,7 +18,7 @@ class ValidatingSocket < TCPSocket
 
   def validate_hostname!(hostname)
     ip = Danbooru::IpAddress.new(::Resolv.getaddress(hostname))
-    raise ProhibitedIpError, "Connection to #{hostname} failed; #{ip} is a prohibited IP" if ip.is_local? || ip.ipv4_tunneled?
+    raise ProhibitedIpError, "Connection to #{hostname} failed; #{ip} is a prohibited IP" if ip.prohibited_for_outgoing?
     ip.to_s
   end
 end

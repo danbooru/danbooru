@@ -79,6 +79,25 @@ class DanbooruIpAddressTest < ActiveSupport::TestCase
       end
     end
 
+    context "#prohibited_for_outgoing?" do
+      should "return true for local addresses" do
+        assert(Danbooru::IpAddress.parse("127.0.0.1").prohibited_for_outgoing?)
+        assert(Danbooru::IpAddress.parse("169.254.169.254").prohibited_for_outgoing?)
+        assert(Danbooru::IpAddress.parse("::ffff:127.0.0.1").prohibited_for_outgoing?)
+      end
+
+      should "return true for IPv4-tunneled addresses" do
+        assert(Danbooru::IpAddress.parse("2001:0:4136:e378:8000:63bf:3fff:fdd2").prohibited_for_outgoing?)
+        assert(Danbooru::IpAddress.parse("2002:a9fe:a9fe::1").prohibited_for_outgoing?)
+        assert(Danbooru::IpAddress.parse("64:ff9b::a9fe:a9fe").prohibited_for_outgoing?)
+      end
+
+      should "return false for public addresses" do
+        assert_not(Danbooru::IpAddress.parse("8.8.8.8").prohibited_for_outgoing?)
+        assert_not(Danbooru::IpAddress.parse("2606:4700:4700::1111").prohibited_for_outgoing?)
+      end
+    end
+
     context "#ipv4_tunneled?" do
       should "return true for Teredo, 6to4, and NAT64 addresses" do
         assert(Danbooru::IpAddress.parse("2001:0:4136:e378:8000:63bf:3fff:fdd2").ipv4_tunneled?)

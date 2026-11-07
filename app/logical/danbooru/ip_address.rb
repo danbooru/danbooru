@@ -77,6 +77,11 @@ module Danbooru
       in?(%w[2001::/32 2002::/16 64:ff9b::/96 64:ff9b:1::/48])
     end
 
+    # @return [Boolean] True if outgoing connections to this address should be blocked to prevent SSRF attacks.
+    def prohibited_for_outgoing?
+      is_local? || ipv4_tunneled?
+    end
+
     # If we're being reverse proxied behind Cloudflare, then Tor connections
     # will appear to originate from 2405:8100:8000::/48.
     # @see https://blog.cloudflare.com/cloudflare-onion-service/
