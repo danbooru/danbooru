@@ -4,8 +4,6 @@ require "shellwords"
 
 # A wrapper for the exiftool command.
 class ExifTool
-  extend Memoist
-
   # @see https://exiftool.org/exiftool_pod.html#OPTIONS
   DEFAULT_OPTIONS = %q{
     -G1 -duplicates -unknown -struct --binary
@@ -25,14 +23,27 @@ class ExifTool
   # Get the file's metadata.
   #
   # @param options [String] the options to pass to exiftool
+  # @param max_size [Integer] The maximum size of the metadata, in bytes of JSON. If it's larger, the largest values are
+  #   replaced with "[OVERSIZED]" until it fits. If that isn't enough, the largest keys are dropped.
   # @return [ExifTool::Metadata] the file's metadata
-  def metadata(options: DEFAULT_OPTIONS)
+  def metadata(options: DEFAULT_OPTIONS, max_size: 1.megabyte)
     output, _status = ExternalCommand.run("exiftool #{options} -json #{file.path.shellescape}")
     json = output.parse_json.first
     json = json.except("SourceFile")
+
+    total_size = json.to_json.bytesize
+
+    savings = json.transform_values { |value| value.to_json.bytesize - "[OVERSIZED]".to_json.bytesize }.select { _2 > 0 }
+    oversized_keys = savings.sort_by { -_2 }.take_while { total_size > max_size && (total_size -= _2) }.map(&:first)
+    json = json.merge(oversized_keys.index_with("[OVERSIZED]"))
+
+    # Each entry takes up `"key":value,` in the JSON.
+    entry_sizes = json.to_h { |key, value| [key, { key => value }.to_json.bytesize - 1] }
+    dropped_keys = entry_sizes.sort_by { -_2 }.take_while { total_size > max_size && (total_size -= _2) }.map(&:first)
+    json = json.except(*dropped_keys)
+
     ExifTool::Metadata.new(json.with_indifferent_access)
   end
-  memoize :metadata
 
   # A class representing the set of metadata returned by ExifTool for a file.
   # Behaves like a Hash, but with extra helper methods for interpreting the metadata.
