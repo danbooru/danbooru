@@ -342,6 +342,15 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
       assert_equal([60, 60], webm.dimensions)
     end
 
+    should "delete the output file if the conversion fails" do
+      output_file = Danbooru::Tempfile.new
+      path = output_file.path
+      FFmpeg.stubs(:encode_images!).raises(FFmpeg::Error)
+
+      assert_raises(FFmpeg::Error) { @ugoira.convert(output_file:) }
+      assert_equal(false, File.exist?(path))
+    end
+
     should "clean up the extracted files" do
       paths = @ugoira.files.map(&:path)
       tmpdir = @ugoira.tmpdir.path

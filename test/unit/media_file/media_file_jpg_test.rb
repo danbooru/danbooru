@@ -1,6 +1,16 @@
 require "test_helper"
 
 class MediaFileJpgTest < ActiveSupport::TestCase
+  context "Resizing an image" do
+    should "delete the temp file if saving the image fails" do
+      file = MediaFile.open("test/files/jpg/test-blank.jpg")
+      Vips::Image.any_instance.stubs(:jpegsave).raises(Vips::Error)
+
+      assert_raises(Vips::Error) { file.resize!(150, 150) }
+      assert_equal([], Dir.glob("#{Dir.tmpdir}/danbooru-image-preview-#{file.md5}-*"))
+    end
+  end
+
   context "Previews" do
     should "be generated properly" do
       should_generate_previews(

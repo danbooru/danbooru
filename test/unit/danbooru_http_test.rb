@@ -430,6 +430,28 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         end
       end
 
+      should "delete the temp file if the download fails" do
+        file = Danbooru::Tempfile.new
+        path = file.path
+
+        assert_raises(Danbooru::Http::FileTooLargeError) do
+          Danbooru::Http.max_size(500).download_media(httpbin_url("stream-bytes/1000"), file: file)
+        end
+
+        assert_equal(false, File.exist?(path))
+      end
+
+      should "delete the temp file if the server returns an error" do
+        file = Danbooru::Tempfile.new
+        path = file.path
+
+        assert_raises(Danbooru::Http::DownloadError) do
+          Danbooru::Http.download_media(httpbin_url("status/404"), file: file)
+        end
+
+        assert_equal(false, File.exist?(path))
+      end
+
       should "fail if a gzipped download is too large after decompression" do
         with_local_server("a" * 10_000_000, gzip: true, content_type: "image/png") do |url|
           assert_raises(Danbooru::Http::FileTooLargeError) do

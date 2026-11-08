@@ -273,6 +273,9 @@ module Danbooru
 
         file.rewind
         [response, MediaFile.open(file)]
+      rescue StandardError
+        file.close
+        raise
       end
     end
 

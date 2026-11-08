@@ -18,6 +18,16 @@ class MediaFileWebmTest < ActiveSupport::TestCase
     end
   end
 
+  context "Generating a video preview" do
+    should "delete the temp file if ffmpeg fails" do
+      file = MediaFile.open("test/files/webm/test-512x512.webm")
+      FFmpeg.stubs(:shell!).raises(FFmpeg::Error)
+
+      assert_raises(FFmpeg::Error) { FFmpeg.new(file).smart_video_preview! }
+      assert_equal([], Dir.glob("#{Dir.tmpdir}/danbooru-video-preview-#{file.md5}-*"))
+    end
+  end
+
   context "a vp8 WebM file" do
     should "be parsed correctly" do
       file = MediaFile.open("test/files/webm/test-512x512.webm")

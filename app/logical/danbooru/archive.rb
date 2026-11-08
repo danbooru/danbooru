@@ -198,10 +198,16 @@ module Danbooru
           filenames = extract_to!(dir, flags: flags)
           yield dir, filenames
         end
+      elsif directory.present?
+        [directory, extract_to!(directory, flags: flags)]
       else
-        dir = directory.presence || Dir.mktmpdir(["danbooru-archive-", "-" + File.basename(file.path)])
-        filenames = extract_to!(dir, flags: flags)
-        [dir, filenames]
+        begin
+          dir = Dir.mktmpdir(["danbooru-archive-", "-" + File.basename(file.path)])
+          [dir, extract_to!(dir, flags: flags)]
+        rescue StandardError
+          FileUtils.rm_rf(dir)
+          raise
+        end
       end
     end
 

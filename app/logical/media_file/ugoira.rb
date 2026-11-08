@@ -366,6 +366,9 @@ class MediaFile::Ugoira < MediaFile
       FFmpeg.encode_images!(frames, frame_delays, output_file.path, format:, **options)
       MediaFile.open(output_file)
     end
+  rescue StandardError
+    output_file.close
+    raise
   end
 
   private

@@ -67,6 +67,23 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal(false, File.exist?(@tmpdir))
       end
 
+      should "delete the temp directory if extracting the archive fails" do
+        tmpdir = Dir.mktmpdir
+        Dir.stubs(:mktmpdir).returns(tmpdir)
+
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!("test/files/archive/long-path.tar.gz") }
+        assert_equal(false, File.exist?(tmpdir))
+      ensure
+        FileUtils.rm_rf(tmpdir)
+      end
+
+      should "not delete the given directory if extracting the archive fails" do
+        Dir.mktmpdir do |tmpdir|
+          assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!("test/files/archive/long-path.tar.gz", tmpdir) }
+          assert_equal(true, File.exist?(tmpdir))
+        end
+      end
+
       should "extract to given directory if given a directory" do
         Dir.mktmpdir do |tmpdir|
           dir, filenames = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip", tmpdir)
