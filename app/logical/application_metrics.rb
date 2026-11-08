@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "objspace" # for ObjectSpace.count_objects_size
+
 # Calculates metrics for the /metrics and /metrics/instance endpoints.
 #
 # @see app/logical/danbooru/metric.rb
