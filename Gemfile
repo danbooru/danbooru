@@ -45,7 +45,7 @@ gem "rbtrace", "~> 0.5", require: false # Use `bin/rbtrace --exec` or `RUBYOPT=-
 gem "good_job", "~> 4"
 gem "crass", "~> 1"
 gem "public_suffix", "~> 7"
-gem "debug", "~> 1"
+gem "debug", "~> 1", require: false
 gem "faker", "~> 3"
 gem "resolv", "~> 0.7"
 gem "rover-df", "~> 1"
