@@ -410,6 +410,56 @@ class MediaFilePngTest < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
+
+  def png_with_text_chunks(text_chunks)
+    chunk = ->(type, data) { [data.bytesize].pack("N") + type + data + [Zlib.crc32(type + data)].pack("N") }
+
+    png = "\x89PNG\r\n\x1a\n".b +
+      chunk.call("IHDR", [1, 1, 8, 0, 0, 0, 0].pack("NNC5")) +
+      text_chunks.map { |keyword, text| chunk.call("tEXt", "#{keyword}\0#{text}".b) }.join +
+      chunk.call("IDAT", Zlib.deflate("\0\0")) +
+      chunk.call("IEND", "")
+
+    Tempfile.new(["metadata", ".png"]).tap { |file| File.binwrite(file.path, png) }
+  end
+
+  context "a PNG with too much metadata" do
+    should "remove the largest values when the metadata is too large" do
+      file = png_with_text_chunks("Comment" => "a" * 11.kilobytes, "Title" => "title")
+      metadata = MediaFile.open(file).metadata
+
+      assert_equal("[OVERSIZED]", metadata["PNG:Comment"])
+      assert_equal("title", metadata["PNG:Title"])
+      assert_equal(1, metadata["PNG:ImageWidth"])
+      assert_operator(metadata.to_h.to_json.bytesize, :<=, 10.kilobytes
+    end
+
+    should "remove the largest values when there are too many values" do
+      file = png_with_text_chunks((1..300).to_h { |i| ["Keyword#{i}", "a" * (4.kilobytes + i)] }.merge("Title" => "title"))
+      metadata = MediaFile.open(file).metadata
+
+      assert_equal("[OVERSIZED]", metadata["PNG:Keyword300"])
+      assert_equal("a" * (4.kilobytes + 1), metadata["PNG:Keyword1"])
+      assert_equal("title", metadata["PNG:Title"])
+      assert_operator(metadata.to_h.to_json.bytesize, :<=, 1.megabyte)
+    end
+
+    should "drop the largest keys when replacing the values isn't enough" do
+      file = png_with_text_chunks((1..20_000).to_h { |i| [("k" * (60 + (i % 10))) + i.to_s, "a"] }.merge("Title" => "title"))
+      metadata = MediaFile.open(file).metadata
+
+      assert_equal(1, metadata["PNG:ImageWidth"])
+      assert_equal("title", metadata["PNG:Title"])
+      assert_operator(metadata.to_h.to_json.bytesize, :<=, 1.megabyte)
+    end
+
+    should "not remove anything when the metadata isn't too large" do
+      file = png_with_text_chunks("Comment" => "a" * 100.kilobytes)
+
+      assert_equal("a" * 100.kilobytes, MediaFile.open(file).metadata["PNG:Comment"])
+    end
+  end
+
   context "#full_decode_size" do
     should "be 0 for PNGs that can be decoded as a stream" do
       assert_equal(0, MediaFile.open("test/files/png/test.png").full_decode_size)

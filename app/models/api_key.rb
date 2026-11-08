@@ -7,6 +7,9 @@ class ApiKey < ApplicationRecord
   attribute :permitted_ip_addresses, :ip_address, array: true
   attribute :last_ip_address, :ip_address
 
+  # Hide the key in `inspect` and exception messages. It isn't caught by config.filter_parameters because it's not named `api_key`.
+  self.filter_attributes += [:key]
+
   array_attribute :permissions
   array_attribute :permitted_ip_addresses
 

@@ -318,20 +318,24 @@ class User < ApplicationRecord
     def reset_password(new_password:, password_confirmation:, verification_code:, request:)
       limit_2fa_attempts! if totp.present?
 
-      if is_deleted?
-        errors.add(:base, "You can't reset the password of a deleted account")
-        false
-      elsif totp.present? && !totp.verify(verification_code) && !has_backup_code?(verification_code)
-        UserEvent.create_from_request!(self, :totp_failed_reauthenticate, request)
-        errors.add(:verification_code, "is incorrect")
-        false
-      else
-        with_lock do
-          success = update(password: new_password, password_confirmation: password_confirmation)
-          UserEvent.create_from_request!(self, :password_reset, request) if success
-          login_sessions.active.find_each(&:revoke!) if success
-          verify_backup_code!(verification_code) if success
-          success
+      # Do this inside a lock so that the same verification code can't be used by two requests at once.
+      with_lock do
+        totp_verified = totp.blank? || totp.verify(verification_code)
+
+        if is_deleted?
+          errors.add(:base, "You can't reset the password of a deleted account")
+          false
+        elsif !totp_verified && !has_backup_code?(verification_code)
+          UserEvent.create_from_request!(self, :totp_failed_reauthenticate, request)
+          errors.add(:verification_code, "is incorrect")
+          false
+        elsif update(password: new_password, password_confirmation: password_confirmation)
+          UserEvent.create_from_request!(self, :password_reset, request)
+          login_sessions.active.find_each(&:revoke!)
+          verify_backup_code!(verification_code) unless totp_verified
+          true
+        else
+          false
         end
       end
     end
@@ -468,12 +472,13 @@ class User < ApplicationRecord
     # Check whether the given backup code is correct. If it is, remove it and generate a new backup code.
     #
     # @param backup_code [String] The backup code to verify.
+    # @return [Boolean] True if the code was correct and has been used up, false otherwise.
     def verify_backup_code!(backup_code)
-      if has_backup_code?(backup_code)
-        replace_backup_code!(backup_code)
+      with_lock do
+        next false unless has_backup_code?(backup_code)
+
+        update!(backup_codes: backup_codes.without(backup_code.to_s.strip.to_i) + [generate_backup_code])
         true
-      else
-        false
       end
     end
 
@@ -481,16 +486,6 @@ class User < ApplicationRecord
     def has_backup_code?(backup_code)
       return false unless backup_code.to_s.strip.match?(/\A[0-9]+\z/)
       backup_codes.include?(backup_code.to_s.strip.to_i)
-    end
-
-    # Replace the given backup code with a new one.
-    def replace_backup_code!(backup_code)
-      with_lock do
-        return unless has_backup_code?(backup_code)
-        backup_code = backup_code.strip.to_i
-        new_backup_codes = backup_codes.without(backup_code) + [generate_backup_code]
-        update!(backup_codes: new_backup_codes)
-      end
     end
 
     # Generate a new set of backup codes.
@@ -795,19 +790,6 @@ class User < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    # extra attributes returned for /users/:id.json but not for /users.json.
-    def full_attributes
-      %i[
-        wiki_page_version_count artist_version_count
-        artist_commentary_version_count pool_version_count
-        forum_post_count comment_count favorite_group_count
-        appeal_count flag_count positive_feedback_count
-        neutral_feedback_count negative_feedback_count
-      ]
-    end
-  end
-
   concerning :CountMethods do
     def wiki_page_version_count
       wiki_page_versions.count
@@ -965,7 +947,6 @@ class User < ApplicationRecord
   include BanMethods
   include LevelMethods
   include ForumMethods
-  include ApiMethods
   extend SearchMethods
 
   def initialize_attributes

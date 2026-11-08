@@ -67,6 +67,23 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal(false, File.exist?(@tmpdir))
       end
 
+      should "delete the temp directory if extracting the archive fails" do
+        tmpdir = Dir.mktmpdir
+        Dir.stubs(:mktmpdir).returns(tmpdir)
+
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!("test/files/archive/long-path.tar.gz") }
+        assert_equal(false, File.exist?(tmpdir))
+      ensure
+        FileUtils.rm_rf(tmpdir)
+      end
+
+      should "not delete the given directory if extracting the archive fails" do
+        Dir.mktmpdir do |tmpdir|
+          assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!("test/files/archive/long-path.tar.gz", tmpdir) }
+          assert_equal(true, File.exist?(tmpdir))
+        end
+      end
+
       should "extract to given directory if given a directory" do
         Dir.mktmpdir do |tmpdir|
           dir, filenames = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip", tmpdir)
@@ -124,8 +141,24 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/ugoira/ugoira.zip").format)
         assert_equal("RAR5", Danbooru::Archive.open("test/files/archive/ugoira.rar").format)
         assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.7z").format)
-        assert_equal("GNU tar format", Danbooru::Archive.open("test/files/archive/ugoira.tar").format)
-        assert_equal("GNU tar format", Danbooru::Archive.open("test/files/archive/ugoira.tar.gz").format)
+      end
+    end
+
+    context "an unsupported archive format" do
+      should "not be read" do
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/ugoira.tar").entries }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/ugoira.tar.gz").entries }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/long-path.tar.gz").extract! { nil } }
+      end
+    end
+
+    context "a tar file with a zip file signature" do
+      should "not be extracted" do
+        archive = Danbooru::Archive.open!("test/files/archive/tar-disguised-as-ugoira.tar")
+
+        assert_equal(:ugoira, archive.file_ext)
+        assert_raises(Danbooru::Archive::Error) { archive.entries }
+        assert_raises(Danbooru::Archive::Error) { archive.extract! { nil } }
       end
     end
 

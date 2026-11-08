@@ -41,7 +41,7 @@ gem "puma_worker_killer", "~> 1"
 gem "rack-timeout", "~> 0.7", require: "rack/timeout/base"
 gem "rackup", "~> 2"
 gem "ffi", "~> 1"
-gem "rbtrace", "~> 0.5"
+gem "rbtrace", "~> 0.5", require: false # Use `bin/rbtrace --exec` or `RUBYOPT=-rrbtrace` to enable.
 gem "good_job", "~> 4"
 gem "crass", "~> 1"
 gem "public_suffix", "~> 7"

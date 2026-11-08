@@ -279,6 +279,7 @@ class DTextTest < Minitest::Test
   def test_wiki_links
     assert_parse("<p>a <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/b\">b</a> c</p>", "a [[b]] c")
     assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/%E6%9D%B1%E6%96%B9\">東方</a></p>", "[[東方]]")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/%EF%BC%91%EF%BC%92%EF%BC%93\">１２３</a></p>", "[[１２３]]")
   end
 
   def test_wiki_link_spacing
@@ -691,11 +692,13 @@ class DTextTest < Minitest::Test
     assert_parse('<pre class="language-ruby">code</pre><pre>code</pre>', "```ruby\ncode\n```\n\n```\ncode\n```")
 
     assert_parse('<p>````<br>code<br>```</p>', "````\ncode\n```")
-    assert_parse('<p>```<br>code<br>````</p>', "```\ncode\n````")
+    assert_parse("<pre>code\n````</pre>", "```\ncode\n````")
     assert_parse('<p>````<br>code<br>```</p>', "````\r\ncode\r\n```")
-    assert_parse('<p>```<br>code<br>````</p>', "```\r\ncode\r\n````")
+    assert_parse("<pre>code\n````</pre>", "```\r\ncode\r\n````")
 
-    assert_parse('<p>```<br>```</p>', "```\n```") # XXX wrong? should allow empty code blocks
+    assert_parse('<pre></pre>', "```\n```")
+    assert_parse('<pre class="language-ruby"></pre>', "```ruby\n```")
+    assert_parse('<pre></pre>', "```\n")
     assert_parse('<pre></pre>', "```\n\n```")
 
     assert_parse('<pre>&lt;b&gt;</pre>', "```\n<b>\n```")
@@ -718,10 +721,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p>x ```<br>code<br>```</p>', "x ```\ncode\n```")
     assert_parse('<p> ```<br>code<br>```</p>', " ```\ncode\n```")
     assert_parse('<p>```code```</p>', "```code```")
-    assert_parse('<p>```<br>code```</p>', "```\ncode```")
-    assert_parse('<p>```code<br>```</p>', "```code\n```")
+    assert_parse('<pre>code```</pre>', "```\ncode```")
+    assert_parse('<pre class="language-code"></pre>', "```code\n```")
     assert_parse('<p>```code</p>', "```code")
-    assert_parse('<p>```<br>code</p>', "```\ncode")
+    assert_parse('<pre>code</pre>', "```\ncode")
     assert_parse('<p>```</p>', "```")
 
     assert_parse('<h4>Code</h4><pre>code</pre>', "h4. Code\n```\ncode\n```")
@@ -760,6 +763,20 @@ class DTextTest < Minitest::Test
     assert_parse('<p>foo <strong>bar</strong></p><pre>blah</pre>', "foo [b]bar\n```\nblah\n```")
   end
 
+  def test_unclosed_code_fences
+    # Unclosed code fences continue to the end of the text, like in CommonMark.
+    assert_parse("<pre>code\n\nmore [b]text[/b]</pre>", "```\ncode\n\nmore [b]text[/b]")
+    assert_parse('<p>text</p><pre class="language-ruby">code</pre>', "text\n```ruby\ncode")
+    assert_parse('<pre>one</pre><p>two</p><pre>three</pre>', "```\none\n```\ntwo\n```\nthree")
+    assert_parse("<blockquote><pre>code\n[/quote]\ntext</pre></blockquote>", "[quote]\n```\ncode\n[/quote]\ntext")
+    assert_parse("<pre>code\n```x\nmore</pre>", "```\ncode\n```x\nmore")
+
+    assert_fast_parse("```x\n" * 50_000)
+    assert_fast_parse("a\n```x\n" * 50_000)
+    assert_fast_parse("* a\n```x\n" * 50_000)
+    assert_fast_parse("x```\n" * 50_000)
+  end
+
   def test_long_urls
     host = "http://#{"a" * 200_000}.com"
     path = "http://a.com/#{"b" * 200_000}"
@@ -770,6 +787,18 @@ class DTextTest < Minitest::Test
     assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="#{path}">#{path}</a></p>}, "<#{path}>")
     assert_parse(%{<p><a class="dtext-link" href="#{internal}">#{internal}</a></p>}, internal, domain: "danbooru.donmai.us", internal_domains: ["danbooru.donmai.us"])
     assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="#{host}">x</a></p>}, %{"x":[#{host}]}, domain: "danbooru.donmai.us")
+  end
+
+  def test_backslash_urls
+    evil = 'https://evil.com\@danbooru.donmai.us/'
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="#{evil}">x</a></p>}, %{[x](#{evil})}, domain: "danbooru.donmai.us")
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="#{evil}">x</a></p>}, %{"x":[#{evil}]}, domain: "danbooru.donmai.us")
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="#{evil}">#{evil}</a></p>}, %{<#{evil}>}, domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us\posts">x</a></p>', '"x":[https://danbooru.donmai.us\posts]', domain: "danbooru.donmai.us")
+
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http:/\evil.com">x</a></p>', '[x](/\evil.com)', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http:/\evil.com">x</a></p>', '"x":/\evil.com', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http:/\evil.com">x</a></p>', '"x":[/\evil.com]', domain: "danbooru.donmai.us")
   end
 
   def test_urls
@@ -906,6 +935,9 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also">https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also</a></p>', 'https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
 
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/touhou">touhou</a></p>', 'https://danbooru.donmai.us/wiki_pages/touhou', internal_domains: %w[danbooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts/１２３">https://danbooru.donmai.us/posts/１２３</a></p>', "https://danbooru.donmai.us/posts/１２３", domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/post/show/１２３">https://danbooru.donmai.us/post/show/１２３</a></p>', "https://danbooru.donmai.us/post/show/１２３", domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
   end
 
   def test_old_style_links
@@ -1576,6 +1608,8 @@ class DTextTest < Minitest::Test
     assert_parse('<table class="striped"><td colspan="2">foo</td></table>', "[table][td colspan='2']foo[/td][/table]")
     assert_parse('<table class="striped"><td colspan="2">foo</td></table>', '[table][td colspan = "2"]foo[/td][/table]')
     assert_parse('<table class="striped"><td colspan="3">foo</td></table>', '[table][td colspan=2 colspan=3]foo[/td][/table]')
+    assert_parse('<table class="striped"><td>foo</td></table>', '[table][td colspan="２"]foo[/td][/table]')
+    assert_parse('<table class="striped"><td>foo</td></table>', '[table][td rowspan="١"]foo[/td][/table]')
 
     assert_parse('<table class="striped"><td colspan="2" rowspan="3">foo</td></table>', '[table][td colspan=2 rowspan=3]foo[/td][/table]')
     assert_parse('<table class="striped"><td colspan="2" rowspan="3">foo</td></table>', '[table][td rowspan=3 colspan=2]foo[/td][/table]')
@@ -1707,6 +1741,14 @@ class DTextTest < Minitest::Test
 
     assert_parse('<tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed><p> foo</p>', '[bur:1] foo') # XXX
     assert_parse('<blockquote><tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed></blockquote>', '[quote][bur:1][/quote]') # XXX wrong?
+  end
+
+  def test_stale_match_marks
+    assert_parse('<p>{{a|b<br><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">foo</a></p>', "{{a|b\n[[foo]]")
+    assert_parse('<p>{{a|b c<br><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">foo</a></p>', "{{a|b c\n[[foo]]")
+    assert_parse('<p>[[a#B<br><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">bar</a></p>', "[[a#B\n[[foo|bar]]")
+    assert_parse('<p>{{a|b</p><media-embed data-type="post" data-id="1"></media-embed>', "{{a|b\n!post #1", media_embeds: true)
+    assert_parse('<p>[[a#B</p><media-embed data-type="post" data-id="1"></media-embed>', "[[a#B\n!post #1", media_embeds: true)
   end
 
   def test_media_embeds
@@ -1954,6 +1996,8 @@ class DTextTest < Minitest::Test
     assert_parse('<p>foo<emoji data-name="smile" data-mode="inline"></emoji>bar</p>', "foo:smile:bar", emoji_list:)
     assert_parse('<p>:foo<emoji data-name="smile" data-mode="inline"></emoji></p>', ":foo:smile:", emoji_list:)
     assert_parse('<h4><emoji data-name="smile" data-mode="inline"></emoji></h4>', "h4.:smile:", emoji_list:)
+
+    assert_wiki_pages(["foo"], ":smile: [[foo]]")
   end
 
   def test_inline_mode
@@ -2131,6 +2175,17 @@ class DTextTest < Minitest::Test
 
   def test_null_bytes
     assert_raises(DText::Error) { parse("foo\0bar") }
+    assert_raises(DText::Error) { DText.c_parse_wiki_pages("foo\0bar") }
+    assert_raises(ArgumentError) { parse("foo", base_url: "foo\0bar") }
+    assert_raises(ArgumentError) { parse("foo", domain: "foo\0bar") }
+  end
+
+  def test_invalid_options
+    assert_raises(TypeError) { parse("foo", base_url: 42) }
+    assert_raises(TypeError) { parse("foo", internal_domains: "foo") }
+    assert_raises(TypeError) { parse("foo", internal_domains: [42]) }
+    assert_raises(TypeError) { parse("foo", emoji_list: "foo") }
+    assert_raises(TypeError) { parse("foo", emoji_list: [42]) }
   end
 
   def test_encodings

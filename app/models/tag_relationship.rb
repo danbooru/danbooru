@@ -154,8 +154,8 @@ class TagRelationship < ApplicationRecord
     tag_relationship.process!
   end
 
-  def self.model_restriction(table)
-    super.where(table[:status].eq("active"))
+  def self.model_restriction
+    active
   end
 
   def self.available_includes

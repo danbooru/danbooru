@@ -49,6 +49,10 @@ class UserPolicy < ApplicationPolicy
     policy(:ip_address).show? && (record.id == user.id || record.level < user.level)
   end
 
+  def can_see_flag_count?
+    record.id == user.id || user.is_moderator?
+  end
+
   def can_see_favorites?
     user.is_admin? || record.id == user.id || !record.enable_private_favorites?
   end
@@ -104,6 +108,21 @@ class UserPolicy < ApplicationPolicy
     end
 
     attributes += [:last_ip_addr] if can_see_last_ip_addr?
+
+    attributes
+  end
+
+  # Extra attributes returned for /users/:id.json but not for /users.json.
+  def full_api_attributes
+    attributes = %i[
+      wiki_page_version_count artist_version_count
+      artist_commentary_version_count pool_version_count
+      forum_post_count comment_count favorite_group_count
+      appeal_count positive_feedback_count
+      neutral_feedback_count negative_feedback_count
+    ]
+
+    attributes += [:flag_count] if can_see_flag_count?
 
     attributes
   end

@@ -22,6 +22,14 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#post-version-#{@post.versions[2].id}"
       end
 
+      should "mark tags that were changed by a later version as obsolete when comparing to the current version" do
+        get post_versions_path(search: { post_id: @post.id }, type: "current")
+
+        assert_response :success
+        assert_select "#post-version-#{@post.versions[1].id} ins.diff-obsolete", text: "1"
+        assert_select "#post-version-#{@post.versions[1].id} ins:not(.diff-obsolete)", text: "2"
+      end
+
       should "list all versions that match the search criteria" do
         get_auth post_versions_path, @user, params: { search: { post_id: @post.id }}
         assert_response :success

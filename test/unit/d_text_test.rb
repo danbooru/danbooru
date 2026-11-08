@@ -309,6 +309,18 @@ class DTextTest < ActiveSupport::TestCase
         assert_rewrite_wiki_links("[[Copyright: ~long test subtitle~]]", "[[Test tag]]", "test_tag", "copyright:_~long_test_subtitle~")
 
         assert_rewrite_wiki_links("[[Shin(())code]]", "[[Test Tag]]", "test_tag", "shin(())code")
+      end
+
+      should "not let an unclosed link swallow the next link" do
+        assert_rewrite_wiki_links("[[cat [[rabbit]]", "[[cat [[bunny]]", "bunny", "rabbit")
+        assert_rewrite_wiki_links("[cat] [[rabbit]]", "[cat] [[bunny]]", "bunny", "rabbit")
+      end
+
+      should "not rewrite things that aren't wiki links" do
+        assert_rewrite_wiki_links("[[bunny|a|b]]", "[[bunny|a|b]]", "bunny", "rabbit")
+        assert_rewrite_wiki_links("[[bunny]b]]", "[[bunny]b]]", "bunny", "rabbit")
+        assert_rewrite_wiki_links("[[bunny\n]]", "[[bunny\n]]", "bunny", "rabbit")
+        assert_rewrite_wiki_links("[[[[bunny]]", "[[[[bunny]]", "bunny", "rabbit") # DText parses this as a link to `[bunny`
 
         assert_rewrite_wiki_links("[[00 qan[t] (cosplay)|]]", "[[Test tag]]", "test_tag", "00_qan[t]_(cosplay)")
         assert_rewrite_wiki_links("[[00 Qan[T] (cosplay)|]]", "[[Test Tag]]", "test_tag", "00_qan[t]_(cosplay)")

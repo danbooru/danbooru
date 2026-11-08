@@ -102,8 +102,8 @@ class DanbooruLogger
   end
 
   def self.add_attributes(prefix, hash)
+    hash = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters).filter(hash)
     attributes = flatten_hash(hash).transform_keys { |key| "#{prefix}.#{key}" }
-    attributes.delete_if { |key, value| key.end_with?(*Rails.application.config.filter_parameters.map(&:to_s)) }
     log_attributes(attributes)
   end
 

@@ -50,16 +50,26 @@ static const std::unordered_map<std::string_view, const std::unordered_set<std::
   { "colgroup", {} },
 };
 
+static unsigned char ascii_tolower(unsigned char c) {
+  return (c >= 'A' && c <= 'Z') ? c ^ 0x20 : c;
+}
+
+static bool ascii_isdigit(unsigned char c) {
+  return c >= '0' && c <= '9';
+}
+
+static bool ascii_isalnum(unsigned char c) {
+  return ascii_isdigit(c) || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
 // Permitted HTML attribute values.
 static const std::unordered_set<std::string_view> align_values = { "left", "center", "right", "justify" };
 static const std::unordered_map<std::string_view, std::function<bool(std::string_view)>> permitted_attribute_values = {
   { "align",   [](auto value) { return align_values.find(value) != align_values.end(); } },
-  { "span",    [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
-  { "colspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
-  { "rowspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
+  { "span",    [](auto value) { return std::all_of(value.begin(), value.end(), ascii_isdigit); } },
+  { "colspan", [](auto value) { return std::all_of(value.begin(), value.end(), ascii_isdigit); } },
+  { "rowspan", [](auto value) { return std::all_of(value.begin(), value.end(), ascii_isdigit); } },
 };
-
-static unsigned char ascii_tolower(unsigned char c);
 
 %%{
 machine dtext;
@@ -110,7 +120,7 @@ action in_quote { dstack_is_open(BLOCK_QUOTE) }
 action in_expand { dstack_is_open(BLOCK_EXPAND) }
 action in_spoiler { dstack_is_open(BLOCK_SPOILER) }
 action below_max_depth { dstack.size() < MAX_NESTING_DEPTH }
-action is_allowed_emoji { options.is_allowed_emoji({ f1, f2 + 1 }) }
+action is_allowed_emoji { is_allowed_emoji({ f1, f2 + 1 }) }
 action save_tag_attribute { tag_attributes[{ a1, a2 }] = { b1, b2 }; }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
@@ -238,8 +248,8 @@ wiki_target = ((nonpipebracket* (nonpipebracket - space) -- '[[') | emoticon_tag
 wiki_anchor_id = ([A-Z] ([ _\-]* alnum+)*) >mark_c1 %mark_c2;
 wiki_title = ((ws* (nonpipebracket - space)+)* -- '[[') >mark_d1 %mark_d2;
 
-basic_wiki_link = wiki_prefix '[[' ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? ']]' wiki_suffix;
-aliased_wiki_link = wiki_prefix '[[' ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? '|' ws* wiki_title ws* ']]' wiki_suffix;
+basic_wiki_link = wiki_prefix '[[' >mark_c1 >mark_c2 ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? ']]' wiki_suffix;
+aliased_wiki_link = wiki_prefix '[[' >mark_c1 >mark_c2 ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? '|' ws* wiki_title ws* ']]' wiki_suffix;
 
 tag = (nonspace - [|{}])+ | ([~\-]? emoticon_tags);
 tags = (tag (ws+ tag)*) >mark_b1 %mark_b2;
@@ -263,7 +273,7 @@ tag_request_embed = '[' ('ta' | 'ti' | 'bur') >mark_b1 %mark_b2 ':' id ']';
 # !post #1234: This is a caption.
 # * !post #1: This is the first image in a media gallery.
 # * !post #2: This is the second image in a media gallery.
-media_embed = '* '? >mark_d1 %mark_d2 ('!' ('post' | 'asset') >mark_b1 %mark_b2 ' #' id (':' ws+ ((nonspace nonnewline*) >mark_c1 %mark_c2))? ws* eol) when media_embeds_enabled;
+media_embed = '* '? >mark_d1 %mark_d2 ('!' >mark_c1 >mark_c2 ('post' | 'asset') >mark_b1 %mark_b2 ' #' id (':' ws+ ((nonspace nonnewline*) >mark_c1 %mark_c2))? ws* eol) when media_embeds_enabled;
 
 header_id = (alnum | [_/#!:&\-])+; # XXX '/', '#', '!', ':', and '&' are grandfathered in for old wiki versions.
 header = 'h'i [123456] >mark_a1 %mark_a2 '.' >mark_b1 >mark_b2 ws*;
@@ -275,7 +285,8 @@ list_item = '*'+ >mark_e1 %mark_e2 ws+ nonnewline+ >mark_f1 %mark_f2;
 
 hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
-code_fence = ('```' ws* (alnum* >mark_a1 %mark_a2) ws* eol) (any* >mark_b1 %mark_b2) :>> (eol '```' ws* eol);
+code_fence = '```' ws* (alnum* >mark_a1 %mark_a2) ws* newline;
+close_code_fence = '```' ws* eol;
 
 emoji_name = ([a-zA-Z0-9_]{3,32}) - ('http'i | 'https'i | [0-9]+);
 emoji = ':' emoji_name >mark_f1 @mark_f2 (':' when is_allowed_emoji); # %mark_f2 doesn't work because it doesn't run until after is_allowed_emoji is called.
@@ -650,6 +661,19 @@ code := |*
   };
 *|;
 
+fenced_code := |*
+  newline close_code_fence => {
+    dstack_rewind();
+    fret;
+  };
+
+  eos;
+
+  any => {
+    append_html_escaped(fc);
+  };
+*|;
+
 nodtext := |*
   newline? close_nodtext => {
     dstack_rewind();
@@ -754,9 +778,14 @@ main := |*
     fcall code;
   };
 
+  code_fence close_code_fence => {
+    append_block_code({ a1, a2 });
+    dstack_rewind();
+  };
+
   code_fence => {
-    dstack_close_leaf_blocks();
-    append_code_fence({ b1, b2 }, { a1, a2 });
+    append_block_code({ a1, a2 });
+    fcall fenced_code;
   };
 
   open_expand space* => {
@@ -893,6 +922,13 @@ bool StateMachine::is_inline_element(element_t type) {
   return type >= INLINE;
 }
 
+bool StateMachine::is_allowed_emoji(const std::string_view name) {
+  std::string lowercase_name(name);
+  std::transform(name.begin(), name.end(), lowercase_name.begin(), &ascii_tolower);
+
+  return std::ranges::find(options.emojis, lowercase_name) != options.emojis.end();
+}
+
 bool StateMachine::is_internal_url(const std::string_view url) {
   if (url.starts_with("/")) {
     return true;
@@ -910,7 +946,7 @@ bool StateMachine::is_internal_url(const std::string_view url) {
       return false;
     }
 
-    auto authority = url.substr(scheme_size, url.find_first_of("/?#", scheme_size) - scheme_size);
+    auto authority = url.substr(scheme_size, url.find_first_of("/\\?#", scheme_size) - scheme_size);
     auto userinfo_end = authority.find_last_of('@');
     auto host = userinfo_end == std::string_view::npos ? authority : authority.substr(userinfo_end + 1);
 
@@ -1038,7 +1074,7 @@ void StateMachine::append_bare_unnamed_url(const std::string_view url) {
 void StateMachine::append_unnamed_url(const std::string_view url) {
   DText::URL parsed_url(url);
 
-  if (options.internal_domains.find(std::string(parsed_url.domain)) != options.internal_domains.end()) {
+  if (std::ranges::find(options.internal_domains, parsed_url.domain) != options.internal_domains.end()) {
     append_internal_url(parsed_url);
   } else if (parsed_url.scheme == "mailto") {
     auto title = url;
@@ -1058,7 +1094,7 @@ void StateMachine::append_internal_url(const DText::URL& url) {
     auto controller = path_components.at(0);
     auto id = path_components.at(1);
 
-    if (!id.empty() && std::all_of(id.begin(), id.end(), ::isdigit)) {
+    if (!id.empty() && std::all_of(id.begin(), id.end(), ascii_isdigit)) {
       if (controller == "posts" && fragment.empty()) {
         // https://danbooru.donmai.us/posts/6000000#comment_2288996
         return append_id_link("post", "post", "/posts/", id);
@@ -1095,7 +1131,7 @@ void StateMachine::append_internal_url(const DText::URL& url) {
     auto action = path_components.at(1);
     auto id = path_components.at(2);
 
-    if (!id.empty() && std::all_of(id.begin(), id.end(), ::isdigit)) {
+    if (!id.empty() && std::all_of(id.begin(), id.end(), ascii_isdigit)) {
       if (controller == "post" && action == "show") {
         return append_id_link("post", "post", "/posts/", id);
       }
@@ -1108,8 +1144,8 @@ void StateMachine::append_internal_url(const DText::URL& url) {
 void StateMachine::append_named_url(const std::string_view url, const std::string_view title) {
   auto parsed_title = parse_basic_inline(title);
 
-  // protocol-relative url; treat `//example.com` like `http://example.com`
-  if (url.size() > 2 && url.starts_with("//")) {
+  // protocol-relative url; treat `//example.com` like `http://example.com`. Browsers treat `/\` like `//`.
+  if (url.size() > 2 && (url.starts_with("//") || url.starts_with("/\\"))) {
     auto full_url = "http:" + std::string(url);
     append_absolute_link(full_url, parsed_title, is_internal_url(full_url), false);
   } else if (url[0] == '/' || url[0] == '#') {
@@ -1168,7 +1204,7 @@ void StateMachine::append_wiki_link(const std::string_view prefix, const std::st
   std::transform(normalized_tag.cbegin(), normalized_tag.cend(), normalized_tag.begin(), [](unsigned char c) { return c == ' ' ? '_' : ascii_tolower(c); });
 
   // [[2019]] -> [[~2019]]
-  if (std::all_of(normalized_tag.cbegin(), normalized_tag.cend(), ::isdigit)) {
+  if (std::all_of(normalized_tag.cbegin(), normalized_tag.cend(), ascii_isdigit)) {
     normalized_tag.insert(0, "~");
   }
 
@@ -1193,7 +1229,7 @@ void StateMachine::append_wiki_link(const std::string_view prefix, const std::st
 
   if (!anchor.empty()) {
     std::string normalized_anchor(anchor);
-    std::transform(normalized_anchor.begin(), normalized_anchor.end(), normalized_anchor.begin(), [](char c) { return isalnum(c) ? ascii_tolower(c) : '-'; });
+    std::transform(normalized_anchor.begin(), normalized_anchor.end(), normalized_anchor.begin(), [](unsigned char c) { return ascii_isalnum(c) ? ascii_tolower(c) : '-'; });
     append_html_escaped("#dtext-");
     append_html_escaped(normalized_anchor);
   }
@@ -1233,20 +1269,6 @@ void StateMachine::append_dmail_key_link(const std::string_view dmail_id, const 
   append("</a>");
 }
 
-void StateMachine::append_code_fence(const std::string_view code, const std::string_view language) {
-  if (language.empty()) {
-    append_block("<pre>");
-    append_html_escaped(code);
-    append_block("</pre>");
-  } else {
-    append_block("<pre class=\"language-");
-    append_html_escaped(language);
-    append_block("\">");
-    append_html_escaped(code);
-    append_block("</pre>");
-  }
-}
-
 void StateMachine::append_inline_code(const std::string_view language) {
   if (language.empty()) {
     dstack_open_element(INLINE_CODE, "<code>");
@@ -1281,7 +1303,7 @@ void StateMachine::append_header(char header, const std::string_view id) {
     append_block(">");
   } else {
     auto normalized_id = std::string(id);
-    std::transform(id.begin(), id.end(), normalized_id.begin(), [](char c) { return isalnum(c) ? ascii_tolower(c) : '-'; });
+    std::transform(id.begin(), id.end(), normalized_id.begin(), [](unsigned char c) { return ascii_isalnum(c) ? ascii_tolower(c) : '-'; });
 
     dstack_open_element(block, "<h");
     append_block(header);
@@ -1564,10 +1586,6 @@ std::tuple<std::string_view, std::string_view> StateMachine::trim_url(const std:
   return { trimmed, { trimmed.end(), url.end() } };
 }
 
-static unsigned char ascii_tolower(unsigned char c) {
-  return (c >= 'A' && c <= 'Z') ? c ^ 0x20 : c;
-}
-
 // Replace CRLF sequences with LF.
 static void replace_newlines(const std::string_view input, std::string& output) {
   size_t pos, last = 0;
@@ -1597,11 +1615,6 @@ StateMachine::StateMachine(const auto string, int initial_state, const DTextOpti
   pe = input.c_str() + input.size();
   eof = pe;
   cs = initial_state;
-}
-
-std::string StateMachine::parse_inline(const std::string_view dtext) {
-  StateMachine sm(dtext, dtext_en_inline, options);
-  return sm.parse();
 }
 
 std::string StateMachine::parse_basic_inline(const std::string_view dtext) {

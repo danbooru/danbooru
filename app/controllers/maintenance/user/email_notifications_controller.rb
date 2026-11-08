@@ -17,8 +17,8 @@ module Maintenance
 
       def destroy
         @user = ::User.find(params[:user_id])
-        @user.update!(receive_email_notifications: false)
         authorize @user, policy_class: EmailNotificationPolicy
+        @user.update!(receive_email_notifications: false)
 
         # https://www.rfc-editor.org/rfc/rfc8058#section-3.1
         #

@@ -10,14 +10,17 @@ class ServerStatus
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
-  attr_reader :request
+  attr_reader :request, :include_sensitive_info
 
-  def initialize(request = nil)
+  # @param request [ActionDispatch::Request] The current HTTP request.
+  # @param include_sensitive_info [Boolean] If true, include sensitive server info, such as software versions or Postgres info.
+  def initialize(request = nil, include_sensitive_info: false)
     @request = request
+    @include_sensitive_info = include_sensitive_info
   end
 
   def serializable_hash(options = {})
-    {
+    hash = {
       ip: request.remote_ip,
       headers: http_headers,
       instance: {
@@ -33,34 +36,51 @@ class ServerStatus
       version: {
         docker_image_build_date: docker_image_build_date,
         danbooru_version: danbooru_version,
-        ruby_version: ruby_version,
-        rails_version: rails_version,
-        puma_version: puma_version,
-        distro_version: distro_version,
-        libvips_version: libvips_version,
-        ffmpeg_version: ffmpeg_version,
-        mkvmerge_version: mkvmerge_version,
-        exiftool_version: exiftool_version,
-        jemalloc_version: jemalloc_version,
-        redis_version: redis_version,
-        postgres_version: postgres_version,
       },
       server: {
         node_name: node_name,
         node_uptime: node_uptime,
         loadavg: loadavg,
-        kernel_version: kernel_version,
       },
       postgres: {
         up: postgres_up?,
-        error: postgres_error,
-        connection_stats: postgres_connection_stats,
+        active_connections: postgres_active_connections,
       },
       redis: {
         up: redis_up?,
-        info: redis_info,
+        used_memory: redis_used_memory,
       },
     }
+
+    if include_sensitive_info
+      hash.deep_merge!(
+        version: {
+          ruby_version: ruby_version,
+          rails_version: rails_version,
+          puma_version: puma_version,
+          distro_version: distro_version,
+          libvips_version: libvips_version,
+          ffmpeg_version: ffmpeg_version,
+          mkvmerge_version: mkvmerge_version,
+          exiftool_version: exiftool_version,
+          jemalloc_version: jemalloc_version,
+          redis_version: redis_version,
+          postgres_version: postgres_version,
+        },
+        server: {
+          kernel_version: kernel_version,
+        },
+        postgres: {
+          error: postgres_error,
+          connection_stats: postgres_connection_stats,
+        },
+        redis: {
+          info: redis_info,
+        },
+      )
+    end
+
+    hash
   end
 
   concerning :InfoMethods do

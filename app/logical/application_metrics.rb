@@ -757,7 +757,7 @@ class ApplicationMetrics
   def serve_process_metrics
     filename = "tmp/drb-process-metrics-#{puma_worker_id}.sock"
     FileUtils.rm_f(filename)
-    DRb.start_service("drbunix:#{filename}", ApplicationMetrics.instance)
+    DRb.start_service("drbunix:#{filename}", ApplicationMetrics.instance, UNIXFileMode: 0o600)
   end
 
   class << self

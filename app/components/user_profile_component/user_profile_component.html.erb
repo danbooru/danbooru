@@ -231,7 +231,7 @@
           <td><%= link_to user.appeal_count, post_appeals_path(search: { creator_name: user.name }) %></td>
         </tr>
 
-        <% if user == current_user || current_user.is_moderator? %>
+        <% if policy(user).can_see_flag_count? %>
           <tr>
             <th>Flags</th>
             <td><%= link_to user.flag_count, post_flags_path(search: { creator_name: user.name }) %></td>
