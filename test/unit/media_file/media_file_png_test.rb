@@ -431,7 +431,7 @@ class MediaFilePngTest < ActiveSupport::TestCase
       assert_equal("[OVERSIZED]", metadata["PNG:Comment"])
       assert_equal("title", metadata["PNG:Title"])
       assert_equal(1, metadata["PNG:ImageWidth"])
-      assert_operator(metadata.to_h.to_json.bytesize, :<=, 10.kilobytes
+      assert_operator(metadata.to_h.to_json.bytesize, :<=, 10.kilobytes)
     end
 
     should "remove the largest values when there are too many values" do
