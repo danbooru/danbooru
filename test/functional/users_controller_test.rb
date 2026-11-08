@@ -322,6 +322,32 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "show the flag_count only to the user themselves and to mods" do
+        user = create(:user)
+        create(:post_flag, creator: user)
+
+        get_auth user_path(user), user, as: :json
+        assert_response :success
+        assert_equal(1, response.parsed_body["flag_count"])
+
+        get_auth user_path(user), create(:mod_user), as: :json
+        assert_response :success
+        assert_equal(1, response.parsed_body["flag_count"])
+
+        get_auth user_path(user), create(:user), as: :json
+        assert_response :success
+        assert_equal(false, response.parsed_body.key?("flag_count"))
+        assert_equal(0, response.parsed_body["appeal_count"])
+
+        get user_path(user), as: :json
+        assert_response :success
+        assert_equal(false, response.parsed_body.key?("flag_count"))
+
+        get_auth user_path(user, only: "id,flag_count"), create(:user), as: :json
+        assert_response :success
+        assert_equal(false, response.parsed_body.key?("flag_count"))
+      end
+
       should "not show hidden attributes to others" do
         @another = create(:user)
 

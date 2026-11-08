@@ -790,19 +790,6 @@ class User < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    # extra attributes returned for /users/:id.json but not for /users.json.
-    def full_attributes
-      %i[
-        wiki_page_version_count artist_version_count
-        artist_commentary_version_count pool_version_count
-        forum_post_count comment_count favorite_group_count
-        appeal_count flag_count positive_feedback_count
-        neutral_feedback_count negative_feedback_count
-      ]
-    end
-  end
-
   concerning :CountMethods do
     def wiki_page_version_count
       wiki_page_versions.count
@@ -960,7 +947,6 @@ class User < ApplicationRecord
   include BanMethods
   include LevelMethods
   include ForumMethods
-  include ApiMethods
   extend SearchMethods
 
   def initialize_attributes
