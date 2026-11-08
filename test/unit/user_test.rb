@@ -208,6 +208,46 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
+    context "#verify_backup_code! method" do
+      setup do
+        @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
+      end
+
+      should "accept a backup code and replace it with a new one" do
+        assert_equal(true, @user.verify_backup_code!("11111111"))
+        assert_equal(false, @user.reload.backup_codes.include?(1111_1111))
+        assert_equal(3, @user.backup_codes.size)
+      end
+
+      should "reject an incorrect backup code" do
+        assert_equal(false, @user.verify_backup_code!("99999999"))
+        assert_equal([1111_1111, 2222_2222, 3333_3333], @user.reload.backup_codes)
+      end
+
+      should "reject a backup code that was used by a concurrent request" do
+        User.find(@user.id).verify_backup_code!("11111111")
+
+        assert_equal(false, @user.verify_backup_code!("11111111"))
+      end
+    end
+
+    context "#reset_password method" do
+      setup do
+        @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
+        @request = mock
+        @request.stubs(:remote_ip).returns("1.1.1.1")
+        @request.stubs(:user_agent).returns("Firefox")
+        @request.stubs(:session).returns(session_id: "1234")
+      end
+
+      should "reject a backup code that was used by a concurrent request" do
+        User.find(@user.id).verify_backup_code!("11111111")
+
+        assert_equal(false, @user.reset_password(new_password: "newpassword", password_confirmation: "newpassword", verification_code: "11111111", request: @request))
+        assert_equal(false, @user.reload.authenticate_password("newpassword"))
+      end
+    end
+
     context "#recently_verified_account?" do
       should "be true within 24 hours of an account_verification event" do
         create(:user_event, user: @user, category: :account_verification)
