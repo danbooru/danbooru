@@ -414,8 +414,8 @@ class DText
     old_name = old_name.downcase.squeeze("_").tr("_", " ").strip
     new_name = new_name.downcase.squeeze("_").tr("_", " ").strip
 
-    # Match `[[name]]` or `[[name|title]]`
-    rewritten_dtext = dtext.gsub(/\[\[(.*?)(?:\|(.*?))?\]\]/) do |match|
+    # Match `[[name]]` or `[[name|title]]`. Like the DText parser, the name and title can't contain `|`, `]`, or `[[`.
+    rewritten_dtext = dtext.gsub(/\[\[((?:[^\[\]|\n]|\[(?!\[))*)(?:\|((?:[^\[\]|\n]|\[(?!\[))*))?\]\]/) do |match|
       name = $1
       title = $2
 
