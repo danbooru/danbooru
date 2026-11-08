@@ -158,7 +158,6 @@ public:
   using ParseResult = std::tuple<std::string, decltype(wiki_pages)>;
   static ParseResult parse_dtext(const std::string_view dtext, const DTextOptions options);
 
-  std::string parse_inline(const std::string_view dtext);
   std::string parse_basic_inline(const std::string_view dtext);
 
   void dstack_push(element_t element);

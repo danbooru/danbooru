@@ -1611,11 +1611,6 @@ StateMachine::StateMachine(const auto string, int initial_state, const DTextOpti
   cs = initial_state;
 }
 
-std::string StateMachine::parse_inline(const std::string_view dtext) {
-  StateMachine sm(dtext, dtext_en_inline, options);
-  return sm.parse();
-}
-
 std::string StateMachine::parse_basic_inline(const std::string_view dtext) {
   StateMachine sm(dtext, dtext_en_basic_inline, options);
   return sm.parse();
