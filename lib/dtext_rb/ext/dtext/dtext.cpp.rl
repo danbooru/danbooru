@@ -275,7 +275,8 @@ list_item = '*'+ >mark_e1 %mark_e2 ws+ nonnewline+ >mark_f1 %mark_f2;
 
 hr = ws* ('[hr]'i | '<hr>'i) ws* eol+;
 
-code_fence = ('```' ws* (alnum* >mark_a1 %mark_a2) ws* eol) (any* >mark_b1 %mark_b2) :>> (eol '```' ws* eol);
+code_fence = '```' ws* (alnum* >mark_a1 %mark_a2) ws* newline;
+close_code_fence = '```' ws* eol;
 
 emoji_name = ([a-zA-Z0-9_]{3,32}) - ('http'i | 'https'i | [0-9]+);
 emoji = ':' emoji_name >mark_f1 @mark_f2 (':' when is_allowed_emoji); # %mark_f2 doesn't work because it doesn't run until after is_allowed_emoji is called.
@@ -650,6 +651,19 @@ code := |*
   };
 *|;
 
+fenced_code := |*
+  newline close_code_fence => {
+    dstack_rewind();
+    fret;
+  };
+
+  eos;
+
+  any => {
+    append_html_escaped(fc);
+  };
+*|;
+
 nodtext := |*
   newline? close_nodtext => {
     dstack_rewind();
@@ -754,9 +768,14 @@ main := |*
     fcall code;
   };
 
+  code_fence close_code_fence => {
+    append_block_code({ a1, a2 });
+    dstack_rewind();
+  };
+
   code_fence => {
-    dstack_close_leaf_blocks();
-    append_code_fence({ b1, b2 }, { a1, a2 });
+    append_block_code({ a1, a2 });
+    fcall fenced_code;
   };
 
   open_expand space* => {
@@ -1231,20 +1250,6 @@ void StateMachine::append_dmail_key_link(const std::string_view dmail_id, const 
   append("dmail #");
   append(dmail_id);
   append("</a>");
-}
-
-void StateMachine::append_code_fence(const std::string_view code, const std::string_view language) {
-  if (language.empty()) {
-    append_block("<pre>");
-    append_html_escaped(code);
-    append_block("</pre>");
-  } else {
-    append_block("<pre class=\"language-");
-    append_html_escaped(language);
-    append_block("\">");
-    append_html_escaped(code);
-    append_block("</pre>");
-  }
 }
 
 void StateMachine::append_inline_code(const std::string_view language) {

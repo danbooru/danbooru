@@ -691,11 +691,13 @@ class DTextTest < Minitest::Test
     assert_parse('<pre class="language-ruby">code</pre><pre>code</pre>', "```ruby\ncode\n```\n\n```\ncode\n```")
 
     assert_parse('<p>````<br>code<br>```</p>', "````\ncode\n```")
-    assert_parse('<p>```<br>code<br>````</p>', "```\ncode\n````")
+    assert_parse("<pre>code\n````</pre>", "```\ncode\n````")
     assert_parse('<p>````<br>code<br>```</p>', "````\r\ncode\r\n```")
-    assert_parse('<p>```<br>code<br>````</p>', "```\r\ncode\r\n````")
+    assert_parse("<pre>code\n````</pre>", "```\r\ncode\r\n````")
 
-    assert_parse('<p>```<br>```</p>', "```\n```") # XXX wrong? should allow empty code blocks
+    assert_parse('<pre></pre>', "```\n```")
+    assert_parse('<pre class="language-ruby"></pre>', "```ruby\n```")
+    assert_parse('<pre></pre>', "```\n")
     assert_parse('<pre></pre>', "```\n\n```")
 
     assert_parse('<pre>&lt;b&gt;</pre>', "```\n<b>\n```")
@@ -718,10 +720,10 @@ class DTextTest < Minitest::Test
     assert_parse('<p>x ```<br>code<br>```</p>', "x ```\ncode\n```")
     assert_parse('<p> ```<br>code<br>```</p>', " ```\ncode\n```")
     assert_parse('<p>```code```</p>', "```code```")
-    assert_parse('<p>```<br>code```</p>', "```\ncode```")
-    assert_parse('<p>```code<br>```</p>', "```code\n```")
+    assert_parse('<pre>code```</pre>', "```\ncode```")
+    assert_parse('<pre class="language-code"></pre>', "```code\n```")
     assert_parse('<p>```code</p>', "```code")
-    assert_parse('<p>```<br>code</p>', "```\ncode")
+    assert_parse('<pre>code</pre>', "```\ncode")
     assert_parse('<p>```</p>', "```")
 
     assert_parse('<h4>Code</h4><pre>code</pre>', "h4. Code\n```\ncode\n```")
@@ -758,6 +760,20 @@ class DTextTest < Minitest::Test
 
     assert_parse('<blockquote><pre>code</pre></blockquote>', "[quote]\r\n```\r\ncode\r\n```\r\n[/quote]")
     assert_parse('<p>foo <strong>bar</strong></p><pre>blah</pre>', "foo [b]bar\n```\nblah\n```")
+  end
+
+  def test_unclosed_code_fences
+    # Unclosed code fences continue to the end of the text, like in CommonMark.
+    assert_parse("<pre>code\n\nmore [b]text[/b]</pre>", "```\ncode\n\nmore [b]text[/b]")
+    assert_parse('<p>text</p><pre class="language-ruby">code</pre>', "text\n```ruby\ncode")
+    assert_parse('<pre>one</pre><p>two</p><pre>three</pre>', "```\none\n```\ntwo\n```\nthree")
+    assert_parse("<blockquote><pre>code\n[/quote]\ntext</pre></blockquote>", "[quote]\n```\ncode\n[/quote]\ntext")
+    assert_parse("<pre>code\n```x\nmore</pre>", "```\ncode\n```x\nmore")
+
+    assert_fast_parse("```x\n" * 50_000)
+    assert_fast_parse("a\n```x\n" * 50_000)
+    assert_fast_parse("* a\n```x\n" * 50_000)
+    assert_fast_parse("x```\n" * 50_000)
   end
 
   def test_long_urls
