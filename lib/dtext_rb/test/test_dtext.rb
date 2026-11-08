@@ -279,6 +279,7 @@ class DTextTest < Minitest::Test
   def test_wiki_links
     assert_parse("<p>a <a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/b\">b</a> c</p>", "a [[b]] c")
     assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/%E6%9D%B1%E6%96%B9\">東方</a></p>", "[[東方]]")
+    assert_parse("<p><a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/%EF%BC%91%EF%BC%92%EF%BC%93\">１２３</a></p>", "[[１２３]]")
   end
 
   def test_wiki_link_spacing
@@ -934,6 +935,9 @@ class DTextTest < Minitest::Test
     assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also">https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also</a></p>', 'https://danbooru.donmai.us/wiki_pages/touhou#dtext-see-also', domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
 
     assert_parse('<p><a class="dtext-link dtext-wiki-link" href="/wiki_pages/touhou">touhou</a></p>', 'https://danbooru.donmai.us/wiki_pages/touhou', internal_domains: %w[danbooru.donmai.us])
+
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/posts/１２３">https://danbooru.donmai.us/posts/１２３</a></p>', "https://danbooru.donmai.us/posts/１２３", domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us/post/show/１２３">https://danbooru.donmai.us/post/show/１２３</a></p>', "https://danbooru.donmai.us/post/show/１２３", domain: "danbooru.donmai.us", internal_domains: %w[danbooru.donmai.us])
   end
 
   def test_old_style_links
@@ -1604,6 +1608,8 @@ class DTextTest < Minitest::Test
     assert_parse('<table class="striped"><td colspan="2">foo</td></table>', "[table][td colspan='2']foo[/td][/table]")
     assert_parse('<table class="striped"><td colspan="2">foo</td></table>', '[table][td colspan = "2"]foo[/td][/table]')
     assert_parse('<table class="striped"><td colspan="3">foo</td></table>', '[table][td colspan=2 colspan=3]foo[/td][/table]')
+    assert_parse('<table class="striped"><td>foo</td></table>', '[table][td colspan="２"]foo[/td][/table]')
+    assert_parse('<table class="striped"><td>foo</td></table>', '[table][td rowspan="١"]foo[/td][/table]')
 
     assert_parse('<table class="striped"><td colspan="2" rowspan="3">foo</td></table>', '[table][td colspan=2 rowspan=3]foo[/td][/table]')
     assert_parse('<table class="striped"><td colspan="2" rowspan="3">foo</td></table>', '[table][td rowspan=3 colspan=2]foo[/td][/table]')

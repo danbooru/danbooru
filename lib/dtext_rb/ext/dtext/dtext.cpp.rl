@@ -50,16 +50,26 @@ static const std::unordered_map<std::string_view, const std::unordered_set<std::
   { "colgroup", {} },
 };
 
+static unsigned char ascii_tolower(unsigned char c) {
+  return (c >= 'A' && c <= 'Z') ? c ^ 0x20 : c;
+}
+
+static bool ascii_isdigit(unsigned char c) {
+  return c >= '0' && c <= '9';
+}
+
+static bool ascii_isalnum(unsigned char c) {
+  return ascii_isdigit(c) || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
 // Permitted HTML attribute values.
 static const std::unordered_set<std::string_view> align_values = { "left", "center", "right", "justify" };
 static const std::unordered_map<std::string_view, std::function<bool(std::string_view)>> permitted_attribute_values = {
   { "align",   [](auto value) { return align_values.find(value) != align_values.end(); } },
-  { "span",    [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
-  { "colspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
-  { "rowspan", [](auto value) { return std::all_of(value.begin(), value.end(), isdigit); } },
+  { "span",    [](auto value) { return std::all_of(value.begin(), value.end(), ascii_isdigit); } },
+  { "colspan", [](auto value) { return std::all_of(value.begin(), value.end(), ascii_isdigit); } },
+  { "rowspan", [](auto value) { return std::all_of(value.begin(), value.end(), ascii_isdigit); } },
 };
-
-static unsigned char ascii_tolower(unsigned char c);
 
 %%{
 machine dtext;
@@ -1084,7 +1094,7 @@ void StateMachine::append_internal_url(const DText::URL& url) {
     auto controller = path_components.at(0);
     auto id = path_components.at(1);
 
-    if (!id.empty() && std::all_of(id.begin(), id.end(), ::isdigit)) {
+    if (!id.empty() && std::all_of(id.begin(), id.end(), ascii_isdigit)) {
       if (controller == "posts" && fragment.empty()) {
         // https://danbooru.donmai.us/posts/6000000#comment_2288996
         return append_id_link("post", "post", "/posts/", id);
@@ -1121,7 +1131,7 @@ void StateMachine::append_internal_url(const DText::URL& url) {
     auto action = path_components.at(1);
     auto id = path_components.at(2);
 
-    if (!id.empty() && std::all_of(id.begin(), id.end(), ::isdigit)) {
+    if (!id.empty() && std::all_of(id.begin(), id.end(), ascii_isdigit)) {
       if (controller == "post" && action == "show") {
         return append_id_link("post", "post", "/posts/", id);
       }
@@ -1194,7 +1204,7 @@ void StateMachine::append_wiki_link(const std::string_view prefix, const std::st
   std::transform(normalized_tag.cbegin(), normalized_tag.cend(), normalized_tag.begin(), [](unsigned char c) { return c == ' ' ? '_' : ascii_tolower(c); });
 
   // [[2019]] -> [[~2019]]
-  if (std::all_of(normalized_tag.cbegin(), normalized_tag.cend(), ::isdigit)) {
+  if (std::all_of(normalized_tag.cbegin(), normalized_tag.cend(), ascii_isdigit)) {
     normalized_tag.insert(0, "~");
   }
 
@@ -1219,7 +1229,7 @@ void StateMachine::append_wiki_link(const std::string_view prefix, const std::st
 
   if (!anchor.empty()) {
     std::string normalized_anchor(anchor);
-    std::transform(normalized_anchor.begin(), normalized_anchor.end(), normalized_anchor.begin(), [](char c) { return isalnum(c) ? ascii_tolower(c) : '-'; });
+    std::transform(normalized_anchor.begin(), normalized_anchor.end(), normalized_anchor.begin(), [](unsigned char c) { return ascii_isalnum(c) ? ascii_tolower(c) : '-'; });
     append_html_escaped("#dtext-");
     append_html_escaped(normalized_anchor);
   }
@@ -1293,7 +1303,7 @@ void StateMachine::append_header(char header, const std::string_view id) {
     append_block(">");
   } else {
     auto normalized_id = std::string(id);
-    std::transform(id.begin(), id.end(), normalized_id.begin(), [](char c) { return isalnum(c) ? ascii_tolower(c) : '-'; });
+    std::transform(id.begin(), id.end(), normalized_id.begin(), [](unsigned char c) { return ascii_isalnum(c) ? ascii_tolower(c) : '-'; });
 
     dstack_open_element(block, "<h");
     append_block(header);
@@ -1574,10 +1584,6 @@ std::tuple<std::string_view, std::string_view> StateMachine::trim_url(const std:
   }
 
   return { trimmed, { trimmed.end(), url.end() } };
-}
-
-static unsigned char ascii_tolower(unsigned char c) {
-  return (c >= 'A' && c <= 'Z') ? c ^ 0x20 : c;
 }
 
 // Replace CRLF sequences with LF.
