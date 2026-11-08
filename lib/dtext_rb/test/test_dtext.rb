@@ -788,6 +788,18 @@ class DTextTest < Minitest::Test
     assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="#{host}">x</a></p>}, %{"x":[#{host}]}, domain: "danbooru.donmai.us")
   end
 
+  def test_backslash_urls
+    evil = 'https://evil.com\@danbooru.donmai.us/'
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="#{evil}">x</a></p>}, %{[x](#{evil})}, domain: "danbooru.donmai.us")
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="#{evil}">x</a></p>}, %{"x":[#{evil}]}, domain: "danbooru.donmai.us")
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="#{evil}">#{evil}</a></p>}, %{<#{evil}>}, domain: "danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link" href="https://danbooru.donmai.us\posts">x</a></p>', '"x":[https://danbooru.donmai.us\posts]', domain: "danbooru.donmai.us")
+
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http:/\evil.com">x</a></p>', '[x](/\evil.com)', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http:/\evil.com">x</a></p>', '"x":/\evil.com', domain: "danbooru.donmai.us")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http:/\evil.com">x</a></p>', '"x":[/\evil.com]', domain: "danbooru.donmai.us")
+  end
+
   def test_urls
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a> b</p>', 'a http://test.com b')
     assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="Http://test.com">Http://test.com</a> b</p>', 'a Http://test.com b')

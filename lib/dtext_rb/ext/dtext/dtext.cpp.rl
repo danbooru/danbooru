@@ -936,7 +936,7 @@ bool StateMachine::is_internal_url(const std::string_view url) {
       return false;
     }
 
-    auto authority = url.substr(scheme_size, url.find_first_of("/?#", scheme_size) - scheme_size);
+    auto authority = url.substr(scheme_size, url.find_first_of("/\\?#", scheme_size) - scheme_size);
     auto userinfo_end = authority.find_last_of('@');
     auto host = userinfo_end == std::string_view::npos ? authority : authority.substr(userinfo_end + 1);
 
@@ -1134,8 +1134,8 @@ void StateMachine::append_internal_url(const DText::URL& url) {
 void StateMachine::append_named_url(const std::string_view url, const std::string_view title) {
   auto parsed_title = parse_basic_inline(title);
 
-  // protocol-relative url; treat `//example.com` like `http://example.com`
-  if (url.size() > 2 && url.starts_with("//")) {
+  // protocol-relative url; treat `//example.com` like `http://example.com`. Browsers treat `/\` like `//`.
+  if (url.size() > 2 && (url.starts_with("//") || url.starts_with("/\\"))) {
     auto full_url = "http:" + std::string(url);
     append_absolute_link(full_url, parsed_title, is_internal_url(full_url), false);
   } else if (url[0] == '/' || url[0] == '#') {
