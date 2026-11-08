@@ -475,30 +475,32 @@ class ApplicationMetrics
     metrics[:rails_connection_pool_checkout_timeout][{}].set(conn_pool_stats[:checkout_timeout])
 
     if puma_running?
-      resp = Danbooru::Http.internal.timeout(1).get("http://localhost:9293/stats")
-      puma_stats = (resp.code == 200) ? resp.parse.with_indifferent_access : {}
-
-      metrics.set({
-        puma_started_at: Time.zone.parse(puma_stats[:started_at].to_s).to_i,
-        puma_workers:    puma_stats[:workers],
-      }, { worker: "master" })
-
-      puma_stats[:worker_status].to_a.each do |worker|
-        max_threads = worker.dig(:last_status, :max_threads)
-        cur_threads = worker.dig(:last_status, :running)
-        idle_threads = worker.dig(:last_status, :pool_capacity) - (max_threads - cur_threads)
-        busy_threads = cur_threads - idle_threads
+      # Only the master process has stats for every worker.
+      if puma_worker_id == "master"
+        puma_stats = Puma.stats_hash
 
         metrics.set({
-          puma_started_at:          Time.parse(worker[:started_at]).to_i,
-          puma_last_checkin:        Time.parse(worker[:last_checkin]).to_i,
-          puma_max_threads:         max_threads,
-          puma_thread_backlog:      worker.dig(:last_status, :backlog),
-          puma_http_requests_total: worker.dig(:last_status, :requests_count),
-        }, { worker: worker[:index] })
+          puma_started_at: Time.parse(puma_stats[:started_at]).to_i,
+          puma_workers:    puma_stats[:workers],
+        }, { worker: "master" })
 
-        metrics[:puma_threads][worker: worker[:index], state: "idle"].set(idle_threads)
-        metrics[:puma_threads][worker: worker[:index], state: "busy"].set(busy_threads)
+        puma_stats[:worker_status].each do |worker|
+          max_threads = worker.dig(:last_status, :max_threads)
+          cur_threads = worker.dig(:last_status, :running)
+          idle_threads = worker.dig(:last_status, :pool_capacity) - (max_threads - cur_threads)
+          busy_threads = cur_threads - idle_threads
+
+          metrics.set({
+            puma_started_at:          Time.parse(worker[:started_at]).to_i,
+            puma_last_checkin:        Time.parse(worker[:last_checkin]).to_i,
+            puma_max_threads:         max_threads,
+            puma_thread_backlog:      worker.dig(:last_status, :backlog),
+            puma_http_requests_total: worker.dig(:last_status, :requests_count),
+          }, { worker: worker[:index] })
+
+          metrics[:puma_threads][worker: worker[:index], state: "idle"].set(idle_threads)
+          metrics[:puma_threads][worker: worker[:index], state: "busy"].set(busy_threads)
+        end
       end
 
       # XXX The Puma server object is in a thread local variable, which may be in another thread, so we have to search for it.
