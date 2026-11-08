@@ -1725,6 +1725,14 @@ class DTextTest < Minitest::Test
     assert_parse('<blockquote><tag-request-embed data-type="bulk-update-request" data-id="1"></tag-request-embed></blockquote>', '[quote][bur:1][/quote]') # XXX wrong?
   end
 
+  def test_stale_match_marks
+    assert_parse('<p>{{a|b<br><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">foo</a></p>', "{{a|b\n[[foo]]")
+    assert_parse('<p>{{a|b c<br><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">foo</a></p>', "{{a|b c\n[[foo]]")
+    assert_parse('<p>[[a#B<br><a class="dtext-link dtext-wiki-link" href="/wiki_pages/foo">bar</a></p>', "[[a#B\n[[foo|bar]]")
+    assert_parse('<p>{{a|b</p><media-embed data-type="post" data-id="1"></media-embed>', "{{a|b\n!post #1", media_embeds: true)
+    assert_parse('<p>[[a#B</p><media-embed data-type="post" data-id="1"></media-embed>', "[[a#B\n!post #1", media_embeds: true)
+  end
+
   def test_media_embeds
     assert_parse('<media-embed data-type="post" data-id="1234"></media-embed>', "!post #1234")
     assert_parse('<media-embed data-type="asset" data-id="1234"></media-embed>', "!asset #1234")

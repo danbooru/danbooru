@@ -238,8 +238,8 @@ wiki_target = ((nonpipebracket* (nonpipebracket - space) -- '[[') | emoticon_tag
 wiki_anchor_id = ([A-Z] ([ _\-]* alnum+)*) >mark_c1 %mark_c2;
 wiki_title = ((ws* (nonpipebracket - space)+)* -- '[[') >mark_d1 %mark_d2;
 
-basic_wiki_link = wiki_prefix '[[' ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? ']]' wiki_suffix;
-aliased_wiki_link = wiki_prefix '[[' ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? '|' ws* wiki_title ws* ']]' wiki_suffix;
+basic_wiki_link = wiki_prefix '[[' >mark_c1 >mark_c2 ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? ']]' wiki_suffix;
+aliased_wiki_link = wiki_prefix '[[' >mark_c1 >mark_c2 ws* wiki_target ws* :>> ('#' wiki_anchor_id ws*)? '|' ws* wiki_title ws* ']]' wiki_suffix;
 
 tag = (nonspace - [|{}])+ | ([~\-]? emoticon_tags);
 tags = (tag (ws+ tag)*) >mark_b1 %mark_b2;
@@ -263,7 +263,7 @@ tag_request_embed = '[' ('ta' | 'ti' | 'bur') >mark_b1 %mark_b2 ':' id ']';
 # !post #1234: This is a caption.
 # * !post #1: This is the first image in a media gallery.
 # * !post #2: This is the second image in a media gallery.
-media_embed = '* '? >mark_d1 %mark_d2 ('!' ('post' | 'asset') >mark_b1 %mark_b2 ' #' id (':' ws+ ((nonspace nonnewline*) >mark_c1 %mark_c2))? ws* eol) when media_embeds_enabled;
+media_embed = '* '? >mark_d1 %mark_d2 ('!' >mark_c1 >mark_c2 ('post' | 'asset') >mark_b1 %mark_b2 ' #' id (':' ws+ ((nonspace nonnewline*) >mark_c1 %mark_c2))? ws* eol) when media_embeds_enabled;
 
 header_id = (alnum | [_/#!:&\-])+; # XXX '/', '#', '!', ':', and '&' are grandfathered in for old wiki versions.
 header = 'h'i [123456] >mark_a1 %mark_a2 '.' >mark_b1 >mark_b2 ws*;
