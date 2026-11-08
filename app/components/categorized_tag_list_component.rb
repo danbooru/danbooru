@@ -5,38 +5,32 @@ class CategorizedTagListComponent < TagListComponent
   NESTABLE_TAG_CATEGORIES = %w[copyright character meta]
 
   def implications
-    @implications ||= TagImplication.active.where(antecedent_name: tags.map(&:name))
+    @implications ||= TagImplication.active.where(antecedent_name: tags.map(&:name)).to_a
   end
 
   def antecedent_names
-    @antecedent_names ||= implications.map(&:antecedent_name)
+    @antecedent_names ||= implications.to_set(&:antecedent_name)
   end
 
-  def consequent_names
-    @consequent_names ||= implications.map(&:consequent_name)
+  # @return [Hash<String, Array<Tag>>] A hash from each tag name to the list of tags that imply it.
+  def subtags_by_name
+    @subtags_by_name ||= begin
+      consequents_by_antecedent = implications.group_by(&:antecedent_name)
+      tags.flat_map { |t| consequents_by_antecedent.fetch(t.name, []).map { |ti| [ti.consequent_name, t] } }.group_by(&:first).transform_values { |pairs| pairs.map(&:second) }
+    end
   end
 
   # Given a list of tags, build a list of nested tags, with the tags nested according to their implication hierarchy.
   #
   # @return An array of tag trees. Each tag tree is an array, where the first element is the parent tag, and the second
   #   element is an optional tree of subtags. An empty array denotes an empty subtree.
-  def tag_tree(tag_list = tags, level = 0)
-    tag_list.map do |tag|
-      # If we're at the top level and this is a subtag (a tag that implies another tag), then ignore it (it will be included beneath another tag)
-      if level == 0 && tag.name.in?(antecedent_names)
-        nil
+  def tag_tree(tag_list = tags)
+    # Ignore subtags (tags that imply another tag) at the top level, since they will be included beneath their parent tag.
+    tag_list.reject { |tag| tag.name.in?(antecedent_names) }.map { |tag| [tag, subtree(tag)] }
+  end
 
-      # If this is a parent tag (a tag implied by other tags), then build the subtree of tags that imply it.
-      elsif tag.name.in?(consequent_names)
-        antecedents = implications.select { |ti| ti.consequent_name == tag.name }.map(&:antecedent_name)
-        subtags = tags.select { |t| t.name.in?(antecedents) }
-
-        [tag, tag_tree(subtags, level + 1)]
-
-      # If this tag isn't implied by anything, then it doesn't have any subtags.
-      else
-        [tag, []]
-      end
-    end.compact
+  # @return The tree of tags that imply the given tag.
+  def subtree(tag)
+    subtags_by_name.fetch(tag.name, []).map { |subtag| [subtag, subtree(subtag)] }
   end
 end

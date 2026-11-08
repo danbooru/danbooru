@@ -37,5 +37,22 @@ class CategorizedTagListComponentTest < ViewComponent::TestCase
       assert_css("li[data-tag-name='ayanami_rei']", count: 1)
       assert_css("li[data-tag-name='ayanami_rei_(plugsuit)'].tag-nesting-level-1", count: 1)
     end
+
+    should "nest tags multiple levels deep under every consequent" do
+      tags = %w[franchise series_a series_b movie].map { |name| create(:tag, name: name, category: Tag.categories.copyright) }
+
+      create(:tag_implication, antecedent_name: "series_a", consequent_name: "franchise", status: "active")
+      create(:tag_implication, antecedent_name: "series_b", consequent_name: "franchise", status: "active")
+      create(:tag_implication, antecedent_name: "movie", consequent_name: "series_a", status: "active")
+      create(:tag_implication, antecedent_name: "movie", consequent_name: "series_b", status: "active")
+
+      render_inline(CategorizedTagListComponent.new(tags: tags))
+
+      assert_equal(%w[franchise series_a movie series_b movie], page.all("li").pluck("data-tag-name"))
+      assert_css("li[data-tag-name='franchise']:not([class*='tag-nesting-level'])", count: 1)
+      assert_css("li[data-tag-name='series_a'].tag-nesting-level-1", count: 1)
+      assert_css("li[data-tag-name='series_b'].tag-nesting-level-1", count: 1)
+      assert_css("li[data-tag-name='movie'].tag-nesting-level-2", count: 2)
+    end
   end
 end
