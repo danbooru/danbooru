@@ -24,67 +24,94 @@ static void validate_dtext(VALUE string) {
   }
 }
 
-static auto parse_dtext(VALUE input, DTextOptions options = {}) {
-  try  {
-    StringValue(input);
-    validate_dtext(input);
+// Raise TypeError if the argument isn't an array of strings.
+static void validate_string_array(VALUE array) {
+  Check_Type(array, T_ARRAY);
 
-    std::string_view dtext(RSTRING_PTR(input), RSTRING_LEN(input));
-    return StateMachine::parse_dtext(dtext, options);
-  } catch (std::exception& e) {
-    rb_raise(cDTextError, "%s", e.what());
+  for (long i = 0; i < RARRAY_LEN(array); i++) {
+    Check_Type(rb_ary_entry(array, i), T_STRING);
   }
 }
+
+static std::string_view to_string_view(VALUE string) {
+  return { RSTRING_PTR(string), static_cast<size_t>(RSTRING_LEN(string)) };
+}
+
+static std::vector<std::string_view> to_string_views(VALUE array) {
+  std::vector<std::string_view> strings;
+
+  for (long i = 0; i < RARRAY_LEN(array); i++) {
+    strings.push_back(to_string_view(rb_ary_entry(array, i)));
+  }
+
+  return strings;
+}
+
+// Call a function that uses C++ objects and raise any C++ exceptions it throws as Ruby exceptions.
+template <typename F>
+static VALUE rescue(F f) {
+  char error[256];
+
+  try {
+    return f();
+  } catch (std::exception& e) {
+    snprintf(error, sizeof(error), "%s", e.what());
+  }
+
+  rb_raise(cDTextError, "%s", error);
+}
+
 
 static VALUE c_parse(VALUE self, VALUE input, VALUE base_url, VALUE domain, VALUE internal_domains, VALUE emojis, VALUE f_inline, VALUE f_disable_mentions, VALUE f_media_embeds) {
   if (NIL_P(input)) {
     return Qnil;
   }
 
-  DTextOptions options;
-
-  options.f_inline = RTEST(f_inline);
-  options.f_mentions = !RTEST(f_disable_mentions);
-  options.f_media_embeds = RTEST(f_media_embeds);
+  // Ruby exceptions use longjmp, which skips C++ destructors and leaks memory if any C++ objects are live. So all
+  // arguments are validated before any C++ objects are created.
+  StringValue(input);
+  validate_dtext(input);
+  validate_string_array(internal_domains);
+  validate_string_array(emojis);
 
   if (!NIL_P(base_url)) {
-    options.base_url = StringValueCStr(base_url); // base_url.to_str # raises ArgumentError if base_url contains null bytes.
+    StringValueCStr(base_url); // base_url.to_str # raises ArgumentError if base_url contains null bytes.
   }
 
   if (!NIL_P(domain)) {
-    options.domain = StringValueCStr(domain); // domain.to_str # raises ArgumentError if domain contains null bytes.
+    StringValueCStr(domain); // domain.to_str # raises ArgumentError if domain contains null bytes.
   }
 
-  Check_Type(internal_domains, T_ARRAY); // raises TypeError if the argument isn't an array.
+  return rescue([&] {
+    DTextOptions options = {
+      .f_inline = RTEST(f_inline),
+      .f_mentions = !RTEST(f_disable_mentions),
+      .f_media_embeds = RTEST(f_media_embeds),
+      .base_url = NIL_P(base_url) ? "" : std::string(to_string_view(base_url)),
+      .domain = NIL_P(domain) ? "" : std::string(to_string_view(domain)),
+      .internal_domains = to_string_views(internal_domains),
+      .emojis = to_string_views(emojis),
+    };
 
-  for (int i = 0; i < RARRAY_LEN(internal_domains); i++) {
-    VALUE rb_domain = rb_ary_entry(internal_domains, i);
-    std::string domain = StringValueCStr(rb_domain); // raise ArgumentError if the domain contains null bytes.
-    options.internal_domains.insert(domain);
-  }
-
-  Check_Type(emojis, T_ARRAY);
-  options.is_allowed_emoji = [&emojis](const std::string_view name) {
-    VALUE rb_name = rb_str_new(name.begin(), name.size());
-    rb_funcall(rb_name, rb_intern("downcase!"), 0);
-
-    return RTEST(rb_ary_includes(emojis, rb_name));
-  };
-
-  auto [html, _wiki_pages] = parse_dtext(input, options);
-  return rb_utf8_str_new(html.c_str(), html.size());
+    auto [html, _wiki_pages] = StateMachine::parse_dtext(to_string_view(input), options);
+    return rb_utf8_str_new(html.c_str(), html.size());
+  });
 }
 
 static VALUE c_parse_wiki_pages(VALUE self, VALUE input) {
-  auto [_html, wiki_pages] = parse_dtext(input);
+  StringValue(input);
+  validate_dtext(input);
 
-  VALUE rb_wiki_pages = rb_ary_new_capa(wiki_pages.size());
-  for (auto wiki_page : wiki_pages) {
-    VALUE rb_wiki_page = rb_str_new(wiki_page.data(), wiki_page.size());
-    rb_ary_push(rb_wiki_pages, rb_wiki_page);
-  }
+  return rescue([&] {
+    auto [_html, wiki_pages] = StateMachine::parse_dtext(to_string_view(input), {});
 
-  return rb_wiki_pages;
+    VALUE rb_wiki_pages = rb_ary_new_capa(wiki_pages.size());
+    for (auto wiki_page : wiki_pages) {
+      rb_ary_push(rb_wiki_pages, rb_str_new(wiki_page.data(), wiki_page.size()));
+    }
+
+    return rb_wiki_pages;
+  });
 }
 
 extern "C" void Init_dtext() {

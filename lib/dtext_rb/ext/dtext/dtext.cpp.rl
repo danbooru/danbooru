@@ -110,7 +110,7 @@ action in_quote { dstack_is_open(BLOCK_QUOTE) }
 action in_expand { dstack_is_open(BLOCK_EXPAND) }
 action in_spoiler { dstack_is_open(BLOCK_SPOILER) }
 action below_max_depth { dstack.size() < MAX_NESTING_DEPTH }
-action is_allowed_emoji { options.is_allowed_emoji({ f1, f2 + 1 }) }
+action is_allowed_emoji { is_allowed_emoji({ f1, f2 + 1 }) }
 action save_tag_attribute { tag_attributes[{ a1, a2 }] = { b1, b2 }; }
 
 # Matches the beginning or the end of the string. The input string has null bytes prepended and appended to mark the ends of the string.
@@ -912,6 +912,13 @@ bool StateMachine::is_inline_element(element_t type) {
   return type >= INLINE;
 }
 
+bool StateMachine::is_allowed_emoji(const std::string_view name) {
+  std::string lowercase_name(name);
+  std::transform(name.begin(), name.end(), lowercase_name.begin(), &ascii_tolower);
+
+  return std::ranges::find(options.emojis, lowercase_name) != options.emojis.end();
+}
+
 bool StateMachine::is_internal_url(const std::string_view url) {
   if (url.starts_with("/")) {
     return true;
@@ -1057,7 +1064,7 @@ void StateMachine::append_bare_unnamed_url(const std::string_view url) {
 void StateMachine::append_unnamed_url(const std::string_view url) {
   DText::URL parsed_url(url);
 
-  if (options.internal_domains.find(std::string(parsed_url.domain)) != options.internal_domains.end()) {
+  if (std::ranges::find(options.internal_domains, parsed_url.domain) != options.internal_domains.end()) {
     append_internal_url(parsed_url);
   } else if (parsed_url.scheme == "mailto") {
     auto title = url;

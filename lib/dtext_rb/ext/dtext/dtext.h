@@ -111,11 +111,11 @@ struct DTextOptions {
   std::string domain;
 
   // Links to these domains are converted to shortlinks (used so links to https://danbooru.donmai.us/posts/1234 are converted to post #1234).
-  std::unordered_set<std::string> internal_domains;
+  std::vector<std::string_view> internal_domains;
 
-  // A function that returns true if the given emoji is on the list of allowed emojis.
-  // E.g., when the parser encounters `:smile:`, the function should return true if "smile" is a valid emoji.
-  std::function<bool(const std::string_view)> is_allowed_emoji;
+  // The list of allowed emojis, in lowercase.
+  // E.g., when the parser encounters `:smile:` or `:Smile:`, it is converted to an emoji if "smile" is in this list.
+  std::vector<std::string_view> emojis;
 };
 
 class StateMachine {
@@ -208,6 +208,7 @@ public:
   void clear_matches();
 
   bool is_inline_element(element_t type);
+  bool is_allowed_emoji(const std::string_view name);
   bool is_internal_url(const std::string_view url);
   std::tuple<std::string_view, std::string_view> trim_url(const std::string_view url);
 

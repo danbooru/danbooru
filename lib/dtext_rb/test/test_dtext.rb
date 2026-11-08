@@ -1970,6 +1970,8 @@ class DTextTest < Minitest::Test
     assert_parse('<p>foo<emoji data-name="smile" data-mode="inline"></emoji>bar</p>', "foo:smile:bar", emoji_list:)
     assert_parse('<p>:foo<emoji data-name="smile" data-mode="inline"></emoji></p>', ":foo:smile:", emoji_list:)
     assert_parse('<h4><emoji data-name="smile" data-mode="inline"></emoji></h4>', "h4.:smile:", emoji_list:)
+
+    assert_wiki_pages(["foo"], ":smile: [[foo]]")
   end
 
   def test_inline_mode
@@ -2147,6 +2149,17 @@ class DTextTest < Minitest::Test
 
   def test_null_bytes
     assert_raises(DText::Error) { parse("foo\0bar") }
+    assert_raises(DText::Error) { DText.c_parse_wiki_pages("foo\0bar") }
+    assert_raises(ArgumentError) { parse("foo", base_url: "foo\0bar") }
+    assert_raises(ArgumentError) { parse("foo", domain: "foo\0bar") }
+  end
+
+  def test_invalid_options
+    assert_raises(TypeError) { parse("foo", base_url: 42) }
+    assert_raises(TypeError) { parse("foo", internal_domains: "foo") }
+    assert_raises(TypeError) { parse("foo", internal_domains: [42]) }
+    assert_raises(TypeError) { parse("foo", emoji_list: "foo") }
+    assert_raises(TypeError) { parse("foo", emoji_list: [42]) }
   end
 
   def test_encodings
