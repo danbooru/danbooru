@@ -45,6 +45,9 @@ Layout/FirstArrayElementIndentation:
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
+Layout/HashAlignment:
+  EnforcedColonStyle: [key, table]
+
 Layout/LineLength:
   Enabled: false
 
