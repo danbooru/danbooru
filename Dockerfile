@@ -424,7 +424,7 @@ FROM danbooru-base AS development
 
 RUN <<EOS
   apt-get update
-  apt-get install -y --no-install-recommends g++ make ragel git sudo gpg socat libyaml-dev libpq-dev gh ripgrep openssh-client
+  apt-get install -y --no-install-recommends g++ make ragel git sudo gpg socat libyaml-dev libpq-dev gh ripgrep openssh-client strace
 
   groupadd admin -U danbooru
   passwd -d danbooru
