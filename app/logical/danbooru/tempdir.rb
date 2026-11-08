@@ -25,9 +25,11 @@ module Danbooru
       ObjectSpace.undefine_finalizer(self)
     end
 
-    def self.finalizer(path)
+    # Only delete the directory in the process that created it. Forked processes don't have the other threads that are
+    # still using it, so they can garbage collect it while it's still in use.
+    def self.finalizer(path, pid = Process.pid)
       proc do
-        FileUtils.rm_rf(path, secure: true)
+        FileUtils.rm_rf(path, secure: true) if Process.pid == pid
       end
     end
   end
