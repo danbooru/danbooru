@@ -224,6 +224,20 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(response2.to_s, response1.to_s)
       end
 
+      should "return the status, headers, body, and uri of cached responses" do
+        body = "a" * 10_000
+
+        with_local_server(body, gzip: true, content_type: "text/plain") do |url|
+          http = Danbooru::Http.cache(1.hour, key: "cached-response-test")
+          response1 = http.get(url)
+          response2 = http.get(url)
+
+          assert_equal([200, body, "text/plain", url], [response1.status, response1.to_s, response1.mime_type, response1.uri.to_s])
+          assert_equal([200, body, "text/plain", url], [response2.status, response2.to_s, response2.mime_type, response2.uri.to_s])
+          assert_equal(response1.headers.to_h, response2.headers.to_h)
+        end
+      end
+
       should "not cache requests that time out" do
         HTTP::Client.any_instance.expects(:perform).raises(::HTTP::TimeoutError)
 

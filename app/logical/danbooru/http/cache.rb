@@ -17,21 +17,22 @@ module Danbooru
       end
 
       def perform(request, &block)
-        ::Cache.get(cache_key(request), expires_in) do
+        cached = ::Cache.get(cache_key(request), expires_in) do
           response = yield request
 
           return response if !cacheable?(response)
 
-          # XXX hack to remove connection state from response body so we can serialize it for caching.
-          response.flush
-          response.body.instance_variable_set(:@connection, nil)
-          response.body.instance_variable_set(:@stream, nil)
-          response.instance_exec { @request = request.dup }
-          response.request.instance_exec { @uri_normalizer = nil }
-          response.request.body.instance_exec { @source = nil }
-
-          response
+          body = response.to_s
+          { status: response.code, version: response.version, headers: response.headers.to_h, body: body.b, encoding: body.encoding.name }
         end
+
+        ::HTTP::Response.new(
+          status: cached[:status],
+          version: cached[:version],
+          headers: cached[:headers],
+          body: cached[:body].dup.force_encoding(cached[:encoding]),
+          request: request,
+        )
       end
 
       def cacheable?(response)

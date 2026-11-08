@@ -30,6 +30,19 @@ class PumaTest < ActiveSupport::TestCase
     end
   end
 
+  context "Puma metrics" do
+    should "report Puma stats for the master and each worker in cluster mode" do
+      spawn_server(PUMA_WORKERS: 2) do |uri|
+        metrics = Danbooru::Http.get("#{uri}/metrics/instance").to_s
+
+        assert_match(/^puma_workers\{worker="master"\} 2$/, metrics)
+        assert_match(/^puma_last_checkin\{worker="0"\} \d+$/, metrics)
+        assert_match(/^puma_last_checkin\{worker="1"\} \d+$/, metrics)
+        assert_match(/^puma_max_threads\{worker="0"\} \d+$/, metrics)
+      end
+    end
+  end
+
   context "Puma/Rack server limits" do
     should "reject request bodies that are too large" do
       spawn_server(DANBOORU_MAX_FILE_SIZE: 1024) do |uri|
@@ -145,11 +158,13 @@ class PumaTest < ActiveSupport::TestCase
 
   def spawn_server(**env)
     log_file = Danbooru::Tempfile.new("danbooru-puma-test-")
-    port = TCPServer.open("localhost", 0) { |server| server.addr[1] } # reserve a random port
+    dir = Dir.mktmpdir
+    port = reserve_port
     uri = "http://localhost:#{port}"
     env = {
       PUMA_PORT: port,
-      PUMA_CONTROL_URL: "tcp://localhost:0",
+      PUMA_CONTROL_SOCKET: "#{dir}/control.sock",
+      PUMA_STATE_PATH: "#{dir}/puma.state",
       PUMA_WORKERS: 0,
       **env,
     }.stringify_keys.transform_values(&:to_s)
@@ -165,6 +180,12 @@ class PumaTest < ActiveSupport::TestCase
       Process.kill("TERM", pid)
       Timeout.timeout(5) { Process.wait(pid) }
     end
+
+    FileUtils.rm_rf(dir) if dir
+  end
+
+  def reserve_port
+    TCPServer.open("localhost", 0) { |server| server.addr[1] }
   end
 
   def request_status(verb, uri, headers: {}, **options)

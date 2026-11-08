@@ -14,10 +14,10 @@
 # * PUMA_PERSISTENT_TIMEOUT
 # * PUMA_WORKER_TIMEOUT
 # * PUMA_PIDFILE
-# * PUMA_CONTROL_URL
 # * PUMA_RESTART_INTERVAL
 #
-# Use `bin/pumactl` to control a running Puma instance.
+# Use `bin/pumactl -F - -P tmp/pids/server.pid stop|restart|phased-restart` to stop or restart a running Puma instance.
+# Puma stats are available at /metrics/instance.
 #
 # @see https://puma.io
 # @see https://github.com/puma/puma
@@ -144,20 +144,6 @@ Rack::Utils.multipart_file_limit = ENV.fetch("RACK_MULTIPART_FILE_LIMIT", 100).t
 # The maximum number of form fields (including files) a multipart form can contain. Default: 512.
 # https://rack.github.io/rack/main/index.html#multiparttotalpartlimit
 Rack::Utils.multipart_total_part_limit = ENV.fetch("RACK_MULTIPART_TOTAL_PART_LIMIT", 512).to_i + 1
-
-# Start the Puma control rack application on +url+. This application can
-# be communicated with to control the main server. Additionally, you can
-# provide an authentication token, so all requests to the control server
-# will need to include that token as a query parameter. This allows for
-# simple authentication.
-#
-# Usage:
-#
-# * bin/pumactl stats
-# * bin/pumactl -C tcp://localhost:9293 stats
-#
-# https://github.com/puma/puma#controlstatus-server
-activate_control_app ENV.fetch("PUMA_CONTROL_URL", "tcp://localhost:9293"), no_token: true
 
 # The last resort error handler for exceptions unhandled by the app. This only handles errors not handled by the
 # `rescue_exception` handler in ApplicationController. This normally only happens if `rescue_exception` itself raises an

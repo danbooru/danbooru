@@ -186,7 +186,7 @@ proxy_set_header X-Forwarded-Proto $scheme;
 proxy_set_header X-Forwarded-For $remote_addr;
 ```
 
-You can check that the headers are being sent correctly by doing `curl http://localhost:3000/nginx/headers` and `curl http://localhost:3000/status.json` (replacing `localhost:3000` with the URL for your site).
+You can check that the headers are being sent correctly by doing `curl http://localhost:3000/status.json` (replacing `localhost:3000` with the URL for your site).
 
 The headers should look something like this:
 
@@ -198,7 +198,7 @@ X-Forwarded-Port: 443
 X-Forwarded-Proto: https
 ```
 
-You can compare your headers with http://danbooru.donmai.us/nginx/headers and http://danbooru.donmai.us/status.json to see what a working example looks like.
+You can compare your headers with http://danbooru.donmai.us/status.json to see what a working example looks like.
 
 # Working with Docker
 

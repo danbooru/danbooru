@@ -426,12 +426,12 @@ class MediaFilePngTest < ActiveSupport::TestCase
   context "a PNG with too much metadata" do
     should "remove the largest values when the metadata is too large" do
       file = png_with_text_chunks("Comment" => "a" * 11.kilobytes, "Title" => "title")
-      metadata = MediaFile.open(file).metadata
+      metadata = ExifTool.new(file).metadata(max_size: 10.kilobytes)
 
       assert_equal("[OVERSIZED]", metadata["PNG:Comment"])
       assert_equal("title", metadata["PNG:Title"])
       assert_equal(1, metadata["PNG:ImageWidth"])
-      assert_operator(metadata.to_h.to_json.bytesize, :<=, 10.kilobytes
+      assert_operator(metadata.to_h.to_json.bytesize, :<=, 10.kilobytes)
     end
 
     should "remove the largest values when there are too many values" do
