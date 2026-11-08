@@ -28,7 +28,7 @@ class MediaFile
     if file.is_a?(MediaFile)
       media_file = file
     else
-      file = Kernel.open(file, "r", binmode: true) unless file.respond_to?(:read)
+      file = File.open(file, "r", binmode: true) unless file.respond_to?(:read) # rubocop:disable Style/FileOpen
       media_file = new_from_file(file, **options)
     end
 

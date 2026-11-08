@@ -63,7 +63,7 @@ module Danbooru
     # @yieldparam [Danbooru::Archive] The archive.
     # @return [Danbooru::Archive] The archive.
     def self.open!(filelike, &block)
-      file = filelike.respond_to?(:path) ? filelike : Kernel.open(filelike, binmode: true)
+      file = filelike.respond_to?(:path) ? filelike : File.open(filelike, binmode: true)
       archive = new(file)
 
       if block_given?
