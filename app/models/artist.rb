@@ -352,8 +352,8 @@ class Artist < ApplicationRecord
   include BanMethods
   extend SearchMethods
 
-  def self.model_restriction(table)
-    super.where(table[:is_deleted].eq(false))
+  def self.model_restriction
+    undeleted
   end
 
   def self.available_includes

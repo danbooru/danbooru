@@ -177,8 +177,9 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :SearchMethods do
     class_methods do
-      def model_restriction(table)
-        table.project(1)
+      # The records that count as present in `has_<association>` searches. For example, `has_tag=true` ignores empty tags.
+      def model_restriction
+        all
       end
 
       def attribute_restriction(*)
