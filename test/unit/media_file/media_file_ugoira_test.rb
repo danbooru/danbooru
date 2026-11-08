@@ -2,13 +2,13 @@ require "test_helper"
 require "zip"
 
 class MediaFileUgoiraTest < ActiveSupport::TestCase
-  def create_ugoira_zip(file, frame_count: 2, compression_method: Zip::Entry::STORED)
+  def create_ugoira_zip(file, frame_count: 2, compression_method: Zip::Entry::STORED, frame_data: File.binread("test/files/jpg/test.jpg"))
     Zip::File.open(file.path, create: true, suppress_extra_fields: true) do |zip|
       frames = frame_count.times.map { |n| { file: "#{"%06d" % n}.jpg", delay: 100 } }
       zip.get_output_stream(Zip::Entry.new(zip, "animation.json", compression_method: Zip::Entry::STORED)) { |f| f.write(frames.to_json) }
 
       frames.each do |frame|
-        zip.get_output_stream(Zip::Entry.new(zip, frame[:file], compression_method:)) { |f| f.write(File.binread("test/files/jpg/test.jpg")) }
+        zip.get_output_stream(Zip::Entry.new(zip, frame[:file], compression_method:)) { |f| f.write(frame_data) }
       end
     end
 
@@ -453,6 +453,90 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         MediaFile.open(file) do |ugoira|
           assert_equal("cannot have more than #{MediaFile::Ugoira::MAX_FRAME_COUNT} frames", ugoira.error)
           assert_raises(MediaFile::Ugoira::Error) { ugoira.frames }
+        end
+      end
+    end
+
+    should "be rejected without extracting a disguised nested Ugoira frame" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |inner|
+        Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |outer|
+          create_ugoira_zip(inner)
+          create_ugoira_zip(outer, frame_data: inner.read)
+
+          MediaFile.open(outer) do |ugoira|
+            Danbooru::Archive.any_instance.expects(:extract!).never
+
+            assert_equal("file '000000.jpg' is not an image file", ugoira.error)
+            assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+          end
+        end
+      end
+    end
+
+    should "be rejected without extracting a disguised SWF frame" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        create_ugoira_zip(file, frame_data: File.binread("test/files/swf/compressed.swf"))
+
+        MediaFile.open(file) do |ugoira|
+          Danbooru::Archive.any_instance.expects(:extract!).never
+          ExifTool.any_instance.expects(:metadata).never
+
+          assert_equal("file '000000.jpg' is not an image file", ugoira.error)
+          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+        end
+      end
+    end
+
+    should "be rejected without extracting a disguised PNG frame" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        create_ugoira_zip(file, frame_data: File.binread("test/files/png/test.png"))
+
+        MediaFile.open(file) do |ugoira|
+          Danbooru::Archive.any_instance.expects(:extract!).never
+
+          assert_equal("file '000000.jpg' has the wrong file extension (expected '000000.png')", ugoira.error)
+          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+        end
+      end
+    end
+
+    should "be rejected without extracting a disguised GIF frame" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        create_ugoira_zip(file, frame_data: File.binread("test/files/gif/test-static-32x32.gif"))
+
+        MediaFile.open(file) do |ugoira|
+          Danbooru::Archive.any_instance.expects(:extract!).never
+
+          assert_equal("file '000000.jpg' has the wrong file extension (expected '000000.gif')", ugoira.error)
+          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+        end
+      end
+    end
+
+    should "be rejected without extracting a disguised MP4 frame" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        create_ugoira_zip(file, frame_data: File.binread("test/files/mp4/test-300x300.mp4"))
+
+        MediaFile.open(file) do |ugoira|
+          Danbooru::Archive.any_instance.expects(:extract!).never
+          FFmpeg.expects(:shell!).never
+
+          assert_equal("file '000000.jpg' is not an image file", ugoira.error)
+          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+        end
+      end
+    end
+
+    should "be rejected without extracting a disguised WebM frame" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        create_ugoira_zip(file, frame_data: File.binread("test/files/webm/test-512x512.webm"))
+
+        MediaFile.open(file) do |ugoira|
+          Danbooru::Archive.any_instance.expects(:extract!).never
+          FFmpeg.expects(:shell!).never
+
+          assert_equal("file '000000.jpg' is not an image file", ugoira.error)
+          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
         end
       end
     end

@@ -77,10 +77,6 @@ class MediaFile::Ugoira < MediaFile
       end
     end
 
-    frames.each do |frame|
-      return "file '#{File.basename(frame.path)}' is not an image file" if !frame.file_ext.in?(%i[jpg gif png])
-    end
-
     return "must have at least two frames" if frames.size < 2
     return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
 
@@ -134,6 +130,13 @@ class MediaFile::Ugoira < MediaFile
         if entry.send(field) != zip.entries[file_n].send(field)
           return "field '#{field}' in file '#{entry.name}' is inconsistent with central directory"
         end
+      end
+
+      if entry.name != "animation.json"
+        # Check the frame's type from its first bytes, so frames that aren't images are never opened.
+        frame_ext = FileTypeDetector.new(StringIO.new(stream.read(16).to_s)).file_ext
+        return "file '#{entry.name}' is not an image file" if !frame_ext.in?(%i[jpg png gif])
+        return "file '#{entry.name}' has the wrong file extension (expected '#{File.basename(entry.name, ".*")}.#{frame_ext}')" if File.extname(entry.name) != ".#{frame_ext}"
       end
 
       file_n += 1
