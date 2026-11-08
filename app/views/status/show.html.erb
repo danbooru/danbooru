@@ -67,7 +67,7 @@
       </span>
     </h2>
 
-    <% if @status.postgres_up? %>
+    <% if @status.postgres_up? && @status.include_sensitive_info %>
       <details>
         <summary>
           <%= pluralize @status.postgres_active_connections, "active connection" %>.
@@ -75,7 +75,9 @@
 
         <%= render "table", rows: @status.serializable_hash[:postgres][:connection_stats] || [] %>
       </details>
-    <% else %>
+    <% elsif @status.postgres_up? %>
+      <p><%= pluralize @status.postgres_active_connections, "active connection" %>.</p>
+    <% elsif @status.include_sensitive_info %>
       Error: <%= @status.postgres_error %>
     <% end %>
 
@@ -90,7 +92,7 @@
       </span>
     </h2>
 
-    <% if @status.redis_up? %>
+    <% if @status.redis_up? && @status.include_sensitive_info %>
       <details>
         <summary>
           <%= @status.redis_used_memory %> memory used.
@@ -98,6 +100,8 @@
 
         <%= render "list", hash: @status.serializable_hash[:redis][:info] %>
       </details>
+    <% elsif @status.redis_up? %>
+      <p><%= @status.redis_used_memory %> memory used.</p>
     <% end %>
 
     <h2 class="flex gap-2 items-center">
