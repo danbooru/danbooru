@@ -55,7 +55,7 @@ class URL {
     }
 
     // `danbooru.donmai.us`
-    auto domain_end = std::min(rest.find_first_of("/?#:"), rest.size());
+    auto domain_end = std::min(rest.find_first_of("/\\?#:"), rest.size());
     if (domain_end == 0) {
       return;
     }

@@ -54,6 +54,9 @@ class FFmpeg
     FFmpeg.shell!("ffmpeg #{input_args} -vf #{filters} -frames:v 1 -y #{vp.path.shellescape}")
 
     MediaFile.open(vp)
+  rescue StandardError
+    vp&.close
+    raise
   end
 
   # @return [MediaFile, nil] The preview image, or nil on error.

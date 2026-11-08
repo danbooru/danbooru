@@ -14,15 +14,15 @@ module PostVersionsHelper
     removed_tags = post_version.removed_tags.compact
 
     if type == "previous" || other.nil?
-      obsolete_added_tags = []
-      obsolete_removed_tags = []
+      obsolete_added_tags = Set.new
+      obsolete_removed_tags = Set.new
     else
       other_tags = other.tags.split
       other_tags << "rating:#{post_version_value(other.rating)}"
       other_tags << "parent:#{post_version_value(other.parent_id)}"
       other_tags << "source:#{post_version_source(other.source)}"
-      obsolete_added_tags = added_tags - other_tags
-      obsolete_removed_tags = removed_tags & other_tags
+      obsolete_added_tags = (added_tags - other_tags).to_set
+      obsolete_removed_tags = (removed_tags & other_tags).to_set
     end
     html = '<span class="diff-list break-words">'.dup
 

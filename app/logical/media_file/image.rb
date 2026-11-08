@@ -181,6 +181,9 @@ class MediaFile::Image < MediaFile
 
     resized_image.release
     MediaFile::Image.new(output_file)
+  rescue StandardError
+    output_file&.close
+    raise
   end
 
   # Resize the image to fit within the given width and height.

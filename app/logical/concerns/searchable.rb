@@ -723,9 +723,7 @@ module Searchable
       primary_key, foreign_key = foreign_key, primary_key if association.macro == :belongs_to
       return relation if primary_key.nil? || foreign_key.nil?
 
-      self_table = relation.arel_table
-      model_table = model.arel_table
-      model_exists = model.model_restriction(model_table).where(model_table[foreign_key].eq(self_table[primary_key])).exists
+      model_exists = model.visible(current_user).model_restriction.where(model.arel_table[foreign_key].eq(relation.arel_table[primary_key])).arel.exists
       if exists
         visible(relation, name).attribute_restriction(name).where(model_exists)
       else

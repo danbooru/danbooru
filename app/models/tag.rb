@@ -502,8 +502,8 @@ class Tag < ApplicationRecord
     post_count <= SMALL_TAG_THRESHOLD
   end
 
-  def self.model_restriction(table)
-    super.where(table[:post_count].gt(0))
+  def self.model_restriction
+    where(post_count: 1..)
   end
 
   def self.available_includes

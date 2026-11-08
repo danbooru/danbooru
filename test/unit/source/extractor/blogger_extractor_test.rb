@@ -268,6 +268,19 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A blog post URL containing query parameters in the path" do
+      strategy_should_work(
+        "https://benbotport.blogspot.com/2099/06/x&path=%2F2011%2F06%2Fmass-effect-2.html",
+        image_urls: [],
+        page_url: "https://benbotport.blogspot.com/2099/06/x&path=%2F2011%2F06%2Fmass-effect-2.html",
+        profile_url: "https://benbotport.blogspot.com",
+        username: "benbotport",
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
     context "A deleted or nonexistent blog" do
       strategy_should_work(
         "https://qoigjqweroig.blogspot.com/2099/01/post.html",

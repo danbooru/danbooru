@@ -314,6 +314,28 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals(@p1, comments: { id: @p1.comments.first.id })
         assert_search_equals(@p1, has_comments: true, comments: { id: @p1.comments.first.id })
       end
+
+      context "with records the user can't see" do
+        subject { User }
+
+        should "not count deleted feedback for non-moderators" do
+          user = create(:user)
+          create(:user_feedback, user: user, is_deleted: true)
+
+          assert_search_equals([], id: user.id, has_feedback: true)
+          assert_search_equals(user, id: user.id, has_feedback: false)
+          assert_search_equals(user, id: user.id, has_feedback: true, current_user: create(:moderator_user))
+        end
+
+        should "not count forum posts in mod-only topics for non-moderators" do
+          user = create(:user)
+          as(user) { create(:forum_post, creator: user, topic: create(:mod_up_forum_topic)) }
+
+          assert_search_equals([], id: user.id, has_forum_posts: true)
+          assert_search_equals(user, id: user.id, has_forum_posts: false)
+          assert_search_equals(user, id: user.id, has_forum_posts: true, current_user: create(:moderator_user))
+        end
+      end
     end
 
     context "for a `has_many through: has_many` association" do

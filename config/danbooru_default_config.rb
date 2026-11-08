@@ -719,9 +719,11 @@ module Danbooru
     def discord_webhook_secret
     end
 
-    # you should override this
+    # A secret key used to sign unsubscribe links in emails. If this key is
+    # changed, unsubscribe links in old emails will stop working. By default
+    # it's derived from `secret_key_base`.
     def email_key
-      "zDMSATq0W3hmA5p3rKTgD"
+      Rails.application.key_generator.generate_key("email_key")
     end
 
     # The url of the Discord server associated with this site.

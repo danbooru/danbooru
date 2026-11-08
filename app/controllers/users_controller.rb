@@ -25,7 +25,7 @@ class UsersController < ApplicationController
 
   def show
     @user = authorize User.find(params[:id])
-    respond_with(@user, methods: @user.full_attributes) do |format|
+    respond_with(@user, methods: policy(@user).full_api_attributes) do |format|
       format.html.tooltip { render layout: false }
     end
   end
@@ -57,7 +57,7 @@ class UsersController < ApplicationController
 
     if !@user.is_anonymous? || request.format.json? || request.format.xml?
       params[:action] = "show"
-      respond_with(@user, methods: @user.full_attributes, template: "users/show")
+      respond_with(@user, methods: policy(@user).full_api_attributes, template: "users/show")
     else
       redirect_to login_path(url: profile_path)
     end

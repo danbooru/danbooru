@@ -16,6 +16,9 @@ class ApiKey < ApplicationRecord
   attribute :expires_on, :date
   attribute :expires, :boolean
 
+  # Hide the key in `inspect` and exception messages. It isn't caught by config.filter_parameters because it's not named `api_key`.
+  self.filter_attributes += [:key]
+
   array_attribute :permissions
   array_attribute :permitted_ip_addresses
 

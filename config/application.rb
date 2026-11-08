@@ -76,11 +76,25 @@ module Danbooru
     config.active_model.i18n_customize_full_message = true
 
     # Hide sensitive model attributes and request params in exception messages
-    # and logs. These are substring matches, so they match any attribute or
+    # and logs. Symbols are substring matches, so they match any attribute or
     # request param containing the word 'password' etc.
     #
     # https://guides.rubyonrails.org/configuring.html#config-filter-parameters
-    config.filter_parameters += [:password, :api_key, :secret, :ip_addr, :address, :email_verification_key, :signed_id] if !Rails.env.local?
+    if !Rails.env.local?
+      config.filter_parameters += [
+        :password,               # Login and password change params, and users.bcrypt_password_hash.
+        :api_key,                # The `api_key` param used for API authentication.
+        :secret,                 # The signed 2FA secret used during 2FA setup, and users.totp_secret.
+        :token,                  # The CSRF authenticity token.
+        :code,                   # 2FA codes, backup codes, and upgrade codes.
+        :credential,             # Site credentials (cookies, tokens, and passwords for source sites).
+        :ip_addr,                # IP addresses in params and columns (users.last_ip_addr, user_events.ip_addr, etc).
+        :address,                # Email addresses in params and columns (email_addresses.address, etc).
+        :email_verification_key, # The token in email verification links.
+        :signed_id,              # The token in password reset links.
+        :signed_login_event,     # The token in login verification links.
+      ]
+    end
 
     raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
     config.secret_key_base = Danbooru.config.secret_key_base

@@ -7,7 +7,7 @@ class StatusController < ApplicationController
   anonymous_only if: -> { !ServerStatus.new.postgres_up? }
 
   def show
-    @status = authorize ServerStatus.new(request)
+    @status = authorize ServerStatus.new(request, include_sensitive_info: policy(ServerStatus).can_see_sensitive_info?)
     layout = @status.postgres_up? ? "default" : "blank"
 
     respond_with(@status, layout: layout)

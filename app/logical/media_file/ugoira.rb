@@ -77,10 +77,6 @@ class MediaFile::Ugoira < MediaFile
       end
     end
 
-    frames.each do |frame|
-      return "file '#{File.basename(frame.path)}' is not an image file" if !frame.file_ext.in?(%i[jpg gif png])
-    end
-
     return "must have at least two frames" if frames.size < 2
     return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
 
@@ -136,6 +132,13 @@ class MediaFile::Ugoira < MediaFile
         end
       end
 
+      if entry.name != "animation.json"
+        # Check the frame's type from its first bytes, so frames that aren't images are never opened.
+        frame_ext = FileTypeDetector.new(StringIO.new(stream.read(16).to_s)).file_ext
+        return "file '#{entry.name}' is not an image file" if !frame_ext.in?(%i[jpg png gif])
+        return "file '#{entry.name}' has the wrong file extension (expected '#{File.basename(entry.name, ".*")}.#{frame_ext}')" if File.extname(entry.name) != ".#{frame_ext}"
+      end
+
       file_n += 1
       frame_n += 1 unless entry.name == "animation.json"
     end
@@ -145,6 +148,8 @@ class MediaFile::Ugoira < MediaFile
     return "zip64 format is not supported" if zip.instance_variable_get(:@cdir).instance_variable_get(:@version_needed_for_extract) == Zip::VERSION_NEEDED_TO_EXTRACT_ZIP64 # XXX hack
 
     nil
+  rescue Zip::Error => e
+    "invalid zip file (#{e.message})"
   ensure
     zip&.close rescue nil # work around for https://github.com/rubyzip/rubyzip/issues/216; triggered by files with UniversalTime extra field
     stream&.close
@@ -361,6 +366,9 @@ class MediaFile::Ugoira < MediaFile
       FFmpeg.encode_images!(frames, frame_delays, output_file.path, format:, **options)
       MediaFile.open(output_file)
     end
+  rescue StandardError
+    output_file.close
+    raise
   end
 
   private

@@ -2060,8 +2060,8 @@ class Post < ApplicationRecord
     save
   end
 
-  def self.model_restriction(table)
-    super.where(table[:is_pending].eq(false)).where(table[:is_flagged].eq(false)).where(table[:is_deleted].eq(false))
+  def self.model_restriction
+    where(is_pending: false, is_flagged: false, is_deleted: false)
   end
 
   def self.available_includes

@@ -30,7 +30,9 @@ module ApplicationHelper
       return h(diff_record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe
     end
 
-    pattern = /(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)/
+    # Split text into HTML tags, words, spaces, newlines, and single characters. Example:
+    # "Hello <b>world</b>,  a < b\r\n!" => ["Hello", " ", "<b>", "world", "</b>", ",", "  ", "a", " ", "<", " ", "b", "\r\n", "!"]
+    pattern = /(?:<[^<>\n]+>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)/
     DiffBuilder.new(record[field], other[field], pattern).build
   end
 
