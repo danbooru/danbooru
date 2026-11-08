@@ -148,6 +148,8 @@ class MediaFile::Ugoira < MediaFile
     return "zip64 format is not supported" if zip.instance_variable_get(:@cdir).instance_variable_get(:@version_needed_for_extract) == Zip::VERSION_NEEDED_TO_EXTRACT_ZIP64 # XXX hack
 
     nil
+  rescue Zip::Error => e
+    "invalid zip file (#{e.message})"
   ensure
     zip&.close rescue nil # work around for https://github.com/rubyzip/rubyzip/issues/216; triggered by files with UniversalTime extra field
     stream&.close

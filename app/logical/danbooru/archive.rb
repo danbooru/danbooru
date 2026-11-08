@@ -22,6 +22,7 @@ module Archive
     attach_function_maybe :archive_filter_name, [:pointer, :int], :string
     attach_function_maybe :archive_filter_count, [:pointer], :int
     attach_function_maybe :archive_write_set_option, [:pointer, :string, :string, :string], :int
+    attach_function_maybe :archive_read_support_format_by_code, [:pointer, :int], :int
 
     # XXX: Hack to force 'Store' compression on zip archives.
     class << self
@@ -38,6 +39,32 @@ module Archive
       prepend Extension
     end
   end
+
+  class Reader
+    # XXX Monkey patch ffi-libarchive to add a `formats` option that opens a file with only the given formats enabled
+    # and no compression filters. By default, ffi-libarchive enables every format and filter libarchive supports.
+    module Extension
+      def initialize(params = {})
+        if params[:formats].nil?
+          super
+        else
+          BaseArchive.instance_method(:initialize).bind_call(self, C.method(:archive_read_new), C.method(:archive_read_finish))
+          @strip_components = 0
+
+          params[:formats].each do |format|
+            raise Error, @archive if C.archive_read_support_format_by_code(archive, format) != C::OK
+          end
+
+          raise Error, @archive if C.archive_read_open_filename(archive, params[:file_name], 1024) != C::OK
+        end
+      rescue StandardError
+        close
+        raise
+      end
+    end
+
+    prepend Extension
+  end
 end
 
 module Danbooru
@@ -51,6 +78,15 @@ module Danbooru
       # ::Archive::EXTRACT_SECURE_NOABSOLUTEPATHS |
       ::Archive::EXTRACT_SECURE_SYMLINKS |
       ::Archive::EXTRACT_SECURE_NODOTDOT
+
+    # The libarchive formats to enable for each file type we detect. Only these formats are enabled, so libarchive can't
+    # read a file as a different format than we detected (e.g. a tar file disguised as a zip file).
+    LIBARCHIVE_FORMATS = {
+      "zip": [::Archive::FORMAT_ZIP],
+      "ugoira": [::Archive::FORMAT_ZIP],
+      "rar": [::Archive::FORMAT_RAR, 0x100000], # ARCHIVE_FORMAT_RAR_V5
+      "7z": [::Archive::FORMAT_7ZIP],
+    }
 
     attr_reader :file
 
@@ -126,12 +162,15 @@ module Danbooru
 
       # XXX We have to re-open the archive on every call because libarchive is designed for streaming and doesn't
       # support iterating across the archive multiple times.
-      archive = ::Archive::Reader.open_filename(file.path)
+      formats = LIBARCHIVE_FORMATS.fetch(file_ext) { raise Error, "Unsupported archive format (.#{file_ext})" }
+      archive = ::Archive::Reader.send(:new, file_name: file.path, formats:)
       while (entry = archive.next_header(clone_entry: true))
         yield Entry.new(archive, entry)
       end
 
       self
+    rescue ::Archive::Error => e
+      raise Error, e.message
     ensure
       archive&.close
     end

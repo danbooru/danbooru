@@ -124,8 +124,24 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/ugoira/ugoira.zip").format)
         assert_equal("RAR5", Danbooru::Archive.open("test/files/archive/ugoira.rar").format)
         assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.7z").format)
-        assert_equal("GNU tar format", Danbooru::Archive.open("test/files/archive/ugoira.tar").format)
-        assert_equal("GNU tar format", Danbooru::Archive.open("test/files/archive/ugoira.tar.gz").format)
+      end
+    end
+
+    context "an unsupported archive format" do
+      should "not be read" do
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/ugoira.tar").entries }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/ugoira.tar.gz").entries }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/long-path.tar.gz").extract! { nil } }
+      end
+    end
+
+    context "a tar file with a zip file signature" do
+      should "not be extracted" do
+        archive = Danbooru::Archive.open!("test/files/archive/tar-disguised-as-ugoira.tar")
+
+        assert_equal(:ugoira, archive.file_ext)
+        assert_raises(Danbooru::Archive::Error) { archive.entries }
+        assert_raises(Danbooru::Archive::Error) { archive.extract! { nil } }
       end
     end
 

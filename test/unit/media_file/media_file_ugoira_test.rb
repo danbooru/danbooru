@@ -540,6 +540,13 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         end
       end
     end
+
+    should "be rejected if it's a tar file disguised as a zip file" do
+      MediaFile.open("test/files/archive/tar-disguised-as-ugoira.tar") do |ugoira|
+        assert_instance_of(MediaFile::Ugoira, ugoira)
+        assert_equal("invalid zip file (Zip end of central directory signature not found)", ugoira.error)
+      end
+    end
   end
 
   context "a ugoira with frames of different dimensions" do
