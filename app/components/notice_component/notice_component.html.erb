@@ -7,5 +7,5 @@
       x-transition.opacity.400ms
       x-cloak>
   <span class="prose flex-1" x-html="notice.message"><%= message %></span>
-  <a href="javascript:void(0)" id="close-notice-link" class="flex self-center text-lg" data-shortcut="esc" x-on:click="notice.close()"><%= helpers.close_icon %></a>
+  <a href="#" id="close-notice-link" class="flex self-center text-lg" data-shortcut="esc" x-on:click.prevent="notice.close()"><%= helpers.close_icon %></a>
 </div>

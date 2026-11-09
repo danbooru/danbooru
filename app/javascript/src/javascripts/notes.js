@@ -697,7 +697,7 @@ class Note {
       $("#image").off("click.danbooru", Note.Box.toggle_all);
       $("#image").on("mousedown.danbooru.note", Note.TranslationMode.Drag.start);
 
-      Notice.info('Translation mode is on. Drag on the image to create notes. <a href="javascript:void(0)" class="translation-mode-off">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
+      Notice.info('Translation mode is on. Drag on the image to create notes. <a href="#" class="translation-mode-off" x-on:click.prevent>Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
       $(document).on("click.danbooru", "a.translation-mode-off", Note.TranslationMode.stop);
     }
 

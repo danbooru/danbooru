@@ -88,9 +88,9 @@
         <% end %>
 
         <% variants.each do |variant| %>
-          <% menu.with_item class: "px-3 py-1 flex gap-2 cursor-pointer", "data-variant": variant, "x-on:click": "player.setQuality($el.dataset.variant)" do %>
+          <% menu.with_item class: "px-3 py-1 flex gap-2 cursor-pointer", "data-variant": variant, "x-on:click.prevent": "player.setQuality($el.dataset.variant)" do %>
             <%= check_icon "x-bind:class": "{ invisible: player.quality !== $el.parentNode.dataset.variant }" %>
-            <%= link_to variant_name(variant), "javascript:void(0)", class: "text-sm whitespace-nowrap" %>
+            <%= link_to variant_name(variant), "#", class: "text-sm whitespace-nowrap" %>
           <% end %>
         <% end %>
       <% end %>

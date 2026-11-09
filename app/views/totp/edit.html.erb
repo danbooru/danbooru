@@ -29,7 +29,7 @@
       </div>
 
       <div x-data="{ open: false }">
-        <a href="javascript:void(0)" @click="open = true" class="text-xs" x-show="!open">Can't scan the code?</a>
+        <a href="#" @click.prevent="open = true" class="text-xs" x-show="!open">Can't scan the code?</a>
 
         <div class="prose" x-show="open" x-cloak>
           <p>If you can't scan the QR code, then you can enter this code into your app instead:</p>

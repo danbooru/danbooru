@@ -46,7 +46,7 @@
           <% end %>
         <% end %>
       <% end %>
-      <%= link_to "javascript:void(0)", class: "inactive-link contents", "x-on:click.prevent": "blacklist.collapsed = !blacklist.collapsed" do %>
+      <%= link_to "#", class: "inactive-link contents", "x-on:click.prevent": "blacklist.collapsed = !blacklist.collapsed" do %>
         <%= inline ? chevron_down_icon(class: "transition-transform md:-rotate-90", "x-bind:class": "{ 'rotate-180 md:rotate-90' : blacklist.collapsed }")
               : chevron_down_icon(class: "transition-transform", "x-bind:class": "{ 'rotate-180' : blacklist.collapsed }") %>
       <% end %>

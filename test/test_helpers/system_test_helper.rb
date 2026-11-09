@@ -66,6 +66,13 @@ module SystemTestHelper
     assert_equal([], violations, "The page violated its Content-Security-Policy")
   end
 
+  # Assert the block doesn't change the URL, e.g. by following a `href="#"` link whose click handler didn't call preventDefault().
+  def assert_no_navigation
+    url = page.evaluate_script("location.href")
+    yield
+    assert_equal(url, page.evaluate_script("location.href"))
+  end
+
   # @param text [String, Regexp, nil] exact string to match, a pattern to match against, or nil to just check the notice is showing.
   def assert_notice(text = nil)
     return assert_selector "#notice span.prose" if text.nil?

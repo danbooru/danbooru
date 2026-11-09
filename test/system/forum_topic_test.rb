@@ -32,9 +32,11 @@ class ForumTopicsChromeTest < ChromeSystemTestCase
       end
 
       should "copy the post's id when clicking Copy ID" do
-        within "#forum_post_#{@forum_post.id}" do
-          find(".popup-menu-button").click
-          click_link "Copy ID"
+        assert_no_navigation do
+          within "#forum_post_#{@forum_post.id}" do
+            find(".popup-menu-button").click
+            click_link "Copy ID"
+          end
         end
 
         assert_notice "Copied!"
@@ -42,9 +44,11 @@ class ForumTopicsChromeTest < ChromeSystemTestCase
       end
 
       should "copy the post's link when clicking Copy Link" do
-        within "#forum_post_#{@forum_post.id}" do
-          find(".popup-menu-button").click
-          click_link "Copy Link"
+        assert_no_navigation do
+          within "#forum_post_#{@forum_post.id}" do
+            find(".popup-menu-button").click
+            click_link "Copy Link"
+          end
         end
 
         assert_notice "Copied!"

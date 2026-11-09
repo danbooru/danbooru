@@ -7,8 +7,8 @@
     <% end %>
 
     <% if low_similarity_matches.present? %>
-      <%= link_to "Show #{pluralize(low_similarity_matches.length, "low similarity match")}", "javascript:void(0)", "x-on:click": "showLowSimilarity = true", "x-show": "!showLowSimilarity" %>
-      <%= link_to "Hide #{pluralize(low_similarity_matches.length, "low similarity match")}", "javascript:void(0)", "x-on:click": "showLowSimilarity = false", "x-show": "showLowSimilarity", "x-cloak": true %>
+      <%= link_to "Show #{pluralize(low_similarity_matches.length, "low similarity match")}", "#", "x-on:click.prevent": "showLowSimilarity = true", "x-show": "!showLowSimilarity" %>
+      <%= link_to "Hide #{pluralize(low_similarity_matches.length, "low similarity match")}", "#", "x-on:click.prevent": "showLowSimilarity = false", "x-show": "showLowSimilarity", "x-cloak": true %>
     <% end %>
 
     <% if any_similarity_matches.any? %>

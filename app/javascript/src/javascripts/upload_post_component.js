@@ -24,6 +24,10 @@ export default class UploadPostComponent {
     this.initializeSimilar();
   }
 
+  showSimilarTab() {
+    this.$container.find("a.tab.similar-tab").get(0).click();
+  }
+
   initializeDraggable() {
     let initialPanelWidth = 0;
 

@@ -188,10 +188,10 @@
 
           <% %w[button-lg button-md button-sm button-xs button-xxs].each do |size| %>
             <span>.<%= size %></span>
-            <%= link_to "Save", "javascript:void(0)", class: "w-min button-primary #{size}" %>
-            <%= link_to "Save", "javascript:void(0)", class: "w-min button-outline-primary #{size}" %>
-            <%= link_to "Save", "javascript:void(0)", class: "w-min button-primary #{size}", disabled: true %>
-            <%= link_to "Save", "javascript:void(0)", class: "w-min button-outline-primary #{size}", disabled: true %>
+            <%= link_to "Save", "#", class: "w-min button-primary #{size}" %>
+            <%= link_to "Save", "#", class: "w-min button-outline-primary #{size}" %>
+            <%= link_to "Save", "#", class: "w-min button-primary #{size}", disabled: true %>
+            <%= link_to "Save", "#", class: "w-min button-outline-primary #{size}", disabled: true %>
           <% end %>
         </div>
 
@@ -204,10 +204,10 @@
 
           <% %w[button-lg button-md button-sm button-xs button-xxs].each do |size| %>
             <span>.<%= size %></span>
-            <%= link_to "Delete", "javascript:void(0)", class: "w-min button-danger #{size}" %>
-            <%= link_to "Delete", "javascript:void(0)", class: "w-min button-outline-danger #{size}" %>
-            <%= link_to "Delete", "javascript:void(0)", class: "w-min button-danger #{size}", disabled: true %>
-            <%= link_to "Delete", "javascript:void(0)", class: "w-min button-outline-danger #{size}", disabled: true %>
+            <%= link_to "Delete", "#", class: "w-min button-danger #{size}" %>
+            <%= link_to "Delete", "#", class: "w-min button-outline-danger #{size}" %>
+            <%= link_to "Delete", "#", class: "w-min button-danger #{size}", disabled: true %>
+            <%= link_to "Delete", "#", class: "w-min button-outline-danger #{size}", disabled: true %>
           <% end %>
         </div>
       </div>

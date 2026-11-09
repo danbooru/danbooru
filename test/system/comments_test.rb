@@ -16,7 +16,7 @@ class CommentsChromeTest < ChromeSystemTestCase
       should "be hidden, and become visible when clicked" do
         assert_hidden "#comment_#{@comment.id} .body"
 
-        find("#comment_#{@comment.id} .unhide-comment-link").click
+        assert_no_navigation { find("#comment_#{@comment.id} .unhide-comment-link").click }
 
         assert_visible "#comment_#{@comment.id} .body", text: @comment.body
       end
@@ -63,20 +63,27 @@ class CommentsChromeTest < ChromeSystemTestCase
       end
 
       should "copy the comment's id when clicking Copy ID" do
-        within "#comment_#{@comment.id}" do
-          find(".popup-menu-button").click
-          click_link "Copy ID"
+        assert_no_navigation do
+          within "#comment_#{@comment.id}" do
+            find(".popup-menu-button").click
+            click_link "Copy ID"
+          end
         end
 
         assert_notice "Copied!"
 
         assert_clipboard "comment ##{@comment.id}"
+
+        assert_no_navigation { find("#close-notice-link").click }
+        assert_hidden "#notice"
       end
 
       should "copy the comment's link when clicking Copy Link" do
-        within "#comment_#{@comment.id}" do
-          find(".popup-menu-button").click
-          click_link "Copy Link"
+        assert_no_navigation do
+          within "#comment_#{@comment.id}" do
+            find(".popup-menu-button").click
+            click_link "Copy Link"
+          end
         end
 
         assert_notice "Copied!"

@@ -31,7 +31,7 @@
   </div>
 
   <div class="content">
-    <%= link_to "[hidden]", "javascript:void(0)", class: "unhide-comment-link block mb-3", "x-on:click": "showThresholded = true" %>
+    <%= link_to "[hidden]", "#", class: "unhide-comment-link block mb-3", "x-on:click.prevent": "showThresholded = true" %>
 
     <%= tag.div class: "body prose" do %>
       <% if redact_deleted? %>
@@ -143,13 +143,13 @@
           <% end %>
 
           <% menu.with_item do %>
-            <%= link_to "javascript:void(0)", class: "comment-copy-id", "x-on:click": "$copyToClipboard('comment ##{j comment.id}')" do %>
+            <%= link_to "#", class: "comment-copy-id", "x-on:click.prevent": "$copyToClipboard('comment ##{j comment.id}')" do %>
               <%= hashtag_icon %> Copy ID
             <% end %>
           <% end %>
 
           <% menu.with_item do %>
-            <%= link_to "javascript:void(0)", class: "comment-copy-link", "x-on:click": "$copyToClipboard('#{j comment_url(comment)}')" do %>
+            <%= link_to "#", class: "comment-copy-link", "x-on:click.prevent": "$copyToClipboard('#{j comment_url(comment)}')" do %>
               <%= link_icon %> Copy Link
             <% end %>
           <% end %>

@@ -103,5 +103,16 @@ class NotesChromeTest < ChromeSystemTestCase
         assert_not @note.reload.is_active?
       end
     end
+
+    context "translation mode" do
+      should "turn off when the link in the notice is clicked" do
+        visit post_path(@post)
+        assert_no_navigation { click_link "Add note" }
+        assert_selector "body.mode-translation"
+
+        assert_no_navigation { click_link "Turn translation mode off" }
+        assert_no_selector "body.mode-translation"
+      end
+    end
   end
 end

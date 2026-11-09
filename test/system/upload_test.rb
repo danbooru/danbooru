@@ -47,6 +47,21 @@ class UploadsChromeTest < ChromeSystemTestCase
         assert_equal "1girls solo_1girl ", find_field("post_tag_string").value
       end
 
+      should "move the edit panel when a dock option is clicked" do
+        assert_no_navigation do
+          find(".popup-menu:has(#dock-left-link) .popup-menu-button").click
+          click_link "Dock to Left"
+        end
+
+        assert_selector ".upload-container[data-dock='left']"
+      end
+
+      should "show the rating help when the help icon is clicked" do
+        assert_no_navigation { find(".help-tooltip-link").click }
+
+        assert_selector ".tippy-box .help-tooltip-content"
+      end
+
       should "load the iqdb results" do
         click_link "Similar"
 
@@ -58,6 +73,20 @@ class UploadsChromeTest < ChromeSystemTestCase
 
         assert_selector "#post_artist_commentary_original_title"
         assert_selector "#post_artist_commentary_original_description"
+      end
+    end
+
+    context "when the upload has multiple pixel-perfect duplicates" do
+      should "open the Similar tab when the duplicate warning is clicked" do
+        upload = create(:completed_file_upload, uploader: @user)
+        2.times { create(:post, media_asset: build(:media_asset, pixel_hash: upload.media_assets.first.pixel_hash)) }
+        visit upload_path(upload)
+
+        click_link "Pixel-Perfect Duplicate"
+
+        assert_selector ".tab-panel.similar-tab.active-tab"
+        assert_selector "a.tab.similar-tab.active-tab"
+        assert_current_path upload_path(upload)
       end
     end
   end

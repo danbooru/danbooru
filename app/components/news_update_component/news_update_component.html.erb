@@ -8,7 +8,7 @@
     <%= news_update.dtext_message.format_text %>
   </div>
 
-  <a href="javascript:void(0)" class="px-2 py-1" x-on:click="seen = id">
+  <a href="#" class="px-2 py-1" x-on:click.prevent="seen = id">
     <%= close_icon %>
   </a>
 </div>

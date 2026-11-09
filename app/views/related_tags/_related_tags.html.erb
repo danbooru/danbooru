@@ -4,7 +4,7 @@
       <%= spinner_icon(class: "text-muted invisible", "x-cloak": true, "x-bind:class": '{ invisible: !$store.relatedTags.loading }') %>
 
       Related:
-      <%= link_to "", "javascript:void(0)", class: "related-tags-current-tag", "x-on:click.stop": "Danbooru.RelatedTag.update_related_tags($event)" %>
+      <%= link_to "", "#", class: "related-tags-current-tag", "x-on:click.stop.prevent": "Danbooru.RelatedTag.update_related_tags($event)" %>
     </h6>
 
     <%= chevron_down_icon(class: "link-color rotate-180", "x-cloak": true, "x-show": "collapsed") %>

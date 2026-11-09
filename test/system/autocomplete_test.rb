@@ -153,7 +153,7 @@ class AutocompleteChromeTest < ChromeSystemTestCase
     end
 
     should "work for emojis" do
-      assert_clicked_autocomplete_equals(":smile: ", ":smi", selector: @selector)
+      assert_no_navigation { assert_clicked_autocomplete_equals(":smile: ", ":smi", selector: @selector) }
     end
 
     should "preserve tag prefixes when a completion is inserted" do
