@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-# A wrapper around the IPAddress gem that adds some extra utility methods.
+# A wrapper around Ruby's IPAddr class that adds some extra utility methods.
 #
-# @see https://github.com/ipaddress-gem/ipaddress
+# @see https://docs.ruby-lang.org/en/master/IPAddr.html
 module Danbooru
   class IpAddress
     attr_reader :ip_address
 
-    delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :unique_local?, :private?, :to_string, :network, :prefix, :unspecified?, to: :ip_address
+    delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :private?, :prefix, to: :ip_address
     delegate :ip_info, :is_proxy?, to: :ip_lookup
 
     def self.parse(string)
@@ -16,14 +16,15 @@ module Danbooru
       nil
     end
 
-    # @param ip_addr [String, IPAddress] The IP address.
+    # @param ip_addr [String, IPAddr, Danbooru::IpAddress] The IP address.
     def initialize(ip_addr)
-      if ip_addr.is_a?(::IPAddress)
+      if ip_addr.is_a?(::IPAddr)
         @ip_address = ip_addr
       elsif ip_addr.is_a?(Danbooru::IpAddress)
         @ip_address = ip_addr.ip_address
       else
-        @ip_address = ::IPAddress.parse(ip_addr.to_s.strip)
+        @ip_address = ::IPAddr.new(ip_addr.to_s.strip)
+        raise ArgumentError, "IPv6 zone IDs aren't supported" if ipv6? && @ip_address.zone_id.present?
       end
     end
 
@@ -31,18 +32,15 @@ module Danbooru
       @ip_lookup ||= IpLookup.new(self)
     end
 
-    # @return [Boolean] True if this is a non-publicly routable IP address.
+    # @return [Boolean] True if this is a non-publicly routable IP address. For IPv6, `private?` includes fc00::/7
+    #   (unique local addresses) and `reserved?` includes :: (the unspecified address).
     def is_local?
-      if ipv4?
-        loopback? || link_local? || multicast? || reserved? || private?
-      elsif ipv6?
-        loopback? || link_local? || multicast? || reserved? || unique_local? || unspecified? || ipv4_mapped?
-      end
+      loopback? || link_local? || multicast? || reserved? || private? || ipv4_mapped?
     end
 
     # @return [Boolean] True if this is a multicast address.
     def multicast?
-      (ipv4? && ip_address.multicast?) || (ipv6? && in?(%w[ff00::/8]))
+      in?(%w[224.0.0.0/4 ff00::/8])
     end
 
     # @return [Boolean] True if this is a reserved address.
@@ -91,12 +89,17 @@ module Danbooru
 
     # Convert the IP to a subnet.
     def supernet(prefix)
-      self.class.new(ip_address.supernet(prefix))
+      self.class.new(ip_address.mask(prefix))
+    end
+
+    # @return [Integer] The number of addresses in the subnet (1 for a single address).
+    def size
+      2**((ipv4? ? 32 : 128) - prefix)
     end
 
     # Convert the IP to a /24 or /64 subnet, unless it's a local IP, a Tor IP, or already a subnet.
     def subnet
-      if is_local? || is_tor? || ip_address.size > 1
+      if is_local? || is_tor? || size > 1
         self
       elsif ipv4?
         supernet(24)
@@ -105,13 +108,13 @@ module Danbooru
       end
     end
 
-    # @param ip_addresses [Array<String, IPAddress>] An array of IP addresses or subnets.
+    # @param ip_addresses [Array<String, IpAddress>] An array of IP addresses or subnets.
     # @return [Boolean] True if this IP is contained within any of the given IPs or subnets.
     def in?(ip_addresses)
       ip_addresses.any? { |ip| IpAddress.parse(ip).include?(self) }
     end
 
-    # @param other [String, IPAddress] An IP address or subnet.
+    # @param other [String, IpAddress] An IP address or subnet.
     # @return [Boolean] True if this subnet contains the given IP or subnet.
     def include?(other)
       other = Danbooru::IpAddress.new(other)
@@ -124,16 +127,16 @@ module Danbooru
       to_s
     end
 
-    # "1.2.3.4/24" if the address is a subnet, "1.2.3.4" otherwise.
+    # "1.2.3.0/24" if the address is a subnet, "1.2.3.4" otherwise.
     def to_s
-      (ip_address.size > 1) ? "#{network}/#{prefix}" : ip_address.to_s
+      (size > 1) ? "#{ip_address}/#{prefix}" : ip_address.to_s
     end
 
     def inspect
       "#<Danbooru::IpAddress #{to_s}>"
     end
 
-    # @param other [String, IPAddress] An IP address or subnet.
+    # @param other [String, IpAddress] An IP address or subnet.
     # @return [Boolean] True if this IP is contained within the given subnet.
     def ===(other)
       in?([other])
@@ -146,7 +149,7 @@ module Danbooru
     def <=>(other)
       return nil unless other.is_a?(IpAddress)
 
-      [-prefix.to_i, network.to_s] <=> [-other.prefix.to_i, other.network.to_s]
+      [-prefix, ip_address.to_s] <=> [-other.prefix, other.ip_address.to_s]
     end
 
     # This is needed to be able to correctly treat IpAddresses as hash keys,

@@ -26,7 +26,6 @@ gem "builder", "~> 3"
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
 gem "puma", "~> 7"
 gem "scenic", "~> 1"
-gem "ipaddress_2", "~> 0.14"
 gem "http", "~> 6"
 gem "pundit", "~> 2"
 gem "mail", "~> 2"

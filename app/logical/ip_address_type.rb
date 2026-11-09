@@ -28,7 +28,7 @@ class IpAddressType < ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Inet
   # @param value [Danbooru::IpAddress] the IP address object
   # @return [String]
   def serialize(value)
-    return value.to_string if value.is_a?(Danbooru::IpAddress)
+    return value.to_s if value.is_a?(Danbooru::IpAddress)
     super value
   end
 end
