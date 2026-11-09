@@ -371,8 +371,8 @@ module Danbooru
       # Uncomment the code below and add the following to Nginx:
       #
       #     # Strip tags from filenames (/original/d3/4e/__kousaka_tamaki_to_heart_2_drawn_by_kyogoku_shin__d34e4cf0a437a5d65f8e82b7bcd02606.jpg => /original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg)
-      #     location ~ (.*)/__.+?__(.+)$ {
-      #       rewrite (.*)/__.+?__(.+)$ $1/$2;
+      #     location ~ ^(.*)/__[^/]+?__([^/]+)$ {
+      #       rewrite ^(.*)/__[^/]+?__([^/]+)$ $1/$2;
       #     }
       #
       # custom_filename = "__#{custom_filename}__" if custom_filename.present?
