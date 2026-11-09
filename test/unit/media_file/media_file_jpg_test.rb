@@ -1,6 +1,24 @@
 require "test_helper"
 
 class MediaFileJpgTest < ActiveSupport::TestCase
+  context "Opening a file with a block" do
+    should "close the file if the block raises an error" do
+      file = MediaFile.open("test/files/jpg/test.jpg")
+      assert_raises(RuntimeError) { MediaFile.open(file) { raise "error" } }
+
+      assert_nil(file.file)
+    end
+  end
+
+  context "Quarantining a file" do
+    should "save a copy in the trash folder of the image storage" do
+      path = MediaFile.open("test/files/jpg/test.jpg").quarantine!
+
+      assert_equal("/trash/quarantine/ecef68c44edb8a0d6a3070b5f8e8ee76.jpg", path)
+      assert_equal(File.binread("test/files/jpg/test.jpg"), Danbooru.config.storage_manager.open(path).read)
+    end
+  end
+
   context "Resizing an image" do
     should "delete the temp file if saving the image fails" do
       file = MediaFile.open("test/files/jpg/test-blank.jpg")

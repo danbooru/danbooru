@@ -100,6 +100,9 @@ class ActiveSupport::TestCase
     parallelize_setup do |worker|
       Rails.application.load_seed
 
+      # Give each worker its own temp dir, so tests running at the same time can't see each other's temp files.
+      ENV["TMPDIR"] = Dir.mktmpdir("danbooru-test-worker-#{worker}-")
+
       if defined?(SimpleCov)
         SimpleCov.command_name "#{SimpleCov.command_name}-#{worker}"
       end
@@ -107,6 +110,8 @@ class ActiveSupport::TestCase
   end
 
   parallelize_teardown do
+    FileUtils.rm_rf(ENV.fetch("TMPDIR")) if ENV["TMPDIR"]&.include?("danbooru-test-worker-")
+
     if defined?(SimpleCov)
       SimpleCov.result
     end

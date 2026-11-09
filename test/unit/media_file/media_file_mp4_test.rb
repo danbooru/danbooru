@@ -2287,7 +2287,7 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       Danbooru::Tempfile.create(["danbooru-noise-", ".png"]) do |noise|
         Danbooru::Tempfile.create(["danbooru-1080p-", ".mp4"]) do |video|
           Vips::Image.gaussnoise(1920, 1080).pngsave(noise.path)
-          FFmpeg.shell!("ffmpeg -loop 1 -framerate 60 -i #{noise.path.shellescape} -t 5 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -y #{video.path.shellescape}")
+          FFmpeg.shell!("ffmpeg -loop 1 -framerate 60 -i #{noise.path.shellescape} -t 5 -c:v libx264 -preset ultrafast -pix_fmt yuv420p -y #{video.path.shellescape}", read: [noise.path], write: [video.path])
 
           stub_const(ExternalCommand, :MEMORY_LIMIT, 1.gigabyte) do
             preview = MediaFile.open(video.path).preview!(720, 720)

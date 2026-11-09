@@ -3,6 +3,24 @@ require "test_helper"
 class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
   context "The post replacements controller" do
     context "create action" do
+      context "replacing a post with a file that makes a program call a blocked syscall" do
+        should "fail, log the replacement, quarantine the file, and delete its stored files" do
+          @post = create(:post)
+          user = create(:moderator_user)
+          md5 = Digest::MD5.file("test/files/mp4/test-300x300-av1.mp4").hexdigest
+          MediaFile::Video.any_instance.stubs(:preview!).raises(ExternalCommand::SyscallError, "ffmpeg called a blocked syscall")
+          Rails.logger.stubs(:error)
+          Rails.logger.expects(:error).with { |message| message.start_with?("Replacement of post ##{@post.id} by user ##{user.id} (#{user.name}) was blocked by the sandbox: ffmpeg called a blocked syscall") }
+
+          file = Rack::Test::UploadedFile.new(Rails.root.join("test/files/mp4/test-300x300-av1.mp4"))
+          post_auth post_replacements_path, user, params: { post_id: @post.id, post_replacement: { replacement_file: file }}
+
+          assert_not_equal(md5, @post.reload.md5)
+          stored_files = Dir.glob("#{Danbooru.config.storage_manager.base_dir}/**/*#{md5}*").map { it.delete_prefix(Danbooru.config.storage_manager.base_dir.to_s) }
+          assert_equal(["/trash/quarantine/#{md5}.mp4"], stored_files)
+        end
+      end
+
       context "replacing a post from a source url" do
         should "replace the post" do
           assert_difference("PostReplacement.count") do
