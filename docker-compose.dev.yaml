@@ -153,7 +153,13 @@ services:
     command: ["http", "0.0.0.0", "5588", "/iqdb/data/iqdb.sqlite"]
 
   redis:
-    image: redis:6.2.6
+    image: redis:8.10.3
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 10s
+      interval: 10s
+      retries: 3
 
   postgres:
     image: ghcr.io/danbooru/postgres:16.1
