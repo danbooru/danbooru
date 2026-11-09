@@ -57,7 +57,7 @@ class UserAction < ApplicationRecord
     UNION ALL
       (#{PostDisapproval.visible(user).select("'PostDisapproval', id, user_id, 'create', created_at").to_sql})
     UNION ALL
-      (#{PostFlag.visible(user).select("'PostFlag', id, creator_id, 'create', created_at").to_sql})
+      (#{PostFlag.visible(user).visible_for_search(:creator, user).select("'PostFlag', id, creator_id, 'create', created_at").to_sql})
     UNION ALL
       (#{PostReplacement.visible(user).select("'PostReplacement', id, creator_id, 'create', created_at").to_sql})
     UNION ALL

@@ -71,6 +71,32 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
         get_auth user_user_actions_path(@user, limit: 1000), create(:moderator_user)
         assert_response :success
       end
+
+      context "for flags on the moderator's own uploads" do
+        setup do
+          @mod = create(:moderator_user)
+          @flagger = create(:user)
+          @own_flag = create(:post_flag, post: create(:post, uploader: @mod), creator: @flagger)
+          @other_flag = create(:post_flag, creator: @flagger)
+          @mod_flag = create(:post_flag, post: create(:post, uploader: @mod), creator: @mod, is_deletion: true)
+        end
+
+        should "not show flags by other users" do
+          get_auth user_actions_path(format: :json, search: { model_type: "PostFlag" }), @mod
+
+          assert_response :success
+          assert_not_includes(response.parsed_body.pluck("model_id"), @own_flag.id)
+          assert_includes(response.parsed_body.pluck("model_id"), @other_flag.id)
+          assert_includes(response.parsed_body.pluck("model_id"), @mod_flag.id)
+        end
+
+        should "not show flags by other users when filtering by the flagger" do
+          get_auth user_actions_path(format: :json, search: { user_id: @flagger.id, model_type: "PostFlag" }), @mod
+
+          assert_response :success
+          assert_equal([@other_flag.id], response.parsed_body.pluck("model_id"))
+        end
+      end
     end
   end
 end
