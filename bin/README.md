@@ -17,6 +17,7 @@ These scripts are specific to this project.
 | `generate-changelog` | Generate a changelog from Git commits between two refs. |
 | `generate-source-tests` | Generate skeleton parsing and extracting tests for a URL strategy. |
 | `github-print-test-results` | Parse JUnit test output and print GitHub workflow annotations and a summary. |
+| `media-bench` | Measure how long it takes to process media files like an upload does. |
 | `media-conv` | Convert media files using Danbooru's media conversion logic. |
 | `media-ls` | List properties of media files (like `ls`, but using Danbooru's media file logic). |
 | `setup` | Install Docker and Git, clone the repo, and initialize config files for a fresh install. |
