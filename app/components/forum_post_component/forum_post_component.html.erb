@@ -78,13 +78,13 @@
         <% end %>
 
         <% menu.with_item do %>
-          <%= link_to "javascript:void(0)", class: "forum-post-copy-id", "x-on:click": "Danbooru.Utility.copyToClipboard('forum ##{j forum_post.id}')" do %>
+          <%= link_to "javascript:void(0)", class: "forum-post-copy-id", "x-on:click": "$copyToClipboard('forum ##{j forum_post.id}')" do %>
             <%= hashtag_icon %> Copy ID
           <% end %>
         <% end %>
 
         <% menu.with_item do %>
-          <%= link_to "javascript:void(0)", class: "forum-post-copy-link", "x-on:click": "Danbooru.Utility.copyToClipboard('#{j forum_post_url(forum_post)}')" do %>
+          <%= link_to "javascript:void(0)", class: "forum-post-copy-link", "x-on:click": "$copyToClipboard('#{j forum_post_url(forum_post)}')" do %>
             <%= link_icon %> Copy Link
           <% end %>
         <% end %>

@@ -25,16 +25,16 @@
           <% end %>
         </p>
 
-        <div class="flex justify-center gap-4">
+        <div class="flex justify-center gap-4" x-data>
           <%= link_to user_backup_codes_path(@user, format: :txt), class: "button-outline-primary", download: "danbooru-backup-codes.txt" do %>
             <%= download_icon %> Download
           <% end %>
 
-          <%= tag.button class: "button-outline-primary", onclick: "Danbooru.Utility.printPage('#{j user_backup_codes_path(@user, format: :txt)}')" do %>
+          <%= tag.button class: "button-outline-primary", "x-on:click": "$printPage('#{j user_backup_codes_path(@user, format: :txt)}')" do %>
             <%= print_icon %> Print
           <% end %>
 
-          <%= tag.button class: "button-outline-primary", onclick: "Danbooru.Utility.copyToClipboard('#{j @backup_codes.join("\n")}')" do %>
+          <%= tag.button class: "button-outline-primary", "x-on:click": "$copyToClipboard('#{j @backup_codes.join("\n")}')" do %>
             <%= copy_icon %> Copy
           <% end %>
         </div>

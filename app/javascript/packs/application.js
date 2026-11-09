@@ -118,5 +118,9 @@ window.Danbooru = Danbooru;
 Alpine.plugin(morph);
 Alpine.plugin(persist)
 
+// Let Alpine expressions call these as `$copyToClipboard(text)` and `$printPage(url)`.
+Alpine.magic("copyToClipboard", () => Utility.copyToClipboard);
+Alpine.magic("printPage", () => Utility.printPage);
+
 $(document).on("alpine:initialized", () => { Alpine._initialized = true; });
 $(() => Alpine.start());
