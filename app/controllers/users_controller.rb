@@ -3,6 +3,7 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
 
+  before_action :requires_reauthentication, only: [:deactivate, :destroy]
   around_action :set_timeout, only: [:profile, :show]
   verify_captcha only: :create
 

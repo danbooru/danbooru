@@ -192,9 +192,47 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get "/maintenance/user/deletion"
         assert_redirected_to deactivate_users_path
       end
+
+      should "redirect to the confirm password page if the user hasn't recently authenticated" do
+        login_as(@user)
+        travel_to 2.hours.from_now do
+          get deactivate_user_path(@user)
+        end
+
+        assert_redirected_to confirm_password_session_path(url: deactivate_user_path(@user))
+      end
     end
 
     context "#destroy action" do
+      should "not delete the user if they haven't recently authenticated" do
+        login_as(@user)
+        travel_to 2.hours.from_now do
+          delete user_path(@user), params: { user: { password: "password" }}
+        end
+
+        assert_redirected_to confirm_password_session_path(url: user_path(@user))
+        assert_equal(false, @user.reload.is_deleted?)
+      end
+
+      should "not delete a user with 2FA if they haven't recently authenticated" do
+        @user = create(:user_with_2fa)
+        login_as(@user)
+        travel_to 2.hours.from_now do
+          delete user_path(@user), params: { user: { password: @user.password }}
+        end
+
+        assert_redirected_to confirm_password_session_path(url: user_path(@user))
+        assert_equal(false, @user.reload.is_deleted?)
+      end
+
+      should "delete a user with 2FA if they have recently authenticated" do
+        @user = create(:user_with_2fa)
+        delete_auth user_path(@user), @user, params: { user: { password: @user.password }}
+
+        assert_redirected_to posts_path
+        assert_equal(true, @user.reload.is_deleted?)
+      end
+
       should "delete the user when given the correct password" do
         delete_auth user_path(@user), @user, params: { user: { password: "password" }}
 
