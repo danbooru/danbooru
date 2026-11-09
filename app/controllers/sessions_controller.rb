@@ -4,6 +4,7 @@ class SessionsController < ApplicationController
   respond_to :html
 
   verify_captcha only: :create
+  skip_before_action :redirect_if_name_invalid?, only: [:confirm_password, :reauthenticate]
 
   rescue_from ActiveSupport::MessageVerifier::InvalidSignature do
     redirect_to login_path, notice: "Login expired. Login again to continue", status: 303

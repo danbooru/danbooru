@@ -8,47 +8,94 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "new action" do
+      should "redirect to the confirm password page if the user hasn't recently authenticated" do
+        login_as(@user)
+        travel_to 2.hours.from_now do
+          get new_user_name_change_request_path
+        end
+
+        assert_redirected_to confirm_password_session_path(url: new_user_name_change_request_path)
+      end
+
+      should "let a user with an invalid name confirm their password and then change their name" do
+        @user.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
+        login_as(@user)
+
+        get posts_path
+        assert_redirected_to change_name_user_path(@user)
+
+        get change_name_user_path(@user)
+        assert_redirected_to confirm_password_session_path(url: change_name_user_path(@user))
+
+        get confirm_password_session_path(url: change_name_user_path(@user))
+        assert_response :success
+
+        post reauthenticate_session_path, params: { session: { password: @user.password, url: change_name_user_path(@user) }}
+        assert_redirected_to change_name_user_path(@user)
+
+        get change_name_user_path(@user)
+        assert_response :success
+      end
+
       should "render" do
-        get_auth change_name_user_path(@user), @user
+        get_auth change_name_user_path(@user), @user, reauthenticate: true
         assert_response :success
       end
 
       should "render for the current user" do
-        get_auth new_user_name_change_request_path, @user
+        get_auth new_user_name_change_request_path, @user, reauthenticate: true
         assert_response :success
       end
 
       should "render when the current user's name is invalid" do
         @user.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
-        get_auth change_name_user_path(@user), @user
+        get_auth change_name_user_path(@user), @user, reauthenticate: true
 
         assert_response :success
       end
 
       should "escape the current user's invalid name in the error message" do
         @user.update_columns(name: "foo<bar") # rubocop:disable Rails/SkipsModelValidations
-        get_auth change_name_user_path(@user), @user
+        get_auth change_name_user_path(@user), @user, reauthenticate: true
 
         assert_response :success
         assert_includes(response.body, "Error: Name can&#39;t contain &#39;&lt;&#39;.")
       end
 
       should "render for a moderator changing another user's name" do
-        get_auth change_name_user_path(@user), create(:moderator_user)
+        get_auth change_name_user_path(@user), create(:moderator_user), reauthenticate: true
 
         assert_response :success
       end
 
       should "not render for a regular user changing another user's name" do
-        get_auth change_name_user_path(@user), create(:user)
+        get_auth change_name_user_path(@user), create(:user), reauthenticate: true
 
         assert_response 403
       end
     end
 
     context "create action" do
+      should "redirect to the confirm password page if the user hasn't recently authenticated" do
+        login_as(@user)
+        travel_to 2.hours.from_now do
+          post user_name_change_requests_path, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
+        end
+
+        assert_redirected_to confirm_password_session_path(url: user_name_change_requests_path)
+        assert_not_equal("zun", @user.reload.name)
+      end
+
+      should "redirect to the confirm password page for a request using an API key" do
+        api_key = create(:api_key, user: @user)
+        post user_name_change_requests_path, as: :json, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}, headers: { HTTP_AUTHORIZATION: "Basic #{::Base64.strict_encode64("#{@user.name}:#{api_key.key}")}" }
+
+        assert_redirected_to confirm_password_session_path(url: user_name_change_requests_path)
+        assert_not_equal("zun", @user.reload.name)
+      end
+
       should "work for a user changing their own name" do
-        post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_redirected_to @user
         assert_equal("zun", @user.reload.name)
@@ -60,7 +107,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
       should "work for a moderator changing a regular user's name" do
         @user = create(:user, name: "bkub")
         @mod = create(:moderator_user)
-        post_auth user_name_change_requests_path, @mod, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, @mod, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_redirected_to @user
         assert_equal("zun", @user.reload.name)
@@ -77,7 +124,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail if the new name is invalid" do
         assert_no_changes(-> { @user.reload.name }) do
-          post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { user_id: @user.id, desired_name: "foo__bar" }}
+          post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { user_id: @user.id, desired_name: "foo__bar" }}, reauthenticate: true
 
           assert_response :success
         end
@@ -85,7 +132,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail for a regular user trying to change another user's name" do
         @user = create(:user, name: "bkub")
-        post_auth user_name_change_requests_path, create(:builder_user), params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, create(:builder_user), params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_response 403
         assert_equal("bkub", @user.reload.name)
@@ -95,7 +142,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         @user = create(:user, name: "bkub")
         @user.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
         @another_user = create(:builder_user, name: "not_zun")
-        post_auth user_name_change_requests_path, @another_user, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, @another_user, params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_response 403
         assert_equal("foo__bar", @user.reload.name)
@@ -104,7 +151,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail for a moderator trying to change the name of someone above Builder level" do
         @user = create(:moderator_user, name: "bob")
-        post_auth user_name_change_requests_path, create(:moderator_user), params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, create(:moderator_user), params: { user_name_change_request: { user_id: @user.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_response 403
         assert_equal("bob", @user.reload.name)
@@ -112,7 +159,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail for a banned user trying to change their own name" do
         @banned = create(:banned_user, name: "sockpuppet")
-        post_auth user_name_change_requests_path, @banned, params: { user_name_change_request: { user_id: @banned.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, @banned, params: { user_name_change_request: { user_id: @banned.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_response 403
         assert_equal("sockpuppet", @banned.reload.name)
@@ -120,7 +167,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail for a restricted user trying to change their own name" do
         @restricted = create(:restricted_user, name: "sockpuppet")
-        post_auth user_name_change_requests_path, @restricted, params: { user_name_change_request: { user_id: @restricted.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, @restricted, params: { user_name_change_request: { user_id: @restricted.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_response 403
         assert_equal("sockpuppet", @restricted.reload.name)
@@ -129,7 +176,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
       should "allow a banned user with an invalid name to change their own name" do
         @banned = create(:banned_user, name: "sockpuppet")
         @banned.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
-        post_auth user_name_change_requests_path, @banned, params: { user_name_change_request: { user_id: @banned.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, @banned, params: { user_name_change_request: { user_id: @banned.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_redirected_to @banned
         assert_equal("zun", @banned.reload.name)
@@ -138,7 +185,7 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
       should "allow a restricted user with an invalid name to change their own name" do
         @restricted = create(:restricted_user, name: "sockpuppet")
         @restricted.update_columns(name: "foo__bar") # rubocop:disable Rails/SkipsModelValidations
-        post_auth user_name_change_requests_path, @restricted, params: { user_name_change_request: { user_id: @restricted.id, desired_name: "zun" }}
+        post_auth user_name_change_requests_path, @restricted, params: { user_name_change_request: { user_id: @restricted.id, desired_name: "zun" }}, reauthenticate: true
 
         assert_redirected_to @restricted
         assert_equal("zun", @restricted.reload.name)

@@ -4,6 +4,7 @@ class UserNameChangeRequestsController < ApplicationController
   respond_to :html, :json, :xml
 
   skip_before_action :redirect_if_name_invalid?
+  before_action :requires_reauthentication, only: [:new, :create]
 
   def index
     @change_requests = authorize UserNameChangeRequest.visible(CurrentUser.user).paginated_search(params)
