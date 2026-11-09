@@ -37,6 +37,14 @@ class ArtistURLTest < ActiveSupport::TestCase
       # should_not allow_value("https://foo@gmail.com").for(:url)
     end
 
+    should "not parse URLs that are too long" do
+      Addressable::URI.expects(:parse).never
+      Addressable::URI.expects(:heuristic_parse).never
+
+      artist_url = build(:artist_url, url: "https://example.com/#{"a" * 1_000_000}")
+      assert_equal(false, artist_url.valid?)
+    end
+
     context "when normalizing URLs" do
       should normalize_attribute(:url).from("example.com").to("https://example.com")
       should normalize_attribute(:url).from("http://example.com").to("http://example.com")

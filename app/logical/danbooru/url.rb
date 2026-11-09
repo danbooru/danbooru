@@ -33,6 +33,9 @@ module Danbooru
 
     class Error < StandardError; end
 
+    # Longer URLs are rejected before parsing to avoid DoS attacks on the URL parser.
+    MAX_LENGTH = 2000
+
     # @return [String] The original URL as a string.
     attr_reader :original_url, :url
 
@@ -48,7 +51,9 @@ module Danbooru
     # @param schemes [Array<String>] The list of allowed URL schemes.
     def initialize(url, schemes: %w[http https])
       @original_url = url.to_s
-      @url = Addressable::URI.heuristic_parse(original_url, scheme: "https")
+      raise Error, "URL is too long (maximum is #{MAX_LENGTH} characters)" if original_url.length > MAX_LENGTH
+
+      @url =Addressable::URI.heuristic_parse(original_url, scheme: "https")
 
       @url.authority = @url.normalized_authority
 
@@ -110,6 +115,8 @@ module Danbooru
     # @param base_url [String, nil] The base URL to resolve relative URLs against. If base URL is "https://example.com", then "/path" will become "https://example.com/path".
     # @return [String, nil] The URL in normalized form, or nil if the input string is not a valid URL.
     def self.normalize(url, base_url: nil)
+      return nil if url.length > MAX_LENGTH
+
       url = "https:#{url}" if url.starts_with?("//")
       url = Addressable::URI.join(base_url, url).to_s if base_url.present? && url.starts_with?("/")
 

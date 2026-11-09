@@ -69,7 +69,7 @@ class Source::Extractor::Piapro < Source::Extractor
     DText.from_html(artist_commentary_desc, base_url: "https://piapro.jp") do |element|
       # <a href="/jump/?url=http%3A%2F%2Fbit.ly%2FobhXVP" target="_blank">http://bit.ly/obhXVP</a>
       if element.name == "a" && element["href"]&.starts_with?("/jump")
-        element["href"] = Addressable::URI.parse(element["href"]).query_values["url"] || element["href"]
+        element["href"] = Danbooru::URL.parse(Danbooru::URL.normalize(element["href"], base_url: "https://piapro.jp"))&.params&.dig(:url) || element["href"]
       end
     end
   end

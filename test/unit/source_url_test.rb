@@ -33,6 +33,15 @@ class SourceURLTest < ActiveSupport::TestCase
         assert_equal("https://example.com/東方(%3F).png", Source::URL.parse("https://example.com/%E6%9D%B1%E6%96%B9(%3F).png").to_normalized_s)
       end
 
+      should "not parse URLs that are too long" do
+        Addressable::URI.expects(:heuristic_parse).never
+
+        assert_nil(Source::URL.parse("https://example.com/#{"a" * 2000}"))
+        assert_nil(Danbooru::URL.parse("https://example.com/#{"a" * 2000}"))
+        assert_nil(Danbooru::URL.normalize("/#{"a" * 2000}", base_url: "https://example.com"))
+        assert_raises(Danbooru::URL::Error) { Danbooru::URL.parse!("https://example.com/#{"a" * 2000}") }
+      end
+
       should "parse URLs containing invalid UTF-8" do
         assert_equal("/20140924_45/dnflgmldus_1411489948549jC2ma_PNG/%BD%C3%C1%EE%C7%C3%B7%B9%BE%EE.png", Source::URL.parse("https://cafeptthumb-phinf.pstatic.net/20140924_45/dnflgmldus_1411489948549jC2ma_PNG/%BD%C3%C1%EE%C7%C3%B7%B9%BE%EE.png?type=w1600")&.path)
       end

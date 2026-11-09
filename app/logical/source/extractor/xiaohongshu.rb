@@ -64,7 +64,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
       case element.name
       in "a" if element.classes.include?("tag")
         href = CGI.unescape(element[:href].to_s) # double-encoded
-        tag = Addressable::URI.parse(href).query_values["keyword"].to_s
+        tag = Danbooru::URL.parse(Danbooru::URL.normalize(href, base_url: "https://www.xiaohongshu.com"))&.params&.dig(:keyword).to_s
         element[:href] = "https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(tag)}" if tag.present?
       else
         nil

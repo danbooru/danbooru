@@ -119,10 +119,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def validate_url_format
-    uri = Addressable::URI.parse(url)
-    Source::URL.parse!(url)
-
-    if !uri.host&.include?(".")
+    if Source::URL.parse!(url).host.exclude?(".")
       errors.add(:url, "'#{url}' is not a valid URL")
     end
   rescue StandardError
