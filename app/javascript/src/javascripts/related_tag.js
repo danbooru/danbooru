@@ -1,5 +1,5 @@
 import SourceDataComponent from "./source_data_component.js";
-import { splitWords } from './utility';
+import Utility, { splitWords } from './utility';
 import Alpine from 'alpinejs';
 
 Alpine.store("relatedTags", {
@@ -31,7 +31,7 @@ RelatedTag.initialize_all = function() {
 
 RelatedTag.initialize_recent_and_favorite_tags = function(event) {
   let media_asset_id = $("#related-tags-container").attr("data-media-asset-id");
-  $.get("/related_tag.js", { user_tags: true, media_asset_id: media_asset_id }).done(script => $.globalEval(script));
+  $.get("/related_tag.js", { user_tags: true, media_asset_id: media_asset_id }).done(script => $.globalEval(script, { nonce: Utility.meta("csp-nonce") }));
 }
 
 RelatedTag.update_related_tags = async function(event) {
@@ -39,7 +39,7 @@ RelatedTag.update_related_tags = async function(event) {
     event.preventDefault();
     Alpine.store("relatedTags").loading = true;
     let script = await $.get("/related_tag.js", { query: RelatedTag.current_tag().trim(), limit: RelatedTag.MAX_RELATED_TAGS });
-    $.globalEval(script);
+    $.globalEval(script, { nonce: Utility.meta("csp-nonce") });
     RelatedTag.show();
     Alpine.store("relatedTags").loading = false;
   }

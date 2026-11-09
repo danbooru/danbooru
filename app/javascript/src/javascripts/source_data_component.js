@@ -1,3 +1,5 @@
+import Utility from "./utility";
+
 class SourceDataComponent {
   static initialize() {
     $(document).on("click.danbooru", ".source-data-fetch", SourceDataComponent.fetchData);
@@ -12,7 +14,7 @@ class SourceDataComponent {
     if (/^https?:\/\//.test(url)) {
       $(".source-data").addClass("loading");
       let script = await $.get("/source.js", { url: url, ref: ref });
-      $.globalEval(script);
+      $.globalEval(script, { nonce: Utility.meta("csp-nonce") });
       $(".source-data").removeClass("loading");
     }
   }

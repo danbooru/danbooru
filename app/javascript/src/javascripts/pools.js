@@ -1,3 +1,4 @@
+import Utility from "./utility";
 require("jquery-ui/ui/widgets/sortable");
 require("jquery-ui/themes/base/sortable.css");
 
@@ -33,7 +34,7 @@ Pool.initialize_simple_edit = function() {
       type: "put",
       url: e.target.action,
       data: $("#sortable").sortable("serialize") + "&" + $(e.target).serialize()
-    }).done(script => $.globalEval(script));
+    }).done(script => $.globalEval(script, { nonce: Utility.meta("csp-nonce") }));
     e.preventDefault();
   });
 }

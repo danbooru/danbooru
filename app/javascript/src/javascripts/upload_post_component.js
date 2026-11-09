@@ -1,6 +1,6 @@
 import AlpineCookieStorage from "./alpine_cookie_storage";
 import Draggable from "./draggable";
-import { clamp } from "./utility";
+import Utility, { clamp } from "./utility";
 
 export default class UploadPostComponent {
   IQDB_LIMIT = 5;
@@ -53,6 +53,6 @@ export default class UploadPostComponent {
         similarity: this.IQDB_MIN_SIMILARITY,
         high_similarity: this.IQDB_HIGH_SIMILARITY
       }
-    }).done(script => $.globalEval(script));
+    }).done(script => $.globalEval(script, { nonce: Utility.meta("csp-nonce") }));
   }
 }

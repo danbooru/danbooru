@@ -25,7 +25,7 @@ FavoriteGroup.add_post = function(e) {
 
   e.preventDefault();
   let favgroup_id = $(e.currentTarget).data("favgroup-id");
-  $.ajax({ type: "PUT", url: `/favorite_groups/${favgroup_id}/add_post.js`, data: { post_id: Utility.meta("post-id") } }).done(script => $.globalEval(script));
+  $.ajax({ type: "PUT", url: `/favorite_groups/${favgroup_id}/add_post.js`, data: { post_id: Utility.meta("post-id") } }).done(script => $.globalEval(script, { nonce: Utility.meta("csp-nonce") }));
 }
 
 FavoriteGroup.open_favgroup_dialog = function(e) {
