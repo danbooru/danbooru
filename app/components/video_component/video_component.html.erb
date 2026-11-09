@@ -7,10 +7,10 @@
             "data-start-time": start_time.to_f,
             "data-has-sound": media_asset.has_sound?,
             "x-bind:data-state": "player.state",
-            "x-bind:data-paused": "String(player.paused)",
-            "x-bind:data-muted": "String(player.muted)",
-            "x-bind:data-volume": "String(player.volume)",
-            "x-bind:data-playback-rate": "String(player.playbackRate)",
+            "x-bind:data-paused": "player.paused.toString()",
+            "x-bind:data-muted": "player.muted.toString()",
+            "x-bind:data-volume": "player.volume.toString()",
+            "x-bind:data-playback-rate": "player.playbackRate.toString()",
             "x-data": "{ player: new Danbooru.VideoPlayer($el) }",
             "x-init": "player.initialize()",
             **html_options.except(:class) do %>
@@ -42,7 +42,7 @@
 
     <span class="flex gap-1 text-sm select-none whitespace-nowrap @max-270px:hidden">
       <span x-text="player.formatTime(player.currentTime)">0:00</span> /
-      <span x-text="player.formatTime(Math.max(player.duration, 1))">0:01</span>
+      <span x-text="player.formatTime(player.duration > 1 ? player.duration : 1)">0:01</span>
     </span>
 
     <% if media_asset.has_sound? %>

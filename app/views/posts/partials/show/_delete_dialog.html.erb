@@ -9,7 +9,7 @@
         <%= f.label :reason, "Reason" %>
 
         <span class="dtext-input-counter-text text-xs pointer-events-none select-none"
-              x-text="`${length}/<%= PostFlag::MAX_LENGTH %>`"
+              x-text="length + '/<%= PostFlag::MAX_LENGTH %>'"
               x-bind:class="{ 'text-error': length > <%= PostFlag::MAX_LENGTH %> }">0/<%= PostFlag::MAX_LENGTH %></span>
       </div>
 

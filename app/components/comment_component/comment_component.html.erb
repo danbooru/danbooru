@@ -1,6 +1,6 @@
 <article id="comment_<%= comment.id %>" class="comment message <%= classes %>"
           x-data="{ showThresholded: false }"
-          x-bind:data-show-thresholded="String(showThresholded)"
+          x-bind:data-show-thresholded="showThresholded.toString()"
           data-id="<%= comment.id %>"
           data-post-id="<%= comment.post_id %>"
           data-creator-id="<%= comment.creator_id if can_see_creator? %>"
