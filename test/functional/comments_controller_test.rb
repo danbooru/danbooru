@@ -313,6 +313,32 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not allow commenting on banned posts" do
+        @post.update!(is_banned: true)
+
+        assert_no_difference("Comment.count") do
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" }}
+        end
+        assert_response 403
+      end
+
+      should "not allow commenting on taken down posts" do
+        @post.update!(is_taken_down: true)
+
+        assert_no_difference("Comment.count") do
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" }}
+        end
+        assert_response 403
+      end
+
+      should "allow approvers to comment on banned posts" do
+        @post.update!(is_banned: true)
+
+        assert_difference("Comment.count", 1) do
+          post_auth comments_path, create(:approver), params: { comment: { post_id: @post.id, body: "blah" }}
+        end
+      end
+
       should "keep the comment text when the comment is invalid" do
         body = "too many images\n!post ##{@post.id}\n!post ##{@post.id}"
 

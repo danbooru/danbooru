@@ -2,11 +2,11 @@
 
 class ArtistCommentaryPolicy < ApplicationPolicy
   def create_or_update?
-    unbanned?
+    unbanned? && !record.post&.banblocked?(user)
   end
 
   def revert?
-    unbanned?
+    create_or_update?
   end
 
   def rate_limit_for_write(**_options)

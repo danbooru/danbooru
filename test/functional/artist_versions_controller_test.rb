@@ -41,6 +41,12 @@ class ArtistVersionsControllerTest < ActionDispatch::IntegrationTest
         get artist_version_path(@artist.versions.first), as: :json
         assert_response :success
       end
+
+      should "not show versions of banned artists to anonymous users" do
+        as(@builder) { @artist.update!(is_banned: true) }
+        get artist_version_path(@artist.versions.first), as: :json
+        assert_response 404
+      end
     end
   end
 end

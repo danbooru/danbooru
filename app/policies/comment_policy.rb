@@ -2,7 +2,7 @@
 
 class CommentPolicy < ApplicationPolicy
   def create?
-    unbanned?
+    unbanned? && !record.post&.banblocked?(user)
   end
 
   def update?

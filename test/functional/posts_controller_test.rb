@@ -1394,6 +1394,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("lowres partially_translated translated", @dst.tag_string)
       end
 
+      should "copy notes from a banned post" do
+        @src.update!(is_banned: true)
+        put_auth copy_notes_post_path(@src), @user, params: { other_post_id: @dst.id }
+
+        assert_response :success
+        assert_equal(1, @dst.reload.notes.active.length)
+      end
+
       should "rescale notes" do
         put_auth copy_notes_post_path(@src), @user, params: { other_post_id: @dst.id }
         assert_response :success

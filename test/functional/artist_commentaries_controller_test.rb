@@ -57,6 +57,23 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
         assert_equal("foo", @commentary.reload.original_title)
       end
 
+      should "not create commentary on a banned post" do
+        post = create(:post, is_banned: true)
+
+        assert_no_difference("ArtistCommentary.count") do
+          put_auth create_or_update_artist_commentaries_path(artist_commentary: { original_title: "foo", post_id: post.id }, format: "json"), @user
+        end
+        assert_response 403
+      end
+
+      should "not update commentary on a banned post" do
+        @commentary.post.update!(is_banned: true)
+        put_auth create_or_update_artist_commentaries_path(artist_commentary: { post_id: @commentary.post_id, original_title: "foo" }, format: "json"), @user
+
+        assert_response 403
+        assert_equal("ot1", @commentary.reload.original_title)
+      end
+
       should "work for /posts/:post_id/artist_commentary/create_or_update" do
         assert_difference("ArtistCommentary.count", 1) do
           put_auth create_or_update_post_artist_commentary_path(post_id: create(:post).id, artist_commentary: { original_title: "foo" }), @user, xhr: true

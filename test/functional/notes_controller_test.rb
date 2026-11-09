@@ -46,6 +46,14 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "not create a note on a banned post" do
+        post = create(:post, is_banned: true)
+        post_auth notes_path, @user, params: { note: { x: 0, y: 0, width: 10, height: 10, body: "abc", post_id: post.id }, format: :json }
+
+        assert_response 403
+        assert_equal(0, post.notes.count)
+      end
+
       should "not create a note on a post that cannot have notes" do
         post = create(:post, file_ext: "webm")
         post_auth notes_path, @user, params: { note: { x: 0, y: 0, width: 10, height: 10, body: "abc", post_id: post.id }, format: :json }
@@ -60,6 +68,14 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
         put_auth note_path(@note), @user, params: { note: { body: "xyz" }}
         assert_redirected_to @note
         assert_equal("xyz", @note.reload.body)
+      end
+
+      should "not update a note on a banned post" do
+        @note.post.update!(is_banned: true)
+        put_auth note_path(@note), @user, params: { note: { body: "xyz" }, format: :json }
+
+        assert_response 403
+        assert_equal("000", @note.reload.body)
       end
 
       should "not allow changing the post id to another post" do

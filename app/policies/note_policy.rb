@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 class NotePolicy < ApplicationPolicy
+  def create?
+    unbanned? && !record.post&.banblocked?(user)
+  end
+
+  def update?
+    create?
+  end
+
   def preview?
     create?
   end

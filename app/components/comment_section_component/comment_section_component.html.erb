@@ -12,7 +12,7 @@
   </div>
 
   <div class="new-comment">
-    <% if policy(Comment).create? %>
+    <% if policy(Comment.new(post: post)).create? %>
       <p><%= link_to "Leave a comment", new_comment_path(comment: { post_id: post.id }), class: "expand-comment-response" %></p>
       <%= render "comments/form", comment: post.comments.new, hidden: true %>
     <% elsif current_user.is_anonymous? %>
