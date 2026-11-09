@@ -36,6 +36,8 @@ $(function() {
 
   $("meta[name=reportbooru-beacon]").each((i, meta) => navigator.sendBeacon(meta.content, new URLSearchParams(JSON.parse(meta.dataset.params))));
 
+  $("form[data-autosubmit]").each((i, form) => form.submit());
+
   if (location.hostname.endsWith("danbooru.me")) {
     location.hostname = "danbooru.donmai.us";
   }

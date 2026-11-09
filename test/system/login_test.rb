@@ -23,4 +23,14 @@ class LoginChromeTest < ChromeSystemTestCase
       end
     end
   end
+
+  context "Logout page:" do
+    should "log the user out" do
+      fast_signin create(:user)
+      visit logout_path
+
+      assert_notice "You are now logged out"
+      assert_link "Login"
+    end
+  end
 end
