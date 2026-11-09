@@ -79,8 +79,9 @@ class PostReplacementProcessor
     raise Error, "#{source_url} has multiple images. Enter the URL of a single image" if image_urls.size > 1
     raise Error, "#{source_url} has no images" if image_urls.size == 0
 
+    # Download with the image URL's own extractor so the page site's credentials aren't sent to other sites.
     image_url = image_urls.first
-    file = extractor.download_file!(image_url)
+    file = Source::Extractor.find(image_url, source_url).download_file!(image_url)
 
     [file, image_url]
   end
