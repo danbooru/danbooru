@@ -10,6 +10,7 @@
   <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: main_app.opensearch_url(format: :xml, version: 2), title: "Search posts" %>
 
   <%= csrf_meta_tag %>
+  <%= csp_meta_tag %>
   <% unless CurrentUser.enable_desktop_mode? %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
@@ -51,7 +52,7 @@
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
   <% if CurrentUser.user.theme == "auto" %>
-    <script type="text/javascript">
+    <script nonce="<%= content_security_policy_nonce %>">
       var darkMode = matchMedia("(prefers-color-scheme: dark)");
 
       function applySystemTheme(darkMode) {

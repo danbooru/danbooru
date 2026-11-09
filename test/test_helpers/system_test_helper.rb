@@ -31,6 +31,41 @@ module SystemTestHelper
     end
   end
 
+  # Use Cloudflare Turnstile's test keys for a visible captcha that always passes. Call this before `visit`.
+  # @see https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+  def stub_captcha
+    Danbooru.config.stubs(:captcha_site_key).returns("1x00000000000000000000AA")
+    Danbooru.config.stubs(:captcha_secret_key).returns("1x0000000000000000000000000000000AA")
+  end
+
+  # Wait for the captcha on the current page to be solved. Turnstile fills in a hidden field with a token when it's solved.
+  def wait_for_captcha
+    token = find("input[name='cf-turnstile-response']", visible: false)
+    page.document.synchronize { token.value.present? or raise Capybara::ExpectationNotMet, "The captcha wasn't solved" }
+  end
+
+  # Record Content-Security-Policy violations on every page visited after this. Call this before `visit`.
+  def record_csp_violations
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.add_init_script(script: <<~JS)
+        window.__cspViolations = [];
+        document.addEventListener("securitypolicyviolation", (e) => {
+          window.__cspViolations.push(`${e.effectiveDirective} blocked ${e.blockedURI}`);
+        });
+      JS
+    end
+  end
+
+  # Assert the current page hasn't violated its Content-Security-Policy. Violations are reported asynchronously, so
+  # call this after waiting for whatever might be blocked to load. This requires `record_csp_violations` above to
+  # have been run before visiting the page.
+  def assert_no_csp_violations
+    violations = page.evaluate_script("window.__cspViolations")
+
+    assert_not_nil(violations, "CSP violations weren't recorded; call `record_csp_violations` before visiting the page")
+    assert_equal([], violations, "The page violated its Content-Security-Policy")
+  end
+
   # @param text [String, Regexp, nil] exact string to match, a pattern to match against, or nil to just check the notice is showing.
   def assert_notice(text = nil)
     return assert_selector "#notice span.prose" if text.nil?

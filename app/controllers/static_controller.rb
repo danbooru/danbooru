@@ -39,6 +39,9 @@ class StaticController < ApplicationController
   def site_map
   end
 
+  def csp_test
+  end
+
   def sitemap_index
     @sitemap = params[:sitemap]
     @limit = 1000

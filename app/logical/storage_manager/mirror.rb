@@ -28,4 +28,8 @@ class StorageManager::Mirror < StorageManager
   def file_url(path)
     services.first.file_url(path)
   end
+
+  def base_url
+    services.first.base_url
+  end
 end

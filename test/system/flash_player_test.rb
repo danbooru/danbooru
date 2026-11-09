@@ -17,5 +17,18 @@ class FlashPlayerChromeTest < ChromeSystemTestCase
         page.document.synchronize { evaluate_script("document.querySelector('ruffle-player').readyState") == 2 or raise Capybara::ExpectationNotMet }
       end
     end
+
+    should "play the file without violating the Content-Security-Policy" do
+      record_csp_violations
+      visit post_path(@post)
+
+      # The srcdoc iframe inherits the page's policy and reports its own violations, so check both.
+      within_frame(find("iframe.flash-player")) do
+        page.document.synchronize { evaluate_script("document.querySelector('ruffle-player')?.readyState") == 2 or raise Capybara::ExpectationNotMet }
+        assert_no_csp_violations
+      end
+
+      assert_no_csp_violations
+    end
   end
 end

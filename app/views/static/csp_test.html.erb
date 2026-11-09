@@ -1,0 +1,78 @@
+<%# A page for testing the Content-Security-Policy. Used by test/system/content_security_policy_test.rb. %>
+<%# Everything from blocked.example.com should be blocked, and everything else should be allowed. %>
+<% page_title "Content-Security-Policy Test" %>
+<% storage_url = Danbooru.config.storage_manager.file_url("csp-test") %>
+
+<% content_for(:html_header) do %>
+  <base href="https://blocked.example.com/">
+<% end %>
+
+<script>
+  window.cspTest = { allowed: { inlineScript: true }, done: false };
+</script>
+
+<style>
+  @font-face { font-family: "csp-test-blocked-font"; src: url("https://blocked.example.com/font.woff2"); }
+</style>
+
+<div id="c-static">
+  <div id="a-csp-test" class="prose">
+    <h1>Content-Security-Policy Test</h1>
+
+    <h2>Allowed</h2>
+    <img src="/favicon.svg" width="16" height="16">
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onload="cspTest.allowed.inlineEventHandler = true">
+    <img src="<%= storage_url %>.png">
+    <video src="<%= storage_url %>.mp4"></video>
+    <iframe src="/robots.txt"></iframe>
+    <iframe src="https://challenges.cloudflare.com/csp-test"></iframe>
+    <script src="https://challenges.cloudflare.com/csp-test.js"></script>
+    <script src="https://static.cloudflareinsights.com/csp-test.js"></script>
+    <p style="font-style: italic">An inline style attribute.</p>
+    <p><a href="javascript:void(cspTest.allowed.javascriptURL = true)">javascript: link</a></p>
+
+    <h2>Blocked</h2>
+    <img src="https://blocked.example.com/image.png">
+    <video src="https://blocked.example.com/video.mp4"></video>
+    <script src="https://blocked.example.com/script.js"></script>
+    <link rel="stylesheet" href="https://blocked.example.com/style.css">
+    <p style="font-family: csp-test-blocked-font">An external font.</p>
+    <iframe src="https://blocked.example.com/frame"></iframe>
+    <object data="https://blocked.example.com/object.swf" type="application/x-shockwave-flash"></object>
+  </div>
+</div>
+
+<script>
+  (async () => {
+    let probe = async (name, fn) => {
+      try {
+        cspTest.allowed[name] = await fn();
+      } catch (e) {
+        cspTest.allowed[name] = false;
+      }
+    };
+
+    await probe("eval", () => eval("true"));
+    await probe("newFunction", () => new Function("return true")());
+    await probe("wasm", async () => (await WebAssembly.compile(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]))) instanceof WebAssembly.Module);
+
+    // Allowed.
+    let blobImage = document.createElement("img");
+    blobImage.src = URL.createObjectURL(new Blob(["<svg xmlns='http://www.w3.org/2000/svg'/>"], { type: "image/svg+xml" }));
+    document.body.append(blobImage);
+
+    await Promise.allSettled([
+      fetch("/robots.txt"),
+      fetch("<%= j storage_url %>.json"),
+      fetch("<%= j Danbooru.config.reportbooru_server %>/csp-test"),
+      fetch("https://cloudflareinsights.com/csp-test"),
+      fetch("https://blocked.example.com/fetch"), // Blocked.
+    ]);
+
+    // Blocked.
+    new WebSocket("wss://blocked.example.com/websocket");
+    try { new Worker(URL.createObjectURL(new Blob([""], { type: "text/javascript" }))); } catch (e) {}
+
+    cspTest.done = true;
+  })();
+</script>

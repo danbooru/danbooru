@@ -88,6 +88,7 @@ Rails.application.routes.draw do
       get :posts
     end
   end
+  resources :csp_reports, only: [:create]
   resources :jobs, only: [:index, :destroy] do
     member do
       put :run
@@ -365,6 +366,7 @@ Rails.application.routes.draw do
   get "/static/colors" => "static#colors", :as => "colors"
   get "/static/components" => "static#components", :as => "components"
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
+  get "/static/csp_test" => "static#csp_test", :as => "csp_test" if Rails.env.local? # Used by test/system/content_security_policy_test.rb
   get "/static/terms_of_service", to: redirect("/terms_of_service")
   get "/static/contact", to: redirect("/contact")
   get "/user_upgrade/new", to: redirect("/upgrade")
