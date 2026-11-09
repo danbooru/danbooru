@@ -11,14 +11,9 @@ module PostsHelper
     params[:tags] =~ /order:rank/ || params[:action] =~ /searches|viewed/
   end
 
-  def missed_post_search_count_js(tags)
-    sig = generate_reportbooru_signature(tags)
-    render "posts/partials/index/missed_search_count", sig: sig
-  end
-
-  def post_search_count_js(tags)
-    sig = generate_reportbooru_signature("ps-#{tags}")
-    render "posts/partials/index/search_count", sig: sig
+  # A <meta> tag that tells Javascript to send a request to Reportbooru when the page is loaded.
+  def reportbooru_beacon_tag(path, **params)
+    tag.meta name: "reportbooru-beacon", content: "#{Danbooru.config.reportbooru_server}/#{path}", data: { params: params.to_json }
   end
 
   def generate_reportbooru_signature(value)

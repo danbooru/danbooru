@@ -225,15 +225,15 @@
   <%= render "posts/partials/common/secondary_links" %>
 <% end %>
 
-<% if reportbooru_enabled? && @post_set.post_query.is_simple_tag? && @post_set.current_page == 1 %>
-  <% if @post_set.post_count == 0 %>
-    <%= missed_post_search_count_js(@post_set.post_query.to_s) %>
-  <% else %>
-    <%= post_search_count_js(@post_set.post_query.to_s) %>
-  <% end %>
-<% end %>
-
 <% content_for(:html_header) do %>
+  <% if reportbooru_enabled? && @post_set.post_query.is_simple_tag? && @post_set.current_page == 1 %>
+    <% if @post_set.post_count == 0 %>
+      <%= reportbooru_beacon_tag("missed_searches", sig: generate_reportbooru_signature(@post_set.post_query.to_s)) %>
+    <% else %>
+      <%= reportbooru_beacon_tag("post_searches", sig: generate_reportbooru_signature("ps-#{@post_set.post_query}")) %>
+    <% end %>
+  <% end %>
+
   <% if @post_set.post_query.is_empty_search? %>
     <% if Danbooru.config.site_tagline.present? %>
       <% page_title "#{Danbooru.config.app_name}: #{Danbooru.config.site_tagline}", suffix: nil %>

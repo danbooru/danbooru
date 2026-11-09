@@ -381,17 +381,11 @@
   </div>
 <% end %>
 
-<% if reportbooru_enabled? %>
-  <script type="text/javascript">
-    $(function() {
-      $.post("<%= Danbooru.config.reportbooru_server %>/post_views", {
-        msg: "<%= generate_reportbooru_signature(params[:id]) %>"
-      });
-    });
-  </script>
-<% end %>
-
 <% content_for(:html_header) do %>
+  <% if reportbooru_enabled? %>
+    <%= reportbooru_beacon_tag("post_views", msg: generate_reportbooru_signature(params[:id])) %>
+  <% end %>
+
   <meta name="post-id" content="<%= @post.id %>">
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
 

@@ -34,6 +34,8 @@ $(function() {
     }
   });
 
+  $("meta[name=reportbooru-beacon]").each((i, meta) => navigator.sendBeacon(meta.content, new URLSearchParams(JSON.parse(meta.dataset.params))));
+
   if (location.hostname.endsWith("danbooru.me")) {
     location.hostname = "danbooru.donmai.us";
   }
