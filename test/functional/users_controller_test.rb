@@ -164,22 +164,22 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "#deactivate action" do
       should "render /users/:id/deactivate for the current user" do
-        get_auth deactivate_user_path(@user), @user
+        get_auth deactivate_user_path(@user), @user, reauthenticate: true
         assert_response :success
       end
 
       should "render /users/:id/deactivate for the Owner user" do
-        get_auth deactivate_user_path(@user), create(:owner)
+        get_auth deactivate_user_path(@user), create(:owner), reauthenticate: true
         assert_response :success
       end
 
       should "not render /users/:id/deactivate for a different user" do
-        get_auth deactivate_user_path(@user), create(:user)
+        get_auth deactivate_user_path(@user), create(:user), reauthenticate: true
         assert_response 403
       end
 
       should "render /users/deactivate for a logged-in user" do
-        get_auth deactivate_users_path, @user
+        get_auth deactivate_users_path, @user, reauthenticate: true
         assert_response :success
       end
 
@@ -205,10 +205,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "#destroy action" do
       should "not delete the user if they haven't recently authenticated" do
-        login_as(@user)
-        travel_to 2.hours.from_now do
-          delete user_path(@user), params: { user: { password: "password" }}
-        end
+        delete_auth user_path(@user), @user, params: { user: { password: "password" }}
 
         assert_redirected_to confirm_password_session_path(url: user_path(@user))
         assert_equal(false, @user.reload.is_deleted?)
@@ -216,10 +213,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not delete a user with 2FA if they haven't recently authenticated" do
         @user = create(:user_with_2fa)
-        login_as(@user)
-        travel_to 2.hours.from_now do
-          delete user_path(@user), params: { user: { password: @user.password }}
-        end
+        delete_auth user_path(@user), @user, params: { user: { password: @user.password }}
 
         assert_redirected_to confirm_password_session_path(url: user_path(@user))
         assert_equal(false, @user.reload.is_deleted?)
@@ -227,14 +221,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "delete a user with 2FA if they have recently authenticated" do
         @user = create(:user_with_2fa)
-        delete_auth user_path(@user), @user, params: { user: { password: @user.password }}
+        delete_auth user_path(@user), @user, params: { user: { password: @user.password }}, reauthenticate: true
 
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
       end
 
       should "delete the user when given the correct password" do
-        delete_auth user_path(@user), @user, params: { user: { password: "password" }}
+        delete_auth user_path(@user), @user, params: { user: { password: "password" }}, reauthenticate: true
 
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
@@ -247,7 +241,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not delete the user when given an incorrect password" do
-        delete_auth user_path(@user), @user, params: { user: { password: "hunter2" }}
+        delete_auth user_path(@user), @user, params: { user: { password: "hunter2" }}, reauthenticate: true
 
         assert_redirected_to deactivate_user_path(@user)
         assert_equal(false, @user.reload.is_deleted?)
@@ -258,7 +252,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "allow the Owner to delete other users" do
-        delete_auth user_path(@user), create(:owner)
+        delete_auth user_path(@user), create(:owner), reauthenticate: true
 
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
@@ -271,7 +265,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow users to delete other users" do
-        delete_auth user_path(@user), create(:user), params: { user: { password: "password" }}
+        delete_auth user_path(@user), create(:user), params: { user: { password: "password" }}, reauthenticate: true
 
         assert_response 403
       end

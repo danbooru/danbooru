@@ -152,27 +152,28 @@ class ActionDispatch::IntegrationTest
   register_encoder :atom, response_parser: ->(body) { Nokogiri.XML(body) }
   register_encoder :html, response_parser: ->(body) { Nokogiri.HTML5(body) }
 
-  def login_as(user)
+  # Log in as the user. If `reauthenticate` is true, also confirm their password (and 2FA code) so they can access
+  # pages that use `requires_reauthentication`.
+  def login_as(user, reauthenticate: false)
     return if user.nil? || user.is_anonymous?
     current_user_id = request&.session&.dig(:user_id)
 
-    if current_user_id == user.id
-      return
-    elsif current_user_id.present? && current_user_id != user.id
-      delete session_path # logout
+    if current_user_id != user.id
+      delete session_path if current_user_id.present? # logout
+      post session_path, params: { session: { name: user.name, password: user.password }}
+
+      if user.totp.present?
+        post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: "verify_totp/#{session[:session_id]}"), code: user.totp.code }}
+      end
     end
 
-    post session_path, params: { session: { name: user.name, password: user.password }}
-
-    if user.totp.present?
-      post verify_totp_session_path, params: { totp: { user_id: user.signed_id(purpose: "verify_totp/#{session[:session_id]}"), code: user.totp.code }}
+    if reauthenticate
+      post reauthenticate_session_path, params: { session: { password: user.password, verification_code: user.totp&.code }}
     end
-
-    post reauthenticate_session_path, params: { session: { password: user.password, verification_code: user.totp&.code }}
   end
 
-  def method_authenticated(method_name, url, user, **options)
-    login_as(user)
+  def method_authenticated(method_name, url, user, reauthenticate: false, **options)
+    login_as(user, reauthenticate:)
     send(method_name, url, **options)
   end
 

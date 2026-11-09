@@ -32,7 +32,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
     context "#show" do
       should "render" do
-        get_auth user_email_path(@user), @user, as: :json
+        get_auth user_email_path(@user), @user, as: :json, reauthenticate: true
         assert_response :success
       end
 
@@ -56,7 +56,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a user with an email address" do
         should "render" do
-          get_auth edit_user_email_path(@user), @user
+          get_auth edit_user_email_path(@user), @user, reauthenticate: true
           assert_equal true, @user.email_address.present?
           assert_response :success
         end
@@ -66,7 +66,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         should "render" do
           @user.email_address.destroy!
           @user.reload_email_address
-          get_auth edit_user_email_path(@user), @user
+          get_auth edit_user_email_path(@user), @user, reauthenticate: true
 
           assert_equal false, @user.email_address.present?
           assert_response :success
@@ -76,7 +76,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a restricted user" do
         should "render" do
-          get_auth edit_user_email_path(@restricted_user), @restricted_user
+          get_auth edit_user_email_path(@restricted_user), @restricted_user, reauthenticate: true
           assert_response :success
         end
 
@@ -84,7 +84,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           should "not show the delete button" do
             @restricted_user.email_address.update!(address: "test@gmail.com")
             get email_verification_url(@restricted_user)
-            get_auth edit_user_email_path(@restricted_user), @restricted_user
+            get_auth edit_user_email_path(@restricted_user), @restricted_user, reauthenticate: true
 
             assert_response :success
             assert_select "input[value=Delete]", count: 0
@@ -97,7 +97,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
             get email_verification_url(@restricted_user)
 
             travel_to(25.hours.from_now) do
-              get_auth edit_user_email_path(@restricted_user), @restricted_user
+              get_auth edit_user_email_path(@restricted_user), @restricted_user, reauthenticate: true
             end
 
             assert_response :success
@@ -109,7 +109,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           should "show the delete button" do
             @restricted_user.email_address.update!(address: "test@mailinator.com")
             get email_verification_url(@restricted_user)
-            get_auth edit_user_email_path(@restricted_user), @restricted_user
+            get_auth edit_user_email_path(@restricted_user), @restricted_user, reauthenticate: true
 
             assert_response :success
             assert_select "input[value=Delete]", count: 1
@@ -119,21 +119,21 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
       context "for an unauthorized user" do
         should "return an error" do
-          get_auth edit_user_email_path(@user), @other_user
+          get_auth edit_user_email_path(@user), @other_user, reauthenticate: true
           assert_response 403
         end
       end
 
       context "for an admin editing another user's email address" do
         should "render" do
-          get_auth edit_user_email_path(create(:approver_user)), create(:admin_user)
+          get_auth edit_user_email_path(create(:approver_user)), create(:admin_user), reauthenticate: true
           assert_response :success
         end
       end
 
       context "for an admin editing a moderator's email address" do
         should "return an error" do
-          get_auth edit_user_email_path(create(:moderator_user)), create(:admin_user)
+          get_auth edit_user_email_path(create(:moderator_user)), create(:admin_user), reauthenticate: true
           assert_response 403
         end
       end
@@ -172,7 +172,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user, email_address: build(:email_address, { address: "old@danbooru.donmai.us", is_verified: true }))
 
           assert_no_difference("EmailAddress.count") do
-            put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}
+            put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
           end
 
           assert_redirected_to(edit_admin_user_path(@user))
@@ -195,7 +195,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
 
           assert_difference("EmailAddress.count", 1) do
-            put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}
+            put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
           end
 
           assert_redirected_to(edit_admin_user_path(@user))
@@ -217,7 +217,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @admin = create(:admin_user)
           @user = create(:user, email_address: build(:email_address, { address: "old@danbooru.donmai.us", is_verified: true }))
 
-          put_auth user_email_path(@user), @admin, params: { email_address: { address: "invalid" }}
+          put_auth user_email_path(@user), @admin, params: { email_address: { address: "invalid" }}, reauthenticate: true
 
           assert_response :success
           assert_equal("old@danbooru.donmai.us", @user.reload.email_address.address)
@@ -231,7 +231,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @admin = create(:admin_user)
           @user = create(:user, email_address: build(:email_address, { address: "old@danbooru.donmai.us", is_verified: true }))
 
-          put_auth user_email_path(@user), @admin, params: { email_address: { address: "nobody@invalid.donmai.us" }}
+          put_auth user_email_path(@user), @admin, params: { email_address: { address: "nobody@invalid.donmai.us" }}, reauthenticate: true
 
           assert_response :success
           assert_equal("old@danbooru.donmai.us", @user.reload.email_address.address)
@@ -245,7 +245,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @admin = create(:admin_user)
           @user = create(:moderator_user, email_address: build(:email_address, { address: "old@danbooru.donmai.us", is_verified: true }))
 
-          put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}
+          put_auth user_email_path(@user), @admin, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
 
           assert_response 403
           assert_equal("old@danbooru.donmai.us", @user.reload.email_address.address)
@@ -259,7 +259,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       context "for a user updating their own email address" do
         should "update an existing address" do
           assert_difference("EmailAddress.count", 0) do
-            put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+            put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
           end
 
           assert_redirected_to(settings_path)
@@ -276,7 +276,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @user.email_address.destroy
 
           assert_difference("EmailAddress.count", 1) do
-            put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+            put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
           end
 
           assert_redirected_to(settings_path)
@@ -291,7 +291,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
         should "not allow banned users to change their email address" do
           create(:ban, user: @user, duration: 1.week)
-          put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+          put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
 
           assert_response 403
           assert_equal("bob@ogres.net", @user.reload.email_address.address)
@@ -302,14 +302,14 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         should "allow a user to change their email address immediately after verifying it, if it didn't promote them from Restricted" do
           get email_verification_url(@user)
 
-          put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+          put_auth user_email_path(@user), @user, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
 
           assert_redirected_to(settings_path)
           assert_equal("new@danbooru.donmai.us", @user.reload.email_address.address)
         end
 
         should "fail if the email address is invalid" do
-          put_auth user_email_path(@user), @user, params: { email_address: { address: "invalid" }}
+          put_auth user_email_path(@user), @user, params: { email_address: { address: "invalid" }}, reauthenticate: true
 
           assert_response :success
           assert_equal("bob@ogres.net", @user.reload.email_address.address)
@@ -320,7 +320,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail if the email address is undeliverable" do
-          put_auth user_email_path(@user), @user, params: { email_address: { address: "nobody@invalid.donmai.us" }}
+          put_auth user_email_path(@user), @user, params: { email_address: { address: "nobody@invalid.donmai.us" }}, reauthenticate: true
 
           assert_response :success
           assert_equal("bob@ogres.net", @user.reload.email_address.address)
@@ -336,7 +336,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @restricted_user.email_address.update!(address: "test@gmail.com")
           get email_verification_url(@restricted_user)
 
-          put_auth user_email_path(@restricted_user), @restricted_user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+          put_auth user_email_path(@restricted_user), @restricted_user, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
 
           assert_response 403
           assert_equal("test@gmail.com", @restricted_user.reload.email_address.address)
@@ -347,7 +347,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           get email_verification_url(@restricted_user)
 
           travel_to(25.hours.from_now) do
-            put_auth user_email_path(@restricted_user), @restricted_user, params: { email_address: { address: "new@danbooru.donmai.us" }}
+            put_auth user_email_path(@restricted_user), @restricted_user, params: { email_address: { address: "new@danbooru.donmai.us" }}, reauthenticate: true
           end
 
           assert_redirected_to(settings_path)
@@ -359,7 +359,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
     context "#destroy" do
       should "allow a user to remove their own email address" do
         assert_difference("EmailAddress.count", -1) do
-          delete_auth user_email_path(@user), @user
+          delete_auth user_email_path(@user), @user, reauthenticate: true
         end
 
         assert_redirected_to(settings_path)
@@ -370,7 +370,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow a user to remove another user's email address" do
         assert_no_difference("EmailAddress.count") do
-          delete_auth user_email_path(@user), create(:admin_user)
+          delete_auth user_email_path(@user), create(:admin_user), reauthenticate: true
         end
 
         assert_response 403
@@ -380,7 +380,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         get email_verification_url(@user)
 
         assert_difference("EmailAddress.count", -1) do
-          delete_auth user_email_path(@user), @user
+          delete_auth user_email_path(@user), @user, reauthenticate: true
         end
 
         assert_redirected_to(settings_path)
@@ -393,7 +393,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           get email_verification_url(@restricted_user)
 
           assert_no_difference("EmailAddress.count") do
-            delete_auth user_email_path(@restricted_user), @restricted_user
+            delete_auth user_email_path(@restricted_user), @restricted_user, reauthenticate: true
           end
 
           assert_response 403
@@ -406,7 +406,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
           travel_to(25.hours.from_now) do
             assert_difference("EmailAddress.count", -1) do
-              delete_auth user_email_path(@restricted_user), @restricted_user
+              delete_auth user_email_path(@restricted_user), @restricted_user, reauthenticate: true
             end
           end
 

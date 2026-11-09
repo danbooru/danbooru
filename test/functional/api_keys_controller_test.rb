@@ -9,43 +9,43 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
     context "#index action" do
       should "let a user see their own API keys" do
-        get_auth user_api_keys_path(@user.id), @user
+        get_auth user_api_keys_path(@user.id), @user, reauthenticate: true
 
         assert_response :success
         assert_select "#api-key-#{@api_key.id}", count: 1
       end
 
       should "not let a user see API keys belonging to other users" do
-        get_auth user_api_keys_path(@user.id), create(:user)
+        get_auth user_api_keys_path(@user.id), create(:user), reauthenticate: true
 
         assert_response :success
         assert_select "#api-key-#{@api_key.id}", count: 0
       end
 
       should "let the owner see all API keys" do
-        get_auth user_api_keys_path(@user.id), create(:owner_user)
+        get_auth user_api_keys_path(@user.id), create(:owner_user), reauthenticate: true
 
         assert_response :success
         assert_select "#api-key-#{@api_key.id}", count: 1
       end
 
       should "not return the key in the API" do
-        get_auth user_api_keys_path(@user.id), @user, as: :json
+        get_auth user_api_keys_path(@user.id), @user, as: :json, reauthenticate: true
 
         assert_response :success
         assert_nil response.parsed_body.first["key"]
       end
 
       should "not allow searching by key" do
-        get_auth user_api_keys_path(@user.id, search: { key_like: "#{@api_key.key[0]}*" }), @user, as: :json
+        get_auth user_api_keys_path(@user.id, search: { key_like: "#{@api_key.key[0]}*" }), @user, as: :json, reauthenticate: true
         assert_response :success
         assert_equal(1, response.parsed_body.size)
 
-        get_auth user_api_keys_path(@user.id, search: { key_like: "does-not-match*" }), @user, as: :json
+        get_auth user_api_keys_path(@user.id, search: { key_like: "does-not-match*" }), @user, as: :json, reauthenticate: true
         assert_response :success
         assert_equal(1, response.parsed_body.size)
 
-        get_auth user_api_keys_path(@user.id, search: { key: "does-not-match" }), @user, as: :json
+        get_auth user_api_keys_path(@user.id, search: { key: "does-not-match" }), @user, as: :json, reauthenticate: true
         assert_response :success
         assert_equal(1, response.parsed_body.size)
       end
@@ -69,12 +69,12 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
     context "#new action" do
       should "render for a Member user" do
-        get_auth new_user_api_key_path(@user.id), @user
+        get_auth new_user_api_key_path(@user.id), @user, reauthenticate: true
         assert_response :success
       end
 
       should "pre-fill the form from the URL params" do
-        get_auth new_user_api_key_path(@user.id, api_key: { name: "MyApp", permissions: ["posts:index"] }), @user
+        get_auth new_user_api_key_path(@user.id, api_key: { name: "MyApp", permissions: ["posts:index"] }), @user, reauthenticate: true
 
         assert_response :success
         assert_select "input[name='api_key[name]'][value='MyApp']"
@@ -88,7 +88,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
     context "#create action" do
       should "create a new API key" do
-        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah" }}
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah" }}, reauthenticate: true
 
         assert_redirected_to user_api_keys_path(@user.id)
         assert_equal("blah", @user.api_keys.last.name)
@@ -106,19 +106,19 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
 
     context "#edit action" do
       should "render for the API key owner" do
-        get_auth edit_api_key_path(@api_key.id), @user
+        get_auth edit_api_key_path(@api_key.id), @user, reauthenticate: true
         assert_response :success
       end
 
       should "fail for someone else" do
-        get_auth edit_api_key_path(@api_key.id), create(:user)
+        get_auth edit_api_key_path(@api_key.id), create(:user), reauthenticate: true
         assert_response 403
       end
     end
 
     context "#update action" do
       should "render for the API key owner" do
-        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah", permitted_ip_addresses: "1.2.3.4" }}
+        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah", permitted_ip_addresses: "1.2.3.4" }}, reauthenticate: true
 
         assert_redirected_to user_api_keys_path(@user.id)
         assert_equal("blah", @api_key.reload.name)
@@ -127,14 +127,14 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "fail for someone else" do
-        put_auth api_key_path(@api_key.id), create(:user)
+        put_auth api_key_path(@api_key.id), create(:user), reauthenticate: true
         assert_response 403
       end
     end
 
     context "#destroy" do
       should "delete the user's API key" do
-        delete_auth api_key_path(@api_key.id), @user
+        delete_auth api_key_path(@api_key.id), @user, reauthenticate: true
 
         assert_redirected_to user_api_keys_path(@user.id)
         assert_raise(ActiveRecord::RecordNotFound) { @api_key.reload }
@@ -142,7 +142,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow deleting another user's API key" do
-        delete_auth api_key_path(@api_key.id), create(:user)
+        delete_auth api_key_path(@api_key.id), create(:user), reauthenticate: true
 
         assert_response 403
         assert_not_nil(@api_key.reload)

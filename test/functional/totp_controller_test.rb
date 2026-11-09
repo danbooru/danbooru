@@ -6,14 +6,14 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
       context "for a user with 2FA enabled" do
         should "work for the user" do
           @user = create(:user_with_2fa)
-          get_auth edit_user_totp_path(user_id: @user.id), @user
+          get_auth edit_user_totp_path(user_id: @user.id), @user, reauthenticate: true
 
           assert_response :success
         end
 
         should "not allow a user to view a different user's 2FA edit page" do
           @user = create(:user_with_2fa)
-          get_auth edit_user_totp_path(user_id: @user.id), create(:user)
+          get_auth edit_user_totp_path(user_id: @user.id), create(:user), reauthenticate: true
 
           assert_response 403
         end
@@ -22,14 +22,14 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
       context "for a user with 2FA disabled" do
         should "work for the user" do
           @user = create(:user)
-          get_auth edit_user_totp_path(user_id: @user.id), @user
+          get_auth edit_user_totp_path(user_id: @user.id), @user, reauthenticate: true
 
           assert_response :success
         end
 
         should "not allow a user to view a different user's 2FA edit page" do
           @user = create(:user)
-          get_auth edit_user_totp_path(user_id: @user.id), create(:user)
+          get_auth edit_user_totp_path(user_id: @user.id), create(:user), reauthenticate: true
 
           assert_response 403
         end
@@ -53,7 +53,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
           @totp = TOTP.new(username: @user.name)
 
-          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
+          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}, reauthenticate: true
 
           assert_redirected_to user_backup_codes_path(@user, url: settings_path)
           assert_equal(true, @user.reload.totp.present?)
@@ -65,7 +65,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
         should "log the user out on all other devices" do
           @user = create(:user)
           @totp = TOTP.new(username: @user.name)
-          login_as(@user)
+          login_as(@user, reauthenticate: true)
           @other_session = create(:login_session, user: @user)
 
           put user_totp_path(user_id: @user), params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
@@ -79,7 +79,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
           @totp = TOTP.new(username: create(:user).name)
 
-          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
+          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}, reauthenticate: true
 
           assert_response 403
           assert_equal(false, @user.reload.totp.present?)
@@ -91,7 +91,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
           @totp = TOTP.new(username: @user.name)
 
-          put_auth user_totp_path(user_id: @user), create(:user), params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
+          put_auth user_totp_path(user_id: @user), create(:user), params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}, reauthenticate: true
 
           assert_response 403
           assert_equal(false, @user.reload.totp.present?)
@@ -119,7 +119,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           @user = create(:user)
           @totp = TOTP.new(username: @user.name)
 
-          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: "invalid" }}
+          put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: "invalid" }}, reauthenticate: true
 
           assert_response :success
           assert_equal(false, @user.reload.totp.present?)
@@ -134,7 +134,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
       should "allow a user to disable 2FA" do
         @user = create(:user_with_2fa)
 
-        delete_auth user_totp_path(user_id: @user), @user
+        delete_auth user_totp_path(user_id: @user), @user, reauthenticate: true
 
         assert_redirected_to settings_path
         assert_equal(false, @user.reload.totp.present?)
@@ -146,7 +146,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
       should "not allow a user to disable 2FA for another user" do
         @user = create(:user_with_2fa)
 
-        delete_auth user_totp_path(user_id: @user), create(:user)
+        delete_auth user_totp_path(user_id: @user), create(:user), reauthenticate: true
 
         assert_response 403
         assert_equal(true, @user.reload.totp.present?)

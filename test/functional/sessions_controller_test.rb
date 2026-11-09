@@ -796,7 +796,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail if the user enters the right password but the wrong 2FA code" do
-          travel_to(1.day.ago) { login_as(@user) }
+          travel_to(1.day.ago) { login_as(@user, reauthenticate: true) }
           post reauthenticate_session_path, params: { session: { password: "password", verification_code: "wrong", url: users_path }}
 
           assert_response :success
@@ -805,7 +805,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail if the user enters the wrong password and the right 2FA code" do
-          travel_to(1.day.ago) { login_as(@user) }
+          travel_to(1.day.ago) { login_as(@user, reauthenticate: true) }
           post reauthenticate_session_path, params: { session: { password: "wrong", verification_code: @user.totp.code, url: users_path }}
 
           assert_response :success
@@ -816,7 +816,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         should "fail if the user enters the right password and the wrong backup code" do
           backup_code = "99999999"
 
-          travel_to(1.day.ago) { login_as(@user) }
+          travel_to(1.day.ago) { login_as(@user, reauthenticate: true) }
           post reauthenticate_session_path, params: { session: { password: "password", verification_code: backup_code, url: users_path }}
 
           assert_response :success
@@ -827,7 +827,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         should "fail if the user enters the wrong password and the right backup code" do
           backup_code = @user.backup_codes.first
 
-          travel_to(1.day.ago) { login_as(@user) }
+          travel_to(1.day.ago) { login_as(@user, reauthenticate: true) }
           post reauthenticate_session_path, params: { session: { password: "wrong", verification_code: backup_code, url: users_path }}
 
           assert_response :success
@@ -848,7 +848,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail if the user enters the wrong password" do
-          travel_to(1.day.ago) { login_as(@user) }
+          travel_to(1.day.ago) { login_as(@user, reauthenticate: true) }
           post reauthenticate_session_path, params: { session: { password: "wrong", url: users_path }}
 
           assert_response :success

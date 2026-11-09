@@ -12,21 +12,21 @@ class RateLimitsControllerTest < ActionDispatch::IntegrationTest
         get_auth rate_limits_path, create(:owner_user)
 
         assert_response :success
-        assert_select "tbody tr", count: 4 # 1 for @user, plus the 3 login creates: 1 for the IP, 1 for the session ID, and 1 for the user ID (from reauthenticating)
+        assert_select "tbody tr", count: 3 # 1 for @user, plus the 2 login creates: 1 for the IP and 1 for the session ID
       end
 
       should "show the user their own rate limits" do
         get_auth rate_limits_path, @user
 
         assert_response :success
-        assert_select "tbody tr", count: 2 # @user's rate limit, plus the one from reauthenticating at login
+        assert_select "tbody tr", count: 1 # @user's rate limit
       end
 
       should "not show users rate limits belonging to other users" do
         get_auth rate_limits_path, create(:user)
 
         assert_response :success
-        assert_select "tbody tr", count: 1 # only their own rate limit from reauthenticating at login
+        assert_select "tbody tr", count: 0
       end
     end
   end

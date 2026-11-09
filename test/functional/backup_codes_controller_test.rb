@@ -6,7 +6,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for a user without backup codes" do
         should "generate new backup codes for the user automatically" do
           @user = create(:user)
-          get_auth user_backup_codes_path(@user), @user
+          get_auth user_backup_codes_path(@user), @user, reauthenticate: true
 
           assert_response :success
           assert_equal(3, @user.reload.backup_codes.size)
@@ -15,7 +15,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
         should "not allow a user to view a different user's backup codes" do
           @user = create(:user)
-          get_auth user_backup_codes_path(@user), create(:user)
+          get_auth user_backup_codes_path(@user), create(:user), reauthenticate: true
 
           assert_response 403
           assert_nil(@user.reload.backup_codes)
@@ -26,7 +26,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "after enabling 2FA" do
         should "work" do
           @user = create(:user_with_2fa)
-          get_auth user_backup_codes_path(@user, url: settings_path), @user
+          get_auth user_backup_codes_path(@user, url: settings_path), @user, reauthenticate: true
 
           assert_response :success
           assert_select "a.button-primary[href='#{settings_path}']", text: "Continue"
@@ -34,7 +34,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
         should "not link to a javascript: url" do
           @user = create(:user_with_2fa)
-          get_auth user_backup_codes_path(@user, url: "javascript:alert(1)"), @user
+          get_auth user_backup_codes_path(@user, url: "javascript:alert(1)"), @user, reauthenticate: true
 
           assert_response :success
           assert_select "a[href='javascript:alert(1)']", count: 0
@@ -42,7 +42,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
         should "not link to an external url" do
           @user = create(:user_with_2fa)
-          get_auth user_backup_codes_path(@user, url: "https://evil.com"), @user
+          get_auth user_backup_codes_path(@user, url: "https://evil.com"), @user, reauthenticate: true
 
           assert_response :success
           assert_select "a[href='https://evil.com']", count: 0
@@ -52,7 +52,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for a user with backup codes" do
         should "show the user's existing backup codes" do
           @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
-          get_auth user_backup_codes_path(@user), @user
+          get_auth user_backup_codes_path(@user), @user, reauthenticate: true
 
           assert_response :success
           assert_equal(true, @user.reload.backup_codes.present?)
@@ -77,7 +77,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for a user without backup codes" do
         should "generate new backup codes" do
           @user = create(:user)
-          post_auth user_backup_codes_path(@user), @user
+          post_auth user_backup_codes_path(@user), @user, reauthenticate: true
 
           assert_redirected_to user_backup_codes_path(@user)
           assert_equal(3, @user.reload.backup_codes.size)
@@ -89,7 +89,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for a user with backup codes" do
         should "regenerate the user's backup codes" do
           @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
-          post_auth user_backup_codes_path(@user), @user
+          post_auth user_backup_codes_path(@user), @user, reauthenticate: true
 
           assert_redirected_to user_backup_codes_path(@user)
           assert_equal(3, @user.reload.backup_codes.size)
@@ -101,7 +101,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
         should "not allow a user to regenerate a different user's backup codes" do
           @user = create(:user_with_2fa, backup_codes: [1111_1111, 2222_2222, 3333_3333])
-          post_auth user_backup_codes_path(@user), create(:user)
+          post_auth user_backup_codes_path(@user), create(:user), reauthenticate: true
 
           assert_response 403
           assert_equal([1111_1111, 2222_2222, 3333_3333], @user.backup_codes)
@@ -126,21 +126,21 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for an admin recovering a member account" do
         should "show the confirm recover page" do
           @user = create(:user, :with_2fa, :with_email)
-          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user), reauthenticate: true
 
           assert_response :success
         end
 
         should "show the confirm recover page for a user without backup codes" do
           @user = create(:user, :with_email)
-          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user), reauthenticate: true
 
           assert_response :success
         end
 
         should "show the confirm recover page for a user without an email" do
           @user = create(:user, :with_2fa)
-          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user), reauthenticate: true
 
           assert_response :success
         end
@@ -149,7 +149,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for an admin recovering a moderator account" do
         should "not show the confirm recover page" do
           @user = create(:moderator_user, :with_2fa, :with_email)
-          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:admin_user), reauthenticate: true
 
           assert_response 403
         end
@@ -158,7 +158,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for a member recovering someone else's account" do
         should "not show the confirm recover page" do
           @user = create(:user, :with_2fa, :with_email)
-          get_auth confirm_recover_user_backup_codes_path(@user), create(:user)
+          get_auth confirm_recover_user_backup_codes_path(@user), create(:user), reauthenticate: true
 
           assert_response 403
         end
@@ -181,7 +181,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
         should "send the recovery email" do
           @admin = create(:admin_user)
           @user = create(:user, :with_2fa, :with_email)
-          post_auth recover_user_backup_codes_path(@user), @admin
+          post_auth recover_user_backup_codes_path(@user), @admin, reauthenticate: true
 
           assert_redirected_to edit_admin_user_path(@user)
           assert_equal("backup_code_send", ModAction.last.category)
@@ -196,7 +196,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
         should "fail for a user without backup codes" do
           @user = create(:user, :with_email)
-          post_auth recover_user_backup_codes_path(@user), create(:admin_user)
+          post_auth recover_user_backup_codes_path(@user), create(:admin_user), reauthenticate: true
 
           assert_response 406
           assert_equal(false, ModAction.backup_code_send.exists?)
@@ -205,7 +205,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
 
         should "fail for a user without an email" do
           @user = create(:user, :with_2fa)
-          post_auth recover_user_backup_codes_path(@user), create(:admin_user)
+          post_auth recover_user_backup_codes_path(@user), create(:admin_user), reauthenticate: true
 
           assert_response 406
           assert_equal(false, ModAction.backup_code_send.exists?)
@@ -216,7 +216,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for an admin recovering a moderator account" do
         should "fail" do
           @user = create(:moderator_user, :with_2fa, :with_email)
-          post_auth recover_user_backup_codes_path(@user), create(:admin_user)
+          post_auth recover_user_backup_codes_path(@user), create(:admin_user), reauthenticate: true
 
           assert_response 403
           assert_equal(false, ModAction.backup_code_send.exists?)
@@ -227,7 +227,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       context "for a member recovering someone else's account" do
         should "fail" do
           @user = create(:user, :with_2fa, :with_email)
-          post_auth recover_user_backup_codes_path(@user), create(:user)
+          post_auth recover_user_backup_codes_path(@user), create(:user), reauthenticate: true
 
           assert_response 403
           assert_equal(false, ModAction.backup_code_send.exists?)
