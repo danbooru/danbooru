@@ -111,6 +111,24 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.user_events.password_change.exists?)
           assert_equal(true, @user.user_events.totp_failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
+
+        should "not change the user's password if the account has made too many 2FA attempts" do
+          login_as(@user)
+          User.any_instance.stubs(:limit_2fa_attempts!).raises(RateLimiter::RateLimitError)
+          put user_password_path(@user), params: { user: { current_password: "12345678", password: "abcdefgh", password_confirmation: "abcdefgh", verification_code: @user.totp.code }}
+
+          assert_response 429
+          assert_equal(true, @user.reload.authenticate_password("12345678").present?)
+          assert_equal(false, @user.user_events.password_change.exists?)
+        end
+
+        should "not count a wrong current password as a 2FA attempt" do
+          login_as(@user)
+          User.any_instance.expects(:limit_2fa_attempts!).never
+          put user_password_path(@user), params: { user: { current_password: "wrong", password: "abcdefgh", password_confirmation: "abcdefgh", verification_code: "wrong" }}
+
+          assert_response :success
+        end
       end
     end
   end

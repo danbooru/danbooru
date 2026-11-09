@@ -834,6 +834,23 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
           assert_equal(true, @user.user_events.failed_reauthenticate.exists?(login_session_id: @user.login_sessions.last.login_id))
         end
+
+        should "fail if the account has made too many 2FA attempts" do
+          travel_to(1.day.ago) { login_as(@user, reauthenticate: true) }
+          User.any_instance.stubs(:limit_2fa_attempts!).raises(RateLimiter::RateLimitError)
+          post reauthenticate_session_path, params: { session: { password: "password", verification_code: @user.totp.code, url: users_path }}
+
+          assert_response 429
+          assert_equal(true, Time.zone.parse(session[:last_authenticated_at]) < 1.second.ago)
+        end
+
+        should "not count a wrong password as a 2FA attempt" do
+          travel_to(1.day.ago) { login_as(@user) }
+          User.any_instance.expects(:limit_2fa_attempts!).never
+          post reauthenticate_session_path, params: { session: { password: "wrong", verification_code: "wrong", url: users_path }}
+
+          assert_response :success
+        end
       end
 
       context "for a user without 2FA enabled" do

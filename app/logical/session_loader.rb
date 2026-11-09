@@ -135,7 +135,10 @@ class SessionLoader
   # @param password [String] The user's password.
   # @param verification_code [String] The user's 6-digit 2FA code, or their 8-digit backup code (if they have 2FA enabled).
   def reauthenticate(user, password, verification_code = nil)
-    if !user.authenticate_password(password) # wrong password
+    password_correct = user.authenticate_password(password)
+    user.limit_2fa_attempts! if password_correct && user.totp.present?
+
+    if !password_correct # wrong password
       UserEvent.create_from_request!(user, :failed_reauthenticate, request)
       errors.add(:password, "is incorrect")
       false
