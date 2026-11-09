@@ -30,7 +30,7 @@ class TimeSeriesComponentTest < ViewComponent::TestCase
 
       assert_css(".line-chart")
       assert_css("a", text: "Table")
-      assert_includes(rendered_content, '"type":"line"')
+      assert_equal(["line", "line"], JSON.parse(page.find(".line-chart")["data-options"])["series"].pluck("type"))
     end
 
     should "render a horizontal bar chart for non-date x-axis" do
@@ -46,7 +46,7 @@ class TimeSeriesComponentTest < ViewComponent::TestCase
 
       assert_css(".line-chart")
       assert_css("a", text: "Table")
-      assert_includes(rendered_content, '"type":"bar"')
+      assert_equal(["bar", "bar"], JSON.parse(page.find(".line-chart")["data-options"])["series"].pluck("type"))
     end
   end
 end
