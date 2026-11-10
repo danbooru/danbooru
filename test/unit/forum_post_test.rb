@@ -113,6 +113,18 @@ class ForumPostTest < ActiveSupport::TestCase
         end
       end
 
+      should "not apply the mention limits to posts made by DanbooruBot" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        RateLimit.create!(action: "mentions", key: User.system.cache_key, points: 0, limited: false)
+        users = create_list(:user, 2)
+        body = [*users.map { |user| "@#{user.name}" }, *11.times.map { |i| "@user_#{i}" }].join(" ")
+
+        post = as(@user) { create(:forum_post, creator: User.system, topic: @topic, body: body) }
+
+        assert_equal(true, post.persisted?)
+        assert_equal(1, users.first.dmails.count)
+      end
+
       should "allow mentioning up to 10 users" do
         body = 10.times.map { |i| "@user_#{i}" }.join(" ")
         post = build(:forum_post, creator: @user, topic: @topic, body: body)

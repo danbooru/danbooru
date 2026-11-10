@@ -87,8 +87,9 @@ module Mentionable
     users.select { |user| instance_exec(user, &self.class.mentionable_option(:visible_to)) }
   end
 
+  # Messages posted by DanbooruBot aren't subject to the mention limits.
   def check_mentions?
-    will_save_change_to_attribute?(mention_field) && !skip_mention_notifications
+    will_save_change_to_attribute?(mention_field) && !skip_mention_notifications && creator&.name != Danbooru.config.system_user
   end
 
   def mention_field
