@@ -695,10 +695,8 @@ class User < ApplicationRecord
       def statement_timeout(level)
         if Rails.env.local?
           60_000
-        elsif level >= User::Levels::PLATINUM
+        elsif level >= User::Levels::GOLD
           9_000
-        elsif level == User::Levels::GOLD
-          6_000
         else
           3_000
         end
@@ -715,10 +713,8 @@ class User < ApplicationRecord
       def tag_query_limit(level)
         if level >= User::Levels::MEMBER && Danbooru.config.is_promotion?
           Float::INFINITY
-        elsif level >= User::Levels::PLATINUM
+        elsif level >= User::Levels::GOLD
           Float::INFINITY
-        elsif level == User::Levels::GOLD
-          6
         else
           3
         end
