@@ -100,6 +100,35 @@ class ForumPostTest < ActiveSupport::TestCase
           as(@user) { create(:forum_post, creator: @user, body: "hi from @nonamethanks") }
         end
       end
+
+      should "allow mentioning up to 10 users" do
+        body = 10.times.map { |i| "@user_#{i}" }.join(" ")
+        post = build(:forum_post, creator: @user, topic: @topic, body: body)
+
+        assert_equal(true, post.valid?)
+      end
+
+      should "not allow mentioning more than 10 users" do
+        body = 11.times.map { |i| "@user_#{i}" }.join(" ")
+        post = build(:forum_post, creator: @user, topic: @topic, body: body)
+
+        assert_equal(false, post.save)
+        assert_equal(["Post can't mention more than 10 users"], post.errors.full_messages)
+      end
+
+      should "not count repeated mentions or mentions in quotes towards the limit" do
+        body = ("@foo " * 20) + "[quote]#{11.times.map { |i| "@user_#{i}" }.join(" ")}[/quote]"
+        post = build(:forum_post, creator: @user, topic: @topic, body: body)
+
+        assert_equal(true, post.valid?)
+      end
+
+      should "not allow editing a post to mention more than 10 users" do
+        post = create(:forum_post, creator: @user, topic: @topic, body: "hello")
+        post.update(body: 11.times.map { |i| "@user_#{i}" }.join(" "))
+
+        assert_equal(["Post can't mention more than 10 users"], post.errors.full_messages)
+      end
     end
 
     context "that belongs to a topic with several pages of posts" do

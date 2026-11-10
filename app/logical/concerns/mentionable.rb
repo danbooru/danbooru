@@ -6,6 +6,9 @@
 module Mentionable
   extend ActiveSupport::Concern
 
+  # The maximum number of users that can be mentioned in a single message.
+  MAX_MENTIONS = 10
+
   included do
     attr_accessor :skip_mention_notifications
   end
@@ -16,11 +19,18 @@ module Mentionable
     # - user_field
     def mentionable(options = {})
       @mentionable_options = options
+      validate :validate_mention_count, if: :check_mentions?
       after_save :queue_mention_messages
     end
 
     def mentionable_option(key)
       @mentionable_options[key]
+    end
+  end
+
+  def validate_mention_count
+    if DText.new(send(mention_field)).mentions.size > MAX_MENTIONS
+      errors.add(mention_field, "can't mention more than #{MAX_MENTIONS} users")
     end
   end
 
@@ -42,5 +52,13 @@ module Mentionable
 
       Dmail.create_automated(to: user, title: title, body: body)
     end
+  end
+
+  def check_mentions?
+    will_save_change_to_attribute?(mention_field) && !skip_mention_notifications
+  end
+
+  def mention_field
+    self.class.mentionable_option(:message_field)
   end
 end

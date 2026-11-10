@@ -67,6 +67,21 @@ class CommentTest < ActiveSupport::TestCase
           EOS
         end
       end
+
+      context "too many users" do
+        should "not allow mentioning more than 10 users" do
+          comment = build(:comment, post: @post, body: 11.times.map { |i| "@user_#{i}" }.join(" "))
+
+          assert_equal(false, comment.save)
+          assert_equal(["Comment can't mention more than 10 users"], comment.errors.full_messages)
+        end
+
+        should "allow mentioning up to 10 users" do
+          comment = build(:comment, post: @post, body: 10.times.map { |i| "@user_#{i}" }.join(" "))
+
+          assert_equal(true, comment.save)
+        end
+      end
     end
 
     context "created by an unlimited user" do
