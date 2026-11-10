@@ -350,6 +350,27 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_select "textarea[name='comment[body]']", text: body
         assert_select "#notice", text: /can't include more than 1 image/
       end
+
+      context "that mentions a user" do
+        setup do
+          Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+          @user2 = create(:user)
+        end
+
+        should "charge the mention limit once" do
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "hi @#{@user2.name}" }}
+
+          assert_redirected_to post_path(@post)
+          assert_in_delta(Mentionable::MENTION_BURST - 1, RateLimit.find_by!(action: "mentions", key: @user.cache_key).points, 0.1)
+        end
+
+        should "not charge the mention limit if the comment is invalid" do
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "hi @#{@user2.name}\n!post ##{@post.id}\n!post ##{@post.id}" }}
+
+          assert_response :success
+          assert_nil(RateLimit.find_by(action: "mentions", key: @user.cache_key))
+        end
+      end
     end
 
     context "destroy action" do

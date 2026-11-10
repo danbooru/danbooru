@@ -92,6 +92,53 @@ class CommentTest < ActiveSupport::TestCase
         end
       end
 
+      context "when the user's mention limit is exhausted" do
+        setup do
+          Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+          @user = create(:user)
+          @user2 = create(:user)
+          RateLimit.create!(action: "mentions", key: @user.cache_key, points: 0, limited: false)
+        end
+
+        should "not allow mentioning new users" do
+          comment = as(@user) { build(:comment, creator: @user, post: @post, body: "hi @#{@user2.name}") }
+
+          assert_no_difference("Dmail.count") do
+            assert_equal(false, as(@user) { comment.save })
+          end
+
+          assert_equal(["You've mentioned too many users recently. Wait a while and try again"], comment.errors.full_messages)
+        end
+
+        should "allow comments without new mentions" do
+          comment = as(@user) { create(:comment, creator: @user, post: @post, body: "hi @#{@user2.name}", skip_mention_notifications: true) }
+
+          assert_equal(true, as(@user) { create(:comment, creator: @user, post: @post, body: "hello").persisted? })
+          assert_equal(true, as(@user) { comment.update(body: "hi again @#{@user2.name}") })
+        end
+
+        should "allow mentioning nonexistent users" do
+          assert_equal(true, as(@user) { create(:comment, creator: @user, post: @post, body: "hi @nonexistent_user").persisted? })
+        end
+      end
+
+      context "when the user's mention limit is not exhausted" do
+        setup do
+          Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+          @user = create(:user)
+          @user2 = create(:user)
+        end
+
+        should "charge one point per newly mentioned user" do
+          comment = as(@user) { create(:comment, creator: @user, post: @post, body: "hi @#{@user2.name}") }
+          as(@user) { comment.update!(body: "hi") }
+          as(@user) { comment.update!(body: "hi @#{@user2.name}") }
+
+          assert_equal(2, @user2.dmails.count)
+          assert_in_delta(Mentionable::MENTION_BURST - 2, RateLimit.find_by!(action: "mentions", key: @user.cache_key).points, 0.1)
+        end
+      end
+
       context "edited by another user" do
         setup do
           @user = create(:user)

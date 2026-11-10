@@ -273,6 +273,19 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@user, forum_topic.original_post.updater)
       end
 
+      should "not create a topic when the user's mention limit is exhausted" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        @user2 = create(:user)
+        RateLimit.create!(action: "mentions", key: @user.cache_key, points: 0, limited: false)
+
+        assert_no_difference(["ForumPost.count", "ForumTopic.count", "Dmail.count"]) do
+          post_auth forum_topics_path, @user, params: { forum_topic: { title: "test", original_post_attributes: { body: "hi @#{@user2.name}" }}}
+        end
+
+        assert_response :success
+        assert_select "#notice", text: /mentioned too many users recently/
+      end
+
       should "rate limit the creation of new forum topics" do
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
 
@@ -297,6 +310,21 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@mod, @forum_topic.updater)
         assert_equal(@mod, @forum_topic.original_post.updater)
         assert(ModAction.exists?(category: "forum_topic_lock", subject: @forum_topic, creator: @mod))
+      end
+
+      should "not update the original post when the user's mention limit is exhausted" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        @user2 = create(:user)
+        RateLimit.create!(action: "mentions", key: @user.cache_key, points: 0, limited: false)
+
+        assert_no_difference("Dmail.count") do
+          put_auth forum_topic_path(@forum_topic), @user, params: { forum_topic: { title: "new title", original_post_attributes: { id: @forum_topic.original_post.id, body: "hi @#{@user2.name}" }}}
+        end
+
+        assert_response :success
+        assert_select "#notice", text: /mentioned too many users recently/
+        assert_equal("my forum topic", @forum_topic.reload.title)
+        assert_equal("xxx", @forum_topic.original_post.body)
       end
 
       should "not allow mods to add mentions to another user's original post" do

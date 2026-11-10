@@ -70,6 +70,18 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#notice", text: /can't mention more than 10 users/
         assert_select "#notice", text: /is invalid/, count: 0
       end
+
+      should "show the forum post's error when the user's mention limit is exhausted" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        RateLimit.create!(action: "mentions", key: @user.cache_key, points: 0, limited: false)
+
+        assert_no_difference(["BulkUpdateRequest.count", "Dmail.count"]) do
+          post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request).merge(reason: "hi @#{@mod.name}") }
+        end
+
+        assert_response :success
+        assert_select "#notice", text: /mentioned too many users recently/
+      end
     end
 
     context "#update" do
