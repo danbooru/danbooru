@@ -7,7 +7,7 @@
 # Run:
 #
 #   # Run the Danbooru webserver. Run Postgres first because a database is necessary for Danbooru to function.
-#   docker run --rm -it --network host -e POSTGRES_USER=danbooru -e POSTGRES_HOST_AUTH_METHOD=trust -v $PWD/danbooru-postgres:/var/lib/postgresql/data ghcr.io/danbooru/postgres:14.1 -c listen_addresses=localhost
+#   docker run --rm -it --network host -e POSTGRES_USER=danbooru -e POSTGRES_HOST_AUTH_METHOD=trust -v $PWD/danbooru-postgres:/var/lib/postgresql ghcr.io/danbooru/postgres:18.6 -c listen_addresses=localhost
 #   docker run --rm -it --network host -v $PWD:/danbooru danbooru
 #
 #   # Run a Bash or Ruby shell inside the Danbooru container (for development or debugging).

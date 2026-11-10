@@ -22,4 +22,4 @@ clock: bin/rails danbooru:cron
 shakapacker-dev-server: bin/shakapacker-dev-server
 
 # The postgres database. It can be run in the Procfile, but it's better to run it manually.
-# db: docker run --rm -it --name danbooru-postgres --shm-size=8g -p 5432:5432 -e POSTGRES_USER=danbooru - e POSTRES_HOST_AUTH_METHOD=trust -v danbooru-postgres:/var/lib/postgresql/data ghcr.io/danbooru/postgres:14.1
+# db: docker run --rm -it --name danbooru-postgres --shm-size=8g -p 5432:5432 -e POSTGRES_USER=danbooru -e POSTGRES_HOST_AUTH_METHOD=trust -v danbooru-postgres:/var/lib/postgresql ghcr.io/danbooru/postgres:18.6

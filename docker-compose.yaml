@@ -184,7 +184,7 @@ services:
   #
   # https://github.com/pgautoupgrade/docker-pgautoupgrade
   postgres-upgrade:
-    image: pgautoupgrade/pgautoupgrade:16-bookworm
+    image: pgautoupgrade/pgautoupgrade:18.6-trixie
     restart: no
     shm_size: 1gb
     environment:
@@ -192,10 +192,10 @@ services:
       POSTGRES_USER: danbooru
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - "danbooru-data:/var/lib/postgresql/data"
+      - "danbooru-data:/var/lib/postgresql"
 
   postgres:
-    image: ghcr.io/danbooru/postgres:16.1
+    image: ghcr.io/danbooru/postgres:18.6
     depends_on:
       postgres-upgrade:
         condition: service_completed_successfully
@@ -209,7 +209,7 @@ services:
       interval: 1s
       retries: 1
     volumes:
-      - "danbooru-data:/var/lib/postgresql/data"
+      - "danbooru-data:/var/lib/postgresql"
 
   nginx:
     image: ${DANBOORU_IMAGE:-ghcr.io/danbooru/danbooru:production}
