@@ -316,6 +316,34 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
     end
 
+    context "with a reason that the forum post can't be created with" do
+      setup do
+        @user = create(:user)
+        @reason = 11.times.map { |i| "@user_#{i}" }.join(" ")
+      end
+
+      should "not create the BUR, topic, or post in a new topic" do
+        bur = build(:bulk_update_request, user: @user, reason: @reason)
+
+        assert_no_difference(["BulkUpdateRequest.count", "ForumTopic.count", "ForumPost.count"]) do
+          assert_equal(false, as(@user) { bur.save })
+        end
+
+        assert_equal(["Reason can't mention more than 10 users"], bur.errors.full_messages)
+      end
+
+      should "not create the BUR or post in an existing topic" do
+        topic = create(:forum_topic)
+        bur = build(:bulk_update_request, user: @user, forum_topic: topic, reason: @reason)
+
+        assert_no_difference(["BulkUpdateRequest.count", "ForumPost.count"]) do
+          assert_equal(false, as(@user) { bur.save })
+        end
+
+        assert_equal(["Reason can't mention more than 10 users"], bur.errors.full_messages)
+      end
+    end
+
     context "when validating a new bulk update request" do
       subject { build(:bulk_update_request) }
 

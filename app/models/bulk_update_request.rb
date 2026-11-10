@@ -29,8 +29,8 @@ class BulkUpdateRequest < ApplicationRecord
   validates :forum_post, presence: true, if: ->(bur) { bur.forum_post_id.present? }
   validates :status, inclusion: { in: STATUSES }
   validate :validate_script, if: :script_changed?
-  validates_associated :forum_topic, if: :forum_topic_changed?
-  validates_associated :forum_post, if: :forum_post_changed?
+  validate :validate_forum_topic, if: :forum_topic_changed?
+  validate :validate_forum_post, if: :forum_post_changed?
 
   before_save :update_tags, if: :script_changed?
   after_create :create_forum_topic
@@ -145,6 +145,28 @@ class BulkUpdateRequest < ApplicationRecord
 
   extend SearchMethods
   include ApprovalMethods
+
+  # Show the topic's errors instead of "Forum topic is invalid". If the forum post is being created too, the errors from
+  # the topic's posts are shown by `validate_forum_post` instead.
+  def validate_forum_topic
+    return if forum_topic.nil? || forum_topic.valid?
+
+    topic_errors = forum_topic.errors.reject { |error| error.attribute == :forum_posts && forum_post_changed? }
+    topic_errors.each { |error| errors.add(:base, error.full_message) }
+  end
+
+  # Show the forum post's errors instead of "Forum post is invalid". Errors in the post's body are errors in the reason.
+  def validate_forum_post
+    return if forum_post.nil? || forum_post.valid?
+
+    forum_post.errors.each do |error|
+      if error.attribute == :body
+        errors.add(:reason, error.message)
+      else
+        errors.add(:base, error.full_message)
+      end
+    end
+  end
 
   def update_tags
     self.tags = processor.affected_tags

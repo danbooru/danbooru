@@ -46,6 +46,30 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
       end
+
+      should "show the forum post's error when the reason mentions too many users" do
+        reason = 11.times.map { |i| "@user_#{i}" }.join(" ")
+
+        assert_no_difference(["BulkUpdateRequest.count", "ForumTopic.count", "ForumPost.count"]) do
+          post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request).merge(reason: reason) }
+        end
+
+        assert_response :success
+        assert_select "#notice", text: /can't mention more than 10 users/
+        assert_select "#notice", text: /is invalid/, count: 0
+      end
+
+      should "show the forum post's error when the reason mentions too many users in an existing topic" do
+        reason = 11.times.map { |i| "@user_#{i}" }.join(" ")
+
+        assert_no_difference(["BulkUpdateRequest.count", "ForumPost.count"]) do
+          post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request).merge(reason: reason, forum_topic_id: @forum_topic.id) }
+        end
+
+        assert_response :success
+        assert_select "#notice", text: /can't mention more than 10 users/
+        assert_select "#notice", text: /is invalid/, count: 0
+      end
     end
 
     context "#update" do
