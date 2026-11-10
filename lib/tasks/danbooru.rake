@@ -188,20 +188,68 @@ namespace :danbooru do
   end
 
   namespace :database do
-    desc "Backup the database to a file. Usage: bin/rails danbooru:database:backup > danbooru-backup.pg_dump"
-    task backup: :environment do
-      postgres_url = Addressable::URI.parse(ActiveRecord::Base.configurations.find_db_config(Rails.env).url)
-      postgres_url.query_values = postgres_url.query_values.without("pool").presence
-      warn "pg_dumpall --clean --if-exists --verbose --dbname #{postgres_url}"
-      system(*%W[pg_dumpall --clean --if-exists --verbose --dbname #{postgres_url}])
+    # The connection settings for pg_dump, pg_restore, and psql.
+    pg_env = lambda do
+      config = ActiveRecord::Base.connection_db_config.configuration_hash
+
+      {
+        "PGHOST" => config[:host],
+        "PGPORT" => config[:port]&.to_s,
+        "PGUSER" => config[:username],
+        "PGPASSWORD" => config[:password],
+        "PGDATABASE" => config[:database],
+      }.compact
     end
 
-    desc "Restore the database from a backup. Usage: bin/rails danbooru:database:restore < danbooru-backup.pg_dump"
+    # Usage: bin/rails danbooru:database:backup > danbooru-database.pg_dump
+    desc "Back up the database. Usage: bin/rails danbooru:database:backup > danbooru-database.pg_dump"
+    task backup: :environment do
+      env = pg_env.call
+
+      warn "Backing up database #{env["PGDATABASE"]} on #{env["PGHOST"]}..."
+      system(env, "pg_dump", "--format=custom", "--compress=zstd", "--verbose", exception: true)
+      warn "Done. Run `bin/rails danbooru:database:check < danbooru-database.pg_dump` to check the backup."
+    end
+
+    # Usage: bin/rails danbooru:database:check < danbooru-database.pg_dump
+    desc "Check a backup and show how many tables, rows, and indexes it has. Usage: bin/rails danbooru:database:check < danbooru-database.pg_dump"
+    task check: :environment do
+      # pg_restore reads the backup from stdin and prints the SQL it would run. Count the tables, rows, and indexes in it.
+      count = <<~'AWK'
+        /^COPY / { copying = 1; tables++; next }
+        copying && /^\\\.$/ { copying = 0; next }
+        copying { rows++; next }
+        /^CREATE (UNIQUE )?INDEX / || /^    ADD CONSTRAINT .* (PRIMARY KEY|UNIQUE|EXCLUDE) / { indexes++ }
+        END { printf "The backup has %d tables, %d rows, and %d indexes.\n", tables, rows, indexes }
+      AWK
+
+      system("bash", "-o", "pipefail", "-c", 'pg_restore --file=- | awk "$1"', "_", count) or abort "The backup is incomplete or corrupt."
+    end
+
+    # Usage: bin/rails danbooru:database:restore < danbooru-database.pg_dump
+    #
+    # Old backups made with pg_dumpall are plain SQL files and won't work with pg_restore. Restore them with
+    # `bin/rails dbconsole -p < danbooru-database.pg_dump` instead.
+    desc "Restore the database from a backup. Usage: bin/rails danbooru:database:restore < danbooru-database.pg_dump"
     task restore: :environment do
-      postgres_url = Addressable::URI.parse(ActiveRecord::Base.configurations.find_db_config(Rails.env).url)
-      postgres_url.query_values = postgres_url.query_values.without("pool").presence
-      warn "psql --echo-all #{postgres_url}"
-      system(*%W[psql --echo-all #{postgres_url}])
+      env = pg_env.call
+
+      if ActiveRecord::Base.connection.tables.any?
+        abort "Database #{env["PGDATABASE"]} isn't empty. Drop it first with `bin/rails db:drop:_unsafe db:create`."
+      end
+
+      warn "Restoring database #{env["PGDATABASE"]} on #{env["PGHOST"]}..."
+      system(env, "pg_restore", "--no-owner", "--no-acl", "--exit-on-error", "--verbose", "--dbname=#{env["PGDATABASE"]}") or abort "Restore failed. Database #{env["PGDATABASE"]} is incomplete."
+
+      tables, rows, indexes, size = ActiveRecord::Base.connection.select_rows(<<~SQL.squish).first
+        SELECT
+          (SELECT count(*) FROM pg_stat_user_tables),
+          (SELECT coalesce(sum(n_tup_ins), 0)::bigint FROM pg_stat_user_tables),
+          (SELECT count(*) FROM pg_indexes WHERE schemaname NOT IN ('pg_catalog', 'information_schema')),
+          pg_size_pretty(pg_database_size(current_database()))
+      SQL
+
+      warn "Restored #{tables} tables, #{rows} rows, and #{indexes} indexes to database #{env["PGDATABASE"]} (#{size})."
     end
   end
 end
