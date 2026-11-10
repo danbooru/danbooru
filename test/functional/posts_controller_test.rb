@@ -357,6 +357,22 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "h1", "Search Error"
         end
 
+        should "tell anonymous users to sign up when searching for too many tags" do
+          get posts_path, params: { tags: "1 2 3" }
+
+          assert_response 422
+          assert_select "#page a[href=?]", new_user_path, text: "Sign up"
+          assert_select "#page a[href=?]", new_user_upgrade_path, count: 0
+        end
+
+        should "tell members to upgrade when searching for too many tags" do
+          get_auth posts_path, create(:user), params: { tags: "1 2 3 4" }
+
+          assert_response 422
+          assert_select "#page a[href=?]", new_user_upgrade_path, text: "Upgrade your account"
+          assert_select "#page a[href=?]", new_user_path, count: 0
+        end
+
         should "render an error when exceeding the page limit" do
           get posts_path, params: { page: 1001 }
 
