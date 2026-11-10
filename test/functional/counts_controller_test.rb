@@ -26,6 +26,22 @@ class CountsControllerTest < ActionDispatch::IntegrationTest
         assert_response 422
       end
 
+      should "limit anonymous users to 2 tags" do
+        get posts_counts_path(format: :json, tags: "a b c")
+        assert_response 422
+
+        get posts_counts_path(format: :json, tags: "a b")
+        assert_response :success
+      end
+
+      should "limit members to 3 tags" do
+        get_auth posts_counts_path(format: :json, tags: "a b c d"), create(:user)
+        assert_response 422
+
+        get_auth posts_counts_path(format: :json, tags: "a b c"), create(:user)
+        assert_response :success
+      end
+
       should "allow searches with more tags for users with a higher tag limit" do
         get_auth posts_counts_path(format: :json, tags: "a b c d"), create(:platinum_user)
         assert_response :success

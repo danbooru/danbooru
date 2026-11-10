@@ -715,6 +715,8 @@ class User < ApplicationRecord
           Float::INFINITY
         elsif level >= User::Levels::GOLD
           Float::INFINITY
+        elsif level == User::Levels::ANONYMOUS
+          2
         else
           3
         end
