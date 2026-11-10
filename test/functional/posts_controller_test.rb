@@ -351,7 +351,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render an error when searching for too many tags" do
-          get posts_path, params: { tags: "1 2 3" }
+          get posts_path, params: { tags: "1 2 3 4" }
 
           assert_response 422
           assert_select "h1", "Search Error"

@@ -112,12 +112,12 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
   context "the tag limit" do
     should "raise an error if the query has more tags than the user is allowed to search for" do
-      assert_raises(PostQuery::TagLimitError) { RelatedTagQuery.new(query: "aaa bbb ccc", user: create(:user)) }
+      assert_raises(PostQuery::TagLimitError) { RelatedTagQuery.new(query: "aaa bbb ccc ddd", user: create(:user)) }
     end
 
     should "allow queries within the user's tag limit" do
-      assert_nothing_raised { RelatedTagQuery.new(query: "aaa bbb", user: create(:user)) }
-      assert_nothing_raised { RelatedTagQuery.new(query: "aaa bbb ccc", user: create(:platinum_user)) }
+      assert_nothing_raised { RelatedTagQuery.new(query: "aaa bbb ccc", user: create(:user)) }
+      assert_nothing_raised { RelatedTagQuery.new(query: "aaa bbb ccc ddd", user: create(:platinum_user)) }
     end
   end
 end

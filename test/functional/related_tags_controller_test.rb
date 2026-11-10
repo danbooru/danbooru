@@ -38,7 +38,7 @@ class RelatedTagsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "return a 422 error for searches with too many tags" do
-        get related_tag_path(format: :json), params: { query: "aaa bbb ccc" }
+        get related_tag_path(format: :json), params: { query: "aaa bbb ccc ddd" }
         assert_response 422
       end
 

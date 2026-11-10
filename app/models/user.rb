@@ -720,7 +720,7 @@ class User < ApplicationRecord
         elsif level == User::Levels::GOLD
           6
         else
-          2
+          3
         end
       end
 

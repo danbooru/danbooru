@@ -19,15 +19,15 @@ class CountsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "return a 422 error for searches with too many tags" do
-        get posts_counts_path(format: :json, tags: "a b c")
+        get posts_counts_path(format: :json, tags: "a b c d")
         assert_response 422
 
-        get_auth posts_counts_path(format: :json, tags: "a b c"), create(:user)
+        get_auth posts_counts_path(format: :json, tags: "a b c d"), create(:user)
         assert_response 422
       end
 
       should "allow searches with more tags for users with a higher tag limit" do
-        get_auth posts_counts_path(format: :json, tags: "a b c"), create(:platinum_user)
+        get_auth posts_counts_path(format: :json, tags: "a b c d"), create(:platinum_user)
         assert_response :success
       end
 
