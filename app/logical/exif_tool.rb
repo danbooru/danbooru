@@ -24,10 +24,11 @@ class ExifTool
   #
   # @param options [String] the options to pass to exiftool
   # @param max_size [Integer] The maximum size of the metadata, in bytes of JSON. If it's larger, the largest values are
-  #   replaced with "[OVERSIZED]" until it fits. If that isn't enough, the largest keys are dropped.
+  #   replaced with "[OVERSIZED]" until it fits. If that isn't enough, the largest keys are dropped. If exiftool prints
+  #   more than ExternalCommand's output limit, the metadata only has a `Danbooru:ExifToolError` entry.
   # @return [ExifTool::Metadata] the file's metadata
   def metadata(options: DEFAULT_OPTIONS, max_size: 1.megabyte)
-    output, _status = ExternalCommand.run("exiftool #{options} -json #{file.path.shellescape}")
+    output, _status = ExternalCommand.run("exiftool #{options} -json #{file.path.shellescape}", read: [file.path])
     json = output.parse_json.first
     json = json.except("SourceFile")
 
@@ -43,6 +44,8 @@ class ExifTool
     json = json.except(*dropped_keys)
 
     ExifTool::Metadata.new(json.with_indifferent_access)
+  rescue ExternalCommand::OutputLimitError => e
+    ExifTool::Metadata.new({ "Danbooru:ExifToolError" => e.message }.with_indifferent_access)
   end
 
   # A class representing the set of metadata returned by ExifTool for a file.

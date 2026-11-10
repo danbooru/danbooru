@@ -28,6 +28,37 @@ class MediaFileWebmTest < ActiveSupport::TestCase
     end
   end
 
+  context "Getting a video's streams" do
+    should "not modify the video's metadata" do
+      video = FFmpeg.new(MediaFile.open("test/files/webm/test-audio.webm"))
+      streams = video.video_streams + video.audio_streams
+
+      assert_equal(2, streams.size)
+      assert(streams.all? { it[:packets].present? && it[:frames].present? })
+      assert(video.metadata[:streams].none? { it.key?(:packets) || it.key?(:frames) })
+    end
+
+    should "only read the metadata that's used" do
+      Danbooru::Tempfile.create(["danbooru-tagged-", ".webm"]) do |tagged|
+        FFmpeg.shell!("ffmpeg -i test/files/webm/test-audio.webm -metadata comment=#{"a" * 100.kilobytes} -c copy -y #{tagged.path}", read: ["test/files/webm/test-audio.webm"], write: [tagged.path])
+        video = FFmpeg.new(MediaFile.open(tagged.path))
+
+        stub_const(FFmpeg, :METADATA_OUTPUT_LIMIT, 100.kilobytes) do
+          assert_nil(video.metadata[:error])
+          assert_nil(video.metadata.dig(:format, :tags, :comment))
+          assert_equal(%w[best_effort_timestamp_time height media_type sample_aspect_ratio stream_index type width], video.video_stream[:frames].first.keys.sort)
+        end
+      end
+    end
+
+    should "only split the packets and frames by stream once" do
+      video = FFmpeg.new(MediaFile.open("test/files/webm/test-audio.webm"))
+      video.metadata[:packets_and_frames].expects(:select).twice.returns([])
+
+      5.times { video.video_stream && video.audio_stream }
+    end
+  end
+
   context "a vp8 WebM file" do
     should "be parsed correctly" do
       file = MediaFile.open("test/files/webm/test-512x512.webm")

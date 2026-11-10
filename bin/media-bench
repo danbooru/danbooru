@@ -1,0 +1,100 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Measure how long it takes to process media files the way an upload does: validate them, get their metadata, and
+# generate their thumbnails and samples. Use it to compare performance between versions of the code.
+
+require_relative "../config/environment"
+
+require "optparse"
+
+options = { iterations: 3, jobs: 4 }
+
+OptionParser.new do |opts|
+  opts.banner = <<~EOS
+    #{File.basename($PROGRAM_NAME)} - Measure how long it takes to process media files like an upload does
+
+    Usage: #{File.basename($PROGRAM_NAME)} [options] [FILE|DIR ...]
+
+    Validates each file, gets its metadata, and generates its thumbnails and samples. Defaults to test/files. Prints each
+    file as it's processed to stderr, and a summary to stdout. Nothing is saved to the database or to storage.
+  EOS
+
+  opts.on("-n", "--iterations=N", Integer, "Process each file N times (default: 3)") { options[:iterations] = it }
+  opts.on("-j", "--jobs=N", Integer, "Process N files at once (default: 4)") { options[:jobs] = it }
+end.parse!
+
+UPLOADER = User.new(level: User::Levels::ADMIN)
+
+# Process the file like MediaAsset.upload! does, without saving anything or generating AI tags.
+#
+# @return [Array<(String, Exception)>, nil] The file's type and the error if processing it failed, or nil if it isn't a
+#   file that can be uploaded.
+def process(path)
+  MediaFile.open(path) do |file|
+    next nil if !file.mime_type.to_s.in?(MediaAsset::FILE_MIME_TYPES) || file.is_flash?
+
+    [file.class.name.demodulize, upload(file)]
+  end
+end
+
+# @return [Exception, nil] The error if processing the file failed, for example because it's corrupt.
+def upload(file)
+  MediaAsset.validate_media_file!(file, UPLOADER)
+  media_asset = MediaAsset.new(file:)
+  MediaMetadata.new(file:)
+
+  storage = StorageManager::Null.new
+  media_asset.define_singleton_method(:storage_service) { storage }
+  media_asset.define_singleton_method(:backup_storage_service) { storage }
+  media_asset.distribute_files!(file)
+  nil
+rescue StandardError, NotImplementedError => e
+  e
+end
+
+paths = (ARGV.presence || ["test/files"]).flat_map { File.directory?(it) ? Dir.glob("#{it}/**/*").select { File.file?(it) } : it }.sort
+jobs = Queue.new
+options[:iterations].times { |pass| paths.each_with_index { |path, i| jobs << [path, i + 1, pass + 1] } }
+jobs.close
+results = Queue.new
+
+# Exit immediately on Ctrl-C. A normal exit can hang forever if it happens during `pixel_hash`, because Ruby stops the
+# thread that runs libvips' callbacks while libvips is still waiting for them.
+trap("INT") { exit!(130) }
+
+started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+cpu_before = Process.times
+
+options[:jobs].times.map do
+  Thread.new do
+    while ((path, file_number, pass) = jobs.pop)
+      file_started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      type, error = process(path)
+      seconds = Process.clock_gettime(Process::CLOCK_MONOTONIC) - file_started_at
+      results << { type:, error:, seconds: } if type
+
+      status = type.nil? ? "skipped" : format("%-6s %7.3fs", type, seconds)
+      status += " #{error.class}: #{error.message.lines.first&.chomp}" if error
+      warn format("[file %#{paths.size.to_s.size}d/%d, pass %d/%d] %s %s", file_number, paths.size, pass, options[:iterations], path, status)
+    end
+  end
+end.each(&:join)
+
+wall_time = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
+cpu_after = Process.times
+results = results.size.times.map { results.pop }
+
+percentile = ->(times, p) { times.sort[((times.size - 1) * p).round] }
+puts
+puts "type      files errors      mean    median       p95     total"
+results.group_by { it[:type] }.sort.each do |type, group|
+  times = group.pluck(:seconds)
+  puts format("%-8s %6d %6d %8.3fs %8.3fs %8.3fs %8.2fs", type, group.size, group.count { it[:error] }, times.sum / times.size, percentile.call(times, 0.5), percentile.call(times, 0.95), times.sum)
+end
+
+puts
+puts format("Wall time:           %.2fs (%d files, %d iterations, %d jobs)", wall_time, paths.size, options[:iterations], options[:jobs])
+puts format("CPU time (Rails):    %.2fs", (cpu_after.utime + cpu_after.stime) - (cpu_before.utime + cpu_before.stime))
+puts format("CPU time (commands): %.2fs", (cpu_after.cutime + cpu_after.cstime) - (cpu_before.cutime + cpu_before.cstime))
+puts format("Peak memory (Rails): %d MB", File.read("/proc/self/status")[/VmHWM:\s+(\d+)/, 1].to_i / 1024)

@@ -32,12 +32,12 @@ class MediaFile
       media_file = new_from_file(file, **options)
     end
 
-    if block_given?
-      result = yield media_file
+    return media_file unless block_given?
+
+    begin
+      yield media_file
+    ensure
       media_file.close
-      result
-    else
-      media_file
     end
   end
 
@@ -132,6 +132,16 @@ class MediaFile
   # @return [Integer] The number of bytes needed to decode the whole file in memory, or 0 if it can be decoded as a stream.
   def full_decode_size
     0
+  end
+
+  # Save a copy of the file in the trash folder of the image storage, so a file that may be an attempt to exploit
+  # ffmpeg, exiftool, or another program can be looked at later. Files in the trash folder aren't served.
+  #
+  # @return [String] The path of the copy in the image storage.
+  def quarantine!
+    path = "/trash/quarantine/#{md5}.#{file_ext}"
+    Danbooru.config.storage_manager.store(file, path)
+    path
   end
 
   # @return [Symbol] the detected file extension

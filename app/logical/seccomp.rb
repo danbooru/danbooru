@@ -1,25 +1,12 @@
 # frozen_string_literal: true
 
-# This is a wrapper around seccomp, a Linux kernel feature used to limit the
-# system calls the current process is allowed to make. This is used for
-# sandboxing code when processing user-uploaded files.
+# This is a wrapper around libseccomp for building seccomp filters, which limit the system calls a process is allowed
+# to make. ExternalCommand exports the filters as BPF and loads them with setpriv(1) to sandbox programs that process
+# user-uploaded files.
 #
 # @example
-#   # Allow only the read(2), write(2), close(2), and exit_group(2) syscalls to be used
-#   # for the remainder of the program; kill the process if any other syscalls are called.
-#   Seccomp.allow!("read write close exit_group")
-#
-#   # Kill the process if sync(2) is called; allow all other syscalls.
-#   Seccomp.deny!("sync")
-#
-#   # Run exiftool in a sandboxed subprocess, allowing it to only use syscalls
-#   # from the @exec, @signals, and @tty syscall groups.
-#   Seccomp.allow!("@exec @signals @tty") do
-#     exec "exiftool -json image.jpg"
-#   end
-#
-#   # Run a shell inside a seccomp sandbox.
-#   Seccomp.allow!("@common") { exec "dash" }
+#   # Build a filter that only allows the @exec, @signals, and @tty syscall groups, as BPF for `setpriv --seccomp-filter`.
+#   bpf = Seccomp.allow("@exec @signals @tty").to_bpf
 #
 #   # Print a human-readable dump of the seccomp filter.
 #   puts Seccomp.allow("@exec @signals @tty").to_pfc
@@ -55,26 +42,65 @@
 # @see https://marcin.juszkiewicz.com.pl/download/tables/syscalls.html
 # @see https://filippo.io/linux-syscall-table/
 module Seccomp
-  class Error < StandardError; end
+  # The clone(2) flags for creating namespaces. Namespaces expose a lot of the kernel to attacks.
+  CLONE_NAMESPACE_FLAGS = 0x7E020000
 
-  # Symbolic groups of syscalls that can be used in filters.
+  # The clone(2) flag for creating a thread instead of a process.
+  CLONE_THREAD = 0x00010000
+
+  # The ioctl(2) requests that check whether a file is a terminal (TCGETS and TCGETS2).
+  TERMINAL_IOCTLS = [0x5401, 0x802C542A]
+
+  # The prctl(2) options for naming threads (PR_SET_NAME) and memory mappings (PR_SET_VMA).
+  PR_SET_NAME = 15
+  PR_SET_VMA = 0x53564D41
+
+  # The prctl(2) options that setpriv(1) uses after loading the filter.
+  PR_SET_PDEATHSIG = 1
+  PR_SET_KEEPCAPS = 8
+  PR_SET_NO_NEW_PRIVS = 38
+
+  # The fcntl(2) commands for duplicating file descriptors, getting or setting their flags, and getting or setting the
+  # size of pipes (F_DUPFD, F_GETFD, F_SETFD, F_GETFL, F_SETFL, F_DUPFD_CLOEXEC, F_SETPIPE_SZ, F_GETPIPE_SZ). This leaves
+  # out F_SETOWN and F_SETSIG, which make the kernel send signals to other processes.
+  FCNTL_FLAG_COMMANDS = [0, 1, 2, 3, 4, 1030, 1031, 1032]
+
+  # The action that makes a syscall fail with the given errno, without running it.
+  #
+  # @param errno [Integer] The error number (e.g. `Errno::ENOSYS::Errno`)
+  # @return [Integer] The action
+  def self.errno(errno)
+    0x00050000 | (errno & 0xffff)
+  end
+
+  # Symbolic groups of syscalls that can be used in filters. Each entry is a syscall name, a group name, or a rule
+  # `[syscall_name, action, comparisons]` that only applies when the syscall's arguments match (see `Filter#add_rule`).
+  # Calls that match none of a syscall's rules get the filter's default action.
   SYSCALL_GROUPS = {
-    # A broad set of common syscalls sufficient to run most programs.
-    "@common" => %w[
-      @exec @exit @fs @memory @network @process-control @process-info @signals
-      @stdio @system-info @threads @time @tty
-    ],
     # Syscalls needed to cleanly exit a Ruby program.
     "@exit" => %w[
       exit exit_group getpid munmap rt_sigaction timer_delete
     ],
-    # Syscalls needed to allocate and manage memory.
-    "@memory" => %w[
-      brk mmap mmap2 munmap mprotect mremap
+    # Syscalls needed to allocate and manage memory, and to name memory mappings.
+    "@memory" => [
+      "brk", "get_mempolicy", "madvise", "mmap", "mmap2", "munmap", "mprotect", "mremap",
+      ["prctl", :allow, [[0, :masked_eq, 0xFFFFFFFF, PR_SET_VMA]]],
     ],
-    # Syscalls needed by multi-threaded Ruby programs.
-    "@threads" => %w[
-      futex getpid mmap ppoll read write sched_yield
+    # Syscalls needed by multi-threaded programs. Threads can be created and named, but not processes or namespaces.
+    # clone3 fails because its flags are in memory that seccomp can't check, which makes glibc fall back to clone.
+    "@threads" => [
+      "futex", "getpid", "mmap", "ppoll", "read", "rseq", "write", "sched_yield",
+      ["clone", :allow, [[0, :masked_eq, CLONE_NAMESPACE_FLAGS | CLONE_THREAD, CLONE_THREAD]]],
+      ["clone3", errno(Errno::ENOSYS::Errno), []],
+      ["prctl", :allow, [[0, :masked_eq, 0xFFFFFFFF, PR_SET_NAME]]],
+    ],
+    # Syscalls for changing the limits and CPU affinity of the current process, but not of other processes. Setting the
+    # affinity of other processes fails instead of being killed, because some programs set it for their own threads by
+    # thread ID, which can't be told apart from other processes.
+    "@process-self" => [
+      ["prlimit64", :allow, [[0, :eq, 0]]],
+      ["sched_setaffinity", :allow, [[0, :eq, 0]]],
+      ["sched_setaffinity", errno(Errno::EPERM::Errno), [[0, :ne, 0]]],
     ],
     # Syscalls commonly needed to execute external programs.
     "@exec" => %w[
@@ -84,27 +110,26 @@ module Seccomp
       @process-info
       @exit
       arch_prctl
-      execve execveat
+      execve
       futex
+      getrandom
       set_robust_list
       set_tid_address
-      prlimit64
       timer_settime
     ],
     # Syscalls for reading and writing open files.
     "@stdio" => %w[
-      close
+      close close_range
       dup dup2 dup3
       getdents getdents64
       fadvise64
-      fcntl
-      fgetxattr
       fstat
       lseek
       pipe pipe2
       read pread64 readv preadv preadv2
+      splice
       write pwrite64 writev pwritev pwritev2
-    ],
+    ] + FCNTL_FLAG_COMMANDS.map { ["fcntl", :allow, [[1, :masked_eq, 0xFFFFFFFF, it]]] },
     # Syscalls for opening files.
     "@fs-open" => %w[
       open openat openat2
@@ -115,9 +140,8 @@ module Seccomp
       access faccessat faccessat2
       chdir fchdir
       getcwd
-      getxattr lgetxattr fgetxattr
       readlink readlinkat
-      stat fstat newfstatat lstat
+      stat fstat newfstatat lstat statx
       statfs fstatfs
     ],
     # Syscalls that modify data on the filesystem.
@@ -176,13 +200,15 @@ module Seccomp
       sched_getaffinity
       times
     ],
-    "@process-control" => %w[
-      clone clone3 fork vfork
+    "@process-control" => [
+      ["clone", :allow, [[0, :masked_eq, CLONE_NAMESPACE_FLAGS, 0]]],
+    ] + %w[
+      @threads @process-self
+      fork vfork
       getpriority setpriority
       kill tkill tgkill rt_sigqueueinfo rt_tgsigqueueinfo
       nice
       pidfd_open pidfd_send_signal
-      prlimit64
       setpgid
       wait4 waitid waitpid
     ],
@@ -194,6 +220,7 @@ module Seccomp
       rt_sigsuspend sigsuspend
       rt_sigtimedwait rt_sigtimedwait_time64
       rt_sigreturn
+      restart_syscall
       signalfd signalfd4
       sigaltstack
       signal
@@ -209,10 +236,19 @@ module Seccomp
       clock_gettime
       gettimeofday
       time
+      timer_create
     ],
-    "@tty" => %w[
-      ioctl
+    # Syscalls that setpriv(1) makes after it loads the filter, to drop capabilities, apply Landlock, and set the parent
+    # death signal. These can only take away privileges. The death signal can only be set to SIGKILL, so a program
+    # can't turn it off.
+    "@setpriv" => [
+      "capset", "landlock_create_ruleset", "landlock_add_rule", "landlock_restrict_self",
+      ["prctl", :allow, [[0, :eq, PR_SET_PDEATHSIG], [1, :eq, Signal.list["KILL"]]]],
+      ["prctl", :allow, [[0, :eq, PR_SET_KEEPCAPS]]],
+      ["prctl", :allow, [[0, :eq, PR_SET_NO_NEW_PRIVS]]],
     ],
+    # Syscalls for checking whether a file is a terminal. Other ioctls aren't allowed, because they expose a lot of the kernel.
+    "@tty" => TERMINAL_IOCTLS.map { ["ioctl", :allow, [[1, :masked_eq, 0xFFFFFFFF, it]]] },
   }
 
   # A lowlevel wrapper around libseccomp using the Ruby FFI.
@@ -238,8 +274,7 @@ module Seccomp
 
     # https://github.com/seccomp/libseccomp/blob/main/include/seccomp.h.in#L64
     enum :attr, [
-      :tsync,    4,
-      :optimize, 8,
+      :act_badarch, 2,
     ]
 
     typedef :pointer, :scmp_filter_ctx
@@ -249,20 +284,31 @@ module Seccomp
     # scmp_filter_ctx seccomp_init(uint32_t def_action);
     attach_function :seccomp_init, [:action], :scmp_filter_ctx
 
-    # seccomp_load - Load the current seccomp filter into the kernel
-    # https://man7.org/linux/man-pages/man3/seccomp_load.3.html
-    # int seccomp_load(scmp_filter_ctx ctx);
-    attach_function :seccomp_load, [:scmp_filter_ctx], :int
-
     # seccomp_release - Release the seccomp filter state
     # https://man7.org/linux/man-pages/man3/seccomp_release.3.html
     # void seccomp_release(scmp_filter_ctx ctx);
     attach_function :seccomp_release, [:scmp_filter_ctx], :void
 
-    # seccomp_rule_add - Add a seccomp filter rule
+    # https://github.com/seccomp/libseccomp/blob/main/include/seccomp.h.in#L88
+    enum :compare, [
+      :ne,        1,
+      :lt,        2,
+      :le,        3,
+      :eq,        4,
+      :ge,        5,
+      :gt,        6,
+      :masked_eq, 7,
+    ]
+
+    # struct scmp_arg_cmp
+    class ArgCmp < FFI::Struct
+      layout :arg, :uint, :op, :compare, :datum_a, :uint64, :datum_b, :uint64
+    end
+
+    # seccomp_rule_add_array - Add a seccomp filter rule, optionally only matching certain syscall arguments
     # https://man7.org/linux/man-pages/man3/seccomp_rule_add.3.html
-    # int seccomp_rule_add(scmp_filter_ctx ctx, uint32_t action, int syscall, unsigned int arg_cnt, ...);
-    attach_function :seccomp_rule_add, [:scmp_filter_ctx, :action, :int, :uint32], :int
+    # int seccomp_rule_add_array(scmp_filter_ctx ctx, uint32_t action, int syscall, unsigned int arg_cnt, const struct scmp_arg_cmp *arg_array);
+    attach_function :seccomp_rule_add_array, [:scmp_filter_ctx, :action, :int, :uint32, :pointer], :int
 
     # seccomp_syscall_resolve_name - Resolve a syscall name to a number
     # https://man7.org/linux/man-pages/man3/seccomp_syscall_resolve_name.3.html
@@ -274,10 +320,10 @@ module Seccomp
     # char* seccomp_syscall_resolve_num_arch(uint32_t arch_token, int num)
     attach_function :seccomp_syscall_resolve_num_arch, [:arch, :int], :strptr
 
-    # seccomp_attr_set - Manage the seccomp filter attributes
+    # seccomp_attr_set - Set a seccomp filter attribute
     # https://man7.org/linux/man-pages/man3/seccomp_attr_set.3.html
     # int seccomp_attr_set(scmp_filter_ctx ctx, enum scmp_filter_attr attr, uint32_t value);
-    attach_function :seccomp_attr_set, [:scmp_filter_ctx, :attr, :uint32], :int
+    attach_function :seccomp_attr_set, [:scmp_filter_ctx, :attr, :action], :int
 
     # seccomp_export_bpf - Export the seccomp filter as BPF
     # int seccomp_export_bpf(const scmp_filter_ctx ctx, int fd);
@@ -292,7 +338,10 @@ module Seccomp
 
   module LibC
     extend FFI::Library
-    ffi_lib FFI::Library::LIBC
+
+    # Look up `free` in the whole process instead of in libc, so it uses the same allocator as libseccomp. Otherwise,
+    # with jemalloc preloaded (see the Dockerfile), we'd free jemalloc's memory with glibc's `free` and crash.
+    ffi_lib FFI::CURRENT_PROCESS
 
     attach_function :free, [:pointer], :void
   end
@@ -300,70 +349,57 @@ module Seccomp
   # A Seccomp::Filter represents a single seccomp filter, containing a set of
   # syscall filtering rules and a default action.
   class Filter
-    attr_reader :context, :tsync, :optimize
+    attr_reader :context
 
     # Create a new syscall filter. Use `add_rule` to add rules to the filter.
-    # Use `apply!` to activate the filter after all rules have been added.
+    # Use `to_bpf` to export the filter after all rules have been added.
     #
     # If a block is given, run the block with the new filter.
     #
     # @param default_action [Symbol] The default action to take when a syscall
     #   doesn't match a rule.
-    # @param tsync [Boolean] True to apply the filter to all threads in the
-    #   current process. False to apply it just to the current thread.
-    # @param optimize [Boolean] True to generate the filter as a binary tree,
-    #   false as a sequential list.
-    def initialize(default_action = :kill, tsync: true, optimize: false)
+    def initialize(default_action = :kill)
       @context = init!(default_action)
-      self.tsync = tsync
-      self.optimize = optimize
+
+      # Syscalls for other architectures, like 32-bit or x32 syscalls on x86_64, get the default action too. Otherwise
+      # libseccomp only kills the thread that made them, and the rest of the process keeps running.
+      ret = LibSeccomp.seccomp_attr_set(context, :act_badarch, default_action)
+      raise SystemCallError.new("seccomp_attr_set(act_badarch) failed", -ret) if ret < 0
 
       yield self if block_given?
     end
 
     # Add a syscall rule to the filter. If the syscall doesn't exist, raise an error.
     #
+    # @example
+    #   # Allow prlimit64(2) only if its first argument (the pid) is 0.
+    #   filter.add_rule("prlimit64", :allow, [[0, :eq, 0]])
+    #
+    #   # Allow clone(2) only if none of the bits in `mask` are set in its first argument (the flags).
+    #   filter.add_rule("clone", :allow, [[0, :masked_eq, mask, 0]])
+    #
+    #   # Make clone3(2) fail with ENOSYS.
+    #   filter.add_rule("clone3", Seccomp.errno(Errno::ENOSYS::Errno))
+    #
     # @param syscall_name [String] The name of the syscall
-    # @param action [Symbol] The action to take when the syscall is called (:allow, :log, :kill)
+    # @param action [Symbol, Integer] The action to take when the syscall is called (:allow, :log, :kill, or `Seccomp.errno`)
+    # @param comparisons [Array<Array>] The conditions the syscall's arguments must match for the rule to apply, as
+    #   `[arg_index, op, value]`, or `[arg_index, :masked_eq, mask, value]`. All conditions must match.
     # @return [self]
     # @raise [SystemCallError] If the rule couldn't be added
-    def add_rule(syscall_name, action)
+    def add_rule(syscall_name, action, comparisons = [])
       syscall_number = Seccomp.resolve_syscall_name(syscall_name)
-      ret = LibSeccomp.seccomp_rule_add(context, action, syscall_number, 0)
+      array = FFI::MemoryPointer.new(LibSeccomp::ArgCmp, [comparisons.size, 1].max)
+      comparisons.each_with_index do |(arg, op, datum_a, datum_b), i|
+        cmp = LibSeccomp::ArgCmp.new(array + (i * LibSeccomp::ArgCmp.size))
+        cmp[:arg] = arg
+        cmp[:op] = op
+        cmp[:datum_a] = datum_a
+        cmp[:datum_b] = datum_b || 0
+      end
+
+      ret = LibSeccomp.seccomp_rule_add_array(context, action, syscall_number, comparisons.size, array)
       raise SystemCallError.new("seccomp_rule_add(#{action}, #{syscall_name}) failed", -ret) if ret < 0
-
-      self
-    end
-
-    # Activate the syscall filter by loading it into the kernel. All code after
-    # this point must obey the syscall filter.
-    #
-    # If a block is given, apply the filter to the given block of code. The
-    # block is run in a forked subprocess, which means the filter only applies
-    # to the block of code.
-    #
-    # @return [self]
-    def apply!(&block)
-      return apply_to!(&block) if block_given?
-
-      ret = LibSeccomp.seccomp_load(context)
-      raise SystemCallError.new("seccomp_load(#{context}) failed", -ret) if ret < 0
-      self
-    end
-
-    # Apply the filter to a block of code in a forked subprocess.
-    def apply_to!(&block)
-      raise ArgumentError, "Seccomp::Filter#apply_block!: block required" unless block_given?
-
-      pid = Process.fork do
-        apply!
-        yield self
-      end
-
-      _pid, status = Process.wait2(pid)
-      if status.signaled? && Signal.signame(status.termsig) == "SYS"
-        raise Error, "Subprocess called unauthorized syscall (see dmesg for details)"
-      end
 
       self
     end
@@ -400,40 +436,9 @@ module Seccomp
     # @return [FFI::AutoPointer] The libseccomp context
     def init!(default_action)
       context = LibSeccomp.seccomp_init(default_action)
-      raise Errno::ENOMEM, "seccomp_init(#{default_action}) failed" if context == nil
+      raise Errno::ENOMEM, "seccomp_init(#{default_action}) failed" if context.nil?
 
       FFI::AutoPointer.new(context, LibSeccomp.method(:seccomp_release))
-    end
-
-    # Set an attribute on the filter.
-    #
-    # @see https://man7.org/linux/man-pages/man3/seccomp_attr_set.3.html
-    # @param [Symbol] the attribute name
-    # @param [Integer] the attribute value
-    def set_attr(attr, value)
-      ret = LibSeccomp.seccomp_attr_set(context, attr, value)
-      raise SystemCallError.new("seccomp_attr_set(context, #{attr.inspect}, #{value}) failed", -ret) if ret < 0
-    end
-
-    # If true, apply the filter to all threads in the process. If false,
-    # apply it only to the current thread.
-    #
-    # @param value [Boolean]
-    # @return [void]
-    def tsync=(value)
-      set_attr(:tsync, value ? 1 : 0)
-      @tsync = value
-    end
-
-    # If true, generate the BPF code as a binary tree of if-else statements.
-    # May be faster for large rule sets. If false, generate the BPF code as a
-    # sequential list of if-else statements.
-    #
-    # @param value [Boolean]
-    # @return [void]
-    def optimize=(value)
-      set_attr(:optimize, value ? 2 : 1)
-      @optimize = value
     end
   end
 
@@ -443,39 +448,25 @@ module Seccomp
     filter(syscalls, :allow, default_action: default_action)
   end
 
-  # Create a filter denying the given set of syscalls. Allow all other
-  # syscalls by default. Calling a denied syscall will kill the process by default.
-  def self.deny(syscalls, default_action: :allow)
-    filter(syscalls, :kill, default_action: default_action)
-  end
-
-  # Create and immediately apply a filter allowing only the given set of syscalls.
-  def self.allow!(syscalls, default_action: :kill, &block)
-    allow(syscalls, default_action: default_action).apply!(&block)
-  end
-
-  # Create and immediately apply a filter denying the given set of syscalls.
-  def self.deny!(syscalls, default_action: :allow, &block)
-    deny(syscalls, default_action: default_action).apply!(&block)
-  end
-
-  # Create a syscall filter for the current process that performs `action` when
-  # any of the given syscalls are called, or `default_action` when any other
-  # syscall is called.
+  # Create a syscall filter that performs `action` when any of the given syscalls
+  # are called, or `default_action` when any other syscall is called.
   #
-  # Call `apply!` on the result to activate the filter.
-  #
-  # @param syscalls [Array<String>] The set of syscalls
+  # @param syscalls [Array<String>] The set of syscalls. May include syscall groups (e.g `@stdio`). Rules in groups
+  #   that only match certain arguments keep their own action.
   # @param action [Symbol] The action to take when any of the given syscalls are called (:allow, :log, :kill)
   # @param default_action [Symbol] The action to take when any other syscall is called (:allow, :log, :kill)
-  # @param options [Hash] Options to pass to Seccomp::Filter#initialize
   # @return [Seccomp::Filter] the seccomp filter
-  def self.filter(syscalls, action, default_action: :kill, **options)
-    Filter.new(default_action, **options) do |filter|
-      expand_syscall_names(syscalls).each do |syscall|
-        filter.add_rule(syscall, action)
+  def self.filter(syscalls, action, default_action: :kill)
+    Filter.new(default_action) do |filter|
+      expand_rules(syscalls, action).each do |syscall, rule_action, comparisons|
+        filter.add_rule(syscall, rule_action, comparisons)
       end
     end
+  end
+
+  # @return [Boolean] True if the process was killed for calling a blocked syscall.
+  def self.killed?(status)
+    status.termsig == Signal.list["SYS"]
   end
 
   # Return the list of syscalls available on the current system. This list may
@@ -488,21 +479,28 @@ module Seccomp
     end.compact
   end
 
-  # Recursively expand a list of syscall names, that may contain a mixture of regular
-  # names and syscall group names (e.g. `@stdio`), to a flat list of syscall names.
+  # Recursively expand a list of syscall names and syscall groups (e.g. `@stdio`) to a flat list of syscall names.
   #
-  # @param syscall_names [Array<String>] A list of syscall names. May include syscall
-  #   groups (e.g `@stdio`). May be a space-separated string, or a list of strings.
+  # @param syscalls [String, Array<String>] A list of syscalls and groups, or a space-separated string.
   # @return [Array<String>] A list of syscall names
-  def self.expand_syscall_names(*syscall_names)
-    syscall_names.flatten.flat_map(&:split).flat_map do |syscall|
-      if syscall.start_with?("@")
-        group = SYSCALL_GROUPS.fetch(syscall)
-        expand_syscall_names(group)
-      else
-        syscall
+  def self.expand_syscall_names(syscalls)
+    expand_rules(syscalls, :allow).map(&:first).sort.uniq
+  end
+
+  # Recursively expand a list of syscall names and syscall groups to a list of `[syscall_name, action, comparisons]`
+  # rules. Plain syscall names get the given action.
+  #
+  # @param syscalls [String, Array<String, Array>] A list of syscalls, groups, and rules, or a space-separated string.
+  # @param action [Symbol, Integer] The action for plain syscall names.
+  # @return [Array<Array>] The rules
+  def self.expand_rules(syscalls, action)
+    Array(syscalls).flat_map { it.is_a?(String) ? it.split : [it] }.flat_map do |entry|
+      case entry
+      in Array then [entry]
+      in /\A@/ then expand_rules(SYSCALL_GROUPS.fetch(entry), action)
+      in String then [[entry, action, []]]
       end
-    end.sort.uniq
+    end.uniq
   end
 
   # Resolve a syscall name to a syscall number.

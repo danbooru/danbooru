@@ -453,6 +453,16 @@ class MediaFilePngTest < ActiveSupport::TestCase
       assert_operator(metadata.to_h.to_json.bytesize, :<=, 1.megabyte)
     end
 
+    should "return an error when exiftool prints more than the output limit" do
+      file = png_with_text_chunks("Comment" => "a" * 20.kilobytes)
+
+      stub_const(ExternalCommand, :OUTPUT_LIMIT, 10.kilobytes) do
+        metadata = MediaFile.open(file).metadata
+
+        assert_equal({ "Danbooru:ExifToolError" => "exiftool printed more than 10240 bytes" }, metadata.to_h)
+      end
+    end
+
     should "not remove anything when the metadata isn't too large" do
       file = png_with_text_chunks("Comment" => "a" * 100.kilobytes)
 

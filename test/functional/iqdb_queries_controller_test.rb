@@ -8,6 +8,21 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "show action" do
+      context "for a file that makes a program call a blocked syscall" do
+        should "show an error, log the search, and quarantine the file" do
+          ExifTool.any_instance.stubs(:metadata).raises(ExternalCommand::SyscallError, "exiftool called a blocked syscall")
+          Rails.logger.stubs(:error)
+          Rails.logger.expects(:error).with { |message| message.start_with?("IQDB search by user ##{@user.id} (#{@user.name}) was blocked by the sandbox: exiftool called a blocked syscall") }
+
+          file = Rack::Test::UploadedFile.new(Rails.root.join("test/files/jpg/test.jpg"))
+          post_auth iqdb_queries_path, @user, params: { search: { file: file }}
+
+          assert_response :success
+          assert_includes(response.body, "The file couldn&#39;t be processed")
+          assert_nothing_raised { Danbooru.config.storage_manager.open("/trash/quarantine/ecef68c44edb8a0d6a3070b5f8e8ee76.jpg") }
+        end
+      end
+
       should "be rate limited" do
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         create(:rate_limit, action: "iqdb_queries:show", key: @user.cache_key, limited: true)

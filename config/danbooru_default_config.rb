@@ -256,6 +256,15 @@ module Danbooru
       100.megabytes
     end
 
+    # Whether to run ffmpeg, exiftool, and other programs that process uploaded files without a sandbox. The sandbox uses
+    # Landlock to stop them from reading or writing files other than the ones they're working on, and seccomp to stop
+    # them from making system calls they don't need, like opening network connections or starting other processes. Set
+    # this if your kernel doesn't support Landlock (Linux 5.13+ with Landlock enabled), otherwise these programs will
+    # refuse to run. They're still limited by timeouts, memory limits, and output limits.
+    def disable_upload_sandbox?
+      false
+    end
+
     # Maximum resolution (width * height) of an upload. Default: 441 megapixels (21000x21000 pixels).
     def max_image_resolution
       21_000 * 21_000

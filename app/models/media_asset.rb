@@ -341,11 +341,46 @@ class MediaAsset < ApplicationRecord
         end
 
         media_asset
-      rescue Exception
+      rescue Exception => e
         # If resizing or distributing the file to the backend servers failed, then mark the asset as
         # failed so the user can try the upload again later.
         media_asset&.update!(status: :failed)
+
+        # If the file was blocked by the sandbox, delete any of its files that were already stored, so it can't be
+        # downloaded from the site. Other failed uploads keep their files.
+        if media_asset && ExternalCommand::SyscallError.find_in(e)
+          begin
+            media_asset.delete_files!
+          rescue StandardError => delete_error
+            Rails.logger.error("Failed to delete the files of media asset ##{media_asset.id} after it was blocked by the sandbox: #{delete_error.message}")
+          end
+        end
+
         raise
+      end
+
+      # If `error` is because a program called a blocked syscall while processing `media_file`, log who did it and save
+      # a copy of the file in quarantine, because the file may be an attempt to exploit the program. The details are
+      # escaped, so they can't add fake lines to the log.
+      #
+      # @param error [Exception] The error from processing the file.
+      # @param media_file [MediaFile, nil] The file.
+      # @param user [User] The user who uploaded or searched for the file.
+      # @param action [String] What the user was doing, like "Upload #123".
+      # @param details [Hash] Other things to log, like the source URL.
+      def handle_blocked_file(error, media_file:, user:, action:, **details)
+        blocked_error = ExternalCommand::SyscallError.find_in(error)
+        return if blocked_error.nil?
+
+        begin
+          quarantine_path = media_file&.quarantine!
+        rescue StandardError => e
+          quarantine_path = "failed to save: #{e.message}"
+        end
+
+        details = details.compact.map { |name, value| "#{name}: #{value.to_s.truncate(500).inspect}" }
+        file_details = ["md5: #{media_file&.md5}", "type: #{media_file&.file_ext}", "size: #{media_file&.file_size}", "quarantined file: #{quarantine_path}"]
+        Rails.logger.error("#{action} by user ##{user.id} (#{user.name}) was blocked by the sandbox: #{blocked_error.message} (#{(details + file_details).join(", ")})")
       end
 
       def validate_media_file!(media_file, uploader)
@@ -367,10 +402,16 @@ class MediaAsset < ApplicationRecord
           raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
         elsif media_file.full_decode_size > MAX_FULL_DECODE_SIZE
           raise Error, "Image is too large to decode (size: #{media_file.full_decode_size.to_fs(:human_size)}; max size: #{MAX_FULL_DECODE_SIZE.to_fs(:human_size)})"
+        # Check the metadata before `is_supported?`, which needs the metadata to check AVIFs.
+        elsif media_file.exif_metadata["Danbooru:ExifToolError"].present?
+          raise Error, "File has too much metadata"
         elsif !media_file.is_supported?
           raise Error, "File type is not supported"
         elsif media_file.is_corrupt?
           raise Error, "File is corrupt"
+        # Checked after `is_corrupt?`, because corrupt files often have no dimensions, and "corrupt" is the better error.
+        elsif media_file.width.to_i <= 0 || media_file.height.to_i <= 0
+          raise Error, "Couldn't read the file's dimensions"
         elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
           raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
         end

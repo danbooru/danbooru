@@ -258,6 +258,84 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a file with more metadata than exiftool can print" do
+        should "fail" do
+          stub_const(ExternalCommand, :OUTPUT_LIMIT, 100) do
+            create_upload!("test/files/jpg/test.jpg", user: @user)
+          end
+
+          assert_match("File has too much metadata", Upload.last.error)
+        end
+      end
+
+      context "for a file that makes a program call a blocked syscall" do
+        should "log the upload, the uploader, and the file" do
+          ExifTool.any_instance.stubs(:metadata).raises(ExternalCommand::SyscallError, "exiftool called a blocked syscall")
+          Rails.logger.stubs(:error)
+          Rails.logger.expects(:error).with do |message|
+            message.match?(/\AUpload #\d+ by user ##{@user.id} \(#{@user.name}\) was blocked by the sandbox: exiftool called a blocked syscall/) &&
+              message.include?("md5: ecef68c44edb8a0d6a3070b5f8e8ee76") && message.include?('source: "file://test.jpg"')
+          end
+
+          create_upload!("test/files/jpg/test.jpg", user: @user)
+          assert_equal("exiftool called a blocked syscall", Upload.last.error)
+        end
+
+        should "save the file in the quarantine folder" do
+          ExifTool.any_instance.stubs(:metadata).raises(ExternalCommand::SyscallError, "exiftool called a blocked syscall")
+          create_upload!("test/files/jpg/test.jpg", user: @user)
+
+          quarantined = Danbooru.config.storage_manager.open("/trash/quarantine/ecef68c44edb8a0d6a3070b5f8e8ee76.jpg")
+          assert_equal(File.binread("test/files/jpg/test.jpg"), quarantined.read)
+        end
+
+        should "log, quarantine, and delete the stored files if it happens while generating previews" do
+          MediaFile::Video.any_instance.stubs(:preview!).raises(ExternalCommand::SyscallError, "ffmpeg called a blocked syscall")
+          Rails.logger.stubs(:error)
+          Rails.logger.expects(:error).with { |message| message.start_with?("Upload #") && message.include?("was blocked by the sandbox") }
+
+          create_upload!("test/files/mp4/test-300x300-av1.mp4", user: @user)
+          media_asset = MediaAsset.last
+
+          assert_equal("failed", media_asset.status)
+          assert(media_asset.variants.none? { File.exist?(File.join(Danbooru.config.storage_manager.base_dir, it.file_path)) })
+          assert_nothing_raised { Danbooru.config.storage_manager.open("/trash/quarantine/#{media_asset.md5}.mp4") }
+        end
+
+        should "not let the file name add lines to the log" do
+          ExifTool.any_instance.stubs(:metadata).raises(ExternalCommand::SyscallError, "exiftool called a blocked syscall")
+          Rails.logger.stubs(:error)
+          Rails.logger.expects(:error).with { |message| message.start_with?("Upload #") && message.exclude?("\n") && message.include?('"file://test.jpg\nUpload #1') }
+
+          file = Rack::Test::UploadedFile.new(Rails.root.join("test/files/jpg/test.jpg"), original_filename: "test.jpg\nUpload #1 by user #1 (admin) was blocked by the sandbox")
+          perform_enqueued_jobs do
+            post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }}}
+          end
+        end
+      end
+
+      context "for a video whose previews fail for a reason other than the sandbox" do
+        should "keep the stored files" do
+          MediaFile::Video.any_instance.stubs(:preview!).raises(FFmpeg::Error, "ffmpeg failed")
+          create_upload!("test/files/mp4/test-300x300-av1.mp4", user: @user)
+          media_asset = MediaAsset.last
+
+          assert_equal("failed", media_asset.status)
+          assert_nothing_raised { Danbooru.config.storage_manager.open(media_asset.variant(:original).file_path) }
+        end
+      end
+
+      context "for a file whose dimensions can't be read" do
+        should "fail" do
+          MediaFile::Image.any_instance.stubs(:dimensions).returns([0, 0])
+          create_upload!("test/files/jpg/test.jpg", user: @user)
+
+          assert_equal("error", Upload.last.status)
+          assert_equal("Couldn't read the file's dimensions", Upload.last.error)
+          assert_equal(0, MediaAsset.count)
+        end
+      end
+
       context "for a video with too many frames" do
         should "fail before reading the frames" do
           FFmpeg.any_instance.stubs(:packet_count).returns(FFmpeg::MAX_PACKET_COUNT + 1)
