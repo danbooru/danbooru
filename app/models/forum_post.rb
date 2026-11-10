@@ -40,6 +40,7 @@ class ForumPost < ApplicationRecord
   mentionable(
     message_field: :body,
     title: ->(_user_name) { %{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})} },
+    visible_to: ->(user) { policy(user).show? },
     body: lambda { |user_name|
       <<~EOF
         @#{creator.name} mentioned you in forum ##{id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]). This is an excerpt from the message:

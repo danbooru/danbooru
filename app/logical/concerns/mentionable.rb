@@ -22,6 +22,8 @@ module Mentionable
     # options:
     # - message_field
     # - user_field
+    # - title, body: The title and body of the dmail sent to mentioned users.
+    # - visible_to: Whether a user can see the message. Users who can't see it aren't notified.
     def mentionable(options = {})
       @mentionable_options = options
       validate :validate_mention_count, :validate_mention_author, :validate_mention_rate_limit, if: :check_mentions?
@@ -75,12 +77,14 @@ module Mentionable
 
   # Memoized so that validating and sending the dmails only looks up the users once.
   #
-  # @return [Array<User>] The users mentioned in `text` but not in `text_was`, excluding the author.
+  # @return [Array<User>] The users mentioned in `text` but not in `text_was`, excluding the author and users who can't
+  #   see the message.
   memoize def new_mentioned_users(text, text_was)
     names = DText.new(text).mentions - DText.new(text_was).mentions
     return [] if names.empty?
 
-    User.where_text_includes_lower(:name, names).where.not(id: creator_id).to_a
+    users = User.where_text_includes_lower(:name, names).where.not(id: creator_id)
+    users.select { |user| instance_exec(user, &self.class.mentionable_option(:visible_to)) }
   end
 
   def check_mentions?

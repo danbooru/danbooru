@@ -162,6 +162,28 @@ class CommentTest < ActiveSupport::TestCase
         end
       end
 
+      should "not dmail users who can't see the post" do
+        post = create(:post, is_banned: true)
+        member = create(:user)
+        approver = create(:approver)
+
+        assert_no_difference("member.dmails.count") do
+          assert_difference("approver.dmails.count", 1) do
+            create(:comment, post: post, body: "hi @#{member.name} @#{approver.name}")
+          end
+        end
+      end
+
+      should "dmail members mentioned on gold-only posts" do
+        post = create(:post)
+        member = create(:member_user)
+        Post.any_instance.stubs(:levelblocked?).returns(true)
+
+        assert_difference("member.dmails.count", 1) do
+          create(:comment, post: post, body: "hi @#{member.name}")
+        end
+      end
+
       should "not dmail the author when they mention themselves" do
         user = create(:user)
 

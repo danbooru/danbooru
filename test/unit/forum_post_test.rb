@@ -101,6 +101,18 @@ class ForumPostTest < ActiveSupport::TestCase
         end
       end
 
+      should "not dmail users who can't see the topic" do
+        topic = create(:mod_up_forum_topic)
+        member = create(:user)
+        mod = create(:moderator_user)
+
+        assert_no_difference("member.dmails.count") do
+          assert_difference("mod.dmails.count", 1) do
+            create(:forum_post, topic: topic, body: "hi @#{member.name} @#{mod.name}")
+          end
+        end
+      end
+
       should "allow mentioning up to 10 users" do
         body = 10.times.map { |i| "@user_#{i}" }.join(" ")
         post = build(:forum_post, creator: @user, topic: @topic, body: body)

@@ -35,6 +35,7 @@ class Comment < ApplicationRecord
   mentionable(
     message_field: :body,
     title: ->(_user_name) { "#{creator.name} mentioned you in a comment on post ##{post_id}" },
+    visible_to: ->(user) { !post.banblocked?(user) },
     body: lambda { |user_name|
       <<~EOF
         @#{creator.name} mentioned you in comment ##{id} on post ##{post_id}. This is an excerpt from the message:
