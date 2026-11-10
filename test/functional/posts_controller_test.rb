@@ -41,7 +41,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#quick-edit-form input.button-primary[type=submit][value=Update]"
         assert_select "#quick-edit-form button.button-outline-primary[type=button][name=cancel]", text: "Cancel"
       end
-          
+
       context "the limit param" do
         setup do
           @user = create(:user, per_page: 2)
@@ -1238,6 +1238,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         @post.reload
         assert_equal("bbb", @post.tag_string)
+      end
+
+      should "not overflow the session cookie when adding many new tags" do
+        tags = 40.times.map { |i| "tag#{i}_#{"a" * 150}" }.join(" ")
+        put_auth post_path(@post), @user, params: { post: { tag_string: "bbb #{tags}" }}
+        assert_redirected_to post_path(@post)
+      end
+
+      should "not overflow the session cookie when adding a very long tag" do
+        put_auth post_path(@post), @user, params: { post: { tag_string: "bbb #{"a" * 2000}" }}
+        assert_redirected_to post_path(@post)
+        assert_equal("bbb", @post.reload.tag_string)
       end
 
       should "redraw the post preview with the size and show_votes params" do

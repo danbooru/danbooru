@@ -167,11 +167,11 @@ class PostsController < ApplicationController
     respond_with(post) do |format|
       format.html do
         if post.warnings.any?
-          flash[:notice] = post.warnings.full_messages.join(".\n \n")
+          flash[:notice] = post.warnings.full_messages.join(".\n \n").truncate(500)
         end
 
         if post.errors.any?
-          flash[:notice] = post.errors.full_messages.join("; ")
+          flash[:notice] = post.errors.full_messages.join("; ").truncate(500)
         end
 
         redirect_to post_path(post, { q: params[:q] }.compact_blank)

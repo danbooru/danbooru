@@ -43,14 +43,14 @@ class ArtistsController < ApplicationController
   def create
     @artist = authorize Artist.new(permitted_attributes(Artist))
     @artist.save
-    flash[:notice] = [*@artist.errors.full_messages, *@artist.warnings.full_messages].join(".\n \n") if @artist.warnings.any? || @artist.errors.any?
+    flash[:notice] = [*@artist.errors.full_messages, *@artist.warnings.full_messages].join(".\n \n").truncate(500) if @artist.warnings.any? || @artist.errors.any?
     respond_with(@artist)
   end
 
   def update
     @artist = authorize Artist.find(params[:id])
     @artist.update(permitted_attributes(@artist))
-    flash[:notice] = [*@artist.errors.full_messages, *@artist.warnings.full_messages].join(".\n \n") if @artist.warnings.any? || @artist.errors.any?
+    flash[:notice] = [*@artist.errors.full_messages, *@artist.warnings.full_messages].join(".\n \n").truncate(500) if @artist.warnings.any? || @artist.errors.any?
     respond_with(@artist)
   end
 

@@ -215,6 +215,14 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "not overflow the session cookie when warning about many duplicate artists" do
+        urls = 10.times.map { |i| "https://www.pixiv.net/users/#{i}" }
+        urls.product([1, 2, 3]).each { |url, n| create(:artist, name: "artist#{n}_#{url.split("/").last}_#{"a" * 150}", url_string: url) }
+        post_auth artists_path, @user, params: { artist: { name: "test", url_string: urls.join("\n") }}
+
+        assert_response :redirect
+      end
+
       should "create an artist" do
         assert_difference("Artist.count", 1) do
           post_auth artists_path, @user, params: { artist: { name: "test" }}
@@ -242,6 +250,11 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "update action" do
+      should "not overflow the session cookie when adding a very long URL" do
+        put_auth artist_path(@artist.id), @user, params: { artist: { url_string: "https://example.com/#{"a" * 3000}" }}
+        assert_response :success
+      end
+
       should "undelete an artist" do
         put_auth artist_path(@artist.id), create(:builder_user), params: { artist: { is_deleted: false }}
         assert_redirected_to(artist_path(@artist.id))

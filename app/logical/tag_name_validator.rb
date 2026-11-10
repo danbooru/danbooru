@@ -15,7 +15,8 @@ class TagNameValidator < ActiveModel::EachValidator
     value = Tag.normalize_name(value)
 
     if value.size > MAX_TAG_LENGTH
-      record.errors.add(attribute, "'#{value}' cannot be more than #{MAX_TAG_LENGTH} characters long")
+      record.errors.add(attribute, "'#{value.truncate(MAX_TAG_LENGTH)}' cannot be more than #{MAX_TAG_LENGTH} characters long")
+      return
     end
 
     if !value.in?(Tag::PERMITTED_UNBALANCED_TAGS) && !value.has_balanced_parens?
