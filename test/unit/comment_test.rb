@@ -68,6 +68,15 @@ class CommentTest < ActiveSupport::TestCase
         end
       end
 
+      should "dmail users mentioned with different capitalization" do
+        user1 = create(:user, name: "foo_bar")
+        user2 = create(:user, name: "Baz")
+
+        assert_difference(["user1.dmails.count", "user2.dmails.count"], 1) do
+          create(:comment, post: @post, body: "hi @Foo_Bar and @baz")
+        end
+      end
+
       context "too many users" do
         should "not allow mentioning more than 10 users" do
           comment = build(:comment, post: @post, body: 11.times.map { |i| "@user_#{i}" }.join(" "))
@@ -80,6 +89,37 @@ class CommentTest < ActiveSupport::TestCase
           comment = build(:comment, post: @post, body: 10.times.map { |i| "@user_#{i}" }.join(" "))
 
           assert_equal(true, comment.save)
+        end
+      end
+
+      context "edited by another user" do
+        setup do
+          @user = create(:user)
+          @user2 = create(:user)
+          @mod = create(:moderator_user)
+          @comment = as(@user) { create(:comment, creator: @user, post: @post, body: "hi @#{@user2.name}") }
+        end
+
+        should "not allow adding new mentions" do
+          @user3 = create(:user)
+
+          assert_no_difference("Dmail.count") do
+            assert_equal(false, as(@mod) { @comment.update(updater: @mod, body: "hi @#{@user2.name} @#{@user3.name}") })
+          end
+
+          assert_equal(["You can't mention users in someone else's message"], @comment.errors.full_messages)
+        end
+
+        should "allow edits that don't add new mentions" do
+          assert_equal(true, as(@mod) { @comment.update(updater: @mod, body: "hello @#{@user2.name} @nonexistent_user") })
+        end
+      end
+
+      should "not dmail the author when they mention themselves" do
+        user = create(:user)
+
+        assert_no_difference("Dmail.count") do
+          create(:comment, creator: user, post: @post, body: "hi from @#{user.name}")
         end
       end
     end

@@ -299,6 +299,18 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert(ModAction.exists?(category: "forum_topic_lock", subject: @forum_topic, creator: @mod))
       end
 
+      should "not allow mods to add mentions to another user's original post" do
+        @user2 = create(:user)
+
+        assert_no_difference("Dmail.count") do
+          put_auth forum_topic_path(@forum_topic), @mod, params: { forum_topic: { original_post_attributes: { id: @forum_topic.original_post.id, body: "hi @#{@user2.name}" }}}
+        end
+
+        assert_response :success
+        assert_select "#notice", text: /can't mention users in someone else's message/
+        assert_equal("xxx", @forum_topic.original_post.reload.body)
+      end
+
       should "allow users to update their own topics" do
         put_auth forum_topic_path(@forum_topic), @user, params: { forum_topic: { title: "test" }}
 
