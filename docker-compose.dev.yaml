@@ -161,8 +161,28 @@ services:
       interval: 10s
       retries: 3
 
+  # Upgrades the database to the version of Postgres used below, if it was created by an older version. It exits
+  # without doing anything if the database is already up to date. Keep this the same version as the postgres image.
+  #
+  # After upgrading, it reindexes all databases, which can take a long time for a large database.
+  #
+  # https://github.com/pgautoupgrade/docker-pgautoupgrade
+  postgres-upgrade:
+    image: pgautoupgrade/pgautoupgrade:16-bookworm
+    restart: no
+    shm_size: 1gb
+    environment:
+      PGAUTO_ONESHOT: "yes"
+      POSTGRES_USER: danbooru
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - "danbooru-data:/var/lib/postgresql/data"
+
   postgres:
     image: ghcr.io/danbooru/postgres:16.1
+    depends_on:
+      postgres-upgrade:
+        condition: service_completed_successfully
     shm_size: 1gb
     environment:
       POSTGRES_USER: danbooru
