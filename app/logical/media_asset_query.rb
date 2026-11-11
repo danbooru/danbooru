@@ -5,22 +5,24 @@ class MediaAssetQuery
   extend Memoist
 
   METATAGS = %w[id md5 pixelhash width height duration mpixels ratio filesize filetype date age status is exif]
+  MAX_TERMS = 10 # limit to prevent DoS with huge searches
 
-  attr_reader :search_string
+  attr_reader :search_string, :max_terms
 
   delegate :to_infix, :to_pretty_string, to: :ast
   alias_method :to_s, :to_infix
 
-  def initialize(search_string)
+  def initialize(search_string, max_terms: MAX_TERMS)
     @search_string = search_string.to_s.strip
+    @max_terms = max_terms
   end
 
-  def self.search(search_string, **options)
-    new(search_string).search(**options)
+  def self.search(search_string, max_terms: MAX_TERMS, **options)
+    new(search_string, max_terms:).search(**options)
   end
 
   def ast
-    @ast ||= PostQuery::Parser.parse(search_string, metatags: METATAGS)
+    @ast ||= PostQuery::Parser.parse(search_string, metatags: METATAGS, max_terms: max_terms)
   end
 
   def normalized_ast

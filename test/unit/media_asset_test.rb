@@ -84,6 +84,15 @@ class MediaAssetTest < ActiveSupport::TestCase
         assert_tag_match([], "user:bkub")
         assert_tag_match([], "fav:bkub")
       end
+
+      should "return nothing for searches with too many terms" do
+        assert_tag_match([@asset1], (1..9).map { "nomatch#{it}" }.push("rating:g").join(" or "))
+        assert_tag_match([], (1..10).map { "nomatch#{it}" }.push("rating:g").join(" or "))
+      end
+
+      should "not limit the number of terms in ai_tags_match?" do
+        assert(@asset1.ai_tags_match?((1..20).map { "nomatch#{it}" }.push("rating:g").join(" or ")))
+      end
     end
   end
 end

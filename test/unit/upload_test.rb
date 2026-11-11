@@ -26,6 +26,11 @@ class UploadTest < ActiveSupport::TestCase
         assert_tag_match([@upload1], "md5:#{@asset1.md5}")
       end
 
+      should "return nothing for searches with too many terms" do
+        assert_tag_match([@upload1], (1..9).map { "nomatch#{it}" }.push("id:#{@upload1.upload_media_assets.sole.id}").join(" or "))
+        assert_tag_match([], (1..10).map { "nomatch#{it}" }.push("id:#{@upload1.upload_media_assets.sole.id}").join(" or "))
+      end
+
       should "return assets for the width: metatag" do
         assert_tag_match([@upload1], "width:#{@asset1.image_width}")
       end
