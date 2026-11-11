@@ -23,7 +23,6 @@ class ApplicationController < ActionController::Base
   before_action :ip_ban_check
   before_action :set_variant
   before_action :add_headers
-  before_action :cause_error
   before_action :redirect_if_name_invalid?
   after_action :verify_authorized, if: -> { Rails.env.local? }
   after_action :skip_session_if_publicly_cached
@@ -298,19 +297,6 @@ class ApplicationController < ActionController::Base
     when Array
       value.each { |item| check_param_length!(name, item) }
     end
-  end
-
-  # allow api clients to force errors for testing purposes.
-  def cause_error
-    return unless params[:cause_error].present?
-
-    status = params[:cause_error].to_i
-    raise ArgumentError, "invalid status code" unless status.in?(400..599)
-
-    error = StandardError.new(params[:message])
-    error.set_backtrace(caller)
-
-    render_error_page(status, error)
   end
 
   def redirect_if_name_invalid?
