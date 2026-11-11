@@ -1275,6 +1275,20 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_not_equal("blah", @post.reload.tag_string)
       end
 
+      should "not allow unprivileged users to change the parent of restricted posts with the child: metatag" do
+        banned_post = create(:post, is_banned: true)
+        banned_child = create(:post, is_banned: true, parent: @post)
+
+        put_auth post_path(@post), @user, params: { post: { tag_string: "aaa child:#{banned_post.id}" }}
+        assert_nil(banned_post.reload.parent_id)
+
+        put_auth post_path(@post), @user, params: { post: { tag_string: "aaa -child:#{banned_child.id}" }}
+        assert_equal(@post.id, banned_child.reload.parent_id)
+
+        put_auth post_path(@post), @user, params: { post: { tag_string: "aaa child:none" }}
+        assert_equal(@post.id, banned_child.reload.parent_id)
+      end
+
       should "not allow unverified users to update posts" do
         put_auth post_path(@post), create(:restricted_user), params: { post: { tag_string: "blah" }}
         assert_response 403

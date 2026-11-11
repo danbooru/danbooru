@@ -587,21 +587,21 @@ class Post < ApplicationRecord
           disapprovals.find_or_initialize_by(user: CurrentUser.user).update!(reason: reason.downcase)
 
         in "child", "none"
-          children.each do |post|
+          children.select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
             post.update!(parent_id: nil)
           end
 
         in "-child", ids
           next if ids.blank?
 
-          children.where_numeric_matches(:id, ids).each do |post|
+          children.where_numeric_matches(:id, ids).select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
             post.update!(parent_id: nil)
           end
 
         in "child", ids
           next if ids.blank?
 
-          Post.where_numeric_matches(:id, ids).where.not(id: id).limit(10).each do |post|
+          Post.where_numeric_matches(:id, ids).where.not(id: id).limit(10).select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
             post.update!(parent_id: id)
           end
 

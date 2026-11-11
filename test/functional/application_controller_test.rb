@@ -697,6 +697,18 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal(count_queries.call, queries)
       end
 
+      should "not include hidden methods when only some nested records hide them" do
+        visible_child = create(:post, parent: @post)
+        banned_child = create(:post, parent: @post, is_banned: true)
+
+        get post_path(@post, only: "children[id,file_url]"), as: :json
+        assert_response :success
+
+        children = response.parsed_body["children"].index_by { it["id"] }
+        assert_equal(%w[file_url id], children[visible_child.id].keys.sort)
+        assert_equal(%w[id], children[banned_child.id].keys)
+      end
+
       should "not include hidden associations when only some nested records hide them" do
         create(:comment, post: @post, is_deleted: false)
         create(:comment, post: @post, is_deleted: true)

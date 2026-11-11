@@ -143,7 +143,7 @@ class ApplicationRecord < ActiveRecord::Base
       else
         options[:methods] ||= []
         attributes, methods = api_attributes.partition { |attr| has_attribute?(attr) }
-        methods += options[:methods]
+        methods += options[:methods] unless options[:nested] # nested options are shared by sibling records with different visible methods
         options[:only] ||= attributes + methods
 
         attributes &= options[:only]
@@ -167,9 +167,9 @@ class ApplicationRecord < ActiveRecord::Base
     def serializable_add_includes(options = {})
       super do |association, records, opts|
         if records.respond_to?(:to_ary)
-          yield association, records.to_ary.reject(&:hidden_from_api), opts
+          yield association, records.to_ary.reject(&:hidden_from_api), opts.merge(nested: true)
         elsif !records.hidden_from_api
-          yield association, records, opts
+          yield association, records, opts.merge(nested: true)
         end
       end
     end
