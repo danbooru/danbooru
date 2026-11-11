@@ -23,6 +23,13 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not pass javascript: URLs to the login form" do
+        get new_session_path(url: "javascript://www.example.com/%0Aalert(1)")
+
+        assert_response :success
+        assert_select "input[name='session[url]'][value='#{root_path}']"
+      end
+
       should "fail if the user is already logged in" do
         get_auth new_session_path, @user
         assert_response 403
@@ -244,7 +251,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow redirects to protocol-relative URLs" do
         post session_path, params: { session: { name: @user.name, password: "password" }, url: "//example.com" }
-        assert_response 403
+        assert_redirected_to root_path
+      end
+
+      should "not allow redirects to javascript: URLs" do
+        post session_path, params: { session: { name: @user.name, password: "password", url: "javascript://www.example.com/%0Aalert(1)" }}
+        assert_redirected_to root_path
       end
 
       should "not allow deleted users to login" do
@@ -562,6 +574,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "verify_totp action" do
+      should "not redirect to javascript: URLs" do
+        @user = create(:user_with_2fa, password: "password")
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: @user.totp.code, url: "javascript://www.example.com/%0Aalert(1)" }}
+
+        assert_redirected_to root_path
+        assert_equal(@user.id, session[:user_id])
+      end
+
       should "log the user in if they enter the correct 2FA code" do
         @user = create(:user_with_2fa, password: "password")
 
@@ -772,6 +792,13 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       context "for a user with 2FA enabled" do
         setup do
           @user = create(:user_with_2fa, password: "password")
+        end
+
+        should "not redirect to javascript: URLs" do
+          travel_to(1.day.ago) { login_as(@user) }
+          post reauthenticate_session_path, params: { session: { password: "password", verification_code: @user.totp.code, url: "javascript://www.example.com/%0Aalert(1)" }}
+
+          assert_redirected_to root_path
         end
 
         should "succeed if the user enters the right password and 2FA code" do

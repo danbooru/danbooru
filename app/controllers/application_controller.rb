@@ -327,6 +327,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Return the URL if it's a local path, or nil otherwise. `url_from` isn't enough because it allows `javascript://<host>/...`.
+  def local_path(url)
+    url.to_s if url.to_s.match?(%r{\A/(?![/\\])})
+  end
+
   # Remove blank `search` params from the url.
   #
   # /tags?search[name]=touhou&search[category]=&search[order]=

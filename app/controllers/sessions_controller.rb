@@ -12,7 +12,7 @@ class SessionsController < ApplicationController
 
   def new
     @session = authorize SessionLoader.new(request)
-    @url = params.dig(:session, :url).presence || params[:url].presence || root_path
+    @url = local_path(params.dig(:session, :url).presence || params[:url]) || root_path
 
     if params[:signed_login_event].present? && @session.authorize_login_event!(params[:signed_login_event])
       notice = "New location verified. Login again to continue"
@@ -25,7 +25,7 @@ class SessionsController < ApplicationController
   def create
     @session = authorize SessionLoader.new(request)
     @user = @session.login(params.dig(:session, :name), params.dig(:session, :password))
-    @url = params.dig(:session, :url).presence || params[:url].presence || root_path
+    @url = local_path(params.dig(:session, :url).presence || params[:url]) || root_path
 
     if @user&.totp.present?
       render :confirm_totp
@@ -40,14 +40,14 @@ class SessionsController < ApplicationController
   def confirm_password
     @user = CurrentUser.user
     @session = authorize SessionLoader.new(request)
-    @url = params.dig(:session, :url).presence || params[:url].presence || root_path
+    @url = local_path(params.dig(:session, :url).presence || params[:url]) || root_path
   end
 
   # Verify the user's password and 2FA code before sensitive actions.
   def reauthenticate
     @user = CurrentUser.user
     @session = authorize SessionLoader.new(request)
-    @url = params.dig(:session, :url).presence || params[:url].presence || root_path
+    @url = local_path(params.dig(:session, :url).presence || params[:url]) || root_path
 
     if @session.reauthenticate(@user, params.dig(:session, :password), params.dig(:session, :verification_code))
       redirect_to @url
@@ -59,7 +59,7 @@ class SessionsController < ApplicationController
   # Verify the user's 2FA code after they log in with their password.
   def verify_totp
     @user = User.find_signed!(params.dig(:totp, :user_id), purpose: "verify_totp/#{session[:session_id]}")
-    @url = params.dig(:totp, :url).presence || root_url
+    @url = local_path(params.dig(:totp, :url)) || root_path
     @session = authorize SessionLoader.new(request)
 
     if @session.verify_totp!(@user, params.dig(:totp, :code))

@@ -515,6 +515,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not pass javascript: URLs to the signup form" do
+        get new_user_path(url: "javascript://www.example.com/%0Aalert(1)")
+
+        assert_response :success
+        assert_select "input[name='user[url]'][value='#{root_path}']"
+      end
+
       should "fail for a logged in user" do
         get_auth new_user_path, @user
         assert_response 403
@@ -550,6 +557,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("127.0.0.1", User.last.last_ip_addr.to_s)
       end
 
+      should "not redirect to javascript: URLs" do
+        post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1", url: "javascript://www.example.com/%0Aalert(1)" }}
+        assert_redirected_to User.last
+      end
+
       should "create a user with a valid email" do
         freeze_time
         post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1", email_address: { address: "webmaster@danbooru.donmai.us" }}}
@@ -581,7 +593,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "not redirect to an offsite URL after creating a user" do
         post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1" }, url: "https://evil.com" }
-        assert_response 403
+        assert_redirected_to User.last
       end
 
       should "not create a user with an invalid name" do

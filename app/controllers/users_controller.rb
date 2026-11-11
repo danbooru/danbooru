@@ -33,7 +33,7 @@ class UsersController < ApplicationController
 
   def new
     @user = authorize User.new
-    @url = params.dig(:user, :url).presence || params[:url].presence || root_path
+    @url = local_path(params.dig(:user, :url).presence || params[:url]) || root_path
     respond_with(@user)
   end
 
@@ -67,7 +67,7 @@ class UsersController < ApplicationController
   def create
     user_signup = UserSignup.new(request)
     @user = authorize(user_signup.user)
-    @url = params.dig(:user, :url).presence || params[:url].presence
+    @url = local_path(params.dig(:user, :url).presence || params[:url])
 
     if @user.save(context: [:create, :deliverable])
       set_current_user
