@@ -230,6 +230,13 @@ module Source
       http.timeout(DOWNLOAD_TIMEOUT).max_size(MediaAsset::MAX_FILE_SIZE).use(:spoof_referrer).use(:unpolish_cloudflare)
     end
 
+    # @return [Integer, nil] The max number of files that uploads can download from this site at the same time, or nil
+    #   for no limit. Extractors can override this for sites that return errors when too many files are downloaded at
+    #   once. See ProcessUploadMediaAssetJob.
+    def max_concurrent_downloads
+      nil
+    end
+
     # Fetch the given URL and return the parsed response, or nil on a non-2xx response. Also tracks whether the
     # credentials succeeded or failed if the site uses credentials.
     #

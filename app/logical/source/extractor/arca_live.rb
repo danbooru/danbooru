@@ -91,6 +91,11 @@ module Source
         super.timeout(120).disable_feature(:spoof_referrer)
       end
 
+      # Downloading more than two files at once returns 429 errors.
+      def max_concurrent_downloads
+        2
+      end
+
       memoize def api_response
         http.cache(1.minute).parsed_get(api_url) || {}
       end
