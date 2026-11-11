@@ -136,6 +136,38 @@ module PostSets
         end
       end
 
+      context "a set for a banned artist" do
+        setup do
+          @artist = create(:artist, is_banned: true)
+          @post = create(:post, tag_string: "#{@artist.name} 1girl")
+        end
+
+        should "hide the posts from regular users" do
+          set = PostSets::Post.new(@artist.name, user: @user)
+
+          assert_equal(true, set.banned_artist?)
+          assert_equal(0, set.post_count)
+          assert_equal([], set.sidebar_tags)
+        end
+
+        should "not hide the posts from approvers" do
+          set = PostSets::Post.new(@artist.name, user: create(:approver))
+
+          assert_equal(false, set.banned_artist?)
+          assert_equal(1, set.post_count)
+          assert_not_equal([], set.sidebar_tags)
+        end
+
+        should "use the policy to decide who can search for the artist" do
+          ArtistPolicy.any_instance.stubs(:can_search_banned?).returns(true)
+          set = PostSets::Post.new(@artist.name, user: @user)
+
+          assert_equal(false, set.banned_artist?)
+          assert_equal(1, set.post_count)
+          assert_not_equal([], set.sidebar_tags)
+        end
+      end
+
       context "#per_page method" do
         should "take the limit from the params first, then the limit:<n> metatag, then the account settings" do
           set = PostSets::Post.new("a limit:23 b", 1, 42)
