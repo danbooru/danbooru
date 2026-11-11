@@ -32,7 +32,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def self.urls_match(urls)
-    urls = Array.wrap(urls).flat_map(&:split)
+    urls = Array.wrap(urls).flat_map(&:split).take(10) # limit to prevent DoS with huge searches
     return all if urls.empty?
 
     urls.map do |url|
