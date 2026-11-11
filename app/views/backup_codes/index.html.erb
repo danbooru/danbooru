@@ -42,8 +42,8 @@
         <hr>
       </div>
 
-      <% if @url.present? %>
-        <%= link_to "Continue", @url, class: "button-primary" %>
+      <% if @continue %>
+        <%= link_to "Continue", settings_path, class: "button-primary" %>
       <% else %>
         <%= edit_form_for(:backup_codes, url: user_backup_codes_path(@user), method: "post") do |f| %>
           <%= f.submit_button "Generate new codes" %>

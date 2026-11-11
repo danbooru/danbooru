@@ -55,7 +55,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
 
           put_auth user_totp_path(user_id: @user), @user, params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}, reauthenticate: true
 
-          assert_redirected_to user_backup_codes_path(@user, url: settings_path)
+          assert_redirected_to user_backup_codes_path(@user, continue: true)
           assert_equal(true, @user.reload.totp.present?)
           assert_equal(true, @user.totp_secret.present?)
           assert_equal(true, @user.backup_codes.present?)
@@ -70,7 +70,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
 
           put user_totp_path(user_id: @user), params: { totp: { signed_secret: @totp.signed_secret, verification_code: @totp.code }}
 
-          assert_redirected_to user_backup_codes_path(@user, url: settings_path)
+          assert_redirected_to user_backup_codes_path(@user, continue: true)
           assert_equal(true, @other_session.reload.revoked?)
           assert_equal(true, @user.login_sessions.find_by!(login_id: session[:login_id]).active?)
         end

@@ -24,28 +24,22 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "after enabling 2FA" do
-        should "work" do
+        should "link to the settings page" do
           @user = create(:user_with_2fa)
-          get_auth user_backup_codes_path(@user, url: settings_path), @user, reauthenticate: true
+          get_auth user_backup_codes_path(@user, continue: true), @user, reauthenticate: true
 
           assert_response :success
-          assert_select "a.button-primary[href='#{settings_path}']", text: "Continue"
+          assert_select "a.button-primary[href=?]", settings_path, text: "Continue"
+          assert_select "form[action=?]", user_backup_codes_path(@user), count: 0
         end
 
-        should "not link to a javascript: url" do
+        should "ignore the url param" do
           @user = create(:user_with_2fa)
-          get_auth user_backup_codes_path(@user, url: "javascript:alert(1)"), @user, reauthenticate: true
+          get_auth user_backup_codes_path(@user, continue: true, url: "javascript://www.example.com/%0Aalert(1)"), @user, reauthenticate: true
 
           assert_response :success
-          assert_select "a[href='javascript:alert(1)']", count: 0
-        end
-
-        should "not link to an external url" do
-          @user = create(:user_with_2fa)
-          get_auth user_backup_codes_path(@user, url: "https://evil.com"), @user, reauthenticate: true
-
-          assert_response :success
-          assert_select "a[href='https://evil.com']", count: 0
+          assert_select "a.button-primary[href=?]", settings_path, text: "Continue"
+          assert_select "a[href^=javascript]", count: 0
         end
       end
 
