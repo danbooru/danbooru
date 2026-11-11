@@ -222,7 +222,7 @@ class SiteCredential < ApplicationRecord
 
     with_lock do
       increment(:usage_count)
-      self.metadata.deep_merge!(metadata)
+      self.metadata.deep_merge!(metadata.deep_stringify_keys)
       update!(last_used_at: Time.zone.now, status: :valid)
     end
   end
@@ -238,7 +238,7 @@ class SiteCredential < ApplicationRecord
     with_lock do
       increment(:usage_count)
       increment(:error_count)
-      self.metadata.deep_merge!(metadata)
+      self.metadata.deep_merge!(metadata.deep_stringify_keys)
       update!(last_used_at: Time.zone.now, last_error_at: Time.zone.now, status: status)
     end
   end
