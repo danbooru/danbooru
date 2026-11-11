@@ -346,6 +346,28 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "when the session cookie domain is set" do
+      setup do
+        Danbooru.config.stubs(:session_cookie_domain).returns("example.com")
+      end
+
+      should "delete the host-only session cookie if the request has duplicate session cookies" do
+        get posts_path, headers: { HTTP_COOKIE: "_danbooru2_session=a; _danbooru2_session=b" }
+
+        assert_response :success
+        deleted_cookies = Array(response.headers["Set-Cookie"]).grep(/\A_danbooru2_session=;/)
+        assert_equal(1, deleted_cookies.size)
+        assert_match(%r{\A_danbooru2_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT\z}, deleted_cookies.first)
+      end
+
+      should "not delete the session cookie if the request has a single session cookie" do
+        get posts_path, headers: { HTTP_COOKIE: "_danbooru2_session=a" }
+
+        assert_response :success
+        assert_empty(Array(response.headers["Set-Cookie"]).grep(/max-age=0/))
+      end
+    end
+
     context "on session cookie authentication" do
       setup do
         @user = create(:user, password: "password")

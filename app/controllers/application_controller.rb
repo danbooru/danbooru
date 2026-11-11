@@ -18,6 +18,7 @@ class ApplicationController < ActionController::Base
   before_action :check_get_body
   before_action :check_oversized_get_params
   before_action :reset_current_user
+  before_action :delete_host_only_session_cookie
   before_action :set_current_user
   before_action :normalize_search
   before_action :ip_ban_check
@@ -254,6 +255,17 @@ class ApplicationController < ActionController::Base
       else
         pundit.policy!(record)
       end
+    end
+  end
+
+  # If the session cookie domain is set (e.g. `.donmai.us`), delete any old session cookie set for the current host only
+  # (e.g. `danbooru.donmai.us`). Otherwise the browser sends both cookies and we may read the stale one.
+  def delete_host_only_session_cookie
+    name = Danbooru.config.session_cookie_name
+    session_cookies = request.get_header("HTTP_COOKIE").to_s.split(";").count { it.strip.start_with?("#{name}=") }
+
+    if Danbooru.config.session_cookie_domain.present? && session_cookies > 1
+      response.delete_cookie(name, path: request.session_options[:path] || "/")
     end
   end
 
