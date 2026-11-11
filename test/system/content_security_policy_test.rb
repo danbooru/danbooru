@@ -21,7 +21,7 @@ class ContentSecurityPolicyChromeTest < ChromeSystemTestCase
       click_link "javascript: link"
       page.document.synchronize { evaluate_script("window.cspTest.done") or raise Capybara::ExpectationNotMet, "The CSP test page didn't finish" }
 
-      expected_allowed = %w[inlineScript inlineEventHandler javascriptURL eval newFunction wasm].index_with(true)
+      expected_allowed = %w[inlineScript eval newFunction wasm].index_with(true)
       assert_equal(expected_allowed, evaluate_script("window.cspTest.allowed"))
 
       # Browsers only report the origin, not the full URL, for blocked iframes and objects.
@@ -34,7 +34,10 @@ class ContentSecurityPolicyChromeTest < ChromeSystemTestCase
         "img-src blocked https://blocked.example.com/image.png",
         "media-src blocked https://blocked.example.com/video.mp4",
         "object-src blocked https://blocked.example.com",
+        "script-src-attr blocked inline",
         "script-src-elem blocked https://blocked.example.com/script.js",
+        "script-src-elem blocked inline",
+        "script-src-elem blocked inline",
         "style-src-elem blocked https://blocked.example.com/style.css",
         "worker-src blocked blob",
       ]

@@ -7,7 +7,7 @@
   <base href="https://blocked.example.com/">
 <% end %>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   window.cspTest = { allowed: { inlineScript: true }, done: false };
 </script>
 
@@ -21,7 +21,6 @@
 
     <h2>Allowed</h2>
     <img src="/favicon.svg" width="16" height="16">
-    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onload="cspTest.allowed.inlineEventHandler = true">
     <img src="<%= storage_url %>.png">
     <video src="<%= storage_url %>.mp4"></video>
     <iframe src="/robots.txt"></iframe>
@@ -29,9 +28,11 @@
     <script src="https://challenges.cloudflare.com/csp-test.js"></script>
     <script src="https://static.cloudflareinsights.com/csp-test.js"></script>
     <p style="font-style: italic">An inline style attribute.</p>
-    <p><a href="javascript:void(cspTest.allowed.javascriptURL = true)">javascript: link</a></p>
 
     <h2>Blocked</h2>
+    <script>cspTest.allowed.inlineScriptWithoutNonce = true;</script>
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onload="cspTest.allowed.inlineEventHandler = true">
+    <p><a href="javascript:void(cspTest.allowed.javascriptURL = true)">javascript: link</a></p>
     <img src="https://blocked.example.com/image.png">
     <video src="https://blocked.example.com/video.mp4"></video>
     <script src="https://blocked.example.com/script.js"></script>
@@ -42,7 +43,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   (async () => {
     let probe = async (name, fn) => {
       try {

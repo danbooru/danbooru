@@ -423,7 +423,8 @@ module Danbooru
     end
 
     # Any custom code you want to insert into the default layout without
-    # having to modify the templates.
+    # having to modify the templates. Inline <script> tags and event handlers are
+    # blocked by the CSP, so use <script src="..."> for scripts.
     def custom_html_header_content
       nil
     end

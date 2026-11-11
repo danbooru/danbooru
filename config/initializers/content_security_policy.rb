@@ -20,11 +20,10 @@ Rails.application.configure do
     policy.base_uri   :self
     policy.object_src :none
 
-    # :unsafe_inline is for inline <script> tags, inline event handlers, `javascript:` links, and .js.erb templates.
     # :unsafe_eval is for Alpine.
     # :wasm_unsafe_eval is for the Ruffle player.
     # https://challenges.cloudflare.com is for Cloudflare Turnstile CAPTCHAs.
-    policy.script_src :self, :unsafe_inline, :unsafe_eval, :wasm_unsafe_eval, "challenges.cloudflare.com", "static.cloudflareinsights.com"
+    policy.script_src :self, :unsafe_eval, :wasm_unsafe_eval, "challenges.cloudflare.com", "static.cloudflareinsights.com"
 
     # :blob is for Ugoira frames.
     # :data is for the DText external link icon and the autocorrect underline in CSS.
@@ -52,10 +51,6 @@ Rails.application.configure do
 
   # Generate a random nonce on each request. Inline <script> tags need `nonce="<%= content_security_policy_nonce %>"`.
   config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
-  config.content_security_policy_nonce_directives = []
-  # XXX Uncomment to enable nonce checking; this will cause browsers to ignore unsafe-inline and make nonces mandatory.
-  # config.content_security_policy_nonce_directives = %w[script-src]
-
-  # XXX The CSP is in reporting-only mode in production.
-  config.content_security_policy_report_only = !Rails.env.local?
+  # Inline <script> tags must have a nonce. Inline event handlers and `javascript:` links are blocked.
+  config.content_security_policy_nonce_directives = %w[script-src]
 end
