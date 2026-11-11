@@ -88,7 +88,7 @@ module Source
       end
 
       def http_downloader
-        super.disable_feature(:spoof_referrer)
+        super.timeout(120).disable_feature(:spoof_referrer)
       end
 
       memoize def api_response
