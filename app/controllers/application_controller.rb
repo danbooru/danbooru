@@ -75,6 +75,12 @@ class ApplicationController < ActionController::Base
       if records.all?(ApplicationRecord)
         associations = ParameterBuilder.new(params[:only], model).includes_parameters
         ActiveRecord::Associations::Preloader.new(records: records, associations: associations).call
+
+        # Serializing included records is slow, so limit how many can be included to prevent DoS with huge responses.
+        if ApplicationRecord.included_records(records, associations).size > ParameterBuilder::MAX_INCLUDED_RECORDS
+          raise ParameterBuilder::Error, "Too many included records (max: #{ParameterBuilder::MAX_INCLUDED_RECORDS}). Use a lower limit or fewer includes."
+        end
+
         ApplicationRecord.hide_invisible_includes!(records, associations, CurrentUser.user)
       end
     end

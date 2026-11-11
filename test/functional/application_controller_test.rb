@@ -644,6 +644,28 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
       end
 
+      should "return an error when including too many records" do
+        create_list(:comment, 3, post: @post)
+
+        stub_const(ParameterBuilder, :MAX_INCLUDED_RECORDS, 3) do
+          get posts_path(tags: "id:#{@post.id}", only: "id,comments[creator]", limit: 1), as: :json
+        end
+
+        assert_response 422
+        assert_equal("ParameterBuilder::Error", response.parsed_body["error"])
+      end
+
+      should "allow including records up to the limit" do
+        create_list(:comment, 3, post: @post)
+
+        stub_const(ParameterBuilder, :MAX_INCLUDED_RECORDS, 3) do
+          get posts_path(tags: "id:#{@post.id}", only: "id,comments", limit: 1), as: :json
+        end
+
+        assert_response :success
+        assert_equal(3, response.parsed_body.sole["comments"].size)
+      end
+
       should "support POST requests overridden to GET" do
         post posts_path(format: :json), params: { _method: "GET", limit: 1, only: "id,rating,score" }, as: :url_encoded
 

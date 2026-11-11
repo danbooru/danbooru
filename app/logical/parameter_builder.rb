@@ -8,6 +8,7 @@ class ParameterBuilder
 
   MAX_LENGTH = 1_000 # The maximum length of the `only=` string.
   MAX_DEPTH = 8 # The maximum number of nested fields in the `only=` string.
+  MAX_INCLUDED_RECORDS = 10_000 # The maximum number of associated records that can be included in a response.
 
   attr_reader :only_string, :object
 
