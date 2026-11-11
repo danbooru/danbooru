@@ -32,4 +32,8 @@ class ModerationReportPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:status]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at reason creator model status]
+  end
 end

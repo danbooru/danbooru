@@ -56,7 +56,7 @@ class Comment < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_deleted is_sticky do_not_bump_post body score post creator updater], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:is_edited].to_s.truthy?
         q = q.where("comments.updated_at - comments.created_at > ?", 5.minutes.iso8601)

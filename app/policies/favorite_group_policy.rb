@@ -36,4 +36,8 @@ class FavoriteGroupPolicy < ApplicationPolicy
   def permitted_attributes
     [:name, :post_ids_string, :is_public, :is_private, :post_ids, { post_ids: [] }]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at name is_public post_ids creator]
+  end
 end

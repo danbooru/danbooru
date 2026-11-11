@@ -20,4 +20,8 @@ class ForumPostVotePolicy < ApplicationPolicy
   def permitted_attributes
     [:score]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at score creator forum_post]
+  end
 end

@@ -12,4 +12,8 @@ class ReactionPolicy < ApplicationPolicy
   def permitted_attributes
     [:model_id, :model_type, :reaction_id]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at creator model reaction_id]
+  end
 end

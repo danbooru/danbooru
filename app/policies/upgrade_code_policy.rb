@@ -12,4 +12,8 @@ class UpgradeCodePolicy < ApplicationPolicy
   def upgrade?
     unbanned?
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at code status creator redeemer user_upgrade]
+  end
 end

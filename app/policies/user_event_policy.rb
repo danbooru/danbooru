@@ -13,6 +13,10 @@ class UserEventPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def searchable_attributes
+    [:id, :created_at, :updated_at, :category, :user, :ip_addr, :user_agent, :metadata, :ip_geolocation, { session_id: :exact }]
+  end
+
   def api_attributes
     attributes = super
     attributes -= [:session_id, :user_agent] unless can_see_session?

@@ -48,4 +48,8 @@ class WikiPagePolicy < ApplicationPolicy
   def permitted_attributes
     [:title, :body, :other_names, :other_names_string, :is_deleted, (:is_locked if can_edit_locked?)].compact
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at is_locked is_deleted body title other_names tag artist dtext_links]
+  end
 end

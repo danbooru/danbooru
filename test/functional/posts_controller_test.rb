@@ -486,6 +486,16 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_equal([@hidden_post.id], response.parsed_body.pluck("id"))
         end
 
+        should "use the policy's searchable attributes for the md5: and pixelhash: metatags" do
+          PostPolicy.any_instance.stubs(:searchable_attributes).returns([:md5])
+          MediaAssetPolicy.any_instance.stubs(:searchable_attributes).returns([:pixel_hash])
+
+          %w[md5 pixelhash].each do |metatag|
+            get posts_path(tags: "id:#{@hidden_post.id} #{metatag}:>=#{"0" * 32}"), as: :json
+            assert_equal([@hidden_post.id], response.parsed_body.pluck("id"), metatag)
+          end
+        end
+
         should "allow exact searches on the md5: metatag by non-moderators" do
           get posts_path(tags: "id:#{@hidden_post.id} md5:#{@hidden_post.md5}"), as: :json
           assert_equal([@hidden_post.id], response.parsed_body.pluck("id"))

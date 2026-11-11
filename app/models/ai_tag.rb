@@ -23,7 +23,7 @@ class AITag < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:media_asset, :tag, :post, :score], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     if params[:tag_name].present?
       q = q.named(params[:tag_name])

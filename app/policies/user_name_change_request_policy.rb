@@ -22,4 +22,8 @@ class UserNameChangeRequestPolicy < ApplicationPolicy
   end
 
   alias_method :name_change, :record
+
+  def searchable_attributes
+    %i[id created_at updated_at user original_name desired_name]
+  end
 end

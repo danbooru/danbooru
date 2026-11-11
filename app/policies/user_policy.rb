@@ -90,6 +90,15 @@ class UserPolicy < ApplicationPolicy
     ].compact
   end
 
+  def searchable_attributes
+    %i[
+      id created_at updated_at name level is_deleted post_upload_count post_update_count
+      note_update_count favorite_count posts note_versions artist_commentary_versions post_appeals
+      post_approvals artist_versions comments wiki_page_versions feedback forum_topics forum_posts
+      forum_post_votes tag_aliases tag_implications bans inviter
+    ]
+  end
+
   def api_attributes
     attributes = %i[
       id created_at name inviter_id level level_string

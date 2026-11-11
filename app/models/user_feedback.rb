@@ -39,7 +39,7 @@ class UserFeedback < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :category, :body, :is_deleted, :creator, :user], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:hide_bans].to_s.truthy?
         q = q.not_ban

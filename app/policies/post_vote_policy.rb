@@ -29,6 +29,10 @@ class PostVotePolicy < ApplicationPolicy
     end
   end
 
+  def searchable_attributes
+    %i[id created_at updated_at score is_deleted user post]
+  end
+
   def api_attributes
     attributes = super
     attributes -= [:user_id] unless can_see_voter?

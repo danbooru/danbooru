@@ -40,4 +40,8 @@ class UserFeedbackPolicy < ApplicationPolicy
   def html_data_attributes
     super + [:category]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at category body is_deleted creator user]
+  end
 end

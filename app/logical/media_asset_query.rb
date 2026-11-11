@@ -63,23 +63,13 @@ class MediaAssetQuery
   end
 
   def metatag_matches(name, value, relation, current_user)
-    # Only allow exact hash matches for non-moderators (see Post.metatag_matches).
-    if name.in?(%w[md5 pixelhash]) && !current_user.is_moderator?
-      exact = begin
-        RangeParser.parse(value, :md5) in [:eq | :in, _]
-      rescue RangeParser::ParseError
-        false
-      end
-      return relation.none unless exact
-    end
-
     case name
     when "id"
       relation.attribute_matches(value, :id)
     when "md5"
-      relation.attribute_matches(value, "media_assets.md5", :md5)
+      relation.attribute_matches(value, "media_assets.md5", :md5, exact: MediaAsset.policy(current_user).search_modes[:md5] != :all)
     when "pixelhash"
-      relation.attribute_matches(value, "media_assets.pixel_hash", :md5)
+      relation.attribute_matches(value, "media_assets.pixel_hash", :md5, exact: MediaAsset.policy(current_user).search_modes[:pixel_hash] != :all)
     when "width"
       relation.attribute_matches(value, "media_assets.image_width")
     when "height"
