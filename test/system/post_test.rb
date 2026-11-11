@@ -123,6 +123,45 @@ class PostChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "fetching commentary from another post" do
+      setup do
+        create(:artist_commentary, post: @post, original_title: "orig title", original_description: "orig desc")
+        @other_post = create(:post, source: "https://example.com/other.jpg")
+      end
+
+      should "append the fetched commentary to the existing commentary" do
+        create(:artist_commentary, post: @other_post, original_title: "other title", original_description: "other desc")
+        fast_signin @user
+        visit post_path(@post)
+
+        click_link "Add commentary"
+        within(".ui-dialog") do
+          select "Post", from: "commentary_source_type"
+          fill_in "commentary_post_id", with: @other_post.id
+          click_button "Fetch"
+
+          assert_field "artist_commentary_original_description", with: "orig desc\n\n[tn]\nSource: https://example.com/image.jpg\n[/tn]\n\nh6. other title\n\nother desc\n\n[tn]\nSource: post ##{@other_post.id}\n[/tn]"
+          assert_field "artist_commentary_original_title", with: "orig title"
+        end
+      end
+
+      should "not remove the existing description if the fetched commentary has no description" do
+        create(:artist_commentary, post: @other_post, original_title: "other title", original_description: "")
+        fast_signin @user
+        visit post_path(@post)
+
+        click_link "Add commentary"
+        within(".ui-dialog") do
+          select "Post", from: "commentary_source_type"
+          fill_in "commentary_post_id", with: @other_post.id
+          click_button "Fetch"
+
+          assert_selector ".field_with_errors #artist_commentary_original_title"
+          assert_field "artist_commentary_original_description", with: "orig desc"
+        end
+      end
+    end
+
     should "add the post to a favgroup from the favgroup dialog" do
       @favgroup = create(:favorite_group, creator: @user)
       fast_signin @user

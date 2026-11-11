@@ -102,8 +102,9 @@ ArtistCommentary.merge_commentaries = function(description, commentary) {
   var post_source = $('.image-container').data().source;
   var normalized_source = $(".image-container").data().normalizedSource;
 
-  if ((commentary.original_description && description) &&
-      (commentary.original_description !== description)) {
+  if (!commentary.original_description || commentary.original_description === description) {
+    return description;
+  } else if (description) {
     return description
       + "\n\n[tn]\nSource: " + normalized_source + "\n[/tn]"
       + "\n\nh6. " + (commentary.original_title || "Untitled")
@@ -112,7 +113,7 @@ ArtistCommentary.merge_commentaries = function(description, commentary) {
   } else if (commentary.source !== post_source) {
     return commentary.original_description + "\n\n[tn]\nSource: " + commentary.source + "\n[/tn]";
   } else {
-    return commentary.original_description || description;
+    return commentary.original_description;
   }
 };
 
