@@ -100,7 +100,7 @@
             </div>
           </div>
 
-          <%= link_to "Change email", edit_user_email_path(@user), class: "button-primary h-fit", disabled: !policy(EmailAddress.new(user: @user)).update? %>
+          <%= link_to "Change email", edit_user_email_path(@user), class: "button-primary h-fit", disabled: !policy(EmailAddress.new(user_id: @user.id)).update? %>
         </div>
 
         <div class="card-outlined p-2 flex items-center justify-between gap-4">

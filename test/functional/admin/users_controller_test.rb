@@ -23,6 +23,15 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth edit_admin_user_path(@user), @user
         assert_response 403
       end
+
+      should "show that a user with 2FA but no email address can't recover their account" do
+        user = create(:user_with_2fa)
+        get_auth edit_admin_user_path(user), @admin
+
+        assert_response :success
+        assert_select ".chip-red", text: "No email"
+        assert_select "a[href='#{confirm_recover_user_backup_codes_path(user_id: user.id)}'][disabled]"
+      end
     end
 
     context "#update" do
