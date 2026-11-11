@@ -17,6 +17,14 @@ class ArtistPolicy < ApplicationPolicy
     !user.is_anonymous?
   end
 
+  def rate_limit_for_index(**_options)
+    if user.is_anonymous?
+      { rate: 1.0 / 1.second, burst: 30 }
+    else
+      { rate: 2.0 / 1.second, burst: 40 }
+    end
+  end
+
   def rate_limit_for_write(**_options)
     if user.is_builder?
       { action: "artists:write", rate: 12.0 / 1.minute, burst: 80 } # 720 per hour, 800 in first hour
