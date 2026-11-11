@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
     lib/dtext/version.rb
   ]
 
-  spec.add_development_dependency("minitest", ["~> 6"])
+  spec.add_development_dependency("minitest", ["~> 6", ">= 6.0.6"])
   spec.add_development_dependency("rake", ["~> 13"])
   spec.add_development_dependency("cgi", ["~> 0.5", ">= 0.5.2"])
   spec.add_development_dependency("benchmark", ["~> 0.5"])

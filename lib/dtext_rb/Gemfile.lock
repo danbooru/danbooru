@@ -24,7 +24,7 @@ DEPENDENCIES
   benchmark-ips (~> 2.10)
   cgi (~> 0.5, >= 0.5.2)
   dtext_rb!
-  minitest (~> 6)
+  minitest (~> 6, >= 6.0.6)
   rake (~> 13)
 
 CHECKSUMS
