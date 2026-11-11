@@ -116,6 +116,16 @@ class ArtistURLTest < ActiveSupport::TestCase
         assert_search_equals([@bkub_url], url_not_regex: "masao")
       end
 
+      should "work when searching for profile URLs without a scheme" do
+        @url = create(:artist_url, url: "https://twitter.com/bkub")
+        create(:artist_url, url: "https://twitter.com/bkub_2")
+
+        assert_search_equals([@url], url_matches: "twitter.com/bkub")
+        assert_search_equals([@url], url_matches: "x.com/bkub")
+        assert_search_equals([@url], url_matches: "x.com/BKUB/")
+        assert_no_match(/ILIKE/i, ArtistURL.url_matches("twitter.com/bkub").to_sql)
+      end
+
       should "work when searching for URLs containing backslashes" do
         @url = create(:artist_url, url: "https://twitter.com/foo\\\\bar")
 

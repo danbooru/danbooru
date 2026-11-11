@@ -50,6 +50,8 @@ class ArtistURL < ApplicationRecord
     elsif url =~ %r{\Ahttps?://}i
       profile_url = Source::URL.profile_url(url) || Source::Extractor.find(url).profile_url || normalize_url(url)
       normalized_url_like(profile_url)
+    elsif (profile_url = Source::URL.profile_url("https://#{url}")) # "twitter.com/foo" => "https://x.com/foo"
+      normalized_url_like(profile_url)
     else
       where_ilike(:url, "*#{url.escape_wildcards}*")
     end
