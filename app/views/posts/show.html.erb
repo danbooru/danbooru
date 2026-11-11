@@ -327,20 +327,10 @@
       <li class="active"><a href="#comments">Comments</a></li>
     <% end %>
 
-    <% if RecommenderService.available_for_post?(@post) %>
-      <li><a href="#recommended">Recommended</a></li>
-    <% end %>
-
     <% if policy(@post).update? %>
       <li><a href="#edit" id="post-edit-link" data-shortcut="e">Edit</a></li>
     <% end %>
   </menu>
-
-  <% if RecommenderService.available_for_post?(@post) %>
-    <section id="recommended" style="display: none;">
-      <p><em>Loading...</em></p>
-    </section>
-  <% end %>
 
   <% if Danbooru.config.comments_enabled?.to_s.truthy? %>
     <section id="comments">

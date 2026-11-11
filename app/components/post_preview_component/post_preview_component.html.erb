@@ -32,17 +32,7 @@
       </picture>
     <% end -%>
   </div>
-  <% if recommended -%>
-    <p class="desc recommended">
-      <%= link_to recommended_posts_path(search: { post_id: post.id }), class: "more-recommended-posts", "data-post-id": post.id do %>
-        <%= post.fav_count %>
-
-        <%= empty_heart_icon(class: "fa-xs") %>
-
-        <br>more »
-      <% end %>
-    </p>
-  <% elsif show_votes -%>
+  <% if show_votes -%>
     <div class="post-preview-score text-sm text-center mt-1">
       <%= render_post_votes post, current_user: current_user %>
     </div>

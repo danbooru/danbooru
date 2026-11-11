@@ -9,16 +9,6 @@ class MockServicesController < ApplicationController
     skip_authorization
   end
 
-  def recommender_recommend
-    @data = posts.map { |post| [post.id, rand(0.0..1.0)] }
-    render json: @data
-  end
-
-  def recommender_similar
-    @data = posts.map { |post| [post.id, rand(0.0..1.0)] }
-    render json: @data
-  end
-
   def reportbooru_missed_searches
     @data = tags.map { |tag| "#{tag.name} #{rand(1.0..1000.0)}" }.join("\n")
     render json: @data

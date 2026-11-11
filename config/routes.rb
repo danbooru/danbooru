@@ -231,7 +231,6 @@ Rails.application.routes.draw do
   resources :rate_limits, only: [:index]
   resources :reactions, only: [:index, :show, :create, :destroy]
   resource :related_tag, only: [:show, :update]
-  resources :recommended_posts, only: [:index]
   resources :reports, only: [:index, :show]
   resources :robots, only: [:index]
   resources :saved_searches, except: [:show]
@@ -373,8 +372,6 @@ Rails.application.routes.draw do
   get "/delayed_jobs", to: redirect("/jobs")
   get "/maintenance/user/deletion", to: redirect("/users/deactivate")
 
-  get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
-  get "/mock/recommender/similiar/:post_id" => "mock_services#recommender_similar", as: "mock_recommender_similar"
   get "/mock/reportbooru/missed_searches" => "mock_services#reportbooru_missed_searches", as: "mock_reportbooru_missed_searches"
   get "/mock/reportbooru/post_searches/rank" => "mock_services#reportbooru_post_searches", as: "mock_reportbooru_post_searches"
   get "/mock/reportbooru/post_views/rank" => "mock_services#reportbooru_post_views", as: "mock_reportbooru_post_views"

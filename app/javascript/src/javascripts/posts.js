@@ -11,7 +11,6 @@ let Post = {};
 Post.pending_update_count = 0;
 Post.SWIPE_THRESHOLD = 60;
 Post.SWIPE_VELOCITY = 0.6;
-Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
 Post.LOW_TAG_COUNT = 10;
 Post.HIGH_TAG_COUNT = 20;
 Post.EDIT_DIALOG_WIDTH = 640;
@@ -35,7 +34,6 @@ Post.initialize_all = function() {
     this.initialize_post_relationship_previews();
     this.initialize_post_sections();
     this.initialize_post_image_resize_links();
-    this.initialize_recommended();
   }
 
   if ($("#c-posts #a-show, #c-uploads #a-show").length) {
@@ -386,22 +384,14 @@ Post.initialize_post_sections = function() {
     if (e.target.hash === "#comments") {
       $("#comments").show();
       $("#edit").hide();
-      $("#recommended").hide();
     } else if (e.target.hash === "#edit") {
       $("#edit").show();
       $("#comments").hide();
       $("#post_tag_string").focus().selectEnd();
-      $("#recommended").hide();
       $(document).trigger("danbooru:open-post-edit-tab");
-    } else if (e.target.hash === "#recommended") {
-      $("#comments").hide();
-      $("#edit").hide();
-      $("#recommended").show();
-      $.get("/recommended_posts.js", { search: { post_id: Utility.meta("post-id") }, limit: Post.MAX_RECOMMENDATIONS }).done(script => $.globalEval(script, { nonce: Utility.meta("csp-nonce") }));
     } else {
       $("#edit").hide();
       $("#comments").hide();
-      $("#recommended").hide();
     }
 
     $("#post-sections li").removeClass("active");
@@ -473,18 +463,6 @@ Post.initialize_saved_searches = function() {
     e.preventDefault();
   });
 }
-
-Post.initialize_recommended = function() {
-  $(document).on("click.danbooru", ".post-preview .more-recommended-posts", async function (event) {
-    event.preventDefault();
-
-    let post_id = $(this).parents(".post-preview").data("id");
-    $("#recommended").addClass("loading-recommended-posts");
-    let script = await $.get("/recommended_posts.js", { search: { post_id: post_id }, limit: Post.MAX_RECOMMENDATIONS });
-    $.globalEval(script, { nonce: Utility.meta("csp-nonce") });
-    $("#recommended").removeClass("loading-recommended-posts");
-  });
-};
 
 $(document).ready(function() {
   Post.initialize_all();

@@ -855,13 +855,6 @@ module Danbooru
     def google_cloud_credentials
     end
 
-    # The URL for the recommender server (https://github.com/evazion/recommender).
-    # Optional. Used to generate post recommendations.
-    # Set to http://localhost/mock/recommender to enable a fake recommender
-    # server for development purposes.
-    def recommender_server
-    end
-
     # Uncomment to enable the Redis cache store. Caching is optional for
     # small boorus but highly recommended for large multi-user boorus. Redis is
     # required to enable saved searches.
