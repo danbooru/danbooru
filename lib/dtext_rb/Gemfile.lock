@@ -25,7 +25,7 @@ DEPENDENCIES
   cgi (~> 0.5, >= 0.5.2)
   dtext_rb!
   minitest (~> 6, >= 6.0.6)
-  rake (~> 13)
+  rake (~> 13, >= 13.4.2)
 
 CHECKSUMS
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
