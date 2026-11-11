@@ -668,6 +668,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal(["id"], post["children"].first.keys)
       end
 
+      should "work for nested includes of empty has_many associations" do
+        post = create(:post)
+
+        get posts_path(tags: "id:#{post.id}", only: "id,parent[id],children[id]", limit: 1), as: :json
+        assert_response :success
+        assert_equal({ "id" => post.id, "children" => [] }, response.parsed_body.sole)
+      end
+
       should "not include associations whose foreign key is hidden" do
         create(:comment, post: @post, is_deleted: true)
         create(:post_disapproval, post: create(:post, is_pending: true))

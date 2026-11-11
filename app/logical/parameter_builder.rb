@@ -46,7 +46,7 @@ class ParameterBuilder
 
         child_records = child.is_a?(ActiveRecord::Relation) ? child.to_a : [child]
         merged = child_records.map { |record| build_only_hash(nested, record, seen_objects.dup) }
-        merged = merged.reduce { |memo, entry| memo.deep_merge(entry) { |_key, left, right| left | right } }
+        merged = merged.reduce({}) { |memo, entry| memo.deep_merge(entry) { |_key, left, right| left | right } }
         hash[:include] << { item_sym => merged }
       elsif attributes.include?(item_sym)
         hash[:only] << item_sym
