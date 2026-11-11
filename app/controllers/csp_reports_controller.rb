@@ -9,6 +9,10 @@ class CSPReportsController < ApplicationController
 
   skip_forgery_protection
 
+  # Don't send back the session cookie. A report sent right before logging in could otherwise overwrite the new login
+  # cookie if it finished last.
+  anonymous_only
+
   def create
     authorize nil, policy_class: CSPReportPolicy
 

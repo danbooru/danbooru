@@ -37,11 +37,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # Mark an action as for anonymous users only. The current user won't be loaded, instead the user will be set to the anonymous user.
+  # Mark an action as for anonymous users only. The current user won't be loaded, instead the user will be set to the
+  # anonymous user. The session cookie won't be sent back, so the response can't overwrite a newer login cookie.
   def self.anonymous_only(*_actions, **options)
     skip_before_action :set_current_user, **options
     skip_before_action :redirect_if_name_invalid?, **options
-    before_action -> { CurrentUser.user = User.anonymous }, **options
+    before_action(**options) do
+      CurrentUser.user = User.anonymous
+      request.session_options[:skip] = true
+    end
   end
 
   def self.verify_captcha(**options)

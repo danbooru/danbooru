@@ -19,6 +19,17 @@ class CSPReportsControllerTest < ActionDispatch::IntegrationTest
         assert_response 204
       end
 
+      should "not overwrite the session cookie" do
+        # A report sent with a stale session cookie could log the user out if it finished after they logged in.
+        get login_path
+        assert_not_nil(cookies[Danbooru.config.session_cookie_name])
+
+        post csp_reports_path, params: { "csp-report": { "blocked-uri": "inline" }}.to_json, headers: { "Content-Type": "application/csp-report" }
+
+        assert_response 204
+        assert_nil(response.headers["Set-Cookie"].to_s[/#{Danbooru.config.session_cookie_name}=/])
+      end
+
       should "reject invalid reports" do
         post csp_reports_path, params: "not json", headers: { "Content-Type": "application/csp-report" }
 
