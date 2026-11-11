@@ -437,6 +437,16 @@ class ExternalCommandTest < ActiveSupport::TestCase
       should "not let commands change the CPU affinity of other processes" do
         assert_equal("[-1, #{Errno::EPERM::Errno}]\n", syscall!("sched_setaffinity", Process.pid, 0, 0))
       end
+
+      # SVT-AV1 tries to give its threads realtime priority when it runs as root.
+      should "make changing the scheduling policy fail with EPERM" do
+        assert_match(/\A\[\d+, /, syscall!("sched_get_priority_max", 1)) # SCHED_FIFO
+        assert_match(/\A\[\d+, /, syscall!("sched_get_priority_min", 1))
+
+        %w[sched_setscheduler sched_setparam sched_setattr].each do |name|
+          assert_equal("[-1, #{Errno::EPERM::Errno}]\n", syscall!(name, 0, 0, 0), name)
+        end
+      end
     end
 
     should "raise an error if the sandbox can't be set up" do

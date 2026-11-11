@@ -101,6 +101,11 @@ module Seccomp
       ["prlimit64", :allow, [[0, :eq, 0]]],
       ["sched_setaffinity", :allow, [[0, :eq, 0]]],
       ["sched_setaffinity", errno(Errno::EPERM::Errno), [[0, :ne, 0]]],
+      ["sched_setscheduler", errno(Errno::EPERM::Errno), []],
+      ["sched_setparam", errno(Errno::EPERM::Errno), []],
+      ["sched_setattr", errno(Errno::EPERM::Errno), []],
+      "sched_get_priority_min",
+      "sched_get_priority_max",
     ],
     # Syscalls commonly needed to execute external programs.
     "@exec" => %w[
