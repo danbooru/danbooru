@@ -109,6 +109,20 @@ class PostChromeTest < ChromeSystemTestCase
       end
     end
 
+    should "fill the artist commentary modal with the existing commentary" do
+      create(:artist_commentary, post: @post, original_title: "orig title", original_description: "orig desc", translated_title: "trans title", translated_description: "trans desc")
+      fast_signin @user
+      visit post_path(@post)
+
+      click_link "Add commentary"
+      within(".ui-dialog") do
+        assert_field "artist_commentary_original_title", with: "orig title"
+        assert_field "artist_commentary_original_description", with: "orig desc"
+        assert_field "artist_commentary_translated_title", with: "trans title"
+        assert_field "artist_commentary_translated_description", with: "trans desc"
+      end
+    end
+
     should "add the post to a favgroup from the favgroup dialog" do
       @favgroup = create(:favorite_group, creator: @user)
       fast_signin @user

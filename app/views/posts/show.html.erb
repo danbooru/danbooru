@@ -359,9 +359,10 @@
   </div>
 <% end %>
 
-<% if policy(ArtistCommentary.new(post: @post)).create_or_update? %>
+<% artist_commentary = @post.artist_commentary || ArtistCommentary.new(post: @post) %>
+<% if policy(artist_commentary).create_or_update? %>
   <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
-    <%= render "artist_commentaries/form", post: @post, artist_commentary: @post.artist_commentary || ArtistCommentary.new(post: @post) %>
+    <%= render "artist_commentaries/form", post: @post, artist_commentary: artist_commentary %>
   </div>
 <% end %>
 
