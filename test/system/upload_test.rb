@@ -47,6 +47,21 @@ class UploadsChromeTest < ChromeSystemTestCase
         assert_equal "1girls solo_1girl ", find_field("post_tag_string").value
       end
 
+      should "open the related tags header link in a new tab when ctrl+clicked" do
+        fill_in "post_tag_string", with: "1girl"
+        assert_selector ".related-tags-current-tag[href='/posts?tags=1girl']"
+
+        window = window_opened_by { find(".related-tags-current-tag").click(:control) }
+        within_window(window) { assert_current_path posts_path(tags: "1girl") }
+      end
+
+      should "not follow the related tags header link when clicked" do
+        fill_in "post_tag_string", with: "1girl"
+        assert_selector ".related-tags-current-tag[href='/posts?tags=1girl']"
+
+        assert_no_navigation { find(".related-tags-current-tag").click }
+      end
+
       should "move the edit panel when a dock option is clicked" do
         assert_no_navigation do
           find(".popup-menu:has(#dock-left-link) .popup-menu-button").click
