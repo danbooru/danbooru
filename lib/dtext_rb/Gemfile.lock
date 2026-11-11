@@ -22,7 +22,7 @@ PLATFORMS
 DEPENDENCIES
   benchmark (~> 0.5)
   benchmark-ips (~> 2.10)
-  cgi (~> 0.5)
+  cgi (~> 0.5, >= 0.5.2)
   dtext_rb!
   minitest (~> 6)
   rake (~> 13)
