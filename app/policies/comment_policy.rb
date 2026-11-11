@@ -51,6 +51,10 @@ class CommentPolicy < ApplicationPolicy
     [:body, :is_deleted, (:is_sticky if can_sticky_comment?)].compact
   end
 
+  def searchable_attributes
+    %i[id created_at updated_at is_deleted is_sticky do_not_bump_post body score post creator updater]
+  end
+
   def api_attributes
     attributes = super
     attributes -= [:creator_id] unless can_see_creator?

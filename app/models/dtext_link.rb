@@ -56,7 +56,7 @@ class DtextLink < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :link_type, :link_target, :model, :linked_wiki, :linked_tag], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)
   end
 

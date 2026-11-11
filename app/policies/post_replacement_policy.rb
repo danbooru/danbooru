@@ -25,6 +25,14 @@ class PostReplacementPolicy < ApplicationPolicy
     policy(record.post).visible?
   end
 
+  # Only allow exact md5 matches for non-moderators (see MediaAssetPolicy#searchable_attributes).
+  def searchable_attributes
+    hashes = %i[md5 old_md5]
+    hashes = [hashes.index_with(:exact)] unless user.is_moderator?
+
+    %i[id created_at updated_at file_ext old_file_ext original_url replacement_url creator post media_asset old_media_asset] + hashes
+  end
+
   def api_attributes
     attributes = super
     attributes -= [:md5, :old_md5] unless can_see_md5?

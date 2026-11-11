@@ -32,6 +32,10 @@ class BackgroundJobPolicy < ApplicationPolicy
     end
   end
 
+  def searchable_attributes
+    %i[id created_at updated_at queue_name priority serialized_params scheduled_at performed_at finished_at error active_job_id concurrency_key cron_key cron_at executions_count job_class labels locked_at]
+  end
+
   def api_attributes
     attributes = super
     attributes -= [:serialized_params, :error] unless can_see_params?

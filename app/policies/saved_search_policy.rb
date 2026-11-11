@@ -24,4 +24,8 @@ class SavedSearchPolicy < ApplicationPolicy
   def permitted_attributes
     [:query, :label_string, :disable_labels]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at query]
+  end
 end

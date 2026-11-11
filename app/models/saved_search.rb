@@ -113,7 +113,7 @@ class SavedSearch < ApplicationRecord
   concerning :Search do
     class_methods do
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :query], current_user: current_user)
+        q = search_attributes(params, current_user: current_user)
 
         if params[:label]
           q = q.labeled(params[:label])

@@ -24,4 +24,8 @@ class CommentVotePolicy < ApplicationPolicy
       { action: "comment_votes:write", rate: 1.0 / 1.minute, burst: 30 } # 60 per hour, 90 in first hour
     end
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at score is_deleted comment user]
+  end
 end

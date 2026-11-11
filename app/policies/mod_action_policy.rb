@@ -5,6 +5,10 @@ class ModActionPolicy < ApplicationPolicy
     user.is_moderator? || !record.category.to_sym.in?(ModAction::MOD_ONLY_CATEGORIES)
   end
 
+  def searchable_attributes
+    %i[id created_at updated_at category description creator subject]
+  end
+
   def api_attributes
     super + [:category_id]
   end

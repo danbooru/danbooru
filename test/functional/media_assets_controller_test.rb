@@ -52,6 +52,16 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
           end
         end
 
+        should "use the policy's searchable attributes for hash metatags in ai_tags_match" do
+          MediaAssetPolicy.any_instance.stubs(:searchable_attributes).returns(%i[id md5 pixel_hash])
+
+          %w[md5 pixelhash].each do |metatag|
+            get_auth media_assets_path(search: { id: @hidden_asset.id, ai_tags_match: "#{metatag}:>=#{"0" * 32}" }), @user, as: :json
+
+            assert_equal([@hidden_asset.id], response.parsed_body.pluck("id"), metatag)
+          end
+        end
+
         should "allow range searches in ai_tags_match by moderators" do
           get_auth media_assets_path(search: { id: @hidden_asset.id, ai_tags_match: "md5:>=#{"0" * 32}" }), create(:moderator_user), as: :json
 

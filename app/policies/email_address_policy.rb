@@ -59,4 +59,8 @@ class EmailAddressPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:address]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at user address normalized_address is_verified is_deliverable]
+  end
 end

@@ -96,7 +96,7 @@ class UserAction < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:event_type, :user, :model], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     case params[:order]
     when "event_at_asc"

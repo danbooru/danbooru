@@ -20,4 +20,8 @@ class IpBanPolicy < ApplicationPolicy
   def permitted_attributes
     [:ip_addr, :reason, :is_deleted, :category]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at ip_addr reason is_deleted category hit_count last_hit_at creator]
+  end
 end

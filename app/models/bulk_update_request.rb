@@ -45,7 +45,7 @@ class BulkUpdateRequest < ApplicationRecord
 
   module SearchMethods
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       statuses = params[:status].to_s.split(",")
 

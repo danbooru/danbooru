@@ -887,14 +887,7 @@ class User < ApplicationRecord
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
-      q = search_attributes(
-        params,
-        %i[id created_at updated_at name level is_deleted post_upload_count post_update_count
-           note_update_count favorite_count posts note_versions artist_commentary_versions post_appeals
-           post_approvals artist_versions comments wiki_page_versions feedback forum_topics forum_posts
-           forum_post_votes tag_aliases tag_implications bans inviter],
-        current_user: current_user,
-      )
+      q = search_attributes(params, current_user: current_user)
 
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))

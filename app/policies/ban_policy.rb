@@ -25,4 +25,8 @@ class BanPolicy < ApplicationPolicy
   def html_data_attributes
     super + [:expired?]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at duration reason user banner]
+  end
 end

@@ -11,7 +11,7 @@ class IpGeolocation < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, %i[id created_at updated_at ip_addr network asn is_proxy latitude longitude organization time_zone continent country region city carrier], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)
   end
 

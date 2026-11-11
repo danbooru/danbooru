@@ -37,6 +37,10 @@ class PoolPolicy < ApplicationPolicy
     [:name, :description, :category, :post_ids, :post_ids_string, { post_ids: [] }]
   end
 
+  def searchable_attributes
+    %i[id created_at updated_at is_deleted name description post_ids dtext_links]
+  end
+
   def api_attributes
     super + [:post_count]
   end

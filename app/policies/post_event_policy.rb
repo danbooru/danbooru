@@ -12,6 +12,10 @@ class PostEventPolicy < ApplicationPolicy
     end
   end
 
+  def searchable_attributes
+    %i[model post creator event_at]
+  end
+
   def api_attributes
     [:model_type, :model_id, :post_id, (:creator_id if can_see_creator?), :event_at].compact
   end

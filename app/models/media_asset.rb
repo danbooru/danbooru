@@ -246,14 +246,7 @@ class MediaAsset < ApplicationRecord
       end
 
       def search(params, current_user)
-        # Only allow exact matches on file hashes for non-moderators, so that partial searches can't be used to find the
-        # md5s of images the user can't see.
-        hashes = %i[md5 pixel_hash file_key]
-        attributes = %i[id created_at updated_at status file_ext file_size image_width image_height duration is_public]
-        attributes += hashes if current_user.is_moderator?
-
-        q = search_attributes(params, attributes, current_user: current_user)
-        q = q.where(hashes.select { params[it].present? }.index_with { params[it].to_s }) unless current_user.is_moderator?
+        q = search_attributes(params, current_user: current_user)
 
         if params[:metadata].present?
           q = q.joins(:media_metadata).merge(MediaMetadata.search({ metadata: params[:metadata] }, current_user))

@@ -140,7 +140,7 @@ class Upload < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, %i[id created_at updated_at source referer_url status media_asset_count uploader upload_media_assets media_assets posts], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     if params[:ai_tags_match].present?
       min_score = params.fetch(:min_score, 50).to_i

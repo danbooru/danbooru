@@ -68,4 +68,8 @@ class ForumPostPolicy < ApplicationPolicy
   def html_data_attributes
     super + [[:topic, :is_deleted?]]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at is_deleted body creator updater topic dtext_links votes tag_alias tag_implication bulk_update_request]
+  end
 end

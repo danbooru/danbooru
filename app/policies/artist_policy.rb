@@ -44,4 +44,8 @@ class ArtistPolicy < ApplicationPolicy
   end
 
   alias_method :show_or_new?, :show?
+
+  def searchable_attributes
+    %i[id created_at updated_at is_deleted is_banned name group_name other_names urls wiki_page tag_alias tag]
+  end
 end

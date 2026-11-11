@@ -26,7 +26,7 @@ class Reaction < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :creator, :model, :reaction_id], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)
   end
 

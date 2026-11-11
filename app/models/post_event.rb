@@ -34,7 +34,7 @@ class PostEvent < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:model, :post, :creator, :event_at], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     if params[:category]
       q = q.category_matches(params[:category])

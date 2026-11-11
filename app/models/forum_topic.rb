@@ -74,7 +74,7 @@ class ForumTopic < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_sticky is_locked is_deleted category min_level title response_count creator updater forum_posts bulk_update_requests tag_aliases tag_implications], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:is_private].to_s.truthy?
         q = q.private_only

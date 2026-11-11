@@ -16,4 +16,8 @@ class NewsUpdatePolicy < ApplicationPolicy
   def permitted_attributes
     [:message, :duration, :duration_in_days, :is_deleted]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at message creator updater]
+  end
 end

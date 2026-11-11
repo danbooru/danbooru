@@ -115,6 +115,18 @@ class PostPolicy < ApplicationPolicy
     %i[tag_string old_tag_string parent_id old_parent_id source old_source rating old_rating has_embedded_notes]
   end
 
+  # Only allow exact md5 matches for non-moderators, so partial searches can't be used to find the md5s of hidden posts.
+  def searchable_attributes
+    md5 = user.is_moderator? ? :md5 : { md5: :exact }
+
+    %i[
+      id created_at updated_at rating source pixiv_id fav_count score up_score down_score file_ext
+      file_size image_width image_height tag_count has_children has_active_children is_pending is_flagged is_deleted
+      is_banned last_comment_bumped_at last_commented_at last_noted_at uploader approver parent artist_commentary
+      flags appeals notes comments children approvals replacements media_metadata
+    ] + [md5]
+  end
+
   def api_attributes
     attributes = super
     attributes += [:has_large, :has_visible_children, :media_asset]

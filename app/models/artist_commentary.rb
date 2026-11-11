@@ -43,7 +43,7 @@ class ArtistCommentary < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :original_title, :original_description, :translated_title, :translated_description, :post], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:text_matches].present?
         q = q.text_matches(params[:text_matches])
