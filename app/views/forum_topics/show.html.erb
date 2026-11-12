@@ -1,5 +1,7 @@
 <% page_title @forum_topic.title %>
-<% meta_description(DText.new(@forum_topic.original_post&.body).excerpt) %>
+<% if @forum_topic.original_post.present? && policy(@forum_topic.original_post).show? %>
+  <% meta_description(DText.new(@forum_topic.original_post.body).excerpt) %>
+<% end %>
 
 <% atom_feed_tag(@forum_topic.title, forum_topic_url(@forum_topic.id, format: :atom)) %>
 <%= render "secondary_links" %>
