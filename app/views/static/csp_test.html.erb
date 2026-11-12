@@ -12,6 +12,8 @@
 </script>
 
 <style>
+  @font-face { font-family: "csp-test-data-font"; src: url("data:font/woff2;base64,AAAA"); }
+  @font-face { font-family: "csp-test-google-font"; src: url("https://fonts.gstatic.com/csp-test.woff2"); }
   @font-face { font-family: "csp-test-blocked-font"; src: url("https://blocked.example.com/font.woff2"); }
 </style>
 
@@ -28,6 +30,9 @@
     <script src="https://challenges.cloudflare.com/csp-test.js"></script>
     <script src="https://static.cloudflareinsights.com/csp-test.js"></script>
     <p style="font-style: italic">An inline style attribute.</p>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=CSP+Test">
+    <p style="font-family: csp-test-data-font">A data: font.</p>
+    <p style="font-family: csp-test-google-font">A Google font.</p>
 
     <h2>Blocked</h2>
     <script>cspTest.allowed.inlineScriptWithoutNonce = true;</script>

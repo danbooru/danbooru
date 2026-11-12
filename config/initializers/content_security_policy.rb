@@ -31,13 +31,13 @@ Rails.application.configure do
     policy.media_src :self, storage_host
     policy.connect_src :self, storage_host, reportbooru_host, webpack_dev_server, "cloudflareinsights.com"
 
-    # Allow only same-origin <style> tags and `style="..."` attributes, not external stylesheets.
-    policy.style_src :self, :unsafe_inline
+    # Allow same-origin <style> tags, `style="..."` attributes, and Google Fonts stylesheets (for custom CSS), but not other external stylesheets.
+    policy.style_src :self, :unsafe_inline, "https://fonts.googleapis.com"
     # policy.style_src :self, :https, :unsafe_inline # This would allow @import url(...) in custom CSS
 
-    # Allow only same-origin fonts, not external fonts in custom CSS.
-    policy.font_src :self
-    # policy.font_src :self, :https # This would allow `@font-face { src: url(...) }` in custom CSS.
+    # Allow same-origin fonts, data: fonts, and Google Fonts (for custom CSS), but not other external fonts.
+    policy.font_src :self, :data, "https://fonts.gstatic.com"
+    # policy.font_src :self, :data, :https # This would allow `@font-face { src: url(...) }` in custom CSS.
 
     # Allow same-origin <iframe>s and Cloudflare Turnstile CAPTCHAs. https://www.bing.com is also allowed in
     # IpAddressesController for Bing Maps.

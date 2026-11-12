@@ -8,7 +8,7 @@ class ContentSecurityPolicyChromeTest < ChromeSystemTestCase
 
       # Don't make real requests to external sites. Requests are intercepted after the browser checks the CSP.
       page.driver.with_playwright_page do |playwright_page|
-        %w[https://*.example.com/** https://challenges.cloudflare.com/** https://static.cloudflareinsights.com/** https://cloudflareinsights.com/**].each do |url|
+        %w[https://*.example.com/** https://challenges.cloudflare.com/** https://fonts.googleapis.com/** https://fonts.gstatic.com/** https://static.cloudflareinsights.com/** https://cloudflareinsights.com/**].each do |url|
           playwright_page.context.route(url, ->(route, _request) { route.fulfill(status: 404, body: "") })
         end
       end
