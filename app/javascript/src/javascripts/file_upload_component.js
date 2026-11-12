@@ -77,8 +77,18 @@ export default class FileUploadComponent {
     return dropzone;
   }
 
+  // Fill in the source field with the pasted URL and submit the upload.
   onPaste(e) {
-    let url = e.originalEvent.clipboardData.getData("text");
+    // Some apps copy links as a URL instead of plain text (e.g. "Copy link" in the Pixiv app's share sheet on iOS), so
+    // fall back to the URL if there's no text.
+    let data = e.originalEvent.clipboardData;
+    let url = (data.getData("text") || data.getData("URL")).trim();
+
+    // If there's nothing we can use, let the browser handle the paste normally.
+    if (!url) {
+      return;
+    }
+
     this.$component.find("input[name='upload[source]']:not([disabled])").val(url);
 
     if (/^https?:\/\//.test(url) || URL.canParse(`https://${url}`)) {
