@@ -444,6 +444,7 @@ class ApplicationMetrics
       { name: :ruby_yjit_object_shape_count,                      type: :gauge,   help: "Current number of object shapes." },
 
       { name: :vips_memory_bytes,                                 type: :gauge,   help: "Current amount of memory allocated by libvips." },
+      { name: :vips_memory_highwater_bytes,                       type: :gauge,   help: "Peak amount of memory allocated by libvips since the process started." },
       { name: :vips_allocations,                                  type: :gauge,   help: "Current number of active memory allocations by libvips." },
       { name: :vips_files,                                        type: :gauge,   help: "Current number of files opened by libvips." },
     ], labels: { worker: puma_worker_id })
@@ -602,9 +603,10 @@ class ApplicationMetrics
     end
 
     metrics.set({
-      vips_memory_bytes: Vips.tracked_mem,
-      vips_allocations:  Vips.tracked_allocs,
-      vips_files:        Vips.tracked_files,
+      vips_memory_bytes:           Vips.tracked_mem,
+      vips_memory_highwater_bytes: Vips.tracked_mem_highwater,
+      vips_allocations:            Vips.tracked_allocs,
+      vips_files:                  Vips.tracked_files,
     })
 
     %i[io fast].each do |name|
