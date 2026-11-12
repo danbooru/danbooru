@@ -21,6 +21,12 @@ class CommentPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  # Whether the comment can be shown in the /comments.atom feed. Feed entries show the comment's creator, its body, and
+  # the post's thumbnail, so the user has to be able to see all of them.
+  def show_in_feed?
+    policy(record.post).visible? && (!record.is_deleted? || can_see_deleted?)
+  end
+
   def can_see_updater_notice?
     user.is_moderator?
   end

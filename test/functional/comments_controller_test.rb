@@ -121,6 +121,18 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
+        should "not show deleted comments to users who can't see them" do
+          @comment = create(:comment, post: @post, body: "secret deleted comment", is_deleted: true)
+
+          get comments_path(format: "atom")
+          assert_response :success
+          assert_equal(0, response.parsed_body.css("entry").size)
+          assert_not_includes(response.body, "secret deleted comment")
+
+          get_auth comments_path(format: "atom"), create(:moderator_user)
+          assert_equal(1, response.parsed_body.css("entry").size)
+        end
+
         should "not show comments on restricted posts" do
           @post.update!(is_banned: true)
           @comment = create(:comment, post: @post)

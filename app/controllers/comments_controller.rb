@@ -96,7 +96,7 @@ class CommentsController < ApplicationController
 
     if request.format.atom?
       @comments = @comments.includes(:creator, post: [:media_asset])
-      @comments = @comments.select { |comment| comment.post.visible? }
+      @comments = @comments.select { |comment| policy(comment).show_in_feed? }
     elsif request.format.html?
       @comments = @comments.includes(:creator, :updater, post: [:uploader, :media_asset])
       @comments = @comments.includes(:votes) if CurrentUser.is_member?
