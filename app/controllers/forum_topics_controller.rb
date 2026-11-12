@@ -29,7 +29,7 @@ class ForumTopicsController < ApplicationController
   def show
     @forum_topic = authorize ForumTopic.find(params[:id])
 
-    if request.format.html?
+    if request.format.html? && !Danbooru.config.read_only_mode?
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
 

@@ -8,6 +8,13 @@ class ApplicationController < ActionController::Base
   # Max length of a GET parameter value.
   MAX_GET_PARAMETER_LENGTH = 16.kilobytes
 
+  # Actions that only read data, but are requested with a non-GET method.
+  READ_ONLY_MODE_ALLOWED_ACTIONS = %w[
+    dtext_previews#create
+    iqdb_queries#create
+    notes#preview
+  ]
+
   include Pundit::Authorization
 
   helper_method :search_params, :permitted_attributes, :show_votes?, :preview_size
@@ -20,6 +27,7 @@ class ApplicationController < ActionController::Base
   before_action :reset_current_user
   before_action :delete_host_only_session_cookie
   before_action :set_current_user
+  around_action :prevent_writes_in_read_only_mode
   before_action :normalize_search
   before_action :ip_ban_check
   before_action :set_variant
@@ -135,6 +143,21 @@ class ApplicationController < ActionController::Base
     response.headers["X-Git-Hash"] = Rails.application.config.x.git_hash
   end
 
+  concerning :ReadOnlyModeMethods do
+    private
+
+    # Prevent database writes while the site is in read-only mode. Safe methods and actions that only read data are
+    # wrapped so that any accidental write still fails.
+    def prevent_writes_in_read_only_mode(&block)
+      return block.call unless Danbooru.config.read_only_mode?
+
+      safe = request.get? || request.head? || request.options? || "#{controller_path}##{action_name}".in?(READ_ONLY_MODE_ALLOWED_ACTIONS)
+      raise ActiveRecord::ReadOnlyError, "The site is in read-only mode." unless safe
+
+      ActiveRecord::Base.while_preventing_writes(&block)
+    end
+  end
+
   concerning :ExceptionHandlingMethods do
     def rescue_exception(exception)
       case exception
@@ -176,6 +199,9 @@ class ApplicationController < ActionController::Base
         render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
       when ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
         render_error_page(503, exception, message: "The database is unavailable. Try again later.", layout: "blank")
+      when ActiveRecord::ReadOnlyError
+        response.headers["X-Danbooru-Read-Only"] = "true"
+        render_error_page(503, exception, message: "The site is in read-only mode. You can browse the site, but changes are disabled right now.")
       else
         raise exception if Rails.env.development? || Danbooru.config.debug_mode
         render_error_page(500, exception)
@@ -184,7 +210,7 @@ class ApplicationController < ActionController::Base
 
     def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol, layout: "default")
       @exception = exception
-      @expected = status < 500
+      @expected = status < 500 || exception.is_a?(ActiveRecord::ReadOnlyError)
       @message = message.to_s.encode("utf-8", invalid: :replace, undef: :replace)
       @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace) if @exception
       format = :html unless format.in?(%i[html json xml js atom])
@@ -244,6 +270,8 @@ class ApplicationController < ActionController::Base
     #
     # @raise [RateLimiter::RateLimitError] If the rate limit is exceeded.
     def check_rate_limit(record, policy_class: nil)
+      return if Danbooru.config.read_only_mode?
+
       policy = find_policy(record, policy_class: policy_class)
       rate_limit = policy.rate_limit(action_name, request)
       return if rate_limit.blank?

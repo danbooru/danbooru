@@ -77,6 +77,8 @@ class SessionLoader
   # @param signed_login_event [String] The signed login event from the login verification email.
   # @return [Boolean] True if the location was authorized, false otherwise.
   def authorize_login_event!(signed_login_event)
+    return false if Danbooru.config.read_only_mode?
+
     user_event = UserEvent.find_signed(signed_login_event, purpose: :login_verification)
 
     if user_event.present?
@@ -199,7 +201,7 @@ class SessionLoader
     set_safe_mode
     set_save_data_mode
     initialize_session_cookies
-    CurrentUser.user.unban! if CurrentUser.user.ban_expired?
+    CurrentUser.user.unban! if !Danbooru.config.read_only_mode? && CurrentUser.user.ban_expired?
   ensure
     DanbooruLogger.add_session_attributes(request, session, CurrentUser.user)
   end
@@ -270,10 +272,10 @@ class SessionLoader
     if login_session.nil?
       cleanup_cookies
     elsif user.is_deleted?
-      logout(user)
+      Danbooru.config.read_only_mode? ? cleanup_cookies : logout(user)
     else
       CurrentUser.user = user
-      login_session.update!(last_seen_at: Time.zone.now) if !login_session.last_seen_at&.after?(1.hour.ago)
+      login_session.update!(last_seen_at: Time.zone.now) if !Danbooru.config.read_only_mode? && !login_session.last_seen_at&.after?(1.hour.ago)
     end
   end
 
@@ -285,18 +287,22 @@ class SessionLoader
   end
 
   def update_last_logged_in_at
+    return if Danbooru.config.read_only_mode?
     return if CurrentUser.is_anonymous?
     return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.hour.ago
     CurrentUser.user.update_attribute(:last_logged_in_at, Time.now)
   end
 
   def update_last_ip_addr
+    return if Danbooru.config.read_only_mode?
     return if CurrentUser.is_anonymous?
     return if CurrentUser.user.last_ip_addr == @request.remote_ip
     CurrentUser.user.update_attribute(:last_ip_addr, @request.remote_ip)
   end
 
   def update_api_key(api_key)
+    return if Danbooru.config.read_only_mode?
+
     api_key.increment!(:uses, touch: :last_used_at)
     api_key.update!(last_ip_address: request.remote_ip)
   end

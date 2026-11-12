@@ -1,6 +1,7 @@
 GoodJob.active_record_parent_class = "ApplicationRecord"
 GoodJob.retry_on_unhandled_error = false
 GoodJob.preserve_job_records = true
+Rails.application.config.good_job.enable_pauses = true
 Rails.application.config.good_job.smaller_number_is_higher_priority = true
 
 # Called when a background job raises an unhandled exception. Only called for background jobs run with `perform_later`,
@@ -12,6 +13,12 @@ end
 # Start the metrics server on http://0.0.0.0:9090/metrics when bin/good_job is run.
 if GoodJob::CLI.within_exe?
   Rails.application.config.after_initialize do
+    if Danbooru.config.read_only_mode?
+      ApplicationJob.pause_jobs!
+    else
+      ApplicationJob.unpause_jobs!
+    end
+
     RackMetricsServer.new.start
   end
 end
@@ -22,6 +29,7 @@ ActiveSupport.on_load(:good_job_application_controller) do
 
   include ApplicationController::AuthenticationMethods
   include ApplicationController::ExceptionHandlingMethods
+  include ApplicationController::ReadOnlyModeMethods
   include Pundit::Authorization
 
   # Needed to render the default layout for error pages.
@@ -31,6 +39,7 @@ ActiveSupport.on_load(:good_job_application_controller) do
 
   before_action :set_current_user
   before_action :authorize_user
+  around_action :prevent_writes_in_read_only_mode
   rescue_from Exception, with: :rescue_exception
 
   def authorize_user

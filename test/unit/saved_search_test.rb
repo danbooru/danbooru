@@ -52,6 +52,16 @@ class SavedSearchTest < ActiveSupport::TestCase
           post_ids = SavedSearch.post_ids_for(@user.id, label: "blah")
           assert_equal([], post_ids)
         end
+
+        should "not enqueue a populate job in read-only mode" do
+          Danbooru.config.stubs(:read_only_mode?).returns(true)
+
+          assert_no_enqueued_jobs do
+            SavedSearch.post_ids_for(@user.id, label: "blah")
+          end
+        ensure
+          Danbooru.config.unstub(:read_only_mode?)
+        end
       end
 
       context "with a primed cache" do
