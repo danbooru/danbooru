@@ -339,9 +339,25 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, TagImplication.exists?(antecedent_name: "foo_(summer)", consequent_name: "foo", status: "active"))
         end
 
-        should "fail for large tags" do
-          create(:tag, name: "foo_(summer)", category: Tag.categories.character, post_count: 10)
-          create(:tag, name: "foo", category: Tag.categories.character, post_count: 201)
+        should "succeed when implying a small tag to a large tag" do
+          create(:tag, name: "foo_(summer)", post_count: 10)
+          create(:tag, name: "foo", post_count: 1000)
+          create(:wiki_page, title: "foo_(summer)", body: "asd")
+          create(:wiki_page, title: "foo", body: "asd")
+          @bulk_update_request = create(:bulk_update_request, script: "imply foo_(summer) -> foo")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+          end
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(true, TagImplication.exists?(antecedent_name: "foo_(summer)", consequent_name: "foo", status: "active"))
+        end
+
+        should "fail when implying a large tag to a large tag" do
+          create(:tag, name: "foo_(summer)", category: Tag.categories.character, post_count: 201)
+          create(:tag, name: "foo", category: Tag.categories.character, post_count: 1000)
           create(:wiki_page, title: "foo_(summer)", body: "asd")
           create(:wiki_page, title: "foo", body: "asd")
           @bulk_update_request = create(:bulk_update_request, script: "imply foo_(summer) -> foo")
@@ -382,8 +398,22 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, TagAlias.exists?(antecedent_name: "no_tag", consequent_name: "char1b", status: "active"))
         end
 
-        should "fail when aliasing a tag that's too large" do
+        should "succeed when aliasing a small tag to a large tag" do
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
+          create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
+          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+          end
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(true, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b", status: "active"))
+        end
+
+        should "fail when aliasing a large tag to a large tag" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 201)
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 300)
           @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
 

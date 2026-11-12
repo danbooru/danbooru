@@ -41,14 +41,10 @@ class BulkUpdateRequest::Command::CreateImplication < BulkUpdateRequest::Command
 
   def approval_level(tags: nil)
     child_tag = tags.present? ? tags.find { |tag| tag.name == @antecedent } : self.child_tag
-    parent_tag = tags.present? ? tags.find { |tag| tag.name == @consequent } : self.parent_tag
 
-    # the antecedent is a small character tag
-    child_is_valid = child_tag.present? && child_tag.character? && child_tag.is_small_tag?
-    # the consequent is also a small character tag
-    parent_is_valid = parent_tag.present? && parent_tag.character? && parent_tag.is_small_tag?
+    child_is_small = child_tag.blank? || child_tag.empty? || child_tag.is_small_tag?
 
-    return User::Levels::MODERATOR if child_is_valid && parent_is_valid
+    return User::Levels::MODERATOR if child_is_small
     User::Levels::ADMIN
   end
 end

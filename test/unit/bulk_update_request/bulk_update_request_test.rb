@@ -437,13 +437,13 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         should "find BURs the user can approve" do
           assert_search_equals(@bur3, can_approve: "true", current_user: @builder)
-          assert_search_equals([@bur3, @bur4, @bur5], can_approve: "true", current_user: @mod, order: "id_asc")
+          assert_search_equals([@bur2, @bur3, @bur4, @bur5], can_approve: "true", current_user: @mod, order: "id_asc")
           assert_search_equals([@bur2, @bur3, @bur4, @bur5, @bur6], can_approve: "true", current_user: @admin, order: "id_asc")
         end
 
         should "find BURs the user can't approve" do
           assert_search_equals([@bur2, @bur4, @bur5, @bur6], can_approve: "false", current_user: @builder, order: "id_asc")
-          assert_search_equals([@bur2, @bur6], can_approve: "false", current_user: @mod, order: "id_asc")
+          assert_search_equals(@bur6, can_approve: "false", current_user: @mod)
           assert_search_equals([], can_approve: "false", current_user: @admin)
         end
 
