@@ -17,14 +17,6 @@ class EmailAddress < ApplicationRecord
   after_save :create_mod_action, if: :saved_change_to_address?
   after_save :update_email_address, if: :saved_change_to_address?
 
-  def self.visible(user)
-    if user.is_moderator?
-      where(user: User.where(level: ...user.level).or(User.where(id: user.id)))
-    else
-      none
-    end
-  end
-
   def address=(value)
     value = Danbooru::EmailAddress.correct(value)&.to_s || value
     self.normalized_address = Danbooru::EmailAddress.parse(value)&.canonicalized_address&.to_s || value

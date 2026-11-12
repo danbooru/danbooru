@@ -25,6 +25,16 @@ class CommentVotePolicy < ApplicationPolicy
     end
   end
 
+  def visible(relation)
+    if user.is_moderator?
+      relation
+    elsif user.is_anonymous?
+      relation.none
+    else
+      relation.where(user: user)
+    end
+  end
+
   def searchable_attributes
     %i[id created_at updated_at score is_deleted comment user]
   end

@@ -30,10 +30,6 @@ class UserFeedback < ApplicationRecord
   scope :negative, -> { where(category: "negative") }
 
   module SearchMethods
-    def visible(viewer)
-      viewer.is_moderator? ? all : undeleted
-    end
-
     def default_order
       order(created_at: :desc)
     end

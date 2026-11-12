@@ -32,10 +32,6 @@ class ApiKey < ApplicationRecord
 
   has_secure_token :key
 
-  def self.visible(user)
-    where(user: user)
-  end
-
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)

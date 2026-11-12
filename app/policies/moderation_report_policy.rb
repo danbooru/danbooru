@@ -33,6 +33,16 @@ class ModerationReportPolicy < ApplicationPolicy
     [:status]
   end
 
+  def visible(relation)
+    if user.is_moderator?
+      relation
+    elsif !user.is_anonymous?
+      relation.where(creator: user)
+    else
+      relation.none
+    end
+  end
+
   def searchable_attributes
     %i[id created_at updated_at reason creator model status]
   end

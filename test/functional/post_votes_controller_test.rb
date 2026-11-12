@@ -104,6 +104,23 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "show action" do
+      context "for a deleted vote" do
+        setup do
+          @user = create(:user)
+          @post_vote = create(:post_vote, user: @user, score: 1, is_deleted: true)
+        end
+
+        should "not show the vote to the voter" do
+          get_auth post_vote_path(@post_vote), @user, as: :json
+          assert_response 403
+        end
+
+        should "show the vote to admins" do
+          get_auth post_vote_path(@post_vote), create(:admin_user), as: :json
+          assert_response :success
+        end
+      end
+
       context "for a public upvote" do
         setup do
           @user = create(:user, enable_private_favorites: false)

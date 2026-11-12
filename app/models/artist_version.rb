@@ -7,14 +7,6 @@ class ArtistVersion < ApplicationRecord
   belongs_to_updater
   belongs_to :artist
 
-  def self.visible(user)
-    if policy(user).can_view_banned?
-      all
-    else
-      where(artist: Artist.unbanned)
-    end
-  end
-
   module SearchMethods
     def search(params, current_user)
       q = search_attributes(params, current_user: current_user)

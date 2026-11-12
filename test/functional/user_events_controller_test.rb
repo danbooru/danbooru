@@ -65,6 +65,35 @@ class UserEventsControllerTest < ActionDispatch::IntegrationTest
         assert_no_match(/sockpuppet_admin/, response.body)
       end
 
+      should "not let regular users search by session or browser" do
+        event, other_event = @user.user_events.first(2)
+
+        get_auth user_events_path(search: { session_id: event.session_id }), @user, as: :json
+        assert_includes(response.parsed_body.pluck("id"), other_event.id)
+
+        get_auth user_events_path(search: { user_agent_ilike: "nonexistent*" }), @user, as: :json
+        assert_includes(response.parsed_body.pluck("id"), event.id)
+      end
+
+      should "let moderators search by session and browser" do
+        @mod = create(:moderator_user)
+        event = @user.user_events.first
+
+        get_auth user_events_path(search: { session_id: event.session_id }), @mod, as: :json
+        assert_equal([event.id], response.parsed_body.pluck("id"))
+
+        get_auth user_events_path(search: { user_agent_ilike: "nonexistent*" }), @mod, as: :json
+        assert_equal([], response.parsed_body)
+      end
+
+      should "only show the session search field to moderators" do
+        get_auth user_events_path(mode: "table"), @user
+        assert_select "input#search_session_id", count: 0
+
+        get_auth user_events_path(mode: "table"), create(:moderator_user)
+        assert_select "input#search_session_id", count: 1
+      end
+
       should "show users their own events" do
         get_auth user_events_path, @user
 

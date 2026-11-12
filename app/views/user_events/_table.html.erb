@@ -10,7 +10,9 @@
   <%= search_form_for(user_events_path) do |f| %>
     <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
     <%= f.input :ip_addr, label: "IP Address", input_html: { value: params.dig(:search, :ip_addr) } %>
-    <%= f.input :session_id, label: "Session", input_html: { value: params.dig(:search, :session_id) } %>
+    <% if policy(UserEvent).can_see_session? %>
+      <%= f.input :session_id, label: "Session", input_html: { value: params.dig(:search, :session_id) } %>
+    <% end %>
     <%= f.simple_fields_for :ip_geolocation do |f1| %>
       <%= f1.input :city, input_html: { value: params.dig(:search, :ip_geolocation, :city) } %>
       <%= f1.input :country, as: :string, input_html: { value: params.dig(:search, :ip_geolocation, :country) } %>

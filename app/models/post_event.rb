@@ -14,10 +14,6 @@ class PostEvent < ApplicationRecord
     %w[Upload Flag Appeal Approval Disapproval Delete Undelete Ban Unban Replacement Regenerate RegenerateIqdb MoveFavorites NoteLockCreate NoteLockDelete RatingLockCreate RatingLockDelete]
   end
 
-  def self.visible(_user)
-    all
-  end
-
   def self.category_matches(category)
     category = category.squish.titleize.delete(" ")
 

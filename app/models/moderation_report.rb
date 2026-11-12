@@ -34,16 +34,6 @@ class ModerationReport < ApplicationRecord
     MODEL_TYPES
   end
 
-  def self.visible(user)
-    if user.is_moderator?
-      all
-    elsif !user.is_anonymous?
-      where(creator: user)
-    else
-      none
-    end
-  end
-
   def notify_reporter
     return if creator == User.system
     return unless handled? && status_before_last_save != :handled

@@ -54,6 +54,10 @@ class ForumTopicPolicy < ApplicationPolicy
     super + [:is_read?]
   end
 
+  def visible(relation)
+    relation.where(min_level: ..user.level)
+  end
+
   def searchable_attributes
     %i[id created_at updated_at is_sticky is_locked is_deleted category min_level title response_count creator updater forum_posts bulk_update_requests tag_aliases tag_implications]
   end

@@ -13,16 +13,6 @@ class UserNameChangeRequest < ApplicationRecord
   after_create :create_mod_action
   after_create :send_dmail
 
-  def self.visible(user)
-    if user.is_moderator?
-      all
-    elsif user.is_anonymous?
-      none
-    else
-      where(user: User.undeleted)
-    end
-  end
-
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
 
