@@ -141,7 +141,11 @@ class Source::Extractor
     end
 
     def dtext_artist_commentary_desc
-      DText.from_html(linear_artist_commentary_desc, base_url: "https://www.tumblr.com") do |element|
+      # Include the tags because artists often use them to write commentary.
+      tag_links = tags.map { |tag, url| %{<a href="#{CGI.escapeHTML(url)}">##{CGI.escapeHTML(tag)}</a>} }.join(" ")
+      html = "#{linear_artist_commentary_desc}<p>#{tag_links}</p>"
+
+      DText.from_html(html, base_url: "https://www.tumblr.com") do |element|
         case element.name
         # https://tmblr.co/m08AoE-xy5kbQnjed6Tcmng -> https://www.tumblr.com/phantom-miria
         in "a" if Source::URL.parse(element["href"])&.domain == "tmblr.co"

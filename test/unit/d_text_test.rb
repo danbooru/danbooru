@@ -371,9 +371,9 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("<https://example.com/search[text]=東方>", DText.from_html('<a href="https://example.com/search[text]=東方">https://example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9</a>'))
         assert_equal("<https://example.com/search[text]=東方>", DText.from_html('<a href="//example.com/search[text]=東方">https://example.com/search%5Btext%5D=%E6%9D%B1%E6%96%B9</a>'))
 
-        # <small> inside a link should not wrap link text in [tn], since [tn] is invalid inside link text
-        assert_equal('"fascinating":[https://example.com]', DText.from_html('<a href="https://example.com"><small>fascinating</small></a>'))
-        assert_equal('[tn]prefix [/tn]"link":[https://example.com][tn] suffix[/tn]', DText.from_html('<p><small>prefix </small><a href="https://example.com"><small>link</small></a><small> suffix</small></p>'))
+        # <small> inside a link should wrap the whole link in [tn], since [tn] is invalid inside link text
+        assert_equal('[tn]"fascinating":[https://example.com][/tn]', DText.from_html('<a href="https://example.com"><small>fascinating</small></a>'))
+        assert_equal('[tn]prefix "link":[https://example.com] suffix[/tn]', DText.from_html('<p><small>prefix </small><a href="https://example.com"><small>link</small></a><small> suffix</small></p>'))
       end
 
       should "omit redundant nested formatting tags" do

@@ -612,6 +612,12 @@ class DText
       current.name = "s" if current.name == "strike"
       current.name = "small" if current.name == "sub"
 
+      # Move <small> outside of links, since [tn] is invalid inside links: <a><small>foo</small></a> -> <small><a>foo</a></small>
+      if current.name == "a" && current.children.one? && current.child.name == "small"
+        current.child.replace(current.child.children)
+        current = current.wrap("<small></small>").parent
+      end
+
       # Merge adjacent elements of the same type: <b>foo</b><b>bar</b> -> <b>foobar</b>
       if current.name.in?(%w[b i u s small]) && children.last&.name == current.name
         children.last.add_child(current.children)

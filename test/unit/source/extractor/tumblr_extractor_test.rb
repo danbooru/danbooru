@@ -22,7 +22,11 @@ module Source::Tests::Extractor
           ["tag2", "https://tumblr.com/tagged/tag2"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "description",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          description
+
+          "#tag1":[https://tumblr.com/tagged/tag1] "#tag2":[https://tumblr.com/tagged/tag2]
+        EOS
       )
     end
 
@@ -83,7 +87,11 @@ module Source::Tests::Extractor
           ["squid", "https://tumblr.com/tagged/squid"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "[b]“SPLATOON SUPER NES VERSION (or more like GBA according to some XD)”[/b]",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          [b]“SPLATOON SUPER NES VERSION (or more like GBA according to some XD)”[/b]
+
+          "#splatoon":[https://tumblr.com/tagged/splatoon] "#pixel art":[https://tumblr.com/tagged/pixel%20art] "#inkling":[https://tumblr.com/tagged/inkling] "#super nes":[https://tumblr.com/tagged/super%20nes] "#animation":[https://tumblr.com/tagged/animation] "#nintendo":[https://tumblr.com/tagged/nintendo] "#wiiu":[https://tumblr.com/tagged/wiiu] "#gaming":[https://tumblr.com/tagged/gaming] "#gif":[https://tumblr.com/tagged/gif] "#animated gif":[https://tumblr.com/tagged/animated%20gif] "#saltspray rig":[https://tumblr.com/tagged/saltspray%20rig] "#ink":[https://tumblr.com/tagged/ink] "#i'm a kid now":[https://tumblr.com/tagged/i'm%20a%20kid%20now] "#i'm a squid now":[https://tumblr.com/tagged/i'm%20a%20squid%20now] "#squid":[https://tumblr.com/tagged/squid]
+        EOS
       )
     end
 
@@ -158,7 +166,9 @@ module Source::Tests::Extractor
           ["illustration", "https://tumblr.com/tagged/illustration"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "#original":[https://tumblr.com/tagged/original] "#illustration":[https://tumblr.com/tagged/illustration]
+        EOS
       )
     end
 
@@ -183,7 +193,11 @@ module Source::Tests::Extractor
           ["i love rendering teru so much", "https://tumblr.com/tagged/i love rendering teru so much"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "Teru doddle",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Teru doddle
+
+          "#diddle":[https://tumblr.com/tagged/diddle] "#audibly laughed i think i will start calling doodles diddles":[https://tumblr.com/tagged/audibly%20laughed%20i%20think%20i%20will%20start%20calling%20doodles%20diddles] "#mob psycho 100":[https://tumblr.com/tagged/mob%20psycho%20100] "#mp100":[https://tumblr.com/tagged/mp100] "#hanazawa teruki":[https://tumblr.com/tagged/hanazawa%20teruki] "#espclpse":[https://tumblr.com/tagged/espclpse] "#i love rendering teru so much":[https://tumblr.com/tagged/i%20love%20rendering%20teru%20so%20much]
+        EOS
       )
     end
 
@@ -246,6 +260,8 @@ module Source::Tests::Extractor
           [/quote]
 
           "link":[http://www.google.com]
+
+          "#tag":[https://tumblr.com/tagged/tag] "#red hair":[https://tumblr.com/tagged/red%20hair] "#red-hair":[https://tumblr.com/tagged/red-hair] "#red_hair":[https://tumblr.com/tagged/red_hair]
         EOS
       )
     end
@@ -271,7 +287,11 @@ module Source::Tests::Extractor
           ["tag1 tag2", "https://tumblr.com/tagged/tag1 tag2"],
         ],
         dtext_artist_commentary_title: "test post",
-        dtext_artist_commentary_desc: "description",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          description
+
+          "#tag1 tag2":[https://tumblr.com/tagged/tag1%20tag2]
+        EOS
       )
     end
 
@@ -296,7 +316,11 @@ module Source::Tests::Extractor
           ["tag1", "https://tumblr.com/tagged/tag1"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "description",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          description
+
+          "#tag1":[https://tumblr.com/tagged/tag1]
+        EOS
       )
     end
 
@@ -321,7 +345,11 @@ module Source::Tests::Extractor
           ["my art", "https://tumblr.com/tagged/my art"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "direct quote from kaiba post battle city tournament",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          direct quote from kaiba post battle city tournament
+
+          "#I heard this audio and ran to make this":[https://tumblr.com/tagged/I%20heard%20this%20audio%20and%20ran%20to%20make%20this] "#seto kaiba":[https://tumblr.com/tagged/seto%20kaiba] "#jounouchi katsuya":[https://tumblr.com/tagged/jounouchi%20katsuya] "#yami yugi":[https://tumblr.com/tagged/yami%20yugi] "#ygo":[https://tumblr.com/tagged/ygo] "#video":[https://tumblr.com/tagged/video] "#my art":[https://tumblr.com/tagged/my%20art]
+        EOS
       )
     end
 
@@ -367,6 +395,8 @@ module Source::Tests::Extractor
           the divorce is going well
 
           (edit: added subs) ("original":[https://youtu.be/6youGMi8m-Y?si=XX6Z-KNPOS6BIdr3])
+
+          "#or maybe it is just... going":[https://tumblr.com/tagged/or%20maybe%20it%20is%20just...%20going] "#genshin impact":[https://tumblr.com/tagged/genshin%20impact] "#haikaveh":[https://tumblr.com/tagged/haikaveh] "#bad animatic":[https://tumblr.com/tagged/bad%20animatic] "#i'm sorry":[https://tumblr.com/tagged/i'm%20sorry] "#was imagining this for a while and then procreate released their animation app and i had to":[https://tumblr.com/tagged/was%20imagining%20this%20for%20a%20while%20and%20then%20procreate%20released%20their%20animation%20app%20and%20i%20had%20to] "#today yra desperately tries to figure out procreate dreams. tomorrow?? who knows":[https://tumblr.com/tagged/today%20yra%20desperately%20tries%20to%20figure%20out%20procreate%20dreams.%20tomorrow%3F%3F%20who%20knows] "#crawls back into cave":[https://tumblr.com/tagged/crawls%20back%20into%20cave]
         EOS
       )
     end
@@ -425,7 +455,11 @@ module Source::Tests::Extractor
           ["grass pokemon", "https://tumblr.com/tagged/grass pokemon"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "‘saur family 🌱",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          ‘saur family 🌱
+
+          "#bulbasaur":[https://tumblr.com/tagged/bulbasaur] "#munespice":[https://tumblr.com/tagged/munespice] "#munespice art":[https://tumblr.com/tagged/munespice%20art] "#cute art":[https://tumblr.com/tagged/cute%20art] "#digital illustration":[https://tumblr.com/tagged/digital%20illustration] "#pokemon":[https://tumblr.com/tagged/pokemon] "#art":[https://tumblr.com/tagged/art] "#artists on tumblr":[https://tumblr.com/tagged/artists%20on%20tumblr] "#pokemon fanart":[https://tumblr.com/tagged/pokemon%20fanart] "#chibifanart":[https://tumblr.com/tagged/chibifanart] "#pokemon art":[https://tumblr.com/tagged/pokemon%20art] "#plantlover":[https://tumblr.com/tagged/plantlover] "#ivysaur":[https://tumblr.com/tagged/ivysaur] "#venusaur":[https://tumblr.com/tagged/venusaur] "#grass pokemon":[https://tumblr.com/tagged/grass%20pokemon]
+        EOS
       )
     end
 
@@ -505,6 +539,8 @@ module Source::Tests::Extractor
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           "@phantom-miria":[https://www.tumblr.com/phantom-miria]
+
+          "#ffxiv":[https://tumblr.com/tagged/ffxiv] "#draw":[https://tumblr.com/tagged/draw] "#i'm a cat i'm a kitty cat and i dance dance dance":[https://tumblr.com/tagged/i'm%20a%20cat%20i'm%20a%20kitty%20cat%20and%20i%20dance%20dance%20dance] "#is anyone still even here":[https://tumblr.com/tagged/is%20anyone%20still%20even%20here] "#crawls back into damp cave":[https://tumblr.com/tagged/crawls%20back%20into%20damp%20cave]
         EOS
       )
     end
@@ -530,6 +566,8 @@ module Source::Tests::Extractor
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           "@phantom-miria":[https://www.tumblr.com/phantom-miria]
+
+          "#ffxiv":[https://tumblr.com/tagged/ffxiv] "#draw":[https://tumblr.com/tagged/draw] "#i'm a cat i'm a kitty cat and i dance dance dance":[https://tumblr.com/tagged/i'm%20a%20cat%20i'm%20a%20kitty%20cat%20and%20i%20dance%20dance%20dance] "#is anyone still even here":[https://tumblr.com/tagged/is%20anyone%20still%20even%20here] "#crawls back into damp cave":[https://tumblr.com/tagged/crawls%20back%20into%20damp%20cave]
         EOS
       )
     end
@@ -555,7 +593,11 @@ module Source::Tests::Extractor
           ["kat", "https://tumblr.com/tagged/kat"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "Commission of Kat from Gravity Rush",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Commission of Kat from Gravity Rush
+
+          "#2x2F3":[https://tumblr.com/tagged/2x2F3] "#d-floe":[https://tumblr.com/tagged/d-floe] "#Illustration":[https://tumblr.com/tagged/Illustration] "#gravity rush":[https://tumblr.com/tagged/gravity%20rush] "#kat":[https://tumblr.com/tagged/kat]
+        EOS
       )
     end
 
@@ -579,7 +621,9 @@ module Source::Tests::Extractor
           ["shimoneta", "https://tumblr.com/tagged/shimoneta"],
         ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "#anime girl":[https://tumblr.com/tagged/anime%20girl] "#anime art":[https://tumblr.com/tagged/anime%20art] "#spiderman":[https://tumblr.com/tagged/spiderman] "#superior spider-man":[https://tumblr.com/tagged/superior%20spider-man] "#Binkan":[https://tumblr.com/tagged/Binkan] "#shimoneta":[https://tumblr.com/tagged/shimoneta]
+        EOS
       )
     end
 
@@ -613,6 +657,8 @@ module Source::Tests::Extractor
 
           *EDIT full version [b]"here":[https://files.catbox.moe/fxhzs4.png][/b]
           [/quote]
+
+          "#adorable":[https://tumblr.com/tagged/adorable]
         EOS
       )
     end
@@ -663,6 +709,8 @@ module Source::Tests::Extractor
 
           [tn]Fanart of Alphonse, made for the E.E. Anthology – [/tn]"@equivalentexchangeanthology":[https://www.tumblr.com/equivalentexchangeanthology][tn] ⚕️[/tn]
           [tn]▪︎ [/tn]"Image description (audio available)":[https://href.li?https://ee-anthology.dreamwidth.org/tag/artist:+dee+trowble]
+
+          "#fullmetal alchemist":[https://tumblr.com/tagged/fullmetal%20alchemist] "#fullmetal alchemist brotherhood":[https://tumblr.com/tagged/fullmetal%20alchemist%20brotherhood] "#alphonse elric":[https://tumblr.com/tagged/alphonse%20elric] "#fma:b":[https://tumblr.com/tagged/fma:b] "#fma":[https://tumblr.com/tagged/fma] "#my art":[https://tumblr.com/tagged/my%20art] "#fanart":[https://tumblr.com/tagged/fanart]
         EOS
       )
     end
@@ -721,6 +769,8 @@ module Source::Tests::Extractor
           [/quote]
 
           hmm
+
+          "#orv":[https://tumblr.com/tagged/orv] "#myart":[https://tumblr.com/tagged/myart] "#ok back 2 school":[https://tumblr.com/tagged/ok%20back%202%20school] "#tentatively... i still have to get to the hsy part of the reread so i can draw hsy💜":[https://tumblr.com/tagged/tentatively...%20i%20still%20have%20to%20get%20to%20the%20hsy%20part%20of%20the%20reread%20so%20i%20can%20draw%20hsy💜]
         EOS
       )
     end
@@ -753,6 +803,8 @@ module Source::Tests::Extractor
 
           Chilchuck from Dungeon Meshi yells at Marcille, and in his speech bubble is a screenshot of a Tumblr post saying "bro stop chanting in dead languages you're scaring the hoes", and a blood-stained Marcille standing over a dark magic circle replies with another screenshot saying "im summoning the hoes fool"
           [/quote]
+
+          "#dungeon meshi":[https://tumblr.com/tagged/dungeon%20meshi] "#tw blood":[https://tumblr.com/tagged/tw%20blood] "#july says things":[https://tumblr.com/tagged/july%20says%20things] "#july draws things":[https://tumblr.com/tagged/july%20draws%20things] "#my art":[https://tumblr.com/tagged/my%20art] "#marcille":[https://tumblr.com/tagged/marcille] "#chilchuck":[https://tumblr.com/tagged/chilchuck] "#fanart":[https://tumblr.com/tagged/fanart]
         EOS
       )
     end
@@ -793,11 +845,18 @@ module Source::Tests::Extractor
           [/quote]
 
           "so distant":[https://ministarfruit.tumblr.com/post/802726575387836416/im-getting-asks-about-whats-allowed-and-not]
+
+          "#fiamos":[https://tumblr.com/tagged/fiamos] "#arknights":[https://tumblr.com/tagged/arknights] "#mostima":[https://tumblr.com/tagged/mostima] "#fiammetta":[https://tumblr.com/tagged/fiammetta] "#kiki draws":[https://tumblr.com/tagged/kiki%20draws] "#minifemslashfeb2026":[https://tumblr.com/tagged/minifemslashfeb2026] "#yyyyep this was coming":[https://tumblr.com/tagged/yyyyep%20this%20was%20coming] "#yyyyyyyyyyyyyyyyyyyep.":[https://tumblr.com/tagged/yyyyyyyyyyyyyyyyyyyep.]
         EOS
       )
     end
 
     context "A commentary with nested reblogs" do
+      setup do
+        # XXX switch for a working link
+        skip "Protected link now, not accessible via api."
+      end
+
       strategy_should_work(
         "https://www.tumblr.com/shortgremlinman/707877745599905792/get-asked-idiot",
         image_urls: %w[https://64.media.tumblr.com/a2d9051a56877325cc97dd1d4a44b335/29c31c5d4773345f-37/s21000x21000/e01081a0c6cf5a6f4bd78862130e1b7cef0d861d.jpg],
@@ -909,9 +968,11 @@ module Source::Tests::Extractor
 
           I made the executive decision to draw her even though she didn’t win the poll. Thanks to the anon for the suggestion!
 
-          [tn]Also, the way pandas metabolize their food to gain fat and muscle is [/tn]"fascinating":[https://www.scmp.com/news/people-culture/environment/article/3164671/why-are-pandas-so-chonky-despite-their-vegan-diet][tn]! [/tn]
+          [tn]Also, the way pandas metabolize their food to gain fat and muscle is "fascinating":[https://www.scmp.com/news/people-culture/environment/article/3164671/why-are-pandas-so-chonky-despite-their-vegan-diet]! [/tn]
 
           "Hey, if you’re here, check this out!":[https://www.tumblr.com/caffichai/751605936379101184/food-bank-fundraiser?source=share]
+
+          "#like her outfit":[https://tumblr.com/tagged/like%20her%20outfit] "#Also I think it's funny that they made the bear-girls in arknights skinny! Bears are legendary fat and jacked!!":[https://tumblr.com/tagged/Also%20I%20think%20it's%20funny%20that%20they%20made%20the%20bear-girls%20in%20arknights%20skinny!%20Bears%20are%20legendary%20fat%20and%20jacked!!] "#and also the fact that she's a martial artist and foodie":[https://tumblr.com/tagged/and%20also%20the%20fact%20that%20she's%20a%20martial%20artist%20and%20foodie] "#FEater":[https://tumblr.com/tagged/FEater] "#Arknights":[https://tumblr.com/tagged/Arknights] "#pixel":[https://tumblr.com/tagged/pixel] "#pixel art":[https://tumblr.com/tagged/pixel%20art] "#digital art":[https://tumblr.com/tagged/digital%20art] "#artists on tumblr":[https://tumblr.com/tagged/artists%20on%20tumblr] "#art":[https://tumblr.com/tagged/art] "#Panda":[https://tumblr.com/tagged/Panda] "#Fat girl fthrusday":[https://tumblr.com/tagged/Fat%20girl%20fthrusday]
         EOS
       )
     end
