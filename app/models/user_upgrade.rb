@@ -94,14 +94,6 @@ class UserUpgrade < ApplicationRecord
     recipient != purchaser
   end
 
-  def self.visible(user)
-    if user.is_owner?
-      all
-    else
-      where(recipient: user).or(where(purchaser: user))
-    end
-  end
-
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
 

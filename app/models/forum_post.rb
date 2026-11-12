@@ -53,14 +53,6 @@ class ForumPost < ApplicationRecord
   )
 
   module SearchMethods
-    def visible(user)
-      if policy(user).show_deleted?
-        where(topic_id: ForumTopic.visible(user))
-      else
-        undeleted.where(topic_id: ForumTopic.visible(user))
-      end
-    end
-
     def not_visible(user)
       visible(user).invert_where
     end

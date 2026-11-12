@@ -101,14 +101,6 @@ class ModAction < ApplicationRecord
     %w[Artist Comment CommentVote ForumPost ForumTopic IpBan ModerationReport NewsUpdate Pool Post PostVote SiteCredential Tag TagAlias TagImplication User]
   end
 
-  def self.visible(user)
-    if user.is_moderator?
-      all
-    else
-      where.not(category: MOD_ONLY_CATEGORIES)
-    end
-  end
-
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
 

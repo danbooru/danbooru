@@ -91,10 +91,6 @@ class UserAction < ApplicationRecord
     from("(#{sql}) user_actions")
   end
 
-  def self.visible(_user)
-    all
-  end
-
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
 

@@ -67,9 +67,9 @@ class Comment < ApplicationRecord
       when "post_id", "post_id_desc"
         q = q.order("comments.post_id DESC, comments.id DESC")
       when "score", "score_desc"
-        q = q.order("comments.score DESC, comments.id DESC")
+        q = q.visible_for_search(:score, current_user).order("comments.score DESC, comments.id DESC")
       when "score_asc"
-        q = q.order("comments.score ASC, comments.id ASC")
+        q = q.visible_for_search(:score, current_user).order("comments.score ASC, comments.id ASC")
       when "updated_at", "updated_at_desc"
         q = q.order("comments.updated_at DESC, comments.id DESC")
       when "updated_at_asc"

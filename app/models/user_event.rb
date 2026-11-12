@@ -72,16 +72,6 @@ class UserEvent < ApplicationRecord
 
   scope :authorized, -> { where(category: AUTHORIZED_EVENTS) }
 
-  def self.visible(user)
-    if user.is_moderator?
-      where(user: User.where(level: ...user.level).or(User.where(id: user.id)))
-    elsif user.is_anonymous?
-      none
-    else
-      where(user: user)
-    end
-  end
-
   concerning :SockpuppetMethods do
     class_methods do
       # @return [ActiveRecord::Relation<UserEvent>] A list of user events that share a session ID with the given user.

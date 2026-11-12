@@ -116,7 +116,22 @@ class ApplicationPolicy
   # @example
   #   search_modes # => { id: :all, created_at: :all, uploader: :all, md5: :exact }
   def search_modes
-    searchable_attributes.map { |attribute| attribute.is_a?(Hash) ? attribute : { attribute => :all } }.reduce({}, :merge)
+    searchable_attributes.map do |attribute|
+      if attribute.is_a?(Hash)
+        attribute
+      else
+        { attribute => :all }
+      end
+    end.reduce({}, :merge)
+  end
+
+  # Restrict the relation to the records the user is allowed to see. By default, all records are visible.
+  #
+  # @param relation [ActiveRecord::Relation]
+  # @return [ActiveRecord::Relation]
+  # @see ApplicationRecord.visible
+  def visible(relation)
+    relation
   end
 
   # When a user performs a search, this method is used to filter out results

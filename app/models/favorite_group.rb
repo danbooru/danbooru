@@ -30,16 +30,6 @@ class FavoriteGroup < ApplicationRecord
       where_ilike(:name, name)
     end
 
-    def visible(user)
-      if user.is_owner?
-        all
-      elsif user.is_anonymous?
-        is_public
-      else
-        is_public.or(where(creator: user))
-      end
-    end
-
     def search(params, current_user)
       q = search_attributes(params, current_user: current_user)
 

@@ -23,6 +23,16 @@ class UserNameChangeRequestPolicy < ApplicationPolicy
 
   alias_method :name_change, :record
 
+  def visible(relation)
+    if user.is_moderator?
+      relation
+    elsif user.is_anonymous?
+      relation.none
+    else
+      relation.where(user: User.undeleted)
+    end
+  end
+
   def searchable_attributes
     %i[id created_at updated_at user original_name desired_name]
   end

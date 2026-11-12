@@ -35,16 +35,6 @@ class ModerationReport < ApplicationRecord
     MODEL_TYPES
   end
 
-  def self.visible(user)
-    if user.is_moderator?
-      all
-    elsif !user.is_anonymous?
-      where(creator: user)
-    else
-      none
-    end
-  end
-
   def autoban_reported_user
     if SpamDetector.is_spammer?(reported_user)
       SpamDetector.ban_spammer!(reported_user)

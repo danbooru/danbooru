@@ -81,16 +81,6 @@ class Dmail < ApplicationRecord
   end
 
   module SearchMethods
-    def visible(user)
-      if user.is_anonymous?
-        none
-      elsif user.is_moderator?
-        where(owner: user).or(where(id: ModerationReport.where(model_type: "Dmail").select(:model_id)))
-      else
-        where(owner: user)
-      end
-    end
-
     def sent_by(user)
       where("dmails.from_id = ? AND dmails.owner_id != ?", user.id, user.id)
     end

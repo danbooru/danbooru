@@ -22,12 +22,6 @@ class DtextLink < ApplicationRecord
   scope :pool, -> { where(model_type: "Pool") }
   scope :embedded_media, -> { where(link_type: %i[embedded_post embedded_media_asset]) }
 
-  def self.visible(user)
-    # XXX the double negation is to prevent postgres from choosing a bad query
-    # plan (it doesn't know that most forum posts aren't mod-only posts).
-    wiki_page.or(forum_post.where.not(model_id: ForumPost.not_visible(user))).or(pool)
-  end
-
   def self.model_types
     %w[WikiPage ForumPost Pool]
   end

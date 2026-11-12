@@ -7,16 +7,6 @@ class RateLimit < ApplicationRecord
     expired.delete_all
   end
 
-  def self.visible(user)
-    if user.is_owner?
-      all
-    elsif user.is_anonymous?
-      none
-    else
-      where(key: [user.cache_key])
-    end
-  end
-
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)

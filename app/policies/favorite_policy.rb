@@ -21,6 +21,16 @@ class FavoritePolicy < ApplicationPolicy
     end
   end
 
+  def visible(relation)
+    if user.is_admin?
+      relation
+    elsif user.is_anonymous?
+      relation.public_favorites
+    else
+      relation.where(user: user).or(relation.public_favorites)
+    end
+  end
+
   def searchable_attributes
     %i[id post user]
   end

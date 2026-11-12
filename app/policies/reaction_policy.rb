@@ -13,6 +13,10 @@ class ReactionPolicy < ApplicationPolicy
     [:model_id, :model_type, :reaction_id]
   end
 
+  def visible(relation)
+    relation.where.not(model: ForumPost.not_visible(user))
+  end
+
   def searchable_attributes
     %i[id created_at updated_at creator model reaction_id]
   end

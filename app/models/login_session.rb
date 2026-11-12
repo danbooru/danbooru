@@ -32,14 +32,6 @@ class LoginSession < ApplicationRecord
     update!(status: :revoked)
   end
 
-  def self.visible(user)
-    if user.is_owner?
-      all
-    else
-      where(user: user)
-    end
-  end
-
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)

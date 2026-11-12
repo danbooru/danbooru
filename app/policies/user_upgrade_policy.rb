@@ -25,6 +25,14 @@ class UserUpgradePolicy < ApplicationPolicy
     user.is_owner? && record.has_payment?
   end
 
+  def visible(relation)
+    if user.is_owner?
+      relation
+    else
+      relation.where(recipient: user).or(relation.where(purchaser: user))
+    end
+  end
+
   def searchable_attributes
     %i[id created_at updated_at upgrade_type status transaction_id payment_processor recipient purchaser]
   end

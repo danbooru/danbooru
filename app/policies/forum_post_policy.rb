@@ -69,6 +69,14 @@ class ForumPostPolicy < ApplicationPolicy
     super + [[:topic, :is_deleted?]]
   end
 
+  def visible(relation)
+    if show_deleted?
+      relation.where(topic_id: ForumTopic.visible(user))
+    else
+      relation.undeleted.where(topic_id: ForumTopic.visible(user))
+    end
+  end
+
   def searchable_attributes
     %i[id created_at updated_at is_deleted body creator updater topic dtext_links votes tag_alias tag_implication bulk_update_request]
   end

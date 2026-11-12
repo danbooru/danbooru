@@ -22,16 +22,6 @@ class PostVote < ApplicationRecord
 
   deletable
 
-  def self.visible(user)
-    if user.is_admin?
-      all
-    elsif user.is_anonymous?
-      public_votes
-    else
-      active.where(user: user).or(public_votes)
-    end
-  end
-
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
 

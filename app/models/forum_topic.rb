@@ -48,10 +48,6 @@ class ForumTopic < ApplicationRecord
   scope :rejected, -> { where(category_id: 1).where(id: BulkUpdateRequest.rejected.has_topic.select(:forum_topic_id)).where.not(id: BulkUpdateRequest.has_topic.pending.or(BulkUpdateRequest.has_topic.approved).select(:forum_topic_id)) }
 
   module SearchMethods
-    def visible(user)
-      where(min_level: ..user.level)
-    end
-
     def read_by_user(user)
       last_forum_read_at = user.last_forum_read_at || Time.zone.parse("2000-01-01")
 

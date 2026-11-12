@@ -3,7 +3,11 @@
 class RelatedTagQueryPolicy < ApplicationPolicy
   # The maximum number of posts to sample when finding related tags.
   def max_search_sample_size
-    user.is_builder? ? 100_000 : 10_000
+    if user.is_builder?
+      100_000
+    else
+      10_000
+    end
   end
 
   def rate_limit_for_show(**_options)
