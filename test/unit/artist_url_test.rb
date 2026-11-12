@@ -81,6 +81,7 @@ class ArtistURLTest < ActiveSupport::TestCase
       should normalize_attribute(:url).from("http://www.pawoo.net/@evazion/19451018").to("https://pawoo.net/@evazion")
       should normalize_attribute(:url).from("http://www.pawoo.net/users/evazion/media").to("https://pawoo.net/@evazion")
       should normalize_attribute(:url).from("http://baraag.net/@curator/102270656480174153").to("https://baraag.net/@curator")
+      should normalize_attribute(:url).from("https://baraag.net/ap/users/117595784873325209").to("https://baraag.net/web/accounts/117595784873325209")
       should normalize_attribute(:url).from("http://instagram.com/itomugi").to("https://www.instagram.com/itomugi/")
       should normalize_attribute(:url).from("http://mesh-mesh.booth.pm/items/746971").to("https://mesh-mesh.booth.pm")
     end

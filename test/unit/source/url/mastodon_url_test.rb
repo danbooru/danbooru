@@ -24,11 +24,13 @@ module Source::Tests::URL
         "https://baraag.net/@danbooru",
         "https://baraag.net/@web/danbooru",
         "https://baraag.net/web/accounts/107862785324786980",
+        "https://baraag.net/ap/users/117595784873325209",
       )
 
       should be_secondary_url(
         "https://pawoo.net/web/accounts/47806",
         "https://baraag.net/web/accounts/107862785324786980",
+        "https://baraag.net/ap/users/117595784873325209",
       )
 
       should_not be_secondary_url(
@@ -53,6 +55,11 @@ module Source::Tests::URL
         page_url: "https://baraag.net/@bardbot/105732813175612920",
         username: "bardbot",
         work_id: "105732813175612920",
+      )
+
+      should parse_url("https://baraag.net/ap/users/117595784873325209").into(
+        profile_url: "https://baraag.net/web/accounts/117595784873325209",
+        user_id: "117595784873325209",
       )
 
       should parse_url("https://pawoo.net/@evazion/media").into(username: "evazion", page_url: nil)

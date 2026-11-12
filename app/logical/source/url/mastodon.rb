@@ -55,6 +55,10 @@ class Source::URL::Mastodon < Source::URL
     in _, _, "web", "accounts", user_id
       @user_id = user_id
 
+    # https://baraag.net/ap/users/117595784873325209 (ActivityPub actor URL)
+    in _, _, "ap", "users", /^\d+$/ => user_id
+      @user_id = user_id
+
     # Page: https://pawoo.net/@evazion/19451018
     # https://img.pawoo.net/media_attachments/files/001/297/997/small/c4272a09570757c2.png
     # https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png
