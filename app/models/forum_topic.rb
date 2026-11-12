@@ -19,7 +19,8 @@ class ForumTopic < ApplicationRecord
   has_many :forum_posts, foreign_key: "topic_id", dependent: :destroy, inverse_of: :topic
   has_many :forum_topic_visits
   has_one :forum_topic_visit_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "ForumTopicVisit"
-  has_one :original_post, -> { order(id: :asc) }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
+  # DISTINCT ON makes preloading only load the first post of each topic, instead of every post.
+  has_one :original_post, -> { select("DISTINCT ON (forum_posts.topic_id) forum_posts.*").order(:topic_id, :id) }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :bulk_update_requests
   has_many :tag_aliases
   has_many :tag_implications
