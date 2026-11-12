@@ -13,6 +13,11 @@ class MediaAssetPolicy < ApplicationPolicy
     can_see_image?
   end
 
+  # Whether the user can resize the image or convert it to another format (with e.g. `/media_assets/1.webp?width=100`).
+  def can_convert_image?
+    user.is_owner?
+  end
+
   def can_see_image?
     !record.removed? && (record.post.blank? || record.post.visible?(user))
   end

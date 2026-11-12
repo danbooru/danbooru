@@ -136,6 +136,25 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action for a converted image" do
+      setup do
+        @media_asset = create(:post_with_file).media_asset
+      end
+
+      should "convert the image for the site owner" do
+        get_auth media_asset_path(@media_asset, format: :webp, width: 10, height: 10), create(:owner_user)
+
+        assert_response :success
+        assert_equal("image/webp", response.media_type)
+      end
+
+      should "not convert the image for other users" do
+        get_auth media_asset_path(@media_asset, format: :webp, width: 10, height: 10), create(:admin_user)
+
+        assert_not_equal("image/webp", response.media_type)
+      end
+    end
+
     context "show action" do
       setup do
         @user1 = create(:user)
