@@ -400,9 +400,6 @@ class ApplicationMetrics
       { name: :ruby_vm_constant_cache_misses,                     type: :counter, help: "Total number of constant cache misses." },
       { name: :ruby_objects_count,                                type: :gauge,   help: "Current number of Ruby objects by type." },
       { name: :ruby_objects_size_bytes,                           type: :gauge,   help: "Current approximate size of all Ruby objects." },
-      { name: :ruby_objects_symbols_count,                        type: :gauge,   help: "Current number of symbol objects. Immortal symbols aren't garbage collected." },
-      { name: :ruby_objects_tdata_count,                          type: :gauge,   help: "Current number of T_DATA objects. TypedData objects are Ruby wrappers around C structs." },
-      { name: :ruby_objects_imemo_count,                          type: :gauge,   help: "Current number of T_IMEMO objects." },
 
       { name: :ruby_gc_total,                                     type: :counter, help: "Total number of garbage collections since process start." },
       { name: :ruby_gc_duration_seconds,                          type: :counter, help: "Time spent in garbage collection since process start." },
@@ -528,18 +525,6 @@ class ApplicationMetrics
     ObjectSpace.count_objects_size.each do |type, size|
       next if type == :TOTAL
       metrics[:ruby_objects_size_bytes][type: type.to_s.delete_prefix("T_").downcase].set(size)
-    end
-
-    ObjectSpace.count_tdata_objects.each do |type, count|
-      metrics[:ruby_objects_tdata_count][type: type.to_s].set(count)
-    end
-
-    ObjectSpace.count_symbols.each do |type, count|
-      metrics[:ruby_objects_symbols_count][type: type].set(count)
-    end
-
-    ObjectSpace.count_imemo_objects.each do |type, count|
-      metrics[:ruby_objects_imemo_count][type: type].set(count)
     end
 
     ruby_yjit_stats = defined?(RubyVM::YJIT) ? RubyVM::YJIT.runtime_stats : Hash.new { 0 }
