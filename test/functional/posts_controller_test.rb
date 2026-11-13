@@ -705,6 +705,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(posts[4])
       end
 
+      should "fall back to the adjacent post if no visible posts are found" do
+        posts = create_list(:post, 3)
+        posts[1].update!(is_banned: true)
+
+        get_auth show_seq_post_path(posts[2].id), @user, params: { seq: "next", q: "status:banned" }
+        assert_redirected_to(post_path(posts[1], q: "status:banned"))
+      end
+
       should "not skip banned posts for approvers" do
         posts = create_list(:post, 3)
         posts[1].update!(is_banned: true)

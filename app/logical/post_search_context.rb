@@ -16,16 +16,17 @@ class PostSearchContext
     @tags = params[:q].presence || params[:tags].presence || "status:any"
   end
 
-  # Skips posts the user can't see (banned, taken down, or restricted posts).
+  # Skips posts the user can't see (banned, taken down, or restricted posts). Only checks the next 20 posts to bound
+  # the cost; if none of them are visible, returns the adjacent post.
   memoize def post_id
-    posts = Post.user_tag_match(tags).unscope(:order)
+    posts = Post.user_tag_match(tags)
 
     if seq == "prev"
-      posts = posts.where(id: (id + 1)..).find_each(order: :asc, batch_size: 20)
+      posts = posts.where(id: (id + 1)..).reorder("posts.id asc").limit(20).to_a
     else
-      posts = posts.where(id: ...id).find_each(order: :desc, batch_size: 20)
+      posts = posts.where(id: ...id).reorder("posts.id desc").limit(20).to_a
     end
 
-    posts.find(&:visible?)&.id
+    (posts.find(&:visible?) || posts.first)&.id
   end
 end
