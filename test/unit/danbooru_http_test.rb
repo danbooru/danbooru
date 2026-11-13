@@ -189,6 +189,14 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
         assert_equal(598, resp.status)
       end
+
+      should "include the response in the error for a failed get! request" do
+        error = assert_raises(Danbooru::Http::Error) do
+          Danbooru::Http.new.get!(httpbin_url("status/404"))
+        end
+
+        assert_equal(404, error.response.status)
+      end
     end
 
     context "#post method" do
@@ -453,6 +461,14 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         end
 
         assert_equal(false, File.exist?(path))
+      end
+
+      should "include the response in the error if the server returns an error" do
+        error = assert_raises(Danbooru::Http::DownloadError) do
+          Danbooru::Http.download_media(httpbin_url("status/403"))
+        end
+
+        assert_equal(403, error.response.status)
       end
 
       should "delete the temp file if the server returns an error" do

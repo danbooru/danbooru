@@ -19,7 +19,15 @@
 #
 module Danbooru
   class Http
-    class Error < StandardError; end
+    class Error < StandardError
+      attr_reader :response
+
+      def initialize(message = nil, response: nil)
+        super(message)
+        @response = response
+      end
+    end
+
     class DownloadError < Error; end
     class FileTooLargeError < Error; end
 
@@ -267,7 +275,7 @@ module Danbooru
       # @return [Array<(HTTP::Response, MediaFile)>] the HTTP response and the downloaded file
       def download_media(url, file: Danbooru::Tempfile.new("danbooru-download-#{url.parameterize.truncate(96)}-", binmode: true))
         response = request(:get, url, buffer: false)
-        raise DownloadError, "#{url} failed with code #{response.status}" if response.status != 200
+        raise DownloadError.new("#{url} failed with code #{response.status}", response: response) if response.status != 200
 
         response.body.each { |chunk| file.write(chunk) }
 
@@ -321,7 +329,7 @@ module Danbooru
       if response.status.in?(200..399)
         response
       else
-        raise Error, "#{method.upcase} #{url} failed (HTTP #{response.status})"
+        raise Error.new("#{method.upcase} #{url} failed (HTTP #{response.status})", response: response)
       end
     end
 
