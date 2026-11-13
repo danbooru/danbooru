@@ -5,6 +5,7 @@ class MediaFileWebmTest < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "webm",
+        "test/files/webm/test-16x16-fake-duration.webm" => [150, 150, "055cb014d1107a31e3f2778802033716"],
         "test/files/webm/test-512x512-fake-dimensions.webm" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
         "test/files/webm/test-512x512.webm" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
         "test/files/webm/test-aac.webm" => [150, 84, "511476a470287cd49117078a80d4c6d5"],
@@ -202,9 +203,9 @@ class MediaFileWebmTest < ActiveSupport::TestCase
       assert_equal(false, file.is_corrupt?)
       assert_equal(true, file.is_supported?)
       assert_equal(true, file.is_animated?)
-      assert_equal(1.01, file.duration)
+      assert_equal(1.014, file.duration)
       assert_equal(10, file.frame_count)
-      assert_equal(9.900990099009901, file.frame_rate)
+      assert_equal(9.861932938856016, file.frame_rate)
       assert_equal({
         "File:FileType" => "WEBM",
         "Matroska:EBMLVersion" => 1,
@@ -260,14 +261,14 @@ class MediaFileWebmTest < ActiveSupport::TestCase
         "FFmpeg:FrameCount" => 10,
         "FFmpeg:VideoCodec" => "vp9",
         "FFmpeg:VideoProfile" => "Profile 0",
-        "FFmpeg:VideoBitRate" => 432_546,
+        "FFmpeg:VideoBitRate" => 430_840,
         "FFmpeg:AudioCodec" => "opus",
         "FFmpeg:AudioLayout" => "stereo",
-        "FFmpeg:AudioBitRate" => 50_661,
+        "FFmpeg:AudioBitRate" => 50_461,
         "FFmpeg:AudioPeakLoudness" => 0.1273503081016662,
         "FFmpeg:AudioAverageLoudness" => 0.018620871366628676,
         "FFmpeg:AudioLoudnessRange" => 0.0,
-        "FFmpeg:AudioSilencePercentage" => 0.7506188118811882,
+        "FFmpeg:AudioSilencePercentage" => 0.7476577909270218,
       }, file.metadata.to_h)
     end
   end
@@ -581,6 +582,19 @@ class MediaFileWebmTest < ActiveSupport::TestCase
 
       assert_equal([512, 512], file.dimensions)
       assert_equal(false, file.is_supported?)
+    end
+  end
+
+  context "a WebM file with a fake duration in the container metadata" do
+    # A 141 second 16x16 VP9 video (`ffmpeg -f lavfi -i color=c=black:s=16x16:r=1 -t 141 -pix_fmt yuv420p -c:v libvpx-vp9`)
+    # with the Matroska Duration element (the 8-byte float after the 0x4489 element ID) changed to 1 second.
+    should "read the real duration from the packets" do
+      file = MediaFile.open("test/files/webm/test-16x16-fake-duration.webm")
+
+      assert_equal(1.0, FFmpeg.new(file).container_duration)
+      assert_equal(141.0, file.duration)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_corrupt?)
     end
   end
 end

@@ -458,6 +458,22 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a video with a fake duration in the container metadata" do
+        should "fail for a .webm file" do
+          create_upload!("test/files/webm/test-16x16-fake-duration.webm", user: @user)
+
+          assert_response 201
+          assert_match("Duration must be less than", Upload.last.error)
+        end
+
+        should "fail for a .mp4 file" do
+          create_upload!("test/files/mp4/test-16x16-fake-duration.mp4", user: @user)
+
+          assert_response 201
+          assert_match("Duration must be less than", Upload.last.error)
+        end
+      end
+
       context "for an unsupported archive type" do
         should "fail for a .tar file" do
           create_upload!("test/files/archive/ugoira.tar", user: @user)
