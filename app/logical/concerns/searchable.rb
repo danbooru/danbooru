@@ -565,14 +565,16 @@ module Searchable
     def search_enum_attribute(name)
       relation = self.relation
 
+      # Split on commas, then on spaces unless the value is an enum name containing spaces (e.g. "Bugs & Features").
+      enum_names = relation.defined_enums[name.to_s].keys.map(&:downcase)
+      parse_values = ->(value) { value.split(",").map(&:strip).flat_map { |v| v.downcase.in?(enum_names) ? [v] : v.split } }
+
       if params[name].present?
-        value = params[name].split(/[, ]+/)
-        relation = visible(relation, name).where(name => value)
+        relation = visible(relation, name).where(name => parse_values.call(params[name]))
       end
 
       if params[:"#{name}_not"].present?
-        value = params[:"#{name}_not"].split(/[, ]+/)
-        relation = visible(relation, name).where.not(name => value)
+        relation = visible(relation, name).where.not(name => parse_values.call(params[:"#{name}_not"]))
       end
 
       relation = search_context(relation).search_numeric_attribute(name, key: :"#{name}_id")

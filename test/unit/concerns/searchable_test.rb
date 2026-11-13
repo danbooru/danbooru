@@ -199,6 +199,20 @@ class SearchableTest < ActiveSupport::TestCase
       end
     end
 
+    context "for an enum attribute with spaces in its values" do
+      subject { ForumTopic }
+
+      should "work" do
+        @general = create(:forum_topic, category: "General")
+        @bugs = create(:forum_topic, category: "Bugs & Features")
+
+        assert_search_equals(@bugs, category: "Bugs & Features")
+        assert_search_equals(@bugs, category: "bugs & features")
+        assert_search_equals([@bugs, @general], category: "General,Bugs & Features")
+        assert_search_equals(@general, category_not: "Bugs & Features")
+      end
+    end
+
     context "for an array attribute" do
       subject { WikiPage }
 
