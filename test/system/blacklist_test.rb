@@ -227,6 +227,20 @@ class BlacklistChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "on the move favorites page" do
+      setup do
+        fast_signin create(:approver)
+      end
+
+      should "hide blacklisted posts and show non-blacklisted posts" do
+        visit confirm_move_favorites_moderator_post_post_path(@blacklisted_post)
+        assert_post_hidden @blacklisted_post
+
+        visit confirm_move_favorites_moderator_post_post_path(@safe_post)
+        assert_post_not_blacklisted @safe_post
+      end
+    end
+
     context "on the /post/ID page" do
       should "hide blacklisted posts and show non-blacklisted posts" do
         visit post_path(@blacklisted_post)

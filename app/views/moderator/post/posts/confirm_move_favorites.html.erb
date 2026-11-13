@@ -1,5 +1,7 @@
 <h1>Move Favorites to Parent</h1>
 
+<%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
+
 <div>
   <%= post_preview(@post, show_deleted: true) %>
 </div>
