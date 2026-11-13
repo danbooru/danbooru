@@ -17,7 +17,6 @@ class Blacklist {
 
     this.rules = rules.map(rule => new Rule(this, rule));
     this.initializeRulesWithoutHideMethod();
-    this.posts = $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview").toArray().map(post => new Post(post, this));
     this.apply();
     this.cleanupStorage();
 
@@ -28,6 +27,7 @@ class Blacklist {
 
   // Apply all blacklist rules to all posts.
   apply() {
+    this.posts = $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview").toArray().map(post => new Post(post, this));
     this.posts.forEach(post => post.applyRules());
   }
 
