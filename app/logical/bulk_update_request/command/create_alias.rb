@@ -51,7 +51,14 @@ class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
     return User::Levels::BUILDER if old_is_small_artist && new_is_small_artist
 
     old_is_small = old.blank? || old.empty? || old.is_small_tag?
-    return User::Levels::MODERATOR if old_is_small
+    new_is_small = new.blank? || new.empty? || new.is_small_tag?
+    return User::Levels::MODERATOR if old_is_small && new_is_small
+
+    # Aliasing also changes the new tag's category if it's general and the old tag isn't, and moves the old tag's
+    # implications to the new tag. Only allow this for small new tags.
+    changes_new_category = old.present? && new.present? && !old.general? && new.general?
+    moves_implications = old.present? && old.antecedent_implications.exists?
+    return User::Levels::MODERATOR if old_is_small && !changes_new_category && !moves_implications
 
     User::Levels::ADMIN
   end

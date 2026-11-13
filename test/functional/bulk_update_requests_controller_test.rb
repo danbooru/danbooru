@@ -424,6 +424,31 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
         end
 
+        should "fail when aliasing a small tag to a large tag that would change the large tag's category" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
+          create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
+          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> gen1b")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "gen1b"))
+        end
+
+        should "fail when aliasing a small tag with implications to a large tag" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
+          create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
+          create(:tag_implication, antecedent_name: "char1a", consequent_name: "copyright1")
+          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
+        end
+
         should "succeed when deprecating an empty tag" do
           create(:tag, name: "no_tag", post_count: 0)
           create(:wiki_page, title: "no_tag", body: "asd")
