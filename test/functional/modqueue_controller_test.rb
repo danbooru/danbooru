@@ -48,6 +48,26 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_equal([{ "rating" => @post.rating }], response.parsed_body)
       end
 
+      should "support searching by post attributes" do
+        member_post = create(:post, is_pending: true, uploader: create(:member_user))
+        create(:post, is_pending: true, uploader: create(:builder_user))
+
+        get_auth modqueue_index_path(search: { uploader: { level: User::Levels::MEMBER }}), @admin, as: :json
+
+        assert_response :success
+        assert_equal([member_post.id], response.parsed_body.pluck("id"))
+      end
+
+      should "support searching by post attributes when ordering by disapprovals" do
+        member_post = create(:post, is_pending: true, uploader: create(:member_user))
+        create(:post, is_pending: true, uploader: create(:builder_user))
+
+        get_auth modqueue_index_path(search: { uploader: { level: User::Levels::MEMBER }, order: "disapprovals" }), @admin, as: :json
+
+        assert_response :success
+        assert_equal([member_post.id], response.parsed_body.pluck("id"))
+      end
+
       should "order posts correctly when searching for tags" do
         post1 = create(:post, tag_string: "touhou", is_pending: true, score: 5)
         post2 = create(:post, tag_string: "touhou", is_pending: true, score: 10)

@@ -12,6 +12,8 @@ class ModqueueController < ApplicationController
 
     @posts = Post.includes(:appeals, :vote_by_current_user, :uploader, :media_asset, disapprovals: [:user], flags: [:creator])
     @posts = @posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :unseen))
+    # Tags and order are handled by user_tag_match, because Post.search can't add the joins needed by some orders (e.g. `order:disapprovals`).
+    @posts = @posts.search(search_params.except(:tags, :order, :modqueue), CurrentUser.user).unscope(:order)
     @posts = @posts.user_tag_match(@tags, CurrentUser.user) if @tags.present?
     @posts = @posts.user_tag_match("order:#{@order}", CurrentUser.user)
     @posts = @posts.paginate(params[:page], limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE)
