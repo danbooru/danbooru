@@ -71,6 +71,7 @@ group :development do
   gem "rubocop", "~> 1", require: false
   gem "rubocop-rails", "~> 2", require: false
   gem "rubocop-factory_bot", "~> 2", require: false
+  gem "bundler-audit", "~> 0.9", require: false
   # gem 'meta_request'
   gem "rack-mini-profiler", "~> 5"
   gem "stackprof", "~> 0.2"
