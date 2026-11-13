@@ -26,6 +26,12 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
         assert_equal("mass update [[bunny_ears]] -> [[rabbit_ears]]", @bur.processor.to_dtext)
       end
 
+      should "link tags with category prefixes to the tag's wiki in dtext" do
+        @bur = build(:bulk_update_request, script: "mass update aaa -> char:bbb")
+
+        assert_equal("mass update [[aaa]] -> [[bbb|char:bbb]]", @bur.processor.to_dtext)
+      end
+
       should "render complex queries as search links in dtext" do
         @bur = build(:bulk_update_request, script: "mass update source:imageboard -> source:Imageboard")
 
