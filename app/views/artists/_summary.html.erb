@@ -80,5 +80,5 @@
     </p>
   <% end %>
 
-  <%= render "tag_relationships/alias_and_implication_list", tag: artist.tag %>
+  <%= render TagRelationshipsComponent.new(tag: artist.tag) %>
 <% end %>

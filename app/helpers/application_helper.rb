@@ -224,6 +224,8 @@ module ApplicationHelper
   end
 
   def link_to_wiki_or_artist(tag, classes: nil, **options)
+    classes = "#{tag_class(tag)} #{classes}"
+
     if tag.artist?
       link_to tag.name, show_or_new_artists_path(name: tag.name), class: "wiki-link #{classes}", **options
     else

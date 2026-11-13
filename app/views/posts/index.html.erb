@@ -119,7 +119,7 @@
     <% elsif @post_set.tag&.artist? %>
       <p>There is no artist entry yet for the artist <%= link_to @post_set.tag.name, new_artist_path(artist: { name: @post_set.tag.name }), rel: "nofollow" %>. <%= link_to "Create new artist entry", new_artist_path(artist: { name: @post_set.tag.name }), rel: "nofollow" %>.</p>
 
-      <%= render "tag_relationships/alias_and_implication_list", tag: @post_set.tag %>
+      <%= render TagRelationshipsComponent.new(tag: @post_set.tag) %>
     <% elsif @post_set.wiki_page.present? %>
       <% @post_set.wiki_page.tap do |wiki_page| %>
         <% if policy(wiki_page).edit? %>
@@ -130,7 +130,7 @@
         <% end %>
         <div class="prose">
           <%= wiki_page.dtext_body.format_text %>
-          <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
+          <%= render TagRelationshipsComponent.new(tag: wiki_page.tag) %>
 
           <% if wiki_page.tag&.is_deprecated? %>
             <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>
@@ -176,7 +176,7 @@
     <% elsif @post_set.has_blank_wiki? %>
       <p>There is no wiki page yet for the tag <%= link_to_wiki @post_set.tag.pretty_name %>. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @post_set.tag.name }), rel: "nofollow" %>.</p>
 
-      <%= render "tag_relationships/alias_and_implication_list", tag: @post_set.tag %>
+      <%= render TagRelationshipsComponent.new(tag: @post_set.tag) %>
 
       <% if @post_set.tag&.is_deprecated? %>
         <p class="fineprint">This tag is <%= link_to "deprecated", wiki_page_path("help:deprecation_notice") %> and can't be added to new posts.</p>

@@ -1,0 +1,34 @@
+<% if aliased_tag.present? %>
+  <p class="fineprint">
+    This tag has been aliased to <%= link_to_wiki_or_artist aliased_tag %>
+    (<%= link_to_wiki "learn more", "help:tag_aliases" %>).
+  </p>
+<% end %>
+
+<% if alias_tags.present? %>
+  <p class="fineprint">
+    The following tags are aliased to this tag: <%= tag_links(alias_tags) %>
+    (<%= link_to_wiki "learn more", "help:tag_aliases" %>).
+  </p>
+<% end %>
+
+<% if automatic_tags.present? %>
+  <p class="fineprint">
+    This tag automatically adds <%= tag_links(automatic_tags) %>
+    (<%= link_to_wiki "learn more", "help:autotags" %>).
+  </p>
+<% end %>
+
+<% if implied_tags.present? %>
+  <p class="fineprint">
+    This tag implicates <%= tag_links(implied_tags) %>
+    (<%= link_to_wiki "learn more", "help:tag_implications" %>).
+  </p>
+<% end %>
+
+<% if implying_tags.present? %>
+  <p class="fineprint">
+    The following tags implicate this tag: <%= tag_links(implying_tags) %>
+    (<%= link_to_wiki "learn more", "help:tag_implications" %>).
+  </p>
+<% end %>
