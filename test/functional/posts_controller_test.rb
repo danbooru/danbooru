@@ -692,6 +692,38 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         get show_seq_post_path(posts[1].id), params: { seq: "next" }
         assert_redirected_to(posts[0])
       end
+
+      should "skip banned and taken down posts the user can't see" do
+        posts = create_list(:post, 5)
+        posts[1].update!(is_banned: true)
+        posts[3].update!(is_taken_down: true)
+
+        get_auth show_seq_post_path(posts[2].id), @user, params: { seq: "next" }
+        assert_redirected_to(posts[0])
+
+        get_auth show_seq_post_path(posts[2].id), @user, params: { seq: "prev" }
+        assert_redirected_to(posts[4])
+      end
+
+      should "not skip banned posts for approvers" do
+        posts = create_list(:post, 3)
+        posts[1].update!(is_banned: true)
+
+        get_auth show_seq_post_path(posts[2].id), create(:approver), params: { seq: "next" }
+        assert_redirected_to(posts[1])
+      end
+
+      should "skip levelblocked posts" do
+        stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+          posts = [create(:post), create(:post, tag_string: "restricted_tag"), create(:post)]
+
+          get_auth show_seq_post_path(posts[2].id), @user, params: { seq: "next" }
+          assert_redirected_to(posts[0])
+
+          get_auth show_seq_post_path(posts[2].id), create(:gold_user), params: { seq: "next" }
+          assert_redirected_to(posts[1])
+        end
+      end
     end
 
     context "random action" do
@@ -991,17 +1023,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not let a user remove restricted tags from a duplicate they can't see" do
-        regex = Post::RESTRICTED_TAGS_REGEX
-        silence_warnings { Post.const_set(:RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) }
+        stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+          media_asset = create(:media_asset)
+          post1 = create_post!(user: create(:gold_user), rating: "s", tag_string: "restricted_tag", media_asset: media_asset)
+          create_post!(rating: "g", tag_string: "-restricted_tag", media_asset: media_asset)
 
-        media_asset = create(:media_asset)
-        post1 = create_post!(user: create(:gold_user), rating: "s", tag_string: "restricted_tag", media_asset: media_asset)
-        create_post!(rating: "g", tag_string: "-restricted_tag", media_asset: media_asset)
-
-        assert_equal("restricted_tag", post1.reload.tag_string)
-        assert_equal("s", post1.rating)
-      ensure
-        silence_warnings { Post.const_set(:RESTRICTED_TAGS_REGEX, regex) }
+          assert_equal("restricted_tag", post1.reload.tag_string)
+          assert_equal("s", post1.rating)
+        end
       end
 
       should "not let a user in safe mode change the rating of a duplicate they can't see" do
