@@ -228,6 +228,9 @@ class SessionLoader
     # attacker, and turn self-XSS in the attacker's own account into XSS against the victim.
     if !request.format.symbol.in?([:json, :xml, :atom])
       raise AuthenticationFailure, "API keys can only be used in JSON, XML, or Atom requests"
+    # Don't mix API keys with login sessions. API keys are for scripts, session cookies are for humans in the browser.
+    elsif session[:user_id].present?
+      raise AuthenticationFailure, "Requests can't include both an API key and a login cookie."
     elsif request.authorization
       authenticate_basic_auth
     elsif params[:login].present? && params[:api_key].present?

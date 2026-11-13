@@ -176,6 +176,16 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_not_nil(@api_key2.reload.last_used_at)
         end
 
+        should "fail when the request has a logged in session cookie" do
+          ActionController::Base.allow_forgery_protection = false
+          login_as(@user)
+          basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
+          get profile_path, as: :json, headers: { HTTP_AUTHORIZATION: basic_auth_string }
+
+          assert_response 401
+          assert_equal(0, @api_key.reload.uses)
+        end
+
         should "fail for HTML requests" do
           basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
           get edit_user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }
@@ -225,6 +235,25 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_equal(@user.id, response.parsed_body["id"])
           assert_equal(1, @api_key2.reload.uses)
           assert_not_nil(@api_key2.reload.last_used_at)
+        end
+
+        should "fail when the request has a logged in session cookie" do
+          ActionController::Base.allow_forgery_protection = false
+          login_as(create(:user))
+          get profile_path(login: @user.name, api_key: @api_key.key), as: :json
+
+          assert_response 401
+          assert_equal(0, @api_key.reload.uses)
+        end
+
+        should "succeed when the request has a logged out session cookie" do
+          ActionController::Base.allow_forgery_protection = false
+          login_as(@user)
+          delete session_path
+          get profile_path(login: @user.name, api_key: @api_key.key), as: :json
+
+          assert_response :success
+          assert_equal(@user.id, response.parsed_body["id"])
         end
 
         should "fail for HTML requests" do

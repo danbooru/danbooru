@@ -155,12 +155,12 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "for a request using the user's API key with another user's recently authenticated session" do
-        should "redirect to the confirm password page" do
+        should "fail" do
           api_key = create(:api_key, user: @user)
-          login_as(@other_user)
+          login_as(@other_user, reauthenticate: true)
           put user_email_path(@user), as: :json, params: { email_address: { address: "new@danbooru.donmai.us" }}, headers: { HTTP_AUTHORIZATION: "Basic #{::Base64.strict_encode64("#{@user.name}:#{api_key.key}")}" }
 
-          assert_redirected_to confirm_password_session_path(url: user_email_path(@user.id))
+          assert_response 401
           assert_equal("bob@ogres.net", @user.reload.email_address.address)
           assert_equal(false, @user.user_events.email_change.exists?)
         end

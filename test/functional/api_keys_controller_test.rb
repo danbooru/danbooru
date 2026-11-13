@@ -96,10 +96,10 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not create a new API key using the user's API key with another user's recently authenticated session" do
-        login_as(create(:user))
+        login_as(create(:user), reauthenticate: true)
         post user_api_keys_path(@user.id), as: :json, params: { api_key: { name: "blah" }}, headers: { HTTP_AUTHORIZATION: "Basic #{::Base64.strict_encode64("#{@user.name}:#{@api_key.key}")}" }
 
-        assert_redirected_to confirm_password_session_path(url: user_api_keys_path(@user.id))
+        assert_response 401
         assert_equal([@api_key], @user.api_keys.to_a)
       end
     end
