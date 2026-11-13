@@ -250,6 +250,32 @@ class ForumPostTest < ActiveSupport::TestCase
       should_not allow_value(" ").for(:body)
       should_not allow_value("\u200B").for(:body)
       should_not allow_value((["!post #1"] * 10).join("\n")).for(:body)
+      should_not allow_value("a\r\n\r\n" * 501).for(:body)
+      should allow_value("a\r\n\r\n" * 500).for(:body)
+      should allow_value("[expand][code]#{"a\n" * 900}[/code][/expand]").for(:body)
+      should_not allow_value("[expand][code]#{"a\n" * 1001}[/code][/expand]").for(:body)
+      should_not allow_value("[expand][expand][code]#{"a\n" * 1001}[/code][/expand][/expand]").for(:body)
+
+      should "not allow posts with more than 500 lines" do
+        forum_post = build(:forum_post, body: "a\n" * 501).tap(&:validate)
+
+        assert_includes(forum_post.errors[:body], "can't be more than 500 lines long (put long text inside an [expand] block)")
+      end
+
+      should "not apply the line limits to the system user" do
+        forum_post = create(:forum_post, creator: User.system, body: "a\n" * 1001)
+        assert_equal(true, forum_post.persisted?)
+
+        other_post = create(:forum_post, body: "abc")
+        assert_equal(true, other_post.update(body: "a\n" * 1001, updater: User.system))
+      end
+
+      should "apply the line limits to other users editing a post created by the system user" do
+        forum_post = create(:forum_post, creator: User.system, body: "abc")
+        forum_post.update(body: "a\n" * 501, updater: create(:moderator_user))
+
+        assert_includes(forum_post.errors[:body], "can't be more than 500 lines long (put long text inside an [expand] block)")
+      end
 
       should "not allow NSFW media embeds" do
         post = create(:post, rating: "e")

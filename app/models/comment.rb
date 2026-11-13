@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Comment < ApplicationRecord
+  # Max lines when rendered, with [expand] blocks collapsed, and in total with them expanded.
+  MAX_VISIBLE_LINES = 500
+  MAX_TOTAL_LINES = 1_000
+
   attr_accessor :creator_ip_addr
 
   belongs_to :post
@@ -30,7 +34,7 @@ class Comment < ApplicationRecord
   end
 
   deletable
-  dtext_attribute :body, media_embeds: { max_embeds: 1, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte } # defines :dtext_body
+  dtext_attribute :body, max_lines: MAX_VISIBLE_LINES, max_total_lines: MAX_TOTAL_LINES, media_embeds: { max_embeds: 1, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte } # defines :dtext_body
 
   mentionable(
     message_field: :body,
@@ -91,6 +95,14 @@ class Comment < ApplicationRecord
 
     if (embedded_asset = dtext_body.embedded_media_assets.find { |embedded_asset| embedded_asset.ai_rating_id > post.rating_id && embedded_asset.is_ai_nsfw? })
       errors.add(:body, "can't include a #{embedded_asset.pretty_ai_rating.downcase} image on a #{post.pretty_rating.downcase} post")
+    end
+
+    unless updater&.name == Danbooru.config.system_user
+      if dtext_body.more_lines_than?(MAX_VISIBLE_LINES)
+        errors.add(:body, "can't be more than #{MAX_VISIBLE_LINES} lines long (put long text inside an [expand] block)")
+      elsif dtext_body.more_lines_than?(MAX_TOTAL_LINES, expanded: true)
+        errors.add(:body, "can't be more than #{MAX_TOTAL_LINES} lines long, including [expand] blocks")
+      end
     end
   end
 

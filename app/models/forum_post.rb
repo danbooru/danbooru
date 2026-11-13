@@ -4,11 +4,15 @@ class ForumPost < ApplicationRecord
   # Also used to cap the length of DText previews.
   MAX_BODY_LENGTH = 200_000
 
+  # Max lines when rendered, with [expand] blocks collapsed, and in total with them expanded.
+  MAX_VISIBLE_LINES = 500
+  MAX_TOTAL_LINES = 1_000
+
   # attr_readonly :topic_id # XXX broken by accepts_nested_attributes_for in ForumTopic
   attr_accessor :creator_ip_addr
 
   # defines :dtext_body
-  dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
+  dtext_attribute :body, max_lines: MAX_VISIBLE_LINES, max_total_lines: MAX_TOTAL_LINES, media_embeds: { max_embeds: 5, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
 
   belongs_to :creator, class_name: "User"
   belongs_to :updater, class_name: "User", default: -> { creator }
@@ -24,15 +28,16 @@ class ForumPost < ApplicationRecord
   has_one :bulk_update_request
 
   validates :body, visible_string: true, length: { maximum: MAX_BODY_LENGTH }, if: :body_changed?
+  validate :validate_body, if: :body_changed?
   validate :validate_deletion_of_original_post
   validate :validate_undeletion_of_post
 
-  before_create :autoreport_spam
   before_save :handle_reports_on_deletion
+  before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
-  after_destroy :update_topic_updated_at_on_destroy
   after_update :create_mod_action
+  after_destroy :update_topic_updated_at_on_destroy
   after_create_commit :async_send_discord_notification
 
   deletable
@@ -87,6 +92,16 @@ class ForumPost < ApplicationRecord
 
   def voted?(user, score)
     votes.exists?(creator_id: user.id, score: score)
+  end
+
+  def validate_body
+    return if updater&.name == Danbooru.config.system_user
+
+    if dtext_body.more_lines_than?(MAX_VISIBLE_LINES)
+      errors.add(:body, "can't be more than #{MAX_VISIBLE_LINES} lines long (put long text inside an [expand] block)")
+    elsif dtext_body.more_lines_than?(MAX_TOTAL_LINES, expanded: true)
+      errors.add(:body, "can't be more than #{MAX_TOTAL_LINES} lines long.")
+    end
   end
 
   def validate_deletion_of_original_post

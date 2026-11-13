@@ -48,6 +48,17 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "cut off old posts that are over the line limit" do
+        forum_post = as(@user) { create(:forum_post, creator: @user, topic: @forum_topic) }
+        forum_post.update_columns(body: "#{"a\n\n" * 500}too long")
+        get forum_topic_path(@forum_topic)
+
+        assert_response :success
+        assert_select "#forum_post_#{forum_post.id} .prose p", count: 501
+        assert_select "#forum_post_#{forum_post.id} .prose p.dtext-truncated", count: 1
+        assert_no_match(/too long</, response.body)
+      end
+
       should "show cancel buttons on the inline forum post forms" do
         as(@user) { create(:forum_post, creator: @user, topic: @forum_topic) }
         get_auth forum_topic_path(@forum_topic), @user
@@ -310,6 +321,15 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(@mod, @forum_topic.updater)
         assert_equal(@mod, @forum_topic.original_post.updater)
         assert(ModAction.exists?(category: "forum_topic_lock", subject: @forum_topic, creator: @mod))
+      end
+
+      should "apply the line limits when a mod edits the original post of a topic created by the system user" do
+        topic = create(:forum_topic, creator: User.system, original_post: build(:forum_post, creator: User.system, body: "abc"))
+        put_auth forum_topic_path(topic), @mod, params: { forum_topic: { original_post_attributes: { id: topic.original_post.id, body: "a\n" * 501 }}}
+
+        assert_response :success
+        assert_select "#notice", text: /can't be more than 500 lines long/
+        assert_equal("abc", topic.original_post.reload.body)
       end
 
       should "not update the original post when the user's mention limit is exhausted" do

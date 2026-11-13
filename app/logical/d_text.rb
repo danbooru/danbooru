@@ -22,7 +22,7 @@ class DText
     artstation deviantart gelbooru nijie pawoo pixiv pixiv sankaku seiga twitter yandere
   ]
 
-  attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emoji_list, :emoji_map, :options
+  attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emoji_list, :emoji_map, :max_lines, :max_total_lines, :options
 
   # Preprocess a set of DText messages and collect all tag, artist, wiki page, post, and media asset references. Called
   # before rendering a collection of DText messages (e.g. comments or forum posts) to do all database lookups in one batch.
@@ -68,8 +68,10 @@ class DText
   # @param emoji_map [Hash<String, String>] A hash of emoji (name, value) pairs. The emoji `:name:` is replaced with the value (which may be an HTML <img> or a plaintext emoji).
   # @param emoji_list [Array<String>] The list of valid emoji names.
   # @param max_length [Integer, nil] If present, raise a `DText::Error` if the input is longer than this many characters.
+  # @param max_lines [Integer, nil] If present, cut off the HTML output past this many lines, counting [expand] blocks as one line.
+  # @param max_total_lines [Integer, nil] If present, cut off the HTML output past this many lines, including the contents of [expand] blocks.
   # @raise [DText::Error] If the input is longer than `max_length`.
-  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains, emoji_map: DEFAULT_EMOJI_MAP, emoji_list: DEFAULT_EMOJI_LIST, max_length: nil)
+  def initialize(dtext, inline: false, disable_mentions: false, media_embeds: false, base_url: Rails.application.config.relative_url_root, domain: Danbooru::URL.parse!(Danbooru.config.canonical_url).host, alternate_domains: Danbooru.config.alternate_domains, emoji_map: DEFAULT_EMOJI_MAP, emoji_list: DEFAULT_EMOJI_LIST, max_length: nil, max_lines: nil, max_total_lines: nil)
     raise Error, "DText is too long (max: #{max_length} characters)" if max_length && dtext.to_s.length > max_length
 
     @dtext = dtext
@@ -81,6 +83,8 @@ class DText
     @alternate_domains = alternate_domains
     @emoji_map = emoji_map
     @emoji_list = emoji_list
+    @max_lines = max_lines
+    @max_total_lines = max_total_lines
     @options = { inline:, disable_mentions:, media_embeds:, base_url:, domain:, alternate_domains:, emoji_list: }
   end
 
@@ -97,6 +101,12 @@ class DText
     return nil if dtext.nil?
 
     fragment = parsed_html.dup
+    truncated = [[max_lines, false], [max_total_lines, true]].map do |limit, expanded|
+      next false if limit.nil? || DText.count_lines(fragment, limit + 1, expanded:) <= limit
+
+      DText.truncate_lines!(fragment, limit, expanded:)
+      true
+    end.any?
 
     fragment.css("media-embed").each do |node|
       replace_media_embed!(node, posts: references[:posts], media_assets: references[:media_assets], current_user:)
@@ -114,6 +124,7 @@ class DText
       replace_emoji!(node)
     end
 
+    fragment.add_child(%{<p class="dtext-truncated"><em>This message is too long and has been cut off.</em></p>}) if truncated
     fragment.to_s.html_safe
   rescue DText::Error
     ""
@@ -364,7 +375,12 @@ class DText
     html = DText.parse(text)
     fragment = DText.parse_html(html)
 
-    wiki_pages = fragment.css("a.dtext-wiki-link").map do |node|
+    # Use one XPath query because `DocumentFragment#css` runs a separate query for each top-level node, which is slow
+    # for messages with thousands of paragraphs.
+    nodes = fragment.xpath(Nokogiri::CSS.xpath_for("a.dtext-wiki-link, media-embed, tag-request-embed", prefix: ".//").join(" | "))
+    embed_ids = ->(name, type) { nodes.select { |node| node.name == name && node["data-type"] == type }.pluck("data-id").uniq }
+
+    wiki_pages = nodes.select { |node| node.name == "a" }.map do |node|
       title = node["href"][%r{/wiki_pages/(.*)\z}i, 1]
       title = CGI.unescape(title)
       title = WikiPage.normalize_title(title)
@@ -373,11 +389,11 @@ class DText
 
     # <media-embed data-type="post data-id="1234"></media-embed>
     # <tag-request-embed data-type="bulk-update-request data-id="1234"></tag-request-embed>
-    posts = fragment.css("media-embed").select { |node| node["data-type"] == "post" }.pluck("data-id").uniq
-    media_assets = fragment.css("media-embed").select { |node| node["data-type"] == "asset" }.pluck("data-id").uniq
-    tag_aliases = fragment.css("tag-request-embed").select { |node| node["data-type"] == "tag-alias" }.pluck("data-id").uniq
-    tag_implications = fragment.css("tag-request-embed").select { |node| node["data-type"] == "tag-implication" }.pluck("data-id").uniq
-    bulk_update_requests = fragment.css("tag-request-embed").select { |node| node["data-type"] == "bulk-update-request" }.pluck("data-id").uniq
+    posts = embed_ids["media-embed", "post"]
+    media_assets = embed_ids["media-embed", "asset"]
+    tag_aliases = embed_ids["tag-request-embed", "tag-alias"]
+    tag_implications = embed_ids["tag-request-embed", "tag-implication"]
+    bulk_update_requests = embed_ids["tag-request-embed", "bulk-update-request"]
 
     { wiki_pages:, posts:, media_assets:, tag_aliases:, tag_implications:, bulk_update_requests: }
   rescue DText::Error
@@ -781,6 +797,88 @@ class DText
     plaintext = DText.html_to_plaintext(html, lines:)
 
     plaintext.strip.split(/\r\n|\r|\n/).first(lines).join("\n").truncate(length, separator:)
+  end
+
+  # Check whether the DText takes up more than the given number of lines when rendered. Stops counting once the
+  # limit is passed. Table rows count as their tallest cell.
+  #
+  # @param limit [Integer] the max number of lines
+  # @param expanded [Boolean] if true, count the contents of [expand] blocks, otherwise count them as one line
+  # @return [Boolean] true if the DText has more lines than the limit
+  def more_lines_than?(limit, expanded: false)
+    DText.count_lines(parsed_html, limit + 1, expanded:) > limit
+  end
+
+  # Count the lines in an HTML node, stopping once `limit` is reached.
+  def self.count_lines(node, limit, expanded:)
+    count = 0
+    catch(:limit) { each_line(node, expanded:) { throw :limit if (count += 1) >= limit } }
+    count
+  end
+
+  # Remove everything in the HTML node past the given number of lines. Counts lines the same way as `each_line`.
+  #
+  # @param node [Nokogiri::XML::Node] the node to truncate in place
+  # @param limit [Integer] the number of lines to keep
+  # @param expanded [Boolean] if true, count the contents of [expand] blocks, otherwise count them as one line
+  def self.truncate_lines!(node, limit, expanded:)
+    overflowed = false
+
+    node.children.to_a.each do |child|
+      next child.remove if overflowed
+
+      lines = count_lines(child, limit + 1, expanded:)
+      next limit -= lines if lines <= limit
+
+      overflowed = true
+
+      case child.name
+      when "tr", "br", "hr"
+        child.remove
+      when "pre", "p", "li", "h1", "h2", "h3", "h4", "h5", "h6", "td", "th", "details"
+        if limit == 0
+          child.remove
+        elsif child.name == "pre"
+          child.content = child.text.lines.first(limit).join.chomp
+        else
+          truncate_lines!(child, limit - 1, expanded:)
+        end
+      else
+        truncate_lines!(child, limit, expanded:)
+        child.remove if child.children.empty?
+      end
+    end
+  end
+
+  # Yield once for each rendered line in the HTML node.
+  def self.each_line(node, expanded:, &block)
+    case node.name
+    when "details"
+      yield
+      each_element_child(node) { |child| each_line(child, expanded:, &block) } if expanded
+    when "hr", "br"
+      yield
+    when "pre"
+      (node.text.count("\n") + 1).times(&block)
+    when "p", "li", "h1", "h2", "h3", "h4", "h5", "h6", "td", "th"
+      yield
+      each_element_child(node) { |child| each_line(child, expanded:, &block) }
+    when "tr"
+      height = node.element_children.map { |cell| count_lines(cell, Float::INFINITY, expanded:) }.max || 1
+      height.times(&block)
+    else
+      each_element_child(node) { |child| each_line(child, expanded:, &block) }
+    end
+  end
+
+  # Like `node.element_children.each`, but without building the whole list first, so counting can stop early in
+  # nodes with thousands of children.
+  def self.each_element_child(node)
+    child = node.first_element_child
+    while child
+      yield child
+      child = child.next_element
+    end
   end
 
   # Parse a string of HTML to a document object.

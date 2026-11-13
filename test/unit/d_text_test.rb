@@ -5,6 +5,15 @@ class DTextTest < ActiveSupport::TestCase
     assert_equal(expected, DText.new(dtext).excerpt(**options))
   end
 
+  def assert_line_count(expected, dtext, **options)
+    assert_equal(false, DText.new(dtext).more_lines_than?(expected, **options))
+    assert_equal(true, DText.new(dtext).more_lines_than?(expected - 1, **options)) if expected > 0
+  end
+
+  def assert_truncated(expected, dtext, **options)
+    assert_equal(%{#{expected}<p class="dtext-truncated"><em>This message is too long and has been cut off.</em></p>}, DText.new(dtext, **options).format_text)
+  end
+
   def assert_rewrite_wiki_links(expected, dtext, old, new)
     assert_equal(expected, DText.new(dtext).rewrite_wiki_links(old, new).to_s)
   end
@@ -34,6 +43,67 @@ class DTextTest < ActiveSupport::TestCase
 
       should "raise an error for HTML nested more deeply than DText can produce" do
         assert_raises(ArgumentError) { DText.parse_html("<div>" * 1_000) }
+      end
+    end
+
+    context "#more_lines_than?" do
+      should "count the number of visible lines" do
+        assert_line_count(0, "")
+        assert_line_count(1, "a")
+        assert_line_count(2, "a\nb")
+        assert_line_count(3, "a\r\n\r\nb\r\nc")
+        assert_line_count(3, "h1. title\n\n* a\n* b")
+        assert_line_count(3, "[quote]a\n\n[quote]b\nc[/quote][/quote]")
+        assert_line_count(2, "[spoiler]a\n\nb[/spoiler]")
+        assert_line_count(3, "a\n\n[hr]\n\nb")
+        assert_line_count(3, "[code]a\nb\nc[/code]")
+        assert_line_count(1, "[code][/code]")
+      end
+
+      should "count the tallest cell in each table row" do
+        assert_line_count(3, "[table][thead][tr][th]a[/th][th]b[/th][/tr][/thead][tbody][tr][td]a\nb[/td][td]c[/td][/tr][/tbody][/table]")
+        assert_line_count(2, "[table][tr][td][/td][/tr][tr][td]a[/td][/tr][/table]")
+      end
+
+      should "count collapsed [expand] blocks as a single line" do
+        assert_line_count(1, "[expand]#{"a\n\n" * 1000}[/expand]")
+        assert_line_count(2, "a\n\n[expand=title][code]#{"a\n" * 1000}[/code][/expand]")
+      end
+
+      should "count the contents of [expand] blocks when expanded is true" do
+        assert_line_count(3, "[expand]a\n\nb[/expand]", expanded: true)
+        assert_line_count(12, "[expand][expand][code]#{"a\n" * 9}a[/code][/expand][/expand]", expanded: true)
+      end
+    end
+
+    context "#format_text with a line limit" do
+      should "not change text within the limit" do
+        assert_equal("<p>a</p><p>b</p>", DText.new("a\n\nb", max_lines: 2).format_text)
+        assert_equal("<p>a</p><p>b</p>", DText.new("a\n\nb", max_total_lines: 2).format_text)
+      end
+
+      should "cut off text past the limit" do
+        assert_truncated("<p>a</p><p>b</p>", "a\n\nb\n\nc", max_lines: 2)
+        assert_truncated("<p>a<br>b</p>", "a\nb\nc", max_lines: 2)
+        assert_truncated("<p>a<br><strong>b</strong></p>", "a\n[b]b\nc[/b]", max_lines: 2)
+        assert_truncated("<blockquote><p>a</p></blockquote>", "[quote]a\n\nb[/quote]\n\nc", max_lines: 1)
+        assert_truncated("<pre>a\nb</pre>", "[code]a\nb\nc[/code]", max_lines: 2)
+        assert_truncated("<p>a</p>", "a\n\n[code]b\nc[/code]", max_lines: 1)
+        assert_truncated("<p>a</p>", "a\n\n[hr]", max_lines: 1)
+        assert_truncated("<ul><li>a</li></ul>", "* a\n* b", max_lines: 1)
+      end
+
+      should "cut off table rows that don't fit" do
+        assert_truncated('<table class="striped"><tbody><tr><td>a</td></tr></tbody></table>', "[table][tr][td]a[/td][/tr][tr][td]b\nc[/td][/tr][/table]", max_lines: 2)
+      end
+
+      should "count collapsed [expand] blocks as one line for max_lines" do
+        assert_equal(true, DText.new("[expand]#{"a\n\n" * 10}[/expand]", max_lines: 1).format_text.exclude?("dtext-truncated"))
+        assert_truncated("<p>a</p>", "a\n\n[expand]b[/expand]", max_lines: 1)
+      end
+
+      should "cut off the contents of [expand] blocks for max_total_lines" do
+        assert_truncated("<details><summary>Show</summary><div><p>a</p></div></details>", "[expand]a\n\nb[/expand]", max_total_lines: 2)
       end
     end
 

@@ -68,7 +68,10 @@ class ForumTopicsController < ApplicationController
 
   def update
     @forum_topic = authorize ForumTopic.find(params[:id])
-    @forum_topic.update(updater: CurrentUser.user, **permitted_attributes(@forum_topic))
+    attributes = permitted_attributes(@forum_topic)
+    attributes = attributes.deep_merge(original_post_attributes: { updater: CurrentUser.user }) if attributes[:original_post_attributes].present?
+
+    @forum_topic.update(updater: CurrentUser.user, **attributes)
     respond_with(@forum_topic)
   end
 

@@ -18,6 +18,16 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("text/javascript", response.media_type)
         end
 
+        should "cut off old comments that are over the line limit" do
+          comment = create(:comment, post: @post)
+          comment.update_columns(body: "[expand]#{"a\n\n" * 1000}[/expand]\n\n" * 2)
+          get comments_path(group_by: "post")
+
+          assert_response :success
+          assert_select "#comment_#{comment.id} .body details", count: 1
+          assert_select "#comment_#{comment.id} .body p.dtext-truncated", count: 1
+        end
+
         should "show posts with visible comments" do
           @comment = create(:comment, post: @post)
           get comments_path(group_by: "post")

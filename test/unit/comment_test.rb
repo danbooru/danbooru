@@ -309,6 +309,30 @@ class CommentTest < ActiveSupport::TestCase
 
       should_not allow_value("").for(:body)
       should_not allow_value((["!post #1"] * 10).join("\n")).for(:body)
+      should_not allow_value("a\n" * 501).for(:body)
+      should allow_value("a\n" * 500).for(:body)
+      should_not allow_value("[expand]#{"a\n" * 1001}[/expand]").for(:body)
+
+      should "not allow comments with more than 500 lines" do
+        comment = build(:comment, body: "a\n" * 501).tap(&:validate)
+
+        assert_includes(comment.errors[:body], "can't be more than 500 lines long (put long text inside an [expand] block)")
+      end
+
+      should "not apply the line limits to the system user" do
+        comment = create(:comment, creator: User.system, body: "a\n" * 1001)
+        assert_equal(true, comment.persisted?)
+
+        other_comment = create(:comment, body: "abc")
+        assert_equal(true, other_comment.update(body: "a\n" * 1001, updater: User.system))
+      end
+
+      should "apply the line limits to other users editing a comment created by the system user" do
+        comment = create(:comment, creator: User.system, body: "abc")
+        comment.update(body: "a\n" * 501, updater: create(:moderator_user))
+
+        assert_includes(comment.errors[:body], "can't be more than 500 lines long (put long text inside an [expand] block)")
+      end
 
       should "not allow NSFW media embeds" do
         post = create(:post, rating: "e")
