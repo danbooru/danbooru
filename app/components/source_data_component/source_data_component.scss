@@ -11,4 +11,9 @@ div.source-data {
   td {
     vertical-align: top;
   }
+
+  // Tags are external links, which use `word-break: break-all`. Wrap them on spaces first.
+  .source-data-tag {
+    word-break: normal;
+  }
 }

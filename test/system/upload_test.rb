@@ -101,6 +101,31 @@ class UploadsChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "when the source has long tags" do
+      should "wrap the tags on spaces in the Source tab" do
+        tag = "i redownloaded ibispaint x on my phone. it feels more comfortable to use than i remember."
+        Source::Extractor::Null.any_instance.stubs(:tags).returns([[tag, "https://example.com/tagged/#{tag}"]])
+        upload = create(:completed_file_upload, uploader: @user, upload_media_assets: [build(:upload_media_asset, media_asset: build(:media_asset, file: "test/files/jpg/test.jpg"), source_url: "https://example.com/file.jpg", status: "active")])
+
+        page.current_window.resize_to(500, 900)
+        visit upload_path(upload)
+        click_link "Source"
+        assert_selector ".source-data-tag", text: tag
+
+        # The top of each character in the tag. A line break between two non-space characters means a word was split.
+        tops = page.evaluate_script(<<~JS)
+          (() => {
+            const node = document.querySelector(".source-data-tag").firstChild, range = document.createRange();
+            return [...node.textContent].map((_, i) => { range.setStart(node, i); range.setEnd(node, i + 1); return range.getClientRects()[0].top; });
+          })()
+        JS
+        word_splits = tops.each_index.select { |i| i > 0 && tops[i] > tops[i - 1] && tag[i] != " " && tag[i - 1] != " " }
+
+        assert_operator tops.uniq.size, :>, 1, "the tag should wrap onto multiple lines"
+        assert_equal [], word_splits.map { |i| tag[i - 3, 6] }
+      end
+    end
+
     context "when the upload has multiple pixel-perfect duplicates" do
       should "open the Similar tab when the duplicate warning is clicked" do
         upload = create(:completed_file_upload, uploader: @user)
