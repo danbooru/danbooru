@@ -485,14 +485,20 @@ class ApplicationMetrics
         }, { worker: "master" })
 
         puma_stats[:worker_status].each do |worker|
+          metrics.set({
+            puma_started_at:   Time.parse(worker[:started_at]).to_i,
+            puma_last_checkin: Time.parse(worker[:last_checkin]).to_i,
+          }, { worker: worker[:index] })
+
+          # Workers that are still booting haven't sent their first status update yet.
+          next if worker[:last_status].empty?
+
           max_threads = worker.dig(:last_status, :max_threads)
           cur_threads = worker.dig(:last_status, :running)
           idle_threads = worker.dig(:last_status, :pool_capacity) - (max_threads - cur_threads)
           busy_threads = cur_threads - idle_threads
 
           metrics.set({
-            puma_started_at:          Time.parse(worker[:started_at]).to_i,
-            puma_last_checkin:        Time.parse(worker[:last_checkin]).to_i,
             puma_max_threads:         max_threads,
             puma_thread_backlog:      worker.dig(:last_status, :backlog),
             puma_http_requests_total: worker.dig(:last_status, :requests_count),

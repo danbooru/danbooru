@@ -33,13 +33,43 @@ class PumaTest < ActiveSupport::TestCase
   context "Puma metrics" do
     should "report Puma stats for the master and each worker in cluster mode" do
       spawn_server(PUMA_WORKERS: 2) do |uri|
-        metrics = Danbooru::Http.get("#{uri}/metrics/instance").to_s
+        # Wait for every worker to finish booting and send its first status update to the master.
+        metrics = Timeout.timeout(30) do
+          loop do
+            body = Danbooru::Http.get("#{uri}/metrics/instance").to_s
+            break body if body.match?(/^puma_max_threads\{worker="1"\} \d+$/)
+
+            sleep 0.1
+          end
+        end
 
         assert_match(/^puma_workers\{worker="master"\} 2$/, metrics)
         assert_match(/^puma_last_checkin\{worker="0"\} \d+$/, metrics)
         assert_match(/^puma_last_checkin\{worker="1"\} \d+$/, metrics)
         assert_match(/^puma_max_threads\{worker="0"\} \d+$/, metrics)
+        assert_match(/^puma_max_threads\{worker="1"\} \d+$/, metrics)
       end
+    end
+
+    should "report partial stats for workers that haven't sent their first status update yet" do
+      now = Time.now.utc.iso8601
+      Puma.stubs(:stats_hash).returns({
+        started_at: now,
+        workers: 2,
+        worker_status: [
+          { index: 0, started_at: now, last_checkin: now, last_status: { backlog: 0, running: 5, pool_capacity: 5, max_threads: 5, requests_count: 10 }},
+          { index: 1, started_at: now, last_checkin: now, last_status: {}},
+        ],
+      })
+
+      application_metrics = ApplicationMetrics.new
+      application_metrics.puma_worker_id = "master"
+      metrics = application_metrics.update_process_metrics.to_prom
+
+      assert_match(/^puma_workers\{worker="master"\} 2$/, metrics)
+      assert_match(/^puma_max_threads\{worker="0"\} 5$/, metrics)
+      assert_match(/^puma_last_checkin\{worker="1"\} \d+$/, metrics)
+      assert_no_match(/^puma_max_threads\{worker="1"\}/, metrics)
     end
   end
 
