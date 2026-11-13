@@ -54,15 +54,19 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   end
 
   def validate(errors:, **)
-    if tag_to_pool?
+    prefix, unprefixed_name = (tag_to_pool? ? @antecedent : @consequent).split(":", 2)
+
+    if (tag_to_pool? || pool_to_tag?) && unprefixed_name.present? && TagCategory.mapping.key?(prefix)
+      errors.add(:base, "Can't #{to_dtext} (change the category in a separate line)")
+    elsif tag_to_pool?
       if from_query.tag.nil?
-        errors.add(:base, "Can't convert [[#{@antecedent}]] -> {{#{@consequent}}} (tag [[#{@antecedent}]] doesn't exist)")
+        errors.add(:base, "Can't #{to_dtext} (tag [[#{@antecedent}]] doesn't exist)")
       elsif from_query.tag&.wiki_page&.body.blank? && to_query.pool&.description.blank?
-        errors.add(:base, "Can't convert [[#{@antecedent}]] -> {{#{@consequent}}} (either the tag or the pool must have a description)")
+        errors.add(:base, "Can't #{to_dtext} (either the tag or the pool must have a description)")
       end
     elsif pool_to_tag?
       if from_query.pool.nil?
-        errors.add(:base, "Can't convert {{#{@antecedent}}} -> [[#{@consequent}]] ({{#{@antecedent}}} does not exist)")
+        errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
       end
     else
       errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (convert takes exactly one pool and one tag)")

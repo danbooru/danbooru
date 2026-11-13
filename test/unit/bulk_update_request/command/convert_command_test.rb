@@ -44,6 +44,25 @@ class ConvertCommandTest < ActiveSupport::TestCase
         )
       end
 
+      should "refuse to convert a pool to a tag with a category prefix" do
+        @pool = create(:pool, name: "cute_pool", description: "asd")
+
+        assert_invalid_bur(
+          script: "convert pool:cute_pool -> copy:cute_series",
+          errors: ["Can't convert {{pool:cute_pool}} -> [[copy:cute_series]] (change the category in a separate line)"],
+        )
+      end
+
+      should "refuse to convert a tag with a category prefix to a pool" do
+        @pool = create(:pool, name: "cute_pool", description: "asd")
+        create(:tag, name: "cute_series")
+
+        assert_invalid_bur(
+          script: "convert copy:cute_series -> pool:cute_pool",
+          errors: ["Can't convert [[copy:cute_series]] -> {{pool:cute_pool}} (change the category in a separate line)"],
+        )
+      end
+
       should "refuse to accept too many arguments on the left side" do
         assert_invalid_bur(
           script: "convert tag1 pool:1 -> tag2",
