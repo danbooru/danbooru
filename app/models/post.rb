@@ -291,7 +291,7 @@ class Post < ApplicationRecord
     end
 
     def is_approvable?(user = CurrentUser.user)
-      !is_active? && (uploader != user || Pundit.policy!(user, PostApproval).can_approve_own_uploads?)
+      !is_active? && ((uploader != user && approver != user && !approvals.exists?(user: user)) || Pundit.policy!(user, PostApproval).can_approve_own_uploads?)
     end
 
     def autoban
@@ -690,10 +690,8 @@ class Post < ApplicationRecord
 
     def typed_tags(name)
       @typed_tags ||= {}
-      @typed_tags[name] ||= begin
-        tag_array.select do |tag|
-          tag_categories[tag] == TagCategory.mapping[name]
-        end
+      @typed_tags[name] ||= tag_array.select do |tag|
+        tag_categories[tag] == TagCategory.mapping[name]
       end
     end
 
@@ -818,7 +816,7 @@ class Post < ApplicationRecord
     def update_parent_on_save
       return unless saved_change_to_parent_id? || saved_change_to_is_deleted?
 
-      parent.update_has_children_flag if parent.present?
+      parent.presence&.update_has_children_flag
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
     rescue StandardError
       # XXX Silently ignore errors so that the edit doesn't fail. We can't let
@@ -2010,9 +2008,7 @@ class Post < ApplicationRecord
   end
 
   # @param tags [String] The AI tag query.
-  def ai_tags_match?(tags)
-    media_asset.ai_tags_match?(tags)
-  end
+  delegate :ai_tags_match?, to: :media_asset
 
   def safeblocked?
     CurrentUser.safe_mode? && (rating != "g" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
