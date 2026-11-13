@@ -58,6 +58,7 @@ import PostVotesTooltipComponent from "../src/javascripts/post_votes_tooltip_com
 import PreviewSizeMenuComponent from "../src/javascripts/preview_size_menu_component.js";
 import RelatedTag from "../src/javascripts/related_tag.js";
 import Shortcuts from "../src/javascripts/shortcuts.js";
+import Swipeable from "../src/javascripts/swipeable.js";
 import TagCounter from "../src/javascripts/tag_counter.js";
 import TimeSeriesComponent from "../src/javascripts/time_series_component.js";
 import UploadPostComponent from "../src/javascripts/upload_post_component.js";
@@ -95,6 +96,7 @@ Danbooru.PostVotesTooltipComponent = PostVotesTooltipComponent;
 Danbooru.PreviewSizeMenuComponent = PreviewSizeMenuComponent;
 Danbooru.RelatedTag = RelatedTag;
 Danbooru.Shortcuts = Shortcuts;
+Danbooru.Swipeable = Swipeable;
 Danbooru.TagCounter = TagCounter;
 Danbooru.TimeSeriesComponent = TimeSeriesComponent;
 Danbooru.UploadPostComponent = UploadPostComponent;

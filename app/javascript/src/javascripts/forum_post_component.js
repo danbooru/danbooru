@@ -1,5 +1,11 @@
+import Swipeable from "./swipeable";
+
 class ForumPostComponent {
   static initialize() {
+    if ($("#c-forum-topics #a-show").length) {
+      Swipeable.navigateOnSwipe(document.body);
+    }
+
     if ($("#c-forum-topics #a-show, #c-forum-posts #a-show").length) {
       $(document).on("click.danbooru.forum_post", ".edit_forum_post_link", ForumPostComponent.showEditPostForm);
       $(document).on("click.danbooru.forum_post", ".edit_forum_topic_link", ForumPostComponent.showEditTopicForm);

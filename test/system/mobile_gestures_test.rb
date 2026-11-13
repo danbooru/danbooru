@@ -146,4 +146,31 @@ class MobileGesturesMobileChromeTest < MobileChromeSystemTestCase
       assert_current_path(post_path(@posts[2], q: "pool:#{pool.id}"))
     end
   end
+
+  context "On a forum topic page" do
+    setup do
+      @user = create(:user)
+      @topic = as(@user) { create(:forum_topic, creator: @user, original_post: build(:forum_post, creator: @user)) }
+      as(@user) { create_list(:forum_post, 2, creator: @user, topic: @topic) }
+    end
+
+    should "go to the next page when swiping left" do
+      visit forum_topic_path(@topic, page: 2, limit: 1)
+      swipe(dx: -200)
+      assert_current_path(/page=3/)
+    end
+
+    should "go to the previous page when swiping right" do
+      visit forum_topic_path(@topic, page: 2, limit: 1)
+      swipe(dx: 200)
+      assert_current_path(/page=1/)
+    end
+
+    should "not navigate when the user has disabled mobile gestures" do
+      fast_signin(create(:user, disable_mobile_gestures: true))
+      visit forum_topic_path(@topic, page: 2, limit: 1)
+
+      assert_not_navigated_after_swipe(dx: -200)
+    end
+  end
 end

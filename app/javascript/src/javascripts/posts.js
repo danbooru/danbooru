@@ -1,15 +1,14 @@
 import CurrentUser from './current_user'
 import Utility from './utility'
-import { delay, isMobile } from './utility'
+import { isMobile } from './utility'
 import Notice from './notice'
 import Cookie from './cookie'
 import Note from './notes'
+import Swipeable from './swipeable'
 
 let Post = {};
 
 Post.pending_update_count = 0;
-Post.SWIPE_THRESHOLD = 60;
-Post.SWIPE_VELOCITY = 0.6;
 Post.LOW_TAG_COUNT = 10;
 Post.HIGH_TAG_COUNT = 20;
 Post.EDIT_DIALOG_WIDTH = 640;
@@ -27,7 +26,7 @@ Post.initialize_all = function() {
   }
 
   if ($("#c-posts #a-index, #c-posts #a-show").length) {
-    this.initialize_gestures();
+    Swipeable.navigateOnSwipe(document.body);
   }
 
   if ($("#c-posts").length && $("#a-show").length) {
@@ -43,94 +42,6 @@ Post.initialize_all = function() {
 
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
-  });
-}
-
-// On mobile, swipe left to go to the next page (or next post), and swipe right to go to the previous page (or post).
-//
-// We only watch where a touch starts and where it ends, then decide whether it was a swipe. We never block the
-// browser's own handling of touches, so scrolling, pinch zooming, and selecting text all keep working normally.
-Post.initialize_gestures = function() {
-  if (!isMobile() || CurrentUser.data("disable-mobile-gestures")) {
-    return;
-  }
-
-  // Where and when the current touch started. This is null if there's no touch in progress, or if the user is using
-  // more than one finger (e.g. pinch zooming), since that can't be a swipe.
-  let touchStart = null;
-
-  document.addEventListener("touchstart", event => {
-    if (event.touches.length !== 1) {
-      touchStart = null;
-      return;
-    }
-
-    touchStart = {
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY,
-      time: event.timeStamp,
-      element: event.target,
-    };
-  }, { passive: true });
-
-  document.addEventListener("touchend", async event => {
-    // Ignore multi-finger touches, and wait until the last finger is lifted.
-    if (touchStart === null || event.touches.length > 0) {
-      return;
-    }
-
-    const start = touchStart;
-    touchStart = null;
-
-    const end = event.changedTouches[0];
-    const distanceX = end.clientX - start.x; // Negative if the finger moved left, positive if it moved right.
-    const distanceY = end.clientY - start.y;
-    const duration = event.timeStamp - start.time; // In milliseconds.
-    const speed = Math.abs(distanceX) / duration; // In pixels per millisecond.
-
-    // A swipe is a quick, mostly horizontal movement over a minimum distance.
-    const movedFarEnough = Math.abs(distanceX) >= Post.SWIPE_THRESHOLD;
-    const movedFastEnough = speed >= Post.SWIPE_VELOCITY;
-    const movedMostlySideways = Math.abs(distanceX) > 2 * Math.abs(distanceY);
-
-    if (!movedFarEnough || !movedFastEnough || !movedMostlySideways) {
-      return;
-    }
-
-    // Don't treat it as a swipe if the user is panning around a zoomed-in page, selecting text, or typing in a form.
-    const isZoomedIn = window.visualViewport.scale > 1.01;
-    const isSelectingText = !window.getSelection().isCollapsed;
-    const isInForm = start.element.closest("input, textarea, select, [contenteditable], .ui-dialog");
-
-    if (isZoomedIn || isSelectingText || isInForm) {
-      return;
-    }
-
-    // Swiping right goes back to the previous page, and slides this page off to the right.
-    let link = document.querySelector("a[rel~=prev]:not([hidden])");
-    let slideDirection = "150%";
-
-    // Swiping left goes forward to the next page, and slides this page off to the left (like turning a page).
-    if (distanceX < 0) {
-      link = document.querySelector("a[rel~=next]:not([hidden])");
-      slideDirection = "-150%";
-    }
-
-    // There's no next or previous page (e.g. we're on the last page).
-    if (!link) {
-      return;
-    }
-
-    // Slide the page off the screen, then go to the next or previous page.
-    $("body").css({ "transition": "opacity 0.2s ease, transform 0.2s ease", "opacity": "0", "transform": `translateX(${slideDirection})` });
-    await delay(200);
-    location.href = link.href;
-  }, { passive: true });
-
-  // If the user swipes to another page and then presses the back button, the browser may show this page exactly as
-  // we left it, which is slid off the screen. Undo the slide so the page is visible again.
-  window.addEventListener("pageshow", () => {
-    $("body").css({ "transition": "", "opacity": "", "transform": "" });
   });
 }
 
