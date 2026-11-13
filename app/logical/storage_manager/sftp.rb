@@ -112,6 +112,12 @@ class StorageManager::SFTP < StorageManager
       @sftp = sftp
     end
 
+    # Called by ConnectionPool in child processes after a fork. Only close our copy of the socket, without sending
+    # anything to the server, so the parent process can keep using the connection.
+    def close
+      session.transport.socket.close
+    end
+
     # Remove a file, ignoring any errors if it doesn't exist.
     def rm_f!(path)
       force { sftp.remove!(path) }

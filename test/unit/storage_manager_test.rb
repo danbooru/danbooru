@@ -71,6 +71,19 @@ class StorageManagerTest < ActiveSupport::TestCase
       })
     end
 
+    should "not break when the process forks with open connections" do
+      tempfile("before") { |f| @storage_manager.store(f, "fork.txt") }
+
+      pid = fork { exit!(0) }
+      _, status = Process.wait2(pid)
+      assert_equal(true, status.success?)
+
+      tempfile("after") { |f| @storage_manager.store(f, "fork.txt") }
+      file = @storage_manager.open("fork.txt")
+      assert_equal("after", file.read)
+      file.close
+    end
+
     context "#store method" do
       should "store the file" do
         tempfile("blah") do |file|
