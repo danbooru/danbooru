@@ -766,6 +766,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not load the media assets of child posts one at a time" do
+        create_list(:post, 3, parent: @post)
+
+        assert_no_queries_match(/"media_assets"\."md5" = \$/) do
+          get post_path(@post)
+        end
+
+        assert_response :success
+        assert_select ".post-notice-parent .post-preview", count: 4
+      end
+
       should "embed Flash files in a sandboxed iframe" do
         post = create(:post, file_ext: "swf", media_asset: build(:media_asset, file_ext: "swf"))
         get post_path(post)

@@ -39,7 +39,7 @@ class PostsController < ApplicationController
 
       @child_posts = @post.children
       @child_posts = @child_posts.undeleted unless include_deleted
-      @sibling_posts = @sibling_posts.includes(:media_asset)
+      @child_posts = @child_posts.includes(:media_asset)
     end
 
     respond_with(@post) do |format|
