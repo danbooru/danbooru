@@ -23,6 +23,7 @@ class Upload < ApplicationRecord
 
   # Decode percent-encoded Unicode characters in the URL
   normalizes :source, with: ->(url) { Danbooru::URL.parse(url)&.to_normalized_s.presence || url }
+  normalizes :error, with: ->(error) { error.truncate_bytes(2000) } # Long errors can't be saved because the column is indexed.
 
   validate :validate_source, if: -> { source.present? && source_changed? }
   validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, length: { maximum: 2000 }, if: -> { referer_url.present? && referer_url_changed? }

@@ -337,6 +337,17 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a file that fails with a very long error message" do
+        should "mark the upload as failed" do
+          MediaFile::Image.any_instance.stubs(:dimensions).raises(StandardError, SecureRandom.alphanumeric(10_000))
+          create_upload!("test/files/jpg/test.jpg", user: @user)
+
+          assert_equal("error", Upload.last.status)
+          assert_equal("failed", UploadMediaAsset.last.status)
+          assert_operator(Upload.last.error.bytesize, :<=, 2000)
+        end
+      end
+
       context "for a file whose dimensions can't be read" do
         should "fail" do
           MediaFile::Image.any_instance.stubs(:dimensions).returns([0, 0])
