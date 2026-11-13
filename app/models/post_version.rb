@@ -160,8 +160,8 @@ class PostVersion < ApplicationRecord
 
   def changes
     delta = {
-      added_tags: added_tags,
-      removed_tags: removed_tags,
+      added_tags: added_tags.dup,
+      removed_tags: removed_tags.dup,
       obsolete_removed_tags: [],
       obsolete_added_tags: [],
       unchanged_tags: [],
@@ -268,6 +268,16 @@ class PostVersion < ApplicationRecord
 
   def self.available_includes
     [:updater, :post]
+  end
+
+  # Include rating, parent, and source changes in the added and removed tags in the API.
+  def read_attribute_for_serialization(name)
+    case name.to_s
+    when "added_tags", "removed_tags"
+      changes[name.to_sym]
+    else
+      super
+    end
   end
 
   memoize :previous, :tag_array, :changes, :added_tags_with_fields, :removed_tags_with_fields, :obsolete_removed_tags, :obsolete_added_tags, :unchanged_tags

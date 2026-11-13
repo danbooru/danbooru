@@ -69,6 +69,16 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal @post.versions[0].id, response.parsed_body[0]["id"].to_i
         assert_equal 1, response.parsed_body.length
       end
+
+      should "include source changes in added_tags and removed_tags in the API" do
+        [nil, "id,added_tags,removed_tags"].each do |only|
+          get post_versions_path(search: { id: @post.versions[1].id }, only: only), as: :json
+
+          assert_response :success
+          assert_equal(%w[1 2 source:http://xxx.com], response.parsed_body[0]["added_tags"].sort)
+          assert_equal(%w[source:http://blah.com tagme], response.parsed_body[0]["removed_tags"].sort)
+        end
+      end
     end
 
     context "undo action" do
