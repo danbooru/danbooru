@@ -14,7 +14,10 @@ This file provides guidance for coding agents working in this repository. It's m
 - Use test-driven (red/green) development. Write tests first, then write code to make the tests pass.
 - Always write tests to reproduce a bug before attempting to fix it.
 - Always write tests specifying how new features should work before implementing the feature.
-- When running tests, send their output to a temp file so that they can be reviewed on demand, do not pipe them directly through grep or rg.
+- When running tests, send their output to a temp file so that they can be reviewed on demand. Do not pipe them directly through grep or rg.
+  Do not remove them immediately after reading in the same command: that defeats the purpose of saving the output.
+- Always adversarially analyze your changes: consider every line of code potentially abusable by a bad actor, and design with security in mind.
+  See `.github/skills/security-audit/references/vulnerability-patterns.md` for bugs to avoid and be mindful of.
 - Lint files after you're done editing them. Fix any lint errors introduced by your changes, but not any lint errors that were already present.
 
 ## General Guidelines
@@ -23,6 +26,7 @@ This file provides guidance for coding agents working in this repository. It's m
 - Do not run `git commit` or `git push` unless explicitly requested.
 - Use Ruby scripts instead of Python or Bash when possible. Ruby is the language used by this codebase.
 - Prefer `rg` over `grep`. `rg` is faster.
+- Do not try to run `rm` with insecure variables or paths: it'll be blocked by the command evaluator.
 - Use `sudo apt-get` if you need to install a new package in the devcontainer.
 - Use the debugger instead of guessing at the source of a problem.
 - Don't remove tests if the test is failing and you can't fix it.
