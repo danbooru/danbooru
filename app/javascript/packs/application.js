@@ -9,7 +9,6 @@ import "core-js";
 
 import jQuery from 'jquery';
 
-require('hammerjs');
 require('jquery-hotkeys');
 import Alpine from 'alpinejs';
 import morph from '@alpinejs/morph';

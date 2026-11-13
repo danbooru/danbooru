@@ -2,7 +2,6 @@ import CurrentUser from './current_user'
 import Utility from './utility'
 import { delay, isMobile } from './utility'
 import Notice from './notice'
-import Hammer from 'hammerjs'
 import Cookie from './cookie'
 import Note from './notes'
 
@@ -24,9 +23,12 @@ Post.initialize_all = function() {
 
   if ($("#c-posts").length && $("#a-index").length) {
     this.initialize_excerpt();
-    this.initialize_gestures();
     this.initialize_post_preview_size_menu();
     this.initialize_post_preview_options_menu();
+  }
+
+  if ($("#c-posts #a-index, #c-posts #a-show").length) {
+    this.initialize_gestures();
   }
 
   if ($("#c-posts").length && $("#a-show").length) {
@@ -45,36 +47,92 @@ Post.initialize_all = function() {
   });
 }
 
+// On mobile, swipe left to go to the next page (or next post), and swipe right to go to the previous page (or post).
+//
+// We only watch where a touch starts and where it ends, then decide whether it was a swipe. We never block the
+// browser's own handling of touches, so scrolling, pinch zooming, and selecting text all keep working normally.
 Post.initialize_gestures = function() {
   if (!isMobile() || CurrentUser.data("disable-mobile-gestures")) {
     return;
   }
-  var $body = $("body");
-  if ($body.data("hammer")) {
-    return;
-  }
-  $(".image-container").css({overflow: "visible"});
-  var hasPrev = $(".paginator a[rel~=prev]").length;
-  var hasNext = $(".paginator a[rel~=next]").length;
 
-  var hammer = new Hammer($body[0], {touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: Post.SWIPE_THRESHOLD, velocity: Post.SWIPE_VELOCITY, direction: Hammer.DIRECTION_HORIZONTAL }]], inputClass: Hammer.TouchInput});
-  $body.data("hammer", hammer);
+  // Where and when the current touch started. This is null if there's no touch in progress, or if the user is using
+  // more than one finger (e.g. pinch zooming), since that can't be a swipe.
+  let touchStart = null;
 
-  if (hasPrev) {
-    hammer.on("swiperight", async function(e) {
-      $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
-      await delay(200);
-      Post.swipe_prev(e);
-    });
-  }
+  document.addEventListener("touchstart", event => {
+    if (event.touches.length !== 1) {
+      touchStart = null;
+      return;
+    }
 
-  if (hasNext) {
-    hammer.on("swipeleft", async function(e) {
-      $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
-      await delay(200);
-      Post.swipe_next(e);
-    });
-  }
+    touchStart = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+      time: event.timeStamp,
+      element: event.target,
+    };
+  }, { passive: true });
+
+  document.addEventListener("touchend", async event => {
+    // Ignore multi-finger touches, and wait until the last finger is lifted.
+    if (touchStart === null || event.touches.length > 0) {
+      return;
+    }
+
+    const start = touchStart;
+    touchStart = null;
+
+    const end = event.changedTouches[0];
+    const distanceX = end.clientX - start.x; // Negative if the finger moved left, positive if it moved right.
+    const distanceY = end.clientY - start.y;
+    const duration = event.timeStamp - start.time; // In milliseconds.
+    const speed = Math.abs(distanceX) / duration; // In pixels per millisecond.
+
+    // A swipe is a quick, mostly horizontal movement over a minimum distance.
+    const movedFarEnough = Math.abs(distanceX) >= Post.SWIPE_THRESHOLD;
+    const movedFastEnough = speed >= Post.SWIPE_VELOCITY;
+    const movedMostlySideways = Math.abs(distanceX) > 2 * Math.abs(distanceY);
+
+    if (!movedFarEnough || !movedFastEnough || !movedMostlySideways) {
+      return;
+    }
+
+    // Don't treat it as a swipe if the user is panning around a zoomed-in page, selecting text, or typing in a form.
+    const isZoomedIn = window.visualViewport.scale > 1.01;
+    const isSelectingText = !window.getSelection().isCollapsed;
+    const isInForm = start.element.closest("input, textarea, select, [contenteditable], .ui-dialog");
+
+    if (isZoomedIn || isSelectingText || isInForm) {
+      return;
+    }
+
+    // Swiping right goes back to the previous page, and slides this page off to the right.
+    let link = document.querySelector("a[rel~=prev]:not([hidden])");
+    let slideDirection = "150%";
+
+    // Swiping left goes forward to the next page, and slides this page off to the left (like turning a page).
+    if (distanceX < 0) {
+      link = document.querySelector("a[rel~=next]:not([hidden])");
+      slideDirection = "-150%";
+    }
+
+    // There's no next or previous page (e.g. we're on the last page).
+    if (!link) {
+      return;
+    }
+
+    // Slide the page off the screen, then go to the next or previous page.
+    $("body").css({ "transition": "opacity 0.2s ease, transform 0.2s ease", "opacity": "0", "transform": `translateX(${slideDirection})` });
+    await delay(200);
+    location.href = link.href;
+  }, { passive: true });
+
+  // If the user swipes to another page and then presses the back button, the browser may show this page exactly as
+  // we left it, which is slid off the screen. Undo the slide so the page is visible again.
+  window.addEventListener("pageshow", () => {
+    $("body").css({ "transition": "", "opacity": "", "transform": "" });
+  });
 }
 
 Post.initialize_edit_dialog = function() {
@@ -161,22 +219,6 @@ Post.close_edit_dialog = function(e, ui) {
   $("div.input").has($tag_string).prevAll().show();
   $tag_string.css({"resize": "", "width": ""});
   $(document).trigger("danbooru:close-post-edit-dialog");
-}
-
-Post.swipe_prev = function(e) {
-  if ($(".paginator a[rel~=prev]").length) {
-    location.href = $("a[rel~=prev]").attr("href");
-  }
-
-  e.preventDefault();
-}
-
-Post.swipe_next = function(e) {
-  if ($(".paginator a[rel~=next ]").length) {
-    location.href = $(".paginator a[rel~=next]").attr("href");
-  }
-
-  e.preventDefault();
 }
 
 Post.initialize_links = function() {
