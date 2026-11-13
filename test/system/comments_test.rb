@@ -20,6 +20,14 @@ class CommentsChromeTest < ChromeSystemTestCase
 
         assert_visible "#comment_#{@comment.id} .body", text: @comment.body
       end
+
+      should "hide the vote buttons until the comment is unhidden" do
+        assert_hidden "#comment_#{@comment.id} .comment-votes"
+
+        assert_no_navigation { find("#comment_#{@comment.id} .unhide-comment-link").click }
+
+        assert_visible "#comment_#{@comment.id} .comment-votes"
+      end
     end
 
     context "the comment's Edit button" do
