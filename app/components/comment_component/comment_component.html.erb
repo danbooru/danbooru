@@ -31,7 +31,7 @@
   </div>
 
   <div class="content">
-    <%= link_to "[hidden]", "#", class: "unhide-comment-link block mb-3", "x-on:click.prevent": "showThresholded = true" %>
+    <%= link_to "[hidden]", "#", class: "unhide-comment-link block mb-3 sm:py-3", "x-on:click.prevent": "showThresholded = true" %>
 
     <%= tag.div class: "body prose" do %>
       <% if redact_deleted? %>

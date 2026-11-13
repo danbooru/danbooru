@@ -666,6 +666,7 @@ a.text-danger:hover { color: var(--error-hover-color) !important; }
   .sm\:mt-2 { margin-top: 2 * $spacer; }
 
   .sm\:p-2 { padding: 2 * $spacer; }
+  .sm\:py-3 { padding-top: 3 * $spacer; padding-bottom: 3 * $spacer; }
 
   .sm\:border-b { border-bottom-width: 1px; }
 
