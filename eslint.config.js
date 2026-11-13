@@ -1,8 +1,6 @@
 const js = require("@eslint/js");
 const globals = require("globals");
-const ignoreErb = require("eslint-plugin-ignore-erb");
 const { browser, es2017 } = globals;
-const erbProcessor = ignoreErb.processors[".erb"];
 
 // Trim whitespace from global variable names to avoid errors caused by globals that have leading or trailing spaces (e.g. `AudioWorkletGlobalScope `)
 function normalizeGlobals(...globalSets) {
@@ -104,11 +102,11 @@ module.exports = [
     },
     processor: {
       meta: {
-        name: "eslint-plugin-ignore-erb",
-        version: "0.1.1",
+        name: "erb",
+        version: "1.0.0",
       },
       preprocess: preprocessErb,
-      postprocess: erbProcessor.postprocess,
+      postprocess: (messages) => messages.flat(),
     },
   },
 ];
