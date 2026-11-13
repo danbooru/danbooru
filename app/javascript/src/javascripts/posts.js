@@ -23,7 +23,6 @@ Post.initialize_all = function() {
 
   if ($("#c-posts").length && $("#a-index").length) {
     this.initialize_excerpt();
-    this.initialize_post_preview_size_menu();
     this.initialize_post_preview_options_menu();
   }
 
@@ -303,19 +302,6 @@ Post.scroll_relationship_preview = function($post) {
   let max_scroll_left = Math.max(0, post_container.scrollWidth - post_container.clientWidth);
 
   post_container.scrollLeft = Math.max(0, Math.min(target_scroll_left, max_scroll_left));
-}
-
-Post.initialize_post_preview_size_menu = function() {
-  $(document).on("click.danbooru", ".post-preview-size-menu .popup-menu-content a", (e) => {
-    let url = new URL($(e.target).get(0).href);
-    let size = url.searchParams.get("size");
-
-    Cookie.put("post_preview_size", size);
-    url.searchParams.delete("size");
-    location.replace(url);
-
-    e.preventDefault();
-  });
 }
 
 Post.initialize_post_preview_options_menu = function() {

@@ -7,6 +7,17 @@ class PostChromeTest < ChromeSystemTestCase
   end
 
   context "Post:" do
+    should "change the thumbnail size from the Size menu on the post index" do
+      visit posts_path
+
+      find(".preview-size-menu .popup-menu-button").click
+      find(".preview-size-menu .popup-menu-content a", text: "Large").click
+
+      assert_selector ".post-preview.post-preview-225"
+      assert_no_current_path(/size=/)
+      assert_equal "225", page.driver.with_playwright_page { |playwright_page| playwright_page.context.cookies.find { |cookie| cookie["name"] == "post_preview_size" }&.dig("value") }
+    end
+
     should "show the editing interface" do
       fast_signin @user
       visit post_path(@post)
