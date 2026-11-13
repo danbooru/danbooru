@@ -25,6 +25,11 @@ class ArtistPolicy < ApplicationPolicy
     end
   end
 
+  # Whether the user can see posts when searching for a banned artist.
+  def can_search_banned?
+    user.is_approver?
+  end
+
   def rate_limit_for_write(**_options)
     if user.is_builder?
       { action: "artists:write", rate: 12.0 / 1.minute, burst: 80 } # 720 per hour, 800 in first hour
@@ -44,4 +49,8 @@ class ArtistPolicy < ApplicationPolicy
   end
 
   alias_method :show_or_new?, :show?
+
+  def searchable_attributes
+    %i[id created_at updated_at is_deleted is_banned name group_name other_names urls wiki_page tag_alias tag]
+  end
 end

@@ -58,14 +58,6 @@ class ForumPost < ApplicationRecord
   )
 
   module SearchMethods
-    def visible(user)
-      if policy(user).show_deleted?
-        where(topic_id: ForumTopic.visible(user))
-      else
-        undeleted.where(topic_id: ForumTopic.visible(user))
-      end
-    end
-
     def not_visible(user)
       visible(user).invert_where
     end
@@ -78,7 +70,7 @@ class ForumPost < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_deleted body creator updater topic dtext_links votes tag_alias tag_implication bulk_update_request], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:linked_to].present?
         q = q.wiki_link_matches(params[:linked_to])

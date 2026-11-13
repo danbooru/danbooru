@@ -40,4 +40,16 @@ class SiteCredentialPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:is_enabled]
   end
+
+  def visible(relation)
+    if user.is_admin?
+      relation.where(creator: user).or(relation.is_public)
+    else
+      relation.where(creator: user)
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at creator site is_enabled is_public status usage_count error_count last_used_at last_error_at credential metadata]
+  end
 end

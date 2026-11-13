@@ -2,7 +2,7 @@
 
 class FavoriteGroupPolicy < ApplicationPolicy
   def show?
-    record.creator_id == user.id || record.is_public
+    user.is_owner? || record.creator_id == user.id || record.is_public
   end
 
   def create?
@@ -35,5 +35,19 @@ class FavoriteGroupPolicy < ApplicationPolicy
 
   def permitted_attributes
     [:name, :post_ids_string, :is_public, :is_private, :post_ids, { post_ids: [] }]
+  end
+
+  def visible(relation)
+    if user.is_owner?
+      relation
+    elsif user.is_anonymous?
+      relation.is_public
+    else
+      relation.is_public.or(relation.where(creator: user))
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at name is_public post_ids creator]
   end
 end

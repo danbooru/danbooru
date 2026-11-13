@@ -24,4 +24,16 @@ class SavedSearchPolicy < ApplicationPolicy
   def permitted_attributes
     [:query, :label_string, :disable_labels]
   end
+
+  def visible(relation)
+    if user.is_anonymous?
+      relation.none
+    else
+      relation.where(user: user)
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at query]
+  end
 end

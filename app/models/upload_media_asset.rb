@@ -28,16 +28,6 @@ class UploadMediaAsset < ApplicationRecord
   scope :finished, -> { where(status: %w[active failed]) }
   scope :expired, -> { unfinished.where(created_at: ..4.hours.ago) }
 
-  def self.visible(user)
-    if user.is_moderator?
-      all
-    elsif user.is_anonymous?
-      none
-    else
-      where(user: user)
-    end
-  end
-
   def self.prune!
     expired.update_all(status: :failed, error: "Stuck processing for more than 4 hours")
   end
@@ -58,7 +48,7 @@ class UploadMediaAsset < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, %i[id created_at updated_at status source_url page_url error upload media_asset post], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     if params[:is_posted].to_s.truthy?
       q = q.where.associated(:post)

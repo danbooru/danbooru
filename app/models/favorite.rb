@@ -10,18 +10,8 @@ class Favorite < ApplicationRecord
 
   scope :public_favorites, -> { where.not(user: User.has_private_favorites) }
 
-  def self.visible(user)
-    if user.is_admin?
-      all
-    elsif user.is_anonymous?
-      public_favorites
-    else
-      where(user: user).or(public_favorites)
-    end
-  end
-
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :post, :user], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)
   end
 

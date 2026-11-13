@@ -26,7 +26,7 @@ class Note < ApplicationRecord
 
   module SearchMethods
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_active x y width height body version post], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       q.apply_default_order(params)
     end

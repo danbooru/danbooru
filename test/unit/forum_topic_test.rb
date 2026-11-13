@@ -8,6 +8,25 @@ class ForumTopicTest < ActiveSupport::TestCase
       @topic = create(:forum_topic, title: "xxx", creator: @user)
     end
 
+    context "preloading the original post" do
+      should "only load the first post of each topic" do
+        topic2 = create(:forum_topic)
+        op1 = create(:forum_post, topic: @topic)
+        op2 = create(:forum_post, topic: topic2)
+        create_list(:forum_post, 2, topic: @topic)
+        create_list(:forum_post, 2, topic: topic2)
+
+        loaded = 0
+        callback = ->(*, payload) { loaded += payload[:record_count] if payload[:class_name] == "ForumPost" }
+        topics = ActiveSupport::Notifications.subscribed(callback, "instantiation.active_record") do
+          ForumTopic.where(id: [@topic.id, topic2.id]).order(:id).includes(:original_post).load
+        end
+
+        assert_equal([op1, op2], topics.map(&:original_post))
+        assert_equal(2, loaded)
+      end
+    end
+
     context "#mark_as_read!" do
       context "without a previous visit" do
         should "create a new visit" do

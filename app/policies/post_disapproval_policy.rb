@@ -29,6 +29,10 @@ class PostDisapprovalPolicy < ApplicationPolicy
     unbanned? && record.post.in_modqueue? && record.user_id == user.id
   end
 
+  def searchable_attributes
+    %i[id created_at updated_at message reason post user]
+  end
+
   def api_attributes
     attributes = super
     attributes -= [:user_id] unless can_view_creator?

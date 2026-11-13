@@ -19,14 +19,6 @@ class IpBan < ApplicationRecord
     partial: 100,
   }, suffix: "ban"
 
-  def self.visible(user)
-    if user.is_moderator?
-      all
-    else
-      none
-    end
-  end
-
   def self.ip_matches(ip_addr)
     where("ip_addr >>= ?", ip_addr.to_s)
   end
@@ -40,7 +32,7 @@ class IpBan < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, %i[id created_at updated_at ip_addr reason is_deleted category hit_count last_hit_at creator], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     case params[:order]
     when /\A(created_at|updated_at|last_hit_at)(?:_(asc|desc))?\z/i

@@ -45,6 +45,20 @@ class DmailPolicy < ApplicationPolicy
     [:is_read, :is_deleted]
   end
 
+  def visible(relation)
+    if user.is_anonymous?
+      relation.none
+    elsif user.is_moderator?
+      relation.where(owner: user).or(relation.where(id: ModerationReport.where(model_type: "Dmail").select(:model_id)))
+    else
+      relation.where(owner: user)
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at is_read is_deleted title body to from]
+  end
+
   def api_attributes
     super + [:key]
   end

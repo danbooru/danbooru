@@ -21,14 +21,6 @@ class SavedSearch < ApplicationRecord
   scope :labeled, ->(label) { where_array_includes_any_lower(:labels, [normalize_label(label)]) }
   scope :has_tag, ->(name) { where_regex(:query, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "i") }
 
-  def self.visible(user)
-    if user.is_anonymous?
-      none
-    else
-      where(user: user)
-    end
-  end
-
   concerning :Redis do
     extend Memoist
 
@@ -113,7 +105,7 @@ class SavedSearch < ApplicationRecord
   concerning :Search do
     class_methods do
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :query], current_user: current_user)
+        q = search_attributes(params, current_user: current_user)
 
         if params[:label]
           q = q.labeled(params[:label])

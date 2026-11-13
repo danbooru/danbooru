@@ -19,7 +19,8 @@ class ForumTopic < ApplicationRecord
   has_many :forum_posts, foreign_key: "topic_id", dependent: :destroy, inverse_of: :topic
   has_many :forum_topic_visits
   has_one :forum_topic_visit_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "ForumTopicVisit"
-  has_one :original_post, -> { order(id: :asc) }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
+  # DISTINCT ON makes preloading only load the first post of each topic, instead of every post.
+  has_one :original_post, -> { select("DISTINCT ON (forum_posts.topic_id) forum_posts.*").order(:topic_id, :id) }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :bulk_update_requests
   has_many :tag_aliases
   has_many :tag_implications
@@ -48,10 +49,6 @@ class ForumTopic < ApplicationRecord
   scope :rejected, -> { where(category_id: 1).where(id: BulkUpdateRequest.rejected.has_topic.select(:forum_topic_id)).where.not(id: BulkUpdateRequest.has_topic.pending.or(BulkUpdateRequest.has_topic.approved).select(:forum_topic_id)) }
 
   module SearchMethods
-    def visible(user)
-      where(min_level: ..user.level)
-    end
-
     def read_by_user(user)
       last_forum_read_at = user.last_forum_read_at || Time.zone.parse("2000-01-01")
 
@@ -74,7 +71,7 @@ class ForumTopic < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_sticky is_locked is_deleted category min_level title response_count creator updater forum_posts bulk_update_requests tag_aliases tag_implications], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:is_private].to_s.truthy?
         q = q.private_only

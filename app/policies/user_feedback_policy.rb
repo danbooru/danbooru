@@ -40,4 +40,16 @@ class UserFeedbackPolicy < ApplicationPolicy
   def html_data_attributes
     super + [:category]
   end
+
+  def visible(relation)
+    if user.is_moderator?
+      relation
+    else
+      relation.undeleted
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at category body is_deleted creator user]
+  end
 end

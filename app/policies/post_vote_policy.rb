@@ -10,7 +10,10 @@ class PostVotePolicy < ApplicationPolicy
   end
 
   def show?
-    user.is_admin? || record.user == user || (record.is_positive? && !record.is_deleted? && !record.user.enable_private_favorites?)
+    return true if user.is_admin?
+    return false if record.is_deleted?
+
+    record.user == user || (record.is_positive? && !record.user.enable_private_favorites?)
   end
 
   def can_see_voter?
@@ -27,6 +30,20 @@ class PostVotePolicy < ApplicationPolicy
     else # record.is_negative?
       { action: "post_votes:write", rate: 1.0 / 1.minute, burst: 40 } # 60 per hour, 100 in first hour
     end
+  end
+
+  def visible(relation)
+    if user.is_admin?
+      relation
+    elsif user.is_anonymous?
+      relation.public_votes
+    else
+      relation.active.where(user: user).or(relation.public_votes)
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at score is_deleted user post]
   end
 
   def api_attributes

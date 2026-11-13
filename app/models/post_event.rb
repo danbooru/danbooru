@@ -14,10 +14,6 @@ class PostEvent < ApplicationRecord
     %w[Upload Flag Appeal Approval Disapproval Delete Undelete Ban Unban Replacement Regenerate RegenerateIqdb MoveFavorites NoteLockCreate NoteLockDelete RatingLockCreate RatingLockDelete]
   end
 
-  def self.visible(_user)
-    all
-  end
-
   def self.category_matches(category)
     category = category.squish.titleize.delete(" ")
 
@@ -34,7 +30,7 @@ class PostEvent < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:model, :post, :creator, :event_at], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     if params[:category]
       q = q.category_matches(params[:category])

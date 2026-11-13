@@ -98,6 +98,42 @@ class ApplicationPolicy
     { rate: user.api_regen_multiplier, burst: 200 }
   end
 
+  # The list of attributes the user can search by. Each entry is either an attribute name, which can be searched with
+  # every operator, or a `{ name => :exact }` hash, which only allows exact matches. Exact matches should be used for
+  # secret values like hashes, so they can't be guessed one character at a time with wildcard or range searches.
+  #
+  # @example
+  #   [:id, :created_at, :uploader, { md5: :exact }]
+  #
+  # @see ApplicationRecord#search
+  # @see app/logical/concerns/searchable.rb
+  def searchable_attributes
+    []
+  end
+
+  # The searchable attributes as a hash of attribute names to search modes.
+  #
+  # @example
+  #   search_modes # => { id: :all, created_at: :all, uploader: :all, md5: :exact }
+  def search_modes
+    searchable_attributes.map do |attribute|
+      if attribute.is_a?(Hash)
+        attribute
+      else
+        { attribute => :all }
+      end
+    end.reduce({}, :merge)
+  end
+
+  # Restrict the relation to the records the user is allowed to see. By default, all records are visible.
+  #
+  # @param relation [ActiveRecord::Relation]
+  # @return [ActiveRecord::Relation]
+  # @see ApplicationRecord.visible
+  def visible(relation)
+    relation
+  end
+
   # When a user performs a search, this method is used to filter out results
   # that are hidden from the user based on what they're searching for. For
   # example, if a user searches for post flags by flagger name, they can see

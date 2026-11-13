@@ -45,7 +45,7 @@ class Ban < ApplicationRecord
   scope :active, -> { unexpired }
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :duration, :reason, :user, :banner], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     q = q.expired if params[:expired].to_s.truthy?
     q = q.unexpired if params[:expired].to_s.falsy?

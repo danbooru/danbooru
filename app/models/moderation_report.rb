@@ -35,16 +35,6 @@ class ModerationReport < ApplicationRecord
     MODEL_TYPES
   end
 
-  def self.visible(user)
-    if user.is_moderator?
-      all
-    elsif !user.is_anonymous?
-      where(creator: user)
-    else
-      none
-    end
-  end
-
   def autoban_reported_user
     if SpamDetector.is_spammer?(reported_user)
       SpamDetector.ban_spammer!(reported_user)
@@ -86,7 +76,7 @@ class ModerationReport < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :reason, :creator, :model, :status], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     if params[:recipient_id].present?
       q = q.received_by(User.search({ id: params[:recipient_id] }, current_user))

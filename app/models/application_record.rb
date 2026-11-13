@@ -41,16 +41,18 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :PrivilegeMethods do
     class_methods do
-      def visible(_user)
-        all
+      # @return [ActiveRecord::Relation] The records the user is allowed to see (see ApplicationPolicy#visible).
+      def visible(user)
+        policy(user).visible(all)
       end
 
       def visible_for_search(attribute, current_user)
         policy(current_user).visible_for_search(all, attribute)
       end
 
+      # @raise [Pundit::NotDefinedError] If the model doesn't have a policy.
       def policy(current_user)
-        Pundit.policy(current_user, self)
+        Pundit.policy!(current_user, self)
       end
     end
 

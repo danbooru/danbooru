@@ -60,4 +60,23 @@ class ApplicationRecordTest < ActiveSupport::TestCase
       assert_equal(true,  Post.exists?(@post4.id))
     end
   end
+
+  context "ApplicationRecord.visible" do
+    should "return the records the policy allows the user to see" do
+      TagPolicy.any_instance.stubs(:visible).returns(Tag.where(id: @tags.first.id))
+
+      assert_equal([@tags.first], Tag.visible(User.anonymous).to_a)
+    end
+
+    should "raise an error for a model without a policy" do
+      assert_raises(Pundit::NotDefinedError) { GoodJob::Job.visible(User.anonymous) }
+    end
+
+    should "apply the policy to the current scope" do
+      ip_ban = create(:ip_ban)
+
+      assert_equal([], IpBan.where(id: ip_ban.id).visible(create(:user)).to_a)
+      assert_equal([ip_ban], IpBan.where(id: ip_ban.id).visible(create(:moderator_user)).to_a)
+    end
+  end
 end

@@ -86,6 +86,29 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not show deleted forum posts in the atom feed to users who can't see them" do
+        create(:forum_post, topic: @forum_topic, creator: @other_user, body: "secret deleted reply", is_deleted: true)
+
+        get_auth forum_topic_path(@forum_topic), @user, params: { format: :atom }
+        assert_response :success
+        assert_not_includes(response.body, "secret deleted reply")
+
+        get_auth forum_topic_path(@forum_topic), @mod, params: { format: :atom }
+        assert_includes(response.body, "secret deleted reply")
+      end
+
+      should "not show a deleted original post in the page description to users who can't see it" do
+        @forum_topic.original_post.update!(body: "secret deleted op")
+        @forum_topic.update!(is_deleted: true, updater: @mod)
+
+        get_auth forum_topic_path(@forum_topic), @user
+        assert_response :success
+        assert_select "meta[name=description][content*='secret deleted op']", count: 0
+
+        get_auth forum_topic_path(@forum_topic), @mod
+        assert_select "meta[name=description][content*='secret deleted op']", count: 1
+      end
+
       should "raise an error if the user doesn't have permission to view the topic" do
         @forum_topic.update(min_level: User::Levels::ADMIN, updater: @user)
         get_auth forum_topic_path(@forum_topic), @user
@@ -119,6 +142,18 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       should "render for atom feed" do
         get forum_topics_path, params: { format: :atom }
         assert_response :success
+      end
+
+      should "not show a deleted original post in the atom feed to users who can't see it" do
+        @other_topic.original_post.update!(body: "secret deleted op")
+        @other_topic.update!(is_deleted: true, updater: @mod)
+
+        get_auth forum_topics_path, @user, params: { format: :atom }
+        assert_response :success
+        assert_not_includes(response.body, "secret deleted op")
+
+        get_auth forum_topics_path, @mod, params: { format: :atom }
+        assert_includes(response.body, "secret deleted op")
       end
 
       should "render for a sitemap" do

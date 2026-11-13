@@ -11,17 +11,13 @@ class ForumPostVote < ApplicationRecord
   scope :up, -> { where(score: 1) }
   scope :down, -> { where(score: -1) }
 
-  def self.visible(user)
-    where(forum_post: ForumPost.visible(user))
-  end
-
   def self.forum_post_matches(params, current_user)
     return all if params.blank?
     where(forum_post_id: ForumPost.search(params, current_user).reorder(nil).select(:id))
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :score, :creator, :forum_post], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q = q.forum_post_matches(params[:forum_post], current_user)
     q.apply_default_order(params)
   end

@@ -32,16 +32,8 @@ class ApiKey < ApplicationRecord
 
   has_secure_token :key
 
-  def self.visible(user)
-    if user.is_owner?
-      all
-    else
-      where(user: user)
-    end
-  end
-
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :user], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)
   end
 

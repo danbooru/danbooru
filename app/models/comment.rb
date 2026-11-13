@@ -53,7 +53,7 @@ class Comment < ApplicationRecord
 
   module SearchMethods
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_deleted is_sticky do_not_bump_post body score post creator updater], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:is_edited].to_s.truthy?
         q = q.where("comments.updated_at - comments.created_at > ?", 5.minutes.iso8601)
@@ -71,9 +71,9 @@ class Comment < ApplicationRecord
       when "post_id", "post_id_desc"
         q = q.order("comments.post_id DESC, comments.id DESC")
       when "score", "score_desc"
-        q = q.order("comments.score DESC, comments.id DESC")
+        q = q.visible_for_search(:score, current_user).order("comments.score DESC, comments.id DESC")
       when "score_asc"
-        q = q.order("comments.score ASC, comments.id ASC")
+        q = q.visible_for_search(:score, current_user).order("comments.score ASC, comments.id ASC")
       when "updated_at", "updated_at_desc"
         q = q.order("comments.updated_at DESC, comments.id DESC")
       when "updated_at_asc"

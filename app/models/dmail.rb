@@ -81,16 +81,6 @@ class Dmail < ApplicationRecord
   end
 
   module SearchMethods
-    def visible(user)
-      if user.is_anonymous?
-        none
-      elsif user.is_moderator?
-        where(owner: user).or(where(id: ModerationReport.where(model_type: "Dmail").select(:model_id)))
-      else
-        where(owner: user)
-      end
-    end
-
     def sent_by(user)
       where("dmails.from_id = ? AND dmails.owner_id != ?", user.id, user.id)
     end
@@ -111,7 +101,7 @@ class Dmail < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_read, :is_deleted, :title, :body, :to, :from], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
       q = q.where_text_matches([:title, :body], params[:message_matches])
 
       q = q.folder_matches(params[:folder])

@@ -45,6 +45,12 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "show private favgroups to the site owner" do
+        @favgroup = create(:private_favorite_group)
+        get_auth favorite_group_path(@favgroup), create(:owner_user)
+        assert_response :success
+      end
+
       should "not show private favgroups to other users" do
         @favgroup = create(:private_favorite_group)
         get_auth favorite_group_path(@favgroup), create(:user)

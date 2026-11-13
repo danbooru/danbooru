@@ -39,14 +39,6 @@ class Upload < ApplicationRecord
   scope :failed, -> { where(status: "error") }
   scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
 
-  def self.visible(user)
-    if user.is_moderator?
-      all
-    else
-      where(uploader: user)
-    end
-  end
-
   def self.prune!
     expired.update_all(status: "error", error: "Stuck processing for more than 4 hours")
   end
@@ -140,7 +132,7 @@ class Upload < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, %i[id created_at updated_at source referer_url status media_asset_count uploader upload_media_assets media_assets posts], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     if params[:ai_tags_match].present?
       min_score = params.fetch(:min_score, 50).to_i

@@ -20,4 +20,8 @@ class TagPolicy < ApplicationPolicy
     permitted << :is_deprecated if can_change_deprecated_status?
     permitted
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at is_deprecated category post_count name wiki_page artist antecedent_alias consequent_aliases antecedent_implications consequent_implications dtext_links]
+  end
 end

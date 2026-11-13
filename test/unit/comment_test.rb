@@ -257,6 +257,15 @@ class CommentTest < ActiveSupport::TestCase
         assert_search_equals([c2, c1], body_matches: "aaa")
       end
 
+      should "not sort deleted comments by score for users who can't see their score" do
+        c1 = create(:comment, score: 1)
+        c2 = create(:comment, score: 5, is_deleted: true)
+
+        assert_equal([c1], Comment.search({ order: "score" }, create(:user)).to_a)
+        assert_equal([c2, c1], Comment.search({ order: "score" }, create(:moderator_user)).to_a)
+        assert_equal([c1, c2], Comment.search({ order: "score_asc" }, create(:moderator_user)).to_a)
+      end
+
       should "default to id_desc order when searched with no options specified" do
         comms = create_list(:comment, 3)
 

@@ -17,4 +17,8 @@ class UserActionPolicy < ApplicationPolicy
       true
     end
   end
+
+  def searchable_attributes
+    %i[event_type user model]
+  end
 end

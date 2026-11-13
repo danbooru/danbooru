@@ -78,7 +78,7 @@ class WikiPage < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_locked is_deleted body title other_names tag artist dtext_links], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
       q = q.where_text_matches([:title, :body], params[:title_or_body_matches])
 
       if params[:title_normalize].present?
