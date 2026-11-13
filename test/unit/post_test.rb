@@ -498,6 +498,16 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "using the co: and ch: tag prefixes" do
+        should "add the tags with the right category" do
+          @post.update!(tag_string: "co:abc ch:xyz")
+
+          assert_equal("abc xyz", @post.reload.tag_string)
+          assert_equal(Tag.categories.copyright, Tag.find_by_name("abc").category)
+          assert_equal(Tag.categories.character, Tag.find_by_name("xyz").category)
+        end
+      end
+
       context "using a tag prefix on an aliased tag" do
         setup do
           create(:tag_alias, antecedent_name: "abc", consequent_name: "xyz")

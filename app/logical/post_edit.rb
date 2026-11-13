@@ -139,7 +139,7 @@ class PostEdit
       value = quoted_string
 
       name = name.delete_suffix(":").downcase
-      name = TagCategory.short_name_mapping.fetch(name, name) # 'art:bkub' => 'artist:bkub'
+      name = TagCategory.reverse_mapping.fetch(TagCategory.mapping[name], name) # 'art:bkub' => 'artist:bkub'
       value = value.downcase unless name.in?(["newpool", "newfavgroup", "source"])
       value = value.gsub(/[[:space:]]/, "_") unless name == "source"
 
