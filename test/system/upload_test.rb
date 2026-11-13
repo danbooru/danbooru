@@ -14,6 +14,9 @@ class UploadsChromeTest < ChromeSystemTestCase
       create(:tag, name: "1girl")
       @user = create(:user, favorite_tags: "1girl", created_at: 1.month.ago)
       fast_signin @user
+
+      # Enable CSRF protection after signing in so uploads must send a valid CSRF token, like in production.
+      ActionController::Base.any_instance.stubs(:allow_forgery_protection).returns(true)
     end
 
     should "upload a file and show the post form" do

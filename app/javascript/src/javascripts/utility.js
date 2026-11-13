@@ -161,7 +161,7 @@ export async function createUpload(params, pollDelay = 250) {
 
   let response = await fetch("/uploads.json", {
     method: "POST",
-    headers: { "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").content },
+    headers: { "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content },
     body: formData
   });
 
