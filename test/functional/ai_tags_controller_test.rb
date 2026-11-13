@@ -46,6 +46,28 @@ class AITagsControllerTest < ActionDispatch::IntegrationTest
         get_auth ai_tags_path(search: { is_posted: false }), @user
         assert_response :success
       end
+
+      context "with deprecated tags" do
+        setup do
+          @deprecated_tag = create(:tag, name: "eyebrows_visible_through_hair", is_deprecated: true)
+          @deprecated_ai_tag = create(:ai_tag, tag: @deprecated_tag, media_asset: @posted_asset1)
+        end
+
+        should "not show deprecated tags in the html view" do
+          get_auth ai_tags_path, @user
+
+          assert_response :success
+          assert_select ".media-asset-preview[data-tag-id='#{@tag1.id}']"
+          assert_select ".media-asset-preview[data-tag-id='#{@deprecated_tag.id}']", count: 0
+        end
+
+        should "include deprecated tags in the api" do
+          get_auth ai_tags_path(format: :json, search: { tag_id: @deprecated_tag.id }), @user
+
+          assert_response :success
+          assert_equal([@deprecated_tag.id], response.parsed_body.pluck("tag_id"))
+        end
+      end
     end
 
     context "tag action" do
