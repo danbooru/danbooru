@@ -17,6 +17,31 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     end
 
     context "when approving a BUR" do
+      context "that the approver doesn't have the level to approve" do
+        should "not change anything in the database or the cache" do
+          @mod = create(:mod_user)
+          create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
+          create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
+          create(:tag, name: "gen1c", category: Tag.categories.general, post_count: 5)
+          create(:wiki_page, title: "gen1a")
+          create(:wiki_page, title: "gen1c")
+          @bur = create(:bulk_update_request, script: "imply gen1a -> gen1c\ncategory gen1a -> character\nalias gen1a -> gen1b")
+
+          table_counts = -> { ApplicationRecord.connection.tables.index_with { |table| ApplicationRecord.connection.select_value("SELECT COUNT(*) FROM #{table}") } }
+          rows = -> { [Tag.order(:id).map(&:attributes), BulkUpdateRequest.order(:id).map(&:attributes), ForumTopic.order(:id).map(&:attributes), ForumPost.order(:id).map(&:attributes)] }
+          counts_before = table_counts.call
+          rows_before = rows.call
+
+          # Simulated lines are rolled back in the database, but cache writes aren't (see 9ff162afe).
+          %i[write write_multi delete delete_multi increment decrement].each { |method| Rails.cache.expects(method).never }
+          assert_no_enqueued_jobs { @bur.approve!(@mod) }
+
+          assert_includes(@bur.errors.full_messages, "Can't approve create alias [[gen1a]] -> [[gen1b]] (requires Admin)")
+          assert_equal(counts_before, table_counts.call)
+          assert_equal(rows_before, rows.call)
+        end
+      end
+
       context "that has both implications and unimplications" do
         should "process them sequentially" do
           @bur = create_bur!("imply foo -> bar\nunimply foo -> bar", @admin)

@@ -449,6 +449,55 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
         end
 
+        should "fail when an earlier line changes the small tag's category before aliasing it to a large tag" do
+          create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
+          create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
+          @bulk_update_request = create(:bulk_update_request, script: "category gen1a -> character\nalias gen1a -> gen1b")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
+          end
+
+          assert_includes(response.body, "Danbooru.Notice.error")
+          assert_includes(response.body, "requires Admin")
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b"))
+          assert_equal(true, Tag.find_by_name("gen1b").general?)
+        end
+
+        should "fail when an earlier line adds an implication to the small tag before aliasing it to a large tag" do
+          create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
+          create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
+          create(:tag, name: "gen1c", category: Tag.categories.general, post_count: 5)
+          create(:wiki_page, title: "gen1a")
+          create(:wiki_page, title: "gen1c")
+          @bulk_update_request = create(:bulk_update_request, script: "imply gen1a -> gen1c\nalias gen1a -> gen1b")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
+          end
+
+          assert_includes(response.body, "Danbooru.Notice.error")
+          assert_includes(response.body, "requires Admin")
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b"))
+          assert_equal(false, TagImplication.exists?(antecedent_name: "gen1b", consequent_name: "gen1c"))
+        end
+
+        should "succeed when an earlier line changes the small tag's category before aliasing it to a small tag" do
+          create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
+          create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 20)
+          @bulk_update_request = create(:bulk_update_request, script: "category gen1a -> character\nalias gen1a -> gen1b")
+
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
+          end
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(true, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b", status: "active"))
+        end
+
         should "succeed when deprecating an empty tag" do
           create(:tag, name: "no_tag", post_count: 0)
           create(:wiki_page, title: "no_tag", body: "asd")

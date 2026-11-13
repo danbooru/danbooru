@@ -29,6 +29,7 @@ class BulkUpdateRequest < ApplicationRecord
   validates :forum_post, presence: true, if: ->(bur) { bur.forum_post_id.present? }
   validates :status, inclusion: { in: STATUSES }
   validate :validate_script, if: :script_changed?
+  validate :validate_approval, on: :approval
   validate :validate_forum_topic, if: :forum_topic_changed?
   validate :validate_forum_post, if: :forum_post_changed?
 
@@ -108,10 +109,13 @@ class BulkUpdateRequest < ApplicationRecord
     def approve!(approver)
       transaction do
         CurrentUser.scoped(approver) do
-          processor.validate!(:approval)
-          update!(status: "processing", approver: approver)
-          processor.process_later!
-          forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.") if forum_post.present?
+          self.approver = approver
+          self.status = "processing"
+
+          if save(context: :approval)
+            processor.process_later!
+            forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.") if forum_post.present?
+          end
         end
       end
     end
@@ -139,6 +143,12 @@ class BulkUpdateRequest < ApplicationRecord
 
   def validate_script
     if processor.invalid?(:request)
+      processor.errors.full_messages.each { |error| errors.add(:base, error) }
+    end
+  end
+
+  def validate_approval
+    if processor.invalid?(:approval)
       processor.errors.full_messages.each { |error| errors.add(:base, error) }
     end
   end

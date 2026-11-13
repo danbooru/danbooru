@@ -11,6 +11,9 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
     user.is_admin? || (record.user_id == user.id && !record.has_too_many_votes_to_edit?)
   end
 
+  # A cheap estimate based on the tags' current state, used to show the Approve button and for the can_approve
+  # search. The real check is done by `BulkUpdateRequest#approve!`, which checks each line after simulating the lines
+  # before it, since an earlier line can change what a later line needs.
   def approve?(tags: nil)
     return false if !unbanned? || record.is_approved?
 

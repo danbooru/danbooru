@@ -34,10 +34,17 @@ class BulkUpdateRequest::Processor
   # validation_context will be either :request (when the BUR is first created
   # or edited) or :approval (when the BUR is approved). Certain validations
   # only run when the BUR is requested, not when it's approved.
+  #
+  # On approval, each line's approval level is checked again after simulating the lines before it, since an earlier
+  # line (e.g. a category change or implication) can change what a later line does.
   def validate_script
     CurrentUser.scoped(User.system) do
       BulkUpdateRequest.transaction(requires_new: true) do
         commands.each do |command|
+          if validation_context == :approval && approver.level < command.approval_level
+            errors.add(:base, "Can't approve #{command.to_dtext} (requires #{User.level_string(command.approval_level)})")
+          end
+
           command.validate(context: validation_context, errors: errors)
         end
 
