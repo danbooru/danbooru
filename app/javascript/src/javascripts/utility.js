@@ -184,6 +184,12 @@ export async function createUpload(params, pollDelay = 250) {
 export function uploadError(upload) {
   // The upload failed during processing (normally because the URL didn't contain any images)
   if (upload.status === "error") {
+    let sourceCodeUrl = $("#source-code-link").attr("href");
+
+    if (upload.error.includes("is not a supported site") && sourceCodeUrl) {
+      return `${escape(upload.error)}, or open an issue on <a href="${escape(sourceCodeUrl)}/issues/new" target="_blank" rel="noopener noreferrer">GitHub</a> to request support for this site`;
+    }
+
     return escape(upload.error);
   // The upload failed with a 4xx or 5xx error (normally rate limiting)
   } else if (upload.success === false && upload.message) {

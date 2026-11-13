@@ -79,6 +79,18 @@ module Source
         sub_extractor&.artists || super
       end
 
+      # Raise a helpful error if the URL is a webpage from an unsupported site, instead of a generic "not an image" error.
+      def download_file!(download_url)
+        response, file = http_downloader.download_media(download_url)
+
+        if response.mime_type == "text/html"
+          file.close
+          raise Danbooru::Http::DownloadError, "#{Source::URL.parse(download_url).host} is not a supported site. Try using the direct image URL instead"
+        end
+
+        file
+      end
+
       memoize def response
         http.cache(1.minute).get(url) if parsed_url.present? && !parsed_url.file_ext&.in?(%w[jpg jpeg png gif avif webp webm mp4])
       end

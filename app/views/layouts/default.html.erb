@@ -146,7 +146,7 @@
     / <%= link_to "Contact", main_app.contact_path %>
     /
     <% if Danbooru.config.source_code_url.present? %>
-      <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
+      <%= link_to Danbooru.config.source_code_url, id: "source-code-link", title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
         <%= github_icon(class: "h-4") %>
       <% end %>
     <% end %>

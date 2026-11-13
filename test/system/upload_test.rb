@@ -24,6 +24,16 @@ class UploadsChromeTest < ChromeSystemTestCase
       assert_selector "input[type=radio][name='post[rating]']", visible: :all, minimum: 1
     end
 
+    should "show a clickable link to open an issue when uploading a webpage from an unsupported site" do
+      perform_enqueued_jobs do
+        visit new_upload_path
+        fill_in "upload_source", with: "https://example.com"
+        find("#upload_source").send_keys(:enter)
+
+        assert_selector "#notice a[href='#{Danbooru.config.issues_url}/new'][target='_blank']", text: "GitHub"
+      end
+    end
+
     context "after uploading a file" do
       setup do
         @upload = create(:completed_file_upload, uploader: @user)

@@ -80,6 +80,18 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "show action" do
+      should "not render links from user-controlled text in the error message" do
+        upload = create(:upload, uploader: @user, status: "error", error: %{https://example.com/a "Danbooru staff":[https://evil.com] doesn't contain any images})
+
+        get_auth upload_path(upload), @user
+        assert_response :success
+        assert_select "a[href='https://evil.com']", 0
+
+        get_auth uploads_path(mode: "table", search: { status: "error" }), @user
+        assert_response :success
+        assert_select "a[href='https://evil.com']", 0
+      end
+
       should "not show uploads to other users" do
         upload = create(:completed_source_upload, uploader: @user)
         get_auth upload_path(upload), create(:user)
@@ -775,6 +787,16 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_response 201
           assert_equal(true, Upload.last.is_errored?)
           assert_equal("File is not an image or video", Upload.last.error)
+        end
+      end
+
+      context "uploading a webpage from an unsupported site" do
+        should "fail with an unsupported site error" do
+          create_upload!("https://example.com", user: @user)
+
+          assert_response 201
+          assert_equal(true, Upload.last.is_errored?)
+          assert_equal("example.com is not a supported site. Try using the direct image URL instead", Upload.last.error)
         end
       end
 
