@@ -201,8 +201,16 @@ before_worker_boot do |worker_id|
   ApplicationMetrics.serve_process_metrics
 end
 
+# This is called in a worker process when it shuts down, after it has finished serving requests.
+before_worker_shutdown do
+  ApplicationMetrics.retire_worker_metrics
+end
+
 # Initialize metrics in the master process when running in cluster mode (when workers > 0), or in the main process when
 # running in single mode (when workers == 0)
 require_relative "../app/logical/application_metrics"
-ApplicationMetrics.puma_worker_id = "master" if @options[:workers] > 0
+if @options[:workers] > 0
+  ApplicationMetrics.puma_worker_id = "master"
+  ApplicationMetrics.start_counter_poller
+end
 ApplicationMetrics.serve_process_metrics

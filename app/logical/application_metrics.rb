@@ -9,6 +9,9 @@ require "objspace" # for ObjectSpace.count_objects_size
 class ApplicationMetrics
   extend Memoist
 
+  # How frequently the Puma master process polls the workers for their counter values.
+  MASTER_POLL_INTERVAL = 30
+
   delegate :[], to: :process_metrics
 
   # The Puma worker ID identifies the current Puma process. Each worker gets an ID from 0 to num_workers-1. Every time a
@@ -16,6 +19,11 @@ class ApplicationMetrics
   #
   # Set in config/puma.rb.
   attr_accessor :puma_worker_id
+
+  def initialize
+    @counters_mutex = Mutex.new
+    @last_counter_snapshots = {}
+  end
 
   # @param [ApplicationMetrics] The singleton instance. Class methods are delegated to this.
   def self.instance
@@ -734,13 +742,107 @@ class ApplicationMetrics
     end
   end
 
+  # Used by the master to hold counter values from the workers. They are held in the master because workers periodically
+  # lose their counters when they restart.
+  #
+  # Other counters, like puma_http_requests_total and puma_restarts_total, are already tracked by the master.
+  def aggregated_counters
+    process_metrics.metrics.values.select { |metric| metric.type == :counter && metric.name.match?(/\A(rails_|puma_exceptions_total\z)/) }
+  end
+
+  # Used by the master to get the worker's current counter values. See `#poll_worker_counters`.
+  #
+  # @return [Array(Integer, Hash{Symbol => Hash{Hash => Numeric}})] This process's PID and its counter values.
+  def counter_snapshot
+    snapshot = aggregated_counters.to_h do |metric|
+      [metric.name, metric.values.to_h { |value| [value.labels.except(:worker), value.value] }]
+    end
+
+    [Process.pid, snapshot]
+  end
+
+  # Used by the master process to add a worker's counter values to the totals in the master.
+  #
+  # @param pid [Integer] The worker's PID.
+  # @param snapshot [Hash{Symbol => Hash{Hash => Numeric}}] The worker's counter values, keyed by metric name and labels.
+  def absorb_counter_snapshot(pid, snapshot)
+    @counters_mutex.synchronize do
+      last_snapshot = @last_counter_snapshots.fetch(pid, {})
+
+      snapshot.each do |name, values|
+        values.each do |labels, value|
+          counter_totals[name][labels].increment([value - (last_snapshot.dig(name, labels) || 0), 0].max)
+        end
+      end
+
+      @last_counter_snapshots[pid] = snapshot
+    end
+  end
+
+  # Runs in the master process while holding @counter_mutex. The aggregated counter totals from the workers.
+  def counter_totals
+    @counter_totals ||= Danbooru::Metric::Set.new(aggregated_counters.map { |metric| { name: metric.name, type: metric.type, help: metric.help } })
+  end
+
+  # Runs in the master process. Collects the counters from each worker and adds them to the totals.
+  def poll_worker_counters
+    Dir.glob("tmp/drb-process-metrics-*.sock").without("tmp/drb-process-metrics-master.sock").each do |filename|
+      absorb_counter_snapshot(*DRbObject.new_with_uri("drbunix:#{filename}").counter_snapshot)
+    rescue IOError, DRb::DRbConnError
+      # The worker may have just exited.
+    end
+
+    @counters_mutex.synchronize do
+      @last_counter_snapshots.select! do |pid, _|
+        Process.kill(0, pid)
+      rescue SystemCallError
+        false
+      end
+    end
+  end
+
+  # Starts a background thread in the master process that polls the workers' counters. Called in config/puma.rb.
+  def start_counter_poller(interval: MASTER_POLL_INTERVAL)
+    Thread.new do
+      loop do
+        sleep interval
+        poll_worker_counters
+      rescue StandardError => e
+        warn "Error polling worker metrics: #{e.class}: #{e.message}"
+      end
+    end
+  end
+
+  # Called by a Puma worker when it shuts down. Sends the worker's final counts to the master, so counts since the last poll aren't lost.
+  def retire_worker_metrics
+    DRbObject.new_with_uri("drbunix:tmp/drb-process-metrics-master.sock").absorb_counter_snapshot(*counter_snapshot)
+  rescue IOError, DRb::DRbConnError
+    # The master may already be shutting down.
+  end
+
+  # Returns the metrics this process contributes to /metrics/instance. The master reports the aggregated counters for
+  # the whole instance, so the workers leave them out.
+  #
+  # @return [Danbooru::Metric::Set] The set of metrics for this process.
+  def instance_process_metrics
+    metrics = update_process_metrics
+
+    if puma_worker_id == "master"
+      @counters_mutex.synchronize { metrics.merge(counter_totals) }
+    elsif puma_running?
+      metrics.except(*aggregated_counters.map(&:name))
+    else
+      metrics
+    end
+  end
+
   # Collects metrics from each Puma worker process and combines them into a single set of metrics for /metrics/instance.
   #
   # @return [Danbooru::Metric::Set] The combined set of metrics from each Puma worker process.
   def instance_metrics
     metrics = Dir.glob("tmp/drb-process-metrics-*.sock").map do |filename|
       application_metrics = DRbObject.new_with_uri("drbunix:#{filename}")
-      application_metrics.update_process_metrics
+      application_metrics.instance_process_metrics
     rescue IOError, DRb::DRbConnError
       # XXX Ignore any errors we may receive when fetching metrics from a remote process that has shut down (usually by the Puma worker killer)
       Danbooru::Metric::Set.new

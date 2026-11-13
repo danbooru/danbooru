@@ -178,6 +178,14 @@ module Danbooru
         new_metric_set
       end
 
+      # @param names [Array<Symbol>] The names of the metrics to leave out.
+      # @return [Metric::Set] A copy of this metric set without the given metrics.
+      def except(*names)
+        new_metric_set = dup
+        new_metric_set.metrics = metrics.except(*names)
+        new_metric_set
+      end
+
       # @return [String] The set of metrics in Prometheus format.
       def to_prom
         metrics.values.map(&:to_prom).join("\n\n")
