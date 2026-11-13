@@ -20,5 +20,14 @@ class SourceDataComponentTest < ViewComponent::TestCase
       assert_css(".source-data-content")
       assert_css("td a", text: "test_artist")
     end
+
+    should "open the create new artist link in a new tab" do
+      source = Source::Extractor.find("https://www.pixiv.net/users/12345")
+      source.stubs(:artist_name).returns("new_artist")
+
+      render_inline(SourceDataComponent.new(source: source))
+
+      assert_css("td a[target=_blank]", text: "Create new artist")
+    end
   end
 end
