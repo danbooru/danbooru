@@ -10,14 +10,16 @@ class ModqueueController < ApplicationController
     @order = params.dig(:search, :order) || "modqueue"
     @tags = params.dig(:search, :tags)
 
-    @posts = Post.includes(:appeals, :vote_by_current_user, :uploader, :media_asset, disapprovals: [:user], flags: [:creator])
-    @posts = @posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :unseen))
+    posts = Post.includes(:appeals, :vote_by_current_user, :uploader, :media_asset, disapprovals: [:user], flags: [:creator])
+    posts = posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :unseen))
     # Tags and order are handled by user_tag_match, because Post.search can't add the joins needed by some orders (e.g. `order:disapprovals`).
-    @posts = @posts.search(search_params.except(:tags, :order, :modqueue), CurrentUser.user).unscope(:order)
-    @posts = @posts.user_tag_match(@tags, CurrentUser.user) if @tags.present?
-    @posts = @posts.user_tag_match("order:#{@order}", CurrentUser.user)
-    @posts = @posts.paginate(params[:page], limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE)
-    @modqueue_posts = @posts.distinct.except(:select, :group, :order, :offset, :limit)
+    posts = posts.search(search_params.except(:tags, :order, :modqueue), CurrentUser.user).unscope(:order)
+    posts = posts.user_tag_match(@tags, CurrentUser.user) if @tags.present?
+    posts = posts.user_tag_match("order:#{@order}", CurrentUser.user)
+
+    # Load every post in the modqueue once, and reuse it for the sidebar and the page count instead of searching again.
+    @modqueue_posts = posts.distinct.except(:select, :group, :order).load
+    @posts = posts.paginate(params[:page], limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE, count: @modqueue_posts.size)
 
     @pending_post_count = @modqueue_posts.select(&:is_pending?).count
     @flagged_post_count = @modqueue_posts.select(&:is_flagged?).count
@@ -29,7 +31,7 @@ class ModqueueController < ApplicationController
     # @new_count = @modqueue_posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :unseen)).count
     # @seen_count = @modqueue_posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :seen)).where(id: CurrentUser.user.post_disapprovals.select(:post_id)).count
 
-    @tags = RelatedTagCalculator.new.frequent_tags_for_post_relation(@modqueue_posts, @modqueue_posts.size).map(&:tag)
+    @tags = RelatedTagCalculator.new.frequent_tags_for_post_relation(Post.where(id: @modqueue_posts.map(&:id)), @modqueue_posts.size).map(&:tag)
     @artist_tags = @tags.select(&:artist?).sort_by(&:overlap_count).reverse.take(10)
     @copyright_tags = @tags.select(&:copyright?).sort_by(&:overlap_count).reverse.take(10)
     @character_tags = @tags.select(&:character?).sort_by(&:overlap_count).reverse.take(10)

@@ -68,6 +68,17 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_equal([member_post.id], response.parsed_body.pluck("id"))
       end
 
+      should "only run the search twice" do
+        create_list(:post, 2, is_pending: true, uploader: create(:member_user))
+
+        # Once for the current page and once for the sidebar, not again for the related tags or the page count.
+        assert_queries_match(/"users"\."level" = /, count: 2) do
+          get_auth modqueue_index_path(search: { uploader: { level: User::Levels::MEMBER }}), @admin
+        end
+
+        assert_response :success
+      end
+
       should "order posts correctly when searching for tags" do
         post1 = create(:post, tag_string: "touhou", is_pending: true, score: 5)
         post2 = create(:post, tag_string: "touhou", is_pending: true, score: 10)
