@@ -73,6 +73,28 @@ class NotesChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "a note containing a link" do
+      setup do
+        as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: '<a href="#plain">plain link</a> <a href="#bold"><b>bold link</b></a>') }
+        visit post_path(@post)
+        find(".note-box").hover
+      end
+
+      should "follow the link instead of opening the edit dialog when the link is clicked" do
+        find(".note-body a", text: "plain link").click
+
+        assert page.current_url.end_with?("#plain")
+        assert_no_selector ".note-edit-dialog"
+      end
+
+      should "follow the link instead of opening the edit dialog when formatted text inside the link is clicked" do
+        find(".note-body a b", text: "bold link").click
+
+        assert page.current_url.end_with?("#bold")
+        assert_no_selector ".note-edit-dialog"
+      end
+    end
+
     context "an existing note" do
       setup do
         @note = as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: "Existing note") }

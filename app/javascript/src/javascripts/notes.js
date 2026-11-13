@@ -551,8 +551,8 @@ class Note {
     }
 
     on_click(e) {
-      // don't open the note edit dialog when the user clicks a link in the note body.
-      if ($(e.target).is("a")) {
+      // don't open the note edit dialog when the user clicks a link in the note body (or formatted text inside a link).
+      if ($(e.target).closest("a").length) {
         return;
       }
 
