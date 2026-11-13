@@ -305,6 +305,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "show the log out link only on the user's own profile" do
+        get_auth user_path(@user), @user
+        assert_response :success
+        assert_select "a#subnav-log-out[data-confirm]", count: 1
+
+        get_auth user_path(@user), create(:user)
+        assert_response :success
+        assert_select "#subnav-log-out", count: 0
+      end
+
       should "show hidden attributes to the user themselves" do
         get_auth user_path(@user), @user, as: :json
 

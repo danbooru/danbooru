@@ -17,6 +17,9 @@
       <% if !@user.is_gold? %>
         <%= subnav_link_to "Upgrade", new_user_upgrade_path %>
       <% end %>
+
+      <%= subnav_divider %>
+      <%= subnav_link_to "Log out", session_path, method: "delete", "data-confirm": "Are you sure you want to log out?" %>
     <% else %>
       <%= subnav_link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %>
       <% if !@user.is_gold? %>
@@ -27,8 +30,5 @@
         <%= subnav_link_to "Manage user", edit_admin_user_path(@user) %>
       <% end %>
     <% end %>
-
-    <%= subnav_divider %>
-    <%= subnav_link_to "Log out", session_path, method: "delete" %>
   <% end %>
 <% end %>
