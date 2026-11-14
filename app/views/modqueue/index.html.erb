@@ -52,7 +52,7 @@
   <% else %>
     <div class="flex flex-col gap-4">
       <% @posts.each do |post| %>
-        <%= render "modqueue/post", post: post %>
+        <%= render "modqueue/post", post: post, tags_by_name: @tags_by_name %>
       <% end %>
     </div>
   <% end %>

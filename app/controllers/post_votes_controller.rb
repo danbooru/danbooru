@@ -6,6 +6,7 @@ class PostVotesController < ApplicationController
   def index
     @post_votes = authorize PostVote.visible(CurrentUser.user).paginated_search(params)
     @post_votes = @post_votes.includes(:user, post: [:uploader, :media_asset]) if request.format.html?
+    @tags_by_name = Tag.where(name: @post_votes.flat_map { it.post.tag_array }.uniq).index_by(&:name) if request.format.html? && request.variant.empty?
     @post = Post.find(params.dig(:search, :post_id)) if params.dig(:search, :post_id).present?
 
     respond_with(@post_votes) do |format|

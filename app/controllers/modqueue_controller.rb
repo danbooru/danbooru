@@ -20,6 +20,7 @@ class ModqueueController < ApplicationController
     # Load every post in the modqueue once, and reuse it for the sidebar and the page count instead of searching again.
     @modqueue_posts = posts.distinct.except(:select, :group, :order).load
     @posts = posts.paginate(params[:page], limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE, count: @modqueue_posts.size)
+    @tags_by_name = Tag.where(name: @posts.flat_map(&:tag_array).uniq).index_by(&:name) if @mode == "list" && request.format.html?
 
     @pending_post_count = @modqueue_posts.count(&:is_pending?)
     @flagged_post_count = @modqueue_posts.count(&:is_flagged?)
