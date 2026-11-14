@@ -10,7 +10,7 @@ class ModqueueController < ApplicationController
     @order = params.dig(:search, :order) || "modqueue"
     @tags = params.dig(:search, :tags)
 
-    posts = Post.includes(:appeals, :vote_by_current_user, :uploader, :media_asset, disapprovals: [:user], flags: [:creator])
+    posts = Post.includes(:vote_by_current_user, :uploader, :media_asset, appeals: [:creator], disapprovals: [:user], flags: [:creator])
     posts = posts.available_for_moderation(CurrentUser.user, search_params.fetch(:modqueue, :unseen))
     # Tags and order are handled by user_tag_match, because Post.search can't add the joins needed by some orders (e.g. `order:disapprovals`).
     posts = posts.search(search_params.except(:tags, :order, :modqueue), CurrentUser.user).unscope(:order)
