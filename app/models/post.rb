@@ -222,7 +222,7 @@ class Post < ApplicationRecord
 
   concerning :ImageMethods do
     def has_large?
-      return false if has_tag?("animated_gif") || has_tag?("animated_png")
+      return false if has_tag?("animated_gif") || has_tag?("animated_png") || has_tag?("animated_webp")
       return true if is_ugoira?
       is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
     end
@@ -426,7 +426,7 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation non-web_source wide_image tall_image]
+      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png animated_webp exif_rotation non-repeating_animation non-web_source wide_image tall_image]
 
       if tags.size >= 30
         tags -= ["tagme"]
@@ -489,11 +489,12 @@ class Post < ApplicationRecord
         # it's unknown whether it's a bad source or not; don't add or remove the tag
       end
 
-      # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, videos, and ugoiras are automatically tagged.
+      # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, WebPs, videos, and ugoiras are automatically tagged.
       tags -= ["animated"] unless is_flash?
       tags << "animated" if media_asset.is_animated?
       tags << "animated_gif" if media_asset.is_animated_gif?
       tags << "animated_png" if media_asset.is_animated_png?
+      tags << "animated_webp" if media_asset.is_animated_webp?
 
       tags << "greyscale" if media_asset.is_greyscale?
       tags << "exif_rotation" if media_asset.is_rotated?

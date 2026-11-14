@@ -615,6 +615,10 @@ class MediaAsset < ApplicationRecord
     def is_animated_png?
       is_animated? && file_ext == "png"
     end
+
+    def is_animated_webp?
+      is_animated? && file_ext == "webp"
+    end
   end
 
   concerning :RatingMethods do

@@ -1557,6 +1557,24 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "a static image tagged with animated_webp" do
+        should "remove the tag" do
+          @media_asset = create(:media_asset, file: "test/files/webp/test.webp")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme animated animated_webp")
+          assert_equal("tagme", @post.tag_string)
+        end
+      end
+
+      context "an animated webp missing the animated_webp tag" do
+        should "automatically add the animated_webp tag" do
+          @media_asset = MediaAsset.upload!("test/files/webp/nyancat.webp")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("animated animated_webp tagme", @post.tag_string)
+        end
+      end
+
       context "a greyscale image missing the greyscale tag" do
         should "automatically add the greyscale tag for a monochrome JPEG file" do
           @media_asset = MediaAsset.upload!("test/files/jpg/test-grey-no-profile.jpg")
