@@ -25,10 +25,10 @@
       </span>
     </div>
 
-    <% if post.has_active_pools? %>
+    <% if pools.present? %>
       <div>
         <strong>Pools</strong>
-        <%= render "pools/inline_list", pools: post.pools.undeleted %>
+        <%= render "pools/inline_list", pools: pools %>
       </div>
     <% end %>
 
