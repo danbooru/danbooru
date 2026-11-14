@@ -99,7 +99,8 @@ class CommentsController < ApplicationController
       @comments = @comments.select { |comment| comment.post.visible? }
     elsif request.format.html?
       @comments = @comments.includes(:creator, :updater, post: [:uploader, :media_asset])
-      @comments = @comments.includes(:votes) if CurrentUser.is_member?
+      @comments = @comments.includes(:active_votes) if CurrentUser.is_member?
+      @comments = @comments.includes(:pending_moderation_reports) if policy(ModerationReport).can_see_moderation_reports?
     end
 
     respond_with(@comments)
