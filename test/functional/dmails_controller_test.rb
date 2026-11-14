@@ -92,6 +92,15 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#dmail-share", count: 1, text: "Share"
       end
 
+      should "copy the share link to the clipboard" do
+        get_auth dmail_path(@dmail), @dmail.owner
+        assert_response :success
+
+        share_url = dmail_url(@dmail, key: @dmail.key)
+        assert_select "[x-data] #dmail-share[href=?]", share_url
+        assert_select "#dmail-share[x-on\\:click\\.prevent=?]", "$copyToClipboard('#{share_url}', 'Share link copied to clipboard')"
+      end
+
       should "not show dmails not owned by the current user" do
         get_auth dmail_path(@dmail), @unrelated_user
         assert_response(403)
