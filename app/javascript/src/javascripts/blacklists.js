@@ -147,6 +147,7 @@ class Post {
     ]);
 
     this.blacklist.rules.forEach(rule => rule.apply(this));
+    this.update();
   }
 
   // @returns {Boolean} - True if the post is blacklisted, i.e. at least one rule matches the post and is enabled.
@@ -262,8 +263,6 @@ class Rule {
       this.posts.delete(post);
       post.rules.delete(this);
     }
-
-    post.update();
   }
 }
 

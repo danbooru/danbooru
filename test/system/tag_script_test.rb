@@ -61,6 +61,21 @@ class TagScriptChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "for a user with an empty blacklist" do
+      should "keep the post visible after applying the script" do
+        fast_signin create(:gold_user, blacklisted_tags: "")
+        visit posts_path
+
+        switch_mode "Tag script"
+        tag_script_field.set("solo")
+        blur_tag_script_field
+        click_post(@post)
+
+        assert_post_tags(@post, "1girl solo tagme")
+        assert_visible post_selector(@post)
+      end
+    end
+
     context "for a gold user" do
       setup do
         fast_signin @user
