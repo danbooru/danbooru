@@ -153,11 +153,7 @@ module PostSets
     end
 
     def includes
-      if show_votes?
-        [:media_asset, :vote_by_current_user]
-      else
-        [:media_asset]
-      end
+      [:media_asset, (:vote_by_current_user if show_votes?), (:uploader if format == "atom")].compact
     end
 
     concerning :TagListMethods do
