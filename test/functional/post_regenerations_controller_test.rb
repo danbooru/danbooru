@@ -76,6 +76,23 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(96, @post.media_asset.image_width)
           assert_equal(128, @post.media_asset.image_height)
         end
+
+        should "fix large animated PNGs that were incorrectly detected as static" do
+          stub_const(MediaAsset, :LARGE_IMAGE_WIDTH, 500) do
+            @post = create(:post_with_file, filename: "apng/ezgif-apng.png")
+            @post.media_asset.update!(duration: nil)
+            @post.update!(tag_string: "animated")
+            assert_equal(true, MediaAsset.find(@post.media_asset.id).has_variant?(:sample))
+
+            post_auth post_regenerations_path, @mod, params: { post_id: @post.id }
+            perform_enqueued_jobs
+            @post.reload
+
+            assert_equal(true, @post.media_asset.is_animated_png?)
+            assert_equal(false, @post.media_asset.has_variant?(:sample))
+            assert_equal(true, @post.has_tag?("animated_png"))
+          end
+        end
       end
     end
   end

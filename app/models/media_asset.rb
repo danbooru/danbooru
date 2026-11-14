@@ -560,18 +560,16 @@ class MediaAsset < ApplicationRecord
     end
 
     def variants
-      @variants ||= variant_types.map { |type| variant(type) }
+      variant_types.map { |type| variant(type) }
     end
 
     def variant_types
-      @variant_types ||= begin
-        variants = []
-        variants = %i[180x180 360x360 720x720] unless is_flash?
-        variants << :sample if is_ugoira? || (is_static_image? && image_width > LARGE_IMAGE_WIDTH)
-        variants << :full if (is_webp? || is_avif?) && is_static_image?
-        variants << :original
-        variants
-      end
+      variants = []
+      variants = %i[180x180 360x360 720x720] unless is_flash?
+      variants << :sample if is_ugoira? || (is_static_image? && image_width > LARGE_IMAGE_WIDTH)
+      variants << :full if (is_webp? || is_avif?) && is_static_image?
+      variants << :original
+      variants
     end
   end
 
