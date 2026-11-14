@@ -1,4 +1,4 @@
-<% disapproval = post.disapprovals.find { |disapproval| disapproval.user == CurrentUser.user } %>
+<% disapproval = post.disapprovals.find { |disapproval| disapproval.user_id == CurrentUser.id } %>
 
 <div class="flex flex-wrap gap-1">
   <%= link_to "Approve", post_approvals_path(post_id: post.id), method: :post, remote: true, class: "button-primary button-xs", disabled: !post.is_approvable? %>

@@ -13,7 +13,8 @@
     <% if disapprovals.map(&:message).any?(&:present?) %>
       Messages:
       <span class="prose">
-        <%= disapprovals.select { _1.message.present? }.map { |disapproval| %{"#{disapproval.dtext_message.format_text}"} }.to_sentence.html_safe %>.
+        <% dtext_references = DText.preprocess(disapprovals.map(&:message)) %>
+        <%= disapprovals.select { _1.message.present? }.map { |disapproval| %{"#{disapproval.dtext_message.format_text(references: dtext_references)}"} }.to_sentence.html_safe %>.
       </span>
     <% end %>
   </p>
