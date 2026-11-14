@@ -156,6 +156,20 @@ class AutocompleteChromeTest < ChromeSystemTestCase
       assert_no_navigation { assert_clicked_autocomplete_equals(":smile: ", ":smi", selector: @selector) }
     end
 
+    should "work in inline editors" do
+      fast_signin create(:moderator_user)
+      visit new_ban_path
+      selector = "input#ban_reason"
+
+      assert_clicked_autocomplete_equals("[[1girl]] ", "[[1g", selector: selector)
+      assert_autocomplete_results(["@oneuser"], "spam @o", selector: selector)
+
+      input_box = find(selector).native.bounding_box
+      menu_box = find("ul.ui-autocomplete").native.bounding_box
+      assert_in_delta input_box["y"] + input_box["height"], menu_box["y"], 1, "the menu should open right below the input"
+      assert_in_delta input_box["x"], menu_box["x"], 1, "the menu should line up with the left edge of the input"
+    end
+
     should "preserve tag prefixes when a completion is inserted" do
       assert_clicked_autocomplete_equals("{{1girl}} ", "{{1gi", selector: @selector)
       assert_clicked_autocomplete_equals("{{-1girl}} ", "{{-1gi", selector: @selector)

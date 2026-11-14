@@ -11,12 +11,13 @@ class DtextEditorComponentTest < ViewComponent::TestCase
       end
     end
 
-    should "render an input for inline dtext fields" do
+    should "render an input with a preview toggle but no toolbar for inline dtext fields" do
       vc_test_view_context.simple_form_for(build(:ban), url: "/bans") do |form|
         render_inline(DtextEditorComponent.new(input_name: :reason, form: form))
 
-        assert_css("input[name='ban[reason]']")
-        assert_no_css(".dtext-editor")
+        assert_css(".dtext-editor-inline input[name='ban[reason]']")
+        assert_css(".dtext-editor-inline a[title^='Preview']")
+        assert_no_css(".dtext-editor-menu")
       end
     end
 

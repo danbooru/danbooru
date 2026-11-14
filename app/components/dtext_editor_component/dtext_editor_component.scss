@@ -11,9 +11,44 @@
   align-items: baseline;
   justify-content: space-between;
 
-  input[type="text"] {
+  .dtext-editor-inline {
     flex-basis: 100%;
     margin-top: 0.25rem;
+  }
+}
+
+.dtext-editor-inline {
+  position: relative;
+
+  // Leave room on the right for the preview toggle.
+  input[type="text"] {
+    width: 100%;
+    padding-right: 1.75rem;
+  }
+
+  // The preview sits exactly on top of the input.
+  .dtext-preview {
+    position: absolute;
+    inset: 0;
+    border-width: 1px;
+    padding: 0 1.75rem 0 0.25rem;
+  }
+
+  // Put the vertical padding inside the scrolling content, so descenders and underlines aren't clipped.
+  .dtext-preview-content {
+    padding-block: 0.125rem;
+  }
+
+  .dtext-inline-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-inline: 0.5rem;
+    cursor: pointer;
+    user-select: none;
   }
 }
 

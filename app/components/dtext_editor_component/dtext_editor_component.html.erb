@@ -1,13 +1,36 @@
 <% if inline? %>
-  <% if input_html[:maxlength].present? %>
-    <% max_length = input_html[:maxlength] %>
+  <% max_length = input_html[:maxlength] %>
+  <% if max_length.present? %>
     <span class="dtext-input-counter-text text-xs pointer-events-none select-none"
           x-text="length + '/<%= max_length %>'"
           x-bind:class="{ 'text-error': length > <%= max_length %> }"><%= current_length %>/<%= max_length %></span>
-    <%= form.text_field(input_name, input_html.except(:maxlength).merge("x-on:input": "length = $event.target.value.length")) %>
-  <% else %>
-    <%= form.text_field(input_name, input_html) %>
   <% end %>
+
+  <div class="dtext-editor dtext-editor-inline"
+       x-data="{ editor: new Danbooru.DTextEditor($root) }"
+       x-init="editor.initialize(<%= { inline: true, domains: domains, previewTimeout: PREVIEW_TIMEOUT_MS }.to_json %>)"
+       x-on:keydown.ctrl.p.prevent="$refs.toggle.click()"
+       spellcheck="true">
+    <%= form.text_field(input_name, input_html.except(:maxlength).merge(
+      "x-model.fill": "editor.dtext",
+      "x-bind:class": "{ invisible: editor.previewMode }",
+      "x-on:pointerdown": "editor.autocomplete.close()",
+      "x-on:input": ("length = $event.target.value.length" if max_length.present?),
+    )) %>
+    <div class="dtext-preview prose" x-ref="preview" tabindex="-1" x-show="editor.previewMode" x-cloak>
+      <div class="dtext-preview-content whitespace-nowrap thin-scrollbar" x-effect="editor.previewMode && editor.renderInlineHtml($el)"></div>
+    </div>
+
+    <a class="dtext-inline-toggle inactive-link"
+       x-ref="toggle"
+       x-on:mousedown.prevent
+       x-on:click="editor.toggleMode(); $nextTick(() => editor.editMode ? editor.focus() : $refs.preview.focus())"
+       x-bind:title="editor.editMode ? 'Preview (Ctrl+P)' : 'Edit (Ctrl+P)'"
+       title="Preview (Ctrl+P)">
+      <%= eye_icon(class: "text-sm", "x-show": "editor.editMode") %>
+      <%= edit_icon(class: "text-sm", "x-show": "editor.previewMode", "x-cloak": true) %>
+    </a>
+  </div>
 <% else %>
   <div class="dtext-editor relative w-fit <%= editor_html[:class] %>"
        x-bind:class="{ 'dtext-editor-loading inert': editor.loading }"

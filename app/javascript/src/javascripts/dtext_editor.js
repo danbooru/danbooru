@@ -574,11 +574,11 @@ export default class DTextEditor {
     event.preventDefault();
   }
 
-  // Position the autocompletion menu below the cursor.
+  // Position the autocompletion menu below the cursor, or below the whole input in inline mode.
   positionAutocompleteMenu() {
     let menu = this.autocomplete.menu.element.get(0);
 
-    computePosition(this.queryRange, menu, {
+    computePosition(this.inline ? this.input : this.queryRange, menu, {
       placement: "bottom-start",
       middleware: [
         inline(),
@@ -625,6 +625,18 @@ export default class DTextEditor {
     } else {
       return "";
     }
+  }
+
+  // Render the inline editor's preview HTML into `element`, scrolled to the same relative position as the input.
+  // Also copy the input's line height, because Firefox doesn't let inputs have a line height below `normal`.
+  //
+  // @param {HTMLElement} element - The element to render the preview into.
+  async renderInlineHtml(element) {
+    let scrolled = this.input.scrollLeft / Math.max(1, this.input.scrollWidth - this.input.clientWidth);
+
+    element.style.lineHeight = getComputedStyle(this.input).lineHeight;
+    element.innerHTML = await this.fetchHtml();
+    element.scrollLeft = scrolled * (element.scrollWidth - element.clientWidth);
   }
 
   // @returns {String} The HTML representation of the DText input. If the request fails or times out, shows an

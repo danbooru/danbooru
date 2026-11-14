@@ -148,6 +148,99 @@ class DtextEditorChromeTest < ChromeSystemTestCase
         find_field("Reason").native.fill("x" * 601)
         assert_selector ".dtext-input-counter-text.text-error", text: "601/600"
       end
+
+      should "toggle between edit and preview mode" do
+        find_field("Reason").set("[[1girl]]")
+
+        find("a[title^='Preview']").click
+
+        assert_hidden "input#ban_reason"
+        assert_selector ".dtext-preview .dtext-wiki-link", text: "1girl"
+
+        find("a[title^='Edit']").click
+
+        assert_visible "input#ban_reason"
+        assert_equal "[[1girl]]", find_field("Reason").value
+      end
+
+      should "vertically center the preview toggle icon in the input" do
+        input_box = find("input#ban_reason").native.bounding_box
+        icon_box = find("a[title^='Preview'] svg").native.bounding_box
+
+        assert_in_delta input_box["y"] + (input_box["height"] / 2), icon_box["y"] + (icon_box["height"] / 2), 0.5
+      end
+
+      should "not show long previews under the toggle icon" do
+        find_field("Reason").set("[[1girl]] #{"word " * 100}")
+        find("a[title^='Preview']").click
+        assert_selector ".dtext-preview .dtext-wiki-link"
+
+        text_right = find(".dtext-preview-content").native.bounding_box.then { it["x"] + it["width"] }
+        icon_left = find("a[title^='Edit'] svg").native.bounding_box["x"]
+
+        assert_operator text_right, :<=, icon_left
+      end
+
+      should "keep the scroll position of long text when previewing" do
+        find_field("Reason").send_keys("[[1girl]] #{"word " * 40}end")
+        assert_operator page.evaluate_script("document.querySelector('#ban_reason').scrollLeft"), :>, 0
+
+        find("a[title^='Preview']").click
+        assert_selector ".dtext-preview .dtext-wiki-link"
+
+        scroll_left, max_scroll = page.evaluate_script("(el => [el.scrollLeft, el.scrollWidth - el.clientWidth])(document.querySelector('.dtext-preview-content'))")
+        assert_in_delta max_scroll, scroll_left, 2, "the preview should be scrolled to the end, like the input"
+      end
+
+      should "keep the same size when previewing an empty field" do
+        input_height = find("input#ban_reason").native.bounding_box["height"]
+
+        find("a[title^='Preview']").click
+        assert_selector ".dtext-preview", visible: :visible
+
+        assert_in_delta input_height, find(".dtext-preview").native.bounding_box["height"], 1
+      end
+
+      should "toggle preview mode with Ctrl+P" do
+        find_field("Reason").set("[[1girl]]")
+        find_field("Reason").send_keys([:control, "p"])
+
+        assert_selector ".dtext-preview .dtext-wiki-link", text: "1girl"
+
+        send_global_key("Control+p")
+
+        assert_visible "input#ban_reason"
+        assert_equal "[[1girl]]", find_field("Reason").value
+      end
+    end
+  end
+end
+
+class DtextEditorFirefoxTest < FirefoxSystemTestCase
+  context "The inline DText editor" do
+    should "not cut off the bottom of the text in previews" do
+      fast_signin create(:moderator_user)
+      visit new_ban_path
+      find_field("Reason").set("asd [[1girl]]")
+      find("a[title^='Preview']").click
+
+      link_bottom = find(".dtext-preview .dtext-wiki-link").native.bounding_box.then { it["y"] + it["height"] }
+      content_bottom = find(".dtext-preview-content").native.bounding_box.then { it["y"] + it["height"] }
+
+      assert_operator link_bottom, :<=, content_bottom
+    end
+
+    # Firefox doesn't let inputs have a line height below `normal`, so the preview has to copy it.
+    should "use the same line height in the preview as in the input" do
+      fast_signin create(:moderator_user)
+      visit new_ban_path
+      find_field("Reason").set("asd test")
+      input_line_height = page.evaluate_script("getComputedStyle(document.querySelector('#ban_reason')).lineHeight")
+
+      find("a[title^='Preview']").click
+      assert_selector ".dtext-preview-content", text: "asd test"
+
+      assert_equal input_line_height, page.evaluate_script("getComputedStyle(document.querySelector('.dtext-preview-content')).lineHeight")
     end
   end
 end
