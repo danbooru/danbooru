@@ -34,6 +34,13 @@ class MobileGesturesMobileChromeTest < MobileChromeSystemTestCase
     JS
   end
 
+  # Zoom the page in, as if the user pinch zoomed it.
+  def pinch_zoom(scale)
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.new_cdp_session(playwright_page).send_message("Emulation.setPageScaleFactor", params: { pageScaleFactor: scale })
+    end
+  end
+
   def assert_not_navigated_after_swipe(**)
     assert_no_navigation do
       swipe(**)
@@ -95,9 +102,7 @@ class MobileGesturesMobileChromeTest < MobileChromeSystemTestCase
     end
 
     should "not navigate when the page is pinch-zoomed" do
-      page.driver.with_playwright_page do |playwright_page|
-        playwright_page.context.new_cdp_session(playwright_page).send_message("Emulation.setPageScaleFactor", params: { pageScaleFactor: 2 })
-      end
+      pinch_zoom(2)
       assert_equal 2, page.evaluate_script("window.visualViewport.scale")
 
       assert_not_navigated_after_swipe(dx: -200)
@@ -125,9 +130,7 @@ class MobileGesturesMobileChromeTest < MobileChromeSystemTestCase
     end
 
     should "allow panning sideways when the page is pinch-zoomed" do
-      page.driver.with_playwright_page do |playwright_page|
-        playwright_page.context.new_cdp_session(playwright_page).send_message("Emulation.setPageScaleFactor", params: { pageScaleFactor: 2 })
-      end
+      pinch_zoom(2)
 
       swipe(dx: -150, duration: 0.5)
       assert_operator page.evaluate_script("window.visualViewport.offsetLeft"), :>, 0
@@ -176,6 +179,14 @@ class MobileGesturesMobileChromeTest < MobileChromeSystemTestCase
       visit post_path(@posts[1], q: "touhou")
       swipe(dx: 200)
       assert_current_path(post_path(@posts[2], q: "touhou"))
+    end
+
+    should "scroll the list of child posts instead of navigating when swiping on it" do
+      as(create(:user)) { create_list(:post, 6, parent: @posts[1], tag_string: "touhou") }
+      visit post_path(@posts[1], q: "touhou")
+
+      assert_not_navigated_after_swipe(dx: -200, from: center_of("#has-children-relationship-preview"))
+      assert_operator page.evaluate_script("document.querySelector('#has-children-relationship-preview .posts-container').scrollLeft"), :>, 0
     end
 
     should "go to the next post in the pool when swiping left" do
