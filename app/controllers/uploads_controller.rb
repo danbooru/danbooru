@@ -11,7 +11,11 @@ class UploadsController < ApplicationController
     @defaults[:status] = "completed" if request.format.html?
 
     @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE, count_pages: true, defaults: @defaults)
-    @uploads = @uploads.includes(:uploader, :posts, upload_media_assets: :media_asset) if request.format.html?
+    if request.format.html?
+      @uploads = @uploads.includes(:uploader, :posts, upload_media_assets: :media_asset)
+    else
+      @uploads = @uploads.includes(upload_media_assets: { media_asset: :post })
+    end
 
     respond_with(@uploads, include: { upload_media_assets: { include: :media_asset }})
   end
