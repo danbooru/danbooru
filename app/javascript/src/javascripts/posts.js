@@ -326,7 +326,9 @@ Post.initialize_post_sections = function() {
     } else if (e.target.hash === "#edit") {
       $("#edit").show();
       $("#comments").hide();
-      $("#post_tag_string").focus().selectEnd();
+      const tag_string = $("#post_tag_string")[0];
+      tag_string.focus({ preventScroll: isMobile() });
+      tag_string.setSelectionRange(tag_string.value.length, tag_string.value.length);
       $(document).trigger("danbooru:open-post-edit-tab");
     } else {
       $("#edit").hide();
