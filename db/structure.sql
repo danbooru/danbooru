@@ -143,7 +143,6 @@ CREATE TABLE public.ai_tags (
 CREATE TABLE public.api_keys (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    key character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     name character varying DEFAULT ''::character varying NOT NULL,
@@ -151,7 +150,9 @@ CREATE TABLE public.api_keys (
     permitted_ip_addresses inet[] DEFAULT '{}'::inet[] NOT NULL,
     uses integer DEFAULT 0 NOT NULL,
     last_used_at timestamp without time zone,
-    last_ip_address inet
+    last_ip_address inet,
+    key_digest character varying NOT NULL,
+    expires_at timestamp without time zone
 );
 
 
@@ -3709,10 +3710,17 @@ CREATE INDEX index_ai_tags_on_tag_id_and_score ON public.ai_tags USING btree (ta
 
 
 --
--- Name: index_api_keys_on_key; Type: INDEX; Schema: public; Owner: -
+-- Name: index_api_keys_on_expires_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_api_keys_on_key ON public.api_keys USING btree (key);
+CREATE INDEX index_api_keys_on_expires_at ON public.api_keys USING btree (expires_at);
+
+
+--
+-- Name: index_api_keys_on_key_digest; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_api_keys_on_key_digest ON public.api_keys USING btree (key_digest);
 
 
 --
@@ -7306,6 +7314,9 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261107130000'),
+('20261107120000'),
+('20261106200000'),
 ('20261104064770'),
 ('20261104064769'),
 ('20261104064768'),

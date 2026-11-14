@@ -36,6 +36,21 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_nil response.parsed_body.first["key"]
       end
 
+      should "show Never for a permanent key" do
+        @api_key.update!(expires: false)
+        get_auth user_api_keys_path(@user.id), @user
+
+        assert_response :success
+        assert_select "#api-key-#{@api_key.id}", text: /Never/
+      end
+
+      should "not show the key in HTML" do
+        get_auth user_api_keys_path(@user.id), @user
+
+        assert_response :success
+        assert_not_includes(response.body, @api_key.key)
+      end
+
       should "not allow searching by key" do
         get_auth user_api_keys_path(@user.id, search: { key_like: "#{@api_key.key[0]}*" }), @user, as: :json, reauthenticate: true
         assert_response :success
@@ -80,6 +95,20 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_select "input[name='api_key[name]'][value='MyApp']"
       end
 
+      should "render an expiration date field" do
+        get_auth new_user_api_key_path(@user.id), @user
+
+        assert_response :success
+        assert_select "input[name='api_key[expires_on]']"
+      end
+
+      should "render an expiry checkbox" do
+        get_auth new_user_api_key_path(@user.id), @user
+
+        assert_response :success
+        assert_select "input[name='api_key[expires]'][type='checkbox']"
+      end
+
       should "fail for an Anonymous user" do
         get new_user_api_key_path(@user.id)
         assert_response 403
@@ -90,9 +119,39 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       should "create a new API key" do
         post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah" }}, reauthenticate: true
 
-        assert_redirected_to user_api_keys_path(@user.id)
+        assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_equal("blah", @user.api_keys.last.name)
+        assert_match(/dbru_[A-Za-z0-9]+/, response.body)
         assert_equal(true, @user.user_events.api_key_create.exists?(login_session_id: @user.login_sessions.last.login_id))
+      end
+
+      should "set the expiration date from the form" do
+        date = 1.month.from_now.to_date
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah", expires: "1", expires_on: date }}
+
+        assert_response :success
+        assert_in_delta(date.end_of_day, @user.api_keys.last.expires_at, 0.001)
+      end
+
+      should "create a permanent key when expiry is unchecked" do
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah", expires: "0" }}
+
+        assert_response :success
+        assert_nil(@user.api_keys.last.expires_at)
+        assert_match(/This key does not expire/, response.body)
+      end
+
+      should "return the new key once in API responses" do
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah" }}, as: :json
+
+        assert_response :success
+        assert_match(/\Adbru_[A-Za-z0-9]+\z/, response.parsed_body["key"])
+
+        get_auth user_api_keys_path(@user.id), @user, as: :json
+
+        assert_response :success
+        assert_nil(response.parsed_body.first["key"])
       end
 
       should "not create a new API key using the user's API key with another user's recently authenticated session" do
@@ -110,6 +169,17 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "show the expiration date without editable fields" do
+        @api_key.update!(expires: true, expires_on: Date.tomorrow)
+
+        get_auth edit_api_key_path(@api_key.id), @user
+
+        assert_response :success
+        assert_select "input[name='api_key[expires]']", count: 0
+        assert_select "input[name='api_key[expires_on]']", count: 0
+        assert_match(@api_key.expires_at.to_date.to_fs(:long), response.body)
+      end
+
       should "fail for someone else" do
         get_auth edit_api_key_path(@api_key.id), create(:user), reauthenticate: true
         assert_response 403
@@ -124,6 +194,28 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_equal("blah", @api_key.reload.name)
         assert_equal(["1.2.3.4"], @api_key.permitted_ip_addresses.map(&:to_s))
         assert_equal(true, @user.user_events.api_key_update.exists?(login_session_id: @user.login_sessions.last.login_id))
+      end
+
+      should "not change the expiration date" do
+        @api_key.update!(expires: true, expires_on: Date.tomorrow)
+        expires_at = @api_key.expires_at
+        name = @api_key.name
+
+        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah", expires: "0", expires_on: 1.month.from_now.to_date }}
+
+        assert_response 403
+        assert_equal(name, @api_key.reload.name)
+        assert_equal(expires_at.to_i, @api_key.expires_at.to_i)
+      end
+
+      should "update without changing the expiration date" do
+        @api_key.update!(expires: true, expires_on: Date.tomorrow)
+        expires_at = @api_key.expires_at
+
+        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah", permitted_ip_addresses: "1.2.3.4" }}
+
+        assert_redirected_to user_api_keys_path(@user.id)
+        assert_equal(expires_at.to_i, @api_key.reload.expires_at.to_i)
       end
 
       should "fail for someone else" do

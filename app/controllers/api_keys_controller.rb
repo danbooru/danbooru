@@ -22,9 +22,18 @@ class ApiKeysController < ApplicationController
 
   def create
     @api_key = authorize ApiKey.new(user: CurrentUser.user, request: request, **permitted_attributes(ApiKey))
-    @api_key.save
 
-    respond_with(@api_key, location: user_api_keys_path(CurrentUser.user.id))
+    if @api_key.save
+      response.headers["Cache-Control"] = "no-store"
+
+      respond_to do |format|
+        format.html { render :create }
+        format.json { render json: @api_key.serializable_hash.merge("key" => @api_key.key) }
+        format.xml { render xml: @api_key.serializable_hash.merge("key" => @api_key.key).to_xml }
+      end
+    else
+      respond_with(@api_key, location: user_api_keys_path(CurrentUser.user.id))
+    end
   end
 
   def update
