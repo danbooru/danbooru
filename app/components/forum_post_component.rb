@@ -8,7 +8,7 @@ class ForumPostComponent < ApplicationComponent
   with_collection_parameter :forum_post
 
   def self.with_collection(forum_posts, forum_topic:, current_user:)
-    forum_posts = forum_posts.includes(:creator, :updater, :bulk_update_request)
+    forum_posts = forum_posts.includes(:creator, :updater, :bulk_update_request, votes: :creator)
     forum_posts = forum_posts.includes(:pending_moderation_reports) if Pundit.policy(current_user, ModerationReport).can_see_moderation_reports?
 
     dtext_references = DText.preprocess(forum_posts.map(&:body))
