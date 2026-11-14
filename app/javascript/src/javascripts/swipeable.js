@@ -26,6 +26,10 @@ export default class Swipeable {
     this.element.addEventListener("touchstart", event => this.onTouchStart(event), { passive: true });
     this.element.addEventListener("touchend", event => this.onTouchEnd(event), { passive: true });
 
+    // The browser cancels the touch when it uses it to scroll something, so it's a scroll, not a swipe. The browser
+    // doesn't count a scroll as the user interacting with the page (see `updateTouchAction`).
+    this.element.addEventListener("pointercancel", () => { this.touchStart = null; });
+
     // The browser reads the touch action when a touch starts, so keep it up to date after anything that can zoom or
     // widen the page.
     this.updateTouchAction();
@@ -73,24 +77,16 @@ export default class Swipeable {
     return distanceX >= Swipeable.THRESHOLD && speed >= Swipeable.VELOCITY && distanceX > 2 * distanceY;
   }
 
-  // Don't treat a touch as a swipe if the user is panning around a zoomed-in page, selecting text, typing in a form,
-  // or scrolling something sideways.
+  // Don't treat a touch as a swipe if the user is panning around a zoomed-in page, selecting text, or typing in a form.
   canSwipeFrom(element) {
     const isSelectingText = !window.getSelection().isCollapsed;
     const isInForm = element.closest("input, textarea, select, [contenteditable], .ui-dialog");
 
-    return !this.isZoomedIn() && !isSelectingText && !isInForm && !this.isInSidewaysScroller(element);
+    return !this.isZoomedIn() && !isSelectingText && !isInForm;
   }
 
   isZoomedIn() {
     return window.visualViewport.scale > 1.01;
-  }
-
-  // True if the element is inside something that scrolls sideways, like a list of child posts.
-  isInSidewaysScroller(element) {
-    return $(element).parentsUntil(this.element).addBack().toArray().some(parent => {
-      return parent.scrollWidth > parent.clientWidth && ["auto", "scroll"].includes(getComputedStyle(parent).overflowX);
-    });
   }
 
   // The browser's back button skips pages that went to another page without the user interacting with them, and a

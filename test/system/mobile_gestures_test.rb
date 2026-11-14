@@ -6,16 +6,18 @@ class MobileGesturesMobileChromeTest < MobileChromeSystemTestCase
   # @param from [Array<Integer>] the [x, y] point where the swipe starts.
   # @param fingers [Integer] how many fingers to swipe with. Extra fingers are placed 40px below the first one.
   # @param steps [Integer] how many touch moves to send. Each one takes the browser about 30ms to process.
-  def swipe(dx: 0, dy: 0, duration: 0.1, from: [200, 400], fingers: 1, steps: 5)
+  # @param start_dy [Integer] how far the finger first moves up or down before it starts moving sideways.
+  def swipe(dx: 0, dy: 0, duration: 0.1, from: [200, 400], fingers: 1, steps: 5, start_dy: 0) # rubocop:disable Metrics/ParameterLists
     page.driver.with_playwright_page do |playwright_page|
       cdp = playwright_page.context.new_cdp_session(playwright_page)
-      touch_points = lambda do |progress|
+      touch_points = lambda do |progress, y_offset = start_dy|
         (0...fingers).map do |finger|
-          { id: finger, x: from[0] + (dx * progress), y: from[1] + (finger * 40) + (dy * progress) }
+          { id: finger, x: from[0] + (dx * progress), y: from[1] + (finger * 40) + (dy * progress) + y_offset }
         end
       end
 
-      cdp.send_message("Input.dispatchTouchEvent", params: { type: "touchStart", touchPoints: touch_points.call(0) })
+      cdp.send_message("Input.dispatchTouchEvent", params: { type: "touchStart", touchPoints: touch_points.call(0, 0) })
+      cdp.send_message("Input.dispatchTouchEvent", params: { type: "touchMove", touchPoints: touch_points.call(0) }) if start_dy != 0
       (1..steps).each do |step|
         sleep duration / steps
         cdp.send_message("Input.dispatchTouchEvent", params: { type: "touchMove", touchPoints: touch_points.call(step.to_f / steps) })
@@ -78,6 +80,12 @@ class MobileGesturesMobileChromeTest < MobileChromeSystemTestCase
 
     should "not navigate when swiping with two fingers" do
       assert_not_navigated_after_swipe(dx: -200, fingers: 2)
+    end
+
+    # A swipe that starts off slightly up or down makes the browser scroll the page. The browser doesn't count that as
+    # the user interacting with the page, so if we navigated, the back button would skip this page afterwards.
+    should "not navigate when the browser uses the touch to scroll" do
+      assert_not_navigated_after_swipe(dx: -200, start_dy: -20)
     end
 
     should "not navigate when swiping right on the first page" do
