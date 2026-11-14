@@ -142,13 +142,10 @@ class Tag < ApplicationRecord
         @categories ||= CategoryMapping.new
       end
 
-      def select_category_for(tag_name)
-        Tag.where(name: tag_name).pick(:category).to_i
-      end
-
       def categories_for(tag_names)
-        Cache.get_multi(Array(tag_names), "tag-category") do |tag|
-          Tag.select_category_for(tag)
+        Cache.get_multi(Array(tag_names), "tag-category") do |names|
+          categories = Tag.where(name: names).pluck(:name, :category).to_h
+          names.index_with { |name| categories.fetch(name, 0) }
         end
       end
     end
