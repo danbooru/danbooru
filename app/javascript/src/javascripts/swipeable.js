@@ -22,7 +22,15 @@ export default class Swipeable {
     // more than one finger (e.g. pinch zooming), since that can't be a swipe.
     let touchStart = null;
 
+    // The browser reads the touch action when a touch starts, so keep it up to date after anything that can zoom or
+    // widen the page.
+    this.updateTouchAction();
+    window.visualViewport.addEventListener("resize", () => this.updateTouchAction());
+    window.addEventListener("click", () => this.updateTouchAction());
+
     this.element.addEventListener("touchstart", event => {
+      this.updateTouchAction();
+
       if (event.touches.length !== 1) {
         touchStart = null;
         return;
@@ -65,6 +73,15 @@ export default class Swipeable {
         $(this.element).trigger(distanceX < 0 ? "swipe:left" : "swipe:right", [event, this]);
       }
     }, { passive: true });
+  }
+
+  // The browser's back button skips pages that went to another page without the user interacting with them, and a
+  // touch only counts as an interaction if the browser didn't use it to scroll. So don't let sideways swipes scroll
+  // the page, unless the page is zoomed in or wider than the screen and the user needs to pan around it.
+  updateTouchAction() {
+    const isZoomedIn = window.visualViewport.scale > 1.01;
+    const isWiderThanScreen = document.documentElement.scrollWidth > document.documentElement.clientWidth;
+    this.element.style.touchAction = isZoomedIn || isWiderThanScreen ? "" : "pan-y pinch-zoom";
   }
 
   // Swipe left to go to the next page, and swipe right to go to the previous page. The page slides off the screen in

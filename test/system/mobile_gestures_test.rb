@@ -104,8 +104,47 @@ class MobileGesturesMobileChromeTest < MobileChromeSystemTestCase
     end
 
     should "allow pinch zooming and text selection" do
-      assert_equal "auto", page.evaluate_script("getComputedStyle(document.body).touchAction")
+      assert_equal "pan-y pinch-zoom", page.evaluate_script("getComputedStyle(document.body).touchAction")
       assert_equal "auto", page.evaluate_script("getComputedStyle(document.body).userSelect")
+    end
+
+    # The browser's back button skips pages that navigated away without the user interacting with them. We can't press
+    # the real back button here, so check that the browser counts the swipe as an interaction instead.
+    should "count the swipe as a user interaction so the back button returns to this page" do
+      # Running a script counts as an interaction, so record the state from a script that runs on page load instead.
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.add_init_script(script: <<~JS)
+          window.addEventListener("pagehide", () => sessionStorage.setItem("interacted", navigator.userActivation.hasBeenActive));
+        JS
+      end
+      visit posts_path(page: 2, limit: 1)
+
+      swipe(dx: -200)
+      assert_current_path(/page=3/)
+      assert_equal "true", page.evaluate_script("sessionStorage.getItem('interacted')")
+    end
+
+    should "allow panning sideways when the page is pinch-zoomed" do
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.context.new_cdp_session(playwright_page).send_message("Emulation.setPageScaleFactor", params: { pageScaleFactor: 2 })
+      end
+
+      swipe(dx: -150, duration: 0.5)
+      assert_operator page.evaluate_script("window.visualViewport.offsetLeft"), :>, 0
+    end
+
+    should "allow panning sideways after tapping something that makes the page wider than the screen" do
+      # Like tapping an image to view it at full size.
+      page.execute_script(<<~JS)
+        document.addEventListener("click", () => {
+          document.querySelector("#page").insertAdjacentHTML("beforeend", "<div style='width: 200vw; height: 10px'></div>");
+        }, { once: true });
+      JS
+
+      swipe(dx: 0, steps: 0)
+      sleep 0.3
+      swipe(dx: -150, duration: 0.5)
+      assert_operator page.evaluate_script("window.visualViewport.offsetLeft"), :>, 0
     end
 
     should "not navigate when the user has disabled mobile gestures" do
