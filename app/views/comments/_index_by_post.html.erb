@@ -5,13 +5,15 @@
     <%= render "post_sets/blank" %>
   <% end %>
 
+  <% comment_sections = CommentSectionComponent.for_posts(@posts, limit: 6, current_user: CurrentUser.user) %>
+
   <% @posts.select(&:visible?).each do |post| %>
     <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post, classes: "post flex sm:flex-col gap-4").article_attrs do %>
       <%= post_preview(post, show_deleted: true, show_votes: true, classes: "flex md:mx-auto !sm:w-full") %>
 
       <div class="flex-1">
         <%= render "comments/partials/index/header", post: post, tags_by_name: @tags_by_name %>
-        <%= render_comment_section(post, limit: 6, current_user: CurrentUser.user) %>
+        <%= render comment_sections.fetch(post.id) %>
       </div>
     <% end %>
   <% end %>

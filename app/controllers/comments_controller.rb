@@ -89,7 +89,7 @@ class CommentsController < ApplicationController
     authorize @posts
 
     if request.format.html?
-      @posts = @posts.includes(:media_asset, :uploader, :vote_by_current_user, comments: [:creator, :votes])
+      @posts = @posts.includes(:media_asset, :uploader, :vote_by_current_user)
       @tags_by_name = Tag.where(name: @posts.flat_map(&:tag_array).uniq).index_by(&:name)
     end
 
