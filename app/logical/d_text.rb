@@ -654,7 +654,15 @@ class DText
         "\n"
       in "hr"
         "\n\n[hr]\n\n"
-      in ("p" | "ul" | "ol")
+      in ("p" | "ul")
+        content = html_to_dtext(element, **options, &block).strip
+        "\n\n#{content}\n\n"
+      in "ol"
+        # DText has no ordered lists, so <ol> items become plain numbered lines. Number the items here, all at once,
+        # because having each item count the items before it is quadratic.
+        start = (element["start"] || 1).to_i
+        element.element_children.select { it.name == "li" }.each_with_index { |li, i| li["value"] = start + i }
+
         content = html_to_dtext(element, **options, &block).strip
         "\n\n#{content}\n\n"
       in "blockquote"
@@ -687,9 +695,12 @@ class DText
       in "code" unless element.ancestors.any? { |e| e.name == "code" }
         content = html_to_dtext(element, **options, &block)
         "[code]#{content}[/code]" if content.present?
+      in "li" if element.parent&.name == "ol"
+        content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
+        "#{element["value"]}. #{content}\n" if content.present?
       in "li"
         content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
-        depth = element.ancestors.count { it.name in "ul" | "ol" }.clamp(1..)
+        depth = element.ancestors.count { it.name == "ul" }.clamp(1..)
         list = "*" * depth
         "#{list} #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")

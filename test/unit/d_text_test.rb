@@ -528,13 +528,21 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo</li><li>bar</li></ul>"))
         assert_equal("* foo bar", DText.from_html("<ul><li>foo\nbar</li></ul>"))
         assert_equal("* foo\n** bar", DText.from_html("<ul><li>foo<ul><li>bar</li></ul></li></ul>"))
-        assert_equal("* foo\n** bar", DText.from_html("<ol><li>foo<ol><li>bar</li></ol></li></ol>"))
+        assert_equal("1. foo\n* bar", DText.from_html("<ol><li>foo<ul><li>bar</li></ul></li></ol>"))
 
         assert_equal("* foo\n* bar", DText.from_html("<li>foo</li><li>bar</li>"))
 
         assert_equal("* foo[br]bar", DText.from_html("<ul><li>foo<br>bar</li></ul>"))
         assert_equal("* foo", DText.from_html("<ul><li>foo<br></li></ul>"))
         assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo<br></li><li>bar</li></ul>"))
+      end
+
+      should "convert <ol> lists to numbered lines" do
+        assert_equal("1. foo\n2. bar", DText.from_html("<ol><li>foo</li><li>bar</li></ol>"))
+        assert_equal("3. foo\n4. bar", DText.from_html(%{<ol start="3"><li>foo</li><li>bar</li></ol>}))
+        assert_equal("1. a\n1. b\n2. c\n2. d", DText.from_html("<ol><li>a<ol><li>b</li><li>c</li></ol></li>\n<li>d</li></ol>"))
+        assert_equal("foo\n\n1. bar\n2. baz\n\nquux", DText.from_html("<p>foo</p><ol><li>bar</li><li>baz</li></ol><p>quux</p>"))
+        assert_equal("<p>1. foo<br>2. bar</p>", DText.new(DText.from_html("<ol><li>foo</li><li>bar</li></ol>")).format_text)
       end
 
       should "convert <block-spoiler> tags to DText" do

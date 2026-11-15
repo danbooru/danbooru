@@ -248,8 +248,8 @@ module Source::Tests::Extractor
 
           plain [b]bold[/b] [i]italics[/i] [s]strike[/s]
 
-          * one
-          * two
+          1. one
+          2. two
 
           * one
 
