@@ -1519,6 +1519,33 @@ class PostTest < ActiveSupport::TestCase
           @post.update!(tag_string: "aaa hair_ribbon hakurei_reimu -/hr")
           assert_equal("aaa hakurei_reimu", @post.reload.tag_string)
         end
+
+        should "remove the tag when it has a category prefix" do
+          @post.update!(tag_string: "aaa bbb ccc ddd")
+          @post.update!(tag_string: "-char:bbb aaa bbb ccc ddd")
+          assert_equal("aaa ccc ddd", @post.reload.tag_string)
+        end
+      end
+
+      context "tagged with a term that can't be parsed" do
+        should "keep the tags after a negated metatag that can't be negated" do
+          @post.update!(tag_string: "aaa bbb ccc ddd")
+          @post.update!(tag_string: "aaa -rating:s bbb -source:x ccc -newpool:x ddd")
+          assert_equal("aaa bbb ccc ddd", @post.reload.tag_string)
+        end
+
+        should "keep the tags after a metatag with an unclosed quote" do
+          @post.update!(tag_string: "aaa bbb ccc ddd")
+          @post.update!(tag_string: %{aaa source:"xxx bbb ccc ddd})
+          assert_equal("aaa bbb ccc ddd", @post.reload.tag_string)
+          assert_match(/Couldn't add tag: 'source:"xxx' cannot begin with 'source:'/, @post.warnings[:base].join("\n"))
+        end
+
+        should "keep the tags after a lone '-'" do
+          @post.update!(tag_string: "aaa bbb ccc ddd")
+          @post.update!(tag_string: "aaa - bbb ccc -gen: ddd")
+          assert_equal("aaa bbb ccc ddd", @post.reload.tag_string)
+        end
       end
 
       context "a static image tagged with animated_gif" do

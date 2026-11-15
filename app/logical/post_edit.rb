@@ -21,6 +21,7 @@ class PostEdit
 
   METATAGS = PRE_METATAGS + POST_METATAGS
   METATAG_NAME_REGEX = /(#{METATAGS.join("|")}):/io
+  CATEGORY_PREFIX_REGEX = /(#{CATEGORIZATION_METATAGS.join("|")}):(?=[^[:space:]])/io
 
   private attr_reader :post, :current_tag_names, :old_tag_names, :new_tag_string, :parser
   private delegate :accept, :expect, :error, :skip, :zero_or_more, :one_of, to: :parser
@@ -123,12 +124,13 @@ class PostEdit
     end
 
     private def term
-      one_of([method(:tag), method(:metatag)])
+      one_of([method(:metatag), method(:tag)])
     end
 
+    # Matches anything that isn't a valid metatag, so that a bad term never stops the rest of the tags from being parsed.
     private def tag
-      negated = accept("-").present?
-      error("Invalid tag name") if accept(METATAG_NAME_REGEX)
+      negated = accept(/-(?=[^[:space:]])/).present?
+      accept(CATEGORY_PREFIX_REGEX) if negated # `-char:chen` is the same as `-chen`
       name = expect(/[^[:space:]]+/)
 
       Tag.new(name: name.downcase, negated: negated)
