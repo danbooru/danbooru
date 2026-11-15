@@ -102,6 +102,7 @@ class CommentsController < ApplicationController
     if request.format.atom?
       @comments = @comments.includes(:creator, post: [:media_asset])
       @comments = @comments.select { |comment| comment.post.visible? }
+      @tags_by_name = Tag.where(name: @comments.flat_map { it.post.tag_array }.uniq).index_by(&:name)
     elsif request.format.html?
       @comments = @comments.includes(:creator, :updater, post: [:uploader, :media_asset])
       @comments = @comments.includes(:active_votes) if CurrentUser.is_member?

@@ -10,7 +10,7 @@ atom_feed(root_url: comments_url) do |feed|
 
   @comments.each do |comment|
     feed.entry(comment, published: comment.created_at, updated: comment.updated_at) do |entry|
-      entry.title("@#{comment.creator.name} on post ##{comment.post_id} (#{comment.post.presenter.humanized_essential_tag_string})")
+      entry.title("@#{comment.creator.name} on post ##{comment.post_id} (#{comment.post.presenter.humanized_essential_tag_string(tags_by_name: @tags_by_name)})")
 
       if comment.post.has_preview?
         entry.content(<<~EOS, type: "html")

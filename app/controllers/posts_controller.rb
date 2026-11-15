@@ -20,6 +20,7 @@ class PostsController < ApplicationController
     else
       @posts = authorize post_set.posts, policy_class: PostPolicy
       raise PageRemovedError if request.format.html? && post_set.banned_artist?
+      @tags_by_name = Tag.where(name: @posts.flat_map(&:tag_array).uniq).index_by(&:name) if request.format.atom?
 
       respond_with(@posts) do |format|
         format.atom

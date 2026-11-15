@@ -9,12 +9,13 @@ class PostPresenter
     @post = post
   end
 
-  def tag_set_presenter
-    @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array)
+  # @param tags_by_name [Hash<String, Tag>] Preloaded tags for the whole page, keyed by name.
+  def tag_set_presenter(tags_by_name: nil)
+    @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array, tags_by_name:)
   end
 
-  def humanized_essential_tag_string
-    @humanized_essential_tag_string ||= tag_set_presenter.humanized_essential_tag_string.presence || "##{@post.id}"
+  def humanized_essential_tag_string(tags_by_name: nil)
+    @humanized_essential_tag_string ||= tag_set_presenter(tags_by_name:).humanized_essential_tag_string.presence || "##{@post.id}"
   end
 
   def filename_for_download(current_user)
