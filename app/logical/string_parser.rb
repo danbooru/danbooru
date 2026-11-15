@@ -10,6 +10,9 @@ require "strscan"
 class StringParser
   class Error < StandardError; end
 
+  # Returned by `backtrack` when the parse failed.
+  FAILURE = Object.new.freeze
+
   attr_reader :input
   attr_accessor :state
   private attr_reader :scanner
@@ -23,6 +26,7 @@ class StringParser
     @input = input.to_s.clone.freeze
     @state = state
     @scanner = StringScanner.new(@input)
+    @backtrack_depth = 0
   end
 
   # Try to match `pattern`, returning the string if it matched or nil if it didn't.
@@ -59,34 +63,18 @@ class StringParser
     scanner.pos -= n
   end
 
-  # Raise a parse error.
+  # Raise a parse error. Inside a backtracking block, throw instead, because raising exceptions is slow.
   #
   # @param message [String] The parse error message.
   # @raise [Error]
   def error(message)
+    throw self if @backtrack_depth > 0
     raise Error, message
-  end
-
-  # Try to parse the given block, backtracking to the previous state if the parse failed.
-  def backtrack(&block)
-    saved_pos = scanner.pos
-    saved_state = state.deep_dup
-    error("Unexpected EOS") if scanner.eos?
-    yield
-  rescue Error
-    scanner.pos = saved_pos
-    self.state = saved_state
-    raise
   end
 
   # Parse the block zero or more times, returning an array of parse results.
   def zero_or_more(&block)
-    matches = []
-    loop do
-      matches << backtrack { yield }
-    end
-  rescue Error
-    matches
+    Enumerator.produce { backtrack(&block) }.take_while { !FAILURE.equal?(it) }
   end
 
   # Parse the block one or more times, returning an array of parse results.
@@ -99,11 +87,27 @@ class StringParser
   # Given a list of parsers, try each in sequence and return the first one that succeeds.
   def one_of(parsers)
     parsers.each do |parser|
-      return backtrack { parser.call }
-    rescue Error
-      next
+      result = backtrack { parser.call }
+      return result unless FAILURE.equal?(result)
     end
 
     error("expected one of: #{parsers}")
+  end
+
+  private
+
+  # Try to parse the given block, backtracking to the previous state and returning FAILURE if the parse failed.
+  def backtrack
+    @backtrack_depth += 1
+    saved_pos = scanner.pos
+    saved_state = state.deep_dup
+
+    catch(self) { return yield unless eos? }
+
+    scanner.pos = saved_pos
+    self.state = saved_state
+    FAILURE
+  ensure
+    @backtrack_depth -= 1
   end
 end
