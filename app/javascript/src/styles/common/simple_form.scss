@@ -15,6 +15,12 @@ form.simple_form {
         padding-left: 0;
         display: block;
       }
+
+      // Keep short hints beside the input on mobile.
+      &.inline-hint {
+        padding-left: 1em;
+        display: inline;
+      }
     }
 
     &.field_with_errors {

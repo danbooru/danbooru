@@ -43,15 +43,22 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
 
           get report_path("posts", search: { group: "uploader", group_limit: 9_999_999, period: "second", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 })
 
-          assert_response 500
+          assert_response 422
+          assert_select "p", text: "Error: The group limit can't be more than 200."
         end
 
-        should "fail for too many timeseries buckets" do
-          create(:post)
-
+        should "fail when the date range is too long for the period" do
           get report_path("posts", search: { period: "day", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 })
 
-          assert_response 500
+          assert_response 422
+          assert_select "p", text: "Error: The date range can't be longer than 2000 days. Choose a longer period or a shorter date range."
+        end
+
+        should "fail for an invalid period" do
+          get report_path("posts", search: { period: "decade" })
+
+          assert_response 422
+          assert_select "p", text: "Error: The period must be one of: second, minute, hour, day, week, month, year."
         end
 
         should "work when filtering by a nested association" do

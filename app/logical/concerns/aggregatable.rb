@@ -5,14 +5,17 @@ module Aggregatable
 
   MAX_GROUP_LIMIT = 200
   MAX_TIMESERIES_BUCKETS = 2_000
+  PERIODS = %w[second minute hour day week month year]
+
+  class Error < StandardError; end
 
   def timeseries(period: "day", date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], group_limit: 10, columns: { count: "COUNT(*)" })
-    raise ArgumentError, "invalid period: #{period}" if !period.in?(%w[second minute hour day week month year])
-    raise ArgumentError, "group_limit exceeds #{MAX_GROUP_LIMIT}" if !group_limit.to_i.in?(0..MAX_GROUP_LIMIT)
+    raise Error, "The period must be one of: #{PERIODS.join(", ")}." if !period.in?(PERIODS)
+    raise Error, "The group limit can't be more than #{MAX_GROUP_LIMIT}." if !group_limit.to_i.in?(0..MAX_GROUP_LIMIT)
     raise ArgumentError if all.group_values.present?
 
     if (to.to_time - from.to_time).abs > MAX_TIMESERIES_BUCKETS.send(period.pluralize)
-      raise ArgumentError, "time range can't exceed #{MAX_TIMESERIES_BUCKETS} #{period.pluralize}"
+      raise Error, "The date range can't be longer than #{MAX_TIMESERIES_BUCKETS} #{period.pluralize}. Choose a longer period or a shorter date range."
     end
 
     from = from.to_date
@@ -98,7 +101,7 @@ module Aggregatable
   end
 
   def aggregate(date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], limit: 50, columns: { count: "COUNT(*)" }, order: Arel.sql("#{columns.first.second} DESC"))
-    raise ArgumentError, "limit exceeds #{MAX_GROUP_LIMIT}" if !limit.to_i.in?(0..MAX_GROUP_LIMIT)
+    raise Error, "The group limit can't be more than #{MAX_GROUP_LIMIT}." if !limit.to_i.in?(0..MAX_GROUP_LIMIT)
 
     group_fields = groups.map { |name| reflections[name.to_s]&.foreign_key || name }
 
