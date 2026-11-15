@@ -42,7 +42,7 @@ class StringParser
   # @param pattern [Regexp, String] The pattern to match.
   # @return [Boolean] True if the pattern was skipped, false otherwise.
   def skip(pattern)
-    scanner.scan(pattern) != nil
+    !scanner.skip(pattern).nil?
   end
 
   # Try to match `pattern`, returning the string if it matched or raising an Error if it didn't.
@@ -52,7 +52,7 @@ class StringParser
   # @raise [Error] If the pattern didn't match
   def expect(pattern)
     str = scanner.scan(pattern)
-    error("Expected '#{pattern}'; got '#{str}'") if str.nil?
+    error { "Expected '#{pattern}'; got '#{str}'" } if str.nil?
     str
   end
 
@@ -65,11 +65,11 @@ class StringParser
 
   # Raise a parse error. Inside a backtracking block, throw instead, because raising exceptions is slow.
   #
-  # @param message [String] The parse error message.
+  # @param message [String] The parse error message. Can be given as a block instead, so it's only built when it's raised.
   # @raise [Error]
-  def error(message)
+  def error(message = nil)
     throw self if @backtrack_depth > 0
-    raise Error, message
+    raise Error, message || yield
   end
 
   # Parse the block zero or more times, returning an array of parse results.
@@ -91,7 +91,7 @@ class StringParser
       return result unless FAILURE.equal?(result)
     end
 
-    error("expected one of: #{parsers}")
+    error { "expected one of: #{parsers}" }
   end
 
   private

@@ -14,6 +14,9 @@ class StringParserTest < ActiveSupport::TestCase
       assert_raises(StringParser::Error) { parser.expect("x") }
       assert_raises(StringParser::Error) { parser.one_or_more { parser.expect("x") } }
       assert_raises(StringParser::Error) { parser.one_of([-> { parser.expect("x") }, -> { parser.expect("y") }]) }
+
+      error = assert_raises(StringParser::Error) { parser.expect(/x/) }
+      assert_equal("Expected '(?-mix:x)'; got ''", error.message)
     end
 
     should "return the first parser that succeeds in one_of" do
