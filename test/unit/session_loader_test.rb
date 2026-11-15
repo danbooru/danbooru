@@ -57,6 +57,16 @@ class SessionLoaderTest < ActiveSupport::TestCase
           assert_equal(@user, CurrentUser.user)
           assert_equal(30.minutes.ago, login_session.reload.last_seen_at)
         end
+
+        should "not log in a session that has been idle for longer than the idle period" do
+          login_session = create(:login_session, user: @user, last_seen_at: (LoginSession::MAX_IDLE_PERIOD + 1.minute).ago)
+          @request.stubs(:session).returns({ user_id: @user.id, login_id: login_session.login_id })
+          SessionLoader.new(@request).load
+
+          assert_equal(true, CurrentUser.user.is_anonymous?)
+          assert_nil(@request.session[:user_id])
+          assert_nil(@request.session[:login_id])
+        end
       end
     end
 
