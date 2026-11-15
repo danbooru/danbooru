@@ -2,38 +2,56 @@ require "test_helper"
 
 class ReportsControllerTest < ActionDispatch::IntegrationTest
   context "The reports controller" do
+    setup do
+      @user = create(:user)
+    end
+
+    context "index action" do
+      should "render for anonymous users" do
+        get reports_path
+
+        assert_response :success
+      end
+    end
+
     context "show action" do
+      should "render the access denied page for anonymous users" do
+        get report_path("posts")
+
+        assert_response 403
+      end
+
       context "posts report" do
         setup do
           @post = create(:post)
         end
 
         should "work" do
-          get report_path("posts")
+          get_auth report_path("posts"), @user
 
           assert_response :success
         end
 
         should "work with the period param" do
-          get report_path("posts", search: { period: "month" })
+          get_auth report_path("posts", search: { period: "month" }), @user
 
           assert_response :success
         end
 
         should "work with the group param" do
-          get report_path("posts", search: { group: "uploader" })
+          get_auth report_path("posts", search: { group: "uploader" }), @user
 
           assert_response :success
         end
 
         should "work with the period and group params" do
-          get report_path("posts", search: { period: "month", group: "uploader" })
+          get_auth report_path("posts", search: { period: "month", group: "uploader" }), @user
 
           assert_response :success
         end
 
         should "work with the group param when the dataset is empty" do
-          get report_path("posts", search: { tags: "does_not_exist", group: "uploader" })
+          get_auth report_path("posts", search: { tags: "does_not_exist", group: "uploader" }), @user
 
           assert_response :success
         end
@@ -41,40 +59,40 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
         should "fail for oversized group limits" do
           create(:post)
 
-          get report_path("posts", search: { group: "uploader", group_limit: 9_999_999, period: "second", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 })
+          get_auth report_path("posts", search: { group: "uploader", group_limit: 9_999_999, period: "second", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 }), @user
 
           assert_response 422
           assert_select "p", text: "Error: The group limit can't be more than 200."
         end
 
         should "fail when the date range is too long for the period" do
-          get report_path("posts", search: { period: "day", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 })
+          get_auth report_path("posts", search: { period: "day", from: 10.years.ago.to_date.iso8601, to: Time.zone.now.to_date.iso8601 }), @user
 
           assert_response 422
           assert_select "p", text: "Error: The date range can't be longer than 2000 days. Choose a longer period or a shorter date range."
         end
 
         should "fail for an invalid period" do
-          get report_path("posts", search: { period: "decade" })
+          get_auth report_path("posts", search: { period: "decade" }), @user
 
           assert_response 422
           assert_select "p", text: "Error: The period must be one of: second, minute, hour, day, week, month, year."
         end
 
         should "work when filtering by a nested association" do
-          get report_path("posts", search: { uploader: { name: @post.uploader.name }})
+          get_auth report_path("posts", search: { uploader: { name: @post.uploader.name }}), @user
 
           assert_response :success
         end
 
         should "work when grouping by an associated attribute" do
-          get report_path("posts", search: { group: "uploader.level" })
+          get_auth report_path("posts", search: { group: "uploader.level" }), @user
 
           assert_response :success
         end
 
         should "work when grouping by an associated attribute over time" do
-          get report_path("posts", search: { group: "uploader.level", period: "month" })
+          get_auth report_path("posts", search: { group: "uploader.level", period: "month" }), @user
 
           assert_response :success
         end
@@ -83,7 +101,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
           Post.delete_all
           post1 = create(:post, id: 1)
 
-          get report_path("posts")
+          get_auth report_path("posts"), @user
 
           assert_response :success
           assert_select "a", text: "All Time" do |links|
@@ -94,7 +112,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
         should "not show an All Time link when no posts exist" do
           Post.delete_all
 
-          get report_path("posts")
+          get_auth report_path("posts"), @user
 
           assert_response :success
           assert_select "a", text: "All Time", count: 0
@@ -104,7 +122,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "post approvals report" do
         should "work" do
           create(:post_approval)
-          get report_path("post_approvals")
+          get_auth report_path("post_approvals"), @user
 
           assert_response :success
         end
@@ -113,7 +131,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "post appeals report" do
         should "work" do
           create(:post_appeal)
-          get report_path("post_appeals")
+          get_auth report_path("post_appeals"), @user
 
           assert_response :success
         end
@@ -122,7 +140,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "post flags report" do
         should "work" do
           create(:post_flag)
-          get report_path("post_flags")
+          get_auth report_path("post_flags"), @user
 
           assert_response :success
         end
@@ -131,7 +149,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "post replacements report" do
         should "work" do
           create(:post_replacement)
-          get report_path("post_replacements")
+          get_auth report_path("post_replacements"), @user
 
           assert_response :success
         end
@@ -140,7 +158,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "post votes report" do
         should "work" do
           create(:post_vote)
-          get report_path("post_votes")
+          get_auth report_path("post_votes"), @user
 
           assert_response :success
         end
@@ -149,7 +167,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "media assets report" do
         should "work" do
           create(:media_asset)
-          get report_path("media_assets")
+          get_auth report_path("media_assets"), @user
 
           assert_response :success
         end
@@ -158,7 +176,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "pools report" do
         should "work" do
           as(create(:user)) { create(:pool) }
-          get report_path("pools")
+          get_auth report_path("pools"), @user
 
           assert_response :success
         end
@@ -167,7 +185,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "comments report" do
         should "work" do
           as(create(:user)) { create(:comment) }
-          get report_path("comments")
+          get_auth report_path("comments"), @user
 
           assert_response :success
         end
@@ -176,7 +194,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "comment votes report" do
         should "work" do
           as(create(:user)) { create(:comment_vote) }
-          get report_path("comment_votes")
+          get_auth report_path("comment_votes"), @user
 
           assert_response :success
         end
@@ -185,7 +203,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "forum posts report" do
         should "work" do
           as(create(:user)) { create(:forum_post) }
-          get report_path("forum_posts")
+          get_auth report_path("forum_posts"), @user
 
           assert_response :success
         end
@@ -194,7 +212,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "bulk update requests report" do
         should "work" do
           create(:bulk_update_request)
-          get report_path("bulk_update_requests")
+          get_auth report_path("bulk_update_requests"), @user
 
           assert_response :success
         end
@@ -203,7 +221,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "tag aliases report" do
         should "work" do
           create(:tag_alias)
-          get report_path("tag_aliases")
+          get_auth report_path("tag_aliases"), @user
 
           assert_response :success
         end
@@ -212,7 +230,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "artist versions report" do
         should "work" do
           create(:artist)
-          get report_path("artist_versions")
+          get_auth report_path("artist_versions"), @user
 
           assert_response :success
         end
@@ -221,7 +239,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "artist commentary versions report" do
         should "work" do
           create(:artist_commentary)
-          get report_path("artist_commentary_versions")
+          get_auth report_path("artist_commentary_versions"), @user
 
           assert_response :success
         end
@@ -230,7 +248,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "note versions report" do
         should "work" do
           as(create(:user)) { create(:note) }
-          get report_path("note_versions")
+          get_auth report_path("note_versions"), @user
 
           assert_response :success
         end
@@ -239,7 +257,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "wiki page versions report" do
         should "work" do
           create(:wiki_page)
-          get report_path("wiki_page_versions")
+          get_auth report_path("wiki_page_versions"), @user
 
           assert_response :success
         end
@@ -248,7 +266,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "mod actions report" do
         should "work" do
           create(:mod_action)
-          get report_path("mod_actions")
+          get_auth report_path("mod_actions"), @user
 
           assert_response :success
         end
@@ -257,7 +275,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "bans report" do
         should "work" do
           create(:ban)
-          get report_path("bans")
+          get_auth report_path("bans"), @user
 
           assert_response :success
         end
@@ -267,7 +285,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
         should "not count mod-only mod actions for non-moderators" do
           create(:mod_action, category: "email_address_update", description: "secret@example.com")
 
-          get report_path("mod_actions", format: :json, search: { category: "email_address_update", description_like: "*secret*" })
+          get_auth report_path("mod_actions", format: :json, search: { category: "email_address_update", description_like: "*secret*" }), @user
           assert_response :success
           assert_equal([0], response.parsed_body.pluck("mod_actions"))
 
@@ -279,15 +297,15 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
         should "not count private post votes" do
           vote = create(:post_vote, score: -1)
 
-          get report_path("post_votes", format: :json, search: { user_id: vote.user_id, post_id: vote.post_id, score: -1 })
+          get_auth report_path("post_votes", format: :json, search: { user_id: vote.user_id, post_id: vote.post_id, score: -1 }), @user
           assert_response :success
           assert_equal([0], response.parsed_body.pluck("votes"))
         end
 
-        should "not count comment votes for anonymous users" do
+        should "not count other users' comment votes" do
           as(create(:user)) { create(:comment_vote) }
 
-          get report_path("comment_votes", format: :json)
+          get_auth report_path("comment_votes", format: :json), @user
           assert_response :success
           assert_equal([0], response.parsed_body.pluck("votes"))
         end
@@ -295,7 +313,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
         should "not count forum posts in restricted topics" do
           as(create(:user)) { create(:forum_post, topic: create(:mod_up_forum_topic), body: "secret") }
 
-          get report_path("forum_posts", format: :json, search: { body_matches: "secret" })
+          get_auth report_path("forum_posts", format: :json, search: { body_matches: "secret" }), @user
           assert_response :success
           assert_equal([0], response.parsed_body.pluck("forum_posts"))
         end
@@ -304,7 +322,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       context "users report" do
         should "work" do
           create(:user)
-          get report_path("users")
+          get_auth report_path("users"), @user
 
           assert_response :success
         end
@@ -312,7 +330,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
 
       context "unknown report" do
         should "work" do
-          get report_path("unknown")
+          get_auth report_path("unknown"), @user
 
           assert_response 404
         end

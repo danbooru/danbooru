@@ -2,6 +2,10 @@ require "application_system_test_case"
 
 class ReportsChromeTest < ChromeSystemTestCase
   context "The posts report" do
+    setup do
+      fast_signin create(:user)
+    end
+
     should "draw a chart without violating the Content-Security-Policy" do
       create(:post)
       record_csp_violations
