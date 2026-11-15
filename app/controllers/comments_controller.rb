@@ -11,7 +11,7 @@ class CommentsController < ApplicationController
   def index
     params[:group_by] ||= "comment" if params[:search].present?
 
-    if params[:group_by] == "comment" || request.format.atom?
+    if params[:group_by] == "comment" || !(request.format.html? || request.format.js?)
       index_by_comment
     elsif request.format.js?
       index_for_post

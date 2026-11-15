@@ -64,6 +64,22 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           get comments_path(group_by: "comment")
           assert_response :success
         end
+
+        should "be the default for .json" do
+          comment = create(:comment)
+          get comments_path, as: :json
+
+          assert_response :success
+          assert_equal([comment.id], response.parsed_body.pluck("id"))
+        end
+
+        should "be the default for .xml" do
+          comment = create(:comment)
+          get comments_path(format: :xml)
+
+          assert_response :success
+          assert_equal([comment.id.to_s], response.parsed_body.xpath("/comments/comment/id").map(&:text))
+        end
       end
 
       context "searching" do
