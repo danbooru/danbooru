@@ -13,9 +13,11 @@ class StaticController < ApplicationController
   end
 
   def not_found
-    @pool = Pool.find(Danbooru.config.page_not_found_pool_id) if Danbooru.config.page_not_found_pool_id.present?
-    @post = @pool.posts.sample if @pool.present?
-    @artist = @post.tags.find(&:artist?) if @post.present?
+    if request.format.html? && Danbooru.config.page_not_found_pool_id.present?
+      @pool = Pool.find(Danbooru.config.page_not_found_pool_id)
+      @post = @pool.posts.sample
+      @artist = @post.tags.find(&:artist?) if @post.present?
+    end
 
     render_error_page(404, nil, template: "static/not_found", message: "Page not found")
   end
