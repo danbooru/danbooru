@@ -206,6 +206,21 @@ class ArtistTest < ActiveSupport::TestCase
       assert_artist_found("warhol", "http://warhol.com/x/test.jpg")
     end
 
+    should "warn about duplicates of each new url" do
+      create(:artist, name: "warhol", url_string: "http://warhol.com/x/a/image.jpg")
+      create(:artist, name: "rembrandt", url_string: "http://rembrandt.com/x/test.jpg")
+      artist = Artist.new(name: "copycat", url_string: "http://warhol.com/x/test.jpg\nhttp://rembrandt.com/x/test.jpg\nhttp://unknown.com/a")
+
+      assert_equal(true, artist.valid?)
+      assert_equal(["Potential duplicate of [[warhol]] and [[rembrandt]]"], artist.warnings.full_messages)
+    end
+
+    should "not loop forever on urls starting with a slash" do
+      artist = Artist.new(name: "slash", url_string: "/foo //bar")
+
+      assert_equal(false, Timeout.timeout(10) { artist.valid? })
+    end
+
     should "not return duplicates if too many artists found" do
       create_list(:artist, 5, url_string: "https://www.example.com")
       assert_artist_not_found("https://www.example.com/image.jpg")

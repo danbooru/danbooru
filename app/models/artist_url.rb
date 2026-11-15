@@ -115,11 +115,6 @@ class ArtistURL < ApplicationRecord
     end
   end
 
-  # @return [Array<Artist>] The list of other artists that also contain this URL.
-  def duplicate_artists
-    ArtistFinder.find_artists(url).without(artist)
-  end
-
   def validate_url_format
     if Source::URL.parse!(url).host.exclude?(".")
       errors.add(:url, "'#{url}' is not a valid URL")
