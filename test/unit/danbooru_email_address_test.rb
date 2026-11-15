@@ -7,6 +7,19 @@ class DanbooruEmailAddressTest < ActiveSupport::TestCase
   end
 
   context "Danbooru::EmailAddress" do
+    context ".is_valid?" do
+      should "accept a single email address" do
+        assert_equal(true, Danbooru::EmailAddress.is_valid?("foo.bar+baz@gmail.com"))
+      end
+
+      should "reject anything that isn't exactly one email address" do
+        ["foo@gmail.com\nBcc: bar@gmail.com", "foo@gmail.com\r\nBcc: bar@gmail.com", "foo@gmail.com\nbar@gmail.com", "junk\nfoo@gmail.com", "foo@gmail.com\n", " foo@gmail.com", "foo@gmail.com, bar@gmail.com", "", nil].each do |address|
+          assert_equal(false, Danbooru::EmailAddress.is_valid?(address), "expected #{address.inspect} to be invalid")
+          assert_nil(Danbooru::EmailAddress.parse(address))
+        end
+      end
+    end
+
     context "#undeliverable?" do
       should "return good addresses as deliverable" do
         assert_undeliverable(false, "webmaster@danbooru.donmai.us")
