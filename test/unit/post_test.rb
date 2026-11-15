@@ -1546,6 +1546,29 @@ class PostTest < ActiveSupport::TestCase
           @post.update!(tag_string: "aaa - bbb ccc -gen: ddd")
           assert_equal("aaa bbb ccc ddd", @post.reload.tag_string)
         end
+
+        # 'ſ' (U+017F LATIN SMALL LETTER LONG S) case folds to 's'.
+        should "treat metatags that only match because of Unicode case folding as regular tags" do
+          @post.update!(tag_string: "aaa bbb")
+          @post.update!(tag_string: "aaa bbb ſtatus:active -ſource:x ſource:y -artiſt:aaa")
+          assert_equal("aaa bbb", @post.reload.tag_string)
+          assert_match(/Couldn't add tag: 'ſtatus:active' must consist of only ASCII characters/, @post.warnings[:base].join("\n"))
+          assert_match(/Couldn't add tag: 'ſource:y' must consist of only ASCII characters/, @post.warnings[:base].join("\n"))
+        end
+      end
+
+      context "tagged with uppercase metatags" do
+        should "parse them the same as lowercase metatags" do
+          @post.update!(tag_string: "aaa bbb")
+          @post.update!(tag_string: "-CHAR:aaa bbb CHAR:ccc RATING:e")
+          assert_equal("bbb ccc", @post.reload.tag_string)
+          assert_equal("e", @post.rating)
+          assert_equal(Tag.categories.character, Tag.find_by_name("ccc").category)
+        end
+      end
+
+      should "only have metatag names made of lowercase letters, numbers, and underscores, with an optional leading '-'" do
+        assert_equal([], PostEdit::METATAGS.grep_v(/\A-?[a-z0-9_]+\z/))
       end
 
       context "a static image tagged with animated_gif" do

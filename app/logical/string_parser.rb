@@ -17,7 +17,7 @@ class StringParser
   attr_accessor :state
   private attr_reader :scanner
 
-  delegate :rest, :eos?, to: :scanner
+  delegate :rest, :eos?, :match?, to: :scanner
 
   # @param input [String] The string to parse.
   # @param state [Object] An arbitrary piece of user-defined state. Will be
