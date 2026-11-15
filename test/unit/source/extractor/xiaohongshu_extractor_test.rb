@@ -2,6 +2,10 @@ require "test_helper"
 
 module Source::Tests::Extractor
   class XiaohongshuExtractorTest < ActiveSupport::ExtractorTestCase
+    def skip_unless_credentials_for(host)
+      skip "Xiaohongshu extractor requires #{host} credentials" unless SiteCredential.for_site("Xiaohongshu").any? { |c| c.credential.with_indifferent_access[:api_host] == host }
+    end
+
     context "A xhscdn.com sample image URL" do
       strategy_should_work(
         "http://sns-webpic-qc.xhscdn.com/202405050857/60985d4963cfb500a9b0838667eb3adc/1000g00828idf6nofk05g5ohki5uk137o8beqcv8!nd_dft_wgth_webp_3",
@@ -57,7 +61,7 @@ module Source::Tests::Extractor
     end
 
     context "A post with multiple images" do
-      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+      setup { skip_unless_credentials_for("www.xiaohongshu.com") }
 
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqAClF0o0f3BaJn3Ye5zUIYtms=",
@@ -90,7 +94,7 @@ module Source::Tests::Extractor
     end
 
     context "A post with user id in url" do
-      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+      setup { skip_unless_credentials_for("www.xiaohongshu.com") }
 
       strategy_should_work(
         "https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqAClF0o0f3BaJn3Ye5zUIYtms=",
@@ -123,7 +127,7 @@ module Source::Tests::Extractor
     end
 
     context "A post with /spectrum/ image URLs" do
-      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+      setup { skip_unless_credentials_for("www.xiaohongshu.com") }
 
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/676692a9000000000b022e4d?xsec_token=ABp9YCBRRqv5v30dlFfxzHwyv1xk_xBquzQJZeoJf5H7g=",
@@ -176,7 +180,7 @@ module Source::Tests::Extractor
     end
 
     context "A video post" do
-      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+      setup { skip_unless_credentials_for("www.xiaohongshu.com") }
 
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/6789d20f000000001d011d4b?xsec_token=ABYRoRr3DGE29GWtiam4UBANcw79-RNRRc1VdpIJVdz1A=",
@@ -208,7 +212,7 @@ module Source::Tests::Extractor
     end
 
     context "A mixed post with videos and images" do
-      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+      setup { skip_unless_credentials_for("www.xiaohongshu.com") }
 
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/67a396a7000000002503cbd3?xsec_token=AB4LyC1SEvdhEyOhMoeo9jT30BdU1-uQcUDPBgukFMt4g=&xsec_source=pc_user",
@@ -251,21 +255,19 @@ module Source::Tests::Extractor
     end
 
     context "A post on rednote.com" do
-      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+      setup { skip_unless_credentials_for("www.rednote.com") }
 
       strategy_should_work(
-        "https://www.rednote.com/explore/69d503c7000000001f007995?xsec_token=ABR7xc7xnydtN9Cqof7XXZDNQnk_bgI9LF753p_b_5IZg=",
+        "https://www.rednote.com/explore/6af5d369000000001603281a?xsec_token=ABJSeoMlAYSt8M0LLAvHiAF0BeMNRpTOVmnPjX7knOzI4=",
         image_urls: %w[
-          https://ci.xiaohongshu.com/notes_pre_post/1040g3k031ulmkboi2i6g5ohqnak0jie6odk9k0o
-          https://ci.xiaohongshu.com/notes_pre_post/1040g3k031ulmkboi2i605ohqnak0jie6kit9f58
-          https://ci.xiaohongshu.com/notes_pre_post/1040g3k031ulmkboi2i505ohqnak0jie6a6iu50o
+          https://ci.xiaohongshu.com/notes_pre_post/1040g3k8327fo5ssa7gcg5ohqnak0jie6kpnthn8
+          https://ci.xiaohongshu.com/1040g008327fo5sl56q5g5ohqnak0jie6bfs2q0o
         ],
         media_files: [
-          { file_size: 3_439_122 },
-          { file_size: 5_734_475 },
-          { file_size: 2_344_734 },
+          { file_size: 3_787_156 },
+          { file_size: 333_894 },
         ],
-        page_url: "https://www.xiaohongshu.com/explore/69d503c7000000001f007995?xsec_token=ABR7xc7xnydtN9Cqof7XXZDNQnk_bgI9LF753p_b_5IZg=",
+        page_url: "https://www.xiaohongshu.com/explore/6af5d369000000001603281a?xsec_token=ABJSeoMlAYSt8M0LLAvHiAF0BeMNRpTOVmnPjX7knOzI4=",
         profile_url: "https://www.xiaohongshu.com/user/profile/623abaa8000000000201c9c6",
         profile_urls: %w[https://www.xiaohongshu.com/user/profile/623abaa8000000000201c9c6],
         display_name: "火叶叶",
@@ -274,15 +276,18 @@ module Source::Tests::Extractor
         updated_at: nil,
         tags: [
           ["明日方舟终末地", "https://www.xiaohongshu.com/search_result?keyword=明日方舟终末地"],
-          ["新潮起故渊离", "https://www.xiaohongshu.com/search_result?keyword=新潮起故渊离"],
-          ["洛茜", "https://www.xiaohongshu.com/search_result?keyword=洛茜"],
           ["明日方舟终末地创作应援", "https://www.xiaohongshu.com/search_result?keyword=明日方舟终末地创作应援"],
-          ["全世界最可爱的小狼宝宝", "https://www.xiaohongshu.com/search_result?keyword=全世界最可爱的小狼宝宝"],
+          ["烟语", "https://www.xiaohongshu.com/search_result?keyword=烟语"],
+          ["终末地丹青渡", "https://www.xiaohongshu.com/search_result?keyword=终末地丹青渡"],
+          ["薯薯的四号谷地", "https://www.xiaohongshu.com/search_result?keyword=薯薯的四号谷地"],
+          ["塔卫二通讯", "https://www.xiaohongshu.com/search_result?keyword=塔卫二通讯"],
         ],
-        dtext_artist_commentary_title: "秘密基地里的洛茜和小管",
+        dtext_artist_commentary_title: "下班别忘记带她最爱吃的桂花米糕",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          扎小辫子的游戏对洛茜来说可能有点幼稚，但是对于管理员来说刚刚好！
-          "#明日方舟终末地":[https://www.xiaohongshu.com/search_result?keyword=明日方舟终末地] "#新潮起故渊离":[https://www.xiaohongshu.com/search_result?keyword=新潮起故渊离] "#洛茜":[https://www.xiaohongshu.com/search_result?keyword=洛茜] "#明日方舟终末地创作应援":[https://www.xiaohongshu.com/search_result?keyword=明日方舟终末地创作应援] "#全世界最可爱的小狼宝宝":[https://www.xiaohongshu.com/search_result?keyword=全世界最可爱的小狼宝宝]
+          陈千语做完酸辣汤急头白脸地打包了一份桂花米糕就回帝江号种植室找李织烟了
+          其实此线稿十一之前就画完了，但是碰上秋促玩了个昏天黑地于是现在才填完坑哈哈（
+          p2neta了一些懂自懂的帝后，产品1.6一句话都没说上我一点也没破防也不着急也不难受也不痛苦也不伤心也不哀嚎也不扭曲也不爬行也不阴暗也不悲伤……
+          "#明日方舟终末地":[https://www.xiaohongshu.com/search_result?keyword=明日方舟终末地] "#明日方舟终末地创作应援":[https://www.xiaohongshu.com/search_result?keyword=明日方舟终末地创作应援] "#烟语":[https://www.xiaohongshu.com/search_result?keyword=烟语] "#终末地丹青渡":[https://www.xiaohongshu.com/search_result?keyword=终末地丹青渡] "#薯薯的四号谷地":[https://www.xiaohongshu.com/search_result?keyword=薯薯的四号谷地] "#塔卫二通讯":[https://www.xiaohongshu.com/search_result?keyword=塔卫二通讯]
         EOS
       )
     end

@@ -92,7 +92,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   memoize def page_json
-    page&.at('script[text()*="__INITIAL_STATE__"]')&.text&.slice(/{.*}/)&.gsub("undefined", "null")&.parse_json || {}
+    page&.at('script[text()*="__INITIAL_STATE__"]')&.text&.slice(/{.*}/)&.gsub("undefined", "null")&.gsub(/new Set\((\[.*?\])\)/, '\1')&.parse_json || {}
   end
 
   def http
