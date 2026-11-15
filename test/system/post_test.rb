@@ -187,3 +187,19 @@ class PostChromeTest < ChromeSystemTestCase
     end
   end
 end
+
+class PostWebkitTest < WebkitSystemTestCase
+  should "scroll to the tag box when opening the edit tab" do
+    user = create(:user, created_at: 1.month.ago)
+    post = create(:post, tag_string: (1..300).map { |i| "tag_#{i}" }.join(" "), source: "https://example.com/image.jpg")
+
+    fast_signin user
+    visit post_path(post)
+    page.execute_script("document.querySelector('#side-edit-link').click()")
+
+    assert_selector ".source-data:not(.loading) .source-data-content", wait: 15
+    rect = page.evaluate_script("document.querySelector('#post_tag_string').getBoundingClientRect().toJSON()")
+    assert_operator rect["top"], :>=, 0
+    assert_operator rect["bottom"], :<=, page.evaluate_script("window.innerHeight")
+  end
+end

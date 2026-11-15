@@ -16,6 +16,9 @@ class SourceDataComponent {
       let script = await $.get("/source.js", { url: url, ref: ref });
       $.globalEval(script, { nonce: Utility.meta("csp-nonce") });
       $(".source-data").removeClass("loading");
+
+      // The source data is above the tag box, so loading it can push the tag box off the screen.
+      $("#post_tag_string:focus")[0]?.scrollIntoView({ block: "nearest" });
     }
   }
 }
