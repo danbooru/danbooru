@@ -30,6 +30,17 @@ class CSPReportsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(response.headers["Set-Cookie"].to_s[/#{Danbooru.config.session_cookie_name}=/])
       end
 
+      should "return an error without overwriting the session cookie for IP banned users" do
+        get login_path
+        assert_not_nil(cookies[Danbooru.config.session_cookie_name])
+
+        create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
+        post csp_reports_path, params: { "csp-report": { "blocked-uri": "inline" }}.to_json, headers: { "Content-Type": "application/csp-report", "REMOTE_ADDR": "1.2.3.4" }
+
+        assert_response 403
+        assert_nil(response.headers["Set-Cookie"].to_s[/#{Danbooru.config.session_cookie_name}=/])
+      end
+
       should "reject invalid reports" do
         post csp_reports_path, params: "not json", headers: { "Content-Type": "application/csp-report" }
 

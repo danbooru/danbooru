@@ -43,10 +43,14 @@ class ApplicationController < ActionController::Base
 
   # Mark an action as for anonymous users only. The current user won't be loaded, instead the user will be set to the
   # anonymous user. The session cookie won't be sent back, so the response can't overwrite a newer login cookie.
+  #
+  # The user is set before any other callbacks run, so that error pages raised by earlier callbacks have a current user.
   def self.anonymous_only(*_actions, **options)
+    skip_before_action :reset_current_user, **options
     skip_before_action :set_current_user, **options
     skip_before_action :redirect_if_name_invalid?, **options
-    before_action(**options) do
+    prepend_before_action(**options) do
+      reset_current_user
       CurrentUser.user = User.anonymous
       request.session_options[:skip] = true
     end
