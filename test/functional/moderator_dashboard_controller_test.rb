@@ -20,6 +20,16 @@ class ModeratorDashboardControllerTest < ActionDispatch::IntegrationTest
         get_auth moderator_dashboard_path, @admin
         assert_response :success
       end
+
+      should "render with search params" do
+        get_auth moderator_dashboard_path, @admin, params: { search: { min_date: 1.day.ago.to_date, max_level: User::Levels::BUILDER }}
+        assert_response :success
+      end
+
+      should "ignore unknown search params" do
+        get_auth moderator_dashboard_path, @admin, params: { search: { foo: "x" }}
+        assert_response :success
+      end
     end
   end
 end
