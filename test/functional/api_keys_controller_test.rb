@@ -59,6 +59,24 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to confirm_password_session_path(url: user_api_keys_path(@user.id))
       end
 
+      should "redirect to the confirm password page if the user reauthenticated more than 15 minutes ago" do
+        login_as(@user, reauthenticate: true)
+        travel_to 16.minutes.from_now do
+          get user_api_keys_path(@user.id)
+        end
+
+        assert_redirected_to confirm_password_session_path(url: user_api_keys_path(@user.id))
+      end
+
+      should "not redirect to the confirm password page if the user reauthenticated less than 15 minutes ago" do
+        login_as(@user, reauthenticate: true)
+        travel_to 14.minutes.from_now do
+          get user_api_keys_path(@user.id)
+        end
+
+        assert_response :success
+      end
+
       should "redirect to the confirm password page if the user has just logged in" do
         post session_path, params: { session: { name: @user.name, password: "password" }}
         get user_api_keys_path(@user.id)
