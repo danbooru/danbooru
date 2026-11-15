@@ -151,8 +151,21 @@ module Searchable
     where_array_to_tsvector_matches(attr, escape_patterns_for_tsquery(patterns).join(" | "))
   end
 
-  def where_any_in_array_iequals(attr, value)
-    where_array_to_tsvector_matches("lower(#{qualified_column_for(attr)})", value.downcase.to_escaped_for_tsquery)
+  # Match if the array contains any of these values, ignoring case.
+  #
+  # This builds a tsquery like `'foo' | 'bar'` and matches it against `array_to_tsvector(lower(attr))`, because that
+  # can use a GIN index on `array_to_tsvector(lower(attr))`. A simpler `lower(attr) && ARRAY[...]` can't use an index
+  # and scans the whole table. Each value is quoted by `to_escaped_for_tsquery`, so tsquery operators inside values
+  # are matched literally.
+  #
+  # @param values [String, Array<String>] The values to match.
+  def where_any_in_array_iequals(attr, values)
+    # Empty strings are invalid inside a tsquery like `'a' | ''`.
+    values = Array.wrap(values).compact_blank
+    return none if values.empty?
+
+    query = values.map { it.downcase.to_escaped_for_tsquery }.join(" | ")
+    where_array_to_tsvector_matches("lower(#{qualified_column_for(attr)})", query)
   end
 
   def where_text_includes_lower(attr, values)
