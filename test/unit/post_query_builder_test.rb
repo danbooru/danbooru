@@ -157,6 +157,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post7, post4], "original smile ~1girl ~multiple_girls -1boy -multiple_boys", tag_limit: 100)
     end
 
+    should "not fail for metatags that only match because of Unicode case folding" do
+      assert_tag_match([], "ſcore:>5")
+    end
+
     should "ignore invalid operator syntax" do
       assert_nothing_raised do
         assert_tag_match([], "-")

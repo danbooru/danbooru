@@ -33,7 +33,11 @@ class PostQuery
     MAX_NESTING_DEPTH = 5
     MAX_TERMS = 200
 
-    attr_reader :parser, :metatags, :metatag_regex, :term_count
+    # Matches a metatag name. Metatag names can only contain ASCII letters, numbers, and underscores. Don't use /i, because then
+    # Unicode characters that case fold to ASCII letters would match too (e.g. 'ſ' (U+017F LATIN SMALL LETTER LONG S) matches 's').
+    METATAG_NAME_REGEX = /\A([a-zA-Z0-9_]+):/
+
+    attr_reader :parser, :metatags, :term_count
 
     delegate :error, :rest, :eos?, :accept, :expect, :rewind, :zero_or_more, :one_or_more, :one_of, to: :parser
 
@@ -47,7 +51,6 @@ class PostQuery
       @max_terms = max_terms
       @max_nesting_depth = max_nesting_depth
       @metatags = metatags
-      @metatag_regex = /(#{metatags.join("|")}):/i
     end
 
     # Parse a search and return the AST.
@@ -174,7 +177,8 @@ class PostQuery
       # metatag = metatag_name ":" quoted_string
       # metatag_name = "user" | "fav" | "pool" | "order" | ...
       def metatag
-        name = expect(metatag_regex).delete_suffix(":")
+        name = expect(METATAG_NAME_REGEX).delete_suffix(":")
+        error("Unknown metatag: #{name}") unless name.downcase.in?(metatags)
         quoted, value = quoted_string
 
         AST.metatag(name, value, quoted)
@@ -198,7 +202,7 @@ class PostQuery
       # A wildcard is a string that contains a '*' character and that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def wildcard
         t = string(/(?=[^[:space:]]*\*)[^[:space:])~-][^[:space:]]*/, skip_balanced_parens: true)
-        error("Invalid tag name: #{t}") if t.match?(/\A#{metatag_regex}/)
+        error("Invalid tag name: #{t}") if t[METATAG_NAME_REGEX, 1]&.downcase&.in?(metatags)
         space
         AST.wildcard(t)
       end
@@ -206,7 +210,7 @@ class PostQuery
       # A tag is a string that begins with a nonspace, non-')', non-'~', or non-'-' character, followed by nonspace characters.
       def tag
         t = string(/[^[:space:])~-][^[:space:]]*/, skip_balanced_parens: true)
-        error("Invalid tag name: #{t}") if t.downcase.in?(%w[and or]) || t.include?("*") || t.match?(/\A#{metatag_regex}/)
+        error("Invalid tag name: #{t}") if t.downcase.in?(%w[and or]) || t.include?("*") || t[METATAG_NAME_REGEX, 1]&.downcase&.in?(metatags)
         space
         AST.tag(t)
       end

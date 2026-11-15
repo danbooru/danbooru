@@ -150,6 +150,19 @@ class PostQueryParserTest < ActiveSupport::TestCase
       assert_parse_equals(%q{(and source:"don't say \"lazy\"" blah)}, %q{source:don't\ say\ "lazy" blah})
     end
 
+    should "only have metatag names made of lowercase letters, numbers, and underscores" do
+      assert_equal([], (PostQueryBuilder::METATAGS + MediaAssetQuery::METATAGS).grep_v(/\A[a-z0-9_]+\z/))
+    end
+
+    should "not parse metatags that only match because of Unicode case folding" do
+      # 'ſ' (U+017F LATIN SMALL LETTER LONG S) case folds to 's'.
+      ast = PostQuery::Parser.parse("ſcore:>5 ſcore:*", metatags: PostQueryBuilder::METATAGS)
+
+      assert_equal([], ast.metatags)
+      assert_equal(["ſcore:>5"], ast.tags.map(&:name))
+      assert_equal(["ſcore:*"], ast.wildcards.map(&:name))
+    end
+
     should "parse escaped wildcards in metatags correctly" do
       # backslash-escaping a wildcard outside of quotes works
       assert_parse_equals('source:\*a\*', 'source:\*a\*')
