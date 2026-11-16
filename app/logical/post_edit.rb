@@ -152,11 +152,11 @@ class PostEdit
 
     private def quoted_string
       if accept('"')
-        string = expect(/(\\"|[^"])*/).gsub(/\\"/, '"') # handle backslash escaped quotes
+        string = expect(/([^"\\]|\\.)*/).gsub(/\\(["\\])/, '\1') # handle backslash escaped quotes and backslashes
         expect('"')
         string
       elsif accept("'")
-        string = expect(/(\\'|[^'])*/).gsub(/\\'/, "'") # handle backslash escaped quotes
+        string = expect(/([^'\\]|\\.)*/).gsub(/\\(['\\])/, '\1') # handle backslash escaped quotes and backslashes
         expect("'")
         string
       else

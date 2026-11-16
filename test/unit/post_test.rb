@@ -1411,6 +1411,18 @@ class PostTest < ActiveSupport::TestCase
             assert_equal("aaa bbb non-web_source", @post.tag_string)
           end
 
+          should "set a source ending in a backslash with a quoted value" do
+            @post.update(tag_string: 'aaa source:"foo\\\\" bbb')
+            assert_equal("foo\\", @post.source)
+            assert_equal("aaa bbb non-web_source", @post.tag_string)
+
+            @post.update(tag_string: "aaa source:'foo\\\\' bbb")
+            assert_equal("foo\\", @post.source)
+
+            @post.update(tag_string: 'aaa source:"foo \\"bar\\" \\\\baz" bbb')
+            assert_equal('foo "bar" \\baz', @post.source)
+          end
+
           should 'strip the source with source:"  foo bar baz  "' do
             @post.update(tag_string: 'source:"  foo bar baz  "')
             assert_equal("foo bar baz", @post.source)
