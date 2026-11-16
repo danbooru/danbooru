@@ -18,6 +18,25 @@ module Explore
           assert_response :success
         end
 
+        should "work with a valid date" do
+          get popular_explore_posts_path(date: "2020-01-02")
+          assert_response :success
+        end
+
+        should "fail for an invalid date" do
+          get popular_explore_posts_path(date: "abc")
+          assert_response 422
+
+          get popular_explore_posts_path(date: "2020-13-45")
+          assert_response 422
+
+          get popular_explore_posts_path(date: "1" * 200)
+          assert_response 422
+
+          get popular_explore_posts_path(date: ["2020-01-02"])
+          assert_response 422
+        end
+
         should "use the site's time zone for the current date" do
           travel_to(Time.zone.local(2026, 11, 7, 20, 0)) do
             @post = create(:post)
