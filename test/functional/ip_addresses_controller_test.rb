@@ -18,6 +18,19 @@ class IpAddressesControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
+      should "return 404 for an invalid IP address" do
+        get_auth ip_address_path("abc"), @mod
+        assert_response 404
+      end
+
+      should "return 403 for an invalid IP address to non-mods" do
+        get_auth ip_address_path("abc"), @user
+        assert_response 403
+
+        get ip_address_path("abc")
+        assert_response 403
+      end
+
       should "work for a Tor address" do
         get_auth ip_address_path("2405:8100:8000::1"), @mod
         assert_response :success
