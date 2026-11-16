@@ -548,6 +548,17 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error instead of 500 for missing or invalid user params" do
+        assert_no_difference("User.count") do
+          post users_path, as: :json
+          assert_response 422
+        end
+
+        post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1", email_address: "x" }}, as: :json
+        assert_response 201
+        assert_nil(User.find_by_name("xxx").email_address)
+      end
+
       should "create a user" do
         freeze_time
         post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1" }}

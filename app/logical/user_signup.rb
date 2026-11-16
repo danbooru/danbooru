@@ -15,16 +15,19 @@ class UserSignup
 
   # @return [User] The user that will be created.
   memoize def user
+    user_params = params[:user].is_a?(Hash) ? params[:user] : {}
+    email_params = user_params[:email_address].is_a?(Hash) ? user_params[:email_address] : {}
+
     User.new(
       request: request,
       last_ip_addr: request.remote_ip,
       last_logged_in_at: Time.zone.now,
       requires_verification: requires_verification?,
       level: initial_level,
-      name: params[:user][:name],
-      password: params[:user][:password],
-      password_confirmation: params[:user][:password_confirmation],
-      email_address_attributes: { address: params.dig(:user, :email_address, :address) },
+      name: user_params[:name],
+      password: user_params[:password],
+      password_confirmation: user_params[:password_confirmation],
+      email_address_attributes: { address: email_params[:address] },
     )
   end
 

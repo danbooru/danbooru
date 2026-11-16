@@ -19,6 +19,7 @@ class UserNameValidator < ActiveModel::EachValidator
   ]
 
   def validate_each(rec, attr, name)
+    name = name.to_s
     forbidden_characters = name.delete(ALLOWED_PUNCTUATION).chars.grep(/[[:punct:]]/).uniq
     current_user = rec.is_a?(UserNameChangeRequest) ? rec.user : rec
 
