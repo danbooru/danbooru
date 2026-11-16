@@ -18,6 +18,13 @@ class PaginatorTest < ActiveSupport::TestCase
       assert_equal(expected_posts.map(&:id), posts.map(&:id))
     end
 
+    should "work for ids that are too large for the id column" do
+      expected_posts = Post.limit(3).order(id: :desc)
+      posts = Post.paginate("b99999999999999999999", limit: 3)
+
+      assert_equal(expected_posts.map(&:id), posts.map(&:id))
+    end
+
     should "return nothing for b0" do
       posts = Post.paginate("b0")
       assert_empty(posts.map(&:id))
@@ -30,6 +37,12 @@ class PaginatorTest < ActiveSupport::TestCase
       posts = Post.paginate("a0", limit: 3)
 
       assert_equal(expected_posts.map(&:id), posts.map(&:id))
+    end
+  end
+
+  context "sequential pagination (after) with an id that is too large for the id column" do
+    should "return nothing" do
+      assert_empty(Post.paginate("a99999999999999999999").map(&:id))
     end
   end
 
