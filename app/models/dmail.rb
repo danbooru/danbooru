@@ -67,7 +67,7 @@ class Dmail < ApplicationRecord
 
     def build_response(options = {})
       Dmail.new do |dmail|
-        if title =~ /Re:/
+        if title.include?("Re:")
           dmail.title = title
         else
           dmail.title = "Re: #{title}"

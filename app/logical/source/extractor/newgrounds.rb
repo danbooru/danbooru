@@ -42,7 +42,7 @@ module Source
       end
 
       def image_urls_from_gallery
-        script = page&.css("script")&.find { |node| node.text.match?(/let imageData =/) }
+        script = page&.css("script")&.find { |node| node.text.include?("let imageData =") }
         images = script&.text.to_s[/let imageData =(.*?);/m, 1]&.parse_json || []
         images.pluck("image")
       end

@@ -618,7 +618,7 @@ class DText
     options = { base_url:, inline:, allowed_shortlinks: }
 
     # Allow caller to rewrite elements before processing them.
-    html.children.each { |element| block.call(element) } if block.present?
+    html.children.each(&block) if block.present?
 
     children = []
     html.children.each do |current|
@@ -696,10 +696,10 @@ class DText
         content = html_to_dtext(element, **options, &block)
         "[code]#{content}[/code]" if content.present?
       in "li" if element.parent&.name == "ol"
-        content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
+        content = html_to_dtext(element, **options, &block).squeeze("\n").strip
         "#{element["value"]}. #{content}\n" if content.present?
       in "li"
-        content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
+        content = html_to_dtext(element, **options, &block).squeeze("\n").strip
         depth = element.ancestors.count { it.name == "ul" }.clamp(1..)
         list = "*" * depth
         "#{list} #{content}\n" if content.present?

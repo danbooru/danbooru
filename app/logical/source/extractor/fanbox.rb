@@ -29,7 +29,7 @@ module Source
         sortable_files += api_response.dig("body", "imageMap").to_a.pluck(1)
 
         # The following is needed because imageMap/fileMap are sorted alphabetically rather than by image order
-        sort_order = api_response.dig("body", "blocks").to_a.map { |b| b["#{b["type"]}Id"] }.compact.uniq
+        sort_order = api_response.dig("body", "blocks").to_a.filter_map { |b| b["#{b["type"]}Id"] }.uniq
         sortable_files = sortable_files.sort_by { |f| sort_order.index(f["id"] || f["imageId"]) } if sort_order.present?
 
         (files + sortable_files).map { |file| file["originalUrl"] || file["url"] }.reject { |file| File.extname(file) == ".zip" } # XXX remove if we ever add a way to extract zip files from sources

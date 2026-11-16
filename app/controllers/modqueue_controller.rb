@@ -21,9 +21,9 @@ class ModqueueController < ApplicationController
     @modqueue_posts = posts.distinct.except(:select, :group, :order).load
     @posts = posts.paginate(params[:page], limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE, count: @modqueue_posts.size)
 
-    @pending_post_count = @modqueue_posts.select(&:is_pending?).count
-    @flagged_post_count = @modqueue_posts.select(&:is_flagged?).count
-    @appealed_post_count = @modqueue_posts.select(&:is_appealed?).count
+    @pending_post_count = @modqueue_posts.count(&:is_pending?)
+    @flagged_post_count = @modqueue_posts.count(&:is_flagged?)
+    @appealed_post_count = @modqueue_posts.count(&:is_appealed?)
     @rating_counts = @modqueue_posts.map(&:rating).tally
     @disapproval_reasons = PostDisapproval.where(post_id: @modqueue_posts.map(&:id)).where.not(reason: "disinterest").group(:reason).order(count: :desc).distinct.count(:post_id)
     @uploaders = @modqueue_posts.map(&:uploader).tally.sort_by(&:last).reverse.take(20).to_h

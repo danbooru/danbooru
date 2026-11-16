@@ -27,7 +27,7 @@ class DTextExporter
       end
 
       opts.on("-m", "--models x,y,z", Array, "Use the specified models") do |model_names|
-        options[:models] = model_names.map(&:camelize).map(&:safe_constantize)
+        options[:models] = model_names.map { it.camelize.safe_constantize }
       end
 
       opts.on("--regen", "Regenerate DText in *.json.gz files") do

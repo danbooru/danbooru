@@ -92,9 +92,7 @@ class ApiKey < ApplicationRecord
     def action_permitted?(controller, action)
       return true if permissions.empty?
 
-      permissions.any? do |permission|
-        permission == "#{controller}:#{action}"
-      end
+      permissions.include?("#{controller}:#{action}")
     end
 
     def validate_permissions

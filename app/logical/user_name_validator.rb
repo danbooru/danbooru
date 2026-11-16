@@ -37,7 +37,7 @@ class UserNameValidator < ActiveModel::EachValidator
       rec.errors.add(attr, "can't end with '#{name.last}'")
     elsif name =~ /\.(#{Mime::EXTENSION_LOOKUP.keys.join("|")})\z/io
       rec.errors.add(attr, "can't end with a file extension")
-    elsif name =~ /__/
+    elsif name.include?("__")
       rec.errors.add(attr, "can't contain multiple underscores in a row")
     elsif forbidden_characters.present?
       rec.errors.add(attr, "can't contain #{forbidden_characters.map { |c| "'#{c}'" }.to_sentence}")

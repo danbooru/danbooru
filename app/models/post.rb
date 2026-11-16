@@ -129,7 +129,7 @@ class Post < ApplicationRecord
     commentary = ArtistCommentary.new(**artist_commentary)
 
     if add_artist_tag
-      tag_string = "#{tag_string} #{upload_media_asset.source_extractor&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip
+      tag_string = "#{tag_string} #{upload_media_asset.source_extractor&.artists.to_a.map { it.tag.name }.join(" ")}".strip
       tag_string += " " if tag_string.present?
     end
 
@@ -381,7 +381,7 @@ class Post < ApplicationRecord
     # Update tag_count_general, tag_count_copyright, etc.
     def update_tag_category_counts
       TagCategory.categories.each do |category_name|
-        tag_count = tags.select { |t| t.category_name.downcase == category_name }.size
+        tag_count = tags.count { |t| t.category_name.downcase == category_name }
         send("tag_count_#{category_name}=", tag_count)
       end
 

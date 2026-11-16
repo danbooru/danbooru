@@ -98,7 +98,7 @@ class ExifTool
       metadata["File:ColorComponents"] == 1 ||
         metadata["PNG:ColorType"] == "Grayscale" ||
         metadata["PNG:ColorType"] == "Grayscale with Alpha" ||
-        metadata["QuickTime:ChromaFormat"].to_s.match?(/Monochrome/) # "Monochrome 4:0:0"
+        metadata["QuickTime:ChromaFormat"].to_s.include?("Monochrome") # "Monochrome 4:0:0"
     end
 
     # https://exiftool.org/TagNames/EXIF.html
@@ -110,7 +110,7 @@ class ExifTool
         # PNGs can have EXIF orientation metadata, but it's only valid if it appears before the IDAT chunk
         # (the actual image data). Metadata found after the IDAT chunk is ignored by most browsers.
         metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"]) &&
-          !metadata["ExifTool:Warning"].to_s.match?(/found after PNG IDAT/)
+          metadata["ExifTool:Warning"].to_s.exclude?("found after PNG IDAT")
       when :avif
         metadata["QuickTime:Rotation"].present?
       else

@@ -65,7 +65,7 @@ class WikiPage < ApplicationRecord
     end
 
     def other_names_match(name)
-      if name =~ /\*/
+      if name.include?("*")
         subquery = WikiPage.from("unnest(other_names) AS other_name").where_ilike("other_name", normalize_other_name(name))
         where(id: subquery)
       else

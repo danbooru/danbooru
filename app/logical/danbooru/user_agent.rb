@@ -49,7 +49,7 @@ module Danbooru
       # "Mozilla/5.0 (Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36 OPR/36.0.2128.0 OMI/4.8.0.129.Driver6.32 , _TV_MT5806/092.003.166.031 (Philips, PUG6654, wired)  CE-HTML/1.0 NETTV/4.6.0.2 SignOn/2.0 SmartTvA/5.0.0 WH1.0 en Opera/68.0.3618.31"
       # "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"
       # "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)"
-      if raw_user_agent.match("Opera|Trident|MSIE")
+      if raw_user_agent.match?(/Opera|Trident|MSIE/)
         []
 
       # "com.apple.Safari.SearchHelper/16611.2.7.1.4 CFNetwork/1240.0.4 Darwin/20.5.0" => "com.apple.Safari.SearchHelper"

@@ -121,9 +121,9 @@ class ApplicationPolicy
   # The list of attributes that are permitted to be used as data-* attributes
   # in tables and in the <body> tag on show pages.
   def html_data_attributes
-    data_attributes = record.class.columns.select do |column|
-      column.type.in?(%i[integer boolean datetime float uuid interval]) && !column.array?
-    end.map(&:name).map(&:to_sym)
+    data_attributes = record.class.columns.filter_map do |column|
+      column.name.to_sym if column.type.in?(%i[integer boolean datetime float uuid interval]) && !column.array?
+    end
 
     api_attributes & data_attributes
   end

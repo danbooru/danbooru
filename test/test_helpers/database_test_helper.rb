@@ -9,7 +9,8 @@ module DatabaseTestHelper
     connection_parameters = connection.instance_eval { @connection_parameters }
     original_parameters = connection_parameters.dup
 
-    connection_parameters.merge!(host: "127.0.0.1", port: 1)
+    connection_parameters[:host] = "127.0.0.1"
+    connection_parameters[:port] = 1
     connection.disconnect!
 
     yield

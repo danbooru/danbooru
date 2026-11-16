@@ -71,7 +71,7 @@ class TagRelationshipsComponentTest < ViewComponent::TestCase
 
       count_queries = lambda do
         count = 0
-        ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].match?(/\ASELECT/) }, "sql.active_record") do
+        ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].start_with?("SELECT") }, "sql.active_record") do
           render_component(Tag.find(@tag.id))
         end
         count

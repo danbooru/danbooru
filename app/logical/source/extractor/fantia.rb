@@ -56,9 +56,9 @@ class Source::Extractor
     def images_for_product
       return [] unless work_type == "product"
 
-      page&.css(".product-gallery-item .img-fluid").to_a.map do |element|
-        element["src"] unless element["src"] =~ %r{/fallback/}
-      end.compact
+      page&.css(".product-gallery-item .img-fluid").to_a.filter_map do |element|
+        element["src"] unless element["src"].to_s.include?("/fallback/")
+      end
     end
 
     def tags

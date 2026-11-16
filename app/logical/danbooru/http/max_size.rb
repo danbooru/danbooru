@@ -65,7 +65,7 @@ module Danbooru
           input = @compressed.byteslice(@offset, INFLATE_SIZE)
           @offset += input.bytesize
 
-          output = String.new
+          output = "".b
           inflater.inflate(input) { |piece| output << add(piece) }
           output
         rescue EOFError

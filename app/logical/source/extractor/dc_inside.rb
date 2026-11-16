@@ -21,9 +21,9 @@ class Source::Extractor::DcInside < Source::Extractor
         src = el.attr("data-original") || el.attr("src")
       end
 
-      next unless src.match %r{\Ahttps?://dcimg\d+\.dcinside\.(?:com|co\.kr)/viewimage\.php}
+      next unless src.match?(%r{\Ahttps?://dcimg\d+\.dcinside\.(?:com|co\.kr)/viewimage\.php})
 
-      if el.attr("onclick").to_s.match(/\Ajavascript:imgPop\('([^']*)'/)
+      if el.attr("onclick").to_s =~ /\Ajavascript:imgPop\('([^']*)'/
         src = $1
       end
 

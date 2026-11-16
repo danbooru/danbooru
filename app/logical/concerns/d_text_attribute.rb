@@ -48,7 +48,7 @@ module DTextAttribute
           flush_cache("dtext_#{name}_was")           #   flush_cache("dtext_body_was")
         end                                          # end
 
-        define_method "reload" do |**options|
+        define_method :reload do |**options|
           flush_cache
           super(**options)
         end

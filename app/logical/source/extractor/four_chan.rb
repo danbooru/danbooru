@@ -21,9 +21,9 @@ module Source
           ["https://i.4cdn.org/#{board}/#{post["tim"]}#{post["ext"]}"]
         # If this is a thread URL
         elsif thread_id.present? && post_id_from_url.nil?
-          api_response.map do |post|
+          api_response.filter_map do |post|
             "https://i.4cdn.org/#{board}/#{post["tim"]}#{post["ext"]}" if post["tim"].present? && post["ext"].present?
-          end.compact
+          end
         # If this is a thumbnail image URL and we can't get the full image URL from the API
         elsif parsed_url.image_url?
           [url.to_s]
@@ -47,7 +47,7 @@ module Source
       end
 
       def artist_commentary_desc
-        commentary = String.new
+        commentary = +""
 
         if post["filename"].present?
           commentary << "<a href=\"https://i.4cdn.org/#{board}/#{post["tim"]}#{post["ext"]}\">#{post["filename"]}#{post["ext"]}</a> (#{post["fsize"].to_fs(:human_size)}, #{post["w"]}x#{post["h"]})<br>"

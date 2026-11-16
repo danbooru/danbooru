@@ -21,7 +21,7 @@ module Source
             images += ordered_gallery_images
           end
 
-          images.compact.uniq.map { |url| Source::URL.parse(url)&.full_image_url || url }.compact
+          images.compact.uniq.filter_map { |url| Source::URL.parse(url)&.full_image_url || url }
         else
           []
         end

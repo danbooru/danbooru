@@ -187,8 +187,8 @@ class UploadLimit
   # @param [Integer] the upload level (0 - 35)
   # @return [Integer] the upload points (0 - 10,000)
   def self.level_to_points(level)
-    (1..level).map do |n|
+    (1..level).sum do |n|
       points_for_next_level(n - 1)
-    end.sum
+    end
   end
 end

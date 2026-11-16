@@ -234,7 +234,7 @@ module Searchable
 
     if query.nil?
       all
-    elsif query =~ /\*/
+    elsif query.include?("*")
       columns.map do |column|
         where_ilike(column, query)
       end.reduce(:or)
