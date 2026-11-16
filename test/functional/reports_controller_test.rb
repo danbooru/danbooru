@@ -72,6 +72,46 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
           assert_select "p", text: "Error: The date range can't be longer than 2000 days. Choose a longer period or a shorter date range."
         end
 
+        should "ignore params that aren't strings" do
+          get_auth report_path("posts", search: { period: ["day"] }), @user
+          assert_response :success
+
+          get_auth report_path("posts", search: { group: ["a"] }), @user
+          assert_response :success
+
+          get_auth report_path("posts", search: { group_limit: ["1"] }), @user
+          assert_response :success
+
+          get_auth report_path("posts", search: { columns: { a: 1 }}), @user
+          assert_response :success
+
+          get_auth report_path("posts", search: { mode: ["a"] }), @user
+          assert_response :success
+        end
+
+        should "fail for an invalid date" do
+          get_auth report_path("posts", search: { from: "abc" }), @user
+          assert_response 422
+          assert_select "p", text: "Error: abc is not a valid date"
+
+          get_auth report_path("posts", search: { period: "day", to: "2020-13-45" }), @user
+          assert_response 422
+          assert_select "p", text: "Error: 2020-13-45 is not a valid date"
+
+          get_auth report_path("posts", search: { period: "day", from: "1.month.ago" }), @user
+          assert_response 422
+          assert_select "p", text: "Error: 1.month.ago is not a valid date"
+
+          get_auth report_path("posts", search: { from: "1" * 200 }), @user
+          assert_response 422
+          assert_select "p", text: "Error: #{"1" * 97}... is not a valid date"
+        end
+
+        should "work with a date and time" do
+          get_auth report_path("posts", search: { from: "2020-1-1 12:00", to: "2020-01-31", period: "day" }), @user
+          assert_response :success
+        end
+
         should "fail for an invalid period" do
           get_auth report_path("posts", search: { period: "decade" }), @user
 
