@@ -42,6 +42,16 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#post-version-#{@post.versions[1].id} ins:not(.diff-obsolete)", text: "2"
       end
 
+      should "show every post when searching for multiple post IDs" do
+        get_auth post_versions_path, @user, params: { search: { post_id: "#{@post.id},#{@post2.id}" }}
+
+        assert_response :success
+        assert_select "h1", text: "Post History"
+        assert_select "#p-standard-listing"
+        assert_select "#post-versions-table #post_#{@post.id}"
+        assert_select "#post-versions-table #post_#{@post2.id}"
+      end
+
       should "list all versions that match the search criteria" do
         get_auth post_versions_path, @user, params: { search: { post_id: @post.id }}
         assert_response :success
