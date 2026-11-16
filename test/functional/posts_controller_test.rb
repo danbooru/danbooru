@@ -1011,6 +1011,22 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "#image.video-component"
           assert_not_select "#translate"
         end
+
+        should "include the tags in the video filenames unless tagged filenames are disabled" do
+          post = create(:post, file_ext: "mp4", tag_string: "touhou chen", media_asset: build(:media_asset, file_ext: "mp4", duration: 1.0))
+          Danbooru.config.stubs(:media_asset_file_url).returns("/untagged.mp4")
+          Danbooru.config.stubs(:media_asset_file_url).with(anything, post.seo_tags).returns("/tagged.mp4")
+
+          get_auth post_path(post), @user
+          assert_response :success
+          assert_select "#image video.video-variant[src$='/tagged.mp4']"
+
+          @user.update!(disable_tagged_filenames: true)
+          get_auth post_path(post), @user
+          assert_response :success
+          assert_select "#image video.video-variant[src$='/untagged.mp4']"
+          assert_not_select "#image video.video-variant[src$='/tagged.mp4']"
+        end
       end
 
       context "with pools" do
