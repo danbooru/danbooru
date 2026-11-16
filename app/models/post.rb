@@ -639,8 +639,8 @@ class Post < ApplicationRecord
         in "parent", new_parent_id
           self.parent_id = new_parent_id
 
-        in "rating", /\A([#{RATINGS.keys.join}])/i
-          self.rating = $1.downcase
+        in "rating", /\A([#{RATINGS.keys.join}])/o
+          self.rating = $1
 
         in "source", "none"
           self.source = ""

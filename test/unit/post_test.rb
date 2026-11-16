@@ -1083,6 +1083,9 @@ class PostTest < ActiveSupport::TestCase
 
               @post.update(tag_string: "aaa rating:g")
               assert_equal("g", @post.reload.rating)
+
+              @post.update(tag_string: "aaa rating:E")
+              assert_equal("e", @post.reload.rating)
             end
 
             should "update the rating for a long name" do
@@ -1110,6 +1113,13 @@ class PostTest < ActiveSupport::TestCase
               @post.update(tag_string: "aaa rating:z")
               @post.reload
               assert_equal("q", @post.rating)
+            end
+
+            should "ignore ratings with Unicode characters" do
+              assert_equal(true, @post.update(tag_string: "aaa bbb rating:ſ"))
+              @post.reload
+              assert_equal("q", @post.rating)
+              assert_equal("aaa bbb", @post.tag_string)
             end
           end
 
