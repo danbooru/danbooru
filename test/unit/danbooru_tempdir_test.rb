@@ -9,30 +9,21 @@ class DanbooruTempdirTest < ActiveSupport::TestCase
       assert_equal(false, File.exist?(dir.path))
     end
 
-    should "not be deleted by a forked process" do
-      # In a forked process, only the thread that forked keeps running, so a directory that another thread is using can be
-      # garbage collected in the forked process.
-      paths = Queue.new
-      done = Queue.new
-      thread = Thread.new do
-        dir = Danbooru::Tempdir.create
-        paths << dir.path
-        done.pop
-        dir.close
-      end
-      path = paths.pop
+    should "only be deleted by the finalizer in the process that created it" do
+      dir = Danbooru::Tempdir.create
+      finalizer = Danbooru::Tempdir.finalizer(dir.path)
 
-      pid = Process.fork do
-        3.times { GC.start(full_mark: true, immediate_sweep: true) }
-        sleep 0.1 # Let the finalizers run.
-        exit!(0)
-      end
-      wait_for_fork(pid)
+      # A forked process doesn't have the other threads that may still be using the directory.
+      other_pid = Process.pid + 1
+      Process.stubs(:pid).returns(other_pid)
+      finalizer.call
+      assert_equal(true, File.exist?(dir.path))
 
-      assert_equal(true, File.exist?(path))
+      Process.unstub(:pid)
+      finalizer.call
+      assert_equal(false, File.exist?(dir.path))
     ensure
-      done << true
-      thread&.join
+      dir&.close
     end
   end
 end
