@@ -1727,7 +1727,7 @@ class Post < ApplicationRecord
         when "filesize_asc"
           joins(:media_asset).reorder("media_assets.file_size ASC")
 
-        when /\A(?<column>#{PostQueryBuilder::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/io
+        when /\A(?<column>#{PostQueryBuilder::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/o
           column = $~[:column]
           direction = $~[:direction] || "desc"
           reorder(column => direction, :id => direction)

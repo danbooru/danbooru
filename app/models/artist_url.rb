@@ -21,7 +21,7 @@ class ArtistURL < ApplicationRecord
     q = q.urls_match(params[:url_matches])
 
     case params[:order]
-    when /\A(id|artist_id|url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/i
+    when /\A(id|artist_id|url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/
       dir = $2 || :desc
       q = q.order($1 => dir).order(id: :desc)
     else

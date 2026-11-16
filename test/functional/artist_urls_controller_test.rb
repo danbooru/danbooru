@@ -13,6 +13,11 @@ class ArtistURLsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "ignore orders with Unicode characters" do
+        get artist_urls_path(search: { order: "iſ_active" })
+        assert_response :success
+      end
+
       should respond_to_search.with { @banned.urls + @artist.urls }
       should respond_to_search(url_matches: "*bkub*").with { @artist.urls }
       should respond_to_search(is_active: "false").with { @artist.urls }

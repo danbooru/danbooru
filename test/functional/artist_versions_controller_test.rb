@@ -20,6 +20,11 @@ class ArtistVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "ignore orders with Unicode characters" do
+        get artist_versions_path(search: { order: "id_aſc" })
+        assert_response :success
+      end
+
       should respond_to_search.with { @versions.reverse }
       should respond_to_search(name: "masao").with { [@versions[2], @versions[0]] }
       should respond_to_search(group_name: "the_best").with { @versions[2] }

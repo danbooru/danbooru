@@ -43,7 +43,7 @@ class IpBan < ApplicationRecord
     q = search_attributes(params, %i[id created_at updated_at ip_addr reason is_deleted category hit_count last_hit_at creator], current_user: current_user)
 
     case params[:order]
-    when /\A(created_at|updated_at|last_hit_at)(?:_(asc|desc))?\z/i
+    when /\A(created_at|updated_at|last_hit_at)(?:_(asc|desc))?\z/
       column = $1
       dir = $2 || :desc
       q = q.order(Arel.sql("#{column} #{dir} NULLS LAST")).order(id: :desc)

@@ -49,6 +49,11 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "ignore orders with Unicode characters" do
+        get_auth ip_bans_path(search: { order: "created_at_deſc" }), @admin
+        assert_response :success
+      end
+
       ip_bans = respond_to_search.as_user { @admin }
       should ip_bans.search_params.with { [@other_ban, @subnet_ban, @ip_ban] }
       should ip_bans.search_params(ip_addr: -> { @ip_ban.ip_addr }).with { @ip_ban }

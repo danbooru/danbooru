@@ -1572,6 +1572,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([p3, p2, p1], "order:gentags_ascx")
     end
 
+    should "ignore count orders with Unicode characters" do
+      p1 = create(:post)
+      p2 = create(:post)
+      p3 = create(:post)
+
+      assert_tag_match([p1, p2, p3], "order:comment_count_asc")
+      assert_tag_match([p3, p2, p1], "order:comment_count_aſc")
+      assert_tag_match([p3, p2, p1], "order:ſeries_pool_count")
+    end
+
     should "return posts for order:comment_bumped" do
       post1 = create(:post)
       post2 = create(:post)
