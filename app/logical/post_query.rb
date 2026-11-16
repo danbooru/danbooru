@@ -96,9 +96,9 @@ class PostQuery
   # @param n [Integer] The number of posts to return.
   # @param timeout [Integer] The search timeout, in milliseconds.
   # @param count [Integer] The number of posts matched by the search. An optional optimization if the search count is known ahead of time.
-  # @return [Array<Post>]
+  # @return [Array<Post>, nil] The posts, or nil if the search timed out.
   def posts_with_timeout(n, timeout: current_user.statement_timeout, count: post_count, **options)
-    Post.with_timeout(timeout, []) do
+    Post.with_timeout(timeout, nil) do
       paginated_posts(1, limit: n, count: count, **options).to_a
     end
   end

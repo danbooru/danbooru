@@ -314,6 +314,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "say the search timed out instead of 'No posts found' when the uploads search times out" do
+        PostQuery.any_instance.stubs(:paginated_posts).raises(ActiveRecord::QueryCanceled)
+        get user_path(@user)
+
+        assert_response :success
+        assert_select ".user-uploads", text: /The search timed out/
+        assert_select ".user-uploads", text: /No posts found/, count: 0
+      end
+
       should "show the log out link only on the user's own profile" do
         get_auth user_path(@user), @user
         assert_response :success

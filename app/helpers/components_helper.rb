@@ -10,6 +10,8 @@ module ComponentsHelper
   # @param posts [ActiveRecord::Relation<Post>, Array<Post>] A set of posts.
   # @param options [Hash] A hash of options for the PostGalleryComponent and PostPreviewComponent.
   def render_post_gallery(posts, **options, &_block)
+    return tag.p("The search timed out.") if posts.nil?
+
     posts = posts.includes(:media_asset) if posts.is_a?(ActiveRecord::Relation)
 
     render(PostGalleryComponent.new(**options)) do |gallery|
