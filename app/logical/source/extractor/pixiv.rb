@@ -242,10 +242,6 @@ module Source
         translated_tags.merge(split_tags.index_with { |tag| tag.split("/").flat_map { translated_parts.fetch(it, []) } })
       end
 
-      def related_posts_search_query
-        illust_id.present? ? "pixiv:#{illust_id}" : "source:#{url}"
-      end
-
       def is_ugoira?
         parsed_url.is_ugoira? || original_urls.any? { |url| Source::URL.parse(url).is_ugoira? }
       end
