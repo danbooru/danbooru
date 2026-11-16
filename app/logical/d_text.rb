@@ -786,7 +786,8 @@ class DText
   #
   # @param allowed_shortlinks [Array<String>] The list of shortlinks to allow in the text (e.g. ["pixiv"] to not escape `pixiv #1234` shortlinks).
   def self.escape(text, allowed_shortlinks: [])
-    text.gsub(/(#{Regexp.union(SHORTLINKS - allowed_shortlinks)}) #(\d+)/i, '\1 &num;\2') # post #1234 -> post &num;1234
+    # post #1234 -> post &num;1234
+    text.gsub(/(#{Regexp.union(SHORTLINKS).source}) #(\d+)/io) { $1.downcase.in?(allowed_shortlinks) ? $& : "#{$1} &num;#{$2}" }
   end
 
   # Return the first paragraph the search string `needle` occurs in.

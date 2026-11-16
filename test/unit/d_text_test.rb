@@ -504,6 +504,8 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("issue &num;1", DText.from_html('<a href="/image"><img src="/image.jpg" alt="issue #1"></a>'))
 
         assert_equal("issue #1", DText.from_html("issue #1", allowed_shortlinks: ["issue"]))
+        assert_equal("Issue #1", DText.from_html("Issue #1", allowed_shortlinks: ["issue"]))
+        assert_equal("pixiv #1 Post &num;2 mod action &num;3", DText.from_html("pixiv #1 Post #2 mod action #3", allowed_shortlinks: ["pixiv"]))
       end
 
       should "put headers on a line by themselves" do
