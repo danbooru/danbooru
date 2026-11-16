@@ -1012,6 +1012,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("test", @post.tag_string)
       end
 
+      should "not allow upload or media asset IDs inside the post params" do
+        assert_no_difference("Post.count") do
+          create_post!(upload_media_asset_id: 1, media_asset_id: 1, upload_id: 1)
+        end
+
+        assert_response 403
+      end
+
       should "re-render the upload page if the upload fails" do
         @post = create_post!(rating: "z", tag_string: "tagme")
         assert_response :success
