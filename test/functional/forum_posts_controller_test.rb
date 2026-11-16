@@ -157,6 +157,26 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         assert_select "button[name=cancel]", false
       end
 
+      should "return 400 for a missing topic" do
+        get_auth new_forum_post_path, @user
+        assert_response 400
+
+        get_auth new_forum_post_path(format: :json), @user
+        assert_response 400
+      end
+
+      should "return 404 for a nonexistent topic" do
+        get_auth new_forum_post_path(format: :json), @user, params: { topic_id: 0 }
+        assert_response 404
+      end
+
+      should "return 404 for a topic the user can't see" do
+        hidden_topic = as(@mod) { create(:mod_up_forum_topic) }
+        get_auth new_forum_post_path(format: :json), @user, params: { topic_id: hidden_topic.id }
+
+        assert_response 404
+      end
+
       should "not allow unauthorized users to quote posts in private forum topics" do
         as(@user) { @forum_post.topic.update(min_level: User::Levels::ADMIN) }
         get_auth new_forum_post_path, @user, params: { post_id: @forum_post.id }
