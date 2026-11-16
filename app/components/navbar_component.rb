@@ -1,13 +1,6 @@
 # frozen_string_literal: true
 
 class NavbarComponent < ApplicationComponent
-  # The locale switcher is rendered from inside the component, so include the
-  # helper directly instead of going through the `helpers` proxy: the proxy
-  # reflects the helpers of the calling controller, which doesn't always expose
-  # every app helper (for example when the error page is rendered from a rescue
-  # handler).
-  include LocaleHelper
-
   attr_reader :current_user
 
   delegate :li_link_to, :unread_dmail_indicator, :close_icon, :menu_icon, :main_app, :image_pack_tag, :halloween?, to: :helpers

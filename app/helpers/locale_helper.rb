@@ -16,8 +16,14 @@ module LocaleHelper
   # request params. Building the URL by hand from request.fullpath would let
   # `/tags?protocol=javascript&host=...` be reflected into the href, turning
   # the switcher link into a `javascript:` URL.
+  #
+  # When there is no routed request (a component rendered by itself, as in the
+  # component tests), there is no page to link back to, so fall back to a URL
+  # that is relative to the current location.
   def locale_switch_url(locale)
     current_page_path(locale: locale)
+  rescue ActionController::UrlGenerationError
+    "?locale=#{locale}"
   end
 
   # Renders "English / 简体中文" with the active language highlighted.

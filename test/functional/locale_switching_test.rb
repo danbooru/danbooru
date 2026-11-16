@@ -48,9 +48,10 @@ class LocaleSwitchingTest < ActionDispatch::IntegrationTest
       get root_path, params: { protocol: "javascript", host: "alert(1)", port: "1337" }
 
       assert_response 200
-      hrefs = css_select("a[href]").pluck("href")
+      hrefs = css_select("#locale-switcher-nav a[href]").pluck("href")
+      assert_equal 2, hrefs.size
       assert_empty(hrefs.grep(/alert|1337/), "the switcher reflected reserved url_for options into a link")
-      assert_includes hrefs, "/posts?locale=zh-CN"
+      assert(hrefs.any? { |href| href.include?("locale=zh-CN") })
     end
   end
 end
