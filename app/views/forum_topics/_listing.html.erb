@@ -20,11 +20,7 @@
       <%= link_to private_icon, forum_topics_path(search: { is_private: true }), class: "topic-status icon private", title: "#{topic.min_level} only" %>
     <% end %>
 
-    <% if forum_topic_status(topic).present? %>
-      <%= link_to topic.pretty_title, forum_topic_path(topic), class: "forum-post-link break-words" %>
-    <% else %>
-      <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link break-words" %>
-    <% end %>
+    <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link break-words" %>
 
     <% if topic.response_count > Danbooru.config.posts_per_page %>
       <%= link_to "page #{topic.last_page}", forum_topic_path(topic, :page => topic.last_page), :class => "last-page" %>

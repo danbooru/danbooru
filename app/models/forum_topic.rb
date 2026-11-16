@@ -183,10 +183,6 @@ class ForumTopic < ApplicationRecord
     original_post&.update_columns(updater_id: updater.id, updated_at: Time.zone.now)
   end
 
-  def pretty_title
-    title.gsub(/\A\[APPROVED\]|\[REJECTED\]/, "")
-  end
-
   def self.available_includes
     [:creator, :updater, :original_post]
   end
