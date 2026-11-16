@@ -2,6 +2,14 @@ require "test_helper"
 
 class UserActionsControllerTest < ActionDispatch::IntegrationTest
   context "The user actions controller" do
+    should "not have a show page" do
+      get "/user_actions/1"
+      assert_response 404
+
+      get "/user_actions/1.json"
+      assert_response 404
+    end
+
     context "index action" do
       setup do
         @user = create(:user)
