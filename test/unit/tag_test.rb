@@ -135,6 +135,15 @@ class TagTest < ActiveSupport::TestCase
   end
 
   context "A tag" do
+    should "only be a metatag if it begins with a metatag name" do
+      assert_equal(true, Tag.new(name: "score:>5").metatag?)
+      assert_equal(true, Tag.new(name: "ORDER:score").metatag?)
+      assert_equal(false, Tag.new(name: "idolmaster").metatag?)
+      assert_equal(false, Tag.new(name: "high_score").metatag?)
+      assert_equal(false, Tag.new(name: "ſcore:>5").metatag?)
+      assert_equal(false, Tag.new(name: "score").metatag?)
+    end
+
     should "be found when one exists" do
       tag = create(:tag)
       assert_difference("Tag.count", 0) do

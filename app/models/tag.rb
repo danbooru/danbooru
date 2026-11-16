@@ -491,7 +491,8 @@ class Tag < ApplicationRecord
   end
 
   def metatag?
-    name.match?(/\A#{PostQueryBuilder::METATAGS.join("|")}:/i)
+    metatag, colon = name.partition(":")
+    colon.present? && metatag.downcase(:ascii).in?(PostQueryBuilder::METATAGS)
   end
 
   def rating?
