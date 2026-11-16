@@ -36,7 +36,8 @@ jobs:
     timeout-minutes: 45
 
     container:
-      image: ghcr.io/helwod/danbooru:development-ce764a1d5c3d836ad35d859edcb59c5ef0d2c608
+      # Development image of the commit under test (built by pipeline.yaml).
+      image: ghcr.io/${{ github.repository }}:development-${{ github.sha }}
       options: --user root -v /var/run/docker.sock:/var/run/docker.sock
 
     env:
