@@ -366,6 +366,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "a[href^=?]", new_wiki_page_path, count: 0
         end
 
+        should "link to the deleted artist entry instead of creating a new one if the tag's artist entry was deleted" do
+          artist = create(:artist, name: "bkub", is_deleted: true)
+          create(:post, tag_string: "bkub rating:s")
+          get posts_path, params: { tags: "bkub rating:s" }
+
+          assert_response :success
+          assert_select "#excerpt", text: /The artist entry for bkub was deleted/
+          assert_select "#excerpt a[href=?]", artist_path(artist), text: "View deleted artist entry"
+          assert_select "a[href^=?]", new_artist_path, count: 0
+        end
+
         should "render an error when searching for too many tags" do
           get posts_path, params: { tags: "1 2 3 4" }
 

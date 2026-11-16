@@ -67,6 +67,8 @@
         <%# no-op %>
       <% elsif @post_set.artist.present? %>
         <%= link_to "Artist", artist_path(@post_set.artist), id: "show-excerpt-link", class: "artist-excerpt-link" %>
+      <% elsif @post_set.deleted_artist.present? %>
+        <%= link_to "Artist", artist_path(@post_set.deleted_artist), id: "show-excerpt-link", class: "artist-excerpt-link" %>
       <% elsif @post_set.tag&.artist? %>
         <%= link_to "Artist", new_artist_path(artist: { name: @post_set.tag.name }), id: "show-excerpt-link", class: "artist-excerpt-link", rel: "nofollow" %>
       <% elsif @post_set.wiki_page.present? %>
@@ -118,6 +120,10 @@
         <%= link_to "", edit_artist_path(@post_set.artist), "data-shortcut": "e", style: "display: none;" %>
       <% end %>
       <%= render "artists/summary", artist: @post_set.artist %>
+    <% elsif @post_set.deleted_artist.present? %>
+      <p>The artist entry for <%= @post_set.tag.name %> was deleted. <%= link_to "View deleted artist entry", artist_path(@post_set.deleted_artist) %>.</p>
+
+      <%= render TagRelationshipsComponent.new(tag: @post_set.tag) %>
     <% elsif @post_set.tag&.artist? %>
       <p>There is no artist entry yet for the artist <%= link_to @post_set.tag.name, new_artist_path(artist: { name: @post_set.tag.name }), rel: "nofollow" %>. <%= link_to "Create new artist entry", new_artist_path(artist: { name: @post_set.tag.name }), rel: "nofollow" %>.</p>
 
