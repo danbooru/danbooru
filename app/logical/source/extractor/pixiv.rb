@@ -243,10 +243,6 @@ module Source
         translated_tags
       end
 
-      def related_posts_search_query
-        illust_id.present? ? "pixiv:#{illust_id}" : "source:#{url}"
-      end
-
       def is_ugoira?
         parsed_url.is_ugoira? || original_urls.any? { |url| Source::URL.parse(url).is_ugoira? }
       end
