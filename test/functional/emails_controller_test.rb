@@ -43,6 +43,14 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#edit" do
+      should "return 404 for a nonexistent user" do
+        get edit_user_email_path(0)
+        assert_response 404
+
+        get_auth edit_user_email_path(0), @user, reauthenticate: true
+        assert_response 404
+      end
+
       context "for a user who hasn't recently authenticated" do
         should "redirect to the confirm password page" do
           login_as(@user)
