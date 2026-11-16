@@ -270,6 +270,13 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(0, @recipient.dmails.active.unread.count)
         assert_equal(0, @recipient.reload.unread_dmail_count)
       end
+
+      should "work for a JSON request" do
+        post_auth mark_all_as_read_dmails_path(format: :json), @recipient
+
+        assert_response :success
+        assert_equal(0, @recipient.reload.unread_dmail_count)
+      end
     end
 
     context "when a user has unread dmails" do
