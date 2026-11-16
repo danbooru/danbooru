@@ -3,10 +3,9 @@ require "test_helper"
 class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
   context "The upgrade codes controller" do
     context "index action" do
-      should "render for the owner" do
+      should "render for superadmins" do
         create(:upgrade_code)
-        @user = create(:owner_user)
-        get_auth upgrade_codes_path, @user
+        get_auth upgrade_codes_path, create(:superadmin_user)
 
         assert_response :success
       end

@@ -160,6 +160,18 @@ namespace :danbooru do
     end
   end
 
+  namespace :users do
+    desc "Change a user's level. Use this to promote or demote superadmins. Usage: ID=123 LEVEL=superadmin bin/rails danbooru:users:set_level"
+    task set_level: :environment do
+      user = User.find_by(id: ENV.fetch("ID")) or abort "User not found"
+      level = User.level_hash.transform_keys(&:downcase).fetch(ENV.fetch("LEVEL").downcase) { abort "Invalid level. Valid levels: #{User.level_hash.keys.join(", ")}" }
+
+      UserPromotion.new(user, User.system, level).promote!(validate: false)
+
+      puts "#{user.name} (##{user.id}) is now #{user.level_string}."
+    end
+  end
+
   # @see app/logical/danbooru_maintenance.rb
   namespace :maintenance do
     # Usage: bin/rails danbooru:maintenance:hourly

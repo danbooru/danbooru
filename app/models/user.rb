@@ -22,7 +22,7 @@ class User < ApplicationRecord
     APPROVER = 37
     MODERATOR = 40
     ADMIN = 50
-    OWNER = 60
+    SUPERADMIN = 60
   end
 
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
@@ -136,7 +136,7 @@ class User < ApplicationRecord
   validate :validate_custom_css, if: :custom_style_changed?
 
   before_save :recalculate_upload_points, if: :level_changed?
-  before_create :promote_to_owner_if_first_user
+  before_create :promote_to_superadmin_if_first_user
   after_create :send_welcome_email
   after_create_commit :login_new_user
 
@@ -525,10 +525,9 @@ class User < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
+      # The site owner is the first superadmin by ID.
       def owner
-        # Some downstream boorus have more than one owner-level user.
-        # For them we fall back to the first owner by ID.
-        User.where(level: Levels::OWNER).first!
+        User.where(level: Levels::SUPERADMIN).first!
       end
 
       def system
@@ -552,7 +551,7 @@ class User < ApplicationRecord
           "Approver" => Levels::APPROVER,
           "Moderator" => Levels::MODERATOR,
           "Admin" => Levels::ADMIN,
-          "Owner" => Levels::OWNER,
+          "Superadmin" => Levels::SUPERADMIN,
         }
       end
 
@@ -565,11 +564,11 @@ class User < ApplicationRecord
       UserPromotion.new(self, promoter, new_level).promote!
     end
 
-    def promote_to_owner_if_first_user
+    def promote_to_superadmin_if_first_user
       return if Rails.env.test?
 
-      if name != Danbooru.config.system_user && !User.exists?(level: Levels::OWNER)
-        self.level = Levels::OWNER
+      if name != Danbooru.config.system_user && !User.exists?(level: Levels::SUPERADMIN)
+        self.level = Levels::SUPERADMIN
       end
     end
 
@@ -625,8 +624,8 @@ class User < ApplicationRecord
       level >= Levels::ADMIN
     end
 
-    def is_owner?
-      level >= Levels::OWNER
+    def is_superadmin?
+      level >= Levels::SUPERADMIN
     end
   end
 

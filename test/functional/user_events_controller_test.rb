@@ -40,14 +40,14 @@ class UserEventsControllerTest < ActionDispatch::IntegrationTest
         assert_equal([@user.id, @user2.id, @mod.id].sort, response.parsed_body.pluck("user_id").uniq.sort)
       end
 
-      should "not show admins events by the owner" do
-        @owner = create(:owner_user)
-        create(:user_event, user: @owner, category: :login)
+      should "not show admins events by a superadmin" do
+        @superadmin = create(:superadmin_user)
+        create(:user_event, user: @superadmin, category: :login)
 
         get_auth user_events_path, create(:admin_user), as: :json
 
         assert_response :success
-        assert_not_includes(response.parsed_body.pluck("user_id"), @owner.id)
+        assert_not_includes(response.parsed_body.pluck("user_id"), @superadmin.id)
       end
 
       should "not show mods higher-level users in the list of sockpuppet accounts" do

@@ -33,11 +33,7 @@ class ApiKey < ApplicationRecord
   has_secure_token :key
 
   def self.visible(user)
-    if user.is_owner?
-      all
-    else
-      where(user: user)
-    end
+    where(user: user)
   end
 
   def self.search(params, current_user)

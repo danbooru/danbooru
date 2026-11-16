@@ -42,8 +42,8 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "render for the owner" do
-        get_auth user_actions_path(limit: 1000), create(:owner_user)
+      should "render for a superadmin" do
+        get_auth user_actions_path(limit: 1000), create(:superadmin_user)
         assert_response :success
       end
 
