@@ -23,8 +23,11 @@ class ArtistCommentariesController < ApplicationController
   end
 
   def create_or_update
-    post_id = params[:artist_commentary].delete(:post_id) || params[:post_id]
-    @artist_commentary = ArtistCommentary.find_or_initialize_by(post_id: post_id)
+    post_id = params[:artist_commentary]&.delete(:post_id) || params[:post_id]
+    raise ActionController::BadRequest, "post_id parameter must be a string or an integer" unless post_id.nil? || post_id.is_a?(String) || post_id.is_a?(Integer)
+
+    post = Post.find(post_id)
+    @artist_commentary = ArtistCommentary.find_or_initialize_by(post: post)
     @artist_commentary.attributes = permitted_attributes(@artist_commentary)
     authorize(@artist_commentary).save
 
