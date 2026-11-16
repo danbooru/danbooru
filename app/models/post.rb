@@ -603,7 +603,7 @@ class Post < ApplicationRecord
         in "child", ids
           next if ids.blank?
 
-          Post.where_numeric_matches(:id, ids).where.not(id: id).limit(10).select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
+          Post.where_numeric_matches(:id, ids).where.not(id: [id, parent_id].compact).limit(10).select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
             post.update!(parent_id: id)
           end
 

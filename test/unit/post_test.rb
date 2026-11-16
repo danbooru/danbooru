@@ -1231,6 +1231,14 @@ class PostTest < ActiveSupport::TestCase
             assert_equal(@post.id, @children[2].reload.parent_id)
           end
 
+          should "not make the post's parent a child with parent:id child:id" do
+            @other = create(:post)
+            @post.update(tag_string: "aaa parent:#{@other.id} child:#{@other.id}")
+
+            assert_equal(@other.id, @post.reload.parent_id)
+            assert_nil(@other.reload.parent_id)
+          end
+
           should "remove children with -child:ids" do
             @children = create_list(:post, 3, parent: @post)
             @post.update(tag_string: "aaa -child:#{@children.first.id}")
