@@ -15,6 +15,11 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for json" do
+        get_auth new_dmail_path(format: :json), @user
+        assert_response :success
+      end
+
       context "with a respond_to_id" do
         should "not allow users to quote dmails belonging to unrelated users " do
           get_auth new_dmail_path, @unrelated_user, params: { respond_to_id: @dmail.id }
