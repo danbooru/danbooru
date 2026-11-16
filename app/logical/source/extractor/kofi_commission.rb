@@ -27,10 +27,10 @@ class Source::Extractor::KofiCommission < Source::Extractor::Kofi
   end
 
   memoize def commission_page
-    url = "https://104.45.231.79/c/#{commission_id}" if commission_id.present?
-    response = backend_http.no_follow.cache(1.minute).get(url)
+    url = "https://ko-fi.com/c/#{commission_id}" if commission_id.present?
+    response = http.no_follow.cache(1.minute).get(url)
 
-    redirect_url = response[:Location] if response.status.in?(300..399)
+    redirect_url = response.headers["Location"] if response.status.redirect?
     backend_get(redirect_url) if redirect_url.present?
   end
 
