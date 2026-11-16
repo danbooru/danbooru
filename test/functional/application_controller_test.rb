@@ -99,6 +99,37 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 400
     end
 
+    context "for parameters containing null bytes" do
+      should "return 400 for GET requests" do
+        get posts_path(tags: "a\0b"), as: :json
+        assert_response 400
+
+        get tags_path(search: { name: "a\0" }), as: :json
+        assert_response 400
+
+        get tags_path(search: { name: ["a", "b\0"] }), as: :json
+        assert_response 400
+
+        get posts_path("a\0b" => "c"), as: :json
+        assert_response 400
+      end
+
+      should "return 400 for POST requests" do
+        post_auth comments_path, create(:user), params: { comment: { post_id: create(:post).id, body: "a\0b" }}, as: :json
+        assert_response 400
+      end
+
+      should "return 400 for API key parameters" do
+        get posts_path(login: "a\0b", api_key: "x"), as: :json
+        assert_response 400
+      end
+
+      should "return 401 for basic auth credentials" do
+        get posts_path, headers: { Authorization: ActionController::HttpAuthentication::Basic.encode_credentials("a\0b", "x") }, as: :json
+        assert_response 401
+      end
+    end
+
     should "return 422 for an oversized param on a GET request" do
       get posts_path(foo: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1)), as: :json
 

@@ -22,6 +22,7 @@ class ApplicationController < ActionController::Base
   before_action :check_oversized_get_params
   before_action :check_pagination_params
   before_action :check_model_params
+  before_action :check_null_bytes
   before_action :reset_current_user
   before_action :delete_host_only_session_cookie
   before_action :set_current_user
@@ -347,6 +348,25 @@ class ApplicationController < ActionController::Base
   def check_pagination_params
     params.slice(:page, :limit).each do |name, value|
       raise ActionController::BadRequest, "#{name} parameter must be a string or an integer" unless value.nil? || value.is_a?(String) || value.is_a?(Integer)
+    end
+  end
+
+  # Reject parameters containing null bytes. PostgreSQL doesn't allow null bytes in strings, so otherwise they cause
+  # errors in any search or form that uses the parameter.
+  def check_null_bytes
+    raise ActionController::BadRequest, "Parameters can't contain null bytes" if contains_null_byte?(params.to_unsafe_h)
+  end
+
+  def contains_null_byte?(value)
+    case value
+    when String
+      value.include?("\0")
+    when Hash
+      value.any? { |name, item| contains_null_byte?(name.to_s) || contains_null_byte?(item) }
+    when Array
+      value.any? { |item| contains_null_byte?(item) }
+    else
+      false
     end
   end
 
