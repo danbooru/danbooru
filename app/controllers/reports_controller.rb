@@ -9,13 +9,16 @@ class ReportsController < ApplicationController
 
   def show
     @report = params[:id]
-    @mode = params.dig(:search, :mode) || "chart"
-    @period = params.dig(:search, :period)&.downcase
-    @from = params.dig(:search, :from) || 1.month.ago
-    @to = params.dig(:search, :to) || Time.zone.now
-    @columns = params.dig(:search, :columns).to_s.split(/[[:space:],]/).map(&:to_sym)
-    @group = params.dig(:search, :group)&.downcase&.tr(" ", "_")
-    @group_limit = params.dig(:search, :group_limit)&.to_i || 10
+    # Ignore params that aren't strings, like `search[period][]=day`.
+    search = params.fetch(:search, {}).permit!.to_h.select { |_name, value| value.is_a?(String) }.with_indifferent_access
+
+    @mode = search[:mode] || "chart"
+    @period = search[:period]&.downcase
+    @from = search[:from].presence&.parse_date! || 1.month.ago
+    @to = search[:to].presence&.parse_date! || Time.zone.now
+    @columns = search[:columns].to_s.split(/[[:space:],]/).map(&:to_sym)
+    @group = search[:group]&.downcase&.tr(" ", "_")
+    @group_limit = search[:group_limit]&.to_i || 10
     authorize nil, policy_class: ReportPolicy
 
     case @report
