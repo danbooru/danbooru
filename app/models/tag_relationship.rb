@@ -78,7 +78,7 @@ class TagRelationship < ApplicationRecord
     end
 
     def status_matches(status)
-      where(status: status.downcase)
+      where(status: Array.wrap(status).map { |value| value.to_s.downcase })
     end
 
     def search(params, current_user)
