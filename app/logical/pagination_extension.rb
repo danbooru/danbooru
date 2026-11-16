@@ -61,11 +61,11 @@ module PaginationExtension
   end
 
   def paginate_sequential_before(before_id, limit)
-    where("#{table_name}.id < ?", before_id).reorder("#{table_name}.id DESC").limit(limit + 1)
+    where(id: ...before_id.to_i).reorder("#{table_name}.id DESC").limit(limit + 1)
   end
 
   def paginate_sequential_after(after_id, limit)
-    where("#{table_name}.id > ?", after_id).reorder("#{table_name}.id ASC").limit(limit + 1)
+    where(id: (after_id.to_i + 1)..).reorder("#{table_name}.id ASC").limit(limit + 1)
   end
 
   def paginate_numbered(page, limit)
