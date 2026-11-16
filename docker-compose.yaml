@@ -118,6 +118,12 @@ x-base-template: &base-template
     # Keep this secret. If someone finds this out, they will be able to log in as any user.
     # DANBOORU_SECRET_KEY_BASE: "<random secret password>"
 
+    # Keys used to encrypt sensitive data in the database. Generate them with `bin/rails db:encryption:init`.
+    # Keep these secret, and don't lose or change them, otherwise encrypted data will become unreadable.
+    # DANBOORU_ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: "<primary_key>"
+    # DANBOORU_ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: "<deterministic_key>"
+    # DANBOORU_ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: "<key_derivation_salt>"
+
     # Don't change the options below.
     RAILS_ENV: production
     DATABASE_URL: postgresql://danbooru@postgres/danbooru?pool=100

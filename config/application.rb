@@ -99,6 +99,11 @@ module Danbooru
     raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
     config.secret_key_base = Danbooru.config.secret_key_base
 
+    # https://guides.rubyonrails.org/active_record_encryption.html
+    config.active_record.encryption.primary_key = Danbooru.config.active_record_encryption_primary_key
+    config.active_record.encryption.deterministic_key = Danbooru.config.active_record_encryption_deterministic_key
+    config.active_record.encryption.key_derivation_salt = Danbooru.config.active_record_encryption_key_derivation_salt
+
     # https://guides.rubyonrails.org/action_mailer_basics.html#intercepting-and-observing-emails
     # app/logical/email_delivery_logger.rb
     config.action_mailer.interceptors = ["EmailDeliveryLogger"]
