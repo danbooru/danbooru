@@ -23,7 +23,7 @@ class PostVotesController < ApplicationController
   end
 
   def create
-    @post_vote = authorize PostVote.new(post_id: params[:post_id], score: params[:score], user: CurrentUser.user)
+    @post_vote = authorize PostVote.new(post: Post.find(params.expect(:post_id)), score: params.expect(:score), user: CurrentUser.user)
     @post_vote.save
     @post = @post_vote.post.reload if request.format.js?
 

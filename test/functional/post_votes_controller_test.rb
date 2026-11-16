@@ -200,6 +200,29 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(1, @post.reload.score)
       end
 
+      should "return 404 for a nonexistent post" do
+        post_auth post_post_votes_path(post_id: 0, score: 1), @user, as: :json
+        assert_response 404
+      end
+
+      should "return 400 for a score param that's missing or isn't a string or integer" do
+        post_auth post_post_votes_path(post_id: @post.id, score: ["1"]), @user, as: :json
+        assert_response 400
+
+        post_auth post_post_votes_path(post_id: @post.id, score: { a: 1 }), @user, as: :json
+        assert_response 400
+
+        post_auth post_post_votes_path(post_id: @post.id), @user, as: :json
+        assert_response 400
+        assert_equal(0, @post.reload.score)
+      end
+
+      should "return an error for an invalid score" do
+        post_auth post_post_votes_path(post_id: @post.id, score: 5), @user, as: :json
+        assert_response 422
+        assert_equal(0, @post.reload.score)
+      end
+
       should "not allow anonymous users to vote" do
         post post_post_votes_path(post_id: @post.id, score: 1), xhr: true
 
