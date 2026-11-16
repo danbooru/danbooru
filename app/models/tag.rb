@@ -208,7 +208,7 @@ class Tag < ApplicationRecord
   concerning :NameMethods do
     def name=(name)
       super
-      self.words = Tag.parse_words(name)
+      self.words = Tag.parse_words(name.to_s)
     end
 
     def pretty_name

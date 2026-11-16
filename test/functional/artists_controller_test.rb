@@ -215,6 +215,14 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing name" do
+        assert_no_difference("Artist.count") do
+          post_auth artists_path, @user, params: { artist: { group_name: "xxx" }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "not overflow the session cookie when warning about many duplicate artists" do
         urls = 10.times.map { |i| "https://www.pixiv.net/users/#{i}" }
         urls.product([1, 2, 3]).each { |url, n| create(:artist, name: "artist#{n}_#{url.split("/").last}_#{"a" * 150}", url_string: url) }

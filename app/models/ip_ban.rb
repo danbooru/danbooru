@@ -9,7 +9,7 @@ class IpBan < ApplicationRecord
 
 
   validate :validate_ip_addr
-  validates :reason, visible_string: true, length: { maximum: 140 }, if: :reason_changed?
+  validates :reason, visible_string: true, length: { maximum: 140 }, if: -> { new_record? || reason_changed? }
 
   after_save :create_mod_action
 

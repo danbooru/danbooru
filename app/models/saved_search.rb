@@ -12,7 +12,7 @@ class SavedSearch < ApplicationRecord
   normalizes :query, with: ->(query) { SavedSearch.normalize_query(query) }
   normalizes :labels, with: ->(labels) { SavedSearch.normalize_labels(labels) }
 
-  validates :query, visible_string: true, length: { maximum: 3000 }, if: :query_changed?
+  validates :query, visible_string: true, length: { maximum: 3000 }, if: -> { new_record? || query_changed? }
   validates :labels, length: { maximum: 20, too_long: "can't have more than 20 labels" }, if: :labels_changed?
   validate :validate_query, if: :query_changed?
   validate :validate_labels, if: :labels_changed?

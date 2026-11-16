@@ -15,6 +15,14 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing reason" do
+        assert_no_difference("IpBan.count") do
+          post_auth ip_bans_path, @admin, params: { ip_ban: { ip_addr: "1.2.3.4" }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "create a new ip ban" do
         assert_difference("IpBan.count", 1) do
           post_auth ip_bans_path, @admin, params: { ip_ban: { ip_addr: "1.2.3.4", reason: "xyz" }}

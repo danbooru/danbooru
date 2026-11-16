@@ -182,6 +182,14 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing body" do
+        assert_no_difference("ForumPost.count") do
+          post_auth forum_posts_path, @user, params: { forum_post: { topic_id: @forum_topic.id }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "return an error for a missing topic" do
         assert_no_difference("ForumPost.count") do
           post_auth forum_posts_path, @user, params: { forum_post: { body: "xxx" }}, as: :json
