@@ -76,8 +76,10 @@ Rails.application.configure do
     config.file_watcher = ActiveSupport::FileUpdateChecker
   end
 
-  BetterErrors::Middleware.allow_ip!(IPAddr.new("0.0.0.0/0"))
-  BetterErrors::Middleware.allow_ip!(IPAddr.new("::/0"))
+  if defined?(BetterErrors)
+    BetterErrors::Middleware.allow_ip!(IPAddr.new("0.0.0.0/0"))
+    BetterErrors::Middleware.allow_ip!(IPAddr.new("::/0"))
+  end
 
   # Log SQL queries at INFO level instead of DEBUG level.
   config.active_record.logger = Logger.new($stderr)

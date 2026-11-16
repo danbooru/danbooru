@@ -10,7 +10,7 @@ gem "sanitize", "~> 7"
 gem "ruby-vips", "~> 2"
 gem "diff-lcs", "~> 2", require: false
 gem "bcrypt", "~> 3", require: "bcrypt"
-gem "aws-sdk-sqs", "~> 1"
+gem "aws-sdk-sqs", "~> 1", require: false
 gem "responders", "~> 3"
 gem "dtext_rb", path: "lib/dtext_rb", require: "dtext"
 gem "memoist", "~> 0.16"
@@ -32,8 +32,8 @@ gem "nokogiri", "~> 1"
 gem "view_component", "~> 4"
 gem "tzinfo-data", "~> 1"
 gem "hsluv", "~> 1"
-gem "google-cloud-bigquery", "~> 1", require: "google/cloud/bigquery"
-gem "google-cloud-storage", "~> 1", require: "google/cloud/storage"
+gem "google-cloud-bigquery", "~> 1", require: false
+gem "google-cloud-storage", "~> 1", require: false
 gem "clockwork", "~> 4"
 gem "puma_worker_killer", "~> 1"
 gem "rack-timeout", "~> 0.7", require: "rack/timeout/base"
@@ -44,16 +44,16 @@ gem "good_job", "~> 4"
 gem "crass", "~> 1"
 gem "public_suffix", "~> 7"
 gem "debug", "~> 1", require: false
-gem "faker", "~> 3"
+gem "faker", "~> 3", require: false
 gem "resolv", "~> 0.7"
 gem "rover-df", "~> 1"
 gem "ffi-libarchive", "~> 1"
 gem "pry-rails", "~> 0.3"
 gem "drb", "~> 2"
-gem "net-sftp", "~> 4"
-gem "rbnacl", "~> 7"
-gem "x25519", "~> 1"
-gem "bcrypt_pbkdf", "~> 1"
+gem "net-sftp", "~> 4", require: false
+gem "rbnacl", "~> 7", require: false
+gem "x25519", "~> 1", require: false
+gem "bcrypt_pbkdf", "~> 1", require: false
 gem "connection_pool", "~> 3"
 gem "rotp", "~> 6"
 gem "rqrcode", "~> 3"
@@ -64,7 +64,7 @@ gem "webrick", "~> 1"
 gem "useragent", "~> 0.16"
 gem "dotenv-rails", "~> 3", require: false # This is loaded in application.rb
 gem "benchmark", "~> 0.5"
-gem "ed25519", "~> 1.4"
+gem "ed25519", "~> 1.4", require: false
 
 group :development do
   gem "rubocop", "~> 1", require: false
@@ -77,7 +77,7 @@ group :development do
   gem "stackprof", "~> 0.2"
   gem "flamegraph", "~> 0.9"
   gem "memory_profiler", "~> 1"
-  gem "better_errors", "~> 2"
+  gem "better_errors", "~> 2", require: false # This is loaded in application.rb
   gem "binding_of_caller", "~> 2"
   gem "benchmark-ips", "~> 2", require: "benchmark/ips"
   gem "listen", "~> 3"

@@ -5,6 +5,8 @@
 #
 # @see https://docs.aws.amazon.com/sqs/index.html
 # @see https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/SQS/Client.html
+require "aws-sdk-sqs"
+
 class SqsService
   attr_reader :url
 

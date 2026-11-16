@@ -14,6 +14,9 @@
 # @see https://cloud.google.com/bigquery/docs
 # @see https://cloud.google.com/storage/docs
 # @see https://en.wikipedia.org/wiki/JSON_streaming#Line-delimited_JSON
+require "google/cloud/bigquery"
+require "google/cloud/storage"
+
 class BigqueryExportService
   extend Memoist
 
