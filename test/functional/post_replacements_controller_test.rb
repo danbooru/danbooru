@@ -303,6 +303,26 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "new action" do
+      should "render" do
+        get_auth new_post_replacement_path, create(:moderator_user), params: { post_id: create(:post).id }
+        assert_response :success
+      end
+
+      should "return 400 for a missing post" do
+        get_auth new_post_replacement_path, create(:moderator_user)
+        assert_response 400
+
+        get_auth new_post_replacement_path(format: :json), create(:moderator_user)
+        assert_response 400
+      end
+
+      should "return 404 for a nonexistent post" do
+        get_auth new_post_replacement_path(post_id: 0, format: :json), create(:moderator_user)
+        assert_response 404
+      end
+    end
+
     context "update action" do
       should "update the replacement" do
         @post_replacement = create(:post_replacement)

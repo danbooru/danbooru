@@ -24,7 +24,7 @@ class PostReplacementsController < ApplicationController
   end
 
   def new
-    @post_replacement = authorize PostReplacement.new(post_id: params[:post_id], **permitted_attributes(PostReplacement))
+    @post_replacement = authorize PostReplacement.new(post: Post.find(params.expect(:post_id)), **permitted_attributes(PostReplacement))
     respond_with(@post_replacement)
   end
 
