@@ -32,6 +32,16 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(updater_name: -> { @builder.name }).with { @versions[1] }
         should respond_to_search(updater: { level: User::Levels::BUILDER }).with { @versions[1] }
       end
+
+      should "show reordered other names as a change" do
+        wiki_page = as(@user) { create(:wiki_page, other_names: ["aaa", "bbb"]) }
+        as(@builder) { wiki_page.update!(other_names: ["bbb", "aaa"]) }
+        version = wiki_page.versions.order(:id).last
+
+        get wiki_page_versions_path, params: { search: { wiki_page_id: wiki_page.id }}
+        assert_response :success
+        assert_select "#wiki-page-version-#{version.id} .version-statuses", text: /OtherNames/
+      end
     end
 
     context "show action" do

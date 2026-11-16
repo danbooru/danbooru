@@ -125,7 +125,7 @@ class PoolVersion < ApplicationRecord
 
   def posts_changed(type)
     other = send(type)
-    ((post_ids - other.post_ids) | (other.post_ids - post_ids)).length.positive?
+    post_ids != other.post_ids
   end
 
   def was_deleted(type)

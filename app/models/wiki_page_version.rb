@@ -48,7 +48,7 @@ class WikiPageVersion < ApplicationRecord
 
   def other_names_changed(type)
     other = send(type)
-    ((other_names - other.other_names) | (other.other_names - other_names)).length.positive?
+    other_names != other.other_names
   end
 
   def was_deleted(type)
