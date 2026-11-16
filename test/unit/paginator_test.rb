@@ -46,6 +46,13 @@ class PaginatorTest < ActiveSupport::TestCase
     end
   end
 
+  context "sequential pagination for a table without an id column" do
+    should "raise an error" do
+      assert_raises(PaginationExtension::PaginationError) { AITag.paginate("a1").to_a }
+      assert_raises(PaginationExtension::PaginationError) { PostEvent.paginate("b1000").to_a }
+    end
+  end
+
   context "numbered pagination" do
     should "return the correct set of records" do
       expected_posts = Post.limit(3).order(id: :desc)
