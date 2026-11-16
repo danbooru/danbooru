@@ -49,6 +49,8 @@ class Source::Extractor::DcInside < Source::Extractor
 
   def artist_commentary_desc
     page&.dup&.css(".writing_view_box")&.tap do |commentary|
+      commentary.css(".tip_box2").remove # "Autoplay settings are in [Settings > Video settings]" tooltip
+
       commentary.css(".writing_view_box .write_div img").each do |img|
         new_src = img.attr("data-original") || img.attr("src")
         img.set_attribute("src", new_src) if new_src.present? && img.classes.exclude?("written_dccon")
