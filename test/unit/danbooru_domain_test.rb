@@ -16,6 +16,7 @@ class DanbooruDomainTest < ActiveSupport::TestCase
         assert_not_nil(parse("小度.中国"))
         assert_not_nil(parse("hosi_na.artstation.com"))
         assert_not_nil(parse("arisaka_.web.fc2.com"))
+        assert_not_nil(parse("xn--d1acpjx3f.xn--p1ai"))
 
         assert_nil(parse(""))
         assert_nil(parse("."))
@@ -26,6 +27,9 @@ class DanbooruDomainTest < ActiveSupport::TestCase
 
         assert_nil(parse("google.123"))
         assert_nil(parse("google.c-m"))
+        assert_nil(parse("google.co1"))
+        assert_nil(parse("google.co-m"))
+        assert_nil(parse("google.1xn--p1ai"))
         assert_nil(parse("google.com-"))
         assert_nil(parse("google.-com"))
         assert_nil(parse("google.x"))
