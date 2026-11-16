@@ -309,7 +309,11 @@ class User < ApplicationRecord
 
     def request_password_reset!(request)
       with_lock do
-        if can_receive_email?(require_verified_email: false)
+        # Limit emails per account, so someone with many IPs can't flood the user's inbox. This is silent instead of
+        # returning an error, so the limit doesn't reveal which accounts exist.
+        limited = RateLimiter.new("password_resets:email", [cache_key], rate: 1.0 / 10.minutes, burst: 3).limited?
+
+        if can_receive_email?(require_verified_email: false) && !limited
           UserMailer.with_request(request).password_reset(self).deliver_later
         end
 

@@ -24,6 +24,26 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("Already logged in", flash[:notice])
       end
 
+      should "limit the number of password reset emails sent to an account across all IPs" do
+        @user = create(:user, email_address: build(:email_address))
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+
+        3.times do |n|
+          post password_reset_path, params: { user: { name: @user.name }}, headers: { REMOTE_ADDR: "10.0.#{n}.1" }
+          assert_redirected_to password_reset_path
+        end
+        assert_enqueued_emails 3
+
+        travel(11.minutes)
+        post password_reset_path, params: { user: { name: @user.name }}, headers: { REMOTE_ADDR: "10.0.3.1" }
+        assert_enqueued_emails 4
+
+        post password_reset_path, params: { user: { name: @user.name }}, headers: { REMOTE_ADDR: "10.0.4.1" }
+        assert_redirected_to password_reset_path
+        assert_enqueued_emails 4
+        assert_equal(5, @user.user_events.password_reset_request.count)
+      end
+
       context "for an account identified by an email address" do
         should "send a password reset email if the account exists and has a verified email address" do
           @user = create(:user, email_address: create(:email_address, address: "Foo.Bar+nospam@Googlemail.com", is_verified: true))
