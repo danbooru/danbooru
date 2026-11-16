@@ -61,6 +61,11 @@ module PostSets
       tag.artist
     end
 
+    # @return [WikiPage, nil] The tag's wiki page, if it was deleted.
+    memoize def deleted_wiki_page
+      WikiPage.deleted.find_by(title: tag.name) if has_blank_wiki?
+    end
+
     def pool
       pool_names = post_query.select_metatags(:pool, :ordpool).map(&:value)
       name = pool_names.first
