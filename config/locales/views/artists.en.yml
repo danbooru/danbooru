@@ -67,10 +67,3 @@ en:
       unbanned: "Artist was unbanned"
       deleted: "Artist deleted"
 
-  activerecord:
-    attributes:
-      artist:
-        name: "Name"
-        group_name: "Group"
-        other_names_string: "Other names"
-        url_string: "URLs"

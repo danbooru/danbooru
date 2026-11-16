@@ -47,7 +47,3 @@ en:
     flash:
       duplicate: "Duplicate of post #%{id}"
 
-  activerecord:
-    attributes:
-      upload:
-        status: "Status"

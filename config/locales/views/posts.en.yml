@@ -111,9 +111,3 @@ en:
       duplicate: "Duplicate of post #%{id}"
       deleted: "Post deleted"
 
-  activerecord:
-    attributes:
-      post:
-        source: "Source"
-        check_translation: "Check translation"
-        partially_translated: "Partially translated"

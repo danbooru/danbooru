@@ -39,8 +39,3 @@ en:
       poor_quality: "Poor quality"
       breaks_rules: "Breaks rules"
 
-  activerecord:
-    attributes:
-      post_disapproval:
-        reason: "Reason"
-        message: "Message"

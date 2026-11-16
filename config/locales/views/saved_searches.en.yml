@@ -32,11 +32,3 @@ en:
       view_posts: "View posts"
       manage: "Manage saved searches"
 
-  activerecord:
-    attributes:
-      saved_search:
-        query: "Query"
-        query_ilike: "Query"
-        label_string: "Labels"
-        label: "Label"
-        disable_labels: "Don't show this dialog again"

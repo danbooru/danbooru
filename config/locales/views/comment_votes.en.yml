@@ -24,7 +24,3 @@ en:
     notice:
       vote_removed: "Vote removed"
 
-  activerecord:
-    attributes:
-      comment_vote:
-        score: "Score"

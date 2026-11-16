@@ -42,7 +42,3 @@ en:
     flash:
       posted: "Comment posted"
 
-  activerecord:
-    attributes:
-      comment:
-        score: "Score"

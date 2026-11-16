@@ -16,8 +16,3 @@ en:
       column_created: "Created"
       column_updated: "Updated"
 
-  activerecord:
-    attributes:
-      artist_url:
-        is_active: "Active?"
-        url_matches: "URL"

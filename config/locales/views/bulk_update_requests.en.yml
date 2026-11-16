@@ -70,13 +70,3 @@ en:
       approved: "BUR #%{id} approved"
       rejected: "BUR #%{id} rejected"
 
-  activerecord:
-    attributes:
-      bulk_update_request:
-        script: "Request"
-        reason: "Reason"
-        title: "Forum Title"
-        forum_topic_id: "Forum topic"
-        forum_post_id: "Forum post"
-        score: "Score"
-        status: "Status"

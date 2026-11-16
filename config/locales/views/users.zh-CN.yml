@@ -161,7 +161,6 @@
     attributes:
       user:
         theme: "主题"
-        per_page: "每页数量"
         default_image_size: "默认图片尺寸"
         receive_email_notifications: "接收邮件通知"
         time_zone: "时区"

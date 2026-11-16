@@ -69,7 +69,3 @@ en:
     flash:
       reverted: "Page was reverted"
 
-  activerecord:
-    attributes:
-      tag:
-        category: "Category"

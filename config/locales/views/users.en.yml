@@ -157,15 +157,3 @@ en:
       settings_updated: "Settings updated"
       deactivated: "Account deactivated"
 
-  activerecord:
-    attributes:
-      user:
-        theme: "Theme"
-        per_page: "Per page"
-        default_image_size: "Default image size"
-        receive_email_notifications: "Receive email notifications"
-        time_zone: "Time zone"
-        comment_threshold: "Comment threshold"
-        blacklisted_tags: "Blacklisted tags"
-        level: "Level"
-        name: "Name"

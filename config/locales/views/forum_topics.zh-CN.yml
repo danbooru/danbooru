@@ -68,5 +68,4 @@
         is_sticky: "置顶"
         is_locked: "锁定"
       forum_post:
-        body: "内容"
         topic_id: "主题 ID"

@@ -39,8 +39,3 @@ en:
     flash:
       appealed: "Post appealed"
 
-  activerecord:
-    attributes:
-      post_appeal:
-        reason: "Reason"
-        status: "Status"

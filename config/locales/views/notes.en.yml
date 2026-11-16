@@ -17,7 +17,3 @@ en:
       requests: "Requests"
       help: "Help"
 
-  activerecord:
-    attributes:
-      note:
-        body: "Text"

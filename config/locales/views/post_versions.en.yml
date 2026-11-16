@@ -51,16 +51,3 @@ en:
       search: "Search"
       undo_selected: "Undo selected"
 
-  activerecord:
-    attributes:
-      post_version:
-        post_id: "Post"
-        parent_id: "Parent"
-        rating: "Rating"
-        source_ilike: "Source"
-        tag_matches: "Tags"
-        version: "Version"
-        updater_name: "Updater"
-        rating_changed: "Rating changed?"
-        parent_changed: "Parent changed?"
-        source_changed: "Source changed?"

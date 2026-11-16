@@ -8,7 +8,3 @@ en:
       updated: "Updated: %{time}"
       source_html: "Source: %{link}"
 
-  activerecord:
-    attributes:
-      source:
-        url: "URL"

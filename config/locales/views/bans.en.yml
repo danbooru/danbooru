@@ -36,15 +36,3 @@ en:
       banned: "Banned user"
       updated: "Ban updated"
 
-  activerecord:
-    attributes:
-      ban:
-        user_name: "User"
-        reason: "Reason"
-        duration: "Duration"
-        delete_posts: "Delete posts"
-        post_deletion_reason: "With reason"
-        delete_comments: "Delete comments"
-        delete_forum_posts: "Delete forum posts"
-        delete_post_votes: "Delete post votes"
-        delete_comment_votes: "Delete comment votes"

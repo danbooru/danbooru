@@ -45,9 +45,3 @@ en:
     flash:
       flagged: "Post flagged"
 
-  activerecord:
-    attributes:
-      post_flag:
-        reason: "Reason"
-        category: "Category"
-        status: "Status"

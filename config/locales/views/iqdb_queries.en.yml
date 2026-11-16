@@ -9,10 +9,3 @@ en:
       similar_tab_html: "Similar %{count}"
       submit: "Search"
 
-  activerecord:
-    attributes:
-      iqdb_query:
-        post_id: "Post ID"
-        url: "URL"
-        hash: "Hash"
-        file: "File"

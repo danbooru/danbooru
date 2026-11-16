@@ -57,8 +57,3 @@ en:
       edit: "Edit"
       history: "History"
 
-  activerecord:
-    attributes:
-      tag:
-        name: "Name"
-        is_deprecated: "Is deprecated?"

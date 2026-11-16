@@ -59,14 +59,3 @@ en:
       undeleted: "Topic undeleted"
       all_read: "All topics marked as read"
 
-  activerecord:
-    attributes:
-      forum_topic:
-        title: "Title"
-        category: "Category"
-        min_level: "Minimum level"
-        is_sticky: "Sticky"
-        is_locked: "Locked"
-      forum_post:
-        body: "Body"
-        topic_id: "Topic ID"

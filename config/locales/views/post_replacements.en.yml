@@ -30,10 +30,3 @@ en:
     flash:
       replaced: "Post replaced"
 
-  activerecord:
-    attributes:
-      post_replacement:
-        replacement_file: "File"
-        replacement_url: "Replacement URL"
-        final_source: "Final Source"
-        tags: "Tags"

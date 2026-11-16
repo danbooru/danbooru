@@ -44,11 +44,3 @@ en:
       translation_requests: "Translation requests"
       help: "Help"
 
-  activerecord:
-    attributes:
-      artist_commentary:
-        original_title: "Original title"
-        original_description: "Original description"
-        translated_title: "Translated title"
-        translated_description: "Translated description"
-        commentary_tags: "Commentary tags"

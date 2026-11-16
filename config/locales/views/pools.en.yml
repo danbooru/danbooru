@@ -49,10 +49,3 @@ en:
       undeleted: "Pool undeleted"
       reverted: "Pool reverted"
 
-  activerecord:
-    attributes:
-      pool:
-        name: "Name"
-        description: "Description"
-        category: "Category"
-        post_ids_string: "Posts"

@@ -55,10 +55,3 @@ en:
       updated: "Favorite group updated"
       deleted: "Favorite group deleted"
 
-  activerecord:
-    attributes:
-      favorite_group:
-        name: "Name"
-        post_count: "Posts"
-        post_ids_string: "Posts"
-        is_private: "Private"

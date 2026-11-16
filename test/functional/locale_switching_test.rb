@@ -43,5 +43,14 @@ class LocaleSwitchingTest < ActionDispatch::IntegrationTest
       assert_includes response.headers["Vary"].to_s, "Accept-Language"
       assert_includes response.headers["Vary"].to_s, "Cookie"
     end
+
+    should "not reflect reserved url_for options in the switcher links" do
+      get root_path, params: { protocol: "javascript", host: "alert(1)", port: "1337" }
+
+      assert_response 200
+      hrefs = css_select("a[href]").pluck("href")
+      assert_empty(hrefs.grep(/alert|1337/), "the switcher reflected reserved url_for options into a link")
+      assert_includes hrefs, "/posts?locale=zh-CN"
+    end
   end
 end

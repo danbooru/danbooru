@@ -45,10 +45,3 @@ en:
     flash:
       deleted: "File deleted"
 
-  activerecord:
-    attributes:
-      media_asset:
-        image_width: "Width"
-        image_height: "Height"
-        file_size: "File size"
-        file_ext: "File type"
