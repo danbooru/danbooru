@@ -26,7 +26,7 @@ class PumaTest < ActiveSupport::TestCase
         spawn_server(PUMA_PORT: -1)
       end
 
-      assert_equal("server exited unexpectedly", error.message)
+      assert_match(/\Aserver exited unexpectedly\n\nServer log:\n.*InvalidURIError/m, error.message)
     end
   end
 
@@ -213,7 +213,12 @@ class PumaTest < ActiveSupport::TestCase
     }.stringify_keys.transform_values(&:to_s)
 
     pid = Process.spawn(env, *%w[bin/rails server --no-daemon], chdir: Rails.root.to_s, out: log_file.path, err: log_file.path)
-    wait_for_server(uri, pid)
+
+    begin
+      wait_for_server(uri, pid)
+    rescue StandardError => e
+      raise e.class, "#{e.message}\n\nServer log:\n#{File.read(log_file.path)}"
+    end
 
     yield(uri) if block_given?
   ensure
