@@ -61,6 +61,14 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "ignore unknown search params" do
+        get_auth iqdb_queries_path, @user, params: { search: { order: "nonsense" }}, as: :json
+        assert_response :success
+
+        get_auth iqdb_queries_path, @user, params: { search: { foo: { a: 1 }}}, as: :json
+        assert_response :success
+      end
+
       context "with a url parameter" do
         should "use the URL as-is for an image URL" do
           mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
