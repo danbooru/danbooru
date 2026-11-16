@@ -43,6 +43,22 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create_or_update action" do
+      should "return 404 for a missing or nonexistent post" do
+        put_auth create_or_update_artist_commentaries_path(format: :json), @user
+        assert_response 404
+
+        put_auth create_or_update_artist_commentaries_path(artist_commentary: { post_id: 0, original_title: "foo" }, format: :json), @user
+        assert_response 404
+      end
+
+      should "return 400 for a post_id param that isn't a string or integer" do
+        put_auth create_or_update_artist_commentaries_path, @user, params: { artist_commentary: { post_id: [create(:post).id], original_title: "foo" }}, as: :json
+        assert_response 400
+
+        put_auth create_or_update_artist_commentaries_path, @user, params: { post_id: { a: 1 }, artist_commentary: { original_title: "foo" }}, as: :json
+        assert_response 400
+      end
+
       should "render for create" do
         assert_difference("ArtistCommentary.count", 1) do
           put_auth create_or_update_artist_commentaries_path(artist_commentary: { original_title: "foo", post_id: create(:post).id }, format: "js"), @user, as: :js
