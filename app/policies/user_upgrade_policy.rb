@@ -10,18 +10,30 @@ class UserUpgradePolicy < ApplicationPolicy
   end
 
   def show?
-    record.recipient == user || record.purchaser == user || user.is_owner?
+    record.recipient == user || record.purchaser == user || user.is_superadmin?
   end
 
   def refund?
-    user.is_owner? && record.complete?
+    user.is_superadmin? && record.complete?
   end
 
   def receipt?
-    (record.purchaser == user || user.is_owner?) && record.has_receipt?
+    (record.purchaser == user || user.is_superadmin?) && record.has_receipt?
   end
 
   def payment?
-    user.is_owner? && record.has_payment?
+    user.is_superadmin? && record.has_payment?
+  end
+
+  def visible(relation)
+    if user.is_superadmin?
+      relation
+    else
+      relation.where(recipient: user).or(relation.where(purchaser: user))
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at upgrade_type status transaction_id payment_processor recipient purchaser]
   end
 end

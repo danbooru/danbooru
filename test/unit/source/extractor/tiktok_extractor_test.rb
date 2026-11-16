@@ -72,7 +72,7 @@ module Source::Tests::Extractor
     context "A video post" do
       strategy_should_work(
         "https://www.tiktok.com/@ashshae0/video/7618903378113924373",
-        image_urls: [%r{\Ahttps://v\d+-webapp-prime\.tiktok\.com/video/tos/[\w/-]+/\?.*&tk=tt_chain_token}],
+        image_urls: [%r{\Ahttps://v\d+-webapp-prime(?:\.us)?\.tiktok\.com/video/tos/[\w/-]+/\?.*&tk=tt_chain_token}],
         media_files: [{ file_size: 1_307_367 }],
         page_url: "https://www.tiktok.com/@ashshae0/video/7618903378113924373",
         profile_url: "https://www.tiktok.com/@ashshae0",

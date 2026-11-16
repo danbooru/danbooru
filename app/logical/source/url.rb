@@ -36,9 +36,6 @@ module Source
     # @return [Array<Source::Site>] The list of sites handled by this class.
     class_attribute :sites
 
-    # True if all URL subclasses have been loaded and don't need to be loaded again.
-    class_attribute :subclasses_loaded, default: false
-
     # The autoloader used to load Source::URL subclasses.
     class_attribute :autoloader, default: Zeitwerk::Loader
 
@@ -98,10 +95,13 @@ module Source
       raise NotImplementedError
     end
 
-    # @return [Array<Source::URL>] The set of Source::URL subclasses. Loaded lazily on demand.
+    # @return [Array<Source::URL>] The set of Source::URL subclasses. Loaded lazily on demand, and cached because
+    #   `descendants` is slow.
     def self.url_subclasses
-      self.subclasses_loaded ||= autoloader&.eager_load_namespace(Source::URL).present?
-      Source::URL.descendants.excluding(Source::URL::Null)
+      @url_subclasses ||= begin
+        autoloader&.eager_load_namespace(Source::URL)
+        Source::URL.descendants.excluding(Source::URL::Null)
+      end
     end
 
     # @return [Source::Extractor, nil] The extractor class to use for this URL. By default, it's the Source::Extractor subclass

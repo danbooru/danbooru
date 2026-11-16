@@ -307,7 +307,7 @@ module ApplicationHelper
         concat tag.div(format_text(warning_msg), class: "notice notice-info notice-small prose")
       end
 
-      block.call(form)
+      yield(form)
     end
   end
 

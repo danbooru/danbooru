@@ -17,11 +17,11 @@ class ArtistURL < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :url, :is_active, :artist], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q = q.urls_match(params[:url_matches])
 
     case params[:order]
-    when /\A(id|artist_id|url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/i
+    when /\A(id|artist_id|url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/
       dir = $2 || :desc
       q = q.order($1 => dir).order(id: :desc)
     else
@@ -113,11 +113,6 @@ class ArtistURL < ApplicationRecord
     else
       "-#{url}"
     end
-  end
-
-  # @return [Array<Artist>] The list of other artists that also contain this URL.
-  def duplicate_artists
-    ArtistFinder.find_artists(url).without(artist)
   end
 
   def validate_url_format

@@ -14,9 +14,9 @@ class Source::Extractor
     PASSWORDS = %w[y yes]
 
     def image_urls
-      api_html&.css("img.DetailIllustItemImage").to_a.pluck(:src).map do |url|
+      api_html&.css("img.DetailIllustItemImage").to_a.pluck(:src).filter_map do |url|
         Source::URL.parse(url)&.full_image_url
-      end&.compact
+      end
     end
 
     def profile_urls

@@ -6,19 +6,20 @@ atom_feed(root_url: comments_url) do |feed|
 
   feed.title(title)
   feed.updated(@comments.first.try(:updated_at))
+  dtext_references = DText.preprocess(@comments.map(&:body))
 
   @comments.each do |comment|
     feed.entry(comment, published: comment.created_at, updated: comment.updated_at) do |entry|
-      entry.title("@#{comment.creator.name} on post ##{comment.post_id} (#{comment.post.presenter.humanized_essential_tag_string})")
+      entry.title("@#{comment.creator.name} on post ##{comment.post_id} (#{comment.post.presenter.humanized_essential_tag_string(tags_by_name: @tags_by_name)})")
 
       if comment.post.has_preview?
         entry.content(<<~EOS, type: "html")
           <img src="#{comment.post.media_asset.variant("360x360").file_url}"/>
 
-          #{comment.dtext_body.format_text}
+          #{comment.dtext_body.format_text(references: dtext_references)}
         EOS
       else
-        entry.content(comment.dtext_body.format_text, type: "html")
+        entry.content(comment.dtext_body.format_text(references: dtext_references), type: "html")
       end
 
       entry.author do |author|

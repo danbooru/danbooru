@@ -145,7 +145,7 @@ class DText
       layout = []
       nest = 0
 
-      str.split(/\n/).each do |line|
+      str.split("\n").each do |line|
         if line =~ /^\s*(\*+) (.+)/
           if nest > 0
             html += "<li>#{current_item}</li>"
@@ -306,7 +306,7 @@ class DText
         end
       end
 
-      stack.reverse.each do |tag|
+      stack.reverse_each do |tag|
         if tag == "blockquote"
           html << "</blockquote>"
         elsif tag == "div"

@@ -10,6 +10,7 @@ class WikiPagesController < ApplicationController
       redirect_to wiki_pages_path(search: { title_normalize: params[:title] }, redirect: true)
     else
       @wiki_pages = authorize WikiPage.paginated_search(params)
+      @wiki_pages = @wiki_pages.includes(:tag) if request.format.html?
       respond_with(@wiki_pages)
     end
   end

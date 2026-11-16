@@ -142,13 +142,10 @@ class Tag < ApplicationRecord
         @categories ||= CategoryMapping.new
       end
 
-      def select_category_for(tag_name)
-        Tag.where(name: tag_name).pick(:category).to_i
-      end
-
       def categories_for(tag_names)
-        Cache.get_multi(Array(tag_names), "tag-category") do |tag|
-          Tag.select_category_for(tag)
+        Cache.get_multi(Array(tag_names), "tag-category") do |names|
+          categories = Tag.where(name: names).pluck(:name, :category).to_h
+          names.index_with { |name| categories.fetch(name, 0) }
         end
       end
     end
@@ -256,6 +253,27 @@ class Tag < ApplicationRecord
 
         tag
       end
+
+      # Translate tags from other sites to Danbooru tags, by wiki other names, or else by tag name if the tag isn't
+      # empty. Aliases are applied in both cases.
+      #
+      # @param names [Array<String>] The tags from the other site.
+      # @return [Hash<String, Array<Tag>>] A hash mapping each name to its translated tags.
+      def translate(names)
+        names = names.compact_blank.uniq
+        return {} if names.empty?
+
+        wiki_titles = WikiPage.titles_for_other_names(names)
+        tag_names = names.index_with { normalize_name(it) }
+        aliases = TagAlias.aliases_for((wiki_titles.values.flatten + tag_names.values).uniq)
+        tags = where(name: (wiki_titles.values.flatten + tag_names.values).map { aliases.fetch(it, it) }).index_by(&:name)
+        find_tag = ->(name) { tags[aliases.fetch(name, name)] }
+
+        names.index_with do |name|
+          wiki_tags = wiki_titles[name].filter_map(&find_tag).uniq
+          wiki_tags.presence || [find_tag.call(tag_names[name])].compact.select { it.post_count > 0 }
+        end
+      end
     end
   end
 
@@ -314,7 +332,7 @@ class Tag < ApplicationRecord
       # Tag.parse_query("looking_at_") => ["looking", "at"]
       def parse_query(string)
         query = parse_words(string)
-        query[-1] += "*" unless string.match?(/[#{WORD_DELIMITERS}]\z/)
+        query[-1] += "*" unless string.match?(/[#{WORD_DELIMITERS}]\z/o)
         query
       end
     end
@@ -380,7 +398,7 @@ class Tag < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_deprecated category post_count name wiki_page artist antecedent_alias consequent_aliases antecedent_implications consequent_implications dtext_links], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])
@@ -491,7 +509,8 @@ class Tag < ApplicationRecord
   end
 
   def metatag?
-    name.match?(/\A#{PostQueryBuilder::METATAGS.join("|")}:/i)
+    metatag, colon = name.partition(":")
+    colon.present? && metatag.downcase(:ascii).in?(PostQueryBuilder::METATAGS)
   end
 
   def rating?

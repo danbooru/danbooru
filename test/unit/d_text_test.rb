@@ -504,6 +504,17 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("issue &num;1", DText.from_html('<a href="/image"><img src="/image.jpg" alt="issue #1"></a>'))
 
         assert_equal("issue #1", DText.from_html("issue #1", allowed_shortlinks: ["issue"]))
+        assert_equal("Issue #1", DText.from_html("Issue #1", allowed_shortlinks: ["issue"]))
+        assert_equal("pixiv #1 Post &num;2 mod action &num;3", DText.from_html("pixiv #1 Post #2 mod action #3", allowed_shortlinks: ["pixiv"]))
+
+        assert_equal("artstation &num;abc123 ArtStation &num;XYZ", DText.from_html("artstation #abc123 ArtStation #XYZ"))
+        assert_equal("artstation #abc123", DText.from_html("artstation #abc123", allowed_shortlinks: ["artstation"]))
+        assert_equal("media asset &num;1", DText.from_html("media asset #1", allowed_shortlinks: ["asset"]))
+        assert_equal("media asset #1", DText.from_html("media asset #1", allowed_shortlinks: ["media asset"]))
+      end
+
+      should "escape brackets in image URLs" do
+        assert_equal('"foo":[https://example.com/a%5Bb%5D.jpg]', DText.from_html('<img src="https://example.com/a[b].jpg" alt="foo">'))
       end
 
       should "put headers on a line by themselves" do

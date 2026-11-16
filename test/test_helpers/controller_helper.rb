@@ -40,7 +40,7 @@ module ControllerHelper
 
     # @return [String] A description of the test, used as the name of the test case.
     def description
-      caller = caller_locations[1] # Shoulda::Context::Context#should -> actual caller
+      caller = caller_locations(2..2).first # Shoulda::Context::Context#should -> actual caller
       description = "respond to a search"
       description += " for #{@params.inspect}" if @params.present?
       description += " (#{File.basename(caller.path)}:#{caller.lineno})"

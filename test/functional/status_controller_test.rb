@@ -34,7 +34,7 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    should "hide sensitive details from non-owners" do
+    should "hide sensitive details from non-superadmins" do
       get_auth status_path(format: :json), create(:admin_user)
 
       assert_response :success
@@ -44,8 +44,8 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
       assert_not(response.parsed_body["server"].key?("kernel_version"))
     end
 
-    should "show sensitive details to the owner" do
-      get_auth status_path(format: :json), create(:owner_user)
+    should "show sensitive details to superadmins" do
+      get_auth status_path(format: :json), create(:superadmin_user)
 
       assert_response :success
       assert(response.parsed_body["version"].key?("ruby_version"))
@@ -56,15 +56,15 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
       assert(response.parsed_body["server"].key?("kernel_version"))
     end
 
-    should "hide sensitive details from non-owners in the html response" do
+    should "hide sensitive details from non-superadmins in the html response" do
       get_auth status_path, create(:admin_user)
 
       assert_response :success
       assert_select "th", text: "Ruby Version", count: 0
     end
 
-    should "show sensitive details to the owner in the html response" do
-      get_auth status_path, create(:owner_user)
+    should "show sensitive details to superadmins in the html response" do
+      get_auth status_path, create(:superadmin_user)
 
       assert_response :success
       assert_select "th", text: "Ruby Version"

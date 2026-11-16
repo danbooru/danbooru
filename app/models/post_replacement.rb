@@ -26,13 +26,7 @@ class PostReplacement < ApplicationRecord
   concerning :Search do
     class_methods do
       def search(params, current_user)
-        # Only allow exact matches on md5s for non-moderators (see MediaAsset.search).
-        hashes = %i[md5 old_md5]
-        attributes = %i[id created_at updated_at file_ext old_file_ext original_url replacement_url creator post media_asset old_media_asset]
-        attributes += hashes if current_user.is_moderator?
-
-        q = search_attributes(params, attributes, current_user: current_user)
-        q = q.where(hashes.select { params[it].present? }.index_with { params[it].to_s }) unless current_user.is_moderator?
+        q = search_attributes(params, current_user: current_user)
         q.apply_default_order(params)
       end
     end

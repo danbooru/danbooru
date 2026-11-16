@@ -5,36 +5,22 @@ class MediaAssetsController < ApplicationController
 
   def index
     @media_assets = authorize MediaAsset.visible(CurrentUser.user).paginated_search(params, limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE, count_pages: false)
-    @media_assets = @media_assets.includes(:media_metadata, :post)
+    @media_assets = @media_assets.includes(:post)
+    @media_assets = @media_assets.includes(:media_metadata) if request.format.html?
     respond_with(@media_assets)
   end
 
   def show
     @media_asset = authorize MediaAsset.find(params[:id])
-    @post = Post.find_by_md5(@media_asset.md5)
 
     if request.format.html?
+      @post = Post.find_by_md5(@media_asset.md5)
       @visible_uma = @media_asset.upload_media_assets.visible(CurrentUser.user).select("*, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY id DESC) AS n")
       @visible_uma = UploadMediaAsset.from(@visible_uma).where("n < 6").select("*").order(id: :desc)
       @visible_uma = @visible_uma.includes(upload: :uploader)
     end
 
-    if CurrentUser.is_owner? && request.format.symbol.in?(%i[jpeg webp avif])
-      width = params.fetch(:width, @media_asset.image_width).to_i
-      height = params.fetch(:height, @media_asset.image_height).to_i
-      quality = params.fetch(:quality, 85).to_i
-      original_file = @media_asset.variant(:original).open_file
-
-      if width != @media_asset.image_width || height != @media_asset.image_height || request.format != @media_asset.mime_type
-        media_file = original_file.preview!(width, height, format: request.format.symbol, quality: quality)
-      else
-        media_file = original_file
-      end
-
-      send_file(media_file.path, type: media_file.mime_type, disposition: "inline")
-    else
-      respond_with(@media_asset)
-    end
+    respond_with(@media_asset)
   end
 
   def destroy

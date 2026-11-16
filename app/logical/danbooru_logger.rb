@@ -64,7 +64,7 @@ class DanbooruLogger
 
   # Get logged HTTP headers from request.
   def self.header_params(request)
-    headers = request.headers.to_h.select { |header, _value| header.match?(/\AHTTP_/) }
+    headers = request.headers.to_h.select { |header, _value| header.start_with?("HTTP_") }
     headers = headers.transform_keys { |header| header.delete_prefix("HTTP_").downcase }
     headers = headers.slice(*HEADERS)
     headers

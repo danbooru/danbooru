@@ -129,7 +129,7 @@ class Post < ApplicationRecord
     commentary = ArtistCommentary.new(**artist_commentary)
 
     if add_artist_tag
-      tag_string = "#{tag_string} #{upload_media_asset.source_extractor&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip
+      tag_string = "#{tag_string} #{upload_media_asset.source_extractor&.artists.to_a.map { it.tag.name }.join(" ")}".strip
       tag_string += " " if tag_string.present?
     end
 
@@ -381,7 +381,7 @@ class Post < ApplicationRecord
     # Update tag_count_general, tag_count_copyright, etc.
     def update_tag_category_counts
       TagCategory.categories.each do |category_name|
-        tag_count = tags.select { |t| t.category_name.downcase == category_name }.size
+        tag_count = tags.count { |t| t.category_name.downcase == category_name }
         send("tag_count_#{category_name}=", tag_count)
       end
 
@@ -639,8 +639,8 @@ class Post < ApplicationRecord
         in "parent", new_parent_id
           self.parent_id = new_parent_id
 
-        in "rating", /\A([#{RATINGS.keys.join}])/i
-          self.rating = $1.downcase
+        in "rating", /\A([#{RATINGS.keys.join}])/o
+          self.rating = $1
 
         in "source", "none"
           self.source = ""
@@ -1187,23 +1187,13 @@ class Post < ApplicationRecord
       end
 
       def metatag_matches(name, value, current_user = User.anonymous, quoted: false)
-        # Only allow exact hash matches for non-moderators, so range searches can't be used to find the md5s of hidden posts.
-        if name.in?(%w[md5 pixelhash]) && !current_user.is_moderator?
-          exact = begin
-            RangeParser.parse(value, :md5) in [:eq | :in, _]
-          rescue RangeParser::ParseError
-            false
-          end
-          return none unless exact
-        end
-
         case name
         when "id"
           attribute_matches(value, :id)
         when "md5"
-          attribute_matches(value, :md5, :md5)
+          attribute_matches(value, :md5, :md5, exact: policy(current_user).search_modes[:md5] != :all)
         when "pixelhash"
-          attribute_matches(value, "media_assets.pixel_hash", :md5).joins(:media_asset)
+          attribute_matches(value, "media_assets.pixel_hash", :md5, exact: MediaAsset.policy(current_user).search_modes[:pixel_hash] != :all).joins(:media_asset)
         when "width"
           attribute_matches(value, "media_assets.image_width").joins(:media_asset)
         when "height"
@@ -1727,7 +1717,7 @@ class Post < ApplicationRecord
         when "filesize_asc"
           joins(:media_asset).reorder("media_assets.file_size ASC")
 
-        when /\A(?<column>#{PostQueryBuilder::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/i
+        when /\A(?<column>#{PostQueryBuilder::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/o
           column = $~[:column]
           direction = $~[:direction] || "desc"
           reorder(column => direction, :id => direction)
@@ -1744,12 +1734,12 @@ class Post < ApplicationRecord
         when "duration_asc"
           joins(:media_asset).reorder("media_assets.duration ASC NULLS LAST, posts.id ASC")
 
-        # artags_desc, copytags_desc, chartags_desc, gentags_desc, metatags_desc
-        when /(#{TagCategory.short_name_list.join("|")})tags(?:\Z|_desc)/
+        # arttags_desc, copytags_desc, chartags_desc, gentags_desc, metatags_desc
+        when /\A(#{TagCategory.short_name_list.join("|")})tags(_desc)?\z/o
           reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} DESC")
 
-        # artags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
-        when /(#{TagCategory.short_name_list.join("|")})tags_asc/
+        # arttags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
+        when /\A(#{TagCategory.short_name_list.join("|")})tags_asc\z/o
           reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
 
         when "random"
@@ -1813,17 +1803,7 @@ class Post < ApplicationRecord
       end
 
       def search(params, current_user)
-        # Only allow exact md5 matches for non-moderators (see MediaAsset.search).
-        attributes = %i[
-          id created_at updated_at rating source pixiv_id fav_count score up_score down_score file_ext
-          file_size image_width image_height tag_count has_children has_active_children is_pending is_flagged is_deleted
-          is_banned last_comment_bumped_at last_commented_at last_noted_at uploader approver parent artist_commentary
-          flags appeals notes comments children approvals replacements media_metadata
-        ]
-        attributes += [:md5] if current_user.is_moderator?
-
-        q = search_attributes(params, attributes, current_user: current_user)
-        q = q.where(md5: params[:md5].to_s) if params[:md5].present? && !current_user.is_moderator?
+        q = search_attributes(params, current_user: current_user)
 
         if params[:tags].present?
           q = q.where(id: user_tag_match(params[:tags], current_user).select(:id))

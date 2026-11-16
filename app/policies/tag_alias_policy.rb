@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class TagAliasPolicy < ApplicationPolicy
+class TagAliasPolicy < TagRelationshipPolicy
   def destroy?
     user.is_admin?
   end

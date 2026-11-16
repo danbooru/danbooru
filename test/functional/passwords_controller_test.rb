@@ -13,7 +13,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not work for a user viewing another users's change password page" do
-        get_auth edit_user_password_path(@user), create(:owner_user)
+        get_auth edit_user_password_path(@user), create(:superadmin_user)
         assert_response 403
       end
 
@@ -51,8 +51,8 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow users to change the password of other users" do
-        @owner = create(:owner_user)
-        put_auth user_password_path(@user), @owner, params: { user: { current_password: "12345678", password: "abcdefgh", password_confirmation: "abcdefgh" }}
+        @superadmin = create(:superadmin_user)
+        put_auth user_password_path(@user), @superadmin, params: { user: { current_password: "12345678", password: "abcdefgh", password_confirmation: "abcdefgh" }}
 
         assert_response 403
         assert_equal(@user, @user.reload.authenticate_password("12345678"))

@@ -108,6 +108,12 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     should "be capped at 100,000 for Builder users and above" do
       assert_equal(100_000, RelatedTagQuery.new(query: "aaa", search_sample_size: 1_000_000, user: create(:builder_user)).search_sample_size)
     end
+
+    should "be capped at the limit set by the policy" do
+      RelatedTagQueryPolicy.any_instance.stubs(:max_search_sample_size).returns(42)
+
+      assert_equal(42, RelatedTagQuery.new(query: "aaa", search_sample_size: 100).search_sample_size)
+    end
   end
 
   context "the tag limit" do

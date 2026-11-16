@@ -9,8 +9,6 @@ class ForumPost < ApplicationRecord
   MAX_TOTAL_LINES = 1_000
 
   # attr_readonly :topic_id # XXX broken by accepts_nested_attributes_for in ForumTopic
-  attr_accessor :creator_ip_addr
-
   # defines :dtext_body
   dtext_attribute :body, max_lines: MAX_VISIBLE_LINES, max_total_lines: MAX_TOTAL_LINES, media_embeds: { max_embeds: 5, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
 
@@ -33,7 +31,6 @@ class ForumPost < ApplicationRecord
   validate :validate_undeletion_of_post
 
   before_save :handle_reports_on_deletion
-  before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_update :create_mod_action
@@ -58,14 +55,6 @@ class ForumPost < ApplicationRecord
   )
 
   module SearchMethods
-    def visible(user)
-      if policy(user).show_deleted?
-        where(topic_id: ForumTopic.visible(user))
-      else
-        undeleted.where(topic_id: ForumTopic.visible(user))
-      end
-    end
-
     def not_visible(user)
       visible(user).invert_where
     end
@@ -78,7 +67,7 @@ class ForumPost < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_deleted body creator updater topic dtext_links votes tag_alias tag_implication bulk_update_request], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:linked_to].present?
         q = q.wiki_link_matches(params[:linked_to])
@@ -113,12 +102,6 @@ class ForumPost < ApplicationRecord
   def validate_undeletion_of_post
     if topic.is_deleted? && !is_deleted?
       errors.add(:base, "Can't undelete post without undeleting the topic first")
-    end
-  end
-
-  def autoreport_spam
-    if SpamDetector.new(self, user_ip: creator_ip_addr).spam?
-      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
   end
 

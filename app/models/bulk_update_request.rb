@@ -46,7 +46,7 @@ class BulkUpdateRequest < ApplicationRecord
 
   module SearchMethods
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       statuses = params[:status].to_s.split(",")
 
@@ -193,7 +193,7 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def has_too_many_votes_to_edit?
-    (forum_post&.votes&.count.presence || 0) >= 5
+    (forum_post&.votes&.size.presence || 0) >= 5
   end
 
   def is_pending?

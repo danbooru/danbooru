@@ -28,7 +28,7 @@ class Source::Extractor::E621 < Source::Extractor
   def tags
     return [] if api_response.blank?
 
-    tags = api_response[:tags].to_h.values.reduce(:+) + ["rating:#{api_response[:rating]}"]
+    tags = api_response[:tags].to_h.values.flatten + ["rating:#{api_response[:rating]}"]
     tags.map do |tag|
       url = "https://e621.net/posts?tags=#{Danbooru::URL.escape(tag)}"
       [tag, url]

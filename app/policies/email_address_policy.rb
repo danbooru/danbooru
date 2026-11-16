@@ -59,4 +59,16 @@ class EmailAddressPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:address]
   end
+
+  def visible(relation)
+    if user.is_moderator?
+      relation.where(user: User.where(level: ...user.level).or(User.where(id: user.id)))
+    else
+      relation.none
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at user address normalized_address is_verified is_deliverable]
+  end
 end

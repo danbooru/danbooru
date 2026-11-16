@@ -118,7 +118,7 @@ class Source::Extractor::Bluesky < Source::Extractor
   def html_artist_commentary_desc
     text = artist_commentary_desc.dup.force_encoding("ASCII-8BIT")
 
-    api_response&.dig("thread", "post", "record", "facets").to_a.reverse.each do |facet|
+    api_response&.dig("thread", "post", "record", "facets").to_a.reverse_each do |facet|
       if (tag = facet["features"].to_a.find { |f| f["$type"] == "app.bsky.richtext.facet#tag" }).present?
         tag_name = tag["tag"]
         byte_start = facet.dig("index", "byteStart")

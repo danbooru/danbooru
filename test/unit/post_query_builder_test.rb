@@ -157,6 +157,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post7, post4], "original smile ~1girl ~multiple_girls -1boy -multiple_boys", tag_limit: 100)
     end
 
+    should "not fail for metatags that only match because of Unicode case folding" do
+      assert_tag_match([], "ſcore:>5")
+    end
+
     should "ignore invalid operator syntax" do
       assert_nothing_raised do
         assert_tag_match([], "-")
@@ -1552,6 +1556,30 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       # ordering is unpredictable so can't be tested.
       assert_tag_match([posts.first], "id:#{posts.first.id} order:none")
+    end
+
+    should "ignore invalid category tag count orders" do
+      p1 = create(:post, tag_string: "a b c")
+      p2 = create(:post, tag_string: "a")
+      p3 = create(:post, tag_string: "a b")
+
+      assert_tag_match([p1, p3, p2], "order:gentags_desc")
+      assert_tag_match([p2, p3, p1], "order:gentags_asc")
+
+      assert_tag_match([p3, p2, p1], "order:xgentags")
+      assert_tag_match([p3, p2, p1], "order:xgentags_asc")
+      assert_tag_match([p3, p2, p1], "order:gentags_desc_foo")
+      assert_tag_match([p3, p2, p1], "order:gentags_ascx")
+    end
+
+    should "ignore count orders with Unicode characters" do
+      p1 = create(:post)
+      p2 = create(:post)
+      p3 = create(:post)
+
+      assert_tag_match([p1, p2, p3], "order:comment_count_asc")
+      assert_tag_match([p3, p2, p1], "order:comment_count_aſc")
+      assert_tag_match([p3, p2, p1], "order:ſeries_pool_count")
     end
 
     should "return posts for order:comment_bumped" do

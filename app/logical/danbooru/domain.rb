@@ -71,7 +71,7 @@ module Danbooru
 
       # TLDs can only contain letters, Unicode, or Punycode, and must be at least two characters long.
       # https://data.iana.org/TLD/tlds-alpha-by-domain.txt
-      return false unless tld.nil? || tld.match?(/\A[[^[:ascii:]]a-z]{2,}|xn--[a-z0-9-]{2,}\z/i)
+      return false unless tld.nil? || tld.match?(/\A(?:[[^[:ascii:]]a-z]{2,}|xn--[a-z0-9-]{2,})\z/i)
 
       # Labels can only contain letters, digits, and hyphens, and can't start or end with a hyphen (the "LDH rule").
       domain.split(".").each do |label|

@@ -8,7 +8,7 @@ module PostsHelper
   end
 
   def discover_mode?
-    params[:tags] =~ /order:rank/ || params[:action] =~ /searches|viewed/
+    params[:tags].to_s.include?("order:rank") || params[:action] =~ /searches|viewed/
   end
 
   # A <meta> tag that tells Javascript to send a request to Reportbooru when the page is loaded.

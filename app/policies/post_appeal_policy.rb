@@ -16,4 +16,8 @@ class PostAppealPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:reason]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at reason status creator post]
+  end
 end

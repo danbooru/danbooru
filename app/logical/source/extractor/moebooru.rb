@@ -25,7 +25,7 @@ module Source
 
       # XXX the base extractor excludes artist tags from the translated tags; we don't want that for moebooru.
       def translated_tags
-        tags.map(&:first).flat_map(&method(:translate_tag)).uniq.sort
+        translate_tags(tags.map(&:first)).values.flatten.uniq.sort
       end
 
       # Moebooru returns an empty array when doing an md5:<hash> search for a

@@ -46,6 +46,7 @@ if !ENV["COVERAGE"].to_s.empty?
 end
 
 require_relative "../config/environment"
+require "faker"
 require "rails/test_help"
 
 # Make Shakapacker only compile the packs once, on the first pack lookup. Otherwise Shakapacker hashes every watched

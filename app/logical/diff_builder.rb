@@ -33,9 +33,9 @@ class DiffBuilder
         next
       end
 
-      newchange = hunk.max { |a, b| a.old_position <=> b.old_position }
+      newchange = hunk.max_by(&:old_position)
       newstart = newchange.old_position
-      oldstart = hunk.min { |a, b| a.old_position <=> b.old_position }.old_position
+      oldstart = hunk.min_by(&:old_position).old_position
 
       if newchange.action == "+"
         output.insert(newstart, "</ins>")
@@ -45,9 +45,9 @@ class DiffBuilder
         case chg.action
         when "-"
           oldstart = chg.old_position
-          output[chg.old_position] = '<span class="paragraph-mark">¶</span><br>' if chg.old_element.match(/^\r?\n$/)
+          output[chg.old_position] = '<span class="paragraph-mark">¶</span><br>' if chg.old_element.match?(/^\r?\n$/)
         when "+"
-          if chg.new_element.match(/^\r?\n$/)
+          if chg.new_element.match?(/^\r?\n$/)
             output.insert(chg.old_position, '<span class="paragraph-mark">¶</span><br>')
           else
             output.insert(chg.old_position, escape_html[chg.new_element].to_s)

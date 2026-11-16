@@ -37,7 +37,7 @@ class DmailsController < ApplicationController
   end
 
   def create
-    @dmail = authorize(Dmail).create_split(from: CurrentUser.user, creator_ip_addr: request.remote_ip, **permitted_attributes(Dmail))
+    @dmail = authorize(Dmail).create_split(from: CurrentUser.user, **permitted_attributes(Dmail))
     respond_with(@dmail)
   end
 

@@ -218,7 +218,7 @@ class ExternalCommand
   # @raise [TimeoutError] If the command runs past the deadline.
   # @raise [OutputLimitError] If the command prints too much.
   def read_output!(output, deadline)
-    buffer = String.new
+    buffer = "".b
 
     loop do
       timed_out! unless output.wait_readable(remaining(deadline))

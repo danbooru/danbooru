@@ -17,7 +17,7 @@ class Source::Extractor::CiEn < Source::Extractor
         urls << og_url.to_s
       end
 
-      urls += page&.css(".l-creatorPage-main article vue-l-image, .l-creatorPage-main article vue-file-player").to_a.map do |node|
+      urls += page&.css(".l-creatorPage-main article vue-l-image, .l-creatorPage-main article vue-file-player").to_a.filter_map do |node|
         case node.name
         when "vue-l-image"
           node["data-raw"]
@@ -26,7 +26,7 @@ class Source::Extractor::CiEn < Source::Extractor
             uri.query = node["auth-key"]
           end.to_s
         end
-      end.compact.uniq
+      end.uniq
 
       urls
     end

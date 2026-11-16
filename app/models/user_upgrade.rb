@@ -94,16 +94,8 @@ class UserUpgrade < ApplicationRecord
     recipient != purchaser
   end
 
-  def self.visible(user)
-    if user.is_owner?
-      all
-    else
-      where(recipient: user).or(where(purchaser: user))
-    end
-  end
-
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :upgrade_type, :status, :transaction_id, :payment_processor, :recipient, :purchaser], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     if params[:is_gifted].to_s.truthy?
       q = q.gifted

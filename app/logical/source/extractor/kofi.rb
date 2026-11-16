@@ -29,7 +29,7 @@ class Source::Extractor::Kofi < Source::Extractor
   end
 
   def display_name
-    profile_page&.at(".kfds-text-limit-profilename-mobile span")&.text
+    profile_page&.at(".nav-profile-title")&.text&.strip
   end
 
   def username
@@ -57,11 +57,6 @@ class Source::Extractor::Kofi < Source::Extractor
   end
 
   def backend_get(path)
-    # Use Ko-fi's backend IP to bypass Cloudflare protection
-    backend_http.cache(1.minute).parsed_get("https://104.45.231.79#{path}") if path.present?
-  end
-
-  def backend_http
-    http.with_legacy_ssl.headers(Host: "ko-fi.com")
+    http.cache(1.minute).parsed_get("https://ko-fi.com#{path}") if path.present?
   end
 end

@@ -89,7 +89,7 @@ class Artist < ApplicationRecord
   concerning :NameMethods do
     class_methods do
       def normalize_name(name)
-        name.to_s.downcase.strip.gsub(/ /, "_").to_s
+        name.to_s.downcase.strip.tr(" ", "_").to_s
       end
 
       def normalize_other_names(other_names)
@@ -299,7 +299,7 @@ class Artist < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_deleted is_banned name group_name other_names urls wiki_page tag_alias tag], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])
@@ -337,7 +337,7 @@ class Artist < ApplicationRecord
   end
 
   def add_url_warnings
-    duplicate_artists = urls.select(&:new_record?).flat_map(&:duplicate_artists).sort.uniq.without(self)
+    duplicate_artists = ArtistFinder.find_artists(urls.select(&:new_record?).map(&:url)).order(:id).without(self)
 
     if duplicate_artists.present?
       names = duplicate_artists.map { |artist| "[[#{artist.name}]]" }

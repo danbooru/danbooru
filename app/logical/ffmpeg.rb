@@ -353,12 +353,12 @@ class FFmpeg
 
   # @return [Integer] The total compressed size of all video streams in bytes, or 0 if there are no video streams.
   memoize def video_size
-    video_packets.pluck("size").map(&:to_i).sum
+    video_packets.pluck("size").sum(&:to_i)
   end
 
   # @return [Integer] The total compressed size of all audio streams in bytes, or 0 if there are no audio streams.
   memoize def audio_size
-    audio_packets.pluck("size").map(&:to_i).sum
+    audio_packets.pluck("size").sum(&:to_i)
   end
 
   # @return [Boolean] True if the video is unplayable.

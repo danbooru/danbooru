@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Dmail < ApplicationRecord
-  attr_accessor :creator_ip_addr, :disable_email_notifications
+  attr_accessor :disable_email_notifications
 
   # defines :dtext_body
   dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
@@ -16,7 +16,6 @@ class Dmail < ApplicationRecord
   belongs_to :from, class_name: "User"
   has_many :moderation_reports, as: :model, dependent: :destroy
 
-  before_create :autoreport_spam
   after_destroy :update_unread_dmail_count
   after_save :update_unread_dmail_count
   after_commit :send_email, on: :create
@@ -67,7 +66,7 @@ class Dmail < ApplicationRecord
 
     def build_response(options = {})
       Dmail.new do |dmail|
-        if title =~ /Re:/
+        if title.include?("Re:")
           dmail.title = title
         else
           dmail.title = "Re: #{title}"
@@ -81,16 +80,6 @@ class Dmail < ApplicationRecord
   end
 
   module SearchMethods
-    def visible(user)
-      if user.is_anonymous?
-        none
-      elsif user.is_moderator?
-        where(owner: user).or(where(id: ModerationReport.where(model_type: "Dmail").select(:model_id)))
-      else
-        where(owner: user)
-      end
-    end
-
     def sent_by(user)
       where("dmails.from_id = ? AND dmails.owner_id != ?", user.id, user.id)
     end
@@ -111,7 +100,7 @@ class Dmail < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_read, :is_deleted, :title, :body, :to, :from], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
       q = q.where_text_matches([:title, :body], params[:message_matches])
 
       q = q.folder_matches(params[:folder])
@@ -143,8 +132,19 @@ class Dmail < ApplicationRecord
   include FactoryMethods
   extend SearchMethods
 
+  # Mark the dmails as read in one query, then recount each owner's unread dmails once, instead of saving and recounting
+  # for every dmail.
   def self.mark_all_as_read
-    unread.update(is_read: true)
+    dmail_ids, owner_ids = unread.pluck(:id, :owner_id).transpose
+    return none if dmail_ids.nil?
+
+    where(id: dmail_ids).update_all(is_read: true, updated_at: Time.zone.now)
+
+    User.where(id: owner_ids.uniq).find_each do |owner|
+      owner.with_lock { owner.update!(unread_dmail_count: owner.dmails.active.unread.count) }
+    end
+
+    where(id: dmail_ids)
   end
 
   def quoted_body
@@ -167,13 +167,6 @@ class Dmail < ApplicationRecord
 
   def is_recipient?
     owner == to
-  end
-
-  def autoreport_spam
-    if is_recipient? && !is_sender? && SpamDetector.new(self, user_ip: creator_ip_addr).spam?
-      self.is_deleted = true
-      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
-    end
   end
 
   def update_unread_dmail_count

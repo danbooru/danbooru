@@ -29,6 +29,14 @@ class ApiKeyPolicy < ApplicationPolicy
     [:name, :permitted_ip_addresses, { permissions: [] }]
   end
 
+  def visible(relation)
+    relation.where(user: user)
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at user]
+  end
+
   def api_attributes
     super - [:key]
   end

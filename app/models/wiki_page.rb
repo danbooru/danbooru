@@ -60,12 +60,12 @@ class WikiPage < ApplicationRecord
       where(id: DtextLink.wiki_page.embedded_media.where(link_target: media_asset_id).select(:model_id))
     end
 
-    def other_names_include(name)
-      where_any_in_array_iequals("other_names", normalize_other_name(name))
+    def other_names_include(names)
+      where_any_in_array_iequals("other_names", Array.wrap(names).map { normalize_other_name(it) })
     end
 
     def other_names_match(name)
-      if name =~ /\*/
+      if name.include?("*")
         subquery = WikiPage.from("unnest(other_names) AS other_name").where_ilike("other_name", normalize_other_name(name))
         where(id: subquery)
       else
@@ -78,7 +78,7 @@ class WikiPage < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_locked is_deleted body title other_names tag artist dtext_links], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
       q = q.where_text_matches([:title, :body], params[:title_or_body_matches])
 
       if params[:title_normalize].present?
@@ -187,6 +187,20 @@ class WikiPage < ApplicationRecord
 
   def self.normalize_other_name(name)
     name.to_s.unicode_normalize(:nfkc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
+  end
+
+  # @param names [Array<String>] A list of other names.
+  # @return [Hash<String, Array<String>>] A hash mapping each name to the titles of the active wikis with that other name, ignoring case.
+  def self.titles_for_other_names(names)
+    other_names = names.index_with { normalize_other_name(it).downcase }
+
+    # Return only the matching other names, compared by Postgres, so we don't load every other name of every matching
+    # wiki. The tsquery condition lets this use an index.
+    wikis = active.other_names_include(names).joins("CROSS JOIN LATERAL unnest(wiki_pages.other_names) AS other_name")
+    matches = wikis.where("lower(other_name) IN (?)", other_names.values).distinct.pluck(:title, Arel.sql("lower(other_name)"))
+    titles = matches.group_by(&:second).transform_values { it.map(&:first) }
+
+    other_names.transform_values { titles.fetch(it, []) }
   end
 
   def pretty_title

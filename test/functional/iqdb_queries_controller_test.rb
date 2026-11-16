@@ -155,6 +155,16 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_select("#post_#{@post.id}")
         end
 
+        should "ignore unknown search params" do
+          mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
+          Post.any_instance.stubs(:file).returns(File.open("test/files/jpg/test.jpg"))
+
+          get_auth iqdb_queries_path, @user, params: { search: { post_id: @post.id, foo: "x" }}
+
+          assert_response :success
+          assert_select("#post_#{@post.id}")
+        end
+
         should "not search for a post the user can't see" do
           @post.update_columns(is_banned: true) # rubocop:disable Rails/SkipsModelValidations
           IqdbClient.any_instance.expects(:query_file).never

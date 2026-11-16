@@ -766,7 +766,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         create(:comment, post: @post)
         count_queries = lambda do
           count = 0
-          ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].match?(/\ASELECT/) }, "sql.active_record") do
+          ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].start_with?("SELECT") }, "sql.active_record") do
             get posts_path(only: "id,uploader[name],comments[body]", limit: 1), as: :json
           end
           count

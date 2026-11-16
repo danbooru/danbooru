@@ -151,8 +151,21 @@ module Searchable
     where_array_to_tsvector_matches(attr, escape_patterns_for_tsquery(patterns).join(" | "))
   end
 
-  def where_any_in_array_iequals(attr, value)
-    where_array_to_tsvector_matches("lower(#{qualified_column_for(attr)})", value.downcase.to_escaped_for_tsquery)
+  # Match if the array contains any of these values, ignoring case.
+  #
+  # This builds a tsquery like `'foo' | 'bar'` and matches it against `array_to_tsvector(lower(attr))`, because that
+  # can use a GIN index on `array_to_tsvector(lower(attr))`. A simpler `lower(attr) && ARRAY[...]` can't use an index
+  # and scans the whole table. Each value is quoted by `to_escaped_for_tsquery`, so tsquery operators inside values
+  # are matched literally.
+  #
+  # @param values [String, Array<String>] The values to match.
+  def where_any_in_array_iequals(attr, values)
+    # Empty strings are invalid inside a tsquery like `'a' | ''`.
+    values = Array.wrap(values).compact_blank
+    return none if values.empty?
+
+    query = values.map { it.downcase.to_escaped_for_tsquery }.join(" | ")
+    where_array_to_tsvector_matches("lower(#{qualified_column_for(attr)})", query)
   end
 
   def where_text_includes_lower(attr, values)
@@ -234,7 +247,7 @@ module Searchable
 
     if query.nil?
       all
-    elsif query =~ /\*/
+    elsif query.include?("*")
       columns.map do |column|
         where_ilike(column, query)
       end.reduce(:or)
@@ -243,8 +256,11 @@ module Searchable
     end
   end
 
-  def attribute_matches(value, field, type = :integer)
+  # @param exact [Boolean] If true, only allow exact matches, not ranges. Used for hashes, so they can't be guessed one
+  #   character at a time with range searches.
+  def attribute_matches(value, field, type = :integer, exact: false)
     operator, arg = RangeParser.parse(value, type)
+    return none if exact && !(operator in :eq | :in)
 
     if operator == :union
       # operator = :union, arg = [[:eq, 5], [:gt, 7], [:lt, 3]]
@@ -270,8 +286,11 @@ module Searchable
     none
   end
 
-  def search_attributes(params, attributes, current_user:)
-    SearchContext.new(all, params, current_user).search_attributes(attributes)
+  # Search the attributes listed in the policy's `searchable_attributes`.
+  #
+  # @see ApplicationPolicy#searchable_attributes
+  def search_attributes(params, current_user:)
+    SearchContext.new(all, params, current_user).search_attributes(policy(current_user).search_modes)
   end
 
   # Order according to the list of IDs in the given string.
@@ -311,16 +330,21 @@ module Searchable
       @current_user = current_user
     end
 
-    def search_attributes(attributes)
+    # @param search_modes [Hash<Symbol, Symbol>] The attributes to search and their search modes (see ApplicationPolicy#search_modes).
+    def search_attributes(search_modes)
       raise ArgumentError, "max parameter depth of 10 exceeded" if parameter_depth(params) > 10
 
-      attributes.reduce(relation) do |relation, attribute|
-        search_context(relation).search_attribute(attribute)
+      search_modes.reduce(relation) do |relation, (attribute, mode)|
+        search_context(relation).search_attribute(attribute, mode)
       end
     end
 
-    def search_attribute(name)
-      if relation.has_attribute?(name)
+    def search_attribute(name, mode = :all)
+      if mode == :exact && relation.has_attribute?(name)
+        search_exact_attribute(name)
+      elsif mode != :all
+        raise ArgumentError, "#{name} has an invalid search mode: #{mode}"
+      elsif relation.has_attribute?(name)
         search_basic_attribute(name)
       elsif relation.reflections.key?(name.to_s)
         search_association_attribute(name)
@@ -363,6 +387,18 @@ module Searchable
       else
         raise NotImplementedError, "unhandled attribute type: #{name} (#{type})"
       end
+    end
+
+    # Only allow exact matches, so the attribute can't be discovered one character at a time with wildcard or range searches.
+    def search_exact_attribute(attr)
+      relation = self.relation
+      relation = visible(relation, attr).where(attr => params[attr].to_s) if params[attr].present?
+      relation = visible(relation, attr).where(attr => params[:"#{attr}_eq"].to_s) if params[:"#{attr}_eq"].present?
+      relation = visible(relation, attr).where.not(attr => params[:"#{attr}_not_eq"].to_s) if params[:"#{attr}_not_eq"].present?
+      relation = visible(relation, attr).where(attr => Array.wrap(params[:"#{attr}_array"]).map(&:to_s)) if params[:"#{attr}_array"].present?
+      relation = visible(relation, attr).where(attr => params[:"#{attr}_comma"].to_s.split(",")) if params[:"#{attr}_comma"].present?
+      relation = visible(relation, attr).where(attr => params[:"#{attr}_space"].to_s.split) if params[:"#{attr}_space"].present?
+      relation
     end
 
     def search_numeric_attribute(attr, key: attr, type: :integer)

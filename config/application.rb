@@ -30,6 +30,9 @@ Dotenv::Rails.load
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Only load BetterErrors when running the server, since it takes ~200ms to load.
+require "better_errors" if Rails.env.development? && defined?(Rails::Server)
+
 # Load the default Danbooru configuration from config/danbooru_default_config.rb
 # and the custom config from config/danbooru_local_config.rb.
 begin
@@ -138,10 +141,13 @@ module Danbooru
     canonical_url = Danbooru::URL.parse!(Danbooru.config.canonical_url)
     config.relative_url_root = canonical_url.path.presence
 
-    Rails.application.routes.default_url_options = {
-      host: canonical_url.host,
-      port: canonical_url.port,
-    }
+    # Set this in an initializer because calling `Rails.application.routes` here would prevent routes from being lazy loaded.
+    initializer "danbooru.default_url_options" do |app|
+      app.routes.default_url_options = {
+        host: canonical_url.host,
+        port: canonical_url.port,
+      }
+    end
   end
 
   I18n.enforce_available_locales = false

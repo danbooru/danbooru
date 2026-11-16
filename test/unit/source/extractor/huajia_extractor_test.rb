@@ -164,12 +164,12 @@ module Source::Tests::Extractor
       )
     end
 
-    context "A Huajjia commission with no images" do
+    context "A Huajia commission with no images" do
       strategy_should_work(
-        "https://huajia.163.com/main/projects/details/pB01DejE",
+        "https://huajia.163.com/main/projects/details/JEoyKqK8",
         image_urls: [],
         media_files: [],
-        page_url: "https://huajia.163.com/main/projects/details/pB01DejE",
+        page_url: "https://huajia.163.com/main/projects/details/JEoyKqK8",
         profile_url: nil,
         profile_urls: [],
         display_name: nil,
@@ -177,17 +177,20 @@ module Source::Tests::Extractor
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "蹲蹲能画黑色哥特长裙oc的小画师",
-        dtext_artist_commentary_desc: "偏好御姐或者成熟冷脸少女类型，更倾向于半身or全身，oc头发和新服设是全身黑，不过服设会一版白色的方便你看清结构，先攒攒小画手，遇到喜欢的会来约ovo",
+        dtext_artist_commentary_title: "文字设定制oc",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          文字设
+          描点等设定我这边会提供
+        EOS
       )
     end
 
     context "A Huajia commission with a description image" do
       strategy_should_work(
-        "https://huajia.163.com/main/projects/details/d8Yz6g0B",
-        image_urls: %w[https://huajia.fp.ps.netease.com/file/6ae93813b0188ed3da81ae8fFHBxw3ld07],
-        media_files: [{ file_size: 143_264 }],
-        page_url: "https://huajia.163.com/main/projects/details/d8Yz6g0B",
+        "https://huajia.163.com/main/projects/details/jBeyoGZB",
+        image_urls: %w[https://huajia.fp.ps.netease.com/file/6af96bee414542dcc2016834NGale7G607],
+        media_files: [{ file_size: 314_513 }],
+        page_url: "https://huajia.163.com/main/projects/details/jBeyoGZB",
         profile_url: nil,
         profile_urls: [],
         display_name: nil,
@@ -195,8 +198,8 @@ module Source::Tests::Extractor
         published_at: nil,
         updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "古风服设",
-        dtext_artist_commentary_desc: "不要太儒雅的版型，想要江湖气或者偏日常的设计，会加毛领子的大欢迎，孩子性格比较跳脱希望衣服也能野一点，超预算也可以例图够牛逼就行，希望花纹和配饰会有一些特色，最好擅长画成男的",
+        dtext_artist_commentary_title: "约上色和细化",
+        dtext_artist_commentary_desc: "想要完善这幅画，狮子有参考呀",
       )
     end
 

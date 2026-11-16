@@ -80,7 +80,7 @@ class TwitterTransactionIdGenerator
     bytes = [*key_bytes, *time_delta_bytes, *hash.bytes[0..15], 3]
     xor_bytes = [xor_key] + bytes.map { |byte| byte ^ xor_key }
 
-    Base64.strict_encode64(xor_bytes.pack("c*")).strip.gsub("=", "")
+    Base64.strict_encode64(xor_bytes.pack("c*")).strip.delete("=")
   end
 
   # Below are internal methods used to calculate the transaction ID.

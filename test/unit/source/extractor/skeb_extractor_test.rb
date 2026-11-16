@@ -149,7 +149,7 @@ module Source::Tests::Extractor
         ],
         media_files: [
           { file_size: 118_186 },
-          { file_size: 109_748 },
+          { file_size: 109_784 },
         ],
         page_url: "https://skeb.jp/@LambOic029/works/146",
         profile_urls: %w[https://skeb.jp/@LambOic029],
@@ -195,7 +195,7 @@ module Source::Tests::Extractor
         media_files: [{ file_size: 546_223 }],
         page_url: "https://skeb.jp/@kaisouafuro/works/112",
         profile_urls: %w[https://skeb.jp/@kaisouafuro],
-        display_name: "まめすず",
+        display_name: "まめすず　C109 ちゃんぽん堂　木曜日 西地区 西１ホール へ07ab",
         username: "kaisouafuro",
         published_at: nil,
         updated_at: nil,

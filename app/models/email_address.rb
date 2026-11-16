@@ -17,14 +17,6 @@ class EmailAddress < ApplicationRecord
   after_save :create_mod_action, if: :saved_change_to_address?
   after_save :update_email_address, if: :saved_change_to_address?
 
-  def self.visible(user)
-    if user.is_moderator?
-      where(user: User.where(level: ...user.level).or(User.where(id: user.id)))
-    else
-      none
-    end
-  end
-
   def address=(value)
     value = Danbooru::EmailAddress.correct(value)&.to_s || value
     self.normalized_address = Danbooru::EmailAddress.parse(value)&.canonicalized_address&.to_s || value
@@ -54,7 +46,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :user, :address, :normalized_address, :is_verified, :is_deliverable], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
 
     q = q.restricted(params[:is_restricted])
 

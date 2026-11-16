@@ -209,7 +209,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://boosty.to/boalizard/posts/7e21d2cb-7ef9-44d4-9c45-1b07111c439f",
         image_urls: [
-          %r{\Ahttps://vd\d+\.okcdn\.ru/\?expires=\d+&.*&type=5&.*&id=4610370112102\z},
+          %r{\Ahttps://vd\d+\.okcdn\.ru/\?expires=\d+&.*&type=5&.*&id=4610370112102(?:&|\z)},
           "https://images.boosty.to/image/0b7398e0-20e1-435c-8400-eb73c39e875a",
           "https://images.boosty.to/image/47d0035c-6bf2-48f8-bc5e-60558574cfd2",
           "https://images.boosty.to/image/8fe3944d-c935-4e95-86b9-d8568b4ec80d",

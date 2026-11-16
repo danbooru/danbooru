@@ -43,7 +43,7 @@ class ForumPostsController < ApplicationController
   end
 
   def create
-    @forum_post = authorize ForumPost.new(creator: CurrentUser.user, updater: CurrentUser.user, creator_ip_addr: request.remote_ip, **permitted_attributes(ForumPost))
+    @forum_post = authorize ForumPost.new(creator: CurrentUser.user, updater: CurrentUser.user, **permitted_attributes(ForumPost))
     @forum_post.save
 
     page = @forum_post.topic.last_page if @forum_post.topic.last_page > 1

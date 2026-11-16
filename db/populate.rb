@@ -4,6 +4,8 @@
 #
 # Usage: POSTS=100 bin/rails runner db/populate.rb
 
+require "faker"
+
 # The number of random posts to generate. By default, we generate 100 random
 # posts and scale the size of other tables based on the number of posts.
 POSTS = ENV.fetch("POSTS", 100).to_i

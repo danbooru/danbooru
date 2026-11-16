@@ -18,7 +18,7 @@ module Source
 
         # http://www.tinami.com/view/1087270 (multiple images)
         elsif image_sub_ids.present?
-          image_sub_ids.map { |sub_id| full_image_url(sub_id) }.compact
+          image_sub_ids.filter_map { |sub_id| full_image_url(sub_id) }
 
         # http://www.tinami.com/view/1087271 (multiple images)
         elsif nv_body_image_urls.present?

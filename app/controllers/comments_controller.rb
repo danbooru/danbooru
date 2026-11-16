@@ -47,7 +47,7 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: request.remote_ip, **permitted_attributes(Comment))
+    @comment = authorize Comment.new(creator: CurrentUser.user, **permitted_attributes(Comment))
     @comment.save
 
     respond_with(@comment, notice: "Comment posted") do |format|
@@ -88,6 +88,11 @@ class CommentsController < ApplicationController
     @posts = Post.where.not(last_comment_bumped_at: nil).user_tag_match(params[:tags]).reorder("last_comment_bumped_at DESC NULLS LAST").paginate(params[:page], limit: @limit, search_count: params[:search])
     authorize @posts
 
+    if request.format.html?
+      @posts = @posts.includes(:media_asset, :uploader, :vote_by_current_user)
+      @tags_by_name = Tag.where(name: @posts.flat_map(&:tag_array).uniq).index_by(&:name)
+    end
+
     respond_with(@posts)
   end
 
@@ -96,10 +101,14 @@ class CommentsController < ApplicationController
 
     if request.format.atom?
       @comments = @comments.includes(:creator, post: [:media_asset])
-      @comments = @comments.select { |comment| comment.post.visible? }
+      @comments = @comments.select { |comment| policy(comment).show_in_feed? }
+      @tags_by_name = Tag.where(name: @comments.flat_map { it.post.tag_array }.uniq).index_by(&:name)
     elsif request.format.html?
       @comments = @comments.includes(:creator, :updater, post: [:uploader, :media_asset])
-      @comments = @comments.includes(:votes) if CurrentUser.is_member?
+      @comments = @comments.includes(:active_votes) if CurrentUser.is_member?
+      @comments = @comments.includes(:pending_moderation_reports) if policy(ModerationReport).can_see_moderation_reports?
+    else
+      @comments = @comments.includes(post: :media_asset)
     end
 
     respond_with(@comments)

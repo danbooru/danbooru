@@ -7,20 +7,12 @@ class ArtistVersion < ApplicationRecord
   belongs_to_updater
   belongs_to :artist
 
-  def self.visible(user)
-    if policy(user).can_view_banned?
-      all
-    else
-      where(artist: Artist.unbanned)
-    end
-  end
-
   module SearchMethods
     def search(params, current_user)
-      q = search_attributes(params, %i[id created_at updated_at is_deleted is_banned name group_name urls other_names updater artist], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       case params[:order]
-      when /\A(id|created_at|updated_at|name)(?:_(asc|desc))?\z/i
+      when /\A(id|created_at|updated_at|name)(?:_(asc|desc))?\z/
         dir = $2 || :desc
         q = q.order($1 => dir).order(id: :desc)
       else
@@ -39,8 +31,8 @@ class ArtistVersion < ApplicationRecord
   end
 
   def current
-    @previous ||= ArtistVersion.where(artist_id: artist_id).order(created_at: :desc).limit(1).to_a
-    @previous.first
+    @current ||= ArtistVersion.where(artist_id: artist_id).order(created_at: :desc).limit(1).to_a
+    @current.first
   end
 
   def self.status_fields

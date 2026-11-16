@@ -12,6 +12,8 @@ class PostVersionsController < ApplicationController
 
     if request.format.html?
       @post_versions = @post_versions.includes(:updater, post: [:uploader, :media_asset, :versions])
+      tag_names = @post_versions.map(&:tag_array).select { it.size <= PostVersion::MAX_DISPLAY_TAGS }.flatten.uniq
+      @tags_by_name = Tag.where(name: tag_names).index_by(&:name)
     else
       @post_versions = @post_versions.includes(post: :versions)
     end

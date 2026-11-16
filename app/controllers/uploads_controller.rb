@@ -11,7 +11,11 @@ class UploadsController < ApplicationController
     @defaults[:status] = "completed" if request.format.html?
 
     @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE, count_pages: true, defaults: @defaults)
-    @uploads = @uploads.includes(:uploader, :posts, upload_media_assets: :media_asset) if request.format.html?
+    if request.format.html?
+      @uploads = @uploads.includes(:uploader, :posts, upload_media_assets: :media_asset)
+    else
+      @uploads = @uploads.includes(upload_media_assets: { media_asset: :post })
+    end
 
     respond_with(@uploads, include: { upload_media_assets: { include: :media_asset }})
   end
@@ -24,10 +28,10 @@ class UploadsController < ApplicationController
       redirect_to @upload.media_assets.first.post
     elsif request.format.html? && @upload.media_asset_count > 1
       redirect_to [@upload, UploadMediaAsset]
-    elsif @upload.media_asset_count == 1
+    elsif request.format.html? && @upload.media_asset_count == 1
       @upload_media_asset = @upload.upload_media_assets.first
       @post = Post.new_from_upload(@upload_media_asset, add_artist_tag: true, source: @upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys)
-      respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
+      respond_with(@upload)
     else
       respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
     end

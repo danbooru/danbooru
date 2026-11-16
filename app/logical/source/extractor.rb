@@ -332,7 +332,7 @@ module Source
     end
 
     def translated_tags
-      translated_tags = normalized_tags.flat_map(&method(:translate_tag)).uniq
+      translated_tags = translate_tags(normalized_tags).values.flatten.uniq
       translated_tags = translated_tags.reject(&:artist?).reject(&:is_deprecated?)
 
       translated_tags.sort_by do |tag|
@@ -340,20 +340,9 @@ module Source
       end
     end
 
-    # Given a tag from the source site, should return an array of corresponding Danbooru tags.
-    def translate_tag(untranslated_tag)
-      return [] if untranslated_tag.blank?
-
-      translated_tag_names = WikiPage.active.other_names_include(untranslated_tag).uniq.pluck(:title)
-      translated_tag_names = TagAlias.to_aliased(translated_tag_names)
-      translated_tags = Tag.where(name: translated_tag_names)
-
-      if translated_tags.empty?
-        normalized_name = TagAlias.to_aliased([Tag.normalize_name(untranslated_tag)])
-        translated_tags = Tag.nonempty.where(name: normalized_name)
-      end
-
-      translated_tags
+    # Given a list of tags from the source site, return a hash mapping each tag to an array of corresponding Danbooru tags.
+    def translate_tags(untranslated_tags)
+      Tag.translate(untranslated_tags)
     end
 
     def dtext_artist_commentary_title
@@ -362,17 +351,6 @@ module Source
 
     def dtext_artist_commentary_desc
       self.class.to_dtext(artist_commentary_desc)
-    end
-
-    # A search query that should return any posts that were previously
-    # uploaded from the same source. These may be duplicates, or they may be
-    # other posts from the same gallery.
-    def related_posts_search_query
-      "source:#{url}"
-    end
-
-    def related_posts(limit = 5)
-      Post.system_tag_match(related_posts_search_query).paginate(1, limit: limit, page_limit: limit)
     end
 
     # A hash containing the results of any API calls made by the extractor. For debugging purposes only.
@@ -514,7 +492,5 @@ module Source
       state = variables.map { |name, value| "@#{name}=#{value.inspect}" }.join(" ")
       "#<#{self.class.name} #{state}>"
     end
-
-    memoize :related_posts
   end
 end

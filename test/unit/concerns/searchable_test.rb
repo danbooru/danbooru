@@ -13,8 +13,66 @@ class SearchableTest < ActiveSupport::TestCase
     context "for a nonexistent attribute" do
       should "raise an error" do
         assert_raises(ArgumentError) do
-          Post.search_attributes({ answer: 42 }, [:answer], current_user: User.anonymous)
+          PostPolicy.any_instance.stubs(:searchable_attributes).returns([:answer])
+          Post.search_attributes({ answer: 42 }, current_user: User.anonymous)
         end
+      end
+    end
+
+    context "for an attribute not allowed by the policy" do
+      should "ignore the attribute" do
+        PostPolicy.any_instance.stubs(:searchable_attributes).returns([:id])
+
+        assert_search_equals([@p3, @p2, @p1], score: 1, source: "a1")
+      end
+    end
+
+    context "for an attribute with an unknown search mode" do
+      should "raise an error" do
+        PostPolicy.any_instance.stubs(:searchable_attributes).returns([{ source: :fuzzy }])
+
+        assert_raises(ArgumentError) { Post.search({ source: "a1" }, User.anonymous) }
+      end
+    end
+
+    context "for an attribute that only allows exact matches" do
+      setup do
+        PostPolicy.any_instance.stubs(:searchable_attributes).returns([{ source: :exact }, { score: :exact }])
+      end
+
+      should "allow exact matches" do
+        assert_search_equals(@p1, source: "a1")
+        assert_search_equals(@p1, source_eq: "a1")
+        assert_search_equals([@p3, @p2], source_not_eq: "a1")
+        assert_search_equals(@p1, source_array: ["a1", "blah"])
+        assert_search_equals([@p2, @p1], source_comma: "a1,b2")
+        assert_search_equals([@p2, @p1], source_space: "a1 b2")
+        assert_search_equals(@p2, score: 2)
+        assert_search_equals(@p2, score_eq: 2)
+      end
+
+      should "not allow partial matches" do
+        assert_search_equals([], source: "a*")
+        assert_search_equals([], score: ">0")
+
+        assert_search_equals([@p3, @p2, @p1], source_like: "a*")
+        assert_search_equals([@p3, @p2, @p1], source_ilike: "A*")
+        assert_search_equals([@p3, @p2, @p1], source_regex: "^a")
+        assert_search_equals([@p3, @p2, @p1], source_not_like: "a*")
+        assert_search_equals([@p3, @p2, @p1], source_lower_comma: "A1")
+        assert_search_equals([@p3, @p2, @p1], score_gt: 1)
+        assert_search_equals([@p3, @p2, @p1], score_lt: 3)
+      end
+    end
+
+    context "for an exact match attribute with a hash value" do
+      should "not raise an error" do
+        PostPolicy.any_instance.stubs(:searchable_attributes).returns([{ md5: :exact }])
+
+        assert_search_equals([], md5: { a: @p1.md5 })
+        assert_search_equals([], md5_eq: { a: @p1.md5 })
+        assert_search_equals([@p3, @p2, @p1], md5_not_eq: { a: @p1.md5 })
+        assert_search_equals([], md5_array: { a: @p1.md5 })
       end
     end
 

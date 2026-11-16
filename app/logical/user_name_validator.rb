@@ -35,13 +35,13 @@ class UserNameValidator < ActiveModel::EachValidator
       rec.errors.add(attr, "can't start with '#{name.first}'")
     elsif name =~ /[[:punct:]]\z/
       rec.errors.add(attr, "can't end with '#{name.last}'")
-    elsif name =~ /\.(#{Mime::EXTENSION_LOOKUP.keys.join("|")})\z/i
+    elsif name =~ /\.(#{Mime::EXTENSION_LOOKUP.keys.join("|")})\z/io
       rec.errors.add(attr, "can't end with a file extension")
-    elsif name =~ /__/
+    elsif name.include?("__")
       rec.errors.add(attr, "can't contain multiple underscores in a row")
     elsif forbidden_characters.present?
       rec.errors.add(attr, "can't contain #{forbidden_characters.map { |c| "'#{c}'" }.to_sentence}")
-    elsif name !~ /\A([a-zA-Z0-9]|\p{Han}|\p{Hangul}|\p{Hiragana}|\p{Katakana}|[#{ALLOWED_PUNCTUATION}])+\z/
+    elsif name !~ /\A([a-zA-Z0-9]|\p{Han}|\p{Hangul}|\p{Hiragana}|\p{Katakana}|[#{ALLOWED_PUNCTUATION}])+\z/o
       rec.errors.add(attr, "must contain only basic letters or numbers")
     elsif name =~ /\Auser_\d+\z/i
       rec.errors.add(attr, "can't be the same as a deleted user")

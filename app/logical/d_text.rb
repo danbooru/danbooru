@@ -17,9 +17,9 @@ class DText
   # post #1234, pixiv #1234, etc. The canonical list is in lib/dtext_rb/ext/dtext/dtext.cpp.rl.
   SHORTLINKS = %w[
     alias appeal artist asset ban bur comment dmail favgroup feedback flag forum implication mod\ action modreport
-    note pool post topic user wiki
+    media\ asset note pool post topic user wiki
     issue pull commit
-    artstation deviantart gelbooru nijie pawoo pixiv pixiv sankaku seiga twitter yandere
+    artstation deviantart gelbooru nijie pawoo pixiv sankaku seiga twitter yandere
   ]
 
   attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emoji_list, :emoji_map, :max_lines, :max_total_lines, :options
@@ -618,7 +618,7 @@ class DText
     options = { base_url:, inline:, allowed_shortlinks: }
 
     # Allow caller to rewrite elements before processing them.
-    html.children.each { |element| block.call(element) } if block.present?
+    html.children.each(&block) if block.present?
 
     children = []
     html.children.each do |current|
@@ -696,10 +696,10 @@ class DText
         content = html_to_dtext(element, **options, &block)
         "[code]#{content}[/code]" if content.present?
       in "li" if element.parent&.name == "ol"
-        content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
+        content = html_to_dtext(element, **options, &block).squeeze("\n").strip
         "#{element["value"]}. #{content}\n" if content.present?
       in "li"
-        content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
+        content = html_to_dtext(element, **options, &block).squeeze("\n").strip
         depth = element.ancestors.count { it.name == "ul" }.clamp(1..)
         list = "*" * depth
         "#{list} #{content}\n" if content.present?
@@ -745,7 +745,7 @@ class DText
         if inline
           escape(alt_text, allowed_shortlinks:)
         elsif alt_text.present? && src.present?
-          %{"#{alt_text.gsub('"', "&quot;")}":[#{src}]\n\n}
+          "#{build_link(src, title: alt_text)}\n\n"
         else
           ""
         end
@@ -786,7 +786,8 @@ class DText
   #
   # @param allowed_shortlinks [Array<String>] The list of shortlinks to allow in the text (e.g. ["pixiv"] to not escape `pixiv #1234` shortlinks).
   def self.escape(text, allowed_shortlinks: [])
-    text.gsub(/(#{Regexp.union(SHORTLINKS - allowed_shortlinks)}) #(\d+)/i, '\1 &num;\2') # post #1234 -> post &num;1234
+    # post #1234 -> post &num;1234
+    text.gsub(/(#{Regexp.union(SHORTLINKS).source}) #([a-z0-9]+)/io) { $1.downcase.in?(allowed_shortlinks) ? $& : "#{$1} &num;#{$2}" }
   end
 
   # Return the first paragraph the search string `needle` occurs in.

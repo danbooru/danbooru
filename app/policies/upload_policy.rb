@@ -28,4 +28,16 @@ class UploadPolicy < ApplicationPolicy
   def permitted_attributes
     [:source, :referer_url, { files: {}}]
   end
+
+  def visible(relation)
+    if user.is_moderator?
+      relation
+    else
+      relation.where(uploader: user)
+    end
+  end
+
+  def searchable_attributes
+    %i[id created_at updated_at source referer_url status media_asset_count uploader upload_media_assets media_assets posts]
+  end
 end

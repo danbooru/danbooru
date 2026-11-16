@@ -12,14 +12,6 @@ class TagListComponent < ApplicationComponent
     @search_params = search_params
   end
 
-  def self.tags_from_names(tag_names)
-    names_to_tags = Tag.where(name: tag_names).index_by(&:name)
-
-    tag_names.map do |name|
-      names_to_tags.fetch(name) { Tag.new(name: name).freeze }
-    end
-  end
-
   def categorized_tags(categories, &block)
     return to_enum(:categorized_tags, categories) unless block_given?
 

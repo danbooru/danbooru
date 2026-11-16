@@ -47,7 +47,7 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
         count_queries = lambda do
           get_auth forum_post_votes_path(only: "id,forum_post[body]"), @user, as: :json # warm up caches
           count = 0
-          ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].match?(/\ASELECT/) }, "sql.active_record") do
+          ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].start_with?("SELECT") }, "sql.active_record") do
             get_auth forum_post_votes_path(only: "id,forum_post[body]"), @user, as: :json
           end
           count

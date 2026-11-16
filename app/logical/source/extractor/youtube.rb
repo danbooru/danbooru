@@ -12,10 +12,10 @@ class Source::Extractor::Youtube < Source::Extractor
       # Single image: https://www.youtube.com/post/UgkxWevNfezmf-a7CRIO0haWiaDSjTI8mGsf
       # Multiple images: https://www.youtube.com/post/UgkxBkJE1Eu_6S9sADZF5IuK5MPRSWf4VVz3
       attachments = community_post.dig("backstageAttachment", "postMultiImageRenderer", "images") || [community_post["backstageAttachment"]].compact
-      attachments.map do |attachment|
+      attachments.filter_map do |attachment|
         url = attachment.dig("backstageImageRenderer", "image", "thumbnails", 0, "url")
         Source::URL.parse(url).try(:full_image_url) || url
-      end.compact
+      end
     else
       []
     end
@@ -59,7 +59,7 @@ class Source::Extractor::Youtube < Source::Extractor
 
   def html_artist_commentary_desc
     community_post.dig(:contentText, :runs).to_a.map do |run|
-      text = CGI.escapeHTML(run[:text].to_s).gsub("\r\n", "\n").gsub("\r", "").normalize_whitespace.gsub("\n", "<br>")
+      text = CGI.escapeHTML(run[:text].to_s).gsub("\r\n", "\n").delete("\r").normalize_whitespace.gsub("\n", "<br>")
       url = run.dig(:navigationEndpoint, :commandMetadata, :webCommandMetadata, :url)
 
       if url&.starts_with?("/")

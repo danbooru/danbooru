@@ -9,8 +9,8 @@
   <% end %>
 
   <% t.column :post do |ai_tag| %>
-    <% if ai_tag.post.present? %>
-      <%= link_to "post ##{ai_tag.post.id}", ai_tag.post %>
+    <% if (post = ai_tag.media_asset.post).present? %>
+      <%= link_to "post ##{post.id}", post %>
     <% end %>
   <% end %>
 

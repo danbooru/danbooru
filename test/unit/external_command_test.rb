@@ -162,18 +162,18 @@ class ExternalCommandTest < ActiveSupport::TestCase
     end
 
     should "kill commands if the Rails process dies" do
-      pid = fork { ExternalCommand.run("sleep 33") }
-      deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10
+      # Run the command from a new process instead of a fork, because forking this multithreaded process can hang the child.
+      pid = Process.spawn("bin/rails", "runner", %{ExternalCommand.run("sleep 33")}, out: File::NULL)
+      deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 60
 
       until `ps -eo args`.lines.map(&:strip).include?("sleep 33")
         _, status = Process.waitpid2(pid, Process::WNOHANG)
-        flunk("the forked process exited before running the command: #{status.inspect}") if status
+        flunk("the Rails process exited before running the command: #{status.inspect}") if status
 
         if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
-          info = "wchan: #{File.read("/proc/#{pid}/wchan")}, children: #{`ps --ppid #{pid} -o args=`.lines.map(&:strip).inspect}"
           Process.kill(:KILL, pid)
           Process.wait(pid)
-          flunk("the forked process hung before running the command (#{info})")
+          flunk("the Rails process didn't run the command after 60 seconds")
         end
 
         sleep 0.1

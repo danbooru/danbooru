@@ -14,7 +14,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def edit?
-    record.id == user.id || user.is_owner?
+    record.id == user.id || user.is_superadmin?
   end
 
   def update?
@@ -22,7 +22,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def deactivate?
-    (record.id == user.id && !user.is_anonymous?) || user.is_owner?
+    (record.id == user.id && !user.is_anonymous?) || user.is_superadmin?
   end
 
   def destroy?
@@ -88,6 +88,15 @@ class UserPolicy < ApplicationPolicy
       disable_mobile_gestures enable_safe_mode
       enable_desktop_mode disable_post_tooltips
     ].compact
+  end
+
+  def searchable_attributes
+    %i[
+      id created_at updated_at name level is_deleted post_upload_count post_update_count
+      note_update_count favorite_count posts note_versions artist_commentary_versions post_appeals
+      post_approvals artist_versions comments wiki_page_versions feedback forum_topics forum_posts
+      forum_post_votes tag_aliases tag_implications bans inviter
+    ]
   end
 
   def api_attributes

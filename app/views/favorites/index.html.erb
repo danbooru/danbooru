@@ -14,14 +14,14 @@
 
     <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
-    <%= table_for @favorites.includes(:user, post: [:uploader, :media_asset]), class: "striped autofit" do |t| %>
+    <%= table_for @favorites, class: "striped autofit" do |t| %>
       <% if @post.nil? %>
         <% t.column "Post" do |favorite| %>
           <%= post_preview(favorite.post, show_deleted: true) %>
         <% end %>
 
         <% t.column "Tags", td: {class: "col-expand"} do |favorite| %>
-          <%= render_inline_tag_list(favorite.post) %>
+          <%= render_inline_tag_list(favorite.post, tags_by_name: @tags_by_name) %>
         <% end %>
 
         <% t.column "Uploader" do |favorite| %>

@@ -486,6 +486,16 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_equal([@hidden_post.id], response.parsed_body.pluck("id"))
         end
 
+        should "use the policy's searchable attributes for the md5: and pixelhash: metatags" do
+          PostPolicy.any_instance.stubs(:searchable_attributes).returns([:md5])
+          MediaAssetPolicy.any_instance.stubs(:searchable_attributes).returns([:pixel_hash])
+
+          %w[md5 pixelhash].each do |metatag|
+            get posts_path(tags: "id:#{@hidden_post.id} #{metatag}:>=#{"0" * 32}"), as: :json
+            assert_equal([@hidden_post.id], response.parsed_body.pluck("id"), metatag)
+          end
+        end
+
         should "allow exact searches on the md5: metatag by non-moderators" do
           get posts_path(tags: "id:#{@hidden_post.id} md5:#{@hidden_post.md5}"), as: :json
           assert_equal([@hidden_post.id], response.parsed_body.pluck("id"))
@@ -562,6 +572,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_select "entry", 1
+        end
+
+        should "title entries with the post's characters, copyrights and artists" do
+          create(:tag, name: "cirno", category: Tag.categories.character)
+          create(:tag, name: "touhou", category: Tag.categories.copyright)
+          create(:tag, name: "bkub", category: Tag.categories.artist)
+          post = create(:post, tag_string: "cirno touhou bkub solo")
+          get posts_path(format: :atom), params: { tags: "id:#{post.id}" }
+
+          assert_response :success
+          assert_select "entry title", text: "cirno (touhou) drawn by bkub"
         end
 
         should "hide restricted posts" do
@@ -1010,6 +1031,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to @post
         assert_equal("s", @post.rating)
         assert_equal("test", @post.tag_string)
+      end
+
+      should "not allow upload or media asset IDs inside the post params" do
+        assert_no_difference("Post.count") do
+          create_post!(upload_media_asset_id: 1, media_asset_id: 1, upload_id: 1)
+        end
+
+        assert_response 403
       end
 
       should "re-render the upload page if the upload fails" do

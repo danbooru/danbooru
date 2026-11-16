@@ -93,7 +93,7 @@ module ExtractorTestHelper
       assert_equal(expected_tags.sort, actual_tags.sort, "Tags expected but not found: #{expected_tags.difference(actual_tags)}. Tags found but not expected: #{actual_tags.difference(expected_tags)}")
     elsif expected_tags&.first.instance_of?(String)
       expected = expected_tags.map(&:downcase).sort
-      actual = actual_tags.map(&:first).map(&:downcase).sort
+      actual = actual_tags.map { it.first.downcase }.sort
       assert_equal(expected, actual, "Tags expected but not found: #{expected.difference(actual)}. Tags found but not expected: #{actual.difference(expected)}")
     end
   end

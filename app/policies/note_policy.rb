@@ -52,4 +52,8 @@ class NotePolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:x, :y, :width, :height, :body]
   end
+
+  def searchable_attributes
+    %i[id created_at updated_at is_active x y width height body version post]
+  end
 end

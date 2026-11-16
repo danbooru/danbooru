@@ -25,6 +25,10 @@ class PostFlagPolicy < ApplicationPolicy
     [:reason]
   end
 
+  def searchable_attributes
+    %i[id created_at updated_at reason status post creator]
+  end
+
   def api_attributes
     attributes = super + [:category]
     attributes -= [:creator_id] unless can_view_flagger?

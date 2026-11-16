@@ -35,7 +35,7 @@ module Source
 
       # XXX The base extractor excludes artist tags from the translated tags; we don't want that for Danbooru.
       def translated_tags
-        tags.map(&:first).flat_map(&method(:translate_tag)).uniq.sort
+        translate_tags(tags.map(&:first)).values.flatten.uniq.sort
       end
 
       # Don't spoof our user agent as a browser to avoid being blocked.

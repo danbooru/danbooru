@@ -112,7 +112,7 @@ module PostSets
 
     # @return [Integer, nil] The number of posts returned by the search, or nil if unknown.
     def post_count
-      return 0 if artist.present? && artist.is_banned? && !current_user.is_approver?
+      return 0 if banned_artist?
       normalized_query.post_count
     end
 
@@ -142,8 +142,9 @@ module PostSets
       end
     end
 
+    # @return [Boolean] True if the search is for a banned artist that the user isn't allowed to search for.
     def banned_artist?
-      artist.present? && artist.is_banned? && !current_user.is_approver?
+      artist.present? && artist.is_banned? && !Pundit.policy!(current_user, artist).can_search_banned?
     end
 
     # @return [Boolean] True if every post on the page is banned and the search includes an artist
@@ -153,17 +154,13 @@ module PostSets
     end
 
     def includes
-      if show_votes?
-        [:media_asset, :vote_by_current_user]
-      else
-        [:media_asset]
-      end
+      [:media_asset, (:vote_by_current_user if show_votes?), (:uploader if format == "atom")].compact
     end
 
     concerning :TagListMethods do
       # @return [Array<Tag>] The list of tags for the sidebar on the post index page.
       def sidebar_tags
-        if artist.present? && artist.is_banned? && !current_user.is_approver?
+        if banned_artist?
           []
         elsif normalized_query.wildcards.one? && normalized_query.tags.none?
           wildcard_tags

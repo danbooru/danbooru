@@ -127,12 +127,15 @@ module Source
       end
 
       def is_carrd?
-        # https://hyphensam.com/#test-image
+        # Older sites use div#wrapper > div#main, newer sites use div.site-wrapper > div.site-main.
+        carrd_layout = "body.is-loading > div#wrapper > div#main > div.inner, body.is-loading > div.site-wrapper > div.site-main > div.inner"
+
+        # https://toasterkiwi.com/#aboutme
         if Source::URL::Carrd.new(url).page_url?
-          page&.at("body.is-loading > div#wrapper > div#main > div.inner").present?
-        # https://hyphensam.com/assets/images/image04.jpg?v=208ad020
+          page&.at(carrd_layout).present?
+        # https://toasterkiwi.com/assets/images/image02.jpg?v=ab180d5e
         elsif Source::URL::Carrd.new(url).image_url? && referer_url.present? && Source::URL::Carrd.new(referer_url).page_url?
-          referer_page&.at("body.is-loading > div#wrapper > div#main > div.inner").present?
+          referer_page&.at(carrd_layout).present?
         else
           false
         end

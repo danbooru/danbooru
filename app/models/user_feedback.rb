@@ -30,16 +30,12 @@ class UserFeedback < ApplicationRecord
   scope :negative, -> { where(category: "negative") }
 
   module SearchMethods
-    def visible(viewer)
-      viewer.is_moderator? ? all : undeleted
-    end
-
     def default_order
       order(created_at: :desc)
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :category, :body, :is_deleted, :creator, :user], current_user: current_user)
+      q = search_attributes(params, current_user: current_user)
 
       if params[:hide_bans].to_s.truthy?
         q = q.not_ban

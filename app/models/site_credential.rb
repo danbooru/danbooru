@@ -187,14 +187,6 @@ class SiteCredential < ApplicationRecord
   scope :is_public, -> { where(is_public: true) }
   scope :personal, -> { where(is_public: false) }
 
-  def self.visible(user)
-    if user.is_admin?
-      where(creator: user).or(is_public)
-    else
-      where(creator: user)
-    end
-  end
-
   # Get all the credentials available for a given site. Credentials are taken from the environment, the danbooru_local_config.rb
   # file, and the database, in that order.
   #
@@ -212,7 +204,7 @@ class SiteCredential < ApplicationRecord
   end
 
   def self.search(params, current_user)
-    q = search_attributes(params, %i[id created_at updated_at creator site is_enabled is_public status usage_count error_count last_used_at last_error_at credential metadata], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)
   end
 

@@ -168,8 +168,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "render /users/:id/deactivate for the Owner user" do
-        get_auth deactivate_user_path(@user), create(:owner), reauthenticate: true
+      should "render /users/:id/deactivate for a superadmin" do
+        get_auth deactivate_user_path(@user), create(:superadmin), reauthenticate: true
         assert_response :success
       end
 
@@ -251,8 +251,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, @user.user_events.user_deletion.exists?)
       end
 
-      should "allow the Owner to delete other users" do
-        delete_auth user_path(@user), create(:owner), reauthenticate: true
+      should "allow a superadmin to delete other users" do
+        delete_auth user_path(@user), create(:superadmin), reauthenticate: true
 
         assert_redirected_to posts_path
         assert_equal(true, @user.reload.is_deleted?)
@@ -340,9 +340,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("1.2.3.4", response.parsed_body["last_ip_addr"])
       end
 
-      should "not show the last_ip_addr of the owner to admins" do
-        owner = create(:owner_user, last_ip_addr: "1.2.3.4")
-        get_auth user_path(owner), create(:admin_user), as: :json
+      should "not show the last_ip_addr of a superadmin to admins" do
+        superadmin = create(:superadmin_user, last_ip_addr: "1.2.3.4")
+        get_auth user_path(superadmin), create(:admin_user), as: :json
 
         assert_response :success
         assert_nil(response.parsed_body["last_ip_addr"])
@@ -845,8 +845,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "allow the owner to view another user's settings" do
-        get_auth edit_user_path(@user), create(:owner_user)
+      should "allow a superadmin to view another user's settings" do
+        get_auth edit_user_path(@user), create(:superadmin_user)
         assert_response :success
       end
 
@@ -879,7 +879,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow a user to update another user's settings" do
-        put_auth user_path(@user), create(:owner_user), params: { user: { per_page: 123 }}
+        put_auth user_path(@user), create(:superadmin_user), params: { user: { per_page: 123 }}
 
         assert_response 403
         assert_equal(20, @user.reload.per_page)
@@ -915,8 +915,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "changing the level" do
         should "not work" do
-          @owner = create(:owner_user)
-          put_auth user_path(@user), @owner, params: { user: { level: User::Levels::BUILDER }}
+          @superadmin = create(:superadmin_user)
+          put_auth user_path(@user), @superadmin, params: { user: { level: User::Levels::BUILDER }}
 
           assert_response 403
           assert_equal(User::Levels::MEMBER, @user.reload.level)
@@ -938,6 +938,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth promote_user_path(@user), create(:moderator_user)
 
         assert_response :success
+      end
+
+      should "not offer the superadmin level to the owner" do
+        get_auth promote_user_path(@user), create(:superadmin_user)
+
+        assert_response :success
+        assert_select "option[value=#{User::Levels::ADMIN}]", count: 1
+        assert_select "option[value=#{User::Levels::SUPERADMIN}]", count: 0
       end
 
       should "not work for a regular user" do

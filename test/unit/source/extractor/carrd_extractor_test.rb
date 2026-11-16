@@ -528,50 +528,54 @@ module Source::Tests::Extractor
     context "For a custom domain:" do
       context "A page URL" do
         strategy_should_work(
-          "https://hyphensam.com/#test-image",
-          image_urls: %w[https://hyphensam.com/assets/images/image04.jpg],
-          media_files: [{ file_size: 14_413 }],
-          page_url: "https://hyphensam.com/#test-image",
-          profile_url: "https://hyphensam.com",
-          profile_urls: %w[https://hyphensam.com],
+          "https://toasterkiwi.com/#aboutme",
+          image_urls: %w[https://toasterkiwi.com/assets/images/image02.jpg],
+          media_files: [{ file_size: 399_540 }],
+          page_url: "https://toasterkiwi.com/#aboutme",
+          profile_url: "https://toasterkiwi.com",
+          profile_urls: %w[https://toasterkiwi.com],
           username: nil,
           other_names: [],
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp,
-            "[image]":[https://hyphensam.com/assets/images/image04.jpg]
+            "[image]":[https://toasterkiwi.com/assets/images/image02.jpg]
 
-            Test text blah blah blah
+            [b]About me[/b]
+
+            I'm Kiwi, and I am a Canadian illustrator! Drawing has been my passion all my life! My art is deeply influenced by glossy texture, bright colors, cute aesthetic, and video games. Along with illustrations, I also design merchandise which I sell on my online shop and events that allow me to keep doing what I love. Thank you so much for your support~!
           EOS
         )
       end
 
       context "An image URL with a referer" do
         strategy_should_work(
-          "https://hyphensam.com/assets/images/image04.jpg?v=2cc95429",
-          referer: "https://hyphensam.com/#test-image",
-          image_urls: %w[https://hyphensam.com/assets/images/image04.jpg],
-          media_files: [{ file_size: 14_413 }],
-          page_url: "https://hyphensam.com/#test-image",
-          profile_url: "https://hyphensam.com",
-          profile_urls: %w[https://hyphensam.com],
+          "https://toasterkiwi.com/assets/images/image02.jpg?v=ab180d5e",
+          referer: "https://toasterkiwi.com/#aboutme",
+          image_urls: %w[https://toasterkiwi.com/assets/images/image02.jpg],
+          media_files: [{ file_size: 399_540 }],
+          page_url: "https://toasterkiwi.com/#aboutme",
+          profile_url: "https://toasterkiwi.com",
+          profile_urls: %w[https://toasterkiwi.com],
           username: nil,
           other_names: [],
           tags: [],
           dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp,
-            "[image]":[https://hyphensam.com/assets/images/image04.jpg]
+            "[image]":[https://toasterkiwi.com/assets/images/image02.jpg]
 
-            Test text blah blah blah
+            [b]About me[/b]
+
+            I'm Kiwi, and I am a Canadian illustrator! Drawing has been my passion all my life! My art is deeply influenced by glossy texture, bright colors, cute aesthetic, and video games. Along with illustrations, I also design merchandise which I sell on my online shop and events that allow me to keep doing what I love. Thank you so much for your support~!
           EOS
         )
       end
 
       context "An image URL without a referer" do
         strategy_should_work(
-          "https://hyphensam.com/assets/images/image04.jpg?v=2cc95429",
-          image_urls: %w[https://hyphensam.com/assets/images/image04.jpg?v=2cc95429],
-          media_files: [{ file_size: 14_413 }],
+          "https://toasterkiwi.com/assets/images/image02.jpg?v=ab180d5e",
+          image_urls: %w[https://toasterkiwi.com/assets/images/image02.jpg?v=ab180d5e],
+          media_files: [{ file_size: 399_540 }],
           page_url: nil,
           profile_url: nil,
         )

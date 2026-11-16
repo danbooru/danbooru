@@ -20,8 +20,9 @@ class PostEdit
   POST_METATAGS = %w[newpool newfavgroup pool -pool favgroup -favgroup fav -fav child -child upvote downvote -upvote -downvote disapproved status -status]
 
   METATAGS = PRE_METATAGS + POST_METATAGS
-  METATAG_NAME_REGEX = /(#{METATAGS.join("|")}):/io
-  CATEGORY_PREFIX_REGEX = /(#{CATEGORIZATION_METATAGS.join("|")}):(?=[^[:space:]])/io
+
+  # Matches a metatag name, like `rating:` or `-pool:`, with an optional leading '-'. Don't use /i, because that matches Unicode characters.
+  METATAG_NAME_REGEX = /-?[a-zA-Z0-9_]+:/
 
   private attr_reader :post, :current_tag_names, :old_tag_names, :new_tag_string, :parser
   private delegate :accept, :expect, :error, :skip, :zero_or_more, :one_of, to: :parser
@@ -129,18 +130,19 @@ class PostEdit
 
     # Matches anything that isn't a valid metatag, so that a bad term never stops the rest of the tags from being parsed.
     private def tag
-      negated = accept(/-(?=[^[:space:]])/).present?
-      accept(CATEGORY_PREFIX_REGEX) if negated # `-char:chen` is the same as `-chen`
+      negated = accept(/-(?=[^[:space:]])/).present? # Extract a leading `-` if followed by non-spaces
       name = expect(/[^[:space:]]+/)
+      category, rest = name.split(":", 2)
+      name = rest if negated && rest.present? && category.downcase(:ascii).in?(CATEGORIZATION_METATAGS) # `-char:chen` is the same as `-chen`
 
       Tag.new(name: name.downcase, negated: negated)
     end
 
     private def metatag
-      name = expect(METATAG_NAME_REGEX)
+      name = expect(METATAG_NAME_REGEX).delete_suffix(":").downcase
+      error { "Unknown metatag: #{name}" } unless name.in?(METATAGS)
       value = quoted_string
 
-      name = name.delete_suffix(":").downcase
       name = TagCategory.reverse_mapping.fetch(TagCategory.mapping[name], name) # 'art:bkub' => 'artist:bkub'
       value = value.downcase unless name.in?(["newpool", "newfavgroup", "source"])
       value = value.gsub(/[[:space:]]/, "_") unless name == "source"

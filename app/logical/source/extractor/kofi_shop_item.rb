@@ -3,7 +3,7 @@
 # @see Source::Extractor::Kofi
 class Source::Extractor::KofiShopItem < Source::Extractor::Kofi
   def image_urls
-    super.presence || shop_item_page&.css("img.kfds-c-carousel-product-img").to_a.pluck(:src)
+    super.presence || shop_item_page&.css(".carousel-item img").to_a.pluck(:src)
   end
 
   def artist_commentary_title
@@ -11,7 +11,7 @@ class Source::Extractor::KofiShopItem < Source::Extractor::Kofi
   end
 
   def artist_commentary_desc
-    shop_item_page&.at(".kfds-c-product-detail-res-width")&.to_html&.gsub("\n", "<br>")
+    shop_item_page&.at("p.line-breaks")&.to_html&.gsub("\n", "<br>")
   end
 
   def user_id

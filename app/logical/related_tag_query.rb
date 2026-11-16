@@ -17,9 +17,9 @@ class RelatedTagQuery
     @media_asset = media_asset
     @categories = categories
     @categories = @categories.to_s.split(/[[:space:],]/) unless categories.is_a?(Array)
-    @categories = @categories.map { |c| Tag.categories.value_for(c) }.compact
+    @categories = @categories.filter_map { |c| Tag.categories.value_for(c) }
     @order = order
-    @search_sample_size = search_sample_size.to_i.clamp(0, user.is_builder? ? 100_000 : 10_000) # XXX should be a policy
+    @search_sample_size = search_sample_size.to_i.clamp(0, Pundit.policy!(user, self).max_search_sample_size)
     @search_sample_size = 5000 if @search_sample_size == 0
     @tag_sample_size = tag_sample_size.to_i.clamp(0, 1000)
     @tag_sample_size = 500 if @tag_sample_size == 0

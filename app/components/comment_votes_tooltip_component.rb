@@ -17,11 +17,11 @@ class CommentVotesTooltipComponent < ApplicationComponent
   end
 
   def upvote_count
-    votes.select(&:is_positive?).length
+    votes.count(&:is_positive?)
   end
 
   def downvote_count
-    votes.select(&:is_negative?).length
+    votes.count(&:is_negative?)
   end
 
   def upvote_ratio

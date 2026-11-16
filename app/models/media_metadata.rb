@@ -17,7 +17,7 @@ class MediaMetadata < ApplicationRecord
   belongs_to :media_asset
 
   def self.search(params, current_user)
-    q = search_attributes(params, [:id, :created_at, :updated_at, :media_asset, :metadata], current_user: current_user)
+    q = search_attributes(params, current_user: current_user)
     q.apply_default_order(params)
   end
 

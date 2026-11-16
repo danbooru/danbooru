@@ -8,8 +8,8 @@ class RateLimitsControllerTest < ActionDispatch::IntegrationTest
         create(:rate_limit, key: @user.cache_key)
       end
 
-      should "show all rate limits to the owner" do
-        get_auth rate_limits_path, create(:owner_user)
+      should "show all rate limits to a superadmin" do
+        get_auth rate_limits_path, create(:superadmin_user)
 
         assert_response :success
         assert_select "tbody tr", count: 3 # 1 for @user, plus the 2 login creates: 1 for the IP and 1 for the session ID

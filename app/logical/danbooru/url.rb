@@ -53,15 +53,19 @@ module Danbooru
       @original_url = url.to_s
       raise Error, "URL is too long (maximum is #{MAX_LENGTH} characters)" if original_url.length > MAX_LENGTH
 
-      @url =Addressable::URI.heuristic_parse(original_url, scheme: "https")
+      if url.is_a?(Danbooru::URL)
+        @url = url.url.dup # Reuse the already parsed URL, because parsing is slow.
+      else
+        @url = Addressable::URI.heuristic_parse(original_url, scheme: "https")
 
-      @url.authority = @url.normalized_authority
+        @url.authority = @url.normalized_authority
 
-      # Decode percent-encoded paths. Leave percent-encoded if characters are invalid UTF-8 or nonprintable (spaces, control characters).
-      @url.path = Addressable::URI.unencode_component(@url.path, String, "/%?#")
-      @url.path.force_encoding("ASCII-8BIT").gsub(/[^[:ascii:]]/) { |c| "%%%02X" % c.ord }.force_encoding("UTF-8") if !@url.path.valid_encoding?
-      @url.path = @url.path.gsub(/[^[:graph:]]/) { |c| "%%%02X" % c.ord }
-      @url.path = nil if @url.path == "/"
+        # Decode percent-encoded paths. Leave percent-encoded if characters are invalid UTF-8 or nonprintable (spaces, control characters).
+        @url.path = Addressable::URI.unencode_component(@url.path, String, "/%?#")
+        @url.path.force_encoding("ASCII-8BIT").gsub(/[^[:ascii:]]/) { |c| "%%%02X" % c.ord }.force_encoding("UTF-8") if !@url.path.valid_encoding?
+        @url.path = @url.path.gsub(/[^[:graph:]]/) { |c| "%%%02X" % c.ord }
+        @url.path = nil if @url.path == "/"
+      end
 
       raise Error, "#{original_url} is not a #{schemes.map { "#{it}://" }.to_sentence(two_words_connector: " or ", last_word_connector: ", or ")} URL" if !@url.normalized_scheme.in?(schemes)
       raise Error, "#{host} is not a valid hostname" if parsed_domain.nil? && ip_address.nil? && @url.normalized_scheme.in?(%w[http https])
