@@ -96,6 +96,17 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(789, @post.reload.file_size)
         end
 
+        should "show the error on the post page after redirecting" do
+          @post = create(:post, file_size: 789)
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
+
+          post_auth post_replacements_path, create(:moderator_user), params: { post_id: @post.id, post_replacement: { replacement_file: file }}
+          assert_redirected_to post_path(@post)
+
+          follow_redirect!
+          assert_select "#notice", text: /isn't a valid filename/
+        end
+
         should "fail if the filename contains a NUL byte" do
           @post = create(:post, file_size: 789)
           body = "--xyz\r\nContent-Disposition: form-data; name=\"post_replacement[replacement_file]\"; filename=\"a%00b.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".b + File.binread("test/files/jpg/test.jpg") + "\r\n--xyz--\r\n".b
