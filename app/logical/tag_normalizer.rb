@@ -7,7 +7,7 @@ module TagNormalizer
   # Ex: 西住みほ生誕祭2019 should be checked as 西住みほ
   # The regexes will not match if there is nothing preceding
   # the pattern to avoid creating empty strings.
-  COMMON_TAG_REGEXES = [
+  COMMON_TAG_REGEX = Regexp.union(
     /(?<!\A)(生誕祭)(?:\d*)\z/,
     /(?<!\A)(誕生祭)(?:\d*)\z/,
     /(?<!\A)(版もうひとつの深夜の真剣お絵描き60分一本勝負)(?:_\d+)?\z/,
@@ -17,12 +17,12 @@ module TagNormalizer
     /(?<!\A)(版深夜のお絵描き60分一本勝負)(?:_\d+)?\z/,
     /(?<!\A)(版真剣お絵描き60分一本勝)(?:_\d+)?\z/,
     /(?<!\A)(版お絵描き60分一本勝負)(?:_\d+)?\z/,
-  ]
+  )
 
   # List of extra terms to strip from the tag.
-  STRIP_TAG_REGEXES = [
+  STRIP_TAG_REGEX = Regexp.union(
     /\d+users入り\z/i,
-  ]
+  )
 
   # Converts to tag into its canonical representation(s). Extractors may override this if
   # their site uses unusual conventions, such as Twitter's "one-hour drawing challenge" tags
@@ -31,10 +31,10 @@ module TagNormalizer
   # @returns {Array<String>}
   def normalize(tag)
     tag = WikiPage.normalize_other_name(tag).downcase
-    tag = tag.gsub(Regexp.union(STRIP_TAG_REGEXES), "")
+    tag = tag.gsub(STRIP_TAG_REGEX, "")
     [
       tag,
-      *tag.split(Regexp.union(COMMON_TAG_REGEXES)),
+      *tag.split(COMMON_TAG_REGEX),
     ].sort.uniq
   end
 end

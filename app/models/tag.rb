@@ -314,7 +314,7 @@ class Tag < ApplicationRecord
       # Tag.parse_query("looking_at_") => ["looking", "at"]
       def parse_query(string)
         query = parse_words(string)
-        query[-1] += "*" unless string.match?(/[#{WORD_DELIMITERS}]\z/)
+        query[-1] += "*" unless string.match?(/[#{WORD_DELIMITERS}]\z/o)
         query
       end
     end

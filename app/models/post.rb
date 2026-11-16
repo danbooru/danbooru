@@ -1727,7 +1727,7 @@ class Post < ApplicationRecord
         when "filesize_asc"
           joins(:media_asset).reorder("media_assets.file_size ASC")
 
-        when /\A(?<column>#{PostQueryBuilder::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/i
+        when /\A(?<column>#{PostQueryBuilder::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/io
           column = $~[:column]
           direction = $~[:direction] || "desc"
           reorder(column => direction, :id => direction)
@@ -1745,11 +1745,11 @@ class Post < ApplicationRecord
           joins(:media_asset).reorder("media_assets.duration ASC NULLS LAST, posts.id ASC")
 
         # artags_desc, copytags_desc, chartags_desc, gentags_desc, metatags_desc
-        when /(#{TagCategory.short_name_list.join("|")})tags(?:\Z|_desc)/
+        when /(#{TagCategory.short_name_list.join("|")})tags(?:\Z|_desc)/o
           reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} DESC")
 
         # artags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
-        when /(#{TagCategory.short_name_list.join("|")})tags_asc/
+        when /(#{TagCategory.short_name_list.join("|")})tags_asc/o
           reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
 
         when "random"
