@@ -41,6 +41,39 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 422
     end
 
+    should "return 400 for a page or limit param that isn't a string or integer" do
+      get posts_path(limit: ["1"]), as: :json
+      assert_response 400
+
+      get artists_path(limit: { a: 1 }), as: :json
+      assert_response 400
+
+      get autocomplete_index_path(limit: ["1"], search: { type: "tag_query", query: "a" }), as: :json
+      assert_response 400
+
+      get related_tag_path(limit: ["1"], search: { query: "a" }), as: :json
+      assert_response 400
+
+      get tags_path(page: ["1"]), as: :json
+      assert_response 400
+
+      post tags_path, params: { limit: true }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 400
+      assert_equal("limit parameter must be a string or an integer", response.parsed_body["message"])
+
+      post tags_path, params: { page: false }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 400
+
+      post tags_path, params: { limit: 1.5 }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 400
+
+      post tags_path, params: { limit: nil, page: nil }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 200
+
+      post tags_path, params: { limit: 1, page: 1 }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 200
+    end
+
     should "return 422 for an oversized param on a GET request" do
       get posts_path(foo: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1)), as: :json
 
