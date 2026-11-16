@@ -4,10 +4,6 @@
 # @see https://github.com/NanmiCoder/MediaCrawler/blob/main/media_platform/xhs/client.py
 # @see https://github.com/JoeanAmier/XHS-Downloader
 class Source::Extractor::Xiaohongshu < Source::Extractor
-  def self.enabled?
-    SiteCredential.for_site("Xiaohongshu").present?
-  end
-
   def image_urls
     if parsed_url.full_image_url.present?
       [parsed_url.full_image_url]
@@ -22,8 +18,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
         if image["stream"].present?
           image.dig(:stream, :h264).to_a.pluck("masterUrl")
         else
-          url = image["urlDefault"]
-          Source::URL.parse(url).try(:full_image_url) || url
+          Source::URL.parse(image["url"]).try(:full_image_url) || image["url"]
         end
       end
     end
@@ -33,16 +28,12 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
     parsed_url.page_url || parsed_referer&.page_url
   end
 
-  def api_host
-    credentials[:api_host].presence || "www.xiaohongshu.com"
-  end
-
   def profile_url
     "https://www.xiaohongshu.com/user/profile/#{user_id}" if user_id.present?
   end
 
   def display_name
-    note.dig("user", "nickname")
+    note.dig("user", "nickName")
   end
 
   def tags
@@ -52,24 +43,18 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   def artist_commentary_title
-    page&.at("#detail-title")&.text&.strip
+    note[:title]
   end
 
+  # Hashtags look like `#明日方舟终末地[话题]#` in the description.
   def artist_commentary_desc
-    page&.at("#detail-desc")&.to_html&.gsub("\n", "<br>")
+    CGI.escapeHTML(note[:desc].to_s).gsub(/#([^#\[\]\n]+)\[话题\]#/) do
+      %{<a href="https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(CGI.unescapeHTML($1))}">##{$1}</a>}
+    end.gsub("\n", "<br>")
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(artist_commentary_desc, base_url: "https://www.xiaohongshu.com") do |element|
-      case element.name
-      in "a" if element.classes.include?("tag")
-        href = CGI.unescape(element[:href].to_s) # double-encoded
-        tag = Danbooru::URL.parse(Danbooru::URL.normalize(href, base_url: "https://www.xiaohongshu.com"))&.params&.dig(:keyword).to_s
-        element[:href] = "https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(tag)}" if tag.present?
-      else
-        nil
-      end
-    end&.strip
+    DText.from_html(artist_commentary_desc)&.strip
   end
 
   def post_id
@@ -81,13 +66,14 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   memoize def note
-    page_json.dig("note", "noteDetailMap", post_id, "note") || {}
+    note = page_json.dig("noteData", "data", "noteData") || {}
+    (note[:noteId] == post_id) ? note : {}
   end
 
   memoize def page
     return nil if page_url.blank?
 
-    url = Danbooru::URL.parse(page_url).with(host: api_host).to_s
+    url = Danbooru::URL.parse(page_url).with(host: "www.rednote.com").to_s
     parsed_get(url)
   end
 
@@ -96,11 +82,13 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   def http
-    super.cookies(webId: credentials[:web_id], web_session: credentials[:web_session], gid: credentials[:session_cookie])
+    # The mobile site works without cookies. The desktop site requires a login and sends logged in accounts to a captcha.
+    super.headers("User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1")
   end
 
   def http_downloader
     # http://sns-webpic-qc.xhs.cdn.com URLs fail with a spoofed referer. Ex: http://sns-webpic-qc.xhscdn.com/202405210748/f4ece3f93e230347cacc53e8628c35be/spectrum/1040g0k030p06mpo4k0005ovbk4n9t3fq5ms4iu0!nd_dft_wlteh_jpg_3
-    super.disable_feature(:spoof_referrer)
+    # ci.xiaohongshu.com randomly drops connections.
+    super.disable_feature(:spoof_referrer).use(:retriable)
   end
 end

@@ -137,12 +137,9 @@ class SiteCredential < ApplicationRecord
       name: "Xfolio",
       default_credential: { session_cookie: Danbooru.config.xfolio_session },
       help: %{Your "Xfolio":https://xfolio.jp 'xfolio_session' cookie.},
-    }, {
-      id: 2450,
-      name: "Xiaohongshu",
-      default_credential: { api_host: Danbooru.config.xiaohongshu_api_host, session_cookie: Danbooru.config.xiaohongshu_session_cookie, web_id: Danbooru.config.xiaohongshu_webid_cookie, web_session: Danbooru.config.xiaohongshu_web_session_cookie },
-      help: %{Your "Xiaohongshu":https://www.xiaohongshu.com 'gid', 'webId' and 'web_session' cookies.},
-    }, {
+    },
+    # { id: 2450, name: "Xiaohongshu" }, # we now use a loginless method
+    {
       id: 2500,
       name: "Zerochan",
       default_credential: { user_id: Danbooru.config.zerochan_user_id, session_cookie: Danbooru.config.zerochan_session_cookie },
