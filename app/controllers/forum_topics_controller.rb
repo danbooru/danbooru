@@ -98,6 +98,8 @@ class ForumTopicsController < ApplicationController
   private
 
   def normalize_search
+    super
+
     if params[:title_matches]
       params[:search] ||= {}
       params[:search][:title_matches] = params.delete(:title_matches)

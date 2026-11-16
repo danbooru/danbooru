@@ -169,6 +169,15 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_equal([@forum_topic, @other_topic, @sticky_topic].map(&:id), response.parsed_body.pluck(:id))
       end
 
+      should "not fail when the search param isn't a hash" do
+        get forum_topics_path, params: { search: "foo", format: :json }
+        assert_response :success
+
+        get forum_topics_path, params: { search: "foo", title_matches: @other_topic.title, format: :json }
+        assert_response :success
+        assert_equal([@other_topic.id], response.parsed_body.pluck(:id))
+      end
+
       should "render for atom feed" do
         get forum_topics_path, params: { format: :atom }
         assert_response :success
