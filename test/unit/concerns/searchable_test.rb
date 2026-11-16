@@ -205,6 +205,33 @@ class SearchableTest < ActiveSupport::TestCase
       end
     end
 
+    context "for search values with the wrong type" do
+      should "raise a search error" do
+        assert_raises(Searchable::SearchError) { Post.search({ is_deleted: "abc" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ is_deleted: ["1", "2"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ is_deleted: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_eq: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score_eq: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score_not: ["1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ created_at_eq: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Comment.search({ body_matches: ["a"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumTopic.search({ min_level: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumTopic.search({ min_level: ["a", "b"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumTopic.search({ min_level_not: ["a"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { UserEvent.search({ ip_addr: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { UserEvent.search({ ip_addr: ["1.1.1.1"] }, User.anonymous).load }
+      end
+
+      should "return nothing for numbers too large for the column" do
+        assert_search_equals([], id: "99999999999999999999")
+        assert_search_equals([], id: ">99999999999999999999")
+        assert_search_equals([@p3, @p2, @p1], id: "<99999999999999999999")
+        assert_search_equals([@p1], id: "#{@p1.id},99999999999999999999")
+      end
+    end
+
     context "for an inet attribute" do
       subject { UserEvent }
 
