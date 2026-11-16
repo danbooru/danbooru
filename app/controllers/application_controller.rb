@@ -364,8 +364,14 @@ class ApplicationController < ActionController::Base
     CurrentUser.user
   end
 
+  # Used by Pundit's `permitted_attributes`. Reject model params that aren't a hash (e.g. `comment=foo` or `comment[]=foo`),
+  # which would otherwise raise an error when they're permitted.
   def pundit_params_for(record)
-    params.fetch(Pundit::PolicyFinder.new(record).param_key, {})
+    key = Pundit::PolicyFinder.new(record).param_key
+    model_params = params.fetch(key, {})
+    raise ActionController::BadRequest, "#{key} parameter must be a hash" unless model_params.is_a?(ActionController::Parameters)
+
+    model_params
   end
 
   def requires_reauthentication

@@ -74,6 +74,19 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 200
     end
 
+    should "return 400 for model params that aren't a hash" do
+      user = create(:user, created_at: 1.month.ago)
+
+      post_auth comments_path, user, params: { comment: "x" }
+      assert_response 400
+
+      post_auth pools_path, user, params: { pool: ["x"] }, as: :json
+      assert_response 400
+
+      post_auth api_keys_path, user, params: { api_key: "x" }, as: :json, reauthenticate: true
+      assert_response 400
+    end
+
     should "return 422 for an oversized param on a GET request" do
       get posts_path(foo: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1)), as: :json
 
