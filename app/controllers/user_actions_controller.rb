@@ -15,9 +15,4 @@ class UserActionsController < ApplicationController
 
     respond_with(@user_actions)
   end
-
-  def show
-    @user_actions = authorize UserAction.find(params[:id])
-    respond_with(@user_actions)
-  end
 end
