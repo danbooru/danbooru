@@ -50,6 +50,6 @@ class DmailsController < ApplicationController
 
   def mark_all_as_read
     @dmails = authorize(Dmail).mark_all_as_read(CurrentUser.user)
-    respond_with(@dmails)
+    respond_with(@dmails, location: dmails_path)
   end
 end
