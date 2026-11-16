@@ -81,7 +81,7 @@ class EmailsController < ApplicationController
 
   def email_address
     if params[:user_id]
-      EmailAddress.find_or_initialize_by(user_id: params[:user_id])
+      EmailAddress.find_or_initialize_by(user: User.find(params.expect(:user_id)))
     else
       EmailAddress.find(params[:id])
     end
