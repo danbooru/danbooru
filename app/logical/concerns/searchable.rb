@@ -3,6 +3,9 @@
 module Searchable
   extend ActiveSupport::Concern
 
+  # Raised when a search param has an invalid value, e.g. `search[is_deleted]=abc` or `search[name][x]=1`.
+  class SearchError < StandardError; end
+
   def negate_relation
     relation = unscoped
     relation = relation.from(all.from_clause.value) if all.from_clause.value.present?
@@ -238,7 +241,7 @@ module Searchable
     elsif value.falsy?
       where(attribute => false)
     else
-      raise ArgumentError, "value must be truthy or falsy"
+      raise SearchError, "#{attribute} must be true or false"
     end
   end
 
@@ -261,6 +264,7 @@ module Searchable
   def attribute_matches(value, field, type = :integer, exact: false)
     operator, arg = RangeParser.parse(value, type)
     return none if exact && !(operator in :eq | :in)
+    arg = clamp_to_column_range(arg, field) if type == :integer
 
     if operator == :union
       # operator = :union, arg = [[:eq, 5], [:gt, 7], [:lt, 3]]
@@ -284,6 +288,22 @@ module Searchable
     relation
   rescue RangeParser::ParseError
     none
+  end
+
+  # Clamp integers to the range of the column's type, so that numbers that are too large for the column don't raise an
+  # error. E.g. `id:99999999999999999999` becomes `id:2147483647` for integer columns.
+  def clamp_to_column_range(arg, field)
+    column = columns_hash[field.to_s]
+    return arg unless column&.type == :integer
+
+    max = (2**((8 * (column.limit || 8)) - 1)) - 1
+    clamp = ->(value) { value.is_a?(Integer) ? value.clamp(-max - 1, max) : value }
+
+    case arg
+    when Range then Range.new(clamp[arg.begin], clamp[arg.end], arg.exclude_end?)
+    when Array then arg.map { |value| clamp_to_column_range(value, field) }
+    else clamp[arg]
+    end
   end
 
   # Search the attributes listed in the policy's `searchable_attributes`.
@@ -365,6 +385,8 @@ module Searchable
         type = column.type
       end
 
+      validate_value_types!(name, type)
+
       case type
       when :string # :string is for columns of type `character varying` in the database
         search_string_attribute(name)
@@ -399,6 +421,27 @@ module Searchable
       relation = visible(relation, attr).where(attr => params[:"#{attr}_comma"].to_s.split(",")) if params[:"#{attr}_comma"].present?
       relation = visible(relation, attr).where(attr => params[:"#{attr}_space"].to_s.split) if params[:"#{attr}_space"].present?
       relation
+    end
+
+    # Raise an error for search params with the wrong type, like `search[name][x]=1` or `search[is_deleted][]=1`. Hashes
+    # are never valid for non-array attributes, and arrays are only valid for some operators.
+    def validate_value_types!(name, type)
+      case type
+      when :jsonb, :array then return
+      when :boolean, :inet then array_keys = [name.to_s]
+      when :enum then array_keys = [name.to_s, "#{name}_not"]
+      when :text then array_keys = ["#{name}_matches"]
+      when :integer, :float, :datetime, :interval then array_keys = ["#{name}_not"]
+      else array_keys = []
+      end
+
+      params.each do |key, value|
+        next unless key == name.to_s || key.start_with?("#{name}_")
+
+        if value.is_a?(Hash) || (value.is_a?(Array) && key.in?(array_keys))
+          raise SearchError, "#{key} has an invalid value"
+        end
+      end
     end
 
     def search_numeric_attribute(attr, key: attr, type: :integer)

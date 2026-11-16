@@ -33,6 +33,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 200
     end
 
+    should "return 422 for search params with the wrong type" do
+      get artists_path(search: { is_deleted: "abc" }), as: :json
+      assert_response 422
+
+      get artists_path(search: { name: { x: 1 }}), as: :json
+      assert_response 422
+    end
+
     should "return 422 for an oversized param on a GET request" do
       get posts_path(foo: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1)), as: :json
 
