@@ -2,6 +2,13 @@ require "test_helper"
 
 class PostFlagTest < ActiveSupport::TestCase
   context "PostFlag: " do
+    context "the category of a flag" do
+      should "match the same flags as searching by category" do
+        assert_equal(:rejected, build(:post_flag, reason: "Unapproved in three days after returning to moderation queue").category)
+        assert_equal(:normal, build(:post_flag, reason: "bad: Unapproved in three days after returning to moderation queue").category)
+      end
+    end
+
     context "an approver" do
       should "be able to flag an unlimited number of posts" do
         @user = create(:approver)

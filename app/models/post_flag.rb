@@ -69,7 +69,7 @@ class PostFlag < ApplicationRecord
     case reason
     when Reasons::UNAPPROVED
       :unapproved
-    when /#{Reasons::REJECTED.gsub("%", ".*")}/o
+    when /\A#{Reasons::REJECTED.gsub("%", ".*")}/o
       :rejected
     else
       :normal
