@@ -348,6 +348,14 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing body" do
+        assert_no_difference("Comment.count") do
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "create a comment" do
         assert_difference("Comment.count", 1) do
           post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" }}

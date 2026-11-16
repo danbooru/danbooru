@@ -25,6 +25,14 @@ class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing query" do
+        assert_no_difference("SavedSearch.count") do
+          post_auth saved_searches_path, @user, params: { saved_search: { label_string: "artist" }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "render" do
         post_auth saved_searches_path, @user, params: { saved_search: { query: "bkub", label_string: "artist" }}
         assert_redirected_to SavedSearch.last

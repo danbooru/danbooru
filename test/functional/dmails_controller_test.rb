@@ -165,6 +165,14 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing title and body" do
+        assert_no_difference("Dmail.count") do
+          post_auth dmails_path, @user, params: { dmail: { to_id: create(:user).id }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       setup do
         @user2 = create(:user)
       end
