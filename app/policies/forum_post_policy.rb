@@ -10,7 +10,7 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def create?
-    unbanned? && policy(record.topic).reply?
+    unbanned? && (record.topic.nil? || policy(record.topic).reply?)
   end
 
   def update?
