@@ -27,7 +27,7 @@ class ForumPostsController < ApplicationController
       quoted_post = authorize ForumPost.find(params.expect(:post_id)), :show?
       @forum_post = authorize quoted_post.build_response
     else
-      @forum_post = authorize ForumPost.new(topic_id: params[:topic_id])
+      @forum_post = authorize ForumPost.new(topic: ForumTopic.visible(CurrentUser.user).find(params.expect(:topic_id)))
     end
 
     respond_with(@forum_post)
