@@ -1558,6 +1558,20 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts.first], "id:#{posts.first.id} order:none")
     end
 
+    should "ignore invalid category tag count orders" do
+      p1 = create(:post, tag_string: "a b c")
+      p2 = create(:post, tag_string: "a")
+      p3 = create(:post, tag_string: "a b")
+
+      assert_tag_match([p1, p3, p2], "order:gentags_desc")
+      assert_tag_match([p2, p3, p1], "order:gentags_asc")
+
+      assert_tag_match([p3, p2, p1], "order:xgentags")
+      assert_tag_match([p3, p2, p1], "order:xgentags_asc")
+      assert_tag_match([p3, p2, p1], "order:gentags_desc_foo")
+      assert_tag_match([p3, p2, p1], "order:gentags_ascx")
+    end
+
     should "return posts for order:comment_bumped" do
       post1 = create(:post)
       post2 = create(:post)

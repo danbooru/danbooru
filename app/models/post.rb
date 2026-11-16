@@ -1744,12 +1744,12 @@ class Post < ApplicationRecord
         when "duration_asc"
           joins(:media_asset).reorder("media_assets.duration ASC NULLS LAST, posts.id ASC")
 
-        # artags_desc, copytags_desc, chartags_desc, gentags_desc, metatags_desc
-        when /(#{TagCategory.short_name_list.join("|")})tags(?:\Z|_desc)/o
+        # arttags_desc, copytags_desc, chartags_desc, gentags_desc, metatags_desc
+        when /\A(#{TagCategory.short_name_list.join("|")})tags(_desc)?\z/o
           reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} DESC")
 
-        # artags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
-        when /(#{TagCategory.short_name_list.join("|")})tags_asc/o
+        # arttags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
+        when /\A(#{TagCategory.short_name_list.join("|")})tags_asc\z/o
           reorder("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
 
         when "random"
