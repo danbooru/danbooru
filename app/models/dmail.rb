@@ -124,7 +124,7 @@ class Dmail < ApplicationRecord
     end
 
     def key
-      signed_id(purpose: "dmail_link")
+      signed_id(purpose: "dmail_link") if persisted?
     end
   end
 
