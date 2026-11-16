@@ -58,11 +58,14 @@ module ComponentsHelper
   # A horizontal tag list, with tags grouped by category. Used in post
   # tooltips, on the comments index, and in the modqueue.
   def render_inline_tag_list(post, **options)
-    render InlineTagListComponent.new(tags: post.tags, **options)
+    render_inline_tag_list_from_names(post.tag_array, **options)
   end
 
-  def render_inline_tag_list_from_names(tag_names, **options)
-    tags = InlineTagListComponent.tags_from_names(tag_names)
+  # @param tags_by_name [Hash<String, Tag>] The tags for the whole page, keyed by name, to avoid a query per tag list.
+  #   Tags not in the hash are shown as new, empty tags.
+  def render_inline_tag_list_from_names(tag_names, tags_by_name: nil, **options)
+    tag_lookup = tags_by_name || Tag.where(name: tag_names).index_by(&:name)
+    tags = tag_names.map { |name| tag_lookup.fetch(name) { Tag.new(name: name).freeze } }
     render InlineTagListComponent.new(tags: tags, **options)
   end
 

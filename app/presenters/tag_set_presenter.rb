@@ -13,8 +13,10 @@ class TagSetPresenter
   # @param [Array<String>] a list of tags to present. Tags will be presented in
   # the order given. The list should not contain duplicates. The list may
   # contain tags that do not exist in the tags table, such as metatags.
-  def initialize(tag_names)
+  # @param tags_by_name [Hash<String, Tag>] Preloaded tags keyed by name, to avoid a query per tag set on index pages.
+  def initialize(tag_names, tags_by_name: nil)
     @tag_names = tag_names
+    @tags_by_name = tags_by_name
   end
 
   # the list of tags inside the tag box in the post edit form.
@@ -44,8 +46,8 @@ class TagSetPresenter
 
   private
 
-  def tags
-    Tag.where(name: tag_names)
+  def tags_by_name
+    @tags_by_name || Tag.where(name: tag_names).index_by(&:name)
   end
 
   def tags_by_category
@@ -58,12 +60,10 @@ class TagSetPresenter
   end
 
   def ordered_tags
-    names_to_tags = tags.index_by(&:name)
-
     tag_names.map do |name|
-      names_to_tags[name] || Tag.new(name: name).freeze
+      tags_by_name[name] || Tag.new(name: name).freeze
     end
   end
 
-  memoize :tags, :tags_by_category, :ordered_tags, :humanized_essential_tag_string
+  memoize :tags_by_name, :tags_by_category, :ordered_tags, :humanized_essential_tag_string
 end

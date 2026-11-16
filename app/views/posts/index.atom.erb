@@ -12,7 +12,7 @@
 
   <% @posts.select(&:visible?).each do |post| %>
     <entry>
-      <title><%= post.presenter.humanized_essential_tag_string %></title>
+      <title><%= post.presenter.humanized_essential_tag_string(tags_by_name: @tags_by_name) %></title>
       <link href="<%= post_url(post) %>" rel="alternate"/>
       <% if post.web_source? %>
         <link href="<%= post.source %>" rel="related"/>

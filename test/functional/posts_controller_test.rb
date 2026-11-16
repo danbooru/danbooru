@@ -564,6 +564,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "entry", 1
         end
 
+        should "title entries with the post's characters, copyrights and artists" do
+          create(:tag, name: "cirno", category: Tag.categories.character)
+          create(:tag, name: "touhou", category: Tag.categories.copyright)
+          create(:tag, name: "bkub", category: Tag.categories.artist)
+          post = create(:post, tag_string: "cirno touhou bkub solo")
+          get posts_path(format: :atom), params: { tags: "id:#{post.id}" }
+
+          assert_response :success
+          assert_select "entry title", text: "cirno (touhou) drawn by bkub"
+        end
+
         should "hide restricted posts" do
           Post.update(is_banned: true)
           get posts_path(format: :atom)

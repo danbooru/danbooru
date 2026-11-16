@@ -49,6 +49,12 @@ class Comment < ApplicationRecord
   )
 
   module SearchMethods
+    # The last `limit` comments on each post, in one query.
+    def last_per_post(limit)
+      ranked = select(:id, Arel.sql("row_number() OVER (PARTITION BY post_id ORDER BY id DESC) AS rank"))
+      where(id: unscoped.from(ranked, :comments).where(rank: ..limit).select(:id))
+    end
+
     def search(params, current_user)
       q = search_attributes(params, %i[id created_at updated_at is_deleted is_sticky do_not_bump_post body score post creator updater], current_user: current_user)
 

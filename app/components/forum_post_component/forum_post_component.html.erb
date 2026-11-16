@@ -90,13 +90,13 @@
         <% end %>
 
         <% if bur.present? %>
-          <% if policy(bur).approve? || policy(bur).update? || policy(bur).destroy? %>
+          <% if policy(bur).approve?(tags: bur_tags) || policy(bur).update? || policy(bur).destroy? %>
             <% menu.with_item do %>
               <hr class="border">
             <% end %>
           <% end %>
 
-          <% if policy(bur).approve? %>
+          <% if policy(bur).approve?(tags: bur_tags) %>
             <% menu.with_item do %>
               <%= link_to approve_bulk_update_request_path(bur.id), id: "approve_bulk_update_request_link_#{bur.id}", class: "approve_bulk_update_request_link", "data-confirm": "Are you sure you want to approve this bulk update request?", method: :post, remote: true do %>
                 <%= check_square_icon %> Approve BUR

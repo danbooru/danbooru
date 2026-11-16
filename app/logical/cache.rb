@@ -10,22 +10,24 @@
 # @see https://guides.rubyonrails.org/caching_with_rails.html#cache-stores
 # @see https://api.rubyonrails.org/classes/ActiveSupport/Cache/RedisCacheStore.html
 class Cache
-  # Get multiple values from the cache at once.
+  # Get multiple values from the cache at once. The block is called once with all the keys that aren't cached, so they
+  # can be generated in one batch.
   # @param keys [Array<String>] the list of keys to fetch
   # @param prefix [String] a prefix for each cache key
+  # @yieldparam missing_keys [Array<String>] the keys that weren't in the cache
+  # @yieldreturn [Hash<String, Object>] a map from each missing key to its value
   # @return [Hash<String, Object>] a map from cache keys to cache values
   def self.get_multi(keys, prefix)
-    sanitized_key_to_key_hash = keys.index_by do |key|
-      "#{prefix}:#{Cache.hash(key)}"
-    end
+    cache_key = ->(key) { "#{prefix}:#{Cache.hash(key)}" }
+    sanitized_key_to_key_hash = keys.index_by(&cache_key)
 
-    sanitized_keys = sanitized_key_to_key_hash.keys
-    sanitized_key_to_value_hash = Rails.cache.fetch_multi(*sanitized_keys) do |sanitized_key|
-      key = sanitized_key_to_key_hash[sanitized_key]
-      yield key
-    end
+    cached = Rails.cache.read_multi(*sanitized_key_to_key_hash.keys).transform_keys(&sanitized_key_to_key_hash)
+    missing_keys = keys.uniq - cached.keys
+    return cached if missing_keys.empty?
 
-    sanitized_key_to_value_hash.transform_keys(&sanitized_key_to_key_hash)
+    generated = yield missing_keys
+    Rails.cache.write_multi(generated.transform_keys(&cache_key))
+    cached.merge(generated)
   end
 
   # Get a value from the cache. If the value isn't in the cache, use the block

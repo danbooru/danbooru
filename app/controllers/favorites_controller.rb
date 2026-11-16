@@ -12,6 +12,12 @@ class FavoritesController < ApplicationController
     @user = User.find_by_name(user_name) if user_name
 
     @favorites = authorize Favorite.visible(CurrentUser.user).paginated_search(params, defaults: { post_id: @post&.id, user_id: @user&.id })
+
+    if request.format.html? && request.variant.empty?
+      @favorites = @favorites.includes(:user, post: [:uploader, :media_asset])
+      @tags_by_name = Tag.where(name: @favorites.flat_map { it.post.tag_array }.uniq).index_by(&:name) if @post.nil?
+    end
+
     respond_with(@favorites) do |format|
       format.html.tooltip { render layout: false }
     end

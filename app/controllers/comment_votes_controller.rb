@@ -5,10 +5,12 @@ class CommentVotesController < ApplicationController
 
   def index
     @comment_votes = authorize CommentVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
-    @comment_votes = @comment_votes.includes(:user, comment: [:creator, { post: [:uploader, :media_asset] }]) if request.format.html?
 
-    comment_id = params[:comment_id] || params[:search][:comment_id]
-    @comment = Comment.find(comment_id) if comment_id
+    if request.format.html?
+      @comment_votes = @comment_votes.includes(:user, comment: [:creator, { post: [:uploader, :media_asset] }])
+      comment_id = params[:comment_id] || params[:search][:comment_id]
+      @comment = Comment.find(comment_id) if comment_id && request.variant.tooltip?
+    end
 
     respond_with(@comment_votes) do |format|
       format.html.tooltip { render layout: false }

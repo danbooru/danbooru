@@ -147,6 +147,18 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
+        should "title entries with the post's characters, copyrights and artists" do
+          create(:tag, name: "cirno", category: Tag.categories.character)
+          create(:tag, name: "touhou", category: Tag.categories.copyright)
+          create(:tag, name: "bkub", category: Tag.categories.artist)
+          @post.update!(tag_string: "cirno touhou bkub solo")
+          @comment = create(:comment, post: @post)
+          get comments_path(format: "atom"), params: { search: { post_id: @post.id }}
+
+          assert_response :success
+          assert_equal(["@#{@comment.creator.name} on post ##{@post.id} (cirno (touhou) drawn by bkub)"], response.parsed_body.css("entry title").map(&:text))
+        end
+
         should "not show comments on restricted posts" do
           @post.update!(is_banned: true)
           @comment = create(:comment, post: @post)

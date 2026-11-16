@@ -337,7 +337,7 @@ class Artist < ApplicationRecord
   end
 
   def add_url_warnings
-    duplicate_artists = urls.select(&:new_record?).flat_map(&:duplicate_artists).sort.uniq.without(self)
+    duplicate_artists = ArtistFinder.find_artists(urls.select(&:new_record?).map(&:url)).order(:id).without(self)
 
     if duplicate_artists.present?
       names = duplicate_artists.map { |artist| "[[#{artist.name}]]" }

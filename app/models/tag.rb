@@ -142,13 +142,10 @@ class Tag < ApplicationRecord
         @categories ||= CategoryMapping.new
       end
 
-      def select_category_for(tag_name)
-        Tag.where(name: tag_name).pick(:category).to_i
-      end
-
       def categories_for(tag_names)
-        Cache.get_multi(Array(tag_names), "tag-category") do |tag|
-          Tag.select_category_for(tag)
+        Cache.get_multi(Array(tag_names), "tag-category") do |names|
+          categories = Tag.where(name: names).pluck(:name, :category).to_h
+          names.index_with { |name| categories.fetch(name, 0) }
         end
       end
     end
@@ -255,6 +252,27 @@ class Tag < ApplicationRecord
         end
 
         tag
+      end
+
+      # Translate tags from other sites to Danbooru tags, by wiki other names, or else by tag name if the tag isn't
+      # empty. Aliases are applied in both cases.
+      #
+      # @param names [Array<String>] The tags from the other site.
+      # @return [Hash<String, Array<Tag>>] A hash mapping each name to its translated tags.
+      def translate(names)
+        names = names.compact_blank.uniq
+        return {} if names.empty?
+
+        wiki_titles = WikiPage.titles_for_other_names(names)
+        tag_names = names.index_with { normalize_name(it) }
+        aliases = TagAlias.aliases_for((wiki_titles.values.flatten + tag_names.values).uniq)
+        tags = where(name: (wiki_titles.values.flatten + tag_names.values).map { aliases.fetch(it, it) }).index_by(&:name)
+        find_tag = ->(name) { tags[aliases.fetch(name, name)] }
+
+        names.index_with do |name|
+          wiki_tags = wiki_titles[name].filter_map(&find_tag).uniq
+          wiki_tags.presence || [find_tag.call(tag_names[name])].compact.select { it.post_count > 0 }
+        end
       end
     end
   end

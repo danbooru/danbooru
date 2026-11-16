@@ -36,7 +36,7 @@ class ForumTopicsController < ApplicationController
     @forum_posts = @forum_topic.forum_posts.order(id: :asc).paginate(params[:page], limit: params[:limit], page_limit: 5_000)
 
     if request.format.atom?
-      @forum_posts = @forum_posts.reverse_order.load
+      @forum_posts = @forum_posts.includes(:creator).reverse_order.load
     end
 
     respond_with(@forum_topic)

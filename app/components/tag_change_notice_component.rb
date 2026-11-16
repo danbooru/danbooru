@@ -13,7 +13,7 @@ class TagChangeNoticeComponent < ApplicationComponent
 
   memoize def pending_burs
     return BulkUpdateRequest.none unless tag.present?
-    BulkUpdateRequest.pending.where_array_includes_any(:tags, tag.name)
+    BulkUpdateRequest.pending.where_array_includes_any(:tags, tag.name).includes(:forum_topic, :forum_post)
   end
 
   def bur_links_for_topic(forum_topic:, burs:)

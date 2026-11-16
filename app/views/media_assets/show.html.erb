@@ -104,7 +104,7 @@
             <h3>Tags</h3>
 
             <ul class="tag-list categorized-tag-list">
-              <% @media_asset.ai_tags.undeprecated.sort_by { |tag| [TagCategory.split_header_list.index(tag.category_name.downcase), tag.name.starts_with?("rating:") ? 0 : 1, tag.name] }.each do |ai_tag| %>
+              <% @media_asset.ai_tags.undeprecated.includes(:tag).sort_by { |tag| [TagCategory.split_header_list.index(tag.category_name.downcase), tag.name.starts_with?("rating:") ? 0 : 1, tag.name] }.each do |ai_tag| %>
                 <%= tag.li class: "tag-type-#{ai_tag.category} space-x-1 text-sm", "data-tag-name": ai_tag.name do %>
                   <% if ai_tag.tag.artist? %>
                     <%= link_to "?", show_or_new_artists_path(name: ai_tag.name) %>
