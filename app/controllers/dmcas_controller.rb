@@ -6,6 +6,8 @@ class DmcasController < ApplicationController
   end
 
   def create
+    raise ActionController::BadRequest, "dmca parameter is required" if params[:dmca].blank?
+
     @dmca = params[:dmca].slice(:name, :email, :address, :infringing_urls, :original_urls, :proof, :perjury_agree, :good_faith_agree, :signature)
     authorize @dmca, policy_class: DmcaPolicy
 

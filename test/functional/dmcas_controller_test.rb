@@ -33,6 +33,13 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
       assert_match(%r{https://example\.com/1\.html}, Dmail.last.body)
     end
 
+    should "return 400 for a missing complaint" do
+      post dmca_path
+
+      assert_response 400
+      assert_emails 0
+    end
+
     should "not send a copy of the complaint to an invalid email address" do
       post dmca_path, params: { dmca: @valid_dmca.merge(email: "not an email") }
 
