@@ -7,6 +7,16 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return 404 for a nonexistent post" do
+        post_auth post_approvals_path(post_id: 0, format: :json), create(:approver)
+        assert_response 404
+      end
+
+      should "return 400 for a missing post" do
+        post_auth post_approvals_path(format: :json), create(:approver)
+        assert_response 400
+      end
+
       context "for a pending post" do
         should "approve the post" do
           @post = create(:post, is_pending: true)

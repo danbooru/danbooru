@@ -19,7 +19,7 @@ class PostApprovalsController < ApplicationController
   end
 
   def create
-    @approval = authorize PostApproval.new(user: CurrentUser.user, post_id: params[:post_id])
+    @approval = authorize PostApproval.new(user: CurrentUser.user, post: Post.find(params.expect(:post_id)))
     @approval.save
     respond_with(@approval)
   end
