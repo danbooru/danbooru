@@ -9,7 +9,8 @@ class IpAddressesController < ApplicationController
   end
 
   def show
-    @ip_address = authorize Danbooru::IpAddress.new(params[:id]), policy_class: IpAddressPolicy
+    authorize nil, policy_class: IpAddressPolicy
+    @ip_address = Danbooru::IpAddress.parse(params[:id]) or raise ActiveRecord::RecordNotFound
     @ip_info = @ip_address.ip_info
     respond_with(@ip_info)
   end
