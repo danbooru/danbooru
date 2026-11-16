@@ -63,6 +63,19 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         assert_nil(code.redeemer)
       end
 
+      should "rate limit code attempts" do
+        user = create(:user)
+        login_as(user)
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+
+        responses = 4.times.map do
+          post upgrade_upgrade_codes_path, params: { upgrade_code: { code: "abcd" }}, xhr: true
+          response.status
+        end
+
+        assert_equal([422, 422, 422, 429], responses)
+      end
+
       should "return an error for an already redeemed code" do
         code = create(:upgrade_code, status: :redeemed)
         user = create(:user)

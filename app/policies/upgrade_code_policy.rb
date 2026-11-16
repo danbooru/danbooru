@@ -24,4 +24,8 @@ class UpgradeCodePolicy < ApplicationPolicy
   def searchable_attributes
     %i[id created_at updated_at code status creator redeemer user_upgrade]
   end
+
+  def rate_limit_for_upgrade(**_options)
+    { rate: 1.0 / 10.minutes, burst: 3 }
+  end
 end
