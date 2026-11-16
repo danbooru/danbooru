@@ -17,9 +17,9 @@ class DText
   # post #1234, pixiv #1234, etc. The canonical list is in lib/dtext_rb/ext/dtext/dtext.cpp.rl.
   SHORTLINKS = %w[
     alias appeal artist asset ban bur comment dmail favgroup feedback flag forum implication mod\ action modreport
-    note pool post topic user wiki
+    media\ asset note pool post topic user wiki
     issue pull commit
-    artstation deviantart gelbooru nijie pawoo pixiv pixiv sankaku seiga twitter yandere
+    artstation deviantart gelbooru nijie pawoo pixiv sankaku seiga twitter yandere
   ]
 
   attr_reader :dtext, :inline, :disable_mentions, :media_embeds, :base_url, :domain, :alternate_domains, :emoji_list, :emoji_map, :max_lines, :max_total_lines, :options
@@ -787,7 +787,7 @@ class DText
   # @param allowed_shortlinks [Array<String>] The list of shortlinks to allow in the text (e.g. ["pixiv"] to not escape `pixiv #1234` shortlinks).
   def self.escape(text, allowed_shortlinks: [])
     # post #1234 -> post &num;1234
-    text.gsub(/(#{Regexp.union(SHORTLINKS).source}) #(\d+)/io) { $1.downcase.in?(allowed_shortlinks) ? $& : "#{$1} &num;#{$2}" }
+    text.gsub(/(#{Regexp.union(SHORTLINKS).source}) #([a-z0-9]+)/io) { $1.downcase.in?(allowed_shortlinks) ? $& : "#{$1} &num;#{$2}" }
   end
 
   # Return the first paragraph the search string `needle` occurs in.
