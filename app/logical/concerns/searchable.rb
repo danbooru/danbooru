@@ -427,7 +427,10 @@ module Searchable
     # are never valid for non-array attributes, and arrays are only valid for some operators.
     def validate_value_types!(name, type)
       case type
-      when :jsonb, :array then return
+      when :array then return
+      when :jsonb
+        raise SearchError, "#{name} has an invalid value" if params[name].present? && !params[name].is_a?(Hash)
+        return
       when :boolean, :inet then array_keys = [name.to_s]
       when :enum then array_keys = [name.to_s, "#{name}_not"]
       when :text then array_keys = ["#{name}_matches"]
