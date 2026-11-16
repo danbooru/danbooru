@@ -88,6 +88,14 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing message" do
+        assert_no_difference("NewsUpdate.count") do
+          post_auth news_updates_path, @admin, params: { news_update: { duration_in_days: 1 }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "work for an admin" do
         assert_difference("NewsUpdate.active.count") do
           post_auth news_updates_path, @admin, params: { news_update: { message: "zzz" }}

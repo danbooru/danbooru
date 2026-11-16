@@ -336,6 +336,14 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing title" do
+        assert_no_difference(["ForumPost.count", "ForumTopic.count"]) do
+          post_auth forum_topics_path, @user, params: { forum_topic: { original_post_attributes: { body: "xaxaxa" }}}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "create a new forum topic and post" do
         assert_difference(["ForumPost.count", "ForumTopic.count"], 1) do
           post_auth forum_topics_path, @user, params: { forum_topic: { title: "bababa", original_post_attributes: { body: "xaxaxa" }}}
