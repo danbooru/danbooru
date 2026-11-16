@@ -9,7 +9,7 @@ class PostAppeal < ApplicationRecord
   belongs_to :post
 
   validates :reason, visible_string: { allow_empty: true }, length: { maximum: MAX_LENGTH }
-  validate :validate_post_is_appealable, on: :create
+  validate :validate_post_is_appealable, on: :create, if: :post
   validate :validate_creator_is_not_limited, on: :create
   validates :creator, uniqueness: { scope: :post, message: "have already appealed this post" }, on: :create
   after_create :prune_disapprovals

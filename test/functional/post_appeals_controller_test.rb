@@ -53,6 +53,11 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing post" do
+        post_auth post_appeals_path, create(:user), params: { post_appeal: { reason: "xxx" }}, as: :json
+        assert_response 422
+      end
+
       context "appealing a deleted post" do
         should "create a new appeal" do
           @post = create(:post, is_deleted: true)
