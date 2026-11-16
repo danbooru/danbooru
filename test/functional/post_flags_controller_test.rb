@@ -119,6 +119,11 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing post" do
+        post_auth post_flags_path, create(:user), params: { post_flag: { reason: "xxx" }}, as: :json
+        assert_response 422
+      end
+
       should "create a new flag" do
         @post = create(:post)
         post_auth post_flags_path, @flagger, params: { post_flag: { post_id: @post.id, reason: "xxx" }}, as: :javascript
