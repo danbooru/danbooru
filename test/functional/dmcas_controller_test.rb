@@ -33,6 +33,13 @@ class DmcasControllerTest < ActionDispatch::IntegrationTest
       assert_match(%r{https://example\.com/1\.html}, Dmail.last.body)
     end
 
+    should "not send a copy of the complaint to an invalid email address" do
+      post dmca_path, params: { dmca: @valid_dmca.merge(email: "not an email") }
+
+      assert_response :success
+      assert_emails 1
+    end
+
     should "not send an email to fake addresses" do
       dmca = {
         name: "John Doe",
