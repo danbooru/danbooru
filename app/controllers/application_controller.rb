@@ -20,6 +20,7 @@ class ApplicationController < ActionController::Base
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
   before_action :check_get_body
   before_action :check_oversized_get_params
+  before_action :check_pagination_params
   before_action :reset_current_user
   before_action :delete_host_only_session_cookie
   before_action :set_current_user
@@ -338,6 +339,13 @@ class ApplicationController < ActionController::Base
       value.each_value { |item| check_param_length!(name, item) }
     when Array
       value.each { |item| check_param_length!(name, item) }
+    end
+  end
+
+  # Reject `page` and `limit` params that aren't strings or integers, like `limit[]=1` or `{"limit": true}` in a JSON body.
+  def check_pagination_params
+    params.slice(:page, :limit).each do |name, value|
+      raise ActionController::BadRequest, "#{name} parameter must be a string or an integer" unless value.nil? || value.is_a?(String) || value.is_a?(Integer)
     end
   end
 
