@@ -107,6 +107,37 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
           assert_select "p", text: "Error: #{"1" * 97}... is not a valid date"
         end
 
+        should "work without any search params" do
+          travel_to(Time.zone.local(2026, 3, 31, 23, 30)) do
+            get_auth report_path("posts"), @user
+
+            assert_response :success
+            assert_select "#search_from[value=?]", "2026-02-28"
+            assert_select "#search_to[value=?]", "2026-03-31"
+          end
+        end
+
+        should "show the parsed dates in the search form" do
+          get_auth report_path("posts", search: { from: "2020-1-2 12:00", to: "2020-2-3", tags: "touhou", mode: "table" }), @user
+
+          assert_response :success
+          assert_select "#search_from[value=?]", "2020-01-02"
+          assert_select "#search_to[value=?]", "2020-02-03"
+          assert_select "#search_tags[value=?]", "touhou"
+          assert_select "#search_mode[value=?]", "table"
+        end
+
+        should "not show non-string params in the search form" do
+          get_auth report_path("posts", search: { tags: ["touhou"], mode: ["table"], group: ["uploader"] }), @user
+
+          assert_response :success
+          assert_select "#search_tags:not([value])"
+          assert_select "#search_mode:not([value])"
+
+          get_auth report_path("posts", search: { from: ["2020-01-01"], to: { a: 1 }}), @user
+          assert_response :success
+        end
+
         should "work with a date and time" do
           get_auth report_path("posts", search: { from: "2020-1-1 12:00", to: "2020-01-31", period: "day" }), @user
           assert_response :success

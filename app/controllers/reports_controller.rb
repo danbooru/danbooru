@@ -10,15 +10,15 @@ class ReportsController < ApplicationController
   def show
     @report = params[:id]
     # Ignore params that aren't strings, like `search[period][]=day`.
-    search = params.fetch(:search, {}).permit!.to_h.select { |_name, value| value.is_a?(String) }.with_indifferent_access
+    @report_params = params.fetch(:search, {}).permit!.to_h.select { |_name, value| value.is_a?(String) }.with_indifferent_access
 
-    @mode = search[:mode] || "chart"
-    @period = search[:period]&.downcase
-    @from = search[:from].presence&.parse_date! || 1.month.ago
-    @to = search[:to].presence&.parse_date! || Time.zone.now
-    @columns = search[:columns].to_s.split(/[[:space:],]/).map(&:to_sym)
-    @group = search[:group]&.downcase&.tr(" ", "_")
-    @group_limit = search[:group_limit]&.to_i || 10
+    @mode = @report_params[:mode] || "chart"
+    @period = @report_params[:period]&.downcase
+    @from = @report_params[:from].presence&.parse_date! || 1.month.ago
+    @to = @report_params[:to].presence&.parse_date! || Time.zone.now
+    @columns = @report_params[:columns].to_s.split(/[[:space:],]/).map(&:to_sym)
+    @group = @report_params[:group]&.downcase&.tr(" ", "_")
+    @group_limit = @report_params[:group_limit]&.to_i || 10
     authorize nil, policy_class: ReportPolicy
 
     case @report
