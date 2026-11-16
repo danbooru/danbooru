@@ -62,6 +62,14 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing name" do
+        assert_no_difference("FavoriteGroup.count") do
+          post_auth favorite_groups_path, @user, params: { favorite_group: { is_public: true }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "render" do
         post_auth favorite_groups_path, @user, params: { favorite_group: attributes_for(:favorite_group) }
         assert_redirected_to favorite_group_path(FavoriteGroup.last)

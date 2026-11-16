@@ -65,6 +65,14 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing name" do
+        assert_no_difference("Pool.count") do
+          post_auth pools_path, @user, params: { pool: { description: "abc" }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "create a pool" do
         post_auth pools_path, @user, params: { pool: { name: "xxx", description: "abc" }}
 
