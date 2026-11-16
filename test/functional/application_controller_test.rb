@@ -85,6 +85,18 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
       post_auth api_keys_path, user, params: { api_key: "x" }, as: :json, reauthenticate: true
       assert_response 400
+
+      put_auth create_or_update_artist_commentaries_path, user, params: { artist_commentary: "x" }, as: :json
+      assert_response 400
+
+      post_auth post_disapprovals_path, create(:approver), params: { post_disapproval: ["x"] }, as: :json
+      assert_response 400
+
+      post dmca_path, params: { dmca: "x" }, as: :json
+      assert_response 400
+
+      post_auth upgrade_upgrade_codes_path, user, params: { upgrade_code: "x" }, as: :json
+      assert_response 400
     end
 
     should "return 422 for an oversized param on a GET request" do

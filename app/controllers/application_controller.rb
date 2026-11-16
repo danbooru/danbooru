@@ -21,6 +21,7 @@ class ApplicationController < ActionController::Base
   before_action :check_get_body
   before_action :check_oversized_get_params
   before_action :check_pagination_params
+  before_action :check_model_params
   before_action :reset_current_user
   before_action :delete_host_only_session_cookie
   before_action :set_current_user
@@ -362,6 +363,15 @@ class ApplicationController < ActionController::Base
 
   def pundit_user
     CurrentUser.user
+  end
+
+  # Reject requests where the model's params aren't a hash (e.g. `POST /comments?comment=foo`). Most controllers expect
+  # `params[:comment]` to be a hash and raise an error otherwise.
+  def check_model_params
+    return if request.get? || request.head?
+
+    key = controller_name.singularize
+    raise ActionController::BadRequest, "#{key} parameter must be a hash" if params.key?(key) && !params[key].is_a?(ActionController::Parameters)
   end
 
   # Used by Pundit's `permitted_attributes`. Reject model params that aren't a hash (e.g. `comment=foo` or `comment[]=foo`),
