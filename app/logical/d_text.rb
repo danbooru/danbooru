@@ -745,7 +745,7 @@ class DText
         if inline
           escape(alt_text, allowed_shortlinks:)
         elsif alt_text.present? && src.present?
-          %{"#{alt_text.gsub('"', "&quot;")}":[#{src}]\n\n}
+          "#{build_link(src, title: alt_text)}\n\n"
         else
           ""
         end

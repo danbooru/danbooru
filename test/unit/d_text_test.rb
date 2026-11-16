@@ -513,6 +513,10 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("media asset #1", DText.from_html("media asset #1", allowed_shortlinks: ["media asset"]))
       end
 
+      should "escape brackets in image URLs" do
+        assert_equal('"foo":[https://example.com/a%5Bb%5D.jpg]', DText.from_html('<img src="https://example.com/a[b].jpg" alt="foo">'))
+      end
+
       should "put headers on a line by themselves" do
         assert_equal("foo\n\nh4. bar\n\nbaz", DText.from_html("<span>foo</span><h4>bar</h4><span>baz</span>"))
       end
