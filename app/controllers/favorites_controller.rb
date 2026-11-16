@@ -24,7 +24,7 @@ class FavoritesController < ApplicationController
   end
 
   def create
-    @favorite = authorize Favorite.new(post_id: params[:post_id], user: CurrentUser.user)
+    @favorite = authorize Favorite.new(post: Post.find(params.expect(:post_id)), user: CurrentUser.user)
     @favorite.save
     @post = @favorite.post.reload
 
