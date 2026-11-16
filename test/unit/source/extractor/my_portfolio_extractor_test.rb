@@ -282,30 +282,30 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://artgerm.com/dc-comics-b",
         image_urls: %w[
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/2eed3dd0-3ebb-4159-a8e5-f5ce67f1a579_rw_1200.jpg?h=65e860683c11bd18313c79dd188e524c
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/8a3c9941-85f8-48fa-9fb2-d06ced997197_rw_1200.jpg?h=ffe4e847c64f963ac8bbfb5784766bd3
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/a63961eb-663f-4be6-a3dd-f224d933f76c_rw_1200.jpg?h=3bfec0b91b2d2ca2790f62ef6360bfae
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/baa6ed83-5fa2-4ddd-911e-0c910ee4b594_rw_1200.jpg?h=a51d9d0e6ed646463647952030c1d659
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/0ab3a574-c77c-48ec-8229-fca5c200c846_rw_1200.jpg?h=7ac3388fef173e7f40ac033d8b63cf32
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/fdb14b44-7110-4df3-b26c-e0ec4149ec40_rw_1200.jpg?h=5696147b27163e612c54cc606a186db4
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/ff7e8422-5756-47e3-944e-dbb8cef0da09_rw_1200.jpg?h=9ab4d09c5fa1495ab1f3b0968389b9cb
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/6d82039e-8f39-4c93-b359-d5bbacc3bdcc_rw_1200.jpg?h=6635c1b51ae7407879f9879dc597c125
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/3ae88ce9-3987-44c5-b54c-a1d18d1a9b50_rw_1200.jpg?h=947d95ea8b739932aa62518cd7f3f568
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/e2e857d1-4307-46ea-8176-1674cf6bef0b_rw_1200.jpg?h=986035a86b4aae69f2f93ebc98806d5a
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/c0ba149c-ad4b-4c43-bf66-93e0e228fca6_rw_600.jpg?h=ea1ff5b31088e3fa92499b7df96ed303
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/d7d87d2e-3a12-49b3-8dff-f1c828da438e_rw_600.jpg?h=34f53bd8bb609a16aa7a328309ee7d54
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/08dc724e-c31e-4523-8af3-196d46ae5d4a_rw_600.jpg?h=2bbc177718e0dda93313f6cc7521ad75
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/25391448-2ad4-43d8-8c14-0bb2d2ab95b4_rw_600.jpg?h=cae7ac1082169d4bb13a6ce425d737e6
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/3df153c1-5b6a-4616-9dae-94e770b54bb4_rw_600.jpg?h=705df12926a017137c36af44a04c0ffe
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/6d3be5f8-5fa2-4e81-808a-0d50078824d6_rw_600.jpg?h=323ab4cd3102da57343e2932cb423ead
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/26b9e086-1cdd-40f4-b1f6-1b037e1ed40d_rw_600.jpg?h=7c9bcc88ed997094e91f60605a0209e1
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/046bde95-926b-4879-85ec-530c50bc8a21_rw_1200.jpg?h=aaecb3f8b115284cd76dea9b0ca5b421
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/fc4612e8-2b06-4e4d-9fc1-d2426f403256_rw_600.jpg?h=2d8c0da715fa0b53e3b2b812d3c704ed
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/8510b012-d6bb-439a-9c77-bc90860a5f9f_rw_1200.jpg?h=652278c20ab786306f074ba8048def1a
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/8aaa6e0a-3529-4a28-b86f-ccd4c8e6c4da_rw_1200.jpg?h=3dd3e090688896c2a5b175bd1e22f7e1
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/8d57769c-1281-4e1d-88f6-9a3dac2fe908_rw_1200.jpg?h=dee6f493a76edde504c6596d33cd2783
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/f61653fd-14b7-42a2-a907-07d0b8cc6d7f_rw_1200.jpg?h=5d931c95f0c2e159a5c60c2d94f263aa
-          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/fd789c3a-c59b-40ed-bbd8-a9df7cf6cb9f_rw_600.jpg?h=7022515a65137c4bdcfad494766956e1
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/2eed3dd0-3ebb-4159-a8e5-f5ce67f1a579_rw_1200.jpg?h=77e1683694d802138968384e1e2d9648
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/8a3c9941-85f8-48fa-9fb2-d06ced997197_rw_1200.jpg?h=15515d07be405b0774f2a06e06a9b6bd
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/a63961eb-663f-4be6-a3dd-f224d933f76c_rw_1200.jpg?h=26d866c72f450bf76d1681ea62da264b
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/baa6ed83-5fa2-4ddd-911e-0c910ee4b594_rw_1200.jpg?h=195d32b3ba3a2b92da5c135754b9e9dd
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/0ab3a574-c77c-48ec-8229-fca5c200c846_rw_1200.jpg?h=bcc29f95f8b85b9b347d1ede1eb0d25a
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/fdb14b44-7110-4df3-b26c-e0ec4149ec40_rw_1200.jpg?h=95cd0d36d6ad06e5999e697ce2bdc1cb
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/ff7e8422-5756-47e3-944e-dbb8cef0da09_rw_1200.jpg?h=42af643817d2a43d15c0b4c416fc858f
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/6d82039e-8f39-4c93-b359-d5bbacc3bdcc_rw_1200.jpg?h=d3a198cc03bd5d6237ee63f85edb5292
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/3ae88ce9-3987-44c5-b54c-a1d18d1a9b50_rw_1200.jpg?h=c5e71de3d11e129ceb1c1e0618b7810d
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/e2e857d1-4307-46ea-8176-1674cf6bef0b_rw_1200.jpg?h=74f0281e3557d265dbc9ea461c61970b
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/c0ba149c-ad4b-4c43-bf66-93e0e228fca6_rw_600.jpg?h=03864d87ffeb527ab05e770976c8c87e
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/d7d87d2e-3a12-49b3-8dff-f1c828da438e_rw_600.jpg?h=c2c9cdab5f5ec16bba1bbf4fe5f0c46c
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/08dc724e-c31e-4523-8af3-196d46ae5d4a_rw_600.jpg?h=1a6de8f3e9de815570b31cf620f167da
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/25391448-2ad4-43d8-8c14-0bb2d2ab95b4_rw_600.jpg?h=62520541ed337650f8adf3811943f217
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/3df153c1-5b6a-4616-9dae-94e770b54bb4_rw_600.jpg?h=c5735bf22b1fe341bf5649f67d3c1d23
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/6d3be5f8-5fa2-4e81-808a-0d50078824d6_rw_600.jpg?h=f0a381a955131a2d94b50a67ffad3438
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/26b9e086-1cdd-40f4-b1f6-1b037e1ed40d_rw_600.jpg?h=cd59f1d2f8ee979dcc290a9345ae19ba
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/046bde95-926b-4879-85ec-530c50bc8a21_rw_1200.jpg?h=3e448f8f610c3603ed708646ff997487
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/fc4612e8-2b06-4e4d-9fc1-d2426f403256_rw_600.jpg?h=2a724854a5c05ef03704e812c548583b
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/8510b012-d6bb-439a-9c77-bc90860a5f9f_rw_1200.jpg?h=fa80f42f182535a6adee1f077d6478ed
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/8aaa6e0a-3529-4a28-b86f-ccd4c8e6c4da_rw_1200.jpg?h=53df14373330c5dcd4c6d009cfe79302
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/8d57769c-1281-4e1d-88f6-9a3dac2fe908_rw_1200.jpg?h=1a99412b28422bba44e4c2e7e236aa8b
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/f61653fd-14b7-42a2-a907-07d0b8cc6d7f_rw_1200.jpg?h=2a6f891e62a1b8a69e9993fb1aa10436
+          https://cdn.myportfolio.com/3a87c4599bde55ea6e62b2756c9e48ab/fd789c3a-c59b-40ed-bbd8-a9df7cf6cb9f_rw_600.jpg?h=c9aa168f922f8f6f9b1810203c12ffcc
         ],
         media_files: [
           { file_size: 375_771 },

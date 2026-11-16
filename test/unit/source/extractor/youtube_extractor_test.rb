@@ -24,7 +24,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://yt3.googleusercontent.com/NsA5K3ie2Xumot_5Eu-VUTG_v-xW5gKplU8aIBDyD0rGjtjzVWcjjG1zI7f0g3RtB-PzWW0s=w1060-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj",
         image_urls: %w[https://yt3.googleusercontent.com/NsA5K3ie2Xumot_5Eu-VUTG_v-xW5gKplU8aIBDyD0rGjtjzVWcjjG1zI7f0g3RtB-PzWW0s=d],
-        media_files: [{ file_size: 200_454 }],
+        media_files: [{ file_size: 200_418 }],
         page_url: nil,
       )
     end
@@ -43,7 +43,7 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://www.youtube.com/channel/UCykMWf8B8I7c_jA8FTy2tGw/community?lb=UgkxWevNfezmf-a7CRIO0haWiaDSjTI8mGsf",
         image_urls: %w[https://yt3.ggpht.com/4aUIQfric9Rg3xy5VqtwWCH6iZgVVKyMnsGJiVp7TQk166jKSSjTKgQyKVEgCz2bhGSAvG43fSgnrg=d],
-        media_files: [{ file_size: 2_348_082 }],
+        media_files: [{ file_size: 2_348_075 }],
         page_url: "https://www.youtube.com/post/UgkxWevNfezmf-a7CRIO0haWiaDSjTI8mGsf",
         profile_url: "https://www.youtube.com/@AmiyaAranha",
         profile_urls: %w[https://www.youtube.com/@AmiyaAranha https://www.youtube.com/channel/UCykMWf8B8I7c_jA8FTy2tGw],
@@ -70,9 +70,9 @@ module Source::Tests::Extractor
           https://yt3.ggpht.com/HazeswOR3AKZiCLMV8cgkI7kQAV7PGKT3iy3wAbmptwSETaWpMbQDzFYTLR2RI-TBZYVtzX8B0TF=d
         ],
         media_files: [
-          { file_size: 2_623_200 },
-          { file_size: 656_633 },
-          { file_size: 723_316 },
+          { file_size: 2_623_193 },
+          { file_size: 656_626 },
+          { file_size: 723_309 },
         ],
         page_url: "https://www.youtube.com/post/UgkxBkJE1Eu_6S9sADZF5IuK5MPRSWf4VVz3",
         profile_url: "https://www.youtube.com/@Mirae_Somang",

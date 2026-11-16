@@ -19,10 +19,9 @@ module Source::Tests::Extractor
 
     context "A IP-based source" do
       strategy_should_work(
-        # "https://httpbin.org/image/jpeg",
-        "http://18.227.178.96/image/jpeg",
-        image_urls: %w[http://18.227.178.96/image/jpeg],
-        media_files: [{ file_size: 35_588 }],
+        "https://1.1.1.1/media/social-share.png",
+        image_urls: %w[https://1.1.1.1/media/social-share.png],
+        media_files: [{ file_size: 192_365 }],
         page_url: nil,
         profile_urls: %w[],
         display_name: nil,

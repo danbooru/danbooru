@@ -40,8 +40,8 @@ module Source::Tests::Extractor
 
     context "A dtstatic.com avatar url" do
       strategy_should_work(
-        "https://c-ssl.dtstatic.com/uploads/avatar/202012/15/20201215234506_75e25.thumb.200_200_c.jpg",
-        image_urls: %w[https://c-ssl.dtstatic.com/uploads/avatar/202012/15/20201215234506_75e25.jpg],
+        "https://a-ho-img.dtstatic.com/uploads/avatar/202012/15/20201215234506_75e25.thumb.200_200_c.jpg",
+        image_urls: %w[https://a-ho-img.dtstatic.com/uploads/avatar/202012/15/20201215234506_75e25.jpg],
         media_files: [{ file_size: 189_655 }],
         page_url: nil,
         profile_url: nil,

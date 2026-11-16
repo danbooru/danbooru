@@ -143,7 +143,7 @@ module Source::Tests::Extractor
     context "A post without download links" do
       strategy_should_work(
         "https://gall.dcinside.com/mgallery/board/view?id=projectmx&no=19701120",
-        image_urls: %w[https://dcimg8.dcinside.co.kr/viewimage.php?no=29bcc427b69d39b37ab0ccaf17dd6b6f62b51b91c5c0132c1f5fd1ce90bf3ec38c0d605a87c215edb0a8612d8efac50958f7f6bd59d2db7f1a4f7e0c4a7044caddd1676abbd90536c760c14f262f2d],
+        image_urls: %w[https://dcimg4.dcinside.co.kr/viewimage.php?no=29bcc427b69d39b37ab0ccaf17dd6b6f62b51b91c5c0132c1f5fd1ce90bf3ec38c0d605a87c215edb0a8612d8efac50958f7f6bd59d2db7f1a4f7e0c4a7044caddd1676abbd90536c760c14f262f2d],
         media_files: [{ file_size: 211_306 }],
         page_url: "https://gall.dcinside.com/mgallery/board/view/?id=projectmx&no=19701120",
         profile_urls: %w[https://gallog.dcinside.com/topic1000],
@@ -154,7 +154,7 @@ module Source::Tests::Extractor
         tags: [],
         dtext_artist_commentary_title: "[일반] 나기사와 혼인하고 경제적 자유를 얻었습니다앱에서 작성",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          "7ee88572bc846ffe3bede9e443d7706f59cc3561bb9d715082519b1cea1c52d2568a0e3eff93ee9d4fba7579796f85e17d9ecd0bdc09cb85823680c8af7ce6a1b6":[https://dcimg8.dcinside.co.kr/viewimage.php?id=3dafdf2ce0d12cab76&no=29bcc427b69d39b37ab0ccaf17dd6b6f62b51b91c5c0132c1f5fd1ce90bf3ec38c0d605a87c215edb0a8612d8efac50958f7f6bd59d2db7f1a4f7e0c4a7044caddd1676abbd90536c760c14f262f2d]
+          "7ee88572bc846ffe3bede9e443d7706f59cc3561bb9d715082519b1cea1c52d2568a0e3eff93ee9d4fba7579796f85e17d9ecd0bdc09cb85823680c8af7ce6a1b6":[https://dcimg4.dcinside.co.kr/viewimage.php?id=3dafdf2ce0d12cab76&no=29bcc427b69d39b37ab0ccaf17dd6b6f62b51b91c5c0132c1f5fd1ce90bf3ec38c0d605a87c215edb0a8612d8efac50958f7f6bd59d2db7f1a4f7e0c4a7044caddd1676abbd90536c760c14f262f2d]
           재정 조언을 위해 나기나기 하세요
           "비틱나":[https://dcimg5.dcinside.com/dccon.php?no=62b5df2be09d3ca567b1c5bc12d46b394aa3b1058c6e4d0ca41648b658ec2575e91e802307af066317aa4fa7beda2fc446c4fcfda2d4297ba6eb538b343abf474e548a774e85ebb121400172d652438880c88dfbffc62427]
         EOS

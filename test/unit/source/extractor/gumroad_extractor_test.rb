@@ -127,25 +127,30 @@ module Source::Tests::Extractor
 
     context "A Gumroad post page url" do
       strategy_should_work(
-        "https://movw2000.gumroad.com/p/new-product-b072093e-e628-4a92-9740-e9b4564d9901",
-        page_url: "https://movw2000.gumroad.com/p/new-product-b072093e-e628-4a92-9740-e9b4564d9901",
+        "https://nyxaurelia.gumroad.com/p/hello-gumroad-shop-open-ehm-a-week-ago-i-kinda-forgot-to-post-c",
         image_urls: %w[
-          https://public-files.gumroad.com/nztoa76lk2wahffodnxwhqh49tkq
-          https://public-files.gumroad.com/2unbiv4p4gysgn1v3n5ah5f9ux9p
+          https://s3.amazonaws.com/gumroad/files/8634544762016/ef20778153834510867ce08c1db379ab/original/Seer_web.jpg
+          https://s3.amazonaws.com/gumroad/files/8634544762016/48d53da0ccd444a7b7db68c53cf2889d/original/Katara_Bloodbend_web.jpg
         ],
-        profile_url: "https://movw2000.gumroad.com",
-        display_name: "DAKO",
-        username: "movw2000",
-        tag_name: "movw2000",
-        other_names: ["DAKO", "movw2000"],
+        media_files: [
+          { file_size: 486_499 },
+          { file_size: 903_272 },
+        ],
+        page_url: "https://nyxaurelia.gumroad.com/p/hello-gumroad-shop-open-ehm-a-week-ago-i-kinda-forgot-to-post-c",
+        profile_url: "https://nyxaurelia.gumroad.com",
+        profile_urls: %w[https://nyxaurelia.gumroad.com],
+        display_name: "Nyx Aurelia",
+        username: "nyxaurelia",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
-        artist_commentary_title: nil,
+        dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          2022 is coming to an end,
+          So, I've posted just couple works on Gumroad - my paintings "Seer" and "Katara: Bloodbend", and there are a couple more coming soon~Thank you to those of you who have bought my works!
 
-          and the products on gumroad will have a 20% discount from now until 12/31.
+          For info on future releases, please sign up for email notifications ("Follow" button)! I will send post emails only to followers from now on :)
 
-          Discount code : omuxoke
+          "See what's new | Sign up for notifs":[https://gumroad.com/nyxaurelia]
         EOS
       )
     end
