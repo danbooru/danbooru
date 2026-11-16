@@ -31,6 +31,14 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(forum_post: { creator_name: -> { @user.name }}).with { [@negative_vote, @vote] }
       should respond_to_search(forum_post: { body_matches: "blah" }).with { [@negative_vote, @vote] }
 
+      should "ignore a forum_post search param that isn't a hash" do
+        get forum_post_votes_path, params: { search: { forum_post: "abc" }}, as: :json
+        assert_response :success
+
+        get forum_post_votes_path, params: { search: { forum_post: ["1", "2"] }}, as: :json
+        assert_response :success
+      end
+
       should "not show votes on forum posts the user can't see" do
         hidden_vote = create(:forum_post_vote, forum_post: create(:forum_post, topic: create(:mod_up_forum_topic)))
 
