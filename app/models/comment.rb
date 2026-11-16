@@ -5,8 +5,6 @@ class Comment < ApplicationRecord
   MAX_VISIBLE_LINES = 500
   MAX_TOTAL_LINES = 1_000
 
-  attr_accessor :creator_ip_addr
-
   belongs_to :post
   belongs_to :creator, class_name: "User"
   belongs_to :updater, class_name: "User", default: -> { creator }
@@ -21,7 +19,6 @@ class Comment < ApplicationRecord
   validates :body, visible_string: true, length: { maximum: 15_000 }, if: :body_changed?
   validate :validate_body, if: :body_changed?
 
-  before_create :autoreport_spam
   before_save :handle_reports_on_deletion
   after_create :update_last_commented_at_on_create
   after_update(if: ->(comment) { (!comment.is_deleted? || !comment.saved_change_to_is_deleted?) && comment.updater != comment.creator }) do |comment|
@@ -103,12 +100,6 @@ class Comment < ApplicationRecord
       elsif dtext_body.more_lines_than?(MAX_TOTAL_LINES, expanded: true)
         errors.add(:body, "can't be more than #{MAX_TOTAL_LINES} lines long, including [expand] blocks")
       end
-    end
-  end
-
-  def autoreport_spam
-    if SpamDetector.new(self, user_ip: creator_ip_addr).spam?
-      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
   end
 

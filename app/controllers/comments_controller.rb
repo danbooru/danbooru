@@ -47,7 +47,7 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: request.remote_ip, **permitted_attributes(Comment))
+    @comment = authorize Comment.new(creator: CurrentUser.user, **permitted_attributes(Comment))
     @comment.save
 
     respond_with(@comment, notice: "Comment posted") do |format|

@@ -17,7 +17,6 @@ gem "memoist", "~> 0.16"
 gem "daemons", "~> 1"
 gem "bootsnap", "~> 1", require: false
 gem "addressable", "~> 2"
-gem "rakismet", "~> 1"
 gem "activemodel-serializers-xml", "~> 1"
 gem "shakapacker", "~> 10"
 gem "rake", "~> 13"

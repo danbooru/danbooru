@@ -16,7 +16,6 @@ class ModerationReport < ApplicationRecord
   validates :model_type, inclusion: { in: MODEL_TYPES }
   validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }, on: :create
 
-  after_create :autoban_reported_user
   after_save :notify_reporter
   after_save :create_modaction
 
@@ -42,12 +41,6 @@ class ModerationReport < ApplicationRecord
       where(creator: user)
     else
       none
-    end
-  end
-
-  def autoban_reported_user
-    if SpamDetector.is_spammer?(reported_user)
-      SpamDetector.ban_spammer!(reported_user)
     end
   end
 

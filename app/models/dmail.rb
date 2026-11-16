@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Dmail < ApplicationRecord
-  attr_accessor :creator_ip_addr, :disable_email_notifications
+  attr_accessor :disable_email_notifications
 
   # defines :dtext_body
   dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emojis: 5, max_small_emojis: 100, max_video_size: 1.megabyte, sfw_only: true }
@@ -16,7 +16,6 @@ class Dmail < ApplicationRecord
   belongs_to :from, class_name: "User"
   has_many :moderation_reports, as: :model, dependent: :destroy
 
-  before_create :autoreport_spam
   after_destroy :update_unread_dmail_count
   after_save :update_unread_dmail_count
   after_commit :send_email, on: :create
@@ -167,13 +166,6 @@ class Dmail < ApplicationRecord
 
   def is_recipient?
     owner == to
-  end
-
-  def autoreport_spam
-    if is_recipient? && !is_sender? && SpamDetector.new(self, user_ip: creator_ip_addr).spam?
-      self.is_deleted = true
-      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
-    end
   end
 
   def update_unread_dmail_count

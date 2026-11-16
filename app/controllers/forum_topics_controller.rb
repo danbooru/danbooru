@@ -58,7 +58,6 @@ class ForumTopicsController < ApplicationController
       creator: CurrentUser.user,
       original_post_attributes: {
         creator: CurrentUser.user,
-        creator_ip_addr: request.remote_ip,
       },
     ))
     @forum_topic.save

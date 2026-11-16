@@ -820,14 +820,6 @@ module Danbooru
       "1x0000000000000000000000000000000AA" if Rails.env.development? # A dummy key that always passes
     end
 
-    # Akismet API key. Used for Dmail spam detection. http://akismet.com/signup/
-    def rakismet_key
-    end
-
-    def rakismet_url
-      Danbooru.config.canonical_url
-    end
-
     # API key for https://ipregistry.co. Used for looking up IP address
     # information and for detecting proxies during signup.
     def ip_registry_api_key
