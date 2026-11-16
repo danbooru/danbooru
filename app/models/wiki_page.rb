@@ -185,8 +185,10 @@ class WikiPage < ApplicationRecord
     other_names.map { |name| normalize_other_name(name) }.uniq.compact_blank
   end
 
+  # NFKC turns spacing accents like '´' into a space plus a combining accent, so keep those characters as they are.
   def self.normalize_other_name(name)
-    name.to_s.unicode_normalize(:nfkc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
+    name = name.to_s.gsub(/[^[:space:]]/) { |char| char.unicode_normalize(:nfkc).match?(/\A \p{M}/) ? char : char.unicode_normalize(:nfkc) }
+    name.unicode_normalize(:nfc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
   end
 
   # @param names [Array<String>] A list of other names.
