@@ -19,22 +19,7 @@ class MediaAssetsController < ApplicationController
       @visible_uma = @visible_uma.includes(upload: :uploader)
     end
 
-    if CurrentUser.is_superadmin? && request.format.symbol.in?(%i[jpeg webp avif])
-      width = params.fetch(:width, @media_asset.image_width).to_i
-      height = params.fetch(:height, @media_asset.image_height).to_i
-      quality = params.fetch(:quality, 85).to_i
-      original_file = @media_asset.variant(:original).open_file
-
-      if width != @media_asset.image_width || height != @media_asset.image_height || request.format != @media_asset.mime_type
-        media_file = original_file.preview!(width, height, format: request.format.symbol, quality: quality)
-      else
-        media_file = original_file
-      end
-
-      send_file(media_file.path, type: media_file.mime_type, disposition: "inline")
-    else
-      respond_with(@media_asset)
-    end
+    respond_with(@media_asset)
   end
 
   def destroy
