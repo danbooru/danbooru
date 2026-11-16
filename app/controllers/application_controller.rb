@@ -82,7 +82,7 @@ class ApplicationController < ActionController::Base
     if params[:only].present? && (request.format.json? || request.format.xml?)
       records = subject.is_a?(ActiveRecord::Relation) ? subject.load.to_a : Array.wrap(subject)
 
-      if records.all?(ApplicationRecord)
+      if records.present? && records.all?(ApplicationRecord)
         associations = ParameterBuilder.new(params[:only], model).includes_parameters
         ActiveRecord::Associations::Preloader.new(records: records, associations: associations).call
 

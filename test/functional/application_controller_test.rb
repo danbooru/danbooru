@@ -136,6 +136,11 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    should "not fail for the only param on pages without a model when there are no results" do
+      get autocomplete_index_path(search: { type: "tag_query", query: "zzzznonexistent" }, only: "id"), as: :json
+      assert_response :success
+    end
+
     should "return 422 for an oversized param on a GET request" do
       get posts_path(foo: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1)), as: :json
 
