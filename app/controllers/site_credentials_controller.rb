@@ -6,6 +6,7 @@ class SiteCredentialsController < ApplicationController
 
   def index
     @site_credentials = authorize SiteCredential.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @site_credentials = @site_credentials.includes(:creator) if request.format.html?
     respond_with(@site_credentials)
   end
 

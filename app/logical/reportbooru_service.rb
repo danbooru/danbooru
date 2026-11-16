@@ -55,7 +55,9 @@ class ReportbooruService
   def popular_posts(date, limit: 100)
     ranking = post_view_rankings(date)
     ranking = post_view_rankings(date.yesterday) if ranking.blank?
-    ranking.take(limit).map { |x| Post.find(x[0]) }
+    post_ids = ranking.take(limit).map { |x| x[0].to_i }
+    posts = Post.includes(:media_asset).where(id: post_ids).index_by(&:id)
+    post_ids.filter_map { posts[it] }
   end
 
   # Send a request to Reportbooru

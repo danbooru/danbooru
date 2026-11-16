@@ -7,6 +7,7 @@ class ApiKeysController < ApplicationController
   def index
     params[:search][:user_id] = params[:user_id] if params[:user_id].present?
     @api_keys = authorize ApiKey.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @api_keys = @api_keys.includes(:user) if request.format.html?
     respond_with(@api_keys)
   end
 

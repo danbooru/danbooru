@@ -9,7 +9,11 @@ class PostEventsController < ApplicationController
     end
 
     @post_events = authorize PostEvent.paginated_search(params, defaults: { post_id: @post&.id }, count_pages: @post.present?)
-    @post_events = @post_events.includes(:creator, :post, model: [:post, :media_asset, :old_media_asset]) if request.format.html?
+    if request.format.html?
+      @post_events = @post_events.includes(:creator, :post, model: [:post, :media_asset, :old_media_asset])
+    else
+      @post_events = @post_events.includes(model: :post)
+    end
 
     respond_with(@post_events)
   end

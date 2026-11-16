@@ -13,7 +13,7 @@
       <% end %>
 
       <% t.column "Tags", td: {class: "col-expand"} do |vote| %>
-        <%= render_inline_tag_list(vote.post) %>
+        <%= render_inline_tag_list(vote.post, tags_by_name: @tags_by_name) %>
       <% end %>
 
       <% t.column "Score" do |vote| %>

@@ -39,8 +39,8 @@ class ArtistVersion < ApplicationRecord
   end
 
   def current
-    @previous ||= ArtistVersion.where(artist_id: artist_id).order(created_at: :desc).limit(1).to_a
-    @previous.first
+    @current ||= ArtistVersion.where(artist_id: artist_id).order(created_at: :desc).limit(1).to_a
+    @current.first
   end
 
   def self.status_fields

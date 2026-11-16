@@ -193,7 +193,7 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def has_too_many_votes_to_edit?
-    (forum_post&.votes&.count.presence || 0) >= 5
+    (forum_post&.votes&.size.presence || 0) >= 5
   end
 
   def is_pending?

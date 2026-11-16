@@ -12,6 +12,25 @@ class TagTest < ActiveSupport::TestCase
     end
   end
 
+  context "Translating tags from other sites" do
+    setup do
+      create(:tag, name: "scenery", post_count: 1)
+      create(:tag, name: "test_paper", post_count: 1)
+      create(:tag, name: "foo", post_count: 1)
+      create(:tag, name: "empty", post_count: 0)
+      create(:tag, name: "deleted", post_count: 1)
+      create(:wiki_page, title: "scenery", other_names: ["風景"])
+      create(:wiki_page, title: "deleted", other_names: ["削除"], is_deleted: true)
+      create(:tag_alias, antecedent_name: "test", consequent_name: "test_paper")
+    end
+
+    should "translate tags by wiki other names, aliases and tag names" do
+      translated = Tag.translate(%w[風景 test FOO empty 削除 unknown _]).transform_values { it.map(&:name) }
+
+      assert_equal({ "風景" => %w[scenery], "test" => %w[test_paper], "FOO" => %w[foo], "empty" => [], "削除" => [], "unknown" => [], "_" => [] }, translated)
+    end
+  end
+
   context "A tag category mapping" do
     should "exist" do
       assert_nothing_raised { Tag.categories }

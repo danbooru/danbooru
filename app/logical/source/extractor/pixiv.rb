@@ -233,14 +233,13 @@ module Source
         })
       end
 
-      def translate_tag(tag)
-        translated_tags = super(tag)
+      # Translate tags like "伊19/陸奥" by their parts if the whole tag can't be translated.
+      def translate_tags(tags)
+        translated_tags = super(tags)
+        split_tags = translated_tags.select { |tag, translated| translated.empty? && tag.include?("/") }.keys
+        translated_parts = super(split_tags.flat_map { it.split("/") })
 
-        if translated_tags.empty? && tag.include?("/")
-          translated_tags = tag.split("/").flat_map { |translated_tag| super(translated_tag) }
-        end
-
-        translated_tags
+        translated_tags.merge(split_tags.index_with { |tag| tag.split("/").flat_map { translated_parts.fetch(it, []) } })
       end
 
       def is_ugoira?
