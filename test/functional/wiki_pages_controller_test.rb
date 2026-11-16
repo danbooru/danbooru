@@ -222,6 +222,22 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "for a nonexistent wiki page" do
+      should "return 404" do
+        get_auth edit_wiki_page_path("nonexistent"), @mod
+        assert_response 404
+
+        put_auth wiki_page_path("nonexistent"), @mod, params: { wiki_page: { body: "x" }}
+        assert_response 404
+
+        put_auth revert_wiki_page_path("nonexistent"), @mod, params: { version_id: 1 }
+        assert_response 404
+
+        delete_auth wiki_page_path("nonexistent"), create(:admin_user)
+        assert_response 404
+      end
+    end
+
     context "new action" do
       should "render" do
         get_auth new_wiki_page_path, @mod, params: { wiki_page: { title: "test" }}

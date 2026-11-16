@@ -38,7 +38,7 @@ class WikiPagesController < ApplicationController
   end
 
   def edit
-    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
+    @wiki_page = find_wiki_page
     authorize @wiki_page
     respond_with(@wiki_page)
   end
@@ -50,7 +50,7 @@ class WikiPagesController < ApplicationController
   end
 
   def update
-    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
+    @wiki_page = find_wiki_page
     @wiki_page.attributes = permitted_attributes(@wiki_page)
     authorize(@wiki_page).save
 
@@ -59,7 +59,7 @@ class WikiPagesController < ApplicationController
   end
 
   def destroy
-    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
+    @wiki_page = find_wiki_page
     authorize @wiki_page
 
     @wiki_page.update(is_deleted: true)
@@ -67,7 +67,7 @@ class WikiPagesController < ApplicationController
   end
 
   def revert
-    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
+    @wiki_page = find_wiki_page
     authorize @wiki_page
 
     @version = @wiki_page.versions.find(params[:version_id])
@@ -87,6 +87,11 @@ class WikiPagesController < ApplicationController
   end
 
   private
+
+  def find_wiki_page
+    wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
+    wiki_page or raise ActiveRecord::RecordNotFound
+  end
 
   def item_matches_params(wiki_page)
     if params[:search][:title_normalize]
