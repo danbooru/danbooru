@@ -15,6 +15,16 @@ class TagAliasTest < ActiveSupport::TestCase
       CurrentUser.user = nil
     end
 
+    context "searching by status" do
+      should "work for a list of statuses" do
+        @active = create(:tag_alias, status: "active")
+        @deleted = create(:tag_alias, status: "deleted")
+
+        assert_equal([@deleted.id, @active.id], TagAlias.search({ status: ["Active", "deleted"] }, User.anonymous).ids)
+        assert_equal([], TagAlias.search({ status: { x: "1" }}, User.anonymous).ids)
+      end
+    end
+
     context "on validation" do
       subject do
         create(:tag, name: "aaa")
