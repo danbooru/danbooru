@@ -41,7 +41,11 @@ class EmailAddressPolicy < ApplicationPolicy
 
   def send_confirmation?
     # XXX record is a user, not the email address.
-    record.id == user.id
+    record.id == user.id && record.email_address.present?
+  end
+
+  def rate_limit_for_send_confirmation(**_options)
+    { rate: 1.0 / 10.minutes, burst: 3 }
   end
 
   def rate_limit_for_update(**_options)

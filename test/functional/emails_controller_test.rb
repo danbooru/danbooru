@@ -601,6 +601,27 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to @user
           assert_enqueued_emails 1
         end
+
+        should "be rate limited" do
+          login_as(@user)
+          Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+
+          responses = 4.times.map do
+            post send_confirmation_user_email_path(@user)
+            response.status
+          end
+
+          assert_equal([302, 302, 302, 429], responses)
+          assert_enqueued_emails 3
+        end
+
+        should "not fail if the user doesn't have an email address" do
+          @user = create(:user)
+          post_auth send_confirmation_user_email_path(@user), @user
+
+          assert_response 403
+          assert_no_enqueued_emails
+        end
       end
 
       context "for an unauthorized user" do
