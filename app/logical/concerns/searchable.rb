@@ -6,6 +6,49 @@ module Searchable
   # Raised when a search param has an invalid value, e.g. `search[is_deleted]=abc` or `search[name][x]=1`.
   class SearchError < StandardError; end
 
+  # Helpers for English full-text searches (`websearch_to_tsquery`), used by `where_tsvector_matches`.
+  module FullTextSearch
+    # From Postgres's `tsearch_data/english.stop`. Recheck when upgrading Postgres to a new major version.
+    STOPWORDS = %w[
+      i me my myself we our ours ourselves you your yours yourself yourselves he him his himself she her hers herself
+      it its itself they them their theirs themselves what which who whom this that these those am is are was were be
+      been being have has had having do does did doing a an the and but if or because as until while of at by for with
+      about against between into through during before after above below to from up down in out on off over under
+      again further then once here there when where why how all any both each few more most other some such no nor not
+      only own same so than too very s t can will just don should now
+    ].to_set.freeze
+
+    # True if Postgres would remove every word, leaving an empty search that matches nothing.
+    #
+    # @example
+    #   stopwords_only?("don't") # => true
+    #   stopwords_only?("the 2") # => false
+    #
+    # @param query [String]
+    # @return [Boolean]
+    def self.stopwords_only?(query)
+      tokens = tokenize(query)
+      tokens.present? && tokens.all? { |token| stopword?(token) }
+    end
+
+    # Split on whitespace, apostrophes, and quotes only, so words with other characters never count as stopwords.
+    #
+    # @example
+    #   tokenize(%q{I don't "a-the" 3rd}) # => ["I", "don", "t", "a-the", "3rd"]
+    #
+    # @param query [String]
+    # @return [Array<String>]
+    def self.tokenize(query)
+      query.to_s.split(/['’"[:space:]]+/).compact_blank
+    end
+
+    # @param word [String]
+    # @return [Boolean]
+    def self.stopword?(word)
+      STOPWORDS.include?(word.downcase(:ascii))
+    end
+  end
+
   def negate_relation
     relation = unscoped
     relation = relation.from(all.from_clause.value) if all.from_clause.value.present?
@@ -223,6 +266,12 @@ module Searchable
   # https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-DOCUMENTS
   # https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
   def where_tsvector_matches(columns, query)
+    # Queries containing only stopwords (e.g. "don't" or "a") turn into an empty query that matches nothing, so do a
+    # substring search instead.
+    if FullTextSearch.stopwords_only?(query)
+      return Array.wrap(columns).map { |column| where_ilike(column, "*#{query.to_s.escape_wildcards}*") }.reduce(:or)
+    end
+
     Array.wrap(columns).map do |column|
       where("(#{to_tsvector("english", arel_table[column]).to_sql}) @@ websearch_to_tsquery('pg_catalog.english', :query)", query: query)
     end.reduce(:or)
