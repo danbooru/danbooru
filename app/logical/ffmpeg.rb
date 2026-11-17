@@ -15,14 +15,14 @@ class FFmpeg
   # The metadata that ffprobe prints, for `-show_entries`. Only the fields we use are printed, because tags and side data
   # can be any size.
   METADATA_FIELDS = {
-    format: %w[duration],
+    format: %w[duration start_time],
     format_tags: %w[major_brand],
     stream: %w[index codec_type codec_name profile width height pix_fmt bit_rate channel_layout],
-    packet: %w[stream_index codec_type size],
+    packet: %w[stream_index codec_type size pts_time duration_time],
     frame: %w[stream_index media_type width height sample_aspect_ratio best_effort_timestamp_time],
   }.map { |section, fields| "#{section}=#{fields.join(",")}" }.join(":")
 
-  # The most output ffprobe can print for a file's metadata. Each packet and its frame take about 350 bytes.
+  # The most output ffprobe can print for a file's metadata. Each packet and its frame take about 400 bytes.
   METADATA_OUTPUT_LIMIT = MAX_PACKET_COUNT * 1.kilobyte
 
   # The maximum width and height of video preview images. This is the size of the largest preview generated for videos.
@@ -133,16 +133,36 @@ class FFmpeg
     video_stream[:height]
   end
 
+  # The container duration can be changed to anything without changing the actual video, so a long video could claim to
+  # be short. If the file has a container duration, it's checked against where the packets end and the larger one is
+  # used. Files without a container duration are played to find out, as there's nothing to fake.
+  #
   # @see https://trac.ffmpeg.org/wiki/FFprobeTips#Duration
   # @return [Float, nil] The duration of the video or animation in seconds, or nil if unknown.
   def duration
-    container_duration || playback_duration
+    if container_duration.present?
+      [container_duration, packet_duration].compact.max
+    else
+      playback_duration
+    end
   end
 
   # @return [Float, nil] The duration of the video in seconds, according to the container metadata. May not match the
   #   true duration of the video in case the container metadata is wrong or the video is truncated.
   memoize def container_duration
     metadata.dig(:format, :duration).to_f if metadata.dig(:format, :duration).present?
+  end
+
+  # @return [Float, nil] The duration of the video in seconds, according to where the packets in the longest video
+  #   stream and the audio streams end. This only demuxes the file, nothing is decoded. Packets aren't in timestamp
+  #   order (B-frames, interleaved streams), so this is the latest packet end, not the last packet. Other video streams
+  #   are ignored because the static image in an animated AVIF is a stream with one packet lasting a default of one
+  #   second. Nil if no packets have timestamps.
+  memoize def packet_duration
+    longest_video_stream = video_streams.max_by { it[:packets].size }
+    timed_packets = [longest_video_stream, *audio_streams].compact.flat_map { it[:packets] }.select { it[:pts_time].present? }
+    ends = timed_packets.map { it[:pts_time].to_d + it[:duration_time].to_d }
+    (ends.max - metadata.dig(:format, :start_time).to_d).to_f if ends.present?
   end
 
   # @return [Float, nil] The true duration of the video in seconds, as determined by actually playing it.

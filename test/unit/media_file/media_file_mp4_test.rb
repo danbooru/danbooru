@@ -5,6 +5,7 @@ class MediaFileMp4Test < ActiveSupport::TestCase
     should "be generated properly" do
       should_generate_previews(
         "mp4",
+        "test/files/mp4/test-16x16-fake-duration.mp4" => [150, 150, "055cb014d1107a31e3f2778802033716"],
         "test/files/mp4/test-300x200-anamorphic.mp4" => [113, 150, "ac09a593a6dd27da474deb9e49779ab0"],
         "test/files/mp4/test-300x300-3gp5.mp4" => [150, 150, "162690cdec098d03df66d1586817e54d"],
         "test/files/mp4/test-300x300-av1.mp4" => [150, 150, "c4054e99b114759d1e4ef16d21676432"],
@@ -886,9 +887,9 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       assert_equal(false, file.is_corrupt?)
       assert_equal(false, file.is_supported?)
       assert_equal(true, file.is_animated?)
-      assert_equal(1.018, file.duration)
+      assert_equal(1.018667, file.duration)
       assert_equal(10, file.frame_count)
-      assert_equal(9.823182711198427, file.frame_rate)
+      assert_equal(9.816750714414033, file.frame_rate)
       assert_equal({
         "File:FileType" => "MP4",
         "QuickTime:MajorBrand" => "MP4 Base Media v1 [IS0 14496-12:2003]",
@@ -981,7 +982,7 @@ class MediaFileMp4Test < ActiveSupport::TestCase
         "FFmpeg:AudioPeakLoudness" => 0.13182567385564067,
         "FFmpeg:AudioAverageLoudness" => 0.019275249131909367,
         "FFmpeg:AudioLoudnessRange" => 0.0,
-        "FFmpeg:AudioSilencePercentage" => 0.7448015717092338,
+        "FFmpeg:AudioSilencePercentage" => 0.7443138925674435,
       }, file.metadata.to_h)
     end
   end
@@ -1115,9 +1116,9 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       assert_equal(false, file.is_corrupt?)
       assert_equal(true, file.is_supported?)
       assert_equal(true, file.is_animated?)
-      assert_equal(1.002, file.duration)
+      assert_equal(1.008979, file.duration)
       assert_equal(10, file.frame_count)
-      assert_equal(9.980039920159681, file.frame_rate)
+      assert_equal(9.911009049742363, file.frame_rate)
       assert_equal({
         "File:FileType" => "MP4",
         "QuickTime:MajorBrand" => "MP4 Base Media v1 [IS0 14496-12:2003]",
@@ -1211,7 +1212,7 @@ class MediaFileMp4Test < ActiveSupport::TestCase
         "FFmpeg:AudioPeakLoudness" => 0.12589254117941673,
         "FFmpeg:AudioAverageLoudness" => 0.018197008586099843,
         "FFmpeg:AudioLoudnessRange" => 0.0,
-        "FFmpeg:AudioSilencePercentage" => 0.7545329341317365,
+        "FFmpeg:AudioSilencePercentage" => 0.7493139103985316,
       }, file.metadata.to_h)
     end
   end
@@ -1839,9 +1840,9 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       assert_equal(false, file.is_corrupt?)
       assert_equal(true, file.is_supported?)
       assert_equal(true, file.is_animated?)
-      assert_equal(5.735011, file.duration)
+      assert_equal(5.735329, file.duration)
       assert_equal(10, file.frame_count)
-      assert_equal(1.7436758185816905, file.frame_rate)
+      assert_equal(1.7435791390520055, file.frame_rate)
       assert_equal({
         "File:FileType" => "MP4",
         "QuickTime:MajorBrand" => "MP4 Base Media v1 [IS0 14496-12:2003]",
@@ -1936,7 +1937,7 @@ class MediaFileMp4Test < ActiveSupport::TestCase
         "FFmpeg:AudioPeakLoudness" => 1.0e-50,
         "FFmpeg:AudioAverageLoudness" => 0.00031622776601683794,
         "FFmpeg:AudioLoudnessRange" => 0.0,
-        "FFmpeg:AudioSilencePercentage" => 1.0,
+        "FFmpeg:AudioSilencePercentage" => 0.9999445541833781,
       }, file.metadata.to_h)
     end
   end
@@ -2309,6 +2310,19 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       FFmpeg.expects(:shell!).never
 
       assert_match(/too many frames/, ffmpeg.metadata[:error])
+    end
+  end
+
+  context "an MP4 file with a fake duration in the container metadata" do
+    # A 141 second 16x16 H.264 video (`ffmpeg -f lavfi -i color=c=black:s=16x16:r=1 -t 141 -pix_fmt yuv420p -c:v libx264`)
+    # with the duration fields in the mvhd, tkhd, and mdhd boxes changed to 1 timescale unit.
+    should "read the real duration from the packets" do
+      file = MediaFile.open("test/files/mp4/test-16x16-fake-duration.mp4")
+
+      assert_operator(FFmpeg.new(file).container_duration, :<, 1.0)
+      assert_equal(141.0, file.duration)
+      assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_corrupt?)
     end
   end
 end
