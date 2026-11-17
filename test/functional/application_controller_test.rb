@@ -41,6 +41,12 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 422
     end
 
+    should "return 400 for a missing or invalid required param" do
+      get_auth new_forum_post_path(post_id: ["1"], format: :json), create(:user)
+      assert_response 400
+      assert_equal("param is missing or the value is empty or invalid: post_id", response.parsed_body["message"])
+    end
+
     should "return 400 for a page or limit param that isn't a string or integer" do
       get posts_path(limit: ["1"]), as: :json
       assert_response 400

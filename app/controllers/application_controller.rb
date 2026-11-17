@@ -161,7 +161,7 @@ class ApplicationController < ActionController::Base
         request.request_parameters = {}
         request.delete_header("action_dispatch.request.formats")
         render_error_page(400, exception, message: exception.message)
-      when ActionController::BadRequest
+      when ActionController::BadRequest, ActionController::ParameterMissing
         render_error_page(400, exception, message: exception.message)
       when RequestBodyNotAllowedError
         render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
