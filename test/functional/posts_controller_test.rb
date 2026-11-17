@@ -1503,6 +1503,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "copy_notes action" do
+      should "return 400 for an other_post_id param that isn't a string or integer" do
+        put_auth copy_notes_post_path(@src), @user, params: { other_post_id: [@dst.id] }, as: :json
+        assert_response 400
+      end
+
       setup do
         as(@user) do
           @src = create(:post, image_width: 100, image_height: 100, tag_string: "translated partially_translated", has_embedded_notes: true)

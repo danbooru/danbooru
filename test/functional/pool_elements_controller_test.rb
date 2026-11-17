@@ -12,6 +12,17 @@ class PoolElementsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return 400 for a post_id param that isn't a string or integer" do
+        post_auth pool_element_path, @user, params: { pool_id: @pool.id, post_id: [@post.id] }, as: :json
+        assert_response 400
+        assert_equal([], @pool.reload.post_ids)
+      end
+
+      should "return 400 for a pool_name param that isn't a string" do
+        post_auth pool_element_path, @user, params: { pool_name: [@pool.name], post_id: @post.id }, as: :json
+        assert_response 400
+      end
+
       should "add a post to a pool" do
         post_auth pool_element_path, @user, params: { pool_id: @pool.id, post_id: @post.id, format: "json" }
         assert_response :success
