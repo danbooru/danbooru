@@ -253,6 +253,23 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(0, @recipient.reload.unread_dmail_count)
         assert_equal(true, [@dmail1, @dmail2, @dmail3, @dmail4].map(&:reload).all?(&:is_read))
       end
+
+      should "not mark any dmails as read if updating the unread dmail count fails" do
+        login_as(@recipient)
+        User.any_instance.stubs(:with_lock).raises(ActiveRecord::Deadlocked)
+        post mark_all_as_read_dmails_path(format: :js)
+
+        assert_response 500
+        assert_equal(2, @recipient.dmails.active.unread.count)
+        assert_equal(2, @recipient.reload.unread_dmail_count)
+
+        User.any_instance.unstub(:with_lock)
+        post mark_all_as_read_dmails_path(format: :js)
+
+        assert_response :success
+        assert_equal(0, @recipient.dmails.active.unread.count)
+        assert_equal(0, @recipient.reload.unread_dmail_count)
+      end
     end
 
     context "when a user has unread dmails" do

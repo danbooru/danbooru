@@ -132,19 +132,15 @@ class Dmail < ApplicationRecord
   include FactoryMethods
   extend SearchMethods
 
-  # Mark the dmails as read in one query, then recount each owner's unread dmails once, instead of saving and recounting
-  # for every dmail.
-  def self.mark_all_as_read
-    dmail_ids, owner_ids = unread.pluck(:id, :owner_id).transpose
-    return none if dmail_ids.nil?
-
-    where(id: dmail_ids).update_all(is_read: true, updated_at: Time.zone.now)
-
-    User.where(id: owner_ids.uniq).find_each do |owner|
-      owner.with_lock { owner.update!(unread_dmail_count: owner.dmails.active.unread.count) }
+  # @param owner [User] The user whose dmails to mark as read.
+  # @return [ActiveRecord::Relation<Dmail>] The owner's dmails.
+  def self.mark_all_as_read(owner)
+    owner.with_lock do
+      owner.dmails.unread.update_all(is_read: true, updated_at: Time.zone.now)
+      owner.update!(unread_dmail_count: owner.dmails.active.unread.count)
     end
 
-    where(id: dmail_ids)
+    owner.dmails
   end
 
   def quoted_body

@@ -49,7 +49,7 @@ class DmailsController < ApplicationController
   end
 
   def mark_all_as_read
-    @dmails = authorize(CurrentUser.user.dmails).mark_all_as_read
+    @dmails = authorize(Dmail).mark_all_as_read(CurrentUser.user)
     respond_with(@dmails)
   end
 end
