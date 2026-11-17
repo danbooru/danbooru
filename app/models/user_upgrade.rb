@@ -10,7 +10,7 @@ class UserUpgrade < ApplicationRecord
     gold: 0,
     platinum: 10,
     gold_to_platinum: 20,
-  }, suffix: "upgrade"
+  }, suffix: "upgrade", validate: true
 
   enum :status, {
     pending: 0,
@@ -24,7 +24,10 @@ class UserUpgrade < ApplicationRecord
     authorize_net: 100,
     shopify: 200,
     upgrade_code: 300,
-  }
+  }, validate: true
+
+  # Upgrade codes are redeemed directly, so they can't be used to create pending upgrades that go through checkout.
+  validates :payment_processor, exclusion: { in: ["upgrade_code"], message: "can't be used to purchase an upgrade" }, if: :pending?
 
   scope :gifted, -> { where("recipient_id != purchaser_id") }
   scope :self_upgrade, -> { where("recipient_id = purchaser_id") }

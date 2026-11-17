@@ -248,115 +248,71 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User::Levels::GOLD, @user_upgrade.recipient.level)
       end
     end
+  end
 
-    context "create action" do
-      context "for a self upgrade" do
-        context "to Gold" do
-          should "create a pending upgrade" do
-            @user = create(:member_user)
+  context "The user upgrades controller new action" do
+    should "disable the purchase button when upgrades can't be purchased" do
+      Danbooru.config.stubs(:user_upgrades_enabled?).returns(true)
+      get_auth new_user_upgrade_path, create(:member_user)
 
-            post_auth user_upgrades_path(user_id: @user.id), @user, params: { upgrade_type: "gold" }, xhr: true
-            assert_response :success
+      assert_response :success
+      assert_select "form[action^='/user_upgrades'] button[disabled]", text: "Upgrade to Gold"
+      assert_select "form[action^='/user_upgrades'] button:not([disabled])", count: 0
+      assert_select "a[href='#{redeem_upgrade_codes_path}']"
+    end
+  end
 
-            @user_upgrade = @user.purchased_upgrades.last
-            assert_equal(@user, @user_upgrade.purchaser)
-            assert_equal(@user, @user_upgrade.recipient)
-            assert_equal("gold", @user_upgrade.upgrade_type)
-            assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.transaction_id)
-            assert_match(/redirectToCheckout/, response.body)
-          end
-        end
+  context "The user upgrades controller create action" do
+    setup do
+      @user = create(:member_user)
+    end
 
-        context "to Platinum" do
-          should "create a pending upgrade" do
-            @user = create(:member_user)
-
-            post_auth user_upgrades_path(user_id: @user.id), @user, params: { upgrade_type: "platinum" }, xhr: true
-            assert_response :success
-
-            @user_upgrade = @user.purchased_upgrades.last
-            assert_equal(@user, @user_upgrade.purchaser)
-            assert_equal(@user, @user_upgrade.recipient)
-            assert_equal("platinum", @user_upgrade.upgrade_type)
-            assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.transaction_id)
-            assert_match(/redirectToCheckout/, response.body)
-          end
-        end
-
-        context "from Gold to Platinum" do
-          should "create a pending upgrade" do
-            @user = create(:member_user)
-
-            post_auth user_upgrades_path(user_id: @user.id), @user, params: { upgrade_type: "gold_to_platinum" }, xhr: true
-            assert_response :success
-
-            @user_upgrade = @user.purchased_upgrades.last
-            assert_equal(@user, @user_upgrade.purchaser)
-            assert_equal(@user, @user_upgrade.recipient)
-            assert_equal("gold_to_platinum", @user_upgrade.upgrade_type)
-            assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.transaction_id)
-            assert_match(/redirectToCheckout/, response.body)
-          end
-        end
+    should "not allow anonymous users to create an upgrade" do
+      assert_no_difference("UserUpgrade.count") do
+        post user_upgrades_path(format: :json), params: { upgrade_type: "gold", payment_processor: "stripe" }
+        assert_response 403
       end
+    end
 
-      context "for a gifted upgrade" do
-        context "to Gold" do
-          should "create a pending upgrade" do
-            @recipient = create(:member_user)
-            @purchaser = create(:member_user)
+    should "not allow anonymous users to create a gifted upgrade" do
+      assert_no_difference("UserUpgrade.count") do
+        post user_upgrades_path(format: :json), params: { user_id: @user.id, upgrade_type: "gold", payment_processor: "stripe" }
+        assert_response 403
+      end
+    end
 
-            post_auth user_upgrades_path(user_id: @recipient.id), @purchaser, params: { upgrade_type: "gold" }, xhr: true
-            assert_response :success
+    should "not allow members to create an upgrade" do
+      assert_no_difference("UserUpgrade.count") do
+        post_auth user_upgrades_path(format: :json), @user, params: { upgrade_type: "gold", payment_processor: "stripe" }
+        assert_response 403
+      end
+    end
 
-            @user_upgrade = @purchaser.purchased_upgrades.last
-            assert_equal(@purchaser, @user_upgrade.purchaser)
-            assert_equal(@recipient, @user_upgrade.recipient)
-            assert_equal("gold", @user_upgrade.upgrade_type)
-            assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.transaction_id)
-            assert_match(/redirectToCheckout/, response.body)
-          end
-        end
+    should "not allow members to create a gifted upgrade" do
+      assert_no_difference("UserUpgrade.count") do
+        post_auth user_upgrades_path(format: :json), create(:member_user), params: { user_id: @user.id, upgrade_type: "gold", payment_processor: "stripe" }
+        assert_response 403
+      end
+    end
 
-        context "to Platinum" do
-          should "create a pending upgrade" do
-            @recipient = create(:member_user)
-            @purchaser = create(:member_user)
+    should "not allow Gold users to create an upgrade" do
+      assert_no_difference("UserUpgrade.count") do
+        post_auth user_upgrades_path(format: :json), create(:gold_user), params: { upgrade_type: "gold_to_platinum", payment_processor: "stripe" }
+        assert_response 403
+      end
+    end
 
-            post_auth user_upgrades_path(user_id: @recipient.id), @purchaser, params: { upgrade_type: "platinum" }, xhr: true
-            assert_response :success
+    should "not allow admins to create an upgrade" do
+      assert_no_difference("UserUpgrade.count") do
+        post_auth user_upgrades_path(format: :json), create(:admin_user), params: { user_id: @user.id, upgrade_type: "gold", payment_processor: "stripe" }
+        assert_response 403
+      end
+    end
 
-            @user_upgrade = @purchaser.purchased_upgrades.last
-            assert_equal(@purchaser, @user_upgrade.purchaser)
-            assert_equal(@recipient, @user_upgrade.recipient)
-            assert_equal("platinum", @user_upgrade.upgrade_type)
-            assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.transaction_id)
-            assert_match(/redirectToCheckout/, response.body)
-          end
-        end
-
-        context "from Gold to Platinum" do
-          should "create a pending upgrade" do
-            @recipient = create(:gold_user)
-            @purchaser = create(:member_user)
-
-            post_auth user_upgrades_path(user_id: @recipient.id), @purchaser, params: { upgrade_type: "gold_to_platinum" }, xhr: true
-            assert_response :success
-
-            @user_upgrade = @purchaser.purchased_upgrades.last
-            assert_equal(@purchaser, @user_upgrade.purchaser)
-            assert_equal(@recipient, @user_upgrade.recipient)
-            assert_equal("gold_to_platinum", @user_upgrade.upgrade_type)
-            assert_equal("pending", @user_upgrade.status)
-            assert_not_nil(@user_upgrade.transaction_id)
-            assert_match(/redirectToCheckout/, response.body)
-          end
-        end
+    should "not allow superadmins to create an upgrade" do
+      assert_no_difference("UserUpgrade.count") do
+        post_auth user_upgrades_path(format: :json), create(:superadmin_user), params: { user_id: @user.id, upgrade_type: "gold", payment_processor: "stripe" }
+        assert_response 403
       end
     end
   end

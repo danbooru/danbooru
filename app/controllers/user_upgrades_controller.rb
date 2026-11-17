@@ -23,10 +23,10 @@ class UserUpgradesController < ApplicationController
   end
 
   def create
-    @user_upgrade = authorize UserUpgrade.create(recipient: recipient, purchaser: CurrentUser.user, status: "pending", upgrade_type: params[:upgrade_type], payment_processor: params[:payment_processor])
+    @user_upgrade = authorize UserUpgrade.new(recipient: recipient, purchaser: CurrentUser.user, status: "pending", upgrade_type: params[:upgrade_type].to_s, payment_processor: params[:payment_processor].to_s)
     @country = params[:country] || "US"
     @allow_promotion_codes = params[:promo].to_s.truthy?
-    @checkout = @user_upgrade.create_checkout!(country: @country, allow_promotion_codes: @allow_promotion_codes)
+    @checkout = @user_upgrade.create_checkout!(country: @country, allow_promotion_codes: @allow_promotion_codes) if @user_upgrade.save
 
     respond_with(@user_upgrade)
   end

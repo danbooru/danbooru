@@ -2,11 +2,15 @@
 
 class UserUpgradePolicy < ApplicationPolicy
   def create?
-    !user.is_anonymous?
+    false
   end
 
   def new?
     true
+  end
+
+  def rate_limit_for_create(**_options)
+    { rate: 1.0 / 1.minute, burst: 10 }
   end
 
   def show?

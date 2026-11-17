@@ -189,6 +189,40 @@ class UserUpgradeTest < ActiveSupport::TestCase
       end
     end
 
+    context "validations" do
+      should "require a payment processor" do
+        user_upgrade = build(:user_upgrade, payment_processor: nil)
+
+        assert_equal(false, user_upgrade.valid?)
+        assert_equal(["Payment processor is not included in the list"], user_upgrade.errors.full_messages)
+      end
+
+      should "not allow an invalid payment processor" do
+        user_upgrade = build(:user_upgrade, payment_processor: "blah")
+
+        assert_equal(false, user_upgrade.valid?)
+        assert_equal(["Payment processor is not included in the list"], user_upgrade.errors.full_messages)
+      end
+
+      should "not allow an invalid upgrade type" do
+        user_upgrade = build(:user_upgrade, upgrade_type: "blah")
+
+        assert_equal(false, user_upgrade.valid?)
+        assert_equal(["Upgrade type is not included in the list"], user_upgrade.errors.full_messages)
+      end
+
+      should "not allow pending upgrades to be paid for with an upgrade code" do
+        user_upgrade = build(:user_upgrade, status: "pending", payment_processor: "upgrade_code")
+
+        assert_equal(false, user_upgrade.valid?)
+        assert_equal(["Payment processor can't be used to purchase an upgrade"], user_upgrade.errors.full_messages)
+      end
+
+      should "allow processing upgrades to be paid for with an upgrade code" do
+        assert_equal(true, build(:user_upgrade, status: "processing", payment_processor: "upgrade_code").valid?)
+      end
+    end
+
     context "the #refund! method" do
       should_eventually "refund a Gold upgrade" do
         @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
