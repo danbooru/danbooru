@@ -16,7 +16,7 @@
       <% end %>
     </section>
 
-    <%= render SimilarImagesComponent.new(matches: @matches, current_user: CurrentUser.user, low_similarity: search_params[:similarity]&.to_f, high_similarity: search_params[:high_similarity]&.to_f) %>
+    <%= render SimilarImagesComponent.new(matches: @matches, current_user: CurrentUser.user, low_similarity: @similarity, high_similarity: @high_similarity) %>
   </div>
 </div>
 
