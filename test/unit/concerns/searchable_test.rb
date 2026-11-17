@@ -224,6 +224,10 @@ class SearchableTest < ActiveSupport::TestCase
         assert_raises(Searchable::SearchError) { UserEvent.search({ ip_addr: ["1.1.1.1"] }, User.anonymous).load }
         assert_raises(Searchable::SearchError) { UserEvent.search({ metadata: "abc" }, User.anonymous).load }
         assert_raises(Searchable::SearchError) { UserEvent.search({ metadata: ["1", "2"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumPostVote.search({ forum_post: "abc" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumPostVote.search({ forum_post: ["1", "2"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ uploader: "abc" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ModerationReport.search({ Comment: "abc" }, User.anonymous).load }
       end
 
       should "return nothing for numbers too large for the column" do

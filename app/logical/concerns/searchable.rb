@@ -726,6 +726,7 @@ module Searchable
     def search_association_attribute(attr)
       association = relation.reflect_on_association(attr)
       relation = self.relation
+      raise SearchError, "#{attr} has an invalid value" if params[attr].present? && !parameter_hash?(params[attr])
 
       if association.polymorphic?
         return search_polymorphic_attribute(attr)
@@ -782,6 +783,8 @@ module Searchable
 
       relation = self.relation
       model_key = model_keys[0]
+      raise SearchError, "#{model_key} has an invalid value" if model_key && params[model_key].present? && !parameter_hash?(params[model_key])
+
       if model_keys.length == 1 && parameter_hash?(params[model_key])
         # Returning none here for the same reason specified above
         return none if params["#{attr}_type"].present? && params["#{attr}_type"] != model_key
