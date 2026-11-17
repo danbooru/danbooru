@@ -160,6 +160,16 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_select("#post_#{@post.id}")
         end
 
+        should "render a response for /posts/:id/similar" do
+          mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
+          Post.any_instance.stubs(:file).returns(File.open("test/files/jpg/test.jpg"))
+
+          get_auth post_similar_path(@post), @user
+
+          assert_response :success
+          assert_select("#post_#{@post.id}")
+        end
+
         should "ignore unknown search params" do
           mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
           Post.any_instance.stubs(:file).returns(File.open("test/files/jpg/test.jpg"))

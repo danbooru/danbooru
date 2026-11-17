@@ -204,7 +204,7 @@ Rails.application.routes.draw do
       get :show_seq
       put :mark_as_translated
     end
-    get :similar, to: "iqdb_queries#index"
+    get :similar, to: "iqdb_queries#show"
   end
   resources :post_appeals, except: [:destroy]
   resources :post_flags, except: [:destroy]
