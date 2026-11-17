@@ -69,6 +69,36 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_select ".edit_forum_post button[name=cancel]", text: "Cancel"
       end
 
+      should "not show the approve button to a moderator for a rejected BUR that requires an admin" do
+        create(:tag, name: "small_tag", post_count: 1)
+        create(:tag, name: "big_tag_a", post_count: 10_000)
+        create(:tag, name: "big_tag_b", post_count: 10_000)
+        pending_bur = create(:bulk_update_request, forum_topic: @forum_topic, script: "category small_tag -> artist")
+        rejected_bur = create(:bulk_update_request, forum_topic: @forum_topic, script: "alias big_tag_a -> big_tag_b")
+        rejected_bur.reject!
+
+        get_auth forum_topic_path(@forum_topic), @mod
+
+        assert_response :success
+        assert_select "#approve_bulk_update_request_link_#{pending_bur.id}", count: 1
+        assert_select "#approve_bulk_update_request_link_#{rejected_bur.id}", count: 0
+      end
+
+      should "show the approve button to a moderator for a rejected BUR they can approve" do
+        create(:tag, name: "small_tag_a", post_count: 1)
+        create(:tag, name: "small_tag_b", post_count: 1)
+        create(:tag, name: "big_tag", post_count: 10_000)
+        pending_bur = create(:bulk_update_request, forum_topic: @forum_topic, script: "category big_tag -> artist")
+        rejected_bur = create(:bulk_update_request, forum_topic: @forum_topic, script: "alias small_tag_a -> small_tag_b")
+        rejected_bur.reject!
+
+        get_auth forum_topic_path(@forum_topic), @mod
+
+        assert_response :success
+        assert_select "#approve_bulk_update_request_link_#{pending_bur.id}", count: 0
+        assert_select "#approve_bulk_update_request_link_#{rejected_bur.id}", count: 1
+      end
+
       should "record a topic visit for html requests" do
         get_auth forum_topic_path(@forum_topic), @user
         @user.reload

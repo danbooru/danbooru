@@ -13,7 +13,7 @@ class ForumPostComponent < ApplicationComponent
 
     dtext_references = DText.preprocess(forum_posts.map(&:body))
     original_forum_post_id = forum_topic.original_post&.id
-    bur_tags = Tag.where(name: forum_posts.filter_map(&:bulk_update_request).select(&:is_pending?).flat_map(&:tags)).to_a
+    bur_tags = Tag.where(name: forum_posts.filter_map(&:bulk_update_request).flat_map(&:tags)).to_a
 
     super(forum_posts, dtext_references: dtext_references, original_forum_post_id: original_forum_post_id, bur_tags: bur_tags, current_user: current_user)
   end
