@@ -188,18 +188,9 @@ Common commands used during day-to-day development:
 | `npm update <package>` | Update an npm package. |
 | `bin/build-docker-image` | Rebuild the Docker image. |
 
-## Commit Messages
+## Contributing
 
-Commit messages should use the following format:
-
-- `<topic>: <short description>`
-- `Fix #<issue number>: <issue title>` (if the commit fixes an issue)
-
-The commit body should explain things in more detail. Provide enough context so that someone looking at the code years from now can understand why the change was made.
-
-## Pull Requests
-
-Pull requests should include tests when possible. For bug fixes, a test should be added that reproduces the bug and that shows the bug is fixed.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to report issues, submit pull requests, and write commit messages, and for a list of common mistakes to avoid.
 
 ## External links
 

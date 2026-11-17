@@ -11,19 +11,19 @@ This file provides guidance for coding agents working in this repository. It's m
 
 ## Development Guidelines
 
+- Read `CONTRIBUTING.md` before making changes. It lists common mistakes to avoid. (Claude Code loads it automatically through the import at the end of this file.)
 - Use test-driven (red/green) development. Write tests first, then write code to make the tests pass.
 - Always write tests to reproduce a bug before attempting to fix it.
 - Always write tests specifying how new features should work before implementing the feature.
 - When running tests, send their output to a temp file so that they can be reviewed on demand. Do not pipe them directly through grep or rg.
   Do not remove them immediately after reading in the same command: that defeats the purpose of saving the output.
-- Always adversarially analyze your changes: consider every line of code potentially abusable by a bad actor, and design with security in mind.
-  See `.github/skills/security-audit/references/vulnerability-patterns.md` for bugs to avoid and be mindful of.
+- Always adversarially analyze your changes: consider every line of code potentially abusable by a bad actor, and design with security in mind. See the "Security" section of `CONTRIBUTING.md` for bugs to avoid.
 - Lint files after you're done editing them. Fix any lint errors introduced by your changes, but not any lint errors that were already present.
 
 ## General Guidelines
 
 - Do not run destructive git commands (for example: `git reset --hard`, `git checkout --`, `git clean`, etc) unless explicitly requested.
-- Do not run `git commit` or `git push` unless explicitly requested.
+- Do not run `git push` unless explicitly requested.
 - Use Ruby scripts instead of Python or Bash when possible. Ruby is the language used by this codebase.
 - Prefer `rg` over `grep`. `rg` is faster.
 - Do not try to run `rm` with insecure variables or paths: it'll be blocked by the command evaluator.
@@ -32,18 +32,7 @@ This file provides guidance for coding agents working in this repository. It's m
 - Don't remove tests if the test is failing and you can't fix it.
 - Place temporary files in `/tmp`. Delete them when you're done.
 - See `docs/` or look for `README.md` files in each folder if you need more information.
-- Propose updates to AGENTS.md, skills, or other documentation if you think it would be helpful for future agents.
-
-## Code Style
-
-- Don't keep old code around as a fallback path. If the old code is wrong, just fix it instead of leaving it in place.
-- Don't introduce unnecessary abstractions, indirections, or helper methods. Don't add methods only used in one place.
-- Avoid loops and mutation. Prefer functional transformations and immutable data instead.
-- Don't add pointless or overly verbose comments. Keep them brief and use plain, simple english.
-
-## Extractors
-- For extractor tests, always generate full test cases with `.test_case`, don't add half-finished tests.
-- If a new site is missing its logo, add it.
+- Propose updates to AGENTS.md, CONTRIBUTING.md, skills, or other documentation if you think it would be helpful for future agents.
 
 ## Commands
 
@@ -59,3 +48,7 @@ This file provides guidance for coding agents working in this repository. It's m
 | `bin/dev exec <container> <CMD>` | Run a command in a specific container. |
 | `bin/rdbg -A danbooru 12345` | Attach debugger to Rails server running in `danbooru` container on port 12345. |
 | `bin/rbtrace --firehose --exec <CMD>` | Trace execution of a Ruby process (see `bin/rbtrace --help` for more options). |
+
+## Contributing guidelines
+
+@CONTRIBUTING.md

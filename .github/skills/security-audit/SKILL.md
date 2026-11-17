@@ -23,13 +23,15 @@ Review every commit since the last deploy for vulnerabilities, using the bugs we
    - Skip merge commits and test-only or docs-only commits, but list what you skipped.
    - Don't read dependency bumps (`chore(deps)`) in full, but check them for known vulnerabilities instead of skipping
      them silently: `npm audit` for JS, and the changelog or `bundle-audit` for gems.
-   - Don't skip CI, Dockerfile, or build changes. See "Build and CI" in the patterns reference.
+   - Don't skip CI, Dockerfile, or build changes. See "Build and CI" in the Security section of CONTRIBUTING.md.
 3. For each remaining commit, read the full message and diff (`git show <sha>`), then read the surrounding code it touches.
    A diff alone isn't enough: check the callers, the policy, the controller, and the view that use the changed code.
    See `app/controllers/README.md` for how authorization, `permitted_attributes`, and `api_attributes` fit together.
-4. Check each commit against [references/vulnerability-patterns.md](references/vulnerability-patterns.md).
+4. Check each commit against the "Security" section of [CONTRIBUTING.md](../../../CONTRIBUTING.md#security).
    Also look for anything else that looks dangerous; the list isn't exhaustive.
    If the list is missing attack categories, be proactive and suggest an update.
+   If available, run `brakeman` and a secret scanner (`gitleaks`) on the range. Neither is in the Gemfile, so install
+   them separately (`gem install brakeman`) or skip them and say so.
 5. Then think like an attacker, past the known patterns. For each commit, ask:
    - Abuse: what's the worst a user at each level (anonymous, member, builder, mod) can do with this? Changes that give
      trusted roles more power count too.
@@ -37,7 +39,7 @@ Review every commit since the last deploy for vulnerabilities, using the bugs we
      the state a permission check relied on?
    - Races: can two concurrent requests both pass a check-then-act (double approve, double vote, double use)?
    - Caching: can a response that depends on the current user be cached publicly or under a key shared between users?
-   See the matching sections in the patterns reference.
+   See the matching sections in the Security section of CONTRIBUTING.md.
 6. Verify every suspected issue before reporting it.
    - Write a failing test (functional test for controllers/API, unit test for models) or reproduce it in `bin/rails runner`.
    - Don't fix anything unless the user asks. Delete throwaway tests afterwards unless the user wants to keep them.
@@ -75,7 +77,7 @@ Stop and ask the user before continuing if:
 ## Completion checks
 
 - Every non-skipped commit in the range was read in full, along with the code around it.
-- Each commit was checked against every category in the patterns reference.
+- Each commit was checked against every category in the Security section of CONTRIBUTING.md.
 - Each commit was checked for abuse, multi-step bypasses, races, and caching (step 5).
 - Each reported finding was reproduced, or clearly marked as unconfirmed.
 - Temporary files and throwaway tests were deleted.
