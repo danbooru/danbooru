@@ -3,6 +3,14 @@ require "test_helper"
 class UserEventsControllerTest < ActionDispatch::IntegrationTest
   context "The user events controller" do
     context "index action" do
+      should "return 400 for a user_id param that isn't a string or integer" do
+        get_auth user_events_path(user_id: [@user.id]), @mod
+        assert_response 400
+
+        get_auth user_events_path(user_id: { a: 1 }), @mod, as: :json
+        assert_response 400
+      end
+
       setup do
         @user = create(:user)
         create(:user_event, user: @user, category: :login)

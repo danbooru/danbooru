@@ -16,7 +16,7 @@ class ForumPostVotesController < ApplicationController
   end
 
   def create
-    @forum_post = ForumPost.find(params[:forum_post_id])
+    @forum_post = ForumPost.find(params.expect(:forum_post_id))
     @forum_post_vote = authorize ForumPostVote.new(creator: CurrentUser.user, forum_post: @forum_post, **permitted_attributes(ForumPostVote))
     @forum_post_vote.save
     respond_with(@forum_post_vote)

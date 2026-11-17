@@ -9,6 +9,12 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return 400 for a post_id param that isn't a string or integer" do
+        post_auth post_regenerations_path, @mod, params: { post_id: [@post.id], category: "iqdb" }, as: :json
+        assert_response 400
+        assert_no_enqueued_jobs(only: RegeneratePostJob)
+      end
+
       should "render" do
         post_auth post_regenerations_path, @mod, params: { post_id: @post.id, category: "iqdb" }
 

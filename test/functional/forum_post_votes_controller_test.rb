@@ -84,6 +84,12 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return 400 for a forum_post_id param that isn't a string or integer" do
+        post_auth forum_post_votes_path, @user, params: { forum_post_id: [@forum_post.id], forum_post_vote: { score: 1 }}, as: :json
+        assert_response 400
+        assert_equal(0, @forum_post.votes.count)
+      end
+
       should "work for a JSON response" do
         post_auth forum_post_votes_path, @user, params: { forum_post_id: @forum_post.id, forum_post_vote: { score: 1 }}, as: :json
 

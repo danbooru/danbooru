@@ -78,7 +78,7 @@ class CommentsController < ApplicationController
   private
 
   def index_for_post
-    @post = Post.find(params[:post_id])
+    @post = Post.find(params.expect(:post_id))
     @comments = authorize @post.comments
     render action: "index_for_post"
   end
