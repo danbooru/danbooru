@@ -151,7 +151,14 @@ class ApplicationController < ActionController::Base
         rescue_exception(exception.cause)
       when ActiveRecord::QueryCanceled
         render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
-      when ActionController::BadRequest, ActionDispatch::Http::Parameters::ParseError
+      when ActionDispatch::Http::Parameters::ParseError
+        # Discard the unparseable request body, otherwise rendering the error page raises the same error again when it
+        # reads the params. Also clear the cached format, which may have fallen back to the Accept header because the
+        # params couldn't be read.
+        request.request_parameters = {}
+        request.delete_header("action_dispatch.request.formats")
+        render_error_page(400, exception, message: exception.message)
+      when ActionController::BadRequest
         render_error_page(400, exception, message: exception.message)
       when RequestBodyNotAllowedError
         render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")

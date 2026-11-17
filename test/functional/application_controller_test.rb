@@ -53,6 +53,36 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_redirected_to wiki_page_path(WikiPage.last)
     end
 
+    context "on a request with an unparseable JSON body" do
+      setup do
+        @user = create(:user)
+        @api_key = create(:api_key, user: @user)
+        @headers = { HTTP_AUTHORIZATION: "Basic #{::Base64.strict_encode64("#{@user.name}:#{@api_key.key}")}" }
+        @env = { "CONTENT_TYPE" => "application/json", "HTTP_ACCEPT" => "*/*" }
+      end
+
+      should "return 400 Bad Request in JSON for a .json URL" do
+        post posts_path(format: :json), params: "tags=touhou&_method=get", headers: @headers, env: @env
+
+        assert_response 400
+        assert_equal("ActionDispatch::Http::Parameters::ParseError", response.parsed_body["error"])
+      end
+
+      should "return 400 Bad Request in JSON for a .json URL for an anonymous user" do
+        post posts_path(format: :json), params: "tags=touhou&_method=get", env: @env
+
+        assert_response 400
+        assert_equal("ActionDispatch::Http::Parameters::ParseError", response.parsed_body["error"])
+      end
+
+      should "return 400 Bad Request in HTML for an HTML URL" do
+        post posts_path, params: "tags=touhou&_method=get", headers: @headers, env: @env
+
+        assert_response 400
+        assert_match(/Error occurred while parsing request parameters/, response.body)
+      end
+    end
+
     should "return 404 Not Found for an unsupported method on the root path" do
       post root_path
       assert_response 404
