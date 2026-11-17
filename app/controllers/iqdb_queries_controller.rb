@@ -15,6 +15,11 @@ class IqdbQueriesController < ApplicationController
     @high_similarity = Float(search_params[:high_similarity], exception: false)
 
     iqdb_params = search_params.to_h.symbolize_keys.slice(:post_id, :media_asset_id, :file, :hash, :url, :image_url, :file_url, :limit)
+    iqdb_params.except(:file).each do |name, value|
+      raise ActionController::BadRequest, "#{name} has an invalid value" unless value.nil? || value.is_a?(String) || value.is_a?(Integer)
+    end
+    raise ActionController::BadRequest, "limit must be a number" if iqdb_params[:limit].present? && Integer(iqdb_params[:limit], exception: false).nil?
+
     @matches = authorize(IqdbClient.new).search(**iqdb_params)
     @matches = @matches.select { |match| match["score"] >= @similarity } if @similarity
 

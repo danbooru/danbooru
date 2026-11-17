@@ -71,6 +71,27 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         assert_equal([@post.id], response.parsed_body.pluck("post_id"))
       end
 
+      should "return 400 for search params that aren't strings or integers" do
+        get_auth iqdb_queries_path, @user, params: { search: { post_id: [@post.id] }}, as: :json
+        assert_response 400
+        assert_equal("post_id has an invalid value", response.parsed_body["message"])
+
+        get_auth iqdb_queries_path, @user, params: { search: { post_id: @post.id, limit: ["1"] }}, as: :json
+        assert_response 400
+
+        get_auth iqdb_queries_path, @user, params: { search: { url: { a: 1 }}}, as: :json
+        assert_response 400
+
+        post_auth iqdb_queries_path, @user, params: { search: { post_id: true }}, headers: { "X-Http-Method-Override": "GET" }, as: :json
+        assert_response 400
+      end
+
+      should "return 400 for a limit param that isn't a number" do
+        get_auth iqdb_queries_path, @user, params: { search: { post_id: @post.id, limit: "abc" }}, as: :json
+        assert_response 400
+        assert_equal("limit must be a number", response.parsed_body["message"])
+      end
+
       should "return 400 for a similarity param that isn't a number" do
         get_auth iqdb_queries_path, @user, params: { post_id: @post.id, similarity: "abc" }, as: :json
         assert_response 400
