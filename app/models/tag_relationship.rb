@@ -100,8 +100,10 @@ class TagRelationship < ApplicationRecord
         q = q.status_matches(params[:status])
       end
 
-      if params[:category].present?
-        q = q.joins(:consequent_tag).where("tags.category": params[:category].split)
+      parsed = parse_search_params!(params, category: [:integer])
+
+      if parsed[:category]
+        q = q.joins(:consequent_tag).where("tags.category": parsed[:category])
       end
 
       case params[:order].to_s.downcase

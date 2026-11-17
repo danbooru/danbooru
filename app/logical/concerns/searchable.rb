@@ -313,6 +313,41 @@ module Searchable
     SearchContext.new(all, params, current_user).search_attributes(policy(current_user).search_modes)
   end
 
+  # Parse search params that aren't handled by `search_attributes`, like `search[min_level]=20`.
+  #
+  # @param params [Hash] The search params.
+  # @param types [Hash{Symbol => Symbol, Array<Symbol>}] The type of each param: `:string`, `:integer`, or a list like
+  #   `[:integer]`, which can be an array (`search[category][]=1`) or a space-separated string (`search[category]=1 4`).
+  # @return [Hash{Symbol => Object}] The parsed value of each param, or nil if the param is missing or blank. Integers are
+  #   clamped to the 64-bit range, so that numbers that are too large match nothing instead of raising a database error.
+  # @raise [SearchError] If a param doesn't have the right type, like `search[min_level][]=20` or `search[min_level]=abc`.
+  def parse_search_params!(params, **types)
+    parse = lambda do |value, type|
+      case [type, value]
+      in [:string, String | Integer] then value.to_s
+      in [:integer, Integer] then value.clamp(-(2**63), (2**63) - 1)
+      in [:integer, String] then Integer(value, 10, exception: false)&.clamp(-(2**63), (2**63) - 1)
+      else nil
+      end
+    end
+
+    types.to_h do |name, type|
+      value = params[name]
+      next [name, nil] if value.blank?
+
+      if type.is_a?(Array)
+        items = value.is_a?(String) ? value.split : Array.wrap(value)
+        parsed = items.map { |item| parse[item, type.first] }
+        raise SearchError, "#{name} must be a list of #{type.first}s" if parsed.any?(nil)
+      else
+        parsed = parse[value, type]
+        raise SearchError, "#{name} must be #{(type == :integer) ? "an integer" : "a string"}" if parsed.nil?
+      end
+
+      [name, parsed]
+    end
+  end
+
   # Order according to the list of IDs in the given string.
   #
   # Post.order_custom("1,2,3") => [post #1, post #2, post #3]

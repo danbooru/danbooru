@@ -7,6 +7,22 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      should "return 422 for a post_id param that isn't a string or integer" do
+        get pool_versions_path, params: { search: { post_id: ["1"] }}, as: :json
+        assert_response 422
+        assert_equal("post_id must be an integer", response.parsed_body["message"])
+      end
+
+      should "return nothing for post IDs that are too large" do
+        get pool_versions_path, params: { search: { post_id: "2147483648" }}, as: :json
+        assert_response :success
+        assert_equal([], response.parsed_body)
+
+        get pool_versions_path, params: { search: { post_id: "99999999999999999999" }}, as: :json
+        assert_response :success
+        assert_equal([], response.parsed_body)
+      end
+
       setup do
         @pool = as(@user) { create(:pool) }
         @user2 = create(:user)

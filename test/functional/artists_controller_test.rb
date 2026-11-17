@@ -161,6 +161,15 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      should "return 422 for name params that aren't strings" do
+        get artists_path, params: { search: { any_name_matches: ["a"] }}, as: :json
+        assert_response 422
+        assert_equal("any_name_matches must be a string", response.parsed_body["message"])
+
+        get artists_path, params: { search: { any_name_or_url_matches: ["a"] }}, as: :json
+        assert_response 422
+      end
+
       should "render" do
         get artists_path
         assert_response :success
