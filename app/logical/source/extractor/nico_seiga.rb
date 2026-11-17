@@ -118,13 +118,7 @@ module Source
       end
 
       def http
-        http = super
-
-        if parsed_url.oekaki_id.present?
-          http = super.with_legacy_ssl
-        end
-
-        http.cookies(
+        super.cookies(
           skip_fetish_warning: "1",
           user_session: credentials[:user_session],
         ).headers(
