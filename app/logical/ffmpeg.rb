@@ -133,13 +133,18 @@ class FFmpeg
     video_stream[:height]
   end
 
-  # The duration is the larger of the container duration and the packet duration, because the container duration can be
-  # changed to anything without changing the actual video, so a long video could claim to be short.
+  # The container duration can be changed to anything without changing the actual video, so a long video could claim to
+  # be short. If the file has a container duration, it's checked against where the packets end and the larger one is
+  # used. Files without a container duration are played to find out, as there's nothing to fake.
   #
   # @see https://trac.ffmpeg.org/wiki/FFprobeTips#Duration
   # @return [Float, nil] The duration of the video or animation in seconds, or nil if unknown.
   def duration
-    [container_duration, packet_duration].compact.max || playback_duration
+    if container_duration.present?
+      [container_duration, packet_duration].compact.max
+    else
+      playback_duration
+    end
   end
 
   # @return [Float, nil] The duration of the video in seconds, according to the container metadata. May not match the

@@ -228,9 +228,9 @@ class MediaFileApngTest < ActiveSupport::TestCase
       assert_equal(true, file.is_corrupt?)
       assert_equal(true, file.is_supported?)
       assert_equal(true, file.is_animated?)
-      assert_equal(1.0, file.duration)
+      assert_nil(file.duration)
       assert_equal(3, file.frame_count)
-      assert_equal(3.0, file.frame_rate)
+      assert_nil(file.frame_rate)
       assert_equal({
         "File:FileType" => "APNG",
         "PNG:ImageWidth" => 150,
@@ -392,9 +392,9 @@ class MediaFileApngTest < ActiveSupport::TestCase
       assert_equal(false, file.is_corrupt?)
       assert_equal(true, file.is_supported?)
       assert_equal(true, file.is_animated?)
-      assert_equal(0.9, file.duration)
+      assert_equal(0.902256, file.duration)
       assert_equal(10, file.frame_count)
-      assert_equal(11.11111111111111, file.frame_rate)
+      assert_equal(11.083328900001774, file.frame_rate)
       assert_equal({
         "File:FileType" => "APNG",
         "PNG:ImageWidth" => 720,
