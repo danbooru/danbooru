@@ -44,6 +44,24 @@ module Danbooru
       SecureRandom.uuid
     end
 
+    # Secret keys used to encrypt sensitive database columns with Active Record encryption.
+    #
+    # If these keys are changed or lost, encrypted data in the database will become permanently unreadable.
+    #
+    # If these are not specified, then reading or writing encrypted data will raise an error.
+    #
+    # Use `bin/rails db:encryption:init` to generate the keys.
+    #
+    # @see https://guides.rubyonrails.org/active_record_encryption.html
+    def active_record_encryption_primary_key
+    end
+
+    def active_record_encryption_deterministic_key
+    end
+
+    def active_record_encryption_key_derivation_salt
+    end
+
     # The name of this Danbooru.
     def app_name
       if CurrentUser.safe_mode?

@@ -50,6 +50,9 @@ x-base-env: &base-env
   # This is insecure because it lets anyone login to your development instance. This is okay
   # because giving others access is insecure anyway.
   DANBOORU_SECRET_KEY_BASE: "insecure"
+  DANBOORU_ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: "insecure-primary-key"
+  DANBOORU_ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: "insecure-deterministic-key"
+  DANBOORU_ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: "insecure-key-derivation-salt"
 
   RAILS_ENV: ${RAILS_ENV:-development}
   DATABASE_URL: postgresql://postgres?pool=100
