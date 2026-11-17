@@ -7,6 +7,22 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      should "search by a list of categories" do
+        get tag_aliases_path, params: { search: { category: [Tag.categories.artist.to_s, Tag.categories.general.to_s] }}, as: :json
+        assert_response :success
+        assert_includes(response.parsed_body.pluck("id"), @tag_alias.id)
+
+        get tag_aliases_path, params: { search: { category: [Tag.categories.artist.to_s] }}, as: :json
+        assert_response :success
+        assert_not_includes(response.parsed_body.pluck("id"), @tag_alias.id)
+      end
+
+      should "return 422 for a category param that's a hash" do
+        get tag_aliases_path, params: { search: { category: { a: "1" }}}, as: :json
+        assert_response 422
+        assert_equal("category must be a list of integers", response.parsed_body["message"])
+      end
+
       setup do
         @user = create(:builder_user)
         as(@user) do

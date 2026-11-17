@@ -52,16 +52,18 @@ class PostVersion < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, current_user: current_user)
 
-      if params[:changed_tags]
-        q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
+      parsed = parse_search_params!(params, changed_tags: :string, all_changed_tags: :string, any_changed_tags: :string)
+
+      if parsed[:changed_tags]
+        q = q.changed_tags_include_all(parsed[:changed_tags].scan(/[^[:space:]]+/))
       end
 
-      if params[:all_changed_tags]
-        q = q.changed_tags_include_all(params[:all_changed_tags].scan(/[^[:space:]]+/))
+      if parsed[:all_changed_tags]
+        q = q.changed_tags_include_all(parsed[:all_changed_tags].scan(/[^[:space:]]+/))
       end
 
-      if params[:any_changed_tags]
-        q = q.changed_tags_include_any(params[:any_changed_tags].scan(/[^[:space:]]+/))
+      if parsed[:any_changed_tags]
+        q = q.changed_tags_include_any(parsed[:any_changed_tags].scan(/[^[:space:]]+/))
       end
 
       if params[:tag_matches]

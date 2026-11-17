@@ -14,6 +14,18 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
 
   context "The post versions controller" do
     context "index action" do
+      should "return 422 for tag change params that aren't strings" do
+        get_auth post_versions_path, @user, params: { search: { changed_tags: ["tagme"] }}, as: :json
+        assert_response 422
+        assert_equal("changed_tags must be a string", response.parsed_body["message"])
+
+        get_auth post_versions_path, @user, params: { search: { all_changed_tags: ["tagme"] }}, as: :json
+        assert_response 422
+
+        get_auth post_versions_path, @user, params: { search: { any_changed_tags: { a: "tagme" }}}, as: :json
+        assert_response 422
+      end
+
       should "list all versions" do
         get_auth post_versions_path, @user
         assert_response :success

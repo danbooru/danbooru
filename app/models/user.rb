@@ -900,12 +900,14 @@ class User < ApplicationRecord
         q = q.name_or_past_name_matches(params[:name_or_past_name_matches], current_user:)
       end
 
-      if params[:min_level].present?
-        q = q.where(level: params[:min_level].to_i..)
+      parsed = parse_search_params!(params, min_level: :integer, max_level: :integer)
+
+      if parsed[:min_level]
+        q = q.where(level: parsed[:min_level]..)
       end
 
-      if params[:max_level].present?
-        q = q.where(level: ..params[:max_level].to_i)
+      if parsed[:max_level]
+        q = q.where(level: ..parsed[:max_level])
       end
 
       if params[:is_banned].present?

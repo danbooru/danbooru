@@ -7,6 +7,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      should "return 422 for level params that aren't strings or integers" do
+        get users_path, params: { search: { min_level: ["1"] }}, as: :json
+        assert_response 422
+        assert_equal("min_level must be an integer", response.parsed_body["message"])
+
+        get users_path, params: { search: { max_level: { a: "1" }}}, as: :json
+        assert_response 422
+      end
+
       setup do
         @mod_user = create(:moderator_user)
         @other_user = create(:contributor_user, inviter: @mod_user, created_at: 2.weeks.ago)
