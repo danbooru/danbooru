@@ -1,4 +1,5 @@
 require "test_helper"
+require "zip"
 
 class DanbooruArchiveTest < ActiveSupport::TestCase
   context "Danbooru::Archive" do
@@ -23,34 +24,13 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
     end
 
-    context ".open method" do
-      should "work without a block" do
-        archive = Danbooru::Archive.open("test/files/ugoira/ugoira.zip")
-        assert_equal(5, archive.entries.count)
-      end
-
-      should "work with a block" do
-        Danbooru::Archive.open("test/files/ugoira/ugoira.zip") do |archive|
-          assert_equal(5, archive.entries.count)
-        end
-      end
-
-      should "return nil if the block raises an error" do
-        assert_nil(Danbooru::Archive.open("test/files/ugoira/ugoira.zip") { raise "failed" })
-      end
-
-      should "return nil if the file doesn't exist" do
-        assert_nil(Danbooru::Archive.open("test/files/does_not_exist.zip"))
-      end
-    end
-
     context ".extract! method" do
       should "extract to temp directory if not given a block or directory" do
         dir, filenames = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip")
 
         assert_equal(true, File.directory?(dir))
         assert_equal(5, filenames.size)
-        filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+        filenames.each_key { |filename| assert_equal(true, File.exist?(filename)) }
       ensure
         FileUtils.rm_rf(dir)
       end
@@ -60,7 +40,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
           @tmpdir = dir
           assert_equal(true, File.directory?(dir))
           assert_equal(5, filenames.size)
-          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+          filenames.each_key { |filename| assert_equal(true, File.exist?(filename)) }
         end
 
         assert_equal(true, @tmpdir.present?)
@@ -72,6 +52,18 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         Dir.stubs(:mktmpdir).returns(tmpdir)
 
         assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!("test/files/archive/long-path.tar.gz") }
+        assert_equal(false, File.exist?(tmpdir))
+      ensure
+        FileUtils.rm_rf(tmpdir)
+      end
+
+      should "delete the temp directory if extracting is interrupted by a request timeout" do
+        tmpdir = Dir.mktmpdir
+        Dir.stubs(:mktmpdir).returns(tmpdir)
+        Danbooru::Archive.any_instance.stubs(:extract_to!).raises(Rack::Timeout::RequestTimeoutException.new({}))
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
+
+        assert_raises(Rack::Timeout::RequestTimeoutException) { archive.extract! }
         assert_equal(false, File.exist?(tmpdir))
       ensure
         FileUtils.rm_rf(tmpdir)
@@ -89,35 +81,58 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
           dir, filenames = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip", tmpdir)
           assert_equal(dir, tmpdir)
           assert_equal(5, filenames.size)
-          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+          filenames.each_key { |filename| assert_equal(true, File.exist?(filename)) }
         end
       end
 
       should "work with a .zip file" do
         Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip") do |_dir, filenames|
           assert_equal(5, filenames.size)
-          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+          filenames.each_key { |filename| assert_equal(true, File.exist?(filename)) }
         end
       end
 
       should "work with a .rar file" do
         Danbooru::Archive.extract!("test/files/archive/ugoira.rar") do |_dir, filenames|
           assert_equal(5, filenames.size)
-          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+          filenames.each_key { |filename| assert_equal(true, File.exist?(filename)) }
         end
       end
 
       should "work with a .7z file" do
         Danbooru::Archive.extract!("test/files/archive/ugoira.7z") do |_dir, filenames|
           assert_equal(5, filenames.size)
-          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+          filenames.each_key { |filename| assert_equal(true, File.exist?(filename)) }
+        end
+      end
+
+      should "keep non-ASCII filenames in a .zip with the UTF-8 filename flag" do
+        # utf8-names.zip was written by hand to match the zips desktop zip tools make: the UTF-8 filename and data
+        # descriptor flags (0x0808), Unix uid/gid and timestamp extra fields, and deflated data. It contains 原画.txt
+        # ("hello\n") and 原画(1).txt ("world\n").
+        assert_equal(%w[原画.txt 原画(1).txt], Danbooru::Archive.open!("test/files/archive/utf8-names.zip").entries.map(&:pathname))
+
+        Danbooru::Archive.extract!("test/files/archive/utf8-names.zip") do |_dir, files|
+          assert_equal(%w[原画.txt 原画(1).txt], files.values)
+          assert_equal(%W[hello\n world\n], files.keys.map { File.read(it) })
+        end
+      end
+
+      should "keep non-ASCII filenames in a .7z file" do
+        # non-ascii-name.7z was created with `7z a non-ascii-name.7z テスト.txt`, where テスト.txt contains "hello".
+        assert_equal(["テスト.txt"], Danbooru::Archive.open!("test/files/archive/non-ascii-name.7z").entries.map(&:pathname))
+
+        Danbooru::Archive.extract!("test/files/archive/non-ascii-name.7z") do |_dir, files|
+          assert_equal(["テスト.txt"], files.values)
+          assert_equal("hello", File.read(files.keys.first))
         end
       end
 
       should "work with an archive containing directories" do
-        Danbooru::Archive.extract!("test/files/archive/directory.zip") do |dir, filenames|
-          assert_equal(["#{dir}/subdir/test.png", "#{dir}/test.png"], filenames.sort)
-          filenames.each { |filename| assert_equal(true, File.exist?(filename)) }
+        Danbooru::Archive.extract!("test/files/archive/directory.zip") do |dir, files|
+          assert_equal(%w[subdir/test.png test.png], files.values.sort)
+          assert_equal(%W[#{dir}/000001 #{dir}/000002], files.keys.sort)
+          files.each_key { |path| assert_equal(:png, FileTypeDetector.new(File.open(path)).file_ext) }
         end
       end
     end
@@ -136,19 +151,11 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
     end
 
-    context "#format method" do
-      should "detect the file type" do
-        assert_equal("ZIP 2.0 (uncompressed)", Danbooru::Archive.open("test/files/ugoira/ugoira.zip").format)
-        assert_equal("RAR5", Danbooru::Archive.open("test/files/archive/ugoira.rar").format)
-        assert_equal("7-Zip", Danbooru::Archive.open("test/files/archive/ugoira.7z").format)
-      end
-    end
-
     context "an unsupported archive format" do
       should "not be read" do
-        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/ugoira.tar").entries }
-        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/ugoira.tar.gz").entries }
-        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open("test/files/archive/long-path.tar.gz").extract! { nil } }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/archive/ugoira.tar").entries }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/archive/ugoira.tar.gz").entries }
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/archive/long-path.tar.gz").extract! { nil } }
       end
     end
 
@@ -164,21 +171,11 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "#file_ext method" do
       should "detect the file extension" do
-        assert_equal(:zip, Danbooru::Archive.open("test/files/ugoira/ugoira.zip").file_ext)
-        assert_equal(:rar, Danbooru::Archive.open("test/files/archive/ugoira.rar").file_ext)
-        assert_equal(:"7z", Danbooru::Archive.open("test/files/archive/ugoira.7z").file_ext)
-        assert_equal(:bin, Danbooru::Archive.open("test/files/archive/ugoira.tar").file_ext)
-        assert_equal(:bin, Danbooru::Archive.open("test/files/archive/ugoira.tar.gz").file_ext)
-      end
-    end
-
-    context "#ls method" do
-      should "work" do
-        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
-        output = StringIO.new
-
-        archive.ls(output)
-        assert_match(/^-rw-rw-r-- *0 0 *1639 2014-10-05 23:31:06 000000\.jpg$/, output.tap(&:rewind).read)
+        assert_equal(:zip, Danbooru::Archive.open!("test/files/ugoira/ugoira.zip").file_ext)
+        assert_equal(:rar, Danbooru::Archive.open!("test/files/archive/ugoira.rar").file_ext)
+        assert_equal(:"7z", Danbooru::Archive.open!("test/files/archive/ugoira.7z").file_ext)
+        assert_equal(:bin, Danbooru::Archive.open!("test/files/archive/ugoira.tar").file_ext)
+        assert_equal(:bin, Danbooru::Archive.open!("test/files/archive/ugoira.tar.gz").file_ext)
       end
     end
 
@@ -203,6 +200,93 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       assert_raises(Danbooru::Archive::Error) { archive.extract! }
     end
 
+    should "not trust paths outside the directory from a compromised bin/archive" do
+      Dir.mktmpdir do |dir|
+        File.symlink("/etc/passwd", "#{dir}/link.jpg")
+
+        ["/etc/passwd", "#{dir}/../../etc/passwd", "#{dir}/link.jpg", "#{dir}/missing.jpg"].each do |path|
+          ExternalCommand.stubs(:run).returns([{ files: [path] }.to_json, nil])
+          assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip", dir) }
+        end
+      end
+    end
+
+    should "extract to a directory whose path goes through a symlink" do
+      Dir.mktmpdir do |dir|
+        FileUtils.mkdir_p("#{dir}/real/extracted")
+        File.symlink("#{dir}/real", "#{dir}/link")
+
+        _dir, files = Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip", "#{dir}/link/extracted")
+        assert_equal(5, files.size)
+        assert(files.keys.all? { File.readable?(it) })
+      end
+    end
+
+    should "extract files with duplicate or overlapping names separately" do
+      { %w[a/b.jpg a/.] => %w[a/b.jpg a], %w[a.jpg ./a.jpg] => %w[a.jpg a.jpg] }.each do |names, expected_names|
+        Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          Zip::OutputStream.open(file.path) do |zip|
+            names.each_with_index do |name, i|
+              zip.put_next_entry(name)
+              zip.write("data #{i}")
+            end
+          end
+
+          Danbooru::Archive.extract!(file.path) do |_dir, files|
+            assert_equal(expected_names, files.values)
+            assert_equal(names.size.times.map { "data #{it}" }, files.keys.map { File.read(it) })
+          end
+        end
+      end
+    end
+
+    should "not extract files with empty names" do
+      [%w[.], [""], %w[a.jpg .]].each do |names|
+        Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          Zip::OutputStream.open(file.path) do |zip|
+            names.each do |name|
+              zip.put_next_entry(name)
+              zip.write("data")
+            end
+          end
+
+          error = assert_raises(Danbooru::Archive::Error, names.inspect) { Danbooru::Archive.extract!(file.path) { nil } }
+          assert_match(/\A'.*' has an empty path\z/, error.message)
+        end
+      end
+    end
+
+    should "raise an error for malformed output from a compromised bin/archive" do
+      entry = { pathname: "a.jpg", pathname_too_long: false, size: 1, filetype: "file" }
+      malformed = [
+        "[]", { error: 1 }, { archives: nil }, { archives: [] }, { archives: [1] }, { archives: [{ error: 1 }] },
+        { archives: [{ entries: nil }] }, { archives: [{ entries: [], extra: 1 }] },
+        { archives: [{ entries: [entry.except(:size)] }] }, { archives: [{ entries: [entry.merge(extra: 1)] }] },
+        { archives: [{ entries: [entry.merge(size: "1")] }] }, { archives: [{ entries: [entry.merge(size: -1)] }] },
+        { archives: [{ entries: [entry.merge(filetype: "symlink")] }] }, { archives: [{ entries: [entry.merge(pathname_too_long: nil)] }] },
+      ]
+
+      malformed.each do |output|
+        ExternalCommand.stubs(:run).returns([output.is_a?(String) ? output : output.to_json, nil])
+        archive = Danbooru::Archive.open!("test/files/ugoira/ugoira.zip")
+
+        assert_raises(Danbooru::Archive::Error, output.inspect) { archive.entries }
+        assert_raises(Danbooru::Archive::Error, output.inspect) { archive.uncompressed_size }
+      end
+
+      ExternalCommand.stubs(:run).returns([{ archives: [{ entries: [entry] }] }.to_json, nil])
+      assert_equal(1, Danbooru::Archive.open!("test/files/ugoira/ugoira.zip").uncompressed_size)
+    end
+
+    should "detect hardlinks" do
+      # hardlink.rar is a RAR5 file written by hand, containing a.txt and b.jpg, a hardlink to /etc/passwd.
+      archive = Danbooru::Archive.open!("test/files/archive/hardlink.rar")
+
+      assert_equal([["a.txt", "file"], ["b.jpg", "other"]], archive.entries.map { [it.pathname, it.filetype] })
+      error = assert_raises(Danbooru::Archive::Error) { archive.extract! }
+      assert_equal("'b.jpg' is not a regular file", error.message)
+    end
+
     should "detect absolute paths" do
       archive = Danbooru::Archive.open!("test/files/archive/absolute-path.7z")
 
@@ -210,11 +294,62 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       assert_raises(Danbooru::Archive::Error) { archive.extract! }
     end
 
-    should "detect archives with large numbers of files" do
-      archive = Danbooru::Archive.open!("test/files/archive/bomb-10k-files.7z")
+    should "stop listing archives with large numbers of files after the max entries" do
+      archive = Danbooru::Archive.open!("test/files/archive/bomb-10k-files.7z", max_entries: 101)
 
       assert_equal(true, archive.exists? { |_, count| count > 100 })
-      assert_equal(10_000, archive.file_count)
+      assert_equal(101, archive.file_count)
+      assert_equal(101, archive.entries.size)
+    end
+
+    should "stop listing archives with large numbers of directories" do
+      Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+        Zip::OutputStream.open(file.path) do |zip|
+          50.times { |n| zip.put_next_entry("dir#{n}/") }
+          zip.put_next_entry("test.jpg")
+          zip.write("data")
+        end
+
+        error = assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!(file.path, max_entries: 4).entries }
+        assert_equal("too many files", error.message)
+        assert_equal(1, Danbooru::Archive.open!(file.path, max_entries: 6).file_count)
+      end
+    end
+
+    should "raise an error if extracting needs more memory than the limit" do
+      # lzma2-4gb-dictionary.7z contains test.txt ("hello world" repeated 50 times). It was created with
+      # `7z a -m0=lzma2 -mhc=off`, then edited to declare a 4 GB LZMA2 dictionary (property byte at offset 0x4e set to
+      # 40), with the header CRCs updated.
+      error = assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/archive/lzma2-4gb-dictionary.7z").extract! { nil } }
+      assert_equal("invalid or corrupt archive", error.message)
+    end
+
+    should "raise an error if listing the files takes too long" do
+      stub_const(Danbooru::Archive, :LIST_TIMEOUT, 0.seconds) do
+        error = assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.open!("test/files/ugoira/ugoira.zip").entries }
+        assert_equal("timed out", error.message)
+      end
+    end
+
+    should "raise an error if an extracted file is larger than the max file size" do
+      Danbooru.config.stubs(:max_file_size).returns(1_000)
+
+      assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!("test/files/ugoira/ugoira.zip") { nil } }
+    end
+
+    should "make extracted files readable even if the archive says they aren't" do
+      Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+        Zip::File.open(file.path, create: true) do |zip|
+          entry = Zip::Entry.new(zip, "test.jpg")
+          zip.add(entry, "test/files/jpg/test.jpg")
+          entry.unix_perms = 0o000
+        end
+
+        Danbooru::Archive.extract!(file.path) do |_dir, filenames|
+          assert_equal(0o600, File.stat(filenames.keys.first).mode & 0o777)
+          assert_equal(File.binread("test/files/jpg/test.jpg"), File.binread(filenames.keys.first))
+        end
+      end
     end
 
     should "detect decompression bombs" do
@@ -222,45 +357,6 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
       assert_equal(1, archive.file_count)
       assert_equal(1_048_576_000, archive.uncompressed_size)
-    end
-
-    context ".create! method" do
-      should "work" do
-        archive = Dir.mktmpdir do |tmpdir|
-          # Test normal files work
-          FileUtils.cp "test/files/gif/test.gif", tmpdir
-
-          # Test utf8 filenames work
-          FileUtils.cp "test/files/jpg/test.jpg", File.join(tmpdir, "テスト.jpg")
-
-          # Test subdirectories work
-          FileUtils.mkdir_p File.join(tmpdir, "subdir")
-          FileUtils.cp "test/files/png/test.png", File.join(tmpdir, "subdir")
-
-          Danbooru::Archive.create!(tmpdir)
-        end
-        media_file = MediaFile.open(archive.file)
-
-        assert_equal(3, archive.file_count)
-        assert_equal(
-          ["subdir/test.png", "test.gif", "テスト.jpg"],
-          archive.entries.map(&:pathname).map { it.force_encoding("UTF-8") },
-        )
-
-        archive.extract! do |_dir, filenames|
-          # Archived files md5 should match
-          assert_equal(
-            ["081a5c3b92d8980d1aadbd215bfac5b9", "1e2edf6bdbd971d8c3cc4da0f98f38ab", "ecef68c44edb8a0d6a3070b5f8e8ee76"],
-            filenames.map { MediaFile.md5 it },
-          )
-        end
-
-        # archive should have no compression
-        assert_equal("None", media_file.metadata["ZIP:ZipCompression"])
-
-        # md5 of the archive should always be the same
-        assert_equal("595f43ab518c05eea06aa3dd740f4724", media_file.md5)
-      end
     end
   end
 end

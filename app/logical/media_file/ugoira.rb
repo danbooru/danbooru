@@ -18,9 +18,6 @@ class MediaFile::Ugoira < MediaFile
 
   MIN_DELAY = 10 # The mininum delay allowed for a single frame in a ugoira. 10ms is the minimum on Pixiv.
   MAX_DELAY = 30_000 # The maximum delay allowed for a single frame in a ugoira. 30s is the max on Pixiv.
-  MAX_FRAME_COUNT = 500 # The maximum number of frames allowed in a ugoira. 500 is the max on Pixiv.
-
-  MAX_ANIMATION_JSON_SIZE = 50.kilobytes # The maximum size of the animation.json file. This is enough for 500 frames + extra.
 
   # @return [Concurrent::ReentrantReadWriteLock] A lock to make sure we don't extract the .zip file more than once when
   #   called from multiple threads (such as during upload when generating samples in parallel).
@@ -57,6 +54,7 @@ class MediaFile::Ugoira < MediaFile
       @preview_frame = nil
       @frames = nil
       @files = nil
+      @zip_info = nil
       @tmpdir = nil
     end
   end
@@ -67,14 +65,15 @@ class MediaFile::Ugoira < MediaFile
     return "number of files is inconsistent with animation.json" if animation_json.present? && files.size != animation_json_frames.size + 1
     return "unrecognized animation.json format" if animation_json_format == "unknown"
 
-    Zip::File.open(file.path) do |zip|
-      animation_json_frames.each_with_index do |json, i|
+    names = zip_info["names"]
+    animation_json_frames.each_with_index do |json, i|
+      if names.present?
         # skip animation.json if it's the first entry in the zip file
-        entry = (zip.entries.first.name == "animation.json") ? zip.entries[i + 1] : zip.entries[i]
-
-        return "'#{json["file"]}' in animation.json doesn't match '#{entry.name}' in zip file" if json["file"] != entry.name
-        return "'#{json["file"]}' in animation.json has invalid delay" if !json["delay"].in?(MIN_DELAY..MAX_DELAY)
+        name = (names.first == "animation.json") ? names[i + 1] : names[i]
+        return "'#{json["file"]}' in animation.json doesn't match '#{name}' in zip file" if json["file"] != name
       end
+
+      return "'#{json["file"]}' in animation.json has invalid delay" if !json["delay"].in?(MIN_DELAY..MAX_DELAY)
     end
 
     return "must have at least two frames" if frames.size < 2
@@ -92,67 +91,41 @@ class MediaFile::Ugoira < MediaFile
     nil
   end
 
-  # Check the structure of the .zip file without extracting it. This makes sure the zip is uncompressed, has at most
-  # MAX_FRAME_COUNT frames, and has no overlapping files, so extracting it can't take more space than the .zip itself.
+  # Check the structure of the .zip file, and extract it if it's valid. This is done in one call to bin/archive in the
+  # sandbox. See `ArchiveCommand.ugoira` in bin/archive for the checks.
   #
-  # @return [String, nil] Return the error message if the .zip file is invalid, or nil if it is valid.
-  memoize def zip_error
-    return nil if file.nil?
-
-    zip = Zip::File.open(file.path)
-    stream = Zip::InputStream.open(file.path)
-    file_n = 0
-    frame_n = 0
-
-    while (entry = stream.get_next_entry)
-      if entry.name == "animation.json"
-        return "animation.json file must come first or last" if file_n != 0 && file_n + 1 != zip.size
-        return "animation.json file is too large" if entry.size > MAX_ANIMATION_JSON_SIZE
+  # @return [Hash] The error if the ugoira is invalid, or the names of the files in the .zip, the frame offsets, and the
+  #   paths of the extracted files. Empty if the ugoira isn't a .zip file.
+  def zip_info
+    synchronize do
+      @zip_info ||= if file.nil?
+        {}
       else
-        return "cannot have more than #{MAX_FRAME_COUNT} frames" if frame_n + 1 > MAX_FRAME_COUNT
-
-        if !entry.name.match?(/\A#{"%06d" % frame_n}\.(jpg|png|gif)\z/)
-          return "file '#{entry.name}' has invalid name (expected '#{"%06d" % frame_n}#{File.extname(entry.name)}')"
-        end
+        result = Danbooru::Archive.run!("ugoira", file.path, tmpdir.path, read: [file.path], write: [tmpdir.path])
+        verify_zip_info!(result) if result["error"].nil?
+        result
       end
-
-      return "zip64 format is not supported" if entry.zip64?
-      return "file '#{entry.name}' cannot have comments" if entry.comment_size > 0
-      return "file '#{entry.name}' cannot have extra fields (fields: #{entry.extra.keys.join(", ")})" if entry.extra_size > 0
-      return "ugoira must not be compressed" if entry.compression_method != Zip::Entry::STORED
-      return "ugoira must not be compressed" if entry.compressed_size != entry.size
-      return "file '#{entry.name}' cannot be a #{entry.ftype}" if entry.ftype != :file
-      return "file '#{entry.name}' has unsupported general purpose flags (#{"%.8b" % entry.gp_flags})" if entry.gp_flags != 0
-      return "file '#{entry.name}' has unsupported header size (expected #{entry.name.size + 30}, got #{entry.calculate_local_header_size})" if entry.calculate_local_header_size != entry.name.size + 30
-      # return "file '#{entry.name}' has invalid CRC" if entry.crc != Zlib.crc32(entry.get_input_stream.read) # XXX this reads the entire file into memory
-
-      %i[crc name extra_size comment_size ftype compression_method compressed_size size].each do |field|
-        if entry.send(field) != zip.entries[file_n].send(field)
-          return "field '#{field}' in file '#{entry.name}' is inconsistent with central directory"
-        end
-      end
-
-      if entry.name != "animation.json"
-        # Check the frame's type from its first bytes, so frames that aren't images are never opened.
-        frame_ext = FileTypeDetector.new(StringIO.new(stream.read(16).to_s)).file_ext
-        return "file '#{entry.name}' is not an image file" if !frame_ext.in?(%i[jpg png gif])
-        return "file '#{entry.name}' has the wrong file extension (expected '#{File.basename(entry.name, ".*")}.#{frame_ext}')" if File.extname(entry.name) != ".#{frame_ext}"
-      end
-
-      file_n += 1
-      frame_n += 1 unless entry.name == "animation.json"
+    rescue Danbooru::Archive::Error
+      @zip_info = { "error" => "invalid zip file" }
     end
+  end
 
-    return "number of files is inconsistent with end-of-central-directory count" if file_n != zip.size
-    return "number of files is inconsistent with central directory count" if file_n != zip.entries.size
-    return "zip64 format is not supported" if zip.instance_variable_get(:@cdir).instance_variable_get(:@version_needed_for_extract) == Zip::VERSION_NEEDED_TO_EXTRACT_ZIP64 # XXX hack
+  # Check the output of bin/archive, in case it was compromised by a malicious file. The files must be inside the
+  # temp directory, and the names and frame offsets must match them.
+  #
+  # @raise [Danbooru::Archive::Error] If the output is invalid.
+  def verify_zip_info!(result)
+    files = Danbooru::Archive.verify_extracted_files!(result["files"], tmpdir.path)
+    names = result["names"]
+    frame_offsets = result["frame_offsets"]
 
-    nil
-  rescue Zip::Error => e
-    "invalid zip file (#{e.message})"
-  ensure
-    zip&.close rescue nil # work around for https://github.com/rubyzip/rubyzip/issues/216; triggered by files with UniversalTime extra field
-    stream&.close
+    raise Danbooru::Archive::Error unless names == files.map { File.basename(it) }
+    raise Danbooru::Archive::Error unless frame_offsets.is_a?(Array) && frame_offsets.all? { it.is_a?(Integer) && it.between?(0, file.size) } && frame_offsets.size == (names - ["animation.json"]).size
+  end
+
+  # @return [String, nil] Return the error message if the .zip file is invalid, or nil if it is valid.
+  def zip_error
+    zip_info["error"]
   end
 
   def file_ext
@@ -171,7 +144,7 @@ class MediaFile::Ugoira < MediaFile
 
   # @return [ExifTool::Metadata] The metadata for the file.
   memoize def metadata
-    data = super.reject { |key, value| key.starts_with?("ZIP:") }
+    data = super.reject { |key, _value| key.starts_with?("ZIP:") }
 
     data.merge(
       "Ugoira:FrameDelays" => frame_delays,
@@ -185,10 +158,8 @@ class MediaFile::Ugoira < MediaFile
 
   # @return [Array<Integer>] The list of offsets to each frame in the .zip file. Used by the ugoira player to locate
   #   frames without needing to parse the zip file first.
-  memoize def frame_offsets
-    Zip::File.open(file.path) do |zip|
-      zip.entries.reject { |entry| entry.name == "animation.json" }.map(&:local_header_offset)
-    end
+  def frame_offsets
+    zip_info["frame_offsets"]
   end
 
   memoize def dimensions
@@ -285,7 +256,7 @@ class MediaFile::Ugoira < MediaFile
     synchronize do
       raise Error, zip_error if zip_error.present?
 
-      @files ||= Danbooru::Archive.extract!(file, tmpdir.path).second.map { |filename| File.open(filename) }
+      @files ||= zip_info["files"].map { |filename| File.open(filename) }
     end
   end
 
@@ -314,8 +285,6 @@ class MediaFile::Ugoira < MediaFile
   # @param data [Hash] Extra data to include in the animation.json file.
   # @return [MediaFile] The new ugoira.
   def create_copy(file: Danbooru::Tempfile.new(%w[danbooru-ugoira- .zip]), mtime: Time.utc(1980, 1, 1), data: {})
-    ziptime = Zip::DOSTime.new(mtime.year, mtime.month, mtime.day, mtime.hour, mtime.min, mtime.sec)
-
     animation_meta = {
       **data,
       width: width,
@@ -326,29 +295,19 @@ class MediaFile::Ugoira < MediaFile
       end,
     }
 
-    # XXX Use rubyzip because libarchive adds some things to the zip that we don't want (extra UniversalTime fields for
-    # timestamps and CRCs after the file data).
-    Danbooru::Tempfile.create do |animation_json_file|
-      Zip::File.open(file, create: true, suppress_extra_fields: true) do |zip|
-        entries = frames.map.with_index do |frame, n|
-          [Zip::Entry.new(zip, "#{"%06d" % n}.#{frame.file_ext}"), frame]
-        end
+    Danbooru::Tempdir.create(["danbooru-ugoira-"]) do |tmpdir|
+      zip_path = "#{tmpdir.path}/ugoira.zip"
+      animation_json_path = "#{tmpdir.path}/animation.json"
+      File.write(animation_json_path, animation_meta.to_json)
 
-        animation_json_file.pwrite(animation_meta.to_json, 0)
-        entries << [Zip::Entry.new(zip, "animation.json"), animation_json_file]
+      entries = frames.map.with_index { |frame, n| ["#{"%06d" % n}.#{frame.file_ext}", frame.path] }
+      entries << ["animation.json", animation_json_path]
 
-        entries.each do |entry, filepath|
-          zip.add(entry, filepath)
-
-          entry.compression_method = Zip::Entry::STORED
-          entry.unix_perms = 0o0644
-          entry.internal_file_attributes = 0 # 0 for binary filetype, 1 for text
-          entry.instance_variable_set(:@time, ziptime) # set manually to avoid rubyzip creating UniversalTime extra field
-        end
-      end
+      # The frames are copied into the zip without being parsed, so the output isn't limited to the max upload size.
+      Danbooru::Archive.run!("create-ugoira", zip_path, mtime.strftime("%Y-%m-%dT%H:%M:%S"), *entries.flatten, read: entries.map(&:second), write: [tmpdir.path], file_size_limit: nil)
+      FileUtils.mv(zip_path, file.path)
     end
 
-    # XXX rubyzip writes to a different file then moves it on top of the file we passed in, so we need to reopen our file to get the new file.
     file.reopen(file, "rb")
     MediaFile::Ugoira.new(file)
   end

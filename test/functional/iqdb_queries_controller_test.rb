@@ -235,8 +235,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_select "#notice", /File is corrupt/
         end
 
-        should "fail for an invalid ugoira without extracting it" do
-          Danbooru::Archive.any_instance.expects(:extract!).never
+        should "fail for an invalid ugoira" do
           IqdbClient.any_instance.expects(:request).never
 
           file = Rack::Test::UploadedFile.new("test/files/ugoira/ugoira-compressed.zip")

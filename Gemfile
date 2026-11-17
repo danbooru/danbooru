@@ -47,7 +47,7 @@ gem "debug", "~> 1", require: false
 gem "faker", "~> 3", require: false
 gem "resolv", "~> 0.7"
 gem "rover-df", "~> 1"
-gem "ffi-libarchive", "~> 1"
+gem "ffi-libarchive", "~> 1", require: false # Used by bin/archive.
 gem "pry-rails", "~> 0.3"
 gem "drb", "~> 2"
 gem "net-sftp", "~> 4", require: false
@@ -59,7 +59,7 @@ gem "rotp", "~> 6"
 gem "rqrcode", "~> 3"
 gem "kramdown", "~> 2"
 gem "abbrev", "~> 0.1"
-gem "rubyzip", "~> 3", require: false
+gem "rubyzip", "~> 3", require: false # Used by bin/archive.
 gem "webrick", "~> 1"
 gem "useragent", "~> 0.16"
 gem "dotenv-rails", "~> 3", require: false # This is loaded in application.rb

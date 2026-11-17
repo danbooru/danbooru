@@ -29,8 +29,8 @@ class Upload < ApplicationRecord
   validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, length: { maximum: 2000 }, if: -> { referer_url.present? && referer_url_changed? }
   validates :status, inclusion: { in: %w[pending processing completed error] }
   validate :validate_file_and_source, on: :create
-  validate :validate_archive_files, on: :create
   validate :validate_uploader_is_not_limited, on: :create
+  validate :validate_archive_files, on: :create # Last, because it's the slowest.
 
   after_create :async_process_upload!
 
@@ -92,29 +92,60 @@ class Upload < ApplicationRecord
     end
 
     def validate_archive_files
-      return unless files.present?
+      # Don't read the archives if the upload is already invalid, because reading them starts a process for them.
+      return if files.blank? || errors.any?
+
+      begin
+        Danbooru::Archive.list!(archive_files.map(&:first))
+      rescue Danbooru::Archive::Error => e
+        errors.add(:base, "#{archive_files.map { |_archive, filename| "'#{filename}'" }.to_sentence} couldn't be read (#{e.message})")
+        return
+      rescue ExternalCommand::SyscallError => e
+        handle_blocked_archives(e, archive_files, action: "Upload")
+        errors.add(:base, "#{archive_files.map { |_archive, filename| "'#{filename}'" }.to_sentence} couldn't be read (#{Danbooru::Archive::INVALID_ARCHIVE})")
+        return
+      end
+
+      invalid_archive = false
 
       archive_files.each do |archive, filename|
         if !archive.file_ext.in?(ARCHIVE_FILE_TYPES)
           errors.add(:base, "'#{filename}' is not a supported file type")
+        elsif archive.file_count == 0
+          errors.add(:base, "'#{filename}' doesn't contain any files")
         elsif archive.exists? { |_, count| count > MAX_FILES_PER_UPLOAD }
           # XXX Potential zip bomb containing thousands of files; don't process it any further.
           errors.add(:base, "'#{filename}' contains too many files (max #{MAX_FILES_PER_UPLOAD} files per upload)")
           next
         elsif archive.uncompressed_size > MediaAsset::MAX_FILE_SIZE
           errors.add(:base, "'#{filename}' is too large (uncompressed size: #{archive.uncompressed_size.to_fs(:human_size)}; max size: #{MediaAsset::MAX_FILE_SIZE.to_fs(:human_size)})")
+        elsif archive.entries.any?(&:pathname_too_long?)
+          errors.add(:base, "'#{filename}' contains a path that's too long (max #{Danbooru::Archive::MAX_PATHNAME_SIZE} bytes)")
         elsif (entry = archive.entries.find { |entry| entry.pathname.starts_with?("/") })
-          errors.add(:base, "'#{entry.pathname_utf8}' in '#{filename}' can't start with '/'")
-        elsif (entry = archive.entries.find { |entry| entry.directory_traversal? })
-          errors.add(:base, "'#{entry.pathname_utf8}' in '#{filename}' can't contain '..' components")
+          errors.add(:base, "'#{entry.pathname}' in '#{filename}' can't start with '/'")
+        elsif (entry = archive.entries.find(&:directory_traversal?))
+          errors.add(:base, "'#{entry.pathname}' in '#{filename}' can't contain '..' components")
         elsif (entry = archive.entries.find { |entry| !entry.file? && !entry.directory? })
-          errors.add(:base, "'#{entry.pathname_utf8}' in '#{filename}' isn't a regular file")
+          errors.add(:base, "'#{entry.pathname}' in '#{filename}' isn't a regular file")
         end
+      rescue Danbooru::Archive::Error => e
+        invalid_archive = true
+        errors.add(:base, "'#{filename}' couldn't be read (#{e.message})")
       end
+
+      # The file count of an invalid archive is unknown.
+      return if invalid_archive
 
       total_files = archive_files.map(&:first).sum(&:file_count) + (files.size - archive_files.size)
       if total_files > MAX_FILES_PER_UPLOAD
         errors.add(:base, "Can't upload more than #{MAX_FILES_PER_UPLOAD} files at a time (total: #{total_files})")
+      end
+
+      # Each archive is limited to the max file size, but they're also limited together, so an upload with many
+      # archives can't extract much more data than the upload itself.
+      total_size = archive_files.map(&:first).sum(&:uncompressed_size)
+      if archive_files.size > 1 && total_size > MediaAsset::MAX_FILE_SIZE
+        errors.add(:base, "The archives are too large (uncompressed size: #{total_size.to_fs(:human_size)}; max size: #{MediaAsset::MAX_FILE_SIZE.to_fs(:human_size)})")
       end
     end
   end
@@ -211,12 +242,18 @@ class Upload < ApplicationRecord
 
     upload_media_assets = uploaded_files.flat_map do |file, original_filename|
       if file.is_a?(Danbooru::Archive)
-        tmpdir, filenames = file.extract!
+        begin
+          tmpdir, extracted_files = file.extract!
+        rescue Danbooru::Archive::Error => e
+          raise Error, "'#{original_filename}' couldn't be extracted (#{e.message})"
+        rescue ExternalCommand::SyscallError => e
+          handle_blocked_archives(e, [[file, original_filename]], action: "Upload ##{id}")
+          raise Error, "'#{original_filename}' couldn't be extracted (#{Danbooru::Archive::INVALID_ARCHIVE})"
+        end
         tmpdirs << tmpdir
 
-        Danbooru.natural_sort(filenames).map do |filename|
-          name = "file://#{original_filename}/#{Pathname.new(filename).relative_path_from(tmpdir)}" # "file://foo.zip/foo/1.jpg"
-          UploadMediaAsset.new(upload: self, file: filename, source_url: name)
+        Danbooru.natural_sort_by(extracted_files, &:last).map do |path, name|
+          UploadMediaAsset.new(upload: self, file: path, source_url: "file://#{original_filename}/#{name}") # "file://foo.zip/foo/1.jpg"
         end
       else
         UploadMediaAsset.new(upload: self, file: file, source_url: "file://#{original_filename}")
@@ -235,10 +272,24 @@ class Upload < ApplicationRecord
   def uploaded_files
     files.map do |_index, file|
       if FileTypeDetector.new(file.tempfile).file_ext.in?(ARCHIVE_FILE_TYPES)
-        [Danbooru::Archive.open!(file.tempfile), file.original_filename]
+        # Only read one more file than the limit, enough to tell if the archive has too many files.
+        [Danbooru::Archive.open!(file.tempfile, max_entries: MAX_FILES_PER_UPLOAD + 1), file.original_filename]
       else
         [MediaFile.open(file.tempfile), file.original_filename]
       end
+    end
+  end
+
+  # Log and quarantine the archives if bin/archive was killed by the sandbox, because they may be an attempt to exploit
+  # libarchive or rubyzip. When several archives are listed by one process, all of them are quarantined, because we
+  # don't know which one did it.
+  #
+  # @param error [ExternalCommand::SyscallError] The error from bin/archive.
+  # @param archives [Array<(Danbooru::Archive, String)>] The archives bin/archive was reading, with their filenames.
+  # @param action [String] What the user was doing, like "Upload #123".
+  def handle_blocked_archives(error, archives, action:)
+    archives.each do |archive, filename|
+      MediaAsset.handle_blocked_file(error, media_file: MediaFile.new(archive.file), user: uploader, action:, source: "file://#{filename}")
     end
   end
 

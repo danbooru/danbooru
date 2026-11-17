@@ -2,9 +2,9 @@
 
 require "io/nonblock"
 
-# Runs the external programs that we use on untrusted files (ffmpeg, ffprobe, mkvmerge, exiftool) in a sandbox, with
-# time, memory, and output limits, so that a malicious file can't make them run forever, use all the memory, or do
-# anything else if it manages to exploit a bug in the program.
+# Runs the external programs that we use on untrusted files (ffmpeg, ffprobe, mkvmerge, exiftool, and bin/archive for
+# archives and ugoiras) in a sandbox, with time, memory, and output limits, so that a malicious file can't make them
+# run forever, use all the memory, or do anything else if it manages to exploit a bug in the program.
 #
 # The sandbox uses Landlock to limit which files the command can access, and seccomp to limit which system calls it can
 # make. Both work without root and without any special support from Docker or Kubernetes. Both are turned off by
@@ -72,9 +72,20 @@ class ExternalCommand
       # Perl calls symlink("", "") to check if symlinks are supported. Landlock stops it from creating any.
       syscalls: %w[symlink],
     },
+    # For bin/archive. Danbooru::Archive runs it with this exact Ruby, and gives it the script and the gems it uses.
+    RbConfig.ruby => {
+      execute: [RbConfig.ruby],
+      read: [RbConfig::CONFIG["rubylibprefix"], File.join(RbConfig::CONFIG["libdir"], RbConfig::CONFIG["LIBRUBY_SO"])],
+      # Ruby's timer thread waits on an eventfd with epoll. Extracting archives creates directories and sets the umask,
+      # libarchive truncates a file when it fails partway through extracting it (for example, when it runs out of
+      # memory), and writing zips renames temp files into place. Landlock only lets them write in the given directories.
+      syscalls: %w[eventfd2 epoll_create1 epoll_ctl epoll_wait epoll_pwait umask mkdir mkdirat rename renameat renameat2 unlink unlinkat ftruncate] + [
+        ["prctl", :allow, [[0, :eq, Seccomp::PR_SET_THP_DISABLE]]],
+      ],
+    },
   }.freeze
 
-  attr_reader :argv, :program, :profile, :read, :write, :timeout, :memory_limit, :output_limit
+  attr_reader :argv, :program, :profile, :read, :write, :timeout, :memory_limit, :output_limit, :file_size_limit
 
   # Run a command and return its output. The command is killed if it runs longer than the timeout or prints more than
   # the output limit.
@@ -88,6 +99,7 @@ class ExternalCommand
   # @param timeout [Integer] The maximum number of seconds the command can run.
   # @param memory_limit [Integer] The maximum number of bytes of memory the command can use.
   # @param output_limit [Integer] The maximum number of bytes the command can print to stdout and stderr.
+  # @param file_size_limit [Integer, nil] The maximum size in bytes of any file the command writes, or nil for no limit.
   # @return [Array<(String, Process::Status)>] The combined stdout and stderr of the command, and its exit status.
   # @raise [TimeoutError] If the command ran longer than the timeout.
   # @raise [OutputLimitError] If the command printed more than the output limit.
@@ -98,7 +110,7 @@ class ExternalCommand
   end
 
   # @see ExternalCommand.run
-  def initialize(command, read: [], write: [], timeout: TIMEOUT, memory_limit: MEMORY_LIMIT, output_limit: OUTPUT_LIMIT)
+  def initialize(command, read: [], write: [], timeout: TIMEOUT, memory_limit: MEMORY_LIMIT, output_limit: OUTPUT_LIMIT, file_size_limit: nil) # rubocop:disable Metrics/ParameterLists
     @argv = command.shellsplit
     @program = argv.first
     raise ArgumentError, "can't run an empty command" if program.nil?
@@ -109,6 +121,7 @@ class ExternalCommand
     @timeout = timeout
     @memory_limit = memory_limit
     @output_limit = output_limit
+    @file_size_limit = file_size_limit
   end
 
   # @see ExternalCommand.run
@@ -137,7 +150,7 @@ class ExternalCommand
           ENV.slice(*ENVIRONMENT), *command,
           in: stdin, out: output_writer, err: output_writer, unsetenv_others: true, close_others: true,
           # Disable core dumps, otherwise a command that crashes when it hits the memory limit can fill the disk.
-          rlimit_as: memory_limit.to_i, rlimit_core: 0,
+          rlimit_as: memory_limit.to_i, rlimit_core: 0, **(file_size_limit ? { rlimit_fsize: file_size_limit.to_i } : {}),
         )
       end
 

@@ -55,6 +55,9 @@ module Seccomp
   PR_SET_NAME = 15
   PR_SET_VMA = 0x53564D41
 
+  # The prctl(2) option Ruby uses at startup to turn off transparent huge pages for itself.
+  PR_SET_THP_DISABLE = 41
+
   # The prctl(2) options that setpriv(1) uses after loading the filter.
   PR_SET_PDEATHSIG = 1
   PR_SET_KEEPCAPS = 8
