@@ -22,7 +22,7 @@ class FFmpeg
     frame: %w[stream_index media_type width height sample_aspect_ratio best_effort_timestamp_time],
   }.map { |section, fields| "#{section}=#{fields.join(",")}" }.join(":")
 
-  # The most output ffprobe can print for a file's metadata. Each packet and its frame take about 350 bytes.
+  # The most output ffprobe can print for a file's metadata. Each packet and its frame take about 400 bytes.
   METADATA_OUTPUT_LIMIT = MAX_PACKET_COUNT * 1.kilobyte
 
   # The maximum width and height of video preview images. This is the size of the largest preview generated for videos.
@@ -148,13 +148,14 @@ class FFmpeg
     metadata.dig(:format, :duration).to_f if metadata.dig(:format, :duration).present?
   end
 
-  # @return [Float, nil] The duration of the video in seconds, according to where the packets in every stream end. This
-  #   only demuxes the file, nothing is decoded. Packets aren't in timestamp order (B-frames, interleaved streams), so
-  #   this is the latest packet end, not the last packet. Streams with a single packet are ignored because the packet's
-  #   duration comes from the demuxer, not the file (the static image in an AVIF is one packet lasting one second).
-  #   Nil if no packets have timestamps.
+  # @return [Float, nil] The duration of the video in seconds, according to where the packets in the longest video
+  #   stream and the audio streams end. This only demuxes the file, nothing is decoded. Packets aren't in timestamp
+  #   order (B-frames, interleaved streams), so this is the latest packet end, not the last packet. Other video streams
+  #   are ignored because the static image in an animated AVIF is a stream with one packet lasting a default of one
+  #   second. Nil if no packets have timestamps.
   memoize def packet_duration
-    timed_packets = packets.group_by { it[:stream_index] }.values.reject { it.size == 1 }.flatten.select { it[:pts_time].present? }
+    longest_video_stream = video_streams.max_by { it[:packets].size }
+    timed_packets = [longest_video_stream, *audio_streams].compact.flat_map { it[:packets] }.select { it[:pts_time].present? }
     ends = timed_packets.map { it[:pts_time].to_d + it[:duration_time].to_d }
     (ends.max - metadata.dig(:format, :start_time).to_d).to_f if ends.present?
   end

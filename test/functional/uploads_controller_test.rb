@@ -460,6 +460,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_response 201
           assert_match("Duration must be less than", Upload.last.error)
         end
+
+        should "fail for a .webm file with a single long frame" do
+          create_upload!("test/files/webm/test-16x16-one-frame-fake-duration.webm", user: @user)
+
+          assert_response 201
+          assert_match("Duration must be less than", Upload.last.error)
+        end
       end
 
       context "for an unsupported archive type" do

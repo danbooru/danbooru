@@ -6,6 +6,7 @@ class MediaFileWebmTest < ActiveSupport::TestCase
       should_generate_previews(
         "webm",
         "test/files/webm/test-16x16-fake-duration.webm" => [150, 150, "055cb014d1107a31e3f2778802033716"],
+        "test/files/webm/test-16x16-one-frame-fake-duration.webm" => [150, 150, "055cb014d1107a31e3f2778802033716"],
         "test/files/webm/test-512x512-fake-dimensions.webm" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
         "test/files/webm/test-512x512.webm" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
         "test/files/webm/test-aac.webm" => [150, 84, "511476a470287cd49117078a80d4c6d5"],
@@ -594,6 +595,18 @@ class MediaFileWebmTest < ActiveSupport::TestCase
       assert_equal(1.0, FFmpeg.new(file).container_duration)
       assert_equal(141.0, file.duration)
       assert_equal(true, file.is_supported?)
+      assert_equal(false, file.is_corrupt?)
+    end
+  end
+
+  context "a WebM file with a single 141 second frame and a fake duration in the container metadata" do
+    # A single VP9 frame lasting 141 seconds, with the Matroska Duration element set to 1 second. From the review of #6769.
+    should "read the real duration from the packets" do
+      file = MediaFile.open("test/files/webm/test-16x16-one-frame-fake-duration.webm")
+
+      assert_equal(1.0, FFmpeg.new(file).container_duration)
+      assert_equal(141.0, file.duration)
+      assert_equal(1, file.frame_count)
       assert_equal(false, file.is_corrupt?)
     end
   end
