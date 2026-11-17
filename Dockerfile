@@ -15,6 +15,28 @@
 #   docker run --rm -it --network host -v $PWD:/danbooru danbooru bin/rails console
 #
 # See https://github.com/danbooru/danbooru/wiki/Docker-Guide for more details.
+#
+# Stages:
+#
+#   ubuntu
+#   └── base                      runtime apt packages
+#       ├── build-base            compilers (g++, make, git)
+#       │   ├── build-ruby ───────── build-gems     bundle install, dtext
+#       │   ├── build-mozjpeg ────── build-vips
+#       │   ├── build-ffmpeg
+#       │   ├── build-exiftool
+#       │   ├── build-openresty
+#       │   └── build-node ───────── build-assets   npm ci, webpack
+#       └── runtime-base          ENV settings, /images, ENTRYPOINT/CMD
+#           ├── danbooru-base     COPY from build-ffmpeg, build-exiftool, build-openresty, build-vips, build-ruby,
+#           │   │                 build-gems, and build-assets (public/packs)
+#           │   └── production    COPY . /danbooru                                   => production image
+#           └── development-base  dev apt packages, sudo
+#               └── development   COPY /usr/local and gems from danbooru-base, node from build-node,
+#                                 node_modules from build-assets, /danbooru from production  => development image
+#
+# development-base is built on runtime-base, not danbooru-base, so that the dev packages aren't reinstalled every
+# time the build outputs change.
 
 # You must also update .ruby-version and the Gemfile when updating the Ruby version.
 # These versions are used by bin/danbooru-dev-entrypoint to detect whether the current installed docker containers are outdated
@@ -346,17 +368,10 @@ EOS
 
 
 
-# The base layer for the production and development layers. Contains everything but the /danbooru directory.
-FROM base AS danbooru-base
+# The settings shared by the production and development layers. Contains no build outputs, so that the layers built on
+# top of it stay cached until the base layer changes.
+FROM base AS runtime-base
 WORKDIR /danbooru
-
-COPY --link --from=build-ffmpeg /usr/local /usr/local
-COPY --link --from=build-exiftool /usr/local /usr/local
-COPY --link --from=build-openresty /usr/local /usr/local
-COPY --link --from=build-vips /usr/local /usr/local
-COPY --link --from=build-ruby /usr/local /usr/local
-COPY --link --from=build-gems $GEM_HOME $GEM_HOME
-COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
 
 # http://jemalloc.net/jemalloc.3.html#tuning
 ENV LD_PRELOAD=libjemalloc.so.2
@@ -375,14 +390,30 @@ ENV BOOTSNAP_READONLY=true
 ENV DOCKER=true
 
 RUN <<EOS
-  ldconfig
-
   mkdir -p /images
-  chown danbooru:danbooru /danbooru /images /home/danbooru public/packs $GEM_HOME
+  chown danbooru:danbooru /images
 EOS
 
 ENTRYPOINT ["tini", "-g", "--"]
 CMD ["bin/rails", "server"]
+
+
+
+# The base layer for the production layer. Contains everything but the /danbooru directory.
+FROM runtime-base AS danbooru-base
+
+COPY --link --from=build-ffmpeg /usr/local /usr/local
+COPY --link --from=build-exiftool /usr/local /usr/local
+COPY --link --from=build-openresty /usr/local /usr/local
+COPY --link --from=build-vips /usr/local /usr/local
+COPY --link --from=build-ruby /usr/local /usr/local
+COPY --link --from=build-gems $GEM_HOME $GEM_HOME
+COPY --link --from=build-assets /danbooru/public/packs /danbooru/public/packs
+
+RUN <<EOS
+  ldconfig
+  chown danbooru:danbooru /danbooru /home/danbooru public/packs $GEM_HOME
+EOS
 
 
 
@@ -418,9 +449,10 @@ ENV DOCKER_IMAGE_BUILD_DATE=$DOCKER_IMAGE_BUILD_DATE
 
 
 
-# The development layer. Contains the production layer, plus enables passwordless sudo, includes nodejs and node_modules
-# for building JS/CSS files, and includes tools and libraries needed for building certain Ruby gems.
-FROM danbooru-base AS development
+# The development packages. This is built on top of runtime-base instead of danbooru-base so that it isn't rebuilt
+# on every commit. Anything built on top of the build outputs gets rebuilt whenever they change, and in CI, steps
+# after a run of `COPY --link` layers can miss the registry cache even when nothing changed.
+FROM runtime-base AS development-base
 
 RUN <<EOS
   apt-get update
@@ -432,12 +464,23 @@ RUN <<EOS
   touch /home/danbooru/.sudo_as_admin_successful
 EOS
 
+
+
+# The development layer. Contains the production layer, plus enables passwordless sudo, includes nodejs and node_modules
+# for building JS/CSS files, and includes tools and libraries needed for building certain Ruby gems.
+FROM development-base AS development
+
+COPY --link --from=danbooru-base /usr/local /usr/local
+COPY --link --from=danbooru-base $GEM_HOME $GEM_HOME
 COPY --link --from=build-node /usr/local /usr/local
 COPY --link --from=build-assets /danbooru/node_modules /node_modules
 COPY --link --from=production /home/danbooru/bootsnap /home/danbooru/bootsnap
 COPY --link --from=production /danbooru /danbooru
 
-RUN chown danbooru:danbooru /danbooru /node_modules /home/danbooru /home/danbooru/bootsnap /home/danbooru/.sudo_as_admin_successful
+RUN <<EOS
+  ldconfig
+  chown danbooru:danbooru /danbooru /node_modules /home/danbooru /home/danbooru/bootsnap /home/danbooru/.sudo_as_admin_successful $GEM_HOME
+EOS
 
 ARG DOCKER_IMAGE_REVISION=""
 ARG DOCKER_IMAGE_BUILD_DATE=""
