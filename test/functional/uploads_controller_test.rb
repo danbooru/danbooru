@@ -2,6 +2,19 @@ require "test_helper"
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
   context "The uploads controller" do
+    should "return 404 for actions that don't exist" do
+      @upload = create(:upload, uploader: create(:user))
+
+      delete_auth "/uploads/#{@upload.id}", @upload.uploader
+      assert_response 404
+
+      put_auth "/uploads/#{@upload.id}", @upload.uploader
+      assert_response 404
+
+      get_auth "/uploads/#{@upload.id}/edit", @upload.uploader
+      assert_response 404
+    end
+
     setup do
       @user = create(:user)
     end

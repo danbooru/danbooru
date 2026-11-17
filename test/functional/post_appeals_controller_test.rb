@@ -7,6 +7,13 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
       @post = create(:post, is_deleted: true)
     end
 
+    should "return 404 for actions that don't exist" do
+      @post_appeal = create(:post_appeal, post: @post, creator: @user)
+
+      delete_auth "/post_appeals/#{@post_appeal.id}", @user
+      assert_response 404
+    end
+
     context "new action" do
       should "render" do
         get_auth new_post_appeal_path, @user

@@ -6,6 +6,11 @@ class RelatedTagsControllerTest < ActionDispatch::IntegrationTest
       as(create(:user)) { create(:post, tag_string: "copy:touhou") }
     end
 
+    should "return 404 for actions that don't exist" do
+      put_auth "/related_tag", create(:user)
+      assert_response 404
+    end
+
     context "show action" do
       should "work" do
         get related_tag_path, params: { query: "touhou" }

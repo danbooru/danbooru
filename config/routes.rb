@@ -8,7 +8,7 @@
 # @see https://guides.rubyonrails.org/routing.html
 # @see http://localhost:3000/rails/info/routes
 Rails.application.routes.draw do
-  resources :posts, only: [:index, :show, :update, :destroy, :new, :create] do
+  resources :posts, only: [:index, :show, :update, :destroy, :create] do
     get :random, on: :collection
   end
 
@@ -83,7 +83,7 @@ Rails.application.routes.draw do
       post :undelete
     end
   end
-  resources :counts do
+  resources :counts, only: [] do
     collection do
       get :posts
     end
@@ -135,7 +135,6 @@ Rails.application.routes.draw do
   resources :ip_geolocations, only: [:index]
   resource :iqdb_queries, only: [:show, :create] do
     collection do
-      get :preview
       get :check, to: redirect { |_path_params, req| "/iqdb_queries?#{req.query_string}" }
     end
   end
@@ -152,12 +151,12 @@ Rails.application.routes.draw do
   resources :ai_tags, only: [:index]
   put "/ai_tags/:media_asset_id/:tag_id/tag", to: "ai_tags#tag", as: "tag_ai_tag"
 
-  resources :mod_actions
+  resources :mod_actions, only: [:index, :show]
   get "/moderator/dashboard" => "moderator_dashboard#show"
   resources :moderation_reports, only: [:new, :create, :index, :show, :update]
   resources :modqueue, only: [:index]
   resources :news_updates
-  resources :notes do
+  resources :notes, except: [:new, :edit] do
     put :revert, on: :member
     get :preview, on: :collection
     post :preview, on: :collection
@@ -207,10 +206,10 @@ Rails.application.routes.draw do
     end
     get :similar, to: "iqdb_queries#index"
   end
-  resources :post_appeals
-  resources :post_flags
+  resources :post_appeals, except: [:destroy]
+  resources :post_flags, except: [:destroy]
   resources :post_approvals, only: [:create, :index, :show]
-  resources :post_disapprovals
+  resources :post_disapprovals, except: [:new, :destroy]
   resources :post_versions, only: [:index] do
     member do
       put :undo
@@ -230,10 +229,10 @@ Rails.application.routes.draw do
   resources :artist_commentary_versions, only: [:index, :show]
   resources :rate_limits, only: [:index]
   resources :reactions, only: [:index, :show, :create, :destroy]
-  resource :related_tag, only: [:show, :update]
+  resource :related_tag, only: [:show]
   resources :reports, only: [:index, :show]
   resources :robots, only: [:index]
-  resources :saved_searches, except: [:show]
+  resources :saved_searches, except: [:show, :new]
   resource :session, only: [:new, :create, :destroy] do
     post :verify_totp, on: :collection
     post :reauthenticate, on: :collection
@@ -241,18 +240,18 @@ Rails.application.routes.draw do
   end
   resource :source, only: [:show]
   resource :status, only: [:show], controller: "status"
-  resources :tags
+  resources :tags, only: [:index, :show, :edit, :update]
   resources :tag_aliases, only: [:show, :index, :destroy]
   resources :tag_implications, only: [:show, :index, :destroy]
   resources :tag_versions, only: [:index, :show]
 
   get "/redeem", to: "upgrade_codes#redeem", as: "redeem_upgrade_codes"
-  resources :upgrade_codes, only: [:create, :index] do
+  resources :upgrade_codes, only: [:index] do
     get :redeem, on: :collection
     post :upgrade, on: :collection
   end
 
-  resources :uploads do
+  resources :uploads, only: [:index, :show, :new, :create] do
     collection do
       get :batch, to: redirect(path: "/uploads/new")
     end
@@ -296,7 +295,7 @@ Rails.application.routes.draw do
   resources :user_feedbacks, except: [:destroy]
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
   resources :site_credentials, except: [:edit]
-  resources :webhooks do
+  resources :webhooks, only: [] do
     post :receive, on: :collection
   end
   resources :wiki_pages, id: /.+?(?=\.json|\.xml|\.html)|.+/ do

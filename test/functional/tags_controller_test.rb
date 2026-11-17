@@ -7,6 +7,19 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       @tag = create(:tag, name: "touhou", category: Tag.categories.copyright, post_count: 1)
     end
 
+    should "return 404 for actions that don't exist" do
+      @admin = create(:admin_user)
+
+      post_auth "/tags", @admin, params: { tag: { name: "foo" }}
+      assert_response 404
+
+      get_auth "/tags/new", @admin
+      assert_response 404
+
+      delete_auth "/tags/#{@tag.id}", @admin
+      assert_response 404
+    end
+
     context "index action" do
       should "render" do
         get tags_path

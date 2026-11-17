@@ -29,6 +29,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       Danbooru.config.stubs(:canonical_url).returns("http://www.example.com")
     end
 
+    should "return 404 for actions that don't exist" do
+      get_auth "/posts/new", @user
+      assert_response 404
+    end
+
     context "index action" do
       setup do
         mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])

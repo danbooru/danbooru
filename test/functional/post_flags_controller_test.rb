@@ -11,6 +11,11 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
       @post_flag = create(:post_flag, reason: "xxx", post: @post, creator: @flagger)
     end
 
+    should "return 404 for actions that don't exist" do
+      delete_auth "/post_flags/#{@post_flag.id}", @flagger
+      assert_response 404
+    end
+
     context "new action" do
       should "render" do
         get_auth new_post_flag_path, @flagger

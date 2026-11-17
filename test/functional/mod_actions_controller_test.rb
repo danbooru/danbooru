@@ -2,6 +2,26 @@ require "test_helper"
 
 class ModActionsControllerTest < ActionDispatch::IntegrationTest
   context "The mod actions controller" do
+    should "return 404 for actions that don't exist" do
+      @mod_action = create(:mod_action)
+      @admin = create(:admin_user)
+
+      post_auth "/mod_actions", @admin
+      assert_response 404
+
+      get_auth "/mod_actions/new", @admin
+      assert_response 404
+
+      get_auth "/mod_actions/#{@mod_action.id}/edit", @admin
+      assert_response 404
+
+      put_auth "/mod_actions/#{@mod_action.id}", @admin
+      assert_response 404
+
+      delete_auth "/mod_actions/#{@mod_action.id}", @admin
+      assert_response 404
+    end
+
     context "index action" do
       should "work" do
         create(:mod_action)

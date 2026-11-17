@@ -8,6 +8,14 @@ class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
       SavedSearch.stubs(:redis).returns(MockRedis.new)
     end
 
+    should "return 404 for actions that don't exist" do
+      get_auth "/saved_searches/new", @user
+      assert_response 404
+
+      get_auth "/saved_searches/#{@saved_search.id}", @user
+      assert_response 404
+    end
+
     context "index action" do
       should "render" do
         get_auth saved_searches_path, @user

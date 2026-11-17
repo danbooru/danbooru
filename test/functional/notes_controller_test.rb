@@ -7,6 +7,14 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
       @note = as(@user) { create(:note, body: "000") }
     end
 
+    should "return 404 for actions that don't exist" do
+      get_auth "/notes/new", @user
+      assert_response 404
+
+      get_auth "/notes/#{@note.id}/edit", @user
+      assert_response 404
+    end
+
     context "index action" do
       setup do
         as(@user) do

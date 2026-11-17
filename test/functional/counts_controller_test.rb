@@ -2,6 +2,14 @@ require "test_helper"
 
 class CountsControllerTest < ActionDispatch::IntegrationTest
   context "The counts commentary controller" do
+    should "return 404 for actions that don't exist" do
+      get "/counts"
+      assert_response 404
+
+      get "/counts/1"
+      assert_response 404
+    end
+
     context "posts action" do
       should "render" do
         get posts_counts_path

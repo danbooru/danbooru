@@ -7,6 +7,16 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
       @post = create(:post, tag_string: "touhou", is_pending: true, uploader: build(:user, created_at: 2.weeks.ago))
     end
 
+    should "return 404 for actions that don't exist" do
+      @post_disapproval = create(:post_disapproval, post: @post, user: @approver)
+
+      get_auth "/post_disapprovals/new", @approver
+      assert_response 404
+
+      delete_auth "/post_disapprovals/#{@post_disapproval.id}", @approver
+      assert_response 404
+    end
+
     context "create action" do
       should "render" do
         assert_difference("PostDisapproval.count", 1) do

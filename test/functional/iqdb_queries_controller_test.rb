@@ -7,6 +7,11 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
       @post = as(@user) { create(:post) }
     end
 
+    should "return 404 for actions that don't exist" do
+      get_auth "/iqdb_queries/preview", @user
+      assert_response 404
+    end
+
     context "show action" do
       context "for a file that makes a program call a blocked syscall" do
         should "show an error, log the search, and quarantine the file" do

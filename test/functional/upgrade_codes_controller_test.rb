@@ -2,6 +2,11 @@ require "test_helper"
 
 class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
   context "The upgrade codes controller" do
+    should "return 404 for actions that don't exist" do
+      post_auth "/upgrade_codes", create(:superadmin_user)
+      assert_response 404
+    end
+
     context "index action" do
       should "render for superadmins" do
         create(:upgrade_code)
