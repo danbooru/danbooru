@@ -83,6 +83,16 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         assert_response 400
       end
 
+      should "ignore a high_similarity param that isn't a number" do
+        mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
+
+        get_auth iqdb_queries_path, @user, params: { url: "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4", high_similarity: { a: 1 }}
+        assert_response :success
+
+        get_auth iqdb_queries_path, @user, params: { url: "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4", high_similarity: ["80"] }
+        assert_response :success
+      end
+
       should "ignore unknown search params" do
         get_auth iqdb_queries_path, @user, params: { search: { order: "nonsense" }}, as: :json
         assert_response :success
