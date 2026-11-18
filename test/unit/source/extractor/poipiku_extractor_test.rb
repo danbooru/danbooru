@@ -376,5 +376,29 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: "箸にも棒にも掛からない",
       )
     end
+
+    # Returns the input URL verbatim
+    context "An inaccessible signed URL" do
+      strategy_should_work(
+        "https://cdn.poipiku.com/008631773/013618929_031509660_fTVEto3S7.png?Expires=0&Signature=WxErQ9KIDi4Bmr7y3SIAGg98T2Pi0~O2WyROEznCcTFD-8GDuzBfJK893kf51yE-~GUQ8a~G3kjiE37iJAnx9a8JZxwW4WFxD-H6X1nXKqfMGoLBfDKZERSaAc12TJxrRZShSbmU~CA24DagMYgBm6RT0dXEsgjUp~D81nlBf-uZxMbGbT~tzhH-KcpzaE~opXv7ObYsL0FXqNkbvrUlqGozkSp-R5L1pHPwMlqpXmUi9qVWVrL9FMZIxECXq4N2T9hCxn3oINtBRxyp8z20YtXDtgqjq~r2QuzucAxmmvwKQmeZJbNhObYH5ReIgTHdlMJyfylhupdPdsUkNxtmhA__&Key-Pair-Id=KJUZTJCQICGXU",
+        image_urls: [
+          %r{https://cdn.poipiku.com/008631773/013618929_031509660_fTVEto3S7.png\?Expires=0&Signature=WxErQ9KIDi4Bmr7y3SIAGg98T2Pi0~O2WyROEznCcTFD-8GDuzBfJK893kf51yE-~GUQ8a~G3kjiE37iJAnx9a8JZxwW4WFxD-H6X1nXKqfMGoLBfDKZERSaAc12TJxrRZShSbmU~CA24DagMYgBm6RT0dXEsgjUp~D81nlBf-uZxMbGbT~tzhH-KcpzaE~opXv7ObYsL0FXqNkbvrUlqGozkSp-R5L1pHPwMlqpXmUi9qVWVrL9FMZIxECXq4N2T9hCxn3oINtBRxyp8z20YtXDtgqjq~r2QuzucAxmmvwKQmeZJbNhObYH5ReIgTHdlMJyfylhupdPdsUkNxtmhA__&Key-Pair-Id=KJUZTJCQICGXU},
+        ],
+        deleted: true,
+        page_url: "https://poipiku.com/8631773/13618929.html",
+        profile_url: "https://poipiku.com/8631773/",
+        profile_urls: %w[https://poipiku.com/8631773/],
+        display_name: "t3_rue",
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          11.3🔞rimk
+          pw:multiply rimk birthdates | ri誕生日×mk誕生日 (date/日日only)
+        EOS
+      )
+    end
   end
 end
