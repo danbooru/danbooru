@@ -229,5 +229,61 @@ module Source::Tests::Extractor
         EOS
       )
     end
+
+    context "A minor gallery short URL" do
+      strategy_should_work(
+        "https://gall.dcinside.com/m/projectmx/8472732",
+        image_urls: %w[https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73de986fa11d02831cece6b72dd02ce8c7323b841a6828662cbe957fa01554f24bb261831eb40e9b8f802c1c671b785c43ed6db2d9b7708e7],
+        media_files: [{ file_size: 1_177_549 }],
+        page_url: "https://gall.dcinside.com/mgallery/board/view/?id=projectmx&no=8472732",
+        profile_urls: %w[https://gallog.dcinside.com/wd3h8jz2hdnf],
+        display_name: "메홍챠",
+        username: "wd3h8jz2hdnf",
+        tags: [],
+        dtext_artist_commentary_title: "[🎨창작] 한복 아즈사그림",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "a0482cad3607b4538a33105d9a33e873018d40805713acde906a805b5883a8e3":[https://dcimg1.dcinside.com/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de986fa11d02831cece6b72dd02ce8c7323b841a6828662cbe957fa01554f24bb624b6a8343eab2bd7a9fa3e92147ed2ecd67a170501b807b0d3d24]
+          얼음공주 이뻐요
+        EOS
+      )
+    end
+
+    context "A mini gallery post" do
+      strategy_should_work(
+        "https://gall.dcinside.com/mini/board/view?id=honkai3rd&no=5127",
+        image_urls: %w[https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73ce98ffa1bd8233c8f98e4853e77576b56d3245192db72dcde2f17ab56d20e72c49ca329bad651f0271843aa3d289b5575a8ef6f6d20c6e1e35920d9184aadc1732e6d25],
+        media_files: [{ file_size: 1_675_906 }],
+        page_url: "https://gall.dcinside.com/mini/board/view/?id=honkai3rd&no=5127",
+        profile_urls: %w[https://gallog.dcinside.com/psb6949],
+        display_name: "시한",
+        username: "psb6949",
+        tags: [],
+        dtext_artist_commentary_title: "[창작] 뫼 그렸음앱에서 작성",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "79ea847eb18a6cfe3af1c6bb11f11a39bbd62ae09f81fa24ab65":[https://dcimg1.dcinside.com/viewimage.php?id=20b4942eeadc33a767ecc4b1&no=24b0d769e1d32ca73ce98ffa1bd8233c8f98e4853e77576b56d3245192db72dcde2f17ab56d20e72c49ca36fe88c3bf16d2fc411ebf6bc5c0ea7fa7097b5a5b1ab0b2ab8bfae3a14d348c5c5138097c4]
+          뫼뫼우스
+          - dc official App
+        EOS
+      )
+    end
+
+    context "A major gallery post" do
+      strategy_should_work(
+        "https://gall.dcinside.com/board/view?id=idolmaster_new1&no=6840503",
+        image_urls: %w[https://image.dcinside.com/viewimage.php?no=24b0d769e1d32ca73ce886fa11d02831261f1a40c7bf6e9339ab41f5e4ae8da5d69206e615f6f9d5088adbfcfde5919ca30226fd8ee32c7ad0ccbdf1334237fcc4cc991a806238acc3da81812469ce2038],
+        media_files: [{ file_size: 1_379_593 }],
+        page_url: "https://gall.dcinside.com/board/view/?id=idolmaster_new1&no=6840503",
+        profile_urls: %w[https://gallog.dcinside.com/psb6949],
+        display_name: "시한",
+        username: "psb6949",
+        tags: [],
+        dtext_artist_commentary_title: "(그림)니치카 그렸슴앱에서 작성",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          "7ae58071b58568f13eea98a518d604032db3b9453cbfa15c5c2ee9":[https://dcimg1.dcinside.com/viewimage.php?id=24b9df2ae8d32bb26bade9bb13c675&no=24b0d769e1d32ca73ce886fa11d02831261f1a40c7bf6e9339ab41f5e4ae8da5d69206e615f6f9d5088adbfcfde591d83d10a513db4151b319a63a99c006532569455d1204fff29779fd85bae6ef6f6e76f6df8737]
+          낙서함
+          - dc official App
+        EOS
+      )
+    end
   end
 end

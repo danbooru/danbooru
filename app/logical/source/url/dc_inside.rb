@@ -3,7 +3,7 @@
 class Source::URL::DcInside < Source::URL
   site "DC Inside", url: "https://www.dcinside.com", domains: %w[dcinside.co.kr dcinside.com]
 
-  attr_reader :full_image_url, :board_name, :post_id, :user_name
+  attr_reader :full_image_url, :board_type, :board_name, :post_id, :user_name
 
   def self.match?(url)
     url.domain.in?(%w[dcinside.co.kr dcinside.com])
@@ -19,13 +19,41 @@ class Source::URL::DcInside < Source::URL
     in _, _, ("viewimage.php" | "viewimagePop.php") if params[:no].present?
       @full_image_url = "https://#{host}/viewimage.php?no=#{params[:no]}"
 
-    # https://gall.dcinside.com/mgallery/board/view/?id=projectmx&no=11076518
-    in "gall", _, "mgallery", "board", "view" if params[:id].present? && params[:no].present?
+    # https://gall.dcinside.com/mgallery/board/view/?id=projectmx&no=11076518 (minor gallery)
+    # https://gall.dcinside.com/mini/board/view/?id=honkai3rd&no=5127 (mini gallery)
+    in "gall", _, ("mgallery" | "mini") => board_type, "board", "view" if params[:id].present? && params[:no].present?
+      @board_type = board_type
       @board_name = params[:id]
       @post_id = params[:no]
 
-    # https://m.dcinside.com/board/projectmx/11076518
+    # https://gall.dcinside.com/board/view/?id=idolmaster_new1&no=6840503 (major gallery)
+    in "gall", _, "board", "view" if params[:id].present? && params[:no].present?
+      @board_type = "major"
+      @board_name = params[:id]
+      @post_id = params[:no]
+
+    # https://gall.dcinside.com/m/projectmx/8472732 (redirects to /mgallery/board/view/?id=projectmx&no=8472732)
+    in "gall", _, "m", board_name, /\A\d+\z/ => post_id
+      @board_type = "mgallery"
+      @board_name = board_name
+      @post_id = post_id
+
+    # https://gall.dcinside.com/mini/honkai3rd/5127 (redirects to /mini/board/view/?id=honkai3rd&no=5127)
+    # https://m.dcinside.com/mini/honkai3rd/5127
+    in ("gall" | "m"), _, "mini", board_name, /\A\d+\z/ => post_id
+      @board_type = "mini"
+      @board_name = board_name
+      @post_id = post_id
+
+    # https://gall.dcinside.com/idolmaster_new1/6840503 (redirects to /board/view/?id=idolmaster_new1&no=6840503)
+    in "gall", _, board_name, /\A\d+\z/ => post_id
+      @board_type = "major"
+      @board_name = board_name
+      @post_id = post_id
+
+    # https://m.dcinside.com/board/projectmx/11076518 (redirects to either a major or minor gallery)
     in "m", _, "board", board_name, post_id
+      @board_type = "mgallery"
       @board_name = board_name
       @post_id = post_id
 
@@ -45,8 +73,16 @@ class Source::URL::DcInside < Source::URL
     full_image_url.present?
   end
 
+  # Major and minor gallery URLs redirect to each other if the board type is wrong, but mini gallery URLs don't.
   def page_url
-    "https://gall.dcinside.com/mgallery/board/view/?id=#{board_name}&no=#{post_id}" if board_name.present? && post_id.present?
+    case board_type
+    in "major"
+      "https://gall.dcinside.com/board/view/?id=#{board_name}&no=#{post_id}"
+    in "mgallery" | "mini"
+      "https://gall.dcinside.com/#{board_type}/board/view/?id=#{board_name}&no=#{post_id}"
+    else
+      nil
+    end
   end
 
   def profile_url
