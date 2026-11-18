@@ -54,13 +54,9 @@ module Source::Tests::Extractor
         page_url: "https://poipiku.com/6849873/8271386.html",
         image_urls: [
           %r{https://cdn.poipiku.com/006849873/008271096_016820933_INusR6FhI.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/006849873/008271386_016865825_S968sAh7Y.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/006849873/008271386_016865826_GBFF3dyRt.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         media_files: [
           { file_size: 343_562 },
-          { file_size: 805_259 },
-          { file_size: 703_879 },
         ],
         profile_url: "https://poipiku.com/6849873/",
         profile_urls: %w[https://poipiku.com/6849873/],
@@ -83,13 +79,9 @@ module Source::Tests::Extractor
         page_url: "https://poipiku.com/6849873/8271386.html",
         image_urls: [
           %r{https://cdn.poipiku.com/006849873/008271096_016820933_INusR6FhI.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/006849873/008271386_016865825_S968sAh7Y.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/006849873/008271386_016865826_GBFF3dyRt.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         media_files: [
           { file_size: 343_562 },
-          { file_size: 805_259 },
-          { file_size: 703_879 },
         ],
         profile_url: "https://poipiku.com/6849873/",
         profile_urls: %w[https://poipiku.com/6849873/],
@@ -323,20 +315,10 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg?Expires=1760463554&Signature=Hcz8PJ458Bb5yYgGmSeQnBxsPN3FFSgbeTI1gkUZvLFGcdSS-EcCSN0Pq8N~84FVI5~cWKNlqgrrMopOd53UI1Xb5NoGxZRiT6WibOvRKwB2RmLvfMbwtPGTqi1u9GoQaVrSW3L7Q1zN3OdLTHjzV0IyGcTOmvtSdPgnauyiXtJ9LJAC9PRCj~-eU6xhrA5AHfHibZ0VA4ziNKOUhJc-gU31HJ81jv9SoUrKBjPQEewDtS6KOQhFOnGvXkF7k3hWVq8y6s7wLVofq4M16jNbFxZolAQEWLF6IsUlP0-xheyasX6N2fVteey8haz4uIHpXSuOUpo9ERhyNmbda7g8bQ__&Key-Pair-Id=KJUZTJCQICGXU",
         image_urls: [
-          %r{https://cdn.poipiku.com/009416896/010718302_W0EFku4aW.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
           %r{https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/009416896/010718302_023702507_F4A4ZHzF8.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/009416896/010718302_023702508_ShgkirOUS.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/009416896/010718302_023702509_WhaFUJNqD.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/009416896/010718302_023702511_nAdPEqifb.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         media_files: [
-          { file_size: 1_454_893 },
           { file_size: 1_504_925 },
-          { file_size: 384_799 },
-          { file_size: 56_656 },
-          { file_size: 828_595 },
-          { file_size: 365_291 },
         ],
         page_url: "https://poipiku.com/9416896/10718302.html",
         profile_urls: %w[https://poipiku.com/9416896/],
@@ -352,20 +334,10 @@ module Source::Tests::Extractor
       strategy_should_work(
         "https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg_640.jpg",
         image_urls: [
-          %r{https://cdn.poipiku.com/009416896/010718302_W0EFku4aW.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
           %r{https://cdn.poipiku.com/009416896/010718302_023702506_X5LNftu5w.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/009416896/010718302_023702507_F4A4ZHzF8.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/009416896/010718302_023702508_ShgkirOUS.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/009416896/010718302_023702509_WhaFUJNqD.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
-          %r{https://cdn.poipiku.com/009416896/010718302_023702511_nAdPEqifb.jpeg\?Expires=\d*&Signature=.*&Key-Pair-Id=.*},
         ],
         media_files: [
-          { file_size: 1_454_893 },
           { file_size: 1_504_925 },
-          { file_size: 384_799 },
-          { file_size: 56_656 },
-          { file_size: 828_595 },
-          { file_size: 365_291 },
         ],
         page_url: "https://poipiku.com/9416896/10718302.html",
         profile_urls: %w[https://poipiku.com/9416896/],

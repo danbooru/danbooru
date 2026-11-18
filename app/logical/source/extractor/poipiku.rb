@@ -14,17 +14,16 @@ class Source::Extractor
     PASSWORDS = %w[y yes]
 
     def image_urls
-      res = api_html&.css("img.DetailIllustItemImage").to_a.pluck(:src).filter_map do |url|
+      images = api_html&.css("img.DetailIllustItemImage").to_a.pluck(:src).filter_map do |url|
         Source::URL.parse(url)
       end
 
-      # If a direct URL was passed, we want to be able to download at least that
+      # Direct URL given, try to retrieve a fresh signed URL or return the given one if unable
       if parsed_url.image_hash.present?
-        res << parsed_url
+        return [(images.find { |img| img.image_hash == parsed_url.image_hash } || parsed_url).full_image_url]
       end
 
-      # Prevent duplicates when a signed but expired URL is passed
-      res.uniq(&:image_hash).map(&:full_image_url).to_a
+      images.map(&:full_image_url)
     end
 
     def profile_urls
