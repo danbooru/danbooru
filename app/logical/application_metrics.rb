@@ -368,6 +368,7 @@ class ApplicationMetrics
     metrics.register([
       { name: :rails_http_requests_total,                         type: :counter, help: "Total number of HTTP requests processed by Rails. Does not include requests processed by Rack middleware or by the Rails router before they got to Rails, such as redirects." },
       { name: :rails_http_request_duration_seconds,               type: :counter, help: "Time spent processing HTTP requests. Total time is CPU time plus idle time. View time is a subset of CPU time. DB time is a subset of idle time." },
+      { name: :rails_http_request_queue_duration_seconds,         type: :histogram, buckets: [0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10], help: "Time HTTP requests spent waiting between the reverse proxy (nginx) and Rails, from the X-Request-Start header. This is mostly time spent waiting for a free Puma thread or worker." },
       { name: :rails_view_renders_total,                          type: :counter, help: "Total number of view templates rendered." },
       { name: :rails_view_render_duration_seconds,                type: :counter, help: "Time spent rendering view templates." },
       { name: :rails_cache_operations_total,                      type: :counter, help: "Total number of Redis cache operations." },
@@ -743,11 +744,11 @@ class ApplicationMetrics
   end
 
   # Used by the master to hold counter values from the workers. They are held in the master because workers periodically
-  # lose their counters when they restart.
+  # lose their counters when they restart. Histograms are included because they're stored as counters.
   #
   # Other counters, like puma_http_requests_total and puma_restarts_total, are already tracked by the master.
   def aggregated_counters
-    process_metrics.metrics.values.select { |metric| metric.type == :counter && metric.name.match?(/\A(rails_|puma_exceptions_total\z)/) }
+    process_metrics.metrics.values.select { |metric| metric.type.in?([:counter, :histogram]) && metric.name.match?(/\A(rails_|puma_exceptions_total\z)/) }
   end
 
   # Used by the master to get the worker's current counter values. See `#poll_worker_counters`.
@@ -781,7 +782,7 @@ class ApplicationMetrics
 
   # Runs in the master process while holding @counter_mutex. The aggregated counter totals from the workers.
   def counter_totals
-    @counter_totals ||= Danbooru::Metric::Set.new(aggregated_counters.map { |metric| { name: metric.name, type: metric.type, help: metric.help } })
+    @counter_totals ||= Danbooru::Metric::Set.new(aggregated_counters.map { |metric| { name: metric.name, type: metric.type, help: metric.help, buckets: metric.buckets } })
   end
 
   # Runs in the master process. Collects the counters from each worker and adds them to the totals.

@@ -15,6 +15,23 @@ class RackServerTiming
     gc_time_before = GC.total_time / 1_000_000.0
     allocations_before = GC.stat(:total_allocated_objects)
 
+    # X-Request-Start: 1707872257.625, 1707872257.658
+    # => request.queue_time_0: 33.0
+    # => request.queue_time_1: 9.0
+    start_times = env["HTTP_X_REQUEST_START"].to_s.split(", ").map(&:to_f)
+    queue_times = start_times.reverse.map do |start_time|
+      queue_time = current_time - start_time
+      current_time = start_time
+      queue_time
+    end
+
+    # The last start time is the one added by our nginx. The earlier ones are from the CDN or the client. The queue
+    # time can be slightly negative if nginx and Puma are on different servers with slightly different clocks. This is
+    # recorded before the request is processed so that requests that raise exceptions are still counted.
+    if start_times.last&.positive?
+      ApplicationMetrics[:rails_http_request_queue_duration_seconds].observe(queue_times.first.clamp(0..))
+    end
+
     metrics.clear
     _, headers, _ = response = @app.call(env)
 
@@ -24,20 +41,8 @@ class RackServerTiming
     metrics[:"request.cpu_time"] = Process.clock_gettime(Process::CLOCK_THREAD_CPUTIME_ID, :float_millisecond) - cpu_time_before
     metrics[:"request.total_time"] = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - total_time_before
 
-    if env["HTTP_X_REQUEST_START"].present?
-      # X-Request-Start: 1707872257.625, 1707872257.658
-      # => request.queue_time_0: 33.0
-      # => request.queue_time_1: 9.0
-      start_times = env["HTTP_X_REQUEST_START"].split(", ").map(&:to_f)
-      queue_times = start_times.reverse.map do |start_time|
-        queue_time = current_time - start_time
-        current_time = start_time
-        queue_time
-      end
-
-      queue_times.each_with_index do |queue_time, i|
-        metrics[:"request.queue_time_#{i}"] = (queue_time * 1000.0).round(4)
-      end
+    queue_times.each_with_index do |queue_time, i|
+      metrics[:"request.queue_time_#{i}"] = (queue_time * 1000.0).round(4)
     end
 
     headers["Server-Timing"] = build_header
