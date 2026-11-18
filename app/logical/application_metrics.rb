@@ -786,7 +786,7 @@ class ApplicationMetrics
 
   # Runs in the master process. Collects the counters from each worker and adds them to the totals.
   def poll_worker_counters
-    Dir.glob("tmp/drb-process-metrics-*.sock").without("tmp/drb-process-metrics-master.sock").each do |filename|
+    Dir.glob(metrics_socket_path("*")).without(metrics_socket_path("master")).each do |filename|
       absorb_counter_snapshot(*DRbObject.new_with_uri("drbunix:#{filename}").counter_snapshot)
     rescue IOError, DRb::DRbConnError
       # The worker may have just exited.
@@ -815,7 +815,7 @@ class ApplicationMetrics
 
   # Called by a Puma worker when it shuts down. Sends the worker's final counts to the master, so counts since the last poll aren't lost.
   def retire_worker_metrics
-    DRbObject.new_with_uri("drbunix:tmp/drb-process-metrics-master.sock").absorb_counter_snapshot(*counter_snapshot)
+    DRbObject.new_with_uri("drbunix:#{metrics_socket_path("master")}").absorb_counter_snapshot(*counter_snapshot)
   rescue IOError, DRb::DRbConnError
     # The master may already be shutting down.
   end
@@ -840,7 +840,7 @@ class ApplicationMetrics
   #
   # @return [Danbooru::Metric::Set] The combined set of metrics from each Puma worker process.
   def instance_metrics
-    metrics = Dir.glob("tmp/drb-process-metrics-*.sock").map do |filename|
+    metrics = Dir.glob(metrics_socket_path("*")).map do |filename|
       application_metrics = DRbObject.new_with_uri("drbunix:#{filename}")
       application_metrics.instance_process_metrics
     rescue IOError, DRb::DRbConnError
@@ -851,10 +851,19 @@ class ApplicationMetrics
     metrics.reduce(&:merge) || Danbooru::Metric::Set.new
   end
 
+  # The path of the Unix domain socket that a Puma process serves its metrics on.
+  #
+  # @param worker_id [String] The Puma worker ID ("master", "0", "1", etc), or "*" for a glob matching every process.
+  # @return [String] The socket path, e.g. "tmp/drb-process-metrics-1234-master.sock".
+  def metrics_socket_path(worker_id)
+    master_pid = puma_worker_id.in?([nil, "master"]) ? Process.pid : Process.ppid
+    "tmp/drb-process-metrics-#{master_pid}-#{worker_id}.sock"
+  end
+
   # Makes metrics for the current process available to other Puma worker processes. Starts a background thread serving process
   # metrics on a Unix domain socket under tmp/. Called by each process on startup in config/puma.rb.
   def serve_process_metrics
-    filename = "tmp/drb-process-metrics-#{puma_worker_id}.sock"
+    filename = metrics_socket_path(puma_worker_id)
     FileUtils.rm_f(filename)
     DRb.start_service("drbunix:#{filename}", ApplicationMetrics.instance, UNIXFileMode: 0o600)
   end

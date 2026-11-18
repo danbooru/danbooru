@@ -33,21 +33,23 @@ class PumaTest < ActiveSupport::TestCase
   context "Puma metrics" do
     should "report Puma stats for the master and each worker in cluster mode" do
       spawn_server(PUMA_WORKERS: 2) do |uri|
-        # Wait for every worker to finish booting and send its first status update to the master.
-        metrics = Timeout.timeout(30) do
-          loop do
-            body = Danbooru::Http.get("#{uri}/metrics/instance").to_s
-            break body if body.match?(/^puma_max_threads\{worker="1"\} \d+$/)
-
-            sleep 0.1
-          end
-        end
+        metrics = wait_for_worker_metrics(uri)
 
         assert_match(/^puma_workers\{worker="master"\} 2$/, metrics)
         assert_match(/^puma_last_checkin\{worker="0"\} \d+$/, metrics)
         assert_match(/^puma_last_checkin\{worker="1"\} \d+$/, metrics)
         assert_match(/^puma_max_threads\{worker="0"\} \d+$/, metrics)
         assert_match(/^puma_max_threads\{worker="1"\} \d+$/, metrics)
+      end
+    end
+
+    should "keep reporting stats after another cluster-mode instance shuts down" do
+      spawn_server(PUMA_WORKERS: 2) do |uri|
+        wait_for_worker_metrics(uri)
+        spawn_server(PUMA_WORKERS: 2) { |other_uri| wait_for_worker_metrics(other_uri) }
+
+        metrics = wait_for_worker_metrics(uri)
+        assert_match(/^puma_workers\{worker="master"\} 2$/, metrics)
       end
     end
 
@@ -228,6 +230,18 @@ class PumaTest < ActiveSupport::TestCase
       loop do
         raise "server exited unexpectedly" unless process_running?(pid)
         return if Danbooru::Http.timeout(1).get("#{uri}/up").status.to_i == 204
+
+        sleep 0.1
+      end
+    end
+  end
+
+  # Waits for every worker to finish booting and send its first status update to the master.
+  def wait_for_worker_metrics(uri)
+    Timeout.timeout(30) do
+      loop do
+        body = Danbooru::Http.get("#{uri}/metrics/instance").to_s
+        return body if body.match?(/^puma_max_threads\{worker="1"\} \d+$/)
 
         sleep 0.1
       end

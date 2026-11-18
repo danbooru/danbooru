@@ -11,11 +11,12 @@ class ApplicationMetricsTest < ActiveSupport::TestCase
       @master = ApplicationMetrics.new.tap { |m| m.puma_worker_id = "master" }
       @worker = ApplicationMetrics.new.tap { |m| m.puma_worker_id = "3" }
       Puma.stubs(:stats_hash).returns({ started_at: Time.now.utc.iso8601, workers: 1, worker_status: [] })
+      Process.stubs(:ppid).returns(Process.pid) # The worker is a child of the master
       @labels = { method: "GET", controller: "posts", action: "index", format: "text/html", status: "200" }
 
-      DRbObject.stubs(:new_with_uri).with("drbunix:tmp/drb-process-metrics-master.sock").returns(@master)
-      DRbObject.stubs(:new_with_uri).with("drbunix:tmp/drb-process-metrics-3.sock").returns(@worker)
-      Dir.stubs(:glob).with("tmp/drb-process-metrics-*.sock").returns(["tmp/drb-process-metrics-3.sock", "tmp/drb-process-metrics-master.sock"])
+      DRbObject.stubs(:new_with_uri).with("drbunix:tmp/drb-process-metrics-#{Process.pid}-master.sock").returns(@master)
+      DRbObject.stubs(:new_with_uri).with("drbunix:tmp/drb-process-metrics-#{Process.pid}-3.sock").returns(@worker)
+      Dir.stubs(:glob).with("tmp/drb-process-metrics-#{Process.pid}-*.sock").returns(["tmp/drb-process-metrics-#{Process.pid}-3.sock", "tmp/drb-process-metrics-#{Process.pid}-master.sock"])
     end
 
     context "#poll_worker_counters" do
@@ -49,7 +50,7 @@ class ApplicationMetricsTest < ActiveSupport::TestCase
       end
 
       should "skip workers that can't be reached" do
-        DRbObject.stubs(:new_with_uri).with("drbunix:tmp/drb-process-metrics-3.sock").raises(DRb::DRbConnError)
+        DRbObject.stubs(:new_with_uri).with("drbunix:tmp/drb-process-metrics-#{Process.pid}-3.sock").raises(DRb::DRbConnError)
 
         assert_nothing_raised { @master.poll_worker_counters }
       end
@@ -66,7 +67,7 @@ class ApplicationMetricsTest < ActiveSupport::TestCase
       end
 
       should "not raise if the master is unreachable" do
-        DRbObject.stubs(:new_with_uri).with("drbunix:tmp/drb-process-metrics-master.sock").raises(DRb::DRbConnError)
+        DRbObject.stubs(:new_with_uri).with("drbunix:tmp/drb-process-metrics-#{Process.pid}-master.sock").raises(DRb::DRbConnError)
 
         assert_nothing_raised { @worker.retire_worker_metrics }
       end
