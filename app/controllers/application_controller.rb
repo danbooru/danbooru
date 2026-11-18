@@ -143,6 +143,8 @@ class ApplicationController < ActionController::Base
   end
 
   concerning :ExceptionHandlingMethods do
+    private
+
     def rescue_exception(exception)
       case exception
       when ActionView::Template::Error
@@ -219,6 +221,8 @@ class ApplicationController < ActionController::Base
   end
 
   concerning :AuthenticationMethods do
+    private
+
     def set_current_user
       CurrentUser.request = request
       SessionLoader.new(request).load
@@ -232,6 +236,8 @@ class ApplicationController < ActionController::Base
   end
 
   concerning :AuthorizationMethods do
+    private
+
     # Checks whether the current user is authorized to perform the current action. Also checks the rate limit for the action.
     #
     # @param record [ActiveRecord::Base, ActiveRecord::Relation] The record to authorize.

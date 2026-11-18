@@ -25,10 +25,6 @@ class LegacyController < ApplicationController
     authorize @tags, policy_class: LegacyControllerPolicy
   end
 
-  def unavailable
-    render plain: "this resource is no longer available", status: 410
-  end
-
   private
 
   def tag_query

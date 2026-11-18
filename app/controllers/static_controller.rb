@@ -22,9 +22,6 @@ class StaticController < ApplicationController
     render_error_page(404, nil, template: "static/not_found", message: "Page not found")
   end
 
-  def error
-  end
-
   def dtext_help
     redirect_to wiki_page_path("help:dtext") unless request.format.js?
   end
