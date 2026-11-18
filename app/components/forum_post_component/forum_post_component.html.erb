@@ -90,7 +90,7 @@
         <% end %>
 
         <% if bur.present? %>
-          <% if policy(bur).approve?(tags: bur_tags) || policy(bur).update? || policy(bur).destroy? %>
+          <% if policy(bur).approve?(tags: bur_tags) || policy(bur).update? || policy(bur).destroy?(tags: bur_tags) %>
             <% menu.with_item do %>
               <hr class="border">
             <% end %>
@@ -112,7 +112,7 @@
             <% end %>
           <% end %>
 
-          <% if policy(bur).destroy? %>
+          <% if policy(bur).destroy?(tags: bur_tags) %>
             <% menu.with_item do %>
               <%= link_to bur, "data-confirm": "Are you sure you want to reject this bulk update request?", method: :delete, remote: true do %>
                 <%= delete_icon %> Reject BUR

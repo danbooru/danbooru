@@ -20,10 +20,10 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
     user.level >= record.approval_level(tags:)
   end
 
-  def destroy?
+  def destroy?(tags: nil)
     return false if !unbanned? || record.is_approved?
 
-    record.is_pending? && (user.is_admin? || record.user_id == user.id)
+    record.is_pending? && (record.user_id == user.id || (user.is_moderator? && approve?(tags:)))
   end
 
   def can_update_forum?

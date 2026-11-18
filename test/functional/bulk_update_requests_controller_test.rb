@@ -201,6 +201,35 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("rejected", @bulk_update_request.reload.status)
         end
       end
+
+      context "for a moderator" do
+        should "succeed for a BUR they can approve" do
+          delete_auth bulk_update_request_path(@bulk_update_request), @mod
+          assert_response :redirect
+          assert_equal("rejected", @bulk_update_request.reload.status)
+        end
+
+        should "fail for a BUR that requires an admin" do
+          create(:tag, name: "big_tag_a", post_count: 10_000)
+          create(:tag, name: "big_tag_b", post_count: 10_000)
+          @bulk_update_request.update!(script: "alias big_tag_a -> big_tag_b")
+
+          delete_auth bulk_update_request_path(@bulk_update_request), @mod
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+        end
+      end
+
+      context "for a builder who can approve the BUR" do
+        should "fail" do
+          create(:tag, name: "artist_a", category: Tag.categories.artist, post_count: 10)
+          @bulk_update_request.update!(script: "alias artist_a -> artist_b")
+
+          delete_auth bulk_update_request_path(@bulk_update_request), @builder
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+        end
+      end
     end
 
     context "#approve" do
