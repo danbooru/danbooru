@@ -390,6 +390,7 @@ class ApplicationMetrics
       { name: :rails_jobs_exceptions_total,                       type: :counter, help: "Total number of jobs failed due to an exception." },
       { name: :rails_jobs_duration_seconds,                       type: :counter, help: "Time spent working jobs. Does not include time spent enqueuing jobs, or waiting for queued jobs to be worked." },
       { name: :rails_jobs_queue_duration_seconds,                 type: :counter, help: "Time spent waiting on jobs to be worked. Does not include time spent enqueuing jobs." },
+      { name: :rails_jobs_queue_latency_seconds,                  type: :histogram, buckets: [0.1, 0.25, 0.5, 1, 2.5, 5, 10, 30, 60, 120, 300, 600, 1800, 3600], help: "How long each background job waited to be worked, by job class. Does not include time spent enqueuing jobs." },
       { name: :rails_jobs_enqueue_duration_seconds,               type: :counter, help: "Time spent adding jobs to the queue." },
 
       { name: :rails_connection_pool_size,                        type: :gauge,   help: "Maximum number of database connections in the pool." },

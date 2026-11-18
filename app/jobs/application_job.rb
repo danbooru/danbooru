@@ -32,6 +32,7 @@ class ApplicationJob < ActiveJob::Base
       # This could be inaccurate due to clocks moving forward or backwards, or machines having unsynchronized clocks.
       queue_duration = Time.zone.now - enqueued_at
       ApplicationMetrics[:rails_jobs_queue_duration_seconds][job_labels].increment(queue_duration)
+      ApplicationMetrics[:rails_jobs_queue_latency_seconds].observe(queue_duration.clamp(0..), job: self.class.name)
     end
 
     ApplicationMetrics[:rails_jobs_duration_seconds][job_labels].increment_duration(&block)
