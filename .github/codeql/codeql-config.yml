@@ -1,0 +1,13 @@
+# CodeQL configuration, used by .github/workflows/codeql.yaml.
+#
+# https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning#using-a-custom-configuration-file
+
+name: Danbooru CodeQL config
+
+paths-ignore:
+  # Tests are full of URL strings and hardcoded passwords that trigger false positives.
+  - test
+  # Development seed script; creates test users with hardcoded passwords.
+  - db/populate.rb
+  # Pure-Ruby reference DText parser, only used by benchmarks. The app uses the C++ parser.
+  - lib/dtext_rb/lib/dtext/ruby.rb
