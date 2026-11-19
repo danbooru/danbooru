@@ -4,6 +4,7 @@
     "config:recommended",
     "mergeConfidence:all-badges",
     "abandonments:recommended",
+    "helpers:pinGitHubActionDigestsToSemver",
     ":configMigration"
   ],
   "lockFileMaintenance": {
