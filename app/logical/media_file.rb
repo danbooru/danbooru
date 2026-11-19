@@ -79,6 +79,7 @@ class MediaFile
   # @param file [File] The image file.
   def initialize(file, **options)
     @file = file
+    @exif_lock = Mutex.new
   end
 
   # Close the file if it is open.
@@ -127,8 +128,9 @@ class MediaFile
     md5
   end
 
-  # @return [Integer] The number of bytes needed to decode the whole file in memory, or 0 if it can be decoded as a stream.
-  def full_decode_size
+  # @return [Integer] The size in bytes of the decoded file if it's decoded all at once, or 0 if it isn't (see
+  #   `MediaAsset::MAX_IN_MEMORY_SIZE`).
+  def in_memory_size
     0
   end
 
@@ -159,14 +161,22 @@ class MediaFile
     exif_metadata
   end
 
-  # @return [ExifTool::Metadata] The metadata for the file, as returned by ExifTool.
+  # @return [ExifTool::Metadata] The metadata for the file, as returned by ExifTool. It's locked so that ExifTool only
+  #   runs once when it's read from several threads, like during upload validation.
   def exif_metadata
-    ExifTool.new(file).metadata
+    @exif_lock.synchronize do
+      @exif_metadata ||= ExifTool.new(file).metadata
+    end
   end
 
   # @return [Mime::Type] The MIME type of the file, or "application/octet-stream" if unknown.
   def mime_type
     Mime::Type.lookup_by_extension(file_ext) || Mime::Type.lookup("application/octet-stream")
+  end
+
+  # @return [Boolean] True if the file is over the upload limits (see `MediaAsset::MAX_IN_MEMORY_SIZE`).
+  def is_too_large?
+    false
   end
 
   # @return [Boolean] True if the file is supported by Danbooru. Certain files may be unsupported because they use features we don't support.
@@ -255,9 +265,11 @@ class MediaFile
     nil
   end
 
-  # Like `preview`, but raises an exception if generating the preview fails for any reason.
-  def preview!(width, height, **options)
-    raise NotImplementedError
+  # Like `preview`, but raises an exception if generating the preview fails for any reason. Videos and ugoiras resize
+  # their preview frame, a single frame made by ffmpeg. It's resized directly, without checking if it's animated.
+  def preview!(max_width, max_height, **options)
+    w, h = MediaFile.scale_dimensions(*preview_frame.dimensions, max_width, max_height)
+    preview_frame.resize!(w, h, **options)
   end
 
   # Return a set of AI-inferred tags for this image. Performs an API call to
@@ -325,5 +337,12 @@ class MediaFile
     end
   end
 
-  memoize :file_ext, :file_size, :md5, :mime_type, :exif_metadata
+  private
+
+  # @return [MediaFile::Image] The frame that previews are made from.
+  def preview_frame
+    raise NotImplementedError
+  end
+
+  memoize :file_ext, :file_size, :md5, :mime_type
 end

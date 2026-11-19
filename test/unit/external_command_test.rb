@@ -359,9 +359,8 @@ class ExternalCommandTest < ActiveSupport::TestCase
       Dir.mktmpdir do |dir|
         command = "#{RbConfig.ruby.shellescape} --disable-gems -e 'Dir.mkdir(ARGV[0])' #{File.join(dir, "new").shellescape}"
 
-        # Without the bin/archive profile, Ruby only gets the base profile, which doesn't let it run at all.
-        error = assert_raises(ExternalCommand::Error) { ExternalCommand.run(command, write: [dir]) }
-        assert_match(/Permission denied/, error.message)
+        # bin/image runs the same Ruby as bin/archive, but it doesn't write files, so it can't create directories.
+        assert_raises(ExternalCommand::SyscallError) { ExternalCommand.run(command, write: [dir], profile_name: "bin/image") }
         assert_equal(true, ExternalCommand.run(command, write: [dir], profile_name: "bin/archive").last.success?)
         assert_equal(true, Dir.exist?(File.join(dir, "new")))
       end

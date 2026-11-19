@@ -1,4 +1,5 @@
 require "test_helper"
+require "vips"
 
 class MediaFileMp4Test < ActiveSupport::TestCase
   context "Previews" do

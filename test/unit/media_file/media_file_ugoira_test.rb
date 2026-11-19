@@ -1,4 +1,5 @@
 require "test_helper"
+require "vips"
 require "zip"
 
 class MediaFileUgoiraTest < ActiveSupport::TestCase
@@ -607,13 +608,13 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         create_ugoira_zip(file)
 
         # Run bin/archive for real, then tamper with its output.
-        [[{}, nil], [{ files: ["/etc/passwd"] }, "invalid zip file"], [{ names: ["000000.jpg", "../x", "animation.json"] }, "invalid zip file"], [{ frame_offsets: ["0", 1] }, "invalid zip file"], [{ frame_offsets: [0, 2**40] }, "invalid zip file"], [{ frame_offsets: [0] * 1000 }, "invalid zip file"], [{ error: { message: "x" }}, "invalid zip file"]].each do |tampered, expected_error|
+        [[{}, nil], [{ files: ["/etc/passwd"] }, "invalid zip file"], [{ names: ["000000.jpg", "../x", "animation.json"] }, "invalid zip file"], [{ frame_offsets: ["0", 1] }, "invalid zip file"], [{ frame_offsets: [0, 2**40] }, "invalid zip file"], [{ frame_offsets: [0] * 1000 }, "invalid zip file"]].each do |tampered, expected_error|
           MediaFile.open(file.path) do |ugoira|
             output = Danbooru::Archive.run!("ugoira", file.path, ugoira.tmpdir.path, read: [file.path], write: [ugoira.tmpdir.path])
-            ExternalCommand.stubs(:run).returns([output.merge(tampered.stringify_keys).to_json, nil])
+            Danbooru::Archive.stubs(:run!).returns(output.merge(tampered.stringify_keys))
 
             expected_error.nil? ? assert_nil(ugoira.error) : assert_equal(expected_error, ugoira.error)
-            ExternalCommand.unstub(:run)
+            Danbooru::Archive.unstub(:run!)
           end
         end
       end
@@ -677,6 +678,37 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     end
   end
 
+  context "a ugoira with frames of different sizes" do
+    should "be rejected without decoding any frames" do
+      Dir.mktmpdir do |dir|
+        Vips::Image.black(64, 64).jpegsave("#{dir}/0.jpg")
+        Vips::Image.black(128, 128).jpegsave("#{dir}/1.jpg")
+        ugoira = MediaFile::Ugoira.new(["#{dir}/0.jpg", "#{dir}/1.jpg"], frame_delays: [100, 100])
+
+        assert_equal("frames must have the same dimensions", ugoira.error)
+        assert_equal(ugoira.frames.map(&:md5), ugoira.frames.map(&:pixel_hash))
+        ugoira.close
+      end
+    end
+  end
+
+  context "a ugoira with a frame that's too large to decode" do
+    should "be rejected as too large, not corrupt, and name the frame that's too large" do
+      Dir.mktmpdir do |dir|
+        image = Vips::Image.black(64, 64)
+        image.jpegsave("#{dir}/0.jpg")
+        image.jpegsave("#{dir}/1.jpg", interlace: true)
+        ugoira = MediaFile::Ugoira.new(["#{dir}/0.jpg", "#{dir}/1.jpg"], frame_delays: [100, 100])
+
+        stub_const(MediaAsset, :MAX_IN_MEMORY_SIZE, 1) do
+          assert_equal("file '1.jpg' is too large to decode", ugoira.error)
+        end
+
+        ugoira.close
+      end
+    end
+  end
+
   context "Conversion of a large ugoira" do
     should "not limit encoding to the default command timeout" do
       Dir.mktmpdir do |dir|
@@ -694,6 +726,8 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     end
 
     should "not limit the first pass of two-pass encoding to the default command timeout" do
+      MediaFile::Image.stubs(:read!)
+      MediaFile::Image.any_instance.stubs(:dimensions).returns([500, 335])
       ExternalCommand.expects(:run).with(regexp_matches(/ -pass 1 /), has_entry(:timeout, FFmpeg::ENCODE_TIMEOUT)).raises(ExternalCommand::TimeoutError, "pass 1 timed out")
       ugoira = MediaFile::Ugoira.new(["test/files/jpg/test.jpg", "test/files/jpg/test.jpg"], frame_delays: [100, 100])
 

@@ -470,20 +470,19 @@ class MediaFilePngTest < ActiveSupport::TestCase
     end
   end
 
-  context "#full_decode_size" do
-    should "be 0 for PNGs that can be decoded as a stream" do
-      assert_equal(0, MediaFile.open("test/files/png/test.png").full_decode_size)
-      assert_equal(0, MediaFile.open("test/files/png/test-rotation-bad-chunk.png").full_decode_size)
-      assert_equal(0, MediaFile.open("test/files/jpg/test-rotation-90cw.jpg").full_decode_size)
+  context "#in_memory_size" do
+    should "be 0 for PNGs that are decoded a few rows at a time" do
+      assert_equal(0, MediaFile.open("test/files/png/test.png").in_memory_size)
+      assert_equal(0, MediaFile.open("test/files/png/test-rotation-bad-chunk.png").in_memory_size)
     end
 
     should "be the size of the decoded image for rotated PNGs" do
-      assert_equal(128 * 64 * 3, MediaFile.open("test/files/png/test-rotation-good-chunk.png").full_decode_size)
+      assert_equal(128 * 64 * 3, MediaFile.open("test/files/png/test-rotation-good-chunk.png").in_memory_size)
     end
 
     should "be the size of the decoded image for interlaced PNGs" do
-      assert_equal(64 * 32 * 3, MediaFile.open("test/files/png/test-interlaced.png").full_decode_size)
-      assert_equal(64 * 32 * 3 * 2, MediaFile.open("test/files/png/test-interlaced-16bit.png").full_decode_size)
+      assert_equal(64 * 32 * 3, MediaFile.open("test/files/png/test-interlaced.png").in_memory_size)
+      assert_equal(64 * 32 * 3 * 2, MediaFile.open("test/files/png/test-interlaced-16bit.png").in_memory_size)
     end
   end
 end

@@ -2,9 +2,10 @@
 
 require "io/nonblock"
 
-# Runs the external programs that we use on untrusted files (ffmpeg, ffprobe, mkvmerge, exiftool, and bin/archive for
-# archives and ugoiras) in a sandbox, with time, memory, and output limits, so that a malicious file can't make them
-# run forever, use all the memory, or do anything else if it manages to exploit a bug in the program.
+# Runs the external programs that we use on untrusted files (ffmpeg, ffprobe, mkvmerge, exiftool, bin/archive for
+# archives and ugoiras, and bin/image for images) in a sandbox, with time, memory, and output limits, so that a
+# malicious file can't make them run forever, use all the memory, or do anything else if it manages to exploit a bug in
+# the program.
 #
 # The sandbox uses Landlock to limit which files the command can access, and seccomp to limit which system calls it can
 # make. Both work without root and without any special support from Docker or Kubernetes. Both are turned off by
@@ -30,7 +31,8 @@ class ExternalCommand
   # The most output a command can print before it's killed.
   OUTPUT_LIMIT = 16.megabytes
 
-  # The environment variables passed to commands. Commands use jemalloc (see the Dockerfile) to stay under the memory limit.
+  # The environment variables passed to commands, plus the `environment` of their profile. Commands use jemalloc (see the
+  # Dockerfile) to stay under the memory limit.
   ENVIRONMENT = %w[PATH LD_PRELOAD MALLOC_CONF].freeze
 
   # What every command can do: load shared libraries, and use basic syscalls for memory, files, threads, and signals.
@@ -49,8 +51,8 @@ class ExternalCommand
     ],
   }.freeze
 
-  # What the Ruby helper scripts (like bin/archive) need on top of the base profile. They're run with this exact Ruby.
-  # Ruby's timer thread waits on an eventfd with epoll, and Ruby turns off transparent huge pages.
+  # What the Ruby helper scripts (bin/archive and bin/image) need on top of the base profile. They're run with this exact
+  # Ruby. Ruby's timer thread waits on an eventfd with epoll, and Ruby turns off transparent huge pages.
   RUBY_PROFILE = {
     execute: [RbConfig.ruby],
     read: [RbConfig::CONFIG["rubylibprefix"], File.join(RbConfig::CONFIG["libdir"], RbConfig::CONFIG["LIBRUBY_SO"])],
@@ -87,6 +89,14 @@ class ExternalCommand
     "bin/archive" => RUBY_PROFILE.merge(
       syscalls: RUBY_PROFILE[:syscalls] + %w[umask mkdir mkdirat rename renameat renameat2 unlink unlinkat ftruncate],
     ),
+    # bin/image only writes the output files it's given, which it creates by opening them. It reads libvips, its
+    # modules, and mozjpeg from /usr/local/lib (see the Dockerfile). jemalloc keeps the address space of freed memory by
+    # default, which counts against the memory limit, so the largest WebPs would run out of address space while hashing
+    # their pixels.
+    "bin/image" => RUBY_PROFILE.merge(
+      read: RUBY_PROFILE[:read] + %w[/usr/local/lib],
+      environment: { "MALLOC_CONF" => [ENV.fetch("MALLOC_CONF", nil), "retain:false"].compact_blank.join(",") },
+    ),
   }.freeze
 
   attr_reader :argv, :program, :profile, :read, :write, :timeout, :memory_limit, :output_limit, :file_size_limit
@@ -114,10 +124,10 @@ class ExternalCommand
     new(...).run
   end
 
-  # Run one of our Ruby helper scripts, like bin/archive, with the sandbox profile of the same name. It's run with this
-  # exact Ruby, without Bundler, so it starts quickly. The gems it uses are passed with `-I`.
+  # Run one of our Ruby helper scripts, like bin/archive or bin/image, with the sandbox profile of the same name. It's
+  # run with this exact Ruby, without Bundler, so it starts quickly. The gems it uses are passed with `-I`.
   #
-  # @param script [String] The script, relative to the Rails root, like "bin/archive".
+  # @param script [String] The script, relative to the Rails root, like "bin/image".
   # @param args [Array] The arguments to the script.
   # @param gems [Array<String>] The names of the bundled gems the script uses.
   # @param read [Array<String>] The files and directories the script can read.
@@ -179,7 +189,7 @@ class ExternalCommand
       # status, so we always know whether the command is still running and needs to be killed.
       Thread.handle_interrupt(Object => :never) do
         pid = Process.spawn(
-          ENV.slice(*ENVIRONMENT), *command,
+          ENV.slice(*ENVIRONMENT).merge(profile.fetch(:environment, {})), *command,
           in: stdin, out: output_writer, err: output_writer, unsetenv_others: true, close_others: true,
           # Disable core dumps, otherwise a command that crashes when it hits the memory limit can fill the disk.
           rlimit_as: memory_limit.to_i, rlimit_core: 0, **(file_size_limit ? { rlimit_fsize: file_size_limit.to_i } : {}),

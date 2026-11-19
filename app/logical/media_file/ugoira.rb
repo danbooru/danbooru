@@ -36,6 +36,7 @@ class MediaFile::Ugoira < MediaFile
       super(file_or_files, **options)
       @files = nil
     elsif file_or_files.respond_to?(:to_a)
+      super(nil, **options)
       @files = file_or_files.to_a.map { |file| file.respond_to?(:path) ? file : File.open(file) }
     else
       raise ArgumentError, "expected a file or an array of files"
@@ -81,12 +82,13 @@ class MediaFile::Ugoira < MediaFile
     return "must have at least two frames" if frames.size < 2
     return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
 
-    # Check the dimensions before decoding the frames, so that a frame can't be larger than the first frame (whose size is
-    # checked by `MediaAsset.validate_media_file!`).
+    # bin/image only decodes the frames if they're all the same size, so that a frame can't be larger than the first
+    # frame (whose size is checked by `MediaAsset.validate_media_file!`).
     return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
 
     frames.each do |frame|
       return "file '#{File.basename(frame.path)}' is animated" if frame.is_animated?
+      return "file '#{File.basename(frame.path)}' is too large to decode" if frame.is_too_large?
       return "file '#{File.basename(frame.path)}' is corrupt" if frame.is_corrupt?
     end
 
@@ -168,10 +170,6 @@ class MediaFile::Ugoira < MediaFile
     frames.first&.dimensions || [0, 0]
   end
 
-  def preview!(width, height, **options)
-    preview_frame.preview!(width, height, **options)
-  end
-
   def duration
     (frame_delays.sum / 1000.0)
   end
@@ -246,10 +244,15 @@ class MediaFile::Ugoira < MediaFile
     end
   end
 
-  # @return [Array<MediaFile>] The list of images in the ugoira.
+  # @return [Array<MediaFile>] The list of images in the ugoira. They're all read with one call to bin/image, instead
+  #   of one call per frame.
   def frames
     synchronize do
-      @frames ||= files.filter_map { |file| MediaFile.open(file) unless file.path.ends_with?(".json") }
+      # Reading many frames can take as long as encoding them, so it gets the same timeout. 500 noisy 1920x1080 frames
+      # take about a minute to read.
+      @frames ||= files.filter_map { |file| MediaFile.open(file) unless file.path.ends_with?(".json") }.tap do |frames|
+        MediaFile::Image.read!(frames, timeout: FFmpeg::ENCODE_TIMEOUT)
+      end
     end
   end
 

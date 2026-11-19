@@ -13,8 +13,24 @@ class MediaAsset < ApplicationRecord
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
 
-  # The max memory for images that can't be decoded as a stream (see `MediaFile::Image#full_decode_size`).
-  MAX_FULL_DECODE_SIZE = 200.megabytes
+  # Images are decoded by bin/image, which can use at most 4 GB of memory (`ExternalCommand::MEMORY_LIMIT`). An image
+  # that needs more fails partway through decoding, which looks the same as a corrupt file. The two limits below reject
+  # images that would need too much memory before they're decoded, so they're reported as too large instead.
+  #
+  # Most JPEGs and PNGs are decoded a few rows at a time, so their size in memory is 0 and only the limits above apply.
+  # Progressive JPEGs, interlaced PNGs, rotated JPEGs and PNGs, GIFs, WebPs, and AVIFs are decoded all at once, so the
+  # whole decoded image has to fit in memory. This is the max size of that decoded image (see
+  # `MediaFile::Image#in_memory_size`).
+  #
+  # Measured with libvips 8.18 at this limit, PNGs need about 1.8 GB and progressive JPEGs under 3 GB. The largest GIF
+  # (46 MP) and AVIF (36 MP) on Danbooru need 1 GB and 2.3 GB.
+  MAX_IN_MEMORY_SIZE = 1.gigabyte
+
+  # The max resolution of WebPs. libvips' WebP loader keeps about five copies of the image in memory while decoding it,
+  # so WebPs run out of memory long before they reach MAX_IN_MEMORY_SIZE. Measured with libvips 8.18, 12803x12803 is the
+  # largest WebP that fits, and 12900x12900 runs out of memory.
+  MAX_WEBP_RESOLUTION = 12_800 * 12_800
+
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
 
   attribute :id
@@ -389,20 +405,32 @@ class MediaAsset < ApplicationRecord
           raise Error, "File is not an image or video"
         elsif media_file.is_flash?
           raise Error, "Flash files are not supported"
-        # Check the size and dimensions before `is_supported?` and `is_corrupt?`, which decode the whole file.
+        # Check the file size before reading the file. Reading the dimensions only decodes images that are within the
+        # limits checked below (see `MediaFile::Image.read!`).
         elsif media_file.file_size > MAX_FILE_SIZE
           raise Error, "File size too large (size: #{media_file.file_size.to_fs(:human_size)}; max size: #{MAX_FILE_SIZE.to_fs(:human_size)})"
         # Check the frame count before the dimensions, because getting a video's dimensions requires reading every frame.
         elsif media_file.is_video? && media_file.packet_count > FFmpeg::MAX_PACKET_COUNT
           raise Error, "Video has too many frames (max: #{FFmpeg::MAX_PACKET_COUNT})"
-        elsif media_file.resolution > MAX_IMAGE_RESOLUTION
+        end
+
+        # Read the file and its metadata at the same time, because both start an external program. Wait for both
+        # before checking them, so neither is still running if a check fails.
+        reads = [Danbooru.async { media_file.dimensions }, Danbooru.async { media_file.exif_metadata }]
+        reads.each(&:wait)
+        reads.each(&:value!)
+
+        # These are the same limits `bin/image` checks before decoding an image (see `within_limits?`). Change both together.
+        if media_file.resolution > MAX_IMAGE_RESOLUTION
           raise Error, "Image resolution is too large (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)"
         elsif media_file.width.to_i > MAX_IMAGE_WIDTH
           raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
         elsif media_file.height.to_i > MAX_IMAGE_HEIGHT
           raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
-        elsif media_file.full_decode_size > MAX_FULL_DECODE_SIZE
-          raise Error, "Image is too large to decode (size: #{media_file.full_decode_size.to_fs(:human_size)}; max size: #{MAX_FULL_DECODE_SIZE.to_fs(:human_size)})"
+        elsif media_file.in_memory_size > MAX_IN_MEMORY_SIZE
+          raise Error, "Image is too large to decode (size: #{media_file.in_memory_size.to_fs(:human_size)}; max size: #{MAX_IN_MEMORY_SIZE.to_fs(:human_size)})"
+        elsif media_file.file_ext == :webp && media_file.resolution > MAX_WEBP_RESOLUTION
+          raise Error, "WebP image is too large to decode (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_WEBP_RESOLUTION / 1_000_000} megapixels)"
         # Check the metadata before `is_supported?`, which needs the metadata to check AVIFs.
         elsif media_file.exif_metadata["Danbooru:ExifToolError"].present?
           raise Error, "File has too much metadata"
@@ -416,7 +444,7 @@ class MediaAsset < ApplicationRecord
         elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
           raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
         end
-      rescue MediaFile::Ugoira::Error => e
+      rescue MediaFile::Ugoira::Error, MediaFile::Image::TimeoutError => e
         raise Error, e.message
       end
     end

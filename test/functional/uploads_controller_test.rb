@@ -305,7 +305,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a PNG that is too large to decode in memory" do
         should "fail before decoding the image" do
-          MediaFile::Image.any_instance.stubs(:full_decode_size).returns(MediaAsset::MAX_FULL_DECODE_SIZE + 1)
+          MediaFile::Image.any_instance.stubs(:in_memory_size).returns(MediaAsset::MAX_IN_MEMORY_SIZE + 1)
           MediaFile::Image.any_instance.expects(:is_corrupt?).never
           MediaFile::Image.any_instance.expects(:pixel_hash).never
 
