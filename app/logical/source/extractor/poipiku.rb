@@ -20,10 +20,16 @@ class Source::Extractor
 
       # Direct URL given, try to retrieve a fresh signed URL or return the given one if unable
       if parsed_url.image_hash.present?
-        return [(images.find { |img| img.image_hash == parsed_url.image_hash } || parsed_url).full_image_url]
-      end
+        image = images.find { it.image_hash == parsed_url.image_hash }
 
-      images.map(&:full_image_url)
+        # Hashless images can only be found by post ID
+        image ||= images.find { it.image_hash.blank? && it.post_id == parsed_url.post_id } if parsed_url.image_hash.blank?
+
+        image ||= parsed_url if parsed_url.signature.present?
+        [image&.full_image_url].compact
+      else
+        images.map(&:full_image_url)
+      end
     end
 
     def profile_urls
