@@ -174,16 +174,27 @@ class PumaTest < ActiveSupport::TestCase
     should "reject URLs that are too long" do
       spawn_server do |uri|
         assert_equal(200, request_status(:get, uri, params: { q: "a" * 1024 * 9 }))
-        assert_equal(500, request_status(:get, uri, params: { q: "a" * 1024 * 10 }))
+        assert_equal(400, request_status(:get, uri, params: { q: "a" * 1024 * 10 }))
         assert_equal(200, request_status(:post, uri, params: { q: "a" * 1024 * 9 }))
-        assert_equal(500, request_status(:post, uri, params: { q: "a" * 1024 * 10 }))
+        assert_equal(400, request_status(:post, uri, params: { q: "a" * 1024 * 10 }))
       end
     end
 
     should "reject requests with too many headers" do
       spawn_server do |uri|
         assert_equal(200, request_status(:get, uri, headers: 110.times.to_h { |i| ["X-#{i}", "a" * 1024] }))
-        assert_equal(500, request_status(:get, uri, headers: 112.times.to_h { |i| ["X-#{i}", "a" * 1024] }))
+        assert_equal(400, request_status(:get, uri, headers: 112.times.to_h { |i| ["X-#{i}", "a" * 1024] }))
+      end
+    end
+
+    should "reject HTTP/1.1 requests without a Host header" do
+      spawn_server do |uri|
+        response = TCPSocket.open("localhost", URI.parse(uri).port) do |socket|
+          socket.write("GET /up HTTP/1.1\r\nConnection: close\r\n\r\n")
+          socket.read
+        end
+
+        assert_match(%r{\AHTTP/1\.1 400 }, response)
       end
     end
   end
