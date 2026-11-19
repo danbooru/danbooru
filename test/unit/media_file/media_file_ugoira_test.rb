@@ -342,6 +342,13 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
       assert_equal([60, 60], webm.dimensions)
     end
 
+    should "close its webm when it's closed" do
+      path = @ugoira.webm.path
+      @ugoira.close
+
+      assert_equal(false, File.exist?(path))
+    end
+
     should "delete the output file if the conversion fails" do
       output_file = Danbooru::Tempfile.new
       path = output_file.path

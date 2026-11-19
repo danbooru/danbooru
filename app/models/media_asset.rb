@@ -134,7 +134,9 @@ class MediaAsset < ApplicationRecord
       in :"720x720"
         media_file.preview!(width, height, format: :webp, quality: 75)
       in :sample if media_asset.is_ugoira?
-        media_file.convert
+        # Open a new handle to the webm, because `store_file!` closes the file after storing it, and the ugoira still
+        # uses the webm for its preview frame.
+        MediaFile.open(media_file.webm.path)
       in :sample | :full if media_asset.is_static_image?
         media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :original
@@ -305,7 +307,7 @@ class MediaAsset < ApplicationRecord
         media_asset = create!(file: media_file, status: :processing)
         yield media_asset if block_given?
 
-        # XXX shouldn't generate thumbnail twice (very slow for ugoira)
+        # XXX shouldn't generate the 360x360 thumbnail twice
         task1 = Danbooru.async { media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags) if media_asset.has_variant?(:"360x360") }
         task2 = Danbooru.async { media_asset.update!(media_metadata: MediaMetadata.new(file: media_file)) }
         media_asset.distribute_files!(media_file)
