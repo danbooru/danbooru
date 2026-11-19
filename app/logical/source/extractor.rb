@@ -414,7 +414,7 @@ module Source
       file_sizes = image_urls.filter_map do |url| # rubocop:disable Lint/UselessAssignment
         response = http_downloader.head(url)
         file_size = response.headers["Content-Length"] || "0"
-        file_size = "0" if !response.status.in?(200..299)
+        file_size = "0" if !response.status.success?
 
         pretty_file_size = file_size.reverse.chars.each_slice(3).map(&:join).join("_").reverse # "1234567" -> "1_234_567"
         "{ file_size: #{pretty_file_size} }"
