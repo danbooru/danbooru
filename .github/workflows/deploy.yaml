@@ -1,4 +1,4 @@
-# Deploy to betabooru or testbooru.
+# Deploy to testbooru.
 #
 # Called by pipeline.yaml after the images are built,
 # or started by hand from the Actions tab.
@@ -12,32 +12,23 @@ on:
   # https://docs.github.com/en/actions/sharing-automations/reusing-workflows
   workflow_call:
   workflow_dispatch:
-    inputs:
-      environment:
-        type: choice
-        required: true
-        description: Environment
-        options:
-          - testbooru
-          - betabooru
-        default: "testbooru"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     # https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idenvironment
-    environment: ${{ inputs.environment || github.ref_name }}
+    environment: testbooru
 
     # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#concurrency
     concurrency:
-      group: deploy-${{ inputs.environment || github.ref_name }}
+      group: deploy-testbooru
       cancel-in-progress: true
 
     steps:
       # https://github.com/marketplace/actions/kubectl-tool-installer
       - name: Install Kubectl
-        uses: Azure/setup-kubectl@v5
+        uses: Azure/setup-kubectl@bda439f5f36b99b262ebdcd3613869bddb064c8e # v5.2.0
 
       - name: Configure Kubectl
         run: |
@@ -49,11 +40,7 @@ jobs:
 
       - name: Deploy
         run: |
-          if kubectl get deploy/betabooru > /dev/null 2>&1; then
-            kubectl rollout restart deploy/betabooru && kubectl rollout status deploy/betabooru
-          else # no betabooru on testbooru
-            kubectl rollout restart deploy/downbooru && kubectl rollout status deploy/downbooru
-            kubectl rollout restart deploy/danbooru-cron && kubectl rollout status deploy/danbooru-cron
-            kubectl rollout restart deploy/danbooru-jobs && kubectl rollout status deploy/danbooru-jobs
-            kubectl rollout restart deploy/danbooru && kubectl rollout status deploy/danbooru
-          fi
+          kubectl rollout restart deploy/downbooru && kubectl rollout status deploy/downbooru
+          kubectl rollout restart deploy/danbooru-cron && kubectl rollout status deploy/danbooru-cron
+          kubectl rollout restart deploy/danbooru-jobs && kubectl rollout status deploy/danbooru-jobs
+          kubectl rollout restart deploy/danbooru && kubectl rollout status deploy/danbooru

@@ -7,8 +7,21 @@ class IqdbQueriesController < ApplicationController
     # XXX allow bare search params for backwards compatibility.
     search_params.merge!(params.slice(:url, :hash, :image_url, :file_url, :post_id, :media_asset_id, :limit, :similarity, :high_similarity).permit!)
 
+    if search_params[:similarity].present?
+      @similarity = Float(search_params[:similarity], exception: false)
+      raise ActionController::BadRequest, "similarity must be a number" if @similarity.nil?
+    end
+
+    @high_similarity = Float(search_params[:high_similarity], exception: false)
+
     iqdb_params = search_params.to_h.symbolize_keys.slice(:post_id, :media_asset_id, :file, :hash, :url, :image_url, :file_url, :limit)
+    iqdb_params.except(:file).each do |name, value|
+      raise ActionController::BadRequest, "#{name} has an invalid value" unless value.nil? || value.is_a?(String) || value.is_a?(Integer)
+    end
+    raise ActionController::BadRequest, "limit must be a number" if iqdb_params[:limit].present? && Integer(iqdb_params[:limit], exception: false).nil?
+
     @matches = authorize(IqdbClient.new).search(**iqdb_params)
+    @matches = @matches.select { |match| match["score"] >= @similarity } if @similarity
 
     respond_with(@matches, template: "iqdb_queries/show", location: iqdb_queries_path)
   rescue IqdbClient::Error, MediaAsset::Error => e

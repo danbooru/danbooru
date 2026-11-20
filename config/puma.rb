@@ -150,7 +150,9 @@ Rack::Utils.multipart_total_part_limit = ENV.fetch("RACK_MULTIPART_TOTAL_PART_LI
 # error, or if a middleware raises an error before or after the request is handled by the app.
 #
 # When RAILS_ENV is development, errors will be swallowed by the BetterErrors gem before they get to this point.
-lowlevel_error_handler do |exception, _env|
+#
+# `status` is the status Puma would return without this handler, e.g. 400 for malformed requests or 500 for app errors.
+lowlevel_error_handler do |exception, _env, status|
   ApplicationMetrics[:puma_exceptions_total][exception: exception.class.name].increment
 
   backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
@@ -162,7 +164,7 @@ lowlevel_error_handler do |exception, _env|
     #{backtrace}
   EOS
 
-  [500, {}, [message]]
+  [status, {}, [message]]
 rescue Exception => second_exception # This should never happen
   message = <<~EOS
     An unexpected error has occurred on the error page. Oh baby, a triple fault!

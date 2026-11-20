@@ -40,7 +40,7 @@
 
 # You must also update .ruby-version and the Gemfile when updating the Ruby version.
 # These versions are used by bin/danbooru-dev-entrypoint to detect whether the current installed docker containers are outdated
-ARG RUBY_VERSION="4.0.9"
+ARG RUBY_VERSION="4.0.10"
 ARG RUBY_MAJOR_VERSION="4.0"
 
 # The comments above these ARGs help renovate figure out where to check for new versions of these dependencies.
@@ -54,10 +54,10 @@ ARG FFMPEG_VERSION="9.0.2"
 ARG EXIFTOOL_VERSION="13.55"
 # github: openresty/openresty
 ARG OPENRESTY_VERSION="1.29.2.3"
-ARG NODE_VERSION="24.22.2"
-ARG UBUNTU_VERSION="resolute-20261006@sha256:c098726dd9b9733f3e885f8de0ef375206a311b0a317eadc40d347b1115fb944"
+ARG NODE_VERSION="26.13.0"
+ARG UBUNTU_VERSION="resolute-20261105.1@sha256:d66b366dac61b575bee2aef07e9c26e8070096fbe84a3d4d3eb0da069b5d76db"
 # Remember to update the UBUNTU_SNAPSHOT ARG below when UBUNTU_VERSION is updated
-ARG UBUNTU_SNAPSHOT="20261006T000000Z"
+ARG UBUNTU_SNAPSHOT="20261105T000000Z"
 
 
 # The base layer for everything.

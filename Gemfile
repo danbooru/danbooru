@@ -1,6 +1,6 @@
 source "https://rubygems.org/"
 
-ruby "~> 4.0.9"
+ruby "~> 4.0.10"
 
 gem "rails", "~> 8"
 gem "json", "~> 3"
@@ -23,7 +23,7 @@ gem "rake", "~> 13"
 gem "redis", "~> 6"
 gem "builder", "~> 3"
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
-gem "puma", "~> 7"
+gem "puma", "~> 8"
 gem "scenic", "~> 1"
 gem "http", "~> 6"
 gem "pundit", "~> 2"
@@ -47,7 +47,7 @@ gem "debug", "~> 1", require: false
 gem "faker", "~> 3", require: false
 gem "resolv", "~> 0.7"
 gem "rover-df", "~> 1"
-gem "ffi-libarchive", "~> 1"
+gem "ffi-libarchive", "~> 1", require: false # Used by bin/archive.
 gem "pry-rails", "~> 0.3"
 gem "drb", "~> 2"
 gem "net-sftp", "~> 4", require: false
@@ -59,7 +59,7 @@ gem "rotp", "~> 6"
 gem "rqrcode", "~> 3"
 gem "kramdown", "~> 2"
 gem "abbrev", "~> 0.1"
-gem "rubyzip", "~> 3", require: false
+gem "rubyzip", "~> 3", require: false # Used by bin/archive.
 gem "webrick", "~> 1"
 gem "useragent", "~> 0.16"
 gem "dotenv-rails", "~> 3", require: false # This is loaded in application.rb

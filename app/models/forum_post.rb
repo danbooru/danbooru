@@ -25,10 +25,10 @@ class ForumPost < ApplicationRecord
   has_one :tag_implication
   has_one :bulk_update_request
 
-  validates :body, visible_string: true, length: { maximum: MAX_BODY_LENGTH }, if: :body_changed?
+  validates :body, visible_string: true, length: { maximum: MAX_BODY_LENGTH }, if: -> { new_record? || body_changed? }
   validate :validate_body, if: :body_changed?
-  validate :validate_deletion_of_original_post
-  validate :validate_undeletion_of_post
+  validate :validate_deletion_of_original_post, if: :topic
+  validate :validate_undeletion_of_post, if: :topic
 
   before_save :handle_reports_on_deletion
   after_create :update_topic_updated_at_on_create

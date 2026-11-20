@@ -109,6 +109,22 @@ module Danbooru
         Danbooru::JSON.parse(self)
       end
 
+      # A YYYY-MM-DD date, optionally followed by a time and time zone, which are ignored. Examples:
+      #
+      #   2020-01-02, 2020-1-2, 2020-01-02 12:00, 2020-01-02 1:00:00, 2020-01-02T12:00:00.123Z, 2020-01-02 12:00:00 -0500
+      DATE_REGEX = /\A[[:space:]]*(\d{4})-(\d{1,2})-(\d{1,2})(?:[T ](?:[01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?: ?(?:Z|[+-]\d{2}:?\d{2}))?)?[[:space:]]*\z/
+
+      # Parse a date like "2020-01-02", "2020-1-2", or "2020-01-02 12:00". The time is ignored.
+      #
+      # @return [Date] The date.
+      # @raise [Date::Error] If the string isn't a valid date.
+      def parse_date!
+        year, month, day = match(DATE_REGEX)&.captures&.map(&:to_i)
+        raise Date::Error, "#{truncate(100)} is not a valid date" unless year && Date.valid_date?(year, month, day)
+
+        Date.new(year, month, day)
+      end
+
       # Parse a string containing HTML into a HTML object.
       #
       # @return [Nokogiri::HTML5::DocumentFragment] The HTML object.

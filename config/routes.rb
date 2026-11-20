@@ -258,7 +258,7 @@ Rails.application.routes.draw do
     resources :upload_media_assets, only: [:show, :index], path: "assets"
   end
   resources :upload_media_assets, only: [:show, :index]
-  resources :user_actions, only: [:index, :show]
+  resources :user_actions, only: [:index]
   resources :users do
     resources :actions, only: [:index], controller: "user_actions", as: "user_actions"
     resources :favorites, only: [:index, :create, :destroy]

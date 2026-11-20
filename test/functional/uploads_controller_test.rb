@@ -1,4 +1,5 @@
 require "test_helper"
+require "zip"
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
   context "The uploads controller" do
@@ -216,6 +217,36 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 422
         assert_equal(["Can't give both a file and a source"], response.parsed_body.dig("errors", "base"))
+      end
+
+      should "fail if the filename isn't valid UTF-8" do
+        assert_no_difference("Upload.count") do
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
+          post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }}}
+        end
+
+        assert_response 422
+        assert_equal(["'a\uFFFD.jpg' isn't a valid filename (filenames must be UTF-8)"], response.parsed_body.dig("errors", "base"))
+      end
+
+      should "fail if the filename contains a NUL byte" do
+        assert_no_difference("Upload.count") do
+          body = "--xyz\r\nContent-Disposition: form-data; name=\"upload[files][0]\"; filename=\"a%00b.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".b + File.binread("test/files/jpg/test.jpg") + "\r\n--xyz--\r\n".b
+          post_auth uploads_path(format: :json), @user, headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: body
+        end
+
+        assert_response 422
+        assert_equal(["'a\uFFFDb.jpg' isn't a valid filename (filenames can't contain NUL bytes)"], response.parsed_body.dig("errors", "base"))
+      end
+
+      should "succeed if the filename has non-ASCII characters" do
+        assert_difference("Upload.count", 1) do
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "あ.jpg")
+          post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }}}
+        end
+
+        assert_response 201
+        assert_equal(["file://あ.jpg"], Upload.last.upload_media_assets.map(&:source_url))
       end
 
       should "fail if given an unsupported filetype" do
@@ -540,6 +571,51 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_match(/'.*' in 'zip-slip\.zip' can't contain '\.\.' components/, response.parsed_body.dig("errors", "base", 0))
         end
 
+        should "fail for an archive containing a path that's too long" do
+          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+            Zip::File.open(file.path, create: true) { |zip| zip.add("#{"#{"a" * 200}/" * 6}test.jpg", "test/files/jpg/test.jpg") }
+            create_upload!(file.path, user: @user)
+
+            assert_response 422
+            assert_match("'#{File.basename(file.path)}' contains a path that's too long (max 1024 bytes)", response.parsed_body.dig("errors", "base", 0))
+          end
+        end
+
+        should "fail for a corrupt archive" do
+          Danbooru::Tempfile.create(["danbooru-archive-", ".7z"]) do |file|
+            File.binwrite(file.path, File.binread("test/files/archive/ugoira.7z").byteslice(0, 2000))
+            create_upload!(file.path, user: @user)
+
+            assert_response 422
+            assert_equal(["'#{File.basename(file.path)}' couldn't be read (invalid or corrupt archive)"], response.parsed_body.dig("errors", "base"))
+          end
+        end
+
+        should "fail for an encrypted archive" do
+          # encrypted.zip and encrypted-headers.7z were created with `7z a -pSECRET` (and `-tzip`, or `-mhe=on` to encrypt
+          # the file list too).
+          %w[encrypted.zip encrypted-headers.7z].each do |name|
+            create_upload!("test/files/archive/#{name}", user: @user)
+
+            assert_response 422
+            assert_equal(["'#{name}' couldn't be read (encrypted archives aren't supported)"], response.parsed_body.dig("errors", "base"))
+          end
+        end
+
+        should "name the archive if it fails to extract after being validated" do
+          create_upload!("test/files/archive/lzma2-4gb-dictionary.7z", user: @user)
+
+          assert_response 201
+          assert_equal("error", Upload.last.status)
+          assert_equal("'lzma2-4gb-dictionary.7z' couldn't be extracted (invalid or corrupt archive)", Upload.last.error)
+        end
+
+        should "fail for an archive containing hardlinks" do
+          create_upload!("test/files/archive/hardlink.rar", user: @user)
+          assert_response 422
+          assert_match("'b.jpg' in 'hardlink.rar' isn't a regular file", response.parsed_body.dig("errors", "base", 0))
+        end
+
         should "fail for an archive containing symlinks" do
           create_upload!("test/files/archive/symlink.zip", user: @user)
           assert_response 422
@@ -708,6 +784,168 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("file://out-of-order.zip/10/11.gif", upload.upload_media_assets[5].source_url)
         end
 
+        should "work for multiple archives and images at once" do
+          files = %w[test/files/archive/directory.zip test/files/archive/ugoira.7z test/files/archive/ugoira.rar test/files/jpg/test.jpg]
+          perform_enqueued_jobs do
+            post_auth uploads_path(format: :json), @user, params: { upload: { files: files.each_with_index.to_h { |path, i| [i.to_s, Rack::Test::UploadedFile.new(path)] }}}
+          end
+
+          assert_response 201
+          upload = Upload.last
+          assert_equal("completed", upload.status)
+          assert_equal(13, upload.upload_media_assets.size)
+          assert_equal(%w[file://directory.zip/subdir/test.png file://directory.zip/test.png], upload.upload_media_assets.map(&:source_url).grep(/directory\.zip/))
+          assert_equal(5, upload.upload_media_assets.map(&:source_url).grep(%r{\Afile://ugoira\.7z/}).size)
+          assert_equal(5, upload.upload_media_assets.map(&:source_url).grep(%r{\Afile://ugoira\.rar/}).size)
+        end
+
+        should "not read the archives if the user has too many queued uploads" do
+          create(:upload_media_asset, upload: create(:upload, uploader: @user), status: "pending")
+
+          stub_const(Upload, :MAX_QUEUED_ASSETS, 0) do
+            Danbooru::Tempfile.create(["danbooru-archive-", ".7z"]) do |corrupt|
+              File.binwrite(corrupt.path, File.binread("test/files/archive/ugoira.7z").byteslice(0, 2000))
+              post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => Rack::Test::UploadedFile.new(corrupt.path) }}}
+
+              assert_response 422
+              assert_equal(["You have too many images queued for upload (queued: 1; limit: 0). Try again later."], response.parsed_body.dig("errors", "base"))
+            end
+          end
+        end
+
+        should "log and quarantine the archives if bin/archive calls a blocked syscall while reading them" do
+          Danbooru::Archive.stubs(:run!).raises(ExternalCommand::SyscallError, "ruby called a blocked syscall")
+          Rails.logger.stubs(:error)
+          Rails.logger.expects(:error).with do |message|
+            message.match?(/\AUpload by user ##{@user.id} \(#{@user.name}\) was blocked by the sandbox: ruby called a blocked syscall/) &&
+              message.include?("md5: 017ef6a8d5397de06ea9f1245bdc554e") && message.include?('source: "file://directory.zip"')
+          end
+
+          create_upload!("test/files/archive/directory.zip", user: @user)
+
+          assert_response 422
+          assert_equal(["'directory.zip' couldn't be read (invalid or corrupt archive)"], response.parsed_body.dig("errors", "base"))
+          quarantined = Danbooru.config.storage_manager.open("/trash/quarantine/017ef6a8d5397de06ea9f1245bdc554e.zip")
+          assert_equal(File.binread("test/files/archive/directory.zip"), quarantined.read)
+        end
+
+        should "log and quarantine the archives if bin/archive calls a blocked syscall while extracting them" do
+          Danbooru::Archive.any_instance.stubs(:extract_to!).raises(ExternalCommand::SyscallError, "ruby called a blocked syscall")
+          Rails.logger.stubs(:error)
+          Rails.logger.expects(:error).with do |message|
+            message.match?(/\AUpload #\d+ by user ##{@user.id} \(#{@user.name}\) was blocked by the sandbox: ruby called a blocked syscall/) &&
+              message.include?("md5: 017ef6a8d5397de06ea9f1245bdc554e") && message.include?('source: "file://directory.zip"')
+          end
+
+          create_upload!("test/files/archive/directory.zip", user: @user)
+
+          assert_response 201
+          assert_equal("error", Upload.last.status)
+          assert_equal("'directory.zip' couldn't be extracted (invalid or corrupt archive)", Upload.last.error)
+          quarantined = Danbooru.config.storage_manager.open("/trash/quarantine/017ef6a8d5397de06ea9f1245bdc554e.zip")
+          assert_equal(File.binread("test/files/archive/directory.zip"), quarantined.read)
+        end
+
+        should "fail if the archives together are too large" do
+          stub_const(MediaAsset, :MAX_FILE_SIZE, 10_000) do
+            files = { "0" => Rack::Test::UploadedFile.new("test/files/ugoira/ugoira.zip"), "1" => Rack::Test::UploadedFile.new("test/files/archive/ugoira.7z") }
+            post_auth uploads_path(format: :json), @user, params: { upload: { files: }}
+
+            assert_response 422
+            assert_equal(["The archives are too large (uncompressed size: 12 KB; max size: 9.77 KB)"], response.parsed_body.dig("errors", "base"))
+          end
+        end
+
+        should "report which archive is invalid when uploading multiple archives" do
+          Danbooru::Tempfile.create(["danbooru-archive-", ".7z"]) do |corrupt|
+            File.binwrite(corrupt.path, File.binread("test/files/archive/ugoira.7z").byteslice(0, 2000))
+            files = { "0" => Rack::Test::UploadedFile.new("test/files/archive/directory.zip"), "1" => Rack::Test::UploadedFile.new(corrupt.path), "2" => Rack::Test::UploadedFile.new("test/files/archive/symlink.zip") }
+            post_auth uploads_path(format: :json), @user, params: { upload: { files: }}
+
+            assert_response 422
+            errors = response.parsed_body.dig("errors", "base")
+            assert_equal(2, errors.size)
+            assert_equal("'#{File.basename(corrupt.path)}' couldn't be read (invalid or corrupt archive)", errors[0])
+            assert_match("'passwd' in 'symlink.zip' isn't a regular file", errors[1])
+          end
+        end
+
+        should "keep files with non-ASCII names separate" do
+          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+            Zip::File.open(file.path, create: true) do |zip|
+              zip.add("あ.jpg", "test/files/jpg/test.jpg")
+              zip.add("い.png", "test/files/png/test.png")
+            end
+
+            upload = assert_successful_upload(file.path, user: @user)
+            name = File.basename(file.path)
+
+            assert_equal(["file://#{name}/あ.jpg", "file://#{name}/い.png"], upload.upload_media_assets.map(&:source_url))
+            assert_equal(2, upload.media_assets.map(&:md5).uniq.size)
+          end
+        end
+
+        should "decode Shift_JIS file names" do
+          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+            # Zips made on Japanese Windows store names in Shift_JIS without the UTF-8 flag.
+            Zip::OutputStream.open(file.path) do |zip|
+              %w[画像２.jpg 画像１０.png 画像１.gif].zip(%w[jpg/test.jpg png/test.png gif/test.gif]).each do |entry_name, path|
+                zip.put_next_entry(entry_name.encode("Shift_JIS").b)
+                zip.write(File.binread("test/files/#{path}"))
+              end
+            end
+
+            upload = assert_successful_upload(file.path, user: @user)
+            name = File.basename(file.path)
+
+            assert_equal(%W[file://#{name}/画像１.gif file://#{name}/画像１０.png file://#{name}/画像２.jpg], upload.upload_media_assets.map(&:source_url))
+            assert_equal(3, upload.media_assets.map(&:md5).uniq.size)
+          end
+        end
+
+        should "not count directories toward the file limit" do
+          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+            Zip::OutputStream.open(file.path) do |zip|
+              20.times { |n| zip.put_next_entry("dir#{n}/") }
+              zip.put_next_entry("dir0/test.jpg")
+              zip.write(File.binread("test/files/jpg/test.jpg"))
+            end
+
+            stub_const(Upload, :MAX_FILES_PER_UPLOAD, 10) do
+              upload = assert_successful_upload(file.path, user: @user)
+              assert_equal(["file://#{File.basename(file.path)}/dir0/test.jpg"], upload.upload_media_assets.map(&:source_url))
+            end
+          end
+        end
+
+        should "ignore macOS and Windows metadata files" do
+          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+            Zip::OutputStream.open(file.path) do |zip|
+              { "a.jpg" => File.binread("test/files/jpg/test.jpg"), "__MACOSX/._a.jpg" => "\x00\x05\x16\x07", "__MACOSX/sub/._b.jpg" => "x", "sub/.DS_Store" => "Bud1", "Thumbs.db" => "x", "desktop.ini" => "x" }.each do |name, data|
+                zip.put_next_entry(name)
+                zip.write(data)
+              end
+            end
+
+            upload = assert_successful_upload(file.path, user: @user)
+            assert_equal(["file://#{File.basename(file.path)}/a.jpg"], upload.upload_media_assets.map(&:source_url))
+          end
+        end
+
+        should "fail for an archive without any files" do
+          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+            Zip::OutputStream.open(file.path) do |zip|
+              zip.put_next_entry("dir/")
+              zip.put_next_entry("__MACOSX/._a.jpg")
+              zip.write("x")
+            end
+            create_upload!(file.path, user: @user)
+
+            assert_response 422
+            assert_equal(["'#{File.basename(file.path)}' doesn't contain any files"], response.parsed_body.dig("errors", "base"))
+          end
+        end
+
         should "work for a .zip file containing directories" do
           upload = assert_successful_upload("test/files/archive/directory.zip", user: @user)
 
@@ -720,11 +958,25 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "uploading a ugoira file from your computer" do
         should "fail without extracting a ugoira with compressed files" do
-          Danbooru::Archive.any_instance.expects(:extract!).never
           create_upload!("test/files/ugoira/ugoira-compressed.zip", user: @user)
 
           assert_response 201
           assert_equal("ugoira must not be compressed", Upload.last.error)
+        end
+
+        should "fail with a readable error for a ugoira with a null byte in a file name" do
+          Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+            write_raw_zip(file, [
+              { name: "animation.json", data: [{ file: "000000.jpg", delay: 100 }].to_json },
+              { name: "000000\0.jpg", data: File.binread("test/files/jpg/test.jpg") },
+            ])
+
+            create_upload!(file.path, user: @user)
+
+            assert_response 201
+            assert_equal("error", Upload.last.status)
+            assert_equal("file '000000?.jpg' has invalid name (expected '000000.jpg')", Upload.last.error)
+          end
         end
 
         should "work for a ugoira in gallery-dl format" do

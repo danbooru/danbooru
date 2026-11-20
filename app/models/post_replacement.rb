@@ -13,6 +13,8 @@ class PostReplacement < ApplicationRecord
 
   attribute :replacement_url, default: ""
 
+  validates :replacement_file, uploaded_filename: true, on: :create
+
   def initialize_fields
     self.original_url = post.source
     self.old_file_ext = post.file_ext

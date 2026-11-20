@@ -233,18 +233,6 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#approve" do
-      should "quote the error message in the .js response" do
-        errors = ActiveModel::Errors.new(@bulk_update_request)
-        errors.add(:base, %{can't approve "alias foo -> bar"})
-        errors.stubs(:clear)
-        BulkUpdateRequest.any_instance.stubs(:approve!)
-        BulkUpdateRequest.any_instance.stubs(:errors).returns(errors)
-
-        post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @admin
-
-        assert_includes(response.body, %{Danbooru.Notice.error("can\\&#39;t approve \\&quot;alias foo -&gt; bar\\&quot;");})
-      end
-
       context "for a member" do
         should "fail" do
           post_auth approve_bulk_update_request_path(@bulk_update_request), @user
@@ -473,8 +461,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
           post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
 
-          assert_includes(response.body, "Danbooru.Notice.error")
-          assert_includes(response.body, "[[char1a]] has implications; requires Admin")
+          assert_js_notice(:error, "Can't approve create alias [[char1a]] -> [[char1b]] ([[char1a]] has implications; requires Admin)")
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
         end
@@ -488,8 +475,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
           post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
 
-          assert_includes(response.body, "Danbooru.Notice.error")
-          assert_includes(response.body, "[[art1a]] is a banned artist; requires Admin")
+          assert_js_notice(:error, "Can't approve create alias [[art1a]] -> [[art1b]] ([[art1a]] is a banned artist; requires Admin)")
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, artist.reload.is_banned?)
         end
@@ -502,8 +488,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
           post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
 
-          assert_includes(response.body, "Danbooru.Notice.error")
-          assert_includes(response.body, "[[char1a_(cosplay)]] is too large; requires Admin")
+          assert_js_notice(:error, "Can't approve create alias [[char1a]] -> [[char1b]] ([[char1a_(cosplay)]] is too large; requires Admin)")
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
         end
@@ -531,8 +516,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
           post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
 
-          assert_includes(response.body, "Danbooru.Notice.error")
-          assert_includes(response.body, "[[art1a_(style)]] is too large; requires Admin")
+          assert_js_notice(:error, "Can't approve create alias [[art1a]] -> [[art1b]] ([[art1a_(style)]] is too large; requires Admin)")
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, TagAlias.exists?(antecedent_name: "art1a", consequent_name: "art1b"))
         end
@@ -545,8 +529,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
           post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
 
-          assert_includes(response.body, "Danbooru.Notice.error")
-          assert_includes(response.body, "[[gen1a_(style)]] is too large; requires Admin")
+          assert_js_notice(:error, "Can't approve create alias [[gen1a]] -> [[art1b]] ([[gen1a_(style)]] is too large; requires Admin)")
           assert_equal("pending", @bulk_update_request.reload.status)
         end
 
@@ -559,8 +542,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
             post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
           end
 
-          assert_includes(response.body, "Danbooru.Notice.error")
-          assert_includes(response.body, "requires Admin")
+          assert_js_notice(:error, "Can't approve create alias [[gen1a]] -> [[gen1b]] (requires Admin)")
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b"))
           assert_equal(true, Tag.find_by_name("gen1b").general?)
@@ -578,8 +560,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
             post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
           end
 
-          assert_includes(response.body, "Danbooru.Notice.error")
-          assert_includes(response.body, "requires Admin")
+          assert_js_notice(:error, "Can't approve create alias [[gen1a]] -> [[gen1b]] ([[gen1a]] has implications; requires Admin)")
           assert_equal("pending", @bulk_update_request.reload.status)
           assert_equal(false, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b"))
           assert_equal(false, TagImplication.exists?(antecedent_name: "gen1b", consequent_name: "gen1c"))

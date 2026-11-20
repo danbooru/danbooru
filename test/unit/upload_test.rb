@@ -99,6 +99,23 @@ class UploadTest < ActiveSupport::TestCase
       should_not allow_value("https://<img src=x onerror=alert(1)>").for(:source)
       should_not allow_value('https://a"><svg/onload=alert(1)>').for(:source)
       should allow_value("https://example.com/image.jpg").for(:source)
+
+      should "not allow files with filenames that aren't valid UTF-8" do
+        file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
+        upload = build(:upload, source: nil, files: { "0" => file })
+
+        assert_equal(false, upload.valid?)
+        assert_equal(["'a\uFFFD.jpg' isn't a valid filename (filenames must be UTF-8)"], upload.errors[:base])
+      end
+
+      should "not allow files with filenames that contain NUL bytes" do
+        file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
+        file.stubs(:original_filename).returns("a\0b.jpg")
+        upload = build(:upload, source: nil, files: { "0" => file })
+
+        assert_equal(false, upload.valid?)
+        assert_equal(["'a\uFFFDb.jpg' isn't a valid filename (filenames can't contain NUL bytes)"], upload.errors[:base])
+      end
     end
   end
 end

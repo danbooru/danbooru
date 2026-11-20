@@ -15,7 +15,7 @@ class Note < ApplicationRecord
   validates :y, presence: true
   validates :width, presence: true
   validates :height, presence: true
-  validates :body, visible_string: true, length: { maximum: 5000 }, if: :body_changed?
+  validates :body, visible_string: true, length: { maximum: 5000 }, if: -> { new_record? || body_changed? }
   validate :validate_note_within_image
   validate :validate_post_can_have_notes, on: :create
   validate :validate_notes_per_post, if: -> { is_active? && (new_record? || is_active_changed?) }

@@ -29,7 +29,7 @@ class ForumTopic < ApplicationRecord
   normalizes :category, with: ->(category) { category.to_s.titleize.presence }
   normalizes :min_level, with: ->(min_level) { min_level.to_s.capitalize.presence }
 
-  validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
+  validates :title, visible_string: true, length: { maximum: 200 }, if: -> { new_record? || title_changed? }
 
   accepts_nested_attributes_for :original_post
 

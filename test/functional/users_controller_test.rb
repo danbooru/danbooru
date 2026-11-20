@@ -7,6 +7,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      should "return 422 for level params that aren't strings or integers" do
+        get users_path, params: { search: { min_level: ["1"] }}, as: :json
+        assert_response 422
+        assert_equal("min_level must be an integer", response.parsed_body["message"])
+
+        get users_path, params: { search: { max_level: { a: "1" }}}, as: :json
+        assert_response 422
+      end
+
       setup do
         @mod_user = create(:moderator_user)
         @other_user = create(:contributor_user, inviter: @mod_user, created_at: 2.weeks.ago)
@@ -548,6 +557,17 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error instead of 500 for missing or invalid user params" do
+        assert_no_difference("User.count") do
+          post users_path, as: :json
+          assert_response 422
+        end
+
+        post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1", email_address: "x" }}, as: :json
+        assert_response 201
+        assert_nil(User.find_by_name("xxx").email_address)
+      end
+
       should "create a user" do
         freeze_time
         post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1" }}

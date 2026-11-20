@@ -50,7 +50,7 @@ class FavoriteGroupsController < ApplicationController
 
   def add_post
     @favorite_group = authorize FavoriteGroup.find(params[:id])
-    @post = Post.find(params[:post_id])
+    @post = Post.find(params.expect(:post_id))
     @favorite_group.add(@post)
 
     respond_with(@favorite_group)
@@ -58,7 +58,7 @@ class FavoriteGroupsController < ApplicationController
 
   def remove_post
     @favorite_group = authorize FavoriteGroup.find(params[:id])
-    @post = Post.find(params[:post_id])
+    @post = Post.find(params.expect(:post_id))
     @favorite_group.remove(@post)
 
     respond_with(@favorite_group)

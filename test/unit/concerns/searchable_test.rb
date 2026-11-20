@@ -205,6 +205,95 @@ class SearchableTest < ActiveSupport::TestCase
       end
     end
 
+    context "parse_search_params!" do
+      should "parse each param as its type" do
+        params = { min_level: "20", name: "foo", category: "1 4" }.with_indifferent_access
+
+        assert_equal({ min_level: 20, name: "foo", category: [1, 4] }, Post.parse_search_params!(params, min_level: :integer, name: :string, category: [:integer]))
+      end
+
+      should "accept a list as an array" do
+        params = { category: ["1", "4"] }.with_indifferent_access
+
+        assert_equal({ category: [1, 4] }, Post.parse_search_params!(params, category: [:integer]))
+      end
+
+      should "accept integers from JSON request bodies" do
+        params = { min_level: 20, name: 5, category: 1 }.with_indifferent_access
+
+        assert_equal({ min_level: 20, name: "5", category: [1] }, Post.parse_search_params!(params, min_level: :integer, name: :string, category: [:integer]))
+      end
+
+      should "return nil for missing or blank params" do
+        params = { name: "", category: [] }.with_indifferent_access
+
+        assert_equal({ min_level: nil, name: nil, category: nil }, Post.parse_search_params!(params, min_level: :integer, name: :string, category: [:integer]))
+      end
+
+      should "only return the given params" do
+        params = { min_level: "20", other: "foo" }.with_indifferent_access
+
+        assert_equal({ min_level: 20 }, Post.parse_search_params!(params, min_level: :integer))
+      end
+
+      should "clamp integers to the 64-bit range" do
+        params = { min_level: "99999999999999999999", max_level: "-99999999999999999999" }.with_indifferent_access
+
+        assert_equal({ min_level: (2**63) - 1, max_level: -(2**63) }, Post.parse_search_params!(params, min_level: :integer, max_level: :integer))
+      end
+
+      should "raise an error for params of the wrong type" do
+        error = assert_raises(Searchable::SearchError) { Post.parse_search_params!({ min_level: "abc" }.with_indifferent_access, min_level: :integer) }
+        assert_equal("min_level must be an integer", error.message)
+
+        error = assert_raises(Searchable::SearchError) { Post.parse_search_params!({ name: ["foo"] }.with_indifferent_access, name: :string) }
+        assert_equal("name must be a string", error.message)
+
+        error = assert_raises(Searchable::SearchError) { Post.parse_search_params!({ category: ["1", "x"] }.with_indifferent_access, category: [:integer]) }
+        assert_equal("category must be a list of integers", error.message)
+
+        assert_raises(Searchable::SearchError) { Post.parse_search_params!({ min_level: ["20"] }.with_indifferent_access, min_level: :integer) }
+        assert_raises(Searchable::SearchError) { Post.parse_search_params!({ min_level: "1.5" }.with_indifferent_access, min_level: :integer) }
+        assert_raises(Searchable::SearchError) { Post.parse_search_params!({ min_level: true }.with_indifferent_access, min_level: :integer) }
+        assert_raises(Searchable::SearchError) { Post.parse_search_params!({ name: { a: 1 }}.with_indifferent_access, name: :string) }
+        assert_raises(Searchable::SearchError) { Post.parse_search_params!({ category: { a: 1 }}.with_indifferent_access, category: [:integer]) }
+        assert_raises(Searchable::SearchError) { Post.parse_search_params!({ category: [["1"]] }.with_indifferent_access, category: [:integer]) }
+      end
+    end
+
+    context "for search values with the wrong type" do
+      should "raise a search error" do
+        assert_raises(Searchable::SearchError) { Post.search({ is_deleted: "abc" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ is_deleted: ["1", "2"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ is_deleted: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_eq: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score_eq: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score_not: ["1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ created_at_eq: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Comment.search({ body_matches: ["a"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumTopic.search({ min_level: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumTopic.search({ min_level: ["a", "b"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumTopic.search({ min_level_not: ["a"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { UserEvent.search({ ip_addr: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { UserEvent.search({ ip_addr: ["1.1.1.1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { UserEvent.search({ metadata: "abc" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { UserEvent.search({ metadata: ["1", "2"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumPostVote.search({ forum_post: "abc" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ForumPostVote.search({ forum_post: ["1", "2"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ uploader: "abc" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { ModerationReport.search({ Comment: "abc" }, User.anonymous).load }
+      end
+
+      should "return nothing for numbers too large for the column" do
+        assert_search_equals([], id: "99999999999999999999")
+        assert_search_equals([], id: ">99999999999999999999")
+        assert_search_equals([@p3, @p2, @p1], id: "<99999999999999999999")
+        assert_search_equals([@p1], id: "#{@p1.id},99999999999999999999")
+      end
+    end
+
     context "for an inet attribute" do
       subject { UserEvent }
 

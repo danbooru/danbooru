@@ -1,126 +1,176 @@
 # frozen_string_literal: true
 
-# Danbooru::Archive is a utility class representing a .zip, .rar, or .7z archive file. This is a wrapper around
-# libarchive that adds some utility methods for extracting an archive safely.
+# A class for reading and extracting .zip, .rar, and .7z archives. The archives are read by `bin/archive` in a separate
+# process inside the ExternalCommand sandbox, so a bug in libarchive or rubyzip can't be exploited by a malicious file
+# to take over the Rails process.
 #
 # @example
 #   Danbooru::Archive.extract!("foo.zip") do |dir, filenames|
 #     puts dir, filenames
 #   end
 #
+# @see bin/archive
 # @see https://github.com/chef/ffi-libarchive
-# @see https://www.rubydoc.info/gems/ffi-libarchive/0.4.2
 # @see https://github.com/libarchive/libarchive/wiki/ManualPages
-
-require "find"
-
-module Archive
-  module C
-    # XXX Monkey patch ffi-libarchive to add some functions we need.
-    # https://www.freebsd.org/cgi/man.cgi?query=archive_util&sektion=3&format=html
-    attach_function_maybe :archive_format_name, [:pointer], :string
-    attach_function_maybe :archive_filter_name, [:pointer, :int], :string
-    attach_function_maybe :archive_filter_count, [:pointer], :int
-    attach_function_maybe :archive_write_set_option, [:pointer, :string, :string, :string], :int
-    attach_function_maybe :archive_read_support_format_by_code, [:pointer, :int], :int
-
-    # XXX: Hack to force 'Store' compression on zip archives.
-    class << self
-      module Extension
-        def archive_write_set_format(archive, format)
-          super
-
-          if format == FORMAT_ZIP
-            archive_write_set_option archive, "zip", "compression", "store"
-          end
-        end
-      end
-
-      prepend Extension
-    end
-  end
-
-  class Reader
-    # XXX Monkey patch ffi-libarchive to add a `formats` option that opens a file with only the given formats enabled
-    # and no compression filters. By default, ffi-libarchive enables every format and filter libarchive supports.
-    module Extension
-      def initialize(params = {})
-        if params[:formats].nil?
-          super
-        else
-          BaseArchive.instance_method(:initialize).bind_call(self, C.method(:archive_read_new), C.method(:archive_read_finish))
-          @strip_components = 0
-
-          params[:formats].each do |format|
-            raise Error, @archive if C.archive_read_support_format_by_code(archive, format) != C::OK
-          end
-
-          raise Error, @archive if C.archive_read_open_filename(archive, params[:file_name], 1024) != C::OK
-        end
-      rescue StandardError
-        close
-        raise
-      end
-    end
-
-    prepend Extension
-  end
-end
-
 module Danbooru
   class Archive
+    extend Memoist
+
     class Error < StandardError; end
 
-    # Default flags when extracting files.
-    # @see https://www.freebsd.org/cgi/man.cgi?query=archive_write_disk&sektion=3&format=html
-    DEFAULT_FLAGS =
-      ::Archive::EXTRACT_NO_OVERWRITE |
-      # ::Archive::EXTRACT_SECURE_NOABSOLUTEPATHS |
-      ::Archive::EXTRACT_SECURE_SYMLINKS |
-      ::Archive::EXTRACT_SECURE_NODOTDOT
+    # The error shown to users when an archive can't be read. The details aren't useful to users. bin/archive uses the
+    # same error.
+    INVALID_ARCHIVE = "invalid or corrupt archive"
 
-    # The libarchive formats to enable for each file type we detect. Only these formats are enabled, so libarchive can't
-    # read a file as a different format than we detected (e.g. a tar file disguised as a zip file).
-    LIBARCHIVE_FORMATS = {
-      "zip": [::Archive::FORMAT_ZIP],
-      "ugoira": [::Archive::FORMAT_ZIP],
-      "rar": [::Archive::FORMAT_RAR, 0x100000], # ARCHIVE_FORMAT_RAR_V5
-      "7z": [::Archive::FORMAT_7ZIP],
-    }
+    # The default number of entries to read. Archives with more files are only read up to this many files.
+    MAX_ENTRIES = 1_000
 
-    attr_reader :file
+    # The longest pathname listed by `#entries`, in bytes. Longer pathnames are truncated.
+    MAX_PATHNAME_SIZE = 1024
+
+    # The most address space bin/archive can use. Ruby reserves about 400 MB at startup, and decompressing needs about
+    # as much memory as the archive's dictionary size, which is at most 128 MB for a 100 MB archive. Archives that
+    # declare a bigger dictionary fail to extract.
+    MEMORY_LIMIT = 1.gigabyte
+
+    # The timeout for listing files. Listing only reads the headers of the first few files, so it should be fast, and
+    # it happens during the upload request.
+    LIST_TIMEOUT = 10.seconds
+
+    SCRIPT = Rails.root.join("bin/archive").to_s
+
+    # The bundled gems used by bin/archive. They're passed with `-I`, so it doesn't have to load Bundler.
+    GEM_PATHS = %w[ffi ffi-libarchive rubyzip].flat_map { |name| Gem.loaded_specs.fetch(name).full_require_paths }.freeze
+
+    attr_reader :file, :max_entries
+
+    # Set by `.list!`, which reads the file lists of several archives at once.
+    attr_writer :listing
 
     delegate :path, to: :file
 
-    # Open an archive, or raise an error if the archive can't be opened. If given a block, pass the archive to the block
-    # and close the archive after the block finishes.
+    # Run a bin/archive command in the sandbox.
     #
-    # @param filelike [String, File] The filename of the archive, or an open archive file.
-    # @yieldparam [Danbooru::Archive] The archive.
-    # @return [Danbooru::Archive] The archive.
-    def self.open!(filelike, &block)
-      file = filelike.respond_to?(:path) ? filelike : File.open(filelike, binmode: true)
-      archive = new(file)
+    # @param args [Array<String>] The arguments to bin/archive.
+    # @param read [Array<String>] The files the command can read.
+    # @param write [Array<String>] The files and directories the command can write to.
+    # @param timeout [Integer] The maximum number of seconds the command can run.
+    # @param file_size_limit [Integer, nil] The largest file the command can write. By default, the max upload size.
+    # @return [Hash] The parsed JSON output of the command. Has an "error" key if the archive is invalid.
+    # @raise [Error] If the command crashed, timed out, or printed too much.
+    # @raise [ExternalCommand::SyscallError] If the command was killed by the sandbox. This isn't wrapped, so the file
+    #   can be quarantined (see `MediaAsset.handle_blocked_file`).
+    def self.run!(*args, read: [], write: [], timeout: ExternalCommand::TIMEOUT, file_size_limit: Danbooru.config.max_file_size.to_i)
+      command = [RbConfig.ruby, "--disable-gems", "-W0", *GEM_PATHS.map { "-I#{it}" }, SCRIPT, *args].map { it.to_s.shellescape }.join(" ")
+      output, _status = ExternalCommand.run(command, read: [SCRIPT, *GEM_PATHS, *read], write:, timeout:, memory_limit: MEMORY_LIMIT, file_size_limit:)
+      result = output.parse_json
 
-      if block_given?
-        begin
-          yield archive
-        ensure
-          archive.close
-        end
-      else
-        archive
+      # The output is a Ruby backtrace if bin/archive crashed. Log it, but don't show it to the user. It's escaped,
+      # because it can include filenames from the archive, which could add fake lines to the log.
+      unless result.is_a?(Hash)
+        DanbooruLogger.info("bin/archive crashed: #{output.truncate(2000).inspect}")
+        raise Error, INVALID_ARCHIVE
       end
-    rescue StandardError => e
-      archive&.close
-      raise Error, e
+
+      raise Error, INVALID_ARCHIVE unless result["error"].nil? || result["error"].is_a?(String)
+
+      result
+    rescue ExternalCommand::TimeoutError
+      raise Error, "timed out"
+    rescue ExternalCommand::OutputLimitError
+      raise Error, "too many files"
     end
 
-    # Open an archive, or return nil if the archive can't be opened. See `#open!` for details.
-    def self.open(filelike, &block)
-      open!(filelike, &block)
-    rescue Error
-      nil
+    # Check that the files bin/archive says it extracted are regular files directly inside the directory it was given,
+    # then make them readable. bin/archive parses untrusted files, so its output can't be trusted, otherwise a
+    # compromised bin/archive could make us read other files on the server. The files keep the permissions from the
+    # archive when they're extracted, which may make them unreadable. They're fixed here instead of in bin/archive,
+    # because the sandbox can't limit which files chmod can change.
+    #
+    # @param paths [Array<String>] The paths of the extracted files.
+    # @param directory [String] The directory the files were extracted to.
+    # @return [Array<String>] The paths.
+    # @raise [Error] If any path isn't directly inside the directory, or isn't a regular file.
+    def self.verify_extracted_files!(paths, directory)
+      raise Error, INVALID_ARCHIVE unless paths.is_a?(Array) && paths.all?(String)
+
+      paths.each do |path|
+        # The path is compared as a string, not resolved, so the directory can be under a symlink (e.g. /tmp on macOS).
+        # bin/archive can't replace the directory itself, or create symlinks or hardlinks, so a path directly inside it
+        # that isn't a symlink can't point anywhere else.
+        raise Error, INVALID_ARCHIVE if File.dirname(path) != directory.to_s || !File.lstat(path).file?
+      end
+
+      File.chmod(0o600, *paths)
+      paths
+    rescue SystemCallError
+      raise Error, INVALID_ARCHIVE
+    end
+
+    # Read the file lists of several archives with one call to bin/archive, instead of starting a process for each
+    # archive. Each archive keeps its list, so `#entries` doesn't read it again. If one archive is invalid, its
+    # `#entries` raises the error.
+    #
+    # @param archives [Array<Danbooru::Archive>] The archives.
+    # @return [Array<Danbooru::Archive>] The archives.
+    # @raise [Error] If bin/archive failed, for example because it timed out.
+    def self.list!(archives)
+      pending = archives.reject(&:listed?)
+      return archives if pending.empty?
+
+      args = pending.flat_map { [it.file_ext, it.path, it.max_entries] }
+      result = run!("list", MAX_PATHNAME_SIZE, *args, read: pending.map(&:path), timeout: LIST_TIMEOUT)
+      raise Error, result["error"] if result["error"]
+
+      results = result["archives"]
+      raise Error, INVALID_ARCHIVE unless results.is_a?(Array) && results.size == pending.size
+
+      pending.zip(results) do |archive, listing|
+        listing = { "error" => INVALID_ARCHIVE } unless valid_listing?(listing, archive.max_entries)
+        archive.listing = listing
+      end
+
+      archives
+    end
+
+    # Check that a file list from bin/archive has the expected format, in case bin/archive was compromised by a
+    # malicious file, so that it fails like any other invalid archive.
+    #
+    # @return [Boolean] True if the file list is valid, or if it's a valid error.
+    def self.valid_listing?(listing, max_entries)
+      case listing
+      in { error: String, **nil }
+        true
+      in { entries: Array => entries, **nil }
+        entries.size <= max_entries && entries.all? do |entry|
+          entry in { pathname: String, pathname_too_long: true | false, size: Integer, filetype: "file" | "directory" | "other", **nil } and
+            entry["pathname"].bytesize <= MAX_PATHNAME_SIZE && entry["size"] >= 0
+        end
+      else
+        false
+      end
+    end
+
+    # Open an archive. The archive isn't read until its entries are needed. If given a block, pass the archive to the
+    # block, and close the file afterwards if it was opened here.
+    #
+    # @param filelike [String, File] The filename of the archive, or an open archive file.
+    # @param max_entries [Integer] The most entries to read from the archive. See `#entries`.
+    # @yieldparam [Danbooru::Archive] The archive.
+    # @return [Danbooru::Archive] The archive, or the block's result if given a block.
+    # @raise [Error] If the file can't be opened, or the block raises an error.
+    def self.open!(filelike, max_entries: MAX_ENTRIES, &block)
+      file = filelike.respond_to?(:path) ? filelike : File.open(filelike, binmode: true)
+      archive = new(file, max_entries:)
+      return archive unless block_given?
+
+      begin
+        yield archive
+      ensure
+        file.close unless file.equal?(filelike)
+      end
+    rescue StandardError => e
+      raise Error, e
     end
 
     # Extract the archive to the given directory. If a block is given, extract the archive to a temp directory and
@@ -130,231 +180,128 @@ module Danbooru
     # @param directory [String] The directory to extract the files to. By default, this is a temp directory the caller must clean up.
     # @yieldparam [String, Array<String>] The path to the temp directory, and the list of extracted files in the directory.
     # @return [(String, Array<String>)] The path to the directory, and the list of extracted files in the directory.
-    def self.extract!(filelike, directory = nil, flags: DEFAULT_FLAGS, &block)
+    def self.extract!(filelike, directory = nil, &block)
       open!(filelike) do |archive|
-        archive.extract!(directory, flags: flags, &block)
+        archive.extract!(directory, &block)
       end
-    end
-
-    def self.create!(directory, filelike = nil, &block)
-      filelike = Danbooru::Tempfile.new(["danbooru-archive-", ".zip"], binmode: true) if filelike.nil?
-      open!(filelike) do |archive|
-        archive.create!(directory)
-      end
-      open!(filelike, &block)
     end
 
     # @param file [File] The archive file.
-    def initialize(file)
+    # @param max_entries [Integer] The most entries to read from the archive. See `#entries`.
+    def initialize(file, max_entries: MAX_ENTRIES)
       @file = file
+      @max_entries = max_entries
     end
 
-    def close
-      # no-op
+    # @return [Hash] The first `max_entries` entries in the archive.
+    # @raise [Error] If the archive is invalid.
+    def listing
+      self.class.list!([self]) unless listed?
+      raise Error, @listing["error"] if @listing["error"]
+
+      @listing
     end
 
-    # Iterate across each entry (file) in the archive.
-    #
-    # @return [Enumerator, Danbooru:Archive] If given a block, call the block on each entry and return the archive
-    #   itself. If not given a block, return an Enumerator.
-    def each_entry(&block)
-      return enum_for(:each_entry) unless block_given?
-
-      # XXX We have to re-open the archive on every call because libarchive is designed for streaming and doesn't
-      # support iterating across the archive multiple times.
-      formats = LIBARCHIVE_FORMATS.fetch(file_ext) { raise Error, "Unsupported archive format (.#{file_ext})" }
-      archive = ::Archive::Reader.send(:new, file_name: file.path, formats:)
-      while (entry = archive.next_header(clone_entry: true))
-        yield Entry.new(archive, entry)
-      end
-
-      self
-    rescue ::Archive::Error => e
-      raise Error, e.message
-    ensure
-      archive&.close
+    # @return [Boolean] True if the archive's file list has been read, even if reading it failed.
+    def listed?
+      !@listing.nil?
     end
 
-    # XXX You can't call `extract!` on these entries because libarchive doesn't let you extract an entry after you iterate past it.
-    #
-    # @return [Array<Danbooru::Archive::Entry>] The list of entries in the archive.
-    def entries
-      @entries ||= each_entry.to_a
+    # @return [Array<Danbooru::Archive::Entry>] The first `max_entries` entries in the archive. The rest of the archive
+    #   isn't read, so it isn't checked for errors.
+    memoize def entries
+      listing["entries"].map { |entry| Entry.new(**entry.symbolize_keys) }
     end
 
-    # Extract the files in the archive to a directory.
+    # Extract the files in the archive to a directory. The files are saved as numbered files in the directory, not under
+    # their names in the archive.
     #
     # If a block is given, extract the archive to a temp directory and delete the directory after the block finishes.
     # Otherwise, extract to a temp directory and return the directory. The caller should delete the directory afterwards.
     #
     # @param directory [String] The directory to extract the files to. By default, this is a temp directory the caller must clean up.
-    # @yieldparam [String, Array<String>] The name of the temp directory, and the list of files in the directory.
-    # @return [(String, Array<String>)] The path to the directory, and the list of extracted files.
-    def extract!(directory = nil, flags: DEFAULT_FLAGS, &block)
+    # @yieldparam [String, Hash{String => String}] The name of the temp directory, and the path and name in the archive of each extracted file.
+    # @return [(String, Hash{String => String})] The path to the directory, and the path and name in the archive of each extracted file.
+    def extract!(directory = nil, &block)
       raise ArgumentError, "can't pass directory and block at the same time" if block_given? && directory.present?
 
       if block_given?
-        Dir.mktmpdir(["danbooru-archive-", "-" + File.basename(file.path)]) do |dir|
-          filenames = extract_to!(dir, flags: flags)
+        Dir.mktmpdir(["danbooru-archive-", "-#{File.basename(file.path)}"]) do |dir|
+          filenames = extract_to!(dir)
           yield dir, filenames
         end
       elsif directory.present?
-        [directory, extract_to!(directory, flags: flags)]
+        [directory, extract_to!(directory)]
       else
         begin
-          dir = Dir.mktmpdir(["danbooru-archive-", "-" + File.basename(file.path)])
-          [dir, extract_to!(dir, flags: flags)]
-        rescue StandardError
-          FileUtils.rm_rf(dir)
-          raise
+          dir = Dir.mktmpdir(["danbooru-archive-", "-#{File.basename(file.path)}"])
+          result = [dir, extract_to!(dir)]
+        ensure
+          FileUtils.rm_rf(dir) if dir && result.nil?
         end
       end
     end
 
-    # Extract the archive to a directory. See `extract!` for details.
-    def extract_to!(directory, flags: DEFAULT_FLAGS)
-      each_entry.filter_map do |entry|
-        raise Danbooru::Archive::Error, "Can't extract archive containing absolute path (path: '#{entry.pathname_utf8}')" if entry.pathname_utf8.starts_with?("/")
-        next if entry.directory?
-        raise Danbooru::Archive::Error, "'#{entry.pathname_utf8}' is not a regular file" if !entry.file?
+    # Extract the archive to a directory with bin/archive. See `extract!` for details.
+    #
+    # @return [Hash{String => String}] The path on disk and the name in the archive of each extracted file.
+    # @raise [Error] If the archive couldn't be extracted.
+    def extract_to!(directory)
+      # libarchive won't extract through symlinks (EXTRACT_SECURE_SYMLINKS), so a directory under a symlink like /tmp on
+      # macOS has to be resolved first.
+      directory = File.realpath(directory)
+      result = self.class.run!("extract", file_ext, path, directory, read: [path], write: [directory])
+      raise Error, result["error"] if result["error"]
 
-        path = "#{directory}/#{entry.pathname_utf8}"
-        raise Danbooru::Archive::Error, "Can't extract archive containing paths that are too long" if path.bytesize >= 4096 # Linux PATH_MAX
+      files = result["files"]
+      raise Error, INVALID_ARCHIVE unless files.is_a?(Array) && files.all? { it in { path: String, name: String, **nil } }
 
-        entry.extract!(path, flags: flags)
-      end
+      self.class.verify_extracted_files!(files.pluck("path"), directory)
+      files.to_h { [it["path"], it["name"]] }
     end
 
-    # Create an uncompressed ZIP archive from the contents of a specified directory. Overwrites existing file.
-
-    # @param directory [String] The directory that contains files to archive.
-    # @return [(String, Array<String>)] The path to the directory, and the list of extracted files in the directory.
-    def create!(directory)
-      ::Archive::Writer.open_filename(file.path, :none, :zip) do |archive|
-        Find.find(directory).lazy.map do |path|
-          Pathname.new path
-        end.select(&:file?).each do |pn|
-          archive.new_entry do |e|
-            e.pathname = pn.relative_path_from(directory).to_s.force_encoding("ASCII-8BIT")
-            e.size = pn.size
-            e.filetype = ::Archive::Entry::FILE
-            e.perm = 0o644
-            archive.write_header e
-            File.open(pn) do |f|
-              until f.eof?
-                chunk = f.read ::Archive::C::DATA_BUFFER_SIZE
-                archive.write_data chunk
-              end
-            end
-          end
-        end
-      end
-    end
-
-    # @return [Integer] The number of files in the archive.
+    # @return [Integer] The number of files in the archive, up to `max_entries`.
     def file_count
-      @file_count ||= entries.count
+      entries.size
     end
 
-    # @return [Integer] The total decompressed size of all files in the archive.
+    # @return [Integer] The total decompressed size of the first `max_entries` files in the archive.
     def uncompressed_size
-      @uncompressed_size ||= entries.sum(&:size)
+      entries.sum(&:size)
     end
 
-    # @return [Boolean] True if any entry in the archive satisfies the condition; otherwise false.
+    # @return [Boolean] True if any of the first `max_entries` entries in the archive satisfies the condition; otherwise false.
     def exists?(&block)
-      each_entry.with_index { |entry, index| return true if yield entry, index + 1 }
-      false
+      entries.each.with_index(1).any?(&block)
     end
 
     # @return [Symbol] The archive format as detected by us (:zip, :rar, :7z, etc).
-    def file_ext
-      @file_ext ||= FileTypeDetector.new(file).file_ext
-    end
-
-    # @return [String] The archive format as returned by libarchive ("RAR", "ZIP", etc).
-    def format
-      @format ||= each_entry.lazy.map(&:format).first
-    end
-
-    # Print the archive contents in `ls -l` format.
-    def ls(io = $stdout)
-      io.puts(entries.map(&:ls).join("\n"))
+    memoize def file_ext
+      FileTypeDetector.new(file).file_ext
     end
   end
 
   # An entry represents a single file in an archive.
-  class Entry
-    attr_reader :archive, :entry
+  #
+  # @!attribute pathname [String] The path of the file in the archive, as UTF-8 with invalid bytes replaced. Truncated
+  #   to MAX_PATHNAME_SIZE bytes.
+  # @!attribute pathname_too_long [Boolean] True if the pathname was truncated.
+  # @!attribute filetype [String] "file", "directory", or "other" (symlinks, hardlinks, devices, etc).
+  Archive::Entry = Data.define(:pathname, :pathname_too_long, :size, :filetype) do
+    alias_method :pathname_too_long?, :pathname_too_long
 
-    delegate :directory?, :file?, :close, :pathname, :pathname=, :size, :strmode, :uid, :gid, :mtime, to: :entry
-
-    # @param entry [::Archive] The archive the entry belongs to.
-    # @param entry [::Archive::Entry] The archive entry.
-    def initialize(archive, entry)
-      @archive = archive
-      @entry = entry
+    def file?
+      filetype == "file"
     end
 
-    # Copy the entry. Called by `dup`.
-    def initialize_copy(entry)
-      @archive = entry.archive
-      @entry = ::Archive::Entry.new(entry.ffi_ptr, clone: true)
-    end
-
-    # Extract the file to the given destination. By default, don't overwrite files, don't allow symlinks or paths
-    # containing '..', and don't extract file ownership, permission, or timestamp information.
-    #
-    # @param destination [String] The path to extract the file to.
-    # @param flags [Integer] The extraction flags.
-    # @return [String] The path to the extracted file.
-    def extract!(destination, flags: Danbooru::Archive::DEFAULT_FLAGS)
-      entry = dup
-      entry.pathname = destination
-
-      result = ::Archive::C.archive_read_extract(entry.archive_ffi_ptr, entry.ffi_ptr, flags)
-      raise Danbooru::Archive::Error, "Error extracting '#{entry.pathname_utf8}': #{archive.error_string}" if result != ::Archive::C::OK
-
-      entry.pathname_utf8
+    def directory?
+      filetype == "directory"
     end
 
     # @see https://security.snyk.io/research/zip-slip-vulnerability
     # @return [Boolean] True if the pathname contains any ".." components, e.g. "../../../../../etc/passwd"
     def directory_traversal?
-      entry.pathname.split("/").compact_blank.grep("..").any?
-    end
-
-    # @return [String, nil] The pathname encoded as UTF-8 instead of ASCII-8BIT. May be wrong if the original pathname wasn't UTF-8.
-    def pathname_utf8
-      pathname&.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
-    end
-
-    # @return [String] The archive entry format ("RAR", "ZIP", etc).
-    def format
-      ::Archive::C.archive_format_name(archive_ffi_ptr)
-    end
-
-    # @return [Array<String>] The list of filters for the entry.
-    def filters
-      count = ::Archive::C.archive_filter_count(archive_ffi_ptr)
-
-      count.times.map do |n|
-        ::Archive::C.archive_filter_name(archive_ffi_ptr, n)
-      end
-    end
-
-    # @return [String] The entry in `ls -l` format.
-    def ls
-      "#{strmode} #{uid} #{gid} #{"%9d" % size} #{mtime.to_fs(:db)} #{pathname_utf8}"
-    end
-
-    def archive_ffi_ptr
-      archive.send(:archive)
-    end
-
-    # @return [FFI::Pointer] The pointer to the libarchive entry object.
-    def ffi_ptr
-      entry.entry
+      pathname.split("/").compact_blank.grep("..").any?
     end
   end
 end

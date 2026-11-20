@@ -225,6 +225,23 @@ class ActionDispatch::IntegrationTest
   def delete_auth(url, user, **options)
     method_authenticated(:delete, url, user, **options)
   end
+
+  # Assert that a .js response consists of a single notice with the given DText message.
+  #
+  # @example
+  #   assert_js_notice(:error, "[[foo]] must have a wiki page")
+  #   # Matches: Danbooru.Notice.error("<a ... href=\"/wiki_pages/foo\" ...>foo<\/a> must have a wiki page");
+  #
+  # @param type [Symbol] The type of notice (`:error` or `:info`).
+  # @param dtext [String] The expected notice message, as DText.
+  def assert_js_notice(type, dtext)
+    match = response.body.strip.match(/\ADanbooru\.Notice\.(error|info)\("(.*)"\);\z/m)
+    assert_not_nil(match, "Expected a Danbooru.Notice call, got: #{response.body}")
+
+    # Undo `escape_javascript`, which turns newlines into `\n` and puts a backslash in front of `\ " ' ` $` and `</`.
+    message = match[2].gsub(/\\(.)/m) { ($1 == "n") ? "\n" : $1 }
+    assert_equal([type.to_s, DText.new(dtext, inline: true).format_text], [match[1], message])
+  end
 end
 
 module Source::Tests; end

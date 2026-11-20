@@ -27,7 +27,7 @@ class ForumPostsController < ApplicationController
       quoted_post = authorize ForumPost.find(params.expect(:post_id)), :show?
       @forum_post = authorize quoted_post.build_response
     else
-      @forum_post = authorize ForumPost.new(topic_id: params[:topic_id])
+      @forum_post = authorize ForumPost.new(topic: ForumTopic.visible(CurrentUser.user).find(params.expect(:topic_id)))
     end
 
     respond_with(@forum_post)
@@ -43,11 +43,13 @@ class ForumPostsController < ApplicationController
   end
 
   def create
-    @forum_post = authorize ForumPost.new(creator: CurrentUser.user, updater: CurrentUser.user, **permitted_attributes(ForumPost))
+    attributes = permitted_attributes(ForumPost)
+    topic = ForumTopic.visible(CurrentUser.user).find_by(id: attributes[:topic_id])
+    @forum_post = authorize ForumPost.new(creator: CurrentUser.user, updater: CurrentUser.user, **attributes.except(:topic_id), topic: topic)
     @forum_post.save
 
-    page = @forum_post.topic.last_page if @forum_post.topic.last_page > 1
-    respond_with(@forum_post, location: forum_topic_path(@forum_post.topic, page: page))
+    page = @forum_post.topic.last_page if @forum_post.persisted? && @forum_post.topic.last_page > 1
+    respond_with(@forum_post, location: (forum_topic_path(@forum_post.topic, page: page) if @forum_post.persisted?))
   end
 
   def update

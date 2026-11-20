@@ -61,6 +61,67 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "filter matches by the similarity param in the API" do
+        @post2 = create(:post)
+        mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }, { post_id: @post2.id, score: 20.0 }])
+
+        get_auth iqdb_queries_path, @user, params: { url: "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4", similarity: 80 }, as: :json
+
+        assert_response :success, response.body.first(600)
+        assert_equal([@post.id], response.parsed_body.pluck("post_id"))
+      end
+
+      should "return 400 for search params that aren't strings or integers" do
+        get_auth iqdb_queries_path, @user, params: { search: { post_id: [@post.id] }}, as: :json
+        assert_response 400
+        assert_equal("post_id has an invalid value", response.parsed_body["message"])
+
+        get_auth iqdb_queries_path, @user, params: { search: { post_id: @post.id, limit: ["1"] }}, as: :json
+        assert_response 400
+
+        get_auth iqdb_queries_path, @user, params: { search: { url: { a: 1 }}}, as: :json
+        assert_response 400
+
+        post_auth iqdb_queries_path, @user, params: { search: { post_id: true }}, headers: { "X-Http-Method-Override": "GET" }, as: :json
+        assert_response 400
+      end
+
+      should "return 400 for a limit param that isn't a number" do
+        get_auth iqdb_queries_path, @user, params: { search: { post_id: @post.id, limit: "abc" }}, as: :json
+        assert_response 400
+        assert_equal("limit must be a number", response.parsed_body["message"])
+      end
+
+      should "return 400 for a similarity param that isn't a number" do
+        get_auth iqdb_queries_path, @user, params: { post_id: @post.id, similarity: "abc" }, as: :json
+        assert_response 400
+        assert_equal("similarity must be a number", response.parsed_body["message"])
+
+        get_auth iqdb_queries_path, @user, params: { post_id: @post.id, similarity: ["80"] }, as: :json
+        assert_response 400
+
+        get_auth iqdb_queries_path, @user, params: { post_id: @post.id, search: { similarity: { a: 1 }}}, as: :json
+        assert_response 400
+      end
+
+      should "ignore a high_similarity param that isn't a number" do
+        mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
+
+        get_auth iqdb_queries_path, @user, params: { url: "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4", high_similarity: { a: 1 }}
+        assert_response :success
+
+        get_auth iqdb_queries_path, @user, params: { url: "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4", high_similarity: ["80"] }
+        assert_response :success
+      end
+
+      should "ignore unknown search params" do
+        get_auth iqdb_queries_path, @user, params: { search: { order: "nonsense" }}, as: :json
+        assert_response :success
+
+        get_auth iqdb_queries_path, @user, params: { search: { foo: { a: 1 }}}, as: :json
+        assert_response :success
+      end
+
       context "with a url parameter" do
         should "use the URL as-is for an image URL" do
           mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
@@ -235,8 +296,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           assert_select "#notice", /File is corrupt/
         end
 
-        should "fail for an invalid ugoira without extracting it" do
-          Danbooru::Archive.any_instance.expects(:extract!).never
+        should "fail for an invalid ugoira" do
           IqdbClient.any_instance.expects(:request).never
 
           file = Rack::Test::UploadedFile.new("test/files/ugoira/ugoira-compressed.zip")

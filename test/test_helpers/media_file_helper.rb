@@ -65,4 +65,26 @@ module MediaFileTestHelper
       "#{file_name.inspect} => [#{width}, #{height}, #{hash.inspect}],"
     end
   end
+
+  # Write an uncompressed zip by hand, so the headers can be inconsistent in ways rubyzip won't write.
+  #
+  # @param entries [Array<Hash>] The files, as `{ name:, data:, crc:, offset: }`. `crc` and `offset` override the CRC
+  #   in both headers and the offset in the central directory.
+  def write_raw_zip(file, entries)
+    zip = "".b
+    central_directory = "".b
+
+    entries.each do |entry|
+      name, data = entry.values_at(:name, :data)
+      crc = entry.fetch(:crc) { Zlib.crc32(data) }
+      offset = entry.fetch(:offset, zip.bytesize)
+
+      zip << [0x04034b50, 20, 0, 0, 0, 33, crc, data.bytesize, data.bytesize, name.bytesize, 0].pack("VvvvvvVVVvv") << name.b << data
+      central_directory << [0x02014b50, 0x031e, 20, 0, 0, 0, 33, crc, data.bytesize, data.bytesize, name.bytesize, 0, 0, 0, 0, 0o100644 << 16, offset].pack("VvvvvvvVVVvvvvvVV") << name.b
+    end
+
+    end_of_central_directory = [0x06054b50, 0, 0, entries.size, entries.size, central_directory.bytesize, zip.bytesize, 0].pack("VvvvvVVv")
+    zip << central_directory << end_of_central_directory
+    File.binwrite(file.path, zip)
+  end
 end

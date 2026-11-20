@@ -15,6 +15,11 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for json" do
+        get_auth new_dmail_path(format: :json), @user
+        assert_response :success
+      end
+
       context "with a respond_to_id" do
         should "not allow users to quote dmails belonging to unrelated users " do
           get_auth new_dmail_path, @unrelated_user, params: { respond_to_id: @dmail.id }
@@ -165,6 +170,14 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing title and body" do
+        assert_no_difference("Dmail.count") do
+          post_auth dmails_path, @user, params: { dmail: { to_id: create(:user).id }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       setup do
         @user2 = create(:user)
       end
@@ -268,6 +281,13 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal(0, @recipient.dmails.active.unread.count)
+        assert_equal(0, @recipient.reload.unread_dmail_count)
+      end
+
+      should "work for a JSON request" do
+        post_auth mark_all_as_read_dmails_path(format: :json), @recipient
+
+        assert_response :success
         assert_equal(0, @recipient.reload.unread_dmail_count)
       end
     end

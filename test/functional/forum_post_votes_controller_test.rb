@@ -31,6 +31,15 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(forum_post: { creator_name: -> { @user.name }}).with { [@negative_vote, @vote] }
       should respond_to_search(forum_post: { body_matches: "blah" }).with { [@negative_vote, @vote] }
 
+      should "return 422 for a forum_post search param that isn't a hash" do
+        get forum_post_votes_path, params: { search: { forum_post: "abc" }}, as: :json
+        assert_response 422
+        assert_equal("forum_post has an invalid value", response.parsed_body["message"])
+
+        get forum_post_votes_path, params: { search: { forum_post: ["1", "2"] }}, as: :json
+        assert_response 422
+      end
+
       should "not show votes on forum posts the user can't see" do
         hidden_vote = create(:forum_post_vote, forum_post: create(:forum_post, topic: create(:mod_up_forum_topic)))
 
@@ -75,6 +84,12 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return 400 for a forum_post_id param that isn't a string or integer" do
+        post_auth forum_post_votes_path, @user, params: { forum_post_id: [@forum_post.id], forum_post_vote: { score: 1 }}, as: :json
+        assert_response 400
+        assert_equal(0, @forum_post.votes.count)
+      end
+
       should "work for a JSON response" do
         post_auth forum_post_votes_path, @user, params: { forum_post_id: @forum_post.id, forum_post_vote: { score: 1 }}, as: :json
 

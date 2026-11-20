@@ -157,6 +157,26 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         assert_select "button[name=cancel]", false
       end
 
+      should "return 400 for a missing topic" do
+        get_auth new_forum_post_path, @user
+        assert_response 400
+
+        get_auth new_forum_post_path(format: :json), @user
+        assert_response 400
+      end
+
+      should "return 404 for a nonexistent topic" do
+        get_auth new_forum_post_path(format: :json), @user, params: { topic_id: 0 }
+        assert_response 404
+      end
+
+      should "return 404 for a topic the user can't see" do
+        hidden_topic = as(@mod) { create(:mod_up_forum_topic) }
+        get_auth new_forum_post_path(format: :json), @user, params: { topic_id: hidden_topic.id }
+
+        assert_response 404
+      end
+
       should "not allow unauthorized users to quote posts in private forum topics" do
         as(@user) { @forum_post.topic.update(min_level: User::Levels::ADMIN) }
         get_auth new_forum_post_path, @user, params: { post_id: @forum_post.id }
@@ -182,6 +202,37 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing body" do
+        assert_no_difference("ForumPost.count") do
+          post_auth forum_posts_path, @user, params: { forum_post: { topic_id: @forum_topic.id }}, as: :json
+        end
+
+        assert_response 422
+      end
+
+      should "return an error for a missing topic" do
+        assert_no_difference("ForumPost.count") do
+          post_auth forum_posts_path, @user, params: { forum_post: { body: "xxx" }}, as: :json
+        end
+
+        assert_response 422
+        assert_equal({ "errors" => { "topic" => ["must exist"] }}, response.parsed_body)
+      end
+
+      should "return an error for a nonexistent topic" do
+        post_auth forum_posts_path, @user, params: { forum_post: { body: "xxx", topic_id: 0 }}, as: :json
+
+        assert_response 422
+        assert_equal({ "errors" => { "topic" => ["must exist"] }}, response.parsed_body)
+      end
+
+      should "show the form with an error for a missing topic in HTML" do
+        post_auth forum_posts_path, @user, params: { forum_post: { body: "xxx" }}
+
+        assert_response :success
+        assert_select "textarea", text: "xxx"
+      end
+
       should "create a new forum post" do
         assert_difference("ForumPost.count", 1) do
           post_auth forum_posts_path, @user, params: { forum_post: { body: "xaxaxa", topic_id: @forum_topic.id }}
@@ -195,8 +246,13 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       should "not allow unauthorized users to create posts in private topics" do
         as(@user) { @forum_post.topic.update!(min_level: User::Levels::ADMIN) }
 
-        post_auth forum_posts_path, @user, params: { forum_post: { body: "xaxaxa", topic_id: @forum_topic.id }}
-        assert_response 403
+        assert_no_difference("ForumPost.count") do
+          post_auth forum_posts_path, @user, params: { forum_post: { body: "xaxaxa", topic_id: @forum_topic.id }}, as: :json
+        end
+
+        # Return the same error as for a nonexistent topic, so the response doesn't reveal that the topic exists.
+        assert_response 422
+        assert_equal({ "errors" => { "topic" => ["must exist"] }}, response.parsed_body)
       end
 
       should "not allow non-moderators to create posts in locked topics" do

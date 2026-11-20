@@ -380,9 +380,10 @@ class Post < ApplicationRecord
 
     # Update tag_count_general, tag_count_copyright, etc.
     def update_tag_category_counts
+      counts = tags.map { |tag| tag.category_name.downcase }.tally
+
       TagCategory.categories.each do |category_name|
-        tag_count = tags.count { |t| t.category_name.downcase == category_name }
-        send("tag_count_#{category_name}=", tag_count)
+        send("tag_count_#{category_name}=", counts.fetch(category_name, 0))
       end
 
       self.tag_count = tag_array.size

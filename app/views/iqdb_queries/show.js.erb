@@ -1,4 +1,4 @@
-<% similar_images_component = SimilarImagesComponent.new(matches: @matches, current_user: CurrentUser.user, show_blacklist: false, low_similarity: search_params[:similarity]&.to_f, high_similarity: search_params[:high_similarity]&.to_f) %>
+<% similar_images_component = SimilarImagesComponent.new(matches: @matches, current_user: CurrentUser.user, show_blacklist: false, low_similarity: @similarity, high_similarity: @high_similarity) %>
 $("#iqdb-similar").html("<%= j render similar_images_component %>").show();
 
 <% if similar_images_component.any_similarity_matches.any? %>

@@ -408,7 +408,9 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
 
   context "An unpacked ugoira with an animation.json file in gallery-dl format" do
     should "find the files and frame delays" do
-      Danbooru::Archive.extract!("test/files/ugoira/ugoira-95239241-gallery-dl.zip") do |tmpdir|
+      Danbooru::Archive.extract!("test/files/ugoira/ugoira-95239241-gallery-dl.zip") do |tmpdir, extracted_files|
+        # Archives are extracted to numbered files, so give them their names back to unpack the ugoira.
+        extracted_files.each { |path, name| File.rename(path, "#{tmpdir}/#{name}") }
         files = Pathname.new(tmpdir).glob("*")
         ugoira = MediaFile::Ugoira.new(files)
 
@@ -434,7 +436,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         end
 
         MediaFile::Ugoira.open(file.path, frame_delays: [100, 100]) do |ugoira|
-          assert_equal("zip64 format is not supported", ugoira.error)
+          assert_equal("invalid zip file", ugoira.error)
         end
       end
     end
@@ -444,11 +446,11 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     should "be rejected without extracting a compressed file" do
       Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
         create_ugoira_zip(file, compression_method: Zip::Entry::DEFLATED)
-        Danbooru::Archive.any_instance.expects(:extract!).never
 
         MediaFile.open(file) do |ugoira|
           assert_kind_of(MediaFile::Ugoira, ugoira)
           assert_equal("ugoira must not be compressed", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
           assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
         end
       end
@@ -456,11 +458,11 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
 
     should "be rejected without extracting a file with too many frames" do
       Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
-        create_ugoira_zip(file, frame_count: MediaFile::Ugoira::MAX_FRAME_COUNT + 1)
-        Danbooru::Archive.any_instance.expects(:extract!).never
+        create_ugoira_zip(file, frame_count: 501)
 
         MediaFile.open(file) do |ugoira|
-          assert_equal("cannot have more than #{MediaFile::Ugoira::MAX_FRAME_COUNT} frames", ugoira.error)
+          assert_equal("cannot have more than 500 frames", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
           assert_raises(MediaFile::Ugoira::Error) { ugoira.frames }
         end
       end
@@ -473,9 +475,8 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
           create_ugoira_zip(outer, frame_data: inner.read)
 
           MediaFile.open(outer) do |ugoira|
-            Danbooru::Archive.any_instance.expects(:extract!).never
-
             assert_equal("file '000000.jpg' is not an image file", ugoira.error)
+            assert_equal([], Dir.children(ugoira.tmpdir.path))
             assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
           end
         end
@@ -487,10 +488,10 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         create_ugoira_zip(file, frame_data: File.binread("test/files/swf/compressed.swf"))
 
         MediaFile.open(file) do |ugoira|
-          Danbooru::Archive.any_instance.expects(:extract!).never
           ExifTool.any_instance.expects(:metadata).never
 
           assert_equal("file '000000.jpg' is not an image file", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
           assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
         end
       end
@@ -501,9 +502,8 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         create_ugoira_zip(file, frame_data: File.binread("test/files/png/test.png"))
 
         MediaFile.open(file) do |ugoira|
-          Danbooru::Archive.any_instance.expects(:extract!).never
-
           assert_equal("file '000000.jpg' has the wrong file extension (expected '000000.png')", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
           assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
         end
       end
@@ -514,9 +514,8 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         create_ugoira_zip(file, frame_data: File.binread("test/files/gif/test-static-32x32.gif"))
 
         MediaFile.open(file) do |ugoira|
-          Danbooru::Archive.any_instance.expects(:extract!).never
-
           assert_equal("file '000000.jpg' has the wrong file extension (expected '000000.gif')", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
           assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
         end
       end
@@ -527,10 +526,10 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         create_ugoira_zip(file, frame_data: File.binread("test/files/mp4/test-300x300.mp4"))
 
         MediaFile.open(file) do |ugoira|
-          Danbooru::Archive.any_instance.expects(:extract!).never
           FFmpeg.expects(:shell!).never
 
           assert_equal("file '000000.jpg' is not an image file", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
           assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
         end
       end
@@ -541,11 +540,88 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         create_ugoira_zip(file, frame_data: File.binread("test/files/webm/test-512x512.webm"))
 
         MediaFile.open(file) do |ugoira|
-          Danbooru::Archive.any_instance.expects(:extract!).never
           FFmpeg.expects(:shell!).never
 
           assert_equal("file '000000.jpg' is not an image file", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
           assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+        end
+      end
+    end
+
+    should "be rejected without extracting a frame hidden inside another frame" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        jpg = File.binread("test/files/jpg/test.jpg")
+        mp4 = File.binread("test/files/mp4/test-300x300.mp4")
+        hidden_header = [0x04034b50, 20, 0, 0, 0, 33, Zlib.crc32(mp4), mp4.bytesize, mp4.bytesize, 10, 0].pack("VvvvvvVVVvv") << "000001.jpg"
+        json = [{ file: "000000.jpg", delay: 100 }, { file: "000001.jpg", delay: 100 }].to_json
+        hidden_offset = (30 + "animation.json".size + json.size) + (30 + "000000.jpg".size) + jpg.size
+
+        # The central directory points 000001.jpg at an MP4 hidden inside 000000.jpg, while the local headers are
+        # followed by a JPEG-looking decoy that claims the MP4's CRC.
+        write_raw_zip(file, [
+          { name: "animation.json", data: json },
+          { name: "000000.jpg", data: jpg + hidden_header + mp4 },
+          { name: "000001.jpg", data: "\xff\xd8".b + ("\0".b * (mp4.size - 2)), crc: Zlib.crc32(mp4), offset: hidden_offset },
+        ])
+
+        MediaFile.open(file.path) do |ugoira|
+          assert_equal("invalid zip file", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
+        end
+      end
+    end
+
+    should "truncate long file names in the error message" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        jpg = File.binread("test/files/jpg/test.jpg")
+        write_raw_zip(file, [{ name: "#{"a" * 5000}.jpg", data: jpg }, { name: "000001.jpg", data: jpg }])
+
+        MediaFile.open(file.path, frame_delays: [100, 100]) do |ugoira|
+          assert_operator(ugoira.error.size, :<=, 1000)
+          assert_match(/\Afile 'aaaa.*\.\.\.\z/, ugoira.error)
+        end
+      end
+    end
+
+    should "be rejected if a file name isn't valid UTF-8" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        jpg = File.binread("test/files/jpg/test.jpg")
+        write_raw_zip(file, [{ name: "\xff.jpg".b, data: jpg }, { name: "000001.jpg", data: jpg }])
+
+        MediaFile.open(file.path, frame_delays: [100, 100]) do |ugoira|
+          assert_equal("file '?.jpg' has invalid name (expected '000000.jpg')", ugoira.error)
+        end
+      end
+    end
+
+    should "not trust invalid frame data from a compromised bin/archive" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        create_ugoira_zip(file)
+
+        # Run bin/archive for real, then tamper with its output.
+        [[{}, nil], [{ files: ["/etc/passwd"] }, "invalid zip file"], [{ names: ["000000.jpg", "../x", "animation.json"] }, "invalid zip file"], [{ frame_offsets: ["0", 1] }, "invalid zip file"], [{ frame_offsets: [0, 2**40] }, "invalid zip file"], [{ frame_offsets: [0] * 1000 }, "invalid zip file"], [{ error: { message: "x" }}, "invalid zip file"]].each do |tampered, expected_error|
+          MediaFile.open(file.path) do |ugoira|
+            output = Danbooru::Archive.run!("ugoira", file.path, ugoira.tmpdir.path, read: [file.path], write: [ugoira.tmpdir.path])
+            ExternalCommand.stubs(:run).returns([output.merge(tampered.stringify_keys).to_json, nil])
+
+            expected_error.nil? ? assert_nil(ugoira.error) : assert_equal(expected_error, ugoira.error)
+            ExternalCommand.unstub(:run)
+          end
+        end
+      end
+    end
+
+    should "be rejected if a file has an invalid CRC" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        create_ugoira_zip(file)
+        data = File.binread(file.path)
+        offset = data.index("\xff\xd8".b) + 100
+        File.binwrite(file.path, (data.getbyte(offset) ^ 0xff).chr, offset)
+
+        MediaFile.open(file.path) do |ugoira|
+          assert_equal("invalid zip file", ugoira.error)
+          assert_equal([], Dir.children(ugoira.tmpdir.path))
         end
       end
     end
@@ -553,7 +629,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     should "be rejected if it's a tar file disguised as a zip file" do
       MediaFile.open("test/files/archive/tar-disguised-as-ugoira.tar") do |ugoira|
         assert_instance_of(MediaFile::Ugoira, ugoira)
-        assert_equal("invalid zip file (Zip end of central directory signature not found)", ugoira.error)
+        assert_equal("invalid zip file", ugoira.error)
       end
     end
   end

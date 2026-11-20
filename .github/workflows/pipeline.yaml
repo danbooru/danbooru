@@ -12,7 +12,7 @@
 # being under a DDoS attack exactly when we needed it.
 #
 # On master, the test suite then runs in the development image. See test.yaml.
-# On betabooru and testbooru, the site is then deployed. See deploy.yaml.
+# On testbooru, the site is then deployed. See deploy.yaml.
 # On production, each push tags the latest commit. See tag-on-push.yaml.
 # The deployment of the production image is only done by hand, there is no automatic deployment.
 #
@@ -83,11 +83,11 @@ jobs:
       contents: write
     uses: ./.github/workflows/tag-on-push.yaml
 
-  # Deploy to betabooru or testbooru.
+  # Deploy to testbooru.
   deploy:
     name: 5. Deploy
     needs: production
-    if: github.ref_name == 'betabooru' || github.ref_name == 'testbooru'
+    if: github.ref_name == 'testbooru'
     permissions: read-all
     uses: ./.github/workflows/deploy.yaml
     secrets: inherit

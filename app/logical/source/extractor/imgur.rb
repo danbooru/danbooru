@@ -72,11 +72,11 @@ module Source
 
       memoize def v1_api_response
         if album_id.present?
-          api_url = "https://api.imgur.com/post/v1/posts/#{album_id}?include=media,tags,account&client_id=#{IMGUR_CLIENT_ID}"
-          http.cache(1.minute).parsed_get(api_url, format: :json) || {}
+          api_url = "https://api.imgur.com/post/v1/posts/#{album_id}?include=media,tags,account"
+          api_http.parsed_get(api_url, format: :json) || {}
         elsif image_id.present?
-          api_url = "https://api.imgur.com/post/v1/media/#{image_id}?include=media,tags,account&client_id=#{IMGUR_CLIENT_ID}"
-          http.cache(1.minute).parsed_get(api_url, format: :json) || {}
+          api_url = "https://api.imgur.com/post/v1/media/#{image_id}?include=media,tags,account"
+          api_http.parsed_get(api_url, format: :json) || {}
         else
           {}
         end
@@ -84,15 +84,17 @@ module Source
 
       memoize def v3_api_response
         if album_id.present?
-          # The client ID is supposed to be passed in a header, not a param, but that doesn't work for old albums.
-          api_url = "https://api.imgur.com/3/album/#{album_id}?client_id=#{IMGUR_CLIENT_ID}"
-          http.cache(1.minute).headers("Client-ID": IMGUR_CLIENT_ID).parsed_get(api_url)&.dig(:data) || {}
+          api_http.parsed_get("https://api.imgur.com/3/album/#{album_id}")&.dig(:data) || {}
         elsif image_id.present?
-          api_url = "https://api.imgur.com/3/image/#{image_id}?client_id=#{IMGUR_CLIENT_ID}"
-          http.cache(1.minute).headers("Client-ID": IMGUR_CLIENT_ID).parsed_get(api_url)&.dig(:data) || {}
+          api_http.parsed_get("https://api.imgur.com/3/image/#{image_id}")&.dig(:data) || {}
         else
           {}
         end
+      end
+
+      # https://apidocs.imgur.com/#authorization-and-oauth
+      def api_http
+        http.cache(1.minute).headers(Authorization: "Client-ID #{IMGUR_CLIENT_ID}")
       end
     end
   end

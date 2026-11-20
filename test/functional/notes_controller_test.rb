@@ -44,6 +44,14 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing body" do
+        assert_no_difference("Note.count") do
+          post_auth notes_path, @user, params: { note: { x: 0, y: 0, width: 10, height: 10, post_id: create(:post).id }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "create a note" do
         assert_difference("Note.count", 1) do
           post = create(:post)

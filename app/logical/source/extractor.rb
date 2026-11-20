@@ -236,12 +236,13 @@ module Source
     # @param url [String] The URL to fetch.
     # @param cache [ActiveSupport::Duration] The duration to cache the response for. Defaults to 1 minute.
     # @param params [Hash] The query params for the URL.
+    # @param headers [Hash] Extra headers to send with this request only.
     # @return [Object, nil] The parsed response. For HTML requests this will be a Nokogiri document; for JSON or XML
     #   requests it will be a hash or array. If the request fails, returns nil.
-    def parsed_get(url, cache: 1.minute, params: {})
+    def parsed_get(url, cache: 1.minute, params: {}, headers: {})
       return nil if url.blank?
 
-      response = http.cache(cache).get(url, params: params)
+      response = http.cache(cache).headers(headers).get(url, params: params)
       update_credentials!(response)
 
       response.parse if response.status.success?
@@ -414,7 +415,7 @@ module Source
       file_sizes = image_urls.filter_map do |url| # rubocop:disable Lint/UselessAssignment
         response = http_downloader.head(url)
         file_size = response.headers["Content-Length"] || "0"
-        file_size = "0" if !response.status.in?(200..299)
+        file_size = "0" if !response.status.success?
 
         pretty_file_size = file_size.reverse.chars.each_slice(3).map(&:join).join("_").reverse # "1234567" -> "1_234_567"
         "{ file_size: #{pretty_file_size} }"

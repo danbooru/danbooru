@@ -15,6 +15,14 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "escape quotes and backslashes in the source search link" do
+        create(:post, is_pending: true, source: 'a "b" c\\')
+        get_auth modqueue_index_path, @admin
+
+        assert_response :success
+        assert_select "a[href=?]", posts_path(tags: 'source:"a \"b\" c\\\\"')
+      end
+
       should "use the size URL param" do
         create(:post, is_pending: true)
         get_auth modqueue_index_path(size: 225), @admin

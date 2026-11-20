@@ -51,6 +51,16 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "return 404 for a nonexistent post" do
+        post_auth favorites_path(post_id: 0), @user, as: :json
+        assert_response 404
+      end
+
+      should "return 400 for a missing post" do
+        post_auth favorites_path, @user, as: :json
+        assert_response 400
+      end
+
       should "not allow creating duplicate favorites" do
         create(:favorite, post: @post, user: @user)
 

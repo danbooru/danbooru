@@ -3,9 +3,9 @@
 <% if post.parsed_source.present? %>
   <%= external_link_to post.normalized_source, external_site_icon(post.parsed_source.site_name, class: "h-4"), title: post.normalized_source, class: "inline-block align-top" %>
 <% elsif post.file_source? %>
-  <%= link_to file_lines_icon(class: "h-3"), posts_path(tags: %{source:"#{post.source.gsub(/"/, '\\"')}"}), title: post.source, class: "align-top" %>
+  <%= link_to file_lines_icon(class: "h-3"), posts_path(tags: %{source:"#{post.source.gsub(/[\\"]/) { "\\#{it}" }}"}), title: post.source, class: "align-top" %>
 <% elsif post.text_source? %>
-  <%= link_to file_pen_icon(class: "h-3"), posts_path(tags: %{source:"#{post.source.gsub(/"/, '\\"')}"}), title: post.source, class: "align-top" %>
+  <%= link_to file_pen_icon(class: "h-3"), posts_path(tags: %{source:"#{post.source.gsub(/[\\"]/) { "\\#{it}" }}"}), title: post.source, class: "align-top" %>
 <% else %>
   <%= link_to link_slash_icon(class: "h-2"), posts_path(tags: "source:none"), title: "no source", class: "align-top" %>
 <% end %>

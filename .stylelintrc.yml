@@ -2,7 +2,6 @@ extends: "stylelint-config-standard-scss"
 rules:
   color-hex-length: long
   custom-property-empty-line-before: null
-  declaration-block-single-line-max-declarations: null
   declaration-empty-line-before: null
   font-family-name-quotes: always-unless-keyword
   no-descending-specificity: null

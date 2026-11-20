@@ -114,7 +114,7 @@ class PostsController < ApplicationController
 
   def copy_notes
     @post = Post.find(params[:id])
-    @other_post = authorize Post.find(params[:other_post_id].to_i)
+    @other_post = authorize Post.find(params.expect(:other_post_id))
     @post.copy_notes_to(@other_post)
 
     if @post.errors.any?

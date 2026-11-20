@@ -13,10 +13,10 @@ class PostFlag < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to :post
 
-  before_validation { post.lock! }
+  before_validation { post&.lock! }
   validates :reason, visible_string: true, length: { in: 1..MAX_LENGTH }
   validate :validate_creator_is_not_limited, on: :create
-  validate :validate_post, on: :create
+  validate :validate_post, on: :create, if: :post
   validates :creator_id, uniqueness: { scope: :post_id, on: :create, unless: :is_deletion, message: "have already flagged this post" }
   after_create :update_post
   after_create :prune_disapprovals
@@ -69,7 +69,7 @@ class PostFlag < ApplicationRecord
     case reason
     when Reasons::UNAPPROVED
       :unapproved
-    when /#{Reasons::REJECTED.gsub("%", ".*")}/o
+    when /\A#{Reasons::REJECTED.gsub("%", ".*")}/o
       :rejected
     else
       :normal

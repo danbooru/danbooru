@@ -62,6 +62,14 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing name" do
+        assert_no_difference("FavoriteGroup.count") do
+          post_auth favorite_groups_path, @user, params: { favorite_group: { is_public: true }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "render" do
         post_auth favorite_groups_path, @user, params: { favorite_group: attributes_for(:favorite_group) }
         assert_redirected_to favorite_group_path(FavoriteGroup.last)
@@ -115,6 +123,14 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "add_post action" do
+      should "return 400 for a post_id param that isn't a string or integer" do
+        put_auth add_post_favorite_group_path(@favgroup), @user, params: { post_id: [create(:post).id] }, as: :json
+        assert_response 400
+
+        put_auth remove_post_favorite_group_path(@favgroup), @user, params: { post_id: { a: 1 }}, as: :json
+        assert_response 400
+      end
+
       should "render" do
         @post = create(:post)
         put_auth add_post_favorite_group_path(@favgroup), @user, params: { post_id: @post.id, format: "js" }

@@ -65,13 +65,6 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal("", response.body.to_s)
       end
 
-      should "verify SSL certificates when legacy SSL is enabled" do
-        assert_equal(590, Danbooru::Http.with_legacy_ssl.get("https://expired.badssl.com").status)
-        assert_equal(590, Danbooru::Http.with_legacy_ssl.get("https://self-signed.badssl.com").status)
-        assert_equal(590, Danbooru::Http.with_legacy_ssl.get("https://wrong.host.badssl.com").status)
-        assert_equal(200, Danbooru::Http.with_legacy_ssl.get("https://badssl.com").status)
-      end
-
       should "decompress gzipped responses under the max size" do
         with_local_server("<p>hello</p>", gzip: true) do |url|
           response = Danbooru::Http.max_size(1_000).get(url)
@@ -174,7 +167,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         resp = Danbooru::Http.head(httpbin_url("anything/\u30D5\u3099")) # U+30D5 U+3099 = ブ ('KATAKANA LETTER HU', 'COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK')
         assert_equal(httpbin_url("anything/%E3%83%95%E3%82%99"), resp.request.uri.to_s)
 
-        resp = Danbooru::Http.with_legacy_ssl.head("https://tuyu-official.jp/wp/wp-content/uploads/2022/09/雨模様［サブスクジャケット］.jpeg")
+        resp = Danbooru::Http.head("https://tuyu-official.jp/wp/wp-content/uploads/2022/09/雨模様［サブスクジャケット］.jpeg")
         assert_equal("%E9%9B%A8%E6%A8%A1%E6%A7%98%EF%BC%BB%E3%82%B5%E3%83%95%E3%82%99%E3%82%B9%E3%82%AF%E3%82%B7%E3%82%99%E3%83%A3%E3%82%B1%E3%83%83%E3%83%88%EF%BC%BD.jpeg", resp.request.uri.path.split("/").last)
       end
 

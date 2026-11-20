@@ -44,7 +44,9 @@ module PaginationExtension
       @paginator_count = Float::INFINITY
     end
 
-    if page.to_s =~ /\Ab(\d+)\z/i
+    if page.to_s.match?(/\A[ab]\d+\z/i) && column_names.exclude?("id")
+      raise PaginationError, "You can't use page=#{page.to_s.first} on this page."
+    elsif page.to_s =~ /\Ab(\d+)\z/i
       @paginator_mode = :sequential_before
       paginate_sequential_before($1, records_per_page)
     elsif page.to_s =~ /\Aa(\d+)\z/i
@@ -61,11 +63,11 @@ module PaginationExtension
   end
 
   def paginate_sequential_before(before_id, limit)
-    where("#{table_name}.id < ?", before_id).reorder("#{table_name}.id DESC").limit(limit + 1)
+    where(id: ...before_id.to_i).reorder("#{table_name}.id DESC").limit(limit + 1)
   end
 
   def paginate_sequential_after(after_id, limit)
-    where("#{table_name}.id > ?", after_id).reorder("#{table_name}.id ASC").limit(limit + 1)
+    where(id: (after_id.to_i + 1)..).reorder("#{table_name}.id ASC").limit(limit + 1)
   end
 
   def paginate_numbered(page, limit)

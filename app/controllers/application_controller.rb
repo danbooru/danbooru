@@ -20,6 +20,9 @@ class ApplicationController < ActionController::Base
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
   before_action :check_get_body
   before_action :check_oversized_get_params
+  before_action :check_pagination_params
+  before_action :check_model_params
+  before_action :check_null_bytes
   before_action :reset_current_user
   before_action :delete_host_only_session_cookie
   before_action :set_current_user
@@ -79,7 +82,7 @@ class ApplicationController < ActionController::Base
     if params[:only].present? && (request.format.json? || request.format.xml?)
       records = subject.is_a?(ActiveRecord::Relation) ? subject.load.to_a : Array.wrap(subject)
 
-      if records.all?(ApplicationRecord)
+      if records.present? && records.all?(ApplicationRecord)
         associations = ParameterBuilder.new(params[:only], model).includes_parameters
         ActiveRecord::Associations::Preloader.new(records: records, associations: associations).call
 
@@ -151,7 +154,14 @@ class ApplicationController < ActionController::Base
         rescue_exception(exception.cause)
       when ActiveRecord::QueryCanceled
         render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
-      when ActionController::BadRequest, ActionDispatch::Http::Parameters::ParseError
+      when ActionDispatch::Http::Parameters::ParseError
+        # Discard the unparseable request body, otherwise rendering the error page raises the same error again when it
+        # reads the params. Also clear the cached format, which may have fallen back to the Accept header because the
+        # params couldn't be read.
+        request.request_parameters = {}
+        request.delete_header("action_dispatch.request.formats")
+        render_error_page(400, exception, message: exception.message)
+      when ActionController::BadRequest, ActionController::ParameterMissing
         render_error_page(400, exception, message: exception.message)
       when RequestBodyNotAllowedError
         render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
@@ -173,7 +183,7 @@ class ApplicationController < ActionController::Base
         render_error_page(410, exception, template: "static/pagination_error", message: exception.message)
       when PostQuery::TagLimitError
         render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
-      when ParamTooLongError, Aggregatable::Error, DText::Error, PostQuery::Error, PostVersion::SearchError, ParameterBuilder::Error, UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
+      when ParamTooLongError, Date::Error, Searchable::SearchError, Aggregatable::Error, DText::Error, PostQuery::Error, PostVersion::SearchError, ParameterBuilder::Error, UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
         render_error_page(422, exception, message: exception.message)
       when RateLimiter::RateLimitError
         render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
@@ -334,6 +344,32 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Reject `page` and `limit` params that aren't strings or integers, like `limit[]=1` or `{"limit": true}` in a JSON body.
+  def check_pagination_params
+    params.slice(:page, :limit).each do |name, value|
+      raise ActionController::BadRequest, "#{name} parameter must be a string or an integer" unless value.nil? || value.is_a?(String) || value.is_a?(Integer)
+    end
+  end
+
+  # Reject parameters containing null bytes. PostgreSQL doesn't allow null bytes in strings, so otherwise they cause
+  # errors in any search or form that uses the parameter.
+  def check_null_bytes
+    raise ActionController::BadRequest, "Parameters can't contain null bytes" if contains_null_byte?(params.to_unsafe_h)
+  end
+
+  def contains_null_byte?(value)
+    case value
+    when String
+      value.include?("\0")
+    when Hash
+      value.any? { |name, item| contains_null_byte?(name.to_s) || contains_null_byte?(item) }
+    when Array
+      value.any? { |item| contains_null_byte?(item) }
+    else
+      false
+    end
+  end
+
   def redirect_if_name_invalid?
     if request.format.html? && !CurrentUser.user.is_anonymous? && CurrentUser.user.name_invalid?
       flash[:notice] = "You must change your username to continue using #{Danbooru.config.app_name}"
@@ -349,8 +385,23 @@ class ApplicationController < ActionController::Base
     CurrentUser.user
   end
 
+  # Reject requests where the model's params aren't a hash (e.g. `POST /comments?comment=foo`). Most controllers expect
+  # `params[:comment]` to be a hash and raise an error otherwise.
+  def check_model_params
+    return if request.get? || request.head?
+
+    key = controller_name.singularize
+    raise ActionController::BadRequest, "#{key} parameter must be a hash" if params.key?(key) && !params[key].is_a?(ActionController::Parameters)
+  end
+
+  # Used by Pundit's `permitted_attributes`. Reject model params that aren't a hash (e.g. `comment=foo` or `comment[]=foo`),
+  # which would otherwise raise an error when they're permitted.
   def pundit_params_for(record)
-    params.fetch(Pundit::PolicyFinder.new(record).param_key, {})
+    key = Pundit::PolicyFinder.new(record).param_key
+    model_params = params.fetch(key, {})
+    raise ActionController::BadRequest, "#{key} parameter must be a hash" unless model_params.is_a?(ActionController::Parameters)
+
+    model_params
   end
 
   def requires_reauthentication

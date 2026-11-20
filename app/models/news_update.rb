@@ -13,7 +13,7 @@ class NewsUpdate < ApplicationRecord
 
   validate :validate_duration, if: :duration_changed?
   validate :validate_active, on: :create
-  validates :message, presence: true, length: { maximum: 280 }, if: :message_changed?
+  validates :message, presence: true, length: { maximum: 280 }, if: -> { new_record? || message_changed? }
 
   after_save :create_mod_action
 

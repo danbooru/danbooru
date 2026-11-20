@@ -7,7 +7,7 @@ class FavoriteGroup < ApplicationRecord
 
   normalizes :name, with: ->(name) { name.unicode_normalize(:nfc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "") }
 
-  validates :name, visible_string: true, uniqueness: { case_sensitive: false, scope: :creator_id }, length: { maximum: 170 }, if: :name_changed?
+  validates :name, visible_string: true, uniqueness: { case_sensitive: false, scope: :creator_id }, length: { maximum: 170 }, if: -> { new_record? || name_changed? }
   validate :validate_name, if: :name_changed?
   validate :creator_can_create_favorite_groups, on: :create
   validates :post_ids, length: { maximum: MAX_POST_COUNT, too_long: "can't have more than #{MAX_POST_COUNT} posts" }, if: :post_ids_changed?

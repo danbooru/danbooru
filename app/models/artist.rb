@@ -17,7 +17,7 @@ class Artist < ApplicationRecord
   validate :validate_artist_name
   validate :validate_other_names, if: :other_names_changed?
   validate :validate_urls
-  validates :name, tag_name: true, uniqueness: true, if: :name_changed?
+  validates :name, tag_name: true, uniqueness: true, if: -> { new_record? || name_changed? }
   validates :group_name, length: { maximum: 80 }, if: :group_name_changed?
   validates :other_names, length: { maximum: 50, too_long: "can't have more than 50 names" }, if: :other_names_changed?
   after_validation :add_url_warnings
@@ -305,12 +305,14 @@ class Artist < ApplicationRecord
         q = q.any_other_name_like(params[:any_other_name_like])
       end
 
-      if params[:any_name_matches].present?
-        q = q.any_name_matches(params[:any_name_matches])
+      parsed = parse_search_params!(params, any_name_matches: :string, any_name_or_url_matches: :string)
+
+      if parsed[:any_name_matches]
+        q = q.any_name_matches(parsed[:any_name_matches])
       end
 
-      if params[:any_name_or_url_matches].present?
-        q = q.any_name_or_url_matches(params[:any_name_or_url_matches])
+      if parsed[:any_name_or_url_matches]
+        q = q.any_name_or_url_matches(parsed[:any_name_or_url_matches])
       end
 
       if params[:url_matches].present?

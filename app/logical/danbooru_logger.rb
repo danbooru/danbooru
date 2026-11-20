@@ -42,7 +42,7 @@ class DanbooruLogger
     if expected
       Rails.logger.info("#{exception.class}: #{exception.message}")
     else
-      backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
+      backtrace = Rails.backtrace_cleaner.clean(exception.backtrace.to_a).join("\n")
       Rails.logger.error("#{exception.class}: #{exception.message}\n#{backtrace}")
     end
 

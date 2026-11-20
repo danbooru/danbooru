@@ -94,4 +94,48 @@ class StringTest < ActiveSupport::TestCase
       assert_equal("Http_User_Agent", "HTTP_USER_AGENT".startcase)
     end
   end
+
+  context "String#parse_date!" do
+    should "parse dates" do
+      assert_equal(Date.new(2020, 1, 2), "2020-01-02".parse_date!)
+      assert_equal(Date.new(2020, 1, 2), "2020-1-2".parse_date!)
+      assert_equal(Date.new(2020, 1, 2), " 2020-01-02 ".parse_date!)
+    end
+
+    should "parse dates with a time and ignore the time" do
+      assert_equal(Date.new(2020, 1, 2), "2020-01-02 12:00".parse_date!)
+      assert_equal(Date.new(2020, 1, 2), "2020-01-02 1:00".parse_date!)
+      assert_equal(Date.new(2020, 1, 2), "2020-01-02T23:59:59".parse_date!)
+      assert_equal(Date.new(2020, 1, 2), "2020-01-02T12:00:00.123Z".parse_date!)
+      assert_equal(Date.new(2020, 1, 2), "2020-01-02T12:00:00+09:00".parse_date!)
+      assert_equal(Date.new(2020, 1, 2), "2020-01-02 12:00:00 -0500".parse_date!)
+    end
+
+    should "raise an error for invalid dates" do
+      assert_raises(Date::Error) { "".parse_date! }
+      assert_raises(Date::Error) { "abc".parse_date! }
+      assert_raises(Date::Error) { "2020-13-01".parse_date! }
+      assert_raises(Date::Error) { "2020-02-30".parse_date! }
+      assert_raises(Date::Error) { "2020-01-02 24:00".parse_date! }
+      assert_raises(Date::Error) { "2020-01-02 12:60".parse_date! }
+      assert_raises(Date::Error) { "2020-01-02 12".parse_date! }
+      assert_raises(Date::Error) { "2020-01-02 abc".parse_date! }
+      assert_raises(Date::Error) { "20200102".parse_date! }
+      assert_raises(Date::Error) { "2020-002".parse_date! }
+      assert_raises(Date::Error) { "1.month.ago".parse_date! }
+      assert_raises(Date::Error) { "January 2, 2020".parse_date! }
+      assert_raises(Date::Error) { "2020-01-02\nabc".parse_date! }
+      assert_raises(Date::Error) { ("1" * 200).parse_date! }
+    end
+
+    should "include the string in the error message" do
+      error = assert_raises(Date::Error) { "abc".parse_date! }
+      assert_equal("abc is not a valid date", error.message)
+    end
+
+    should "truncate long strings in the error message" do
+      error = assert_raises(Date::Error) { ("1" * 200).parse_date! }
+      assert_equal("1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111... is not a valid date", error.message)
+    end
+  end
 end

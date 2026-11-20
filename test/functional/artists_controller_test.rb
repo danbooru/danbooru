@@ -161,6 +161,15 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      should "return 422 for name params that aren't strings" do
+        get artists_path, params: { search: { any_name_matches: ["a"] }}, as: :json
+        assert_response 422
+        assert_equal("any_name_matches must be a string", response.parsed_body["message"])
+
+        get artists_path, params: { search: { any_name_or_url_matches: ["a"] }}, as: :json
+        assert_response 422
+      end
+
       should "render" do
         get artists_path
         assert_response :success
@@ -215,6 +224,14 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing name" do
+        assert_no_difference("Artist.count") do
+          post_auth artists_path, @user, params: { artist: { group_name: "xxx" }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "not overflow the session cookie when warning about many duplicate artists" do
         urls = 10.times.map { |i| "https://www.pixiv.net/users/#{i}" }
         urls.product([1, 2, 3]).each { |url, n| create(:artist, name: "artist#{n}_#{url.split("/").last}_#{"a" * 150}", url_string: url) }

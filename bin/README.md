@@ -9,6 +9,7 @@ These scripts are specific to this project.
 
 | Script | Description |
 |--------|-------------|
+| `archive` | Read, extract, and create archive files. Run in the upload sandbox by `Danbooru::Archive` and `MediaFile::Ugoira`. |
 | `build-docker-image` | Build a Docker image from the current Git commit. |
 | `danbooru-dev-entrypoint` | Entrypoint for containers started with `bin/dev` / `docker-compose.dev.yaml`. |
 | `dev` | Shortcut for `docker compose -f docker-compose.dev.yaml`. |

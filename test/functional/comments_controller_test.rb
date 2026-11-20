@@ -9,6 +9,11 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      should "return 400 for a post_id param that isn't a string or integer for .js" do
+        get comments_path(post_id: [@post.id]), xhr: true
+        assert_response 400
+      end
+
       context "grouped by post" do
         should "render all comments for .js" do
           @comment = create(:comment, post: @post)
@@ -348,6 +353,14 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "return an error for a missing body" do
+        assert_no_difference("Comment.count") do
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id }}, as: :json
+        end
+
+        assert_response 422
+      end
+
       should "create a comment" do
         assert_difference("Comment.count", 1) do
           post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" }}

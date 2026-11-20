@@ -26,6 +26,9 @@ class PoolVersion < ApplicationRecord
     end
 
     def for_post_id(post_id)
+      # The post ID columns are integer arrays, so IDs that don't fit in an integer can't match anything.
+      return none unless post_id.between?(-(2**31), (2**31) - 1)
+
       where_array_includes_any(:added_post_ids, [post_id]).or(where_array_includes_any(:removed_post_ids, [post_id]))
     end
 
@@ -38,8 +41,10 @@ class PoolVersion < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, current_user: current_user)
 
-      if params[:post_id]
-        q = q.for_post_id(params[:post_id].to_i)
+      parsed = parse_search_params!(params, post_id: :integer)
+
+      if parsed[:post_id]
+        q = q.for_post_id(parsed[:post_id])
       end
 
       if params[:name_contains].present?

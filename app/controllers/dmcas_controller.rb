@@ -6,6 +6,8 @@ class DmcasController < ApplicationController
   end
 
   def create
+    raise ActionController::BadRequest, "dmca parameter is required" if params[:dmca].blank?
+
     @dmca = params[:dmca].slice(:name, :email, :address, :infringing_urls, :original_urls, :proof, :perjury_agree, :good_faith_agree, :signature)
     authorize @dmca, policy_class: DmcaPolicy
 
@@ -25,7 +27,8 @@ class DmcasController < ApplicationController
     EOS
 
     UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: Danbooru.config.dmca_email).deliver_now
-    UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now unless Danbooru::EmailAddress.new(@dmca[:email]).undeliverable?
+    email_address = Danbooru::EmailAddress.parse(@dmca[:email])
+    UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now if email_address.present? && !email_address.undeliverable?
   end
 
   def template

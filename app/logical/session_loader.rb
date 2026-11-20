@@ -243,6 +243,8 @@ class SessionLoader
   # Sets the current API user based on the HTTP Basic Auth params.
   def authenticate_basic_auth
     credentials = ::Base64.decode64(request.authorization.split(" ", 2).last || "")
+    raise AuthenticationFailure, "Invalid API key" if credentials.include?("\0")
+
     login, api_key = credentials.split(":", 2)
     DanbooruLogger.add_attributes("param", login: login)
     authenticate_api_key(login, api_key)

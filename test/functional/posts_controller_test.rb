@@ -924,6 +924,22 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             assert_equal @user.level.to_s, element.attribute("data-current-user-level").value
           end
         end
+
+        should "escape quotes and backslashes in the source search link in the tooltip" do
+          @post.update!(source: 'a "b" c\\')
+          get_auth post_path(@post, variant: "tooltip", preview: "true"), @user
+
+          assert_response :success
+          assert_select "a.post-tooltip-source[href=?]", posts_path(tags: 'source:"a \"b\" c\\\\"')
+        end
+
+        should "escape quotes and backslashes in the file source search link in the tooltip" do
+          @post.update!(source: 'file://C:\\a "b"\\')
+          get_auth post_path(@post, variant: "tooltip", preview: "true"), @user
+
+          assert_response :success
+          assert_select "a.post-tooltip-source[href=?]", posts_path(tags: 'source:"file://C:\\\\a \"b\"\\\\"')
+        end
       end
 
       context "a deleted post" do
@@ -1487,6 +1503,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "copy_notes action" do
+      should "return 400 for an other_post_id param that isn't a string or integer" do
+        put_auth copy_notes_post_path(@src), @user, params: { other_post_id: [@dst.id] }, as: :json
+        assert_response 400
+      end
+
       setup do
         as(@user) do
           @src = create(:post, image_width: 100, image_height: 100, tag_string: "translated partially_translated", has_embedded_notes: true)

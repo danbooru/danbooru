@@ -120,7 +120,7 @@ jobs:
 
     steps:
       - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+        uses: mxschmitt/action-tmate@35b54afac29c97fb54faba5b513f8fbd1882f113 # v3.24
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
         with:
           limit-access-to-actor: true
@@ -148,7 +148,7 @@ jobs:
       # https://github.com/marketplace/actions/codecov
       - name: Upload coverage reports to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           root_dir: /danbooru
           working-directory: /danbooru
@@ -162,7 +162,7 @@ jobs:
       # https://docs.codecov.com/docs/test-analytics
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           root_dir: /danbooru
           working-directory: /danbooru
@@ -174,7 +174,7 @@ jobs:
           verbose: true
 
       - name: Upload test results to Github
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: test-results

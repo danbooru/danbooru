@@ -60,6 +60,40 @@ class TagRelationshipsComponentTest < ViewComponent::TestCase
       assert_css(".fineprint a.wiki-link.tag-type-#{Tag.categories.general}[href='/wiki_pages/cosplay']")
     end
 
+    should "truncate long lists with a link to the full list" do
+      as(@user) do
+        11.times do |n|
+          create(:tag_alias, antecedent_name: "alias_#{n.to_s.rjust(2, "0")}", consequent_name: "foo", status: "active")
+          create(:tag_implication, antecedent_name: "foo", consequent_name: "parent_#{n.to_s.rjust(2, "0")}", status: "active")
+          create(:tag_implication, antecedent_name: "child_#{n.to_s.rjust(2, "0")}", consequent_name: "foo", status: "active")
+        end
+      end
+
+      render_component(@tag.reload)
+
+      assert_css(".fineprint", text: /aliased to this tag: alias_00, .*alias_08, and 2 more\s+\(learn more\)/)
+      assert_css(".fineprint", text: /This tag implicates parent_00, .*parent_08, and 2 more\s+\(learn more\)/)
+      assert_css(".fineprint", text: /implicate this tag: child_00, .*child_08, and 2 more\s+\(learn more\)/)
+      assert_no_text("alias_09")
+      assert_no_text("parent_09")
+      assert_no_text("child_09")
+
+      assert_css("a[href='/tag_aliases?search%5Bconsequent_name%5D=foo&search%5Border%5D=name&search%5Bstatus%5D=active']", text: "2 more")
+      assert_css("a[href='/tag_implications?search%5Bantecedent_name%5D=foo&search%5Border%5D=name&search%5Bstatus%5D=active']", text: "2 more")
+      assert_css("a[href='/tag_implications?search%5Bconsequent_name%5D=foo&search%5Border%5D=name&search%5Bstatus%5D=active']", text: "2 more")
+    end
+
+    should "not truncate lists at the limit" do
+      as(@user) do
+        10.times { |n| create(:tag_implication, antecedent_name: "child_#{n}", consequent_name: "foo", status: "active") }
+      end
+
+      render_component(@tag.reload)
+
+      assert_css(".fineprint", text: /child_0, .*and child_9\s+\(learn more\)/)
+      assert_no_text(/\d+ more/)
+    end
+
     should "not run extra queries for each alias or implication" do
       add_relationships = lambda do |n|
         as(@user) do

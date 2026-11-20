@@ -8,8 +8,8 @@ class Dmail < ApplicationRecord
 
   normalizes :title, :body, with: ->(text) { text.to_s.unicode_normalize(:nfc).normalize_whitespace.strip }
 
-  validates :title, visible_string: true, length: { maximum: 200 }, if: :title_changed?
-  validates :body, visible_string: true, length: { maximum: 50_000 }, if: :body_changed?
+  validates :title, visible_string: true, length: { maximum: 200 }, if: -> { new_record? || title_changed? }
+  validates :body, visible_string: true, length: { maximum: 50_000 }, if: -> { new_record? || body_changed? }
 
   belongs_to :owner, class_name: "User"
   belongs_to :to, class_name: "User"
@@ -124,7 +124,7 @@ class Dmail < ApplicationRecord
     end
 
     def key
-      signed_id(purpose: "dmail_link")
+      signed_id(purpose: "dmail_link") if persisted?
     end
   end
 

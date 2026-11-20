@@ -33,6 +33,114 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 200
     end
 
+    should "return 422 for search params with the wrong type" do
+      get artists_path(search: { is_deleted: "abc" }), as: :json
+      assert_response 422
+
+      get artists_path(search: { name: { x: 1 }}), as: :json
+      assert_response 422
+    end
+
+    should "return 400 for a missing or invalid required param" do
+      get_auth new_forum_post_path(post_id: ["1"], format: :json), create(:user)
+      assert_response 400
+      assert_equal("param is missing or the value is empty or invalid: post_id", response.parsed_body["message"])
+    end
+
+    should "return 400 for a page or limit param that isn't a string or integer" do
+      get posts_path(limit: ["1"]), as: :json
+      assert_response 400
+
+      get artists_path(limit: { a: 1 }), as: :json
+      assert_response 400
+
+      get autocomplete_index_path(limit: ["1"], search: { type: "tag_query", query: "a" }), as: :json
+      assert_response 400
+
+      get related_tag_path(limit: ["1"], search: { query: "a" }), as: :json
+      assert_response 400
+
+      get tags_path(page: ["1"]), as: :json
+      assert_response 400
+
+      post tags_path, params: { limit: true }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 400
+      assert_equal("limit parameter must be a string or an integer", response.parsed_body["message"])
+
+      post tags_path, params: { page: false }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 400
+
+      post tags_path, params: { limit: 1.5 }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 400
+
+      post tags_path, params: { limit: nil, page: nil }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 200
+
+      post tags_path, params: { limit: 1, page: 1 }, headers: { "X-Http-Method-Override": "GET" }, as: :json
+      assert_response 200
+    end
+
+    should "return 400 for model params that aren't a hash" do
+      user = create(:user, created_at: 1.month.ago)
+
+      post_auth comments_path, user, params: { comment: "x" }
+      assert_response 400
+
+      post_auth pools_path, user, params: { pool: ["x"] }, as: :json
+      assert_response 400
+
+      post_auth api_keys_path, user, params: { api_key: "x" }, as: :json, reauthenticate: true
+      assert_response 400
+
+      put_auth create_or_update_artist_commentaries_path, user, params: { artist_commentary: "x" }, as: :json
+      assert_response 400
+
+      post_auth post_disapprovals_path, create(:approver), params: { post_disapproval: ["x"] }, as: :json
+      assert_response 400
+
+      post dmca_path, params: { dmca: "x" }, as: :json
+      assert_response 400
+
+      post_auth upgrade_upgrade_codes_path, user, params: { upgrade_code: "x" }, as: :json
+      assert_response 400
+    end
+
+    context "for parameters containing null bytes" do
+      should "return 400 for GET requests" do
+        get posts_path(tags: "a\0b"), as: :json
+        assert_response 400
+
+        get tags_path(search: { name: "a\0" }), as: :json
+        assert_response 400
+
+        get tags_path(search: { name: ["a", "b\0"] }), as: :json
+        assert_response 400
+
+        get posts_path("a\0b" => "c"), as: :json
+        assert_response 400
+      end
+
+      should "return 400 for POST requests" do
+        post_auth comments_path, create(:user), params: { comment: { post_id: create(:post).id, body: "a\0b" }}, as: :json
+        assert_response 400
+      end
+
+      should "return 400 for API key parameters" do
+        get posts_path(login: "a\0b", api_key: "x"), as: :json
+        assert_response 400
+      end
+
+      should "return 401 for basic auth credentials" do
+        get posts_path, headers: { Authorization: ActionController::HttpAuthentication::Basic.encode_credentials("a\0b", "x") }, as: :json
+        assert_response 401
+      end
+    end
+
+    should "not fail for the only param on pages without a model when there are no results" do
+      get autocomplete_index_path(search: { type: "tag_query", query: "zzzznonexistent" }, only: "id"), as: :json
+      assert_response :success
+    end
+
     should "return 422 for an oversized param on a GET request" do
       get posts_path(foo: "a" * (ApplicationController::MAX_GET_PARAMETER_LENGTH + 1)), as: :json
 
@@ -53,6 +161,36 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_redirected_to wiki_page_path(WikiPage.last)
     end
 
+    context "on a request with an unparseable JSON body" do
+      setup do
+        @user = create(:user)
+        @api_key = create(:api_key, user: @user)
+        @headers = { HTTP_AUTHORIZATION: "Basic #{::Base64.strict_encode64("#{@user.name}:#{@api_key.key}")}" }
+        @env = { "CONTENT_TYPE" => "application/json", "HTTP_ACCEPT" => "*/*" }
+      end
+
+      should "return 400 Bad Request in JSON for a .json URL" do
+        post posts_path(format: :json), params: "tags=touhou&_method=get", headers: @headers, env: @env
+
+        assert_response 400
+        assert_equal("ActionDispatch::Http::Parameters::ParseError", response.parsed_body["error"])
+      end
+
+      should "return 400 Bad Request in JSON for a .json URL for an anonymous user" do
+        post posts_path(format: :json), params: "tags=touhou&_method=get", env: @env
+
+        assert_response 400
+        assert_equal("ActionDispatch::Http::Parameters::ParseError", response.parsed_body["error"])
+      end
+
+      should "return 400 Bad Request in HTML for an HTML URL" do
+        post posts_path, params: "tags=touhou&_method=get", headers: @headers, env: @env
+
+        assert_response 400
+        assert_match(/Error occurred while parsing request parameters/, response.body)
+      end
+    end
+
     should "return 404 Not Found for an unsupported method on the root path" do
       post root_path
       assert_response 404
@@ -65,6 +203,38 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
       delete root_path
       assert_response 404
+    end
+
+    context "for a multipart form" do
+      setup do
+        @user = create(:user)
+        login_as(@user)
+      end
+
+      should "treat fields as UTF-8 regardless of their charset" do
+        post wiki_pages_path, headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: multipart_body("wiki_page[title]" => ["text/plain; charset=UTF-16LE", "abcd"], "wiki_page[body]" => ["text/plain; charset=Shift_JIS", "あ"])
+
+        assert_redirected_to wiki_page_path(WikiPage.last)
+        assert_equal("abcd", WikiPage.last.title)
+        assert_equal("あ", WikiPage.last.body)
+        assert_equal(Encoding::UTF_8, WikiPage.last.body.encoding)
+      end
+
+      should "return 400 for fields that aren't valid UTF-8" do
+        assert_no_difference("WikiPage.count") do
+          post wiki_pages_path(format: :json), headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: multipart_body("wiki_page[title]" => ["text/plain", "test"], "wiki_page[body]" => ["text/plain; charset=Shift_JIS", "あ".encode("Shift_JIS")])
+        end
+
+        assert_response 400
+      end
+
+      should "return 400 for fields containing a NUL byte" do
+        assert_no_difference("WikiPage.count") do
+          post wiki_pages_path(format: :json), headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: multipart_body("wiki_page[title]" => ["text/plain", "test"], "wiki_page[body]" => ["text/plain", "a\0b"])
+        end
+
+        assert_response 400
+      end
     end
 
     context "on a RecordNotFound error" do
@@ -802,5 +972,15 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal(%w[is_deleted], comments[true].keys)
       end
     end
+  end
+
+  # @param fields [Hash<String, (String, String)>] A hash of field names to [content type, value] pairs.
+  # @return [String] A multipart/form-data body with the boundary "xyz".
+  def multipart_body(fields)
+    parts = fields.map do |name, (content_type, value)|
+      "--xyz\r\nContent-Disposition: form-data; name=\"#{name}\"\r\nContent-Type: #{content_type}\r\n\r\n".b + value.b + "\r\n".b
+    end
+
+    parts.join.b + "--xyz--\r\n".b
   end
 end
