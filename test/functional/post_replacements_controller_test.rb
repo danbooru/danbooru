@@ -82,6 +82,46 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "replacing a post with a file with an invalid filename" do
+        should "fail if the filename isn't valid UTF-8" do
+          @post = create(:post, file_size: 789)
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
+
+          assert_no_difference("PostReplacement.count") do
+            post_auth post_replacements_path(format: :json), create(:moderator_user), params: { post_id: @post.id, post_replacement: { replacement_file: file }}
+          end
+
+          assert_response 422
+          assert_equal(["'a�.jpg' isn't a valid filename (filenames must be UTF-8)"], response.parsed_body.dig("errors", "base"))
+          assert_equal(789, @post.reload.file_size)
+        end
+
+        should "fail if the filename contains a NUL byte" do
+          @post = create(:post, file_size: 789)
+          body = "--xyz\r\nContent-Disposition: form-data; name=\"post_replacement[replacement_file]\"; filename=\"a%00b.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".b + File.binread("test/files/jpg/test.jpg") + "\r\n--xyz--\r\n".b
+
+          assert_no_difference("PostReplacement.count") do
+            post_auth post_replacements_path(post_id: @post.id, format: :json), create(:moderator_user), headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: body
+          end
+
+          assert_response 422
+          assert_equal(["'a�b.jpg' isn't a valid filename (filenames can't contain NUL bytes)"], response.parsed_body.dig("errors", "base"))
+          assert_equal(789, @post.reload.file_size)
+        end
+
+        should "succeed if the filename has non-ASCII characters" do
+          @post = create(:post)
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "あ.jpg")
+
+          assert_difference("PostReplacement.count", 1) do
+            post_auth post_replacements_path, create(:moderator_user), params: { post_id: @post.id, post_replacement: { replacement_file: file }}
+          end
+
+          assert_redirected_to @post
+          assert_equal("file://あ.jpg", PostReplacement.last.replacement_url)
+        end
+      end
+
       context "when a post with the same MD5 already exists" do
         should "return an error" do
           @post1 = create(:post, md5: "ecef68c44edb8a0d6a3070b5f8e8ee76", file_size: 1234)

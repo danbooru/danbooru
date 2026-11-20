@@ -219,6 +219,36 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(["Can't give both a file and a source"], response.parsed_body.dig("errors", "base"))
       end
 
+      should "fail if the filename isn't valid UTF-8" do
+        assert_no_difference("Upload.count") do
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
+          post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }}}
+        end
+
+        assert_response 422
+        assert_equal(["'a\uFFFD.jpg' isn't a valid filename (filenames must be UTF-8)"], response.parsed_body.dig("errors", "base"))
+      end
+
+      should "fail if the filename contains a NUL byte" do
+        assert_no_difference("Upload.count") do
+          body = "--xyz\r\nContent-Disposition: form-data; name=\"upload[files][0]\"; filename=\"a%00b.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".b + File.binread("test/files/jpg/test.jpg") + "\r\n--xyz--\r\n".b
+          post_auth uploads_path(format: :json), @user, headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: body
+        end
+
+        assert_response 422
+        assert_equal(["'a\uFFFDb.jpg' isn't a valid filename (filenames can't contain NUL bytes)"], response.parsed_body.dig("errors", "base"))
+      end
+
+      should "succeed if the filename has non-ASCII characters" do
+        assert_difference("Upload.count", 1) do
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "あ.jpg")
+          post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }}}
+        end
+
+        assert_response 201
+        assert_equal(["file://あ.jpg"], Upload.last.upload_media_assets.map(&:source_url))
+      end
+
       should "fail if given an unsupported filetype" do
         file = Rack::Test::UploadedFile.new("test/files/ugoira/animation.json")
         post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }}}

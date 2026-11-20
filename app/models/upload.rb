@@ -30,6 +30,7 @@ class Upload < ApplicationRecord
   validates :status, inclusion: { in: %w[pending processing completed error] }
   validate :validate_file_and_source, on: :create
   validate :validate_uploader_is_not_limited, on: :create
+  validates :files, uploaded_filename: true, on: :create
   validate :validate_archive_files, on: :create # Last, because it's the slowest.
 
   after_create :async_process_upload!
