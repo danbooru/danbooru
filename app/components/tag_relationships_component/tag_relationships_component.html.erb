@@ -7,7 +7,7 @@
 
 <% if alias_tags.present? %>
   <p class="fineprint">
-    The following tags are aliased to this tag: <%= tag_links(alias_tags) %>
+    The following tags are aliased to this tag: <%= tag_links(alias_tags, more_url: alias_tags_url) %>
     (<%= link_to_wiki "learn more", "help:tag_aliases" %>).
   </p>
 <% end %>
@@ -21,14 +21,14 @@
 
 <% if implied_tags.present? %>
   <p class="fineprint">
-    This tag implicates <%= tag_links(implied_tags) %>
+    This tag implicates <%= tag_links(implied_tags, more_url: implied_tags_url) %>
     (<%= link_to_wiki "learn more", "help:tag_implications" %>).
   </p>
 <% end %>
 
 <% if implying_tags.present? %>
   <p class="fineprint">
-    The following tags implicate this tag: <%= tag_links(implying_tags) %>
+    The following tags implicate this tag: <%= tag_links(implying_tags, more_url: implying_tags_url) %>
     (<%= link_to_wiki "learn more", "help:tag_implications" %>).
   </p>
 <% end %>

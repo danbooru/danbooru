@@ -4,6 +4,9 @@
 class TagRelationshipsComponent < ApplicationComponent
   extend Memoist
 
+  # Lists longer than this are truncated, with a link to the full list.
+  MAX_VISIBLE_TAGS = 10
+
   attr_reader :tag
 
   delegate :link_to_wiki, :link_to_wiki_or_artist, to: :helpers
@@ -40,7 +43,26 @@ class TagRelationshipsComponent < ApplicationComponent
     tag.consequent_implications.includes(:antecedent_tag).sort_by(&:antecedent_name).map(&:antecedent_tag)
   end
 
-  def tag_links(tags)
-    to_sentence(tags.map { |t| link_to_wiki_or_artist(t) })
+  def alias_tags_url
+    tag_aliases_path(search: { consequent_name: tag.name, status: "active", order: "name" })
+  end
+
+  def implied_tags_url
+    tag_implications_path(search: { antecedent_name: tag.name, status: "active", order: "name" })
+  end
+
+  def implying_tags_url
+    tag_implications_path(search: { consequent_name: tag.name, status: "active", order: "name" })
+  end
+
+  # @param tags [Array<Tag>] the tags to list
+  # @param more_url [String, nil] the link to the full list, if the list is truncated
+  def tag_links(tags, more_url: nil)
+    return to_sentence(tags.map { |t| link_to_wiki_or_artist(t) }) if more_url.blank? || tags.size <= MAX_VISIBLE_TAGS
+
+    # Show one less tag to make room for the "N more" link.
+    visible_tags = tags.first(MAX_VISIBLE_TAGS - 1)
+    links = visible_tags.map { |t| link_to_wiki_or_artist(t) }
+    to_sentence(links + [link_to("#{tags.size - visible_tags.size} more", more_url)])
   end
 end
