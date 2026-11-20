@@ -91,6 +91,19 @@ class ForumTopicsChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "the Mark all as read button" do
+      setup do
+        fast_signin @user
+        visit forum_topics_path
+      end
+
+      should "ask for confirmation before marking all topics as read" do
+        click_and_accept_confirm(find("#subnav-mark-all-as-read"), "Are you sure you want to mark all forum topics as read?")
+
+        assert_notice "All topics marked as read"
+      end
+    end
+
     context "as a moderator" do
       setup do
         @moderator = create(:moderator_user, created_at: 1.month.ago)

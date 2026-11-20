@@ -6,7 +6,7 @@
     <%= subnav_link_to "New", new_forum_topic_path %>
   <% end %>
   <% if policy(ForumTopic).mark_all_as_read? %>
-    <%= subnav_link_to "Mark all as read", mark_all_as_read_forum_topics_path, :method => :post, :"data-shortcut" => "shift+r" %>
+    <%= subnav_link_to "Mark all as read", mark_all_as_read_forum_topics_path, :method => :post, :"data-shortcut" => "shift+r", :"data-confirm" => "Are you sure you want to mark all forum topics as read?" %>
   <% end %>
   <% if @forum_topic && policy(BulkUpdateRequest.new(forum_topic: @forum_topic)).create? %>
     <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path(bulk_update_request: { forum_topic_id: @forum_topic.id }) %>
