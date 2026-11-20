@@ -89,24 +89,24 @@ class Source::Extractor::Blogger < Source::Extractor
 
   memoize def blog
     # https://developers.google.com/blogger/docs/3.0/reference/blogs/getByUrl
-    # curl 'https://www.googleapis.com/blogger/v3/blogs/byurl?key=AIzaSyCN9ax34oMMyM07g_M-5pjeDp_312eITK8&url=https://benbotport.blogspot.com'
+    # curl -H "X-Goog-Api-Key: $API_KEY" 'https://www.googleapis.com/blogger/v3/blogs/byurl?url=https://benbotport.blogspot.com'
     url = "https://www.googleapis.com/blogger/v3/blogs/byurl" if api_key.present? && blog_url.present?
-    parsed_get(url, params: { key: api_key, url: blog_url }) || {}
+    parsed_get(url, params: { url: blog_url }, headers: api_headers) || {}
   end
 
   memoize def post
     # https://developers.google.com/blogger/docs/3.0/reference/posts/getByPath
-    # curl 'https://www.googleapis.com/blogger/v3/blogs/4063061489843530714/posts/bypath?key=AIzaSyCN9ax34oMMyM07g_M-5pjeDp_312eITK8&path=/2011/06/mass-effect-2.html'
+    # curl -H "X-Goog-Api-Key: $API_KEY" 'https://www.googleapis.com/blogger/v3/blogs/4063061489843530714/posts/bypath?path=/2011/06/mass-effect-2.html'
     blog_path = Source::URL.parse(page_url)&.path&.then { Danbooru::URL.unescape(it) }
     url = "https://www.googleapis.com/blogger/v3/blogs/#{Danbooru::URL.escape(blog["id"])}/posts/bypath" if api_key.present? && blog_path.present? && blog["id"].present?
-    parsed_get(url, params: { key: api_key, path: blog_path }) || {}
+    parsed_get(url, params: { path: blog_path }, headers: api_headers) || {}
   end
 
   memoize def pages
     # https://developers.google.com/blogger/docs/3.0/reference/pages/list
-    # curl 'https://www.googleapis.com/blogger/v3/blogs/2199400548823551998/pages?key=AIzaSyCN9ax34oMMyM07g_M-5pjeDp_312eITK8
+    # curl -H "X-Goog-Api-Key: $API_KEY" 'https://www.googleapis.com/blogger/v3/blogs/2199400548823551998/pages'
     url = "https://www.googleapis.com/blogger/v3/blogs/#{Danbooru::URL.escape(blog["id"])}/pages" if api_key.present? && blog["id"].present?
-    parsed_get(url, params: { key: api_key })&.dig(:items) || []
+    parsed_get(url, headers: api_headers)&.dig(:items) || []
   end
 
   memoize def page
@@ -115,5 +115,10 @@ class Source::Extractor::Blogger < Source::Extractor
 
   def api_key
     credentials[:api_key]
+  end
+
+  # https://docs.cloud.google.com/docs/authentication/api-keys-use#using-with-rest
+  def api_headers
+    { "X-Goog-Api-Key": api_key }
   end
 end
