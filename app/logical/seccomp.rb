@@ -233,6 +233,11 @@ module Seccomp
       sigaltstack
       signal
       pause
+    ] + [
+      # abort() sends itself SIGABRT. Seccomp can't check that the target is the process itself, so this fails instead
+      # of being allowed, and abort() falls back to crashing with an illegal instruction instead of being killed by seccomp.
+      ["tgkill", errno(Errno::EPERM::Errno), [[2, :eq, Signal.list["ABRT"]]]],
+      ["tkill", errno(Errno::EPERM::Errno), [[1, :eq, Signal.list["ABRT"]]]],
     ],
     "@system-info" => %w[
       sysinfo

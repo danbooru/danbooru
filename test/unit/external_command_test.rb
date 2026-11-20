@@ -100,11 +100,12 @@ class ExternalCommandTest < ActiveSupport::TestCase
       assert_raises(ExternalCommand::OutputLimitError) { ExternalCommand.run("head -c 101 /dev/zero", read: ["/dev/zero"], output_limit: 100) }
     end
 
-    should "not let commands signal themselves" do
+    should "not report commands that call abort() as calling a blocked syscall" do
       stub_const(ExternalCommand, :PROFILES, PROFILES) do
-        assert_raises(ExternalCommand::SyscallError) do
-          ExternalCommand.run(%{ruby -rfiddle -e 'Fiddle::Function.new(Fiddle::Handle::DEFAULT["abort"], [], Fiddle::TYPE_VOID).call'})
-        end
+        _output, status = ExternalCommand.run(%{ruby -rfiddle -e 'Fiddle::Function.new(Fiddle::Handle::DEFAULT["abort"], [], Fiddle::TYPE_VOID).call'})
+
+        assert_equal(true, status.signaled?)
+        assert_equal(false, Seccomp.killed?(status))
       end
     end
 
@@ -421,6 +422,8 @@ class ExternalCommandTest < ActiveSupport::TestCase
       should "not let commands signal other processes" do
         assert_raises(ExternalCommand::SyscallError) { syscall!("kill", Process.pid, 0) }
         assert_raises(ExternalCommand::SyscallError) { syscall!("tgkill", Process.pid, Process.pid, 0) }
+        assert_equal("[-1, #{Errno::EPERM::Errno}]\n", syscall!("tgkill", Process.pid, Process.pid, Signal.list["ABRT"]))
+        assert_equal("[-1, #{Errno::EPERM::Errno}]\n", syscall!("tkill", Process.pid, Signal.list["ABRT"]))
       end
 
       should "not let commands use dangerous syscalls" do
