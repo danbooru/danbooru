@@ -445,7 +445,22 @@ class PostQuery
         return nil unless metatag?
 
         if quoted? || value.match?(/[[:space:]]/)
-          %{"#{value.gsub('"', '\\"')}"}
+          # Escape quotes, and backslashes that would escape a quote. Leave other escapes like `\*` alone.
+          #
+          # a "b"  => "a \"b\""
+          # a b\   => "a b\\"
+          # a\" b  => "a\\\" b"
+          # a \*   => "a \*"
+          escaped = value.gsub(/\\"|\\.|\\\z|"/m) do |str|
+            case str
+            when '\"' then '\\\\\"'
+            when "\\" then "\\\\"
+            when '"' then '\"'
+            else str
+            end
+          end
+
+          %{"#{escaped}"}
         else
           value
         end

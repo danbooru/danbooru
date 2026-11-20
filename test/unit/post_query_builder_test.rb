@@ -1234,6 +1234,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "source:'a \\\\b'")
     end
 
+    should "return posts for a source search with a trailing backslash or quote" do
+      post = create(:post, source: 'a "b" c\\')
+
+      assert_tag_match([post], 'source:"a \"b\" c\\\\"')
+      assert_tag_match([post], 'source:a\ "b"\ c\\\\')
+      assert_tag_match([post], PostQuery.new('source:a\ "b"\ c\\\\').to_infix)
+      assert_tag_match([post], PostQuery.new('source:a\ "b"\ c\\').to_infix)
+    end
+
     should "return posts for a pixiv source search" do
       url = "http://i1.pixiv.net/img123/img/artist-name/789.png"
       post = create(:post, source: url)

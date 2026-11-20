@@ -924,6 +924,22 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             assert_equal @user.level.to_s, element.attribute("data-current-user-level").value
           end
         end
+
+        should "escape quotes and backslashes in the source search link in the tooltip" do
+          @post.update!(source: 'a "b" c\\')
+          get_auth post_path(@post, variant: "tooltip", preview: "true"), @user
+
+          assert_response :success
+          assert_select "a.post-tooltip-source[href=?]", posts_path(tags: 'source:"a \"b\" c\\\\"')
+        end
+
+        should "escape quotes and backslashes in the file source search link in the tooltip" do
+          @post.update!(source: 'file://C:\\a "b"\\')
+          get_auth post_path(@post, variant: "tooltip", preview: "true"), @user
+
+          assert_response :success
+          assert_select "a.post-tooltip-source[href=?]", posts_path(tags: 'source:"file://C:\\\\a \"b\"\\\\"')
+        end
       end
 
       context "a deleted post" do

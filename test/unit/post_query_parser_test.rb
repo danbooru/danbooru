@@ -520,6 +520,14 @@ class PostQueryParserTest < ActiveSupport::TestCase
         assert_equal('a source:"\\""', to_infix('a source:"\\""'))
         assert_equal('a source:""', to_infix('a source:""'))
 
+        # a trailing backslash or a backslash before a quote is escaped, so it doesn't escape the closing quote
+        assert_equal('source:"a b\\\\"', to_infix('source:a\ b\\'))
+        assert_equal('source:"a b\\\\"', to_infix('source:"a b\\\\"'))
+        assert_equal('source:"a\\\\\\" b"', to_infix('source:a\"\ b'))
+        assert_equal('source:"a\\\\\\" b"', to_infix('source:"a\\\\\\" b"'))
+        assert_equal('source:"a \*"', to_infix('source:"a \*"'))
+        assert_equal('source:"a \b"', to_infix('source:"a \b"'))
+
         assert_equal("a* b", to_infix("a* b"))
 
         assert_equal("none", to_infix("("))
