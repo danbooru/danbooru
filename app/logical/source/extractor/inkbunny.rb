@@ -77,7 +77,7 @@ class Source::Extractor::Inkbunny < Source::Extractor
   memoize def session_id
     return nil if credentials[:username].blank? || credentials[:password].blank?
 
-    response = http.parsed_get("https://inkbunny.net/api_login.php", params: { username: credentials[:username], password: credentials[:password] })
+    response = http.parsed_post("https://inkbunny.net/api_login.php", form: { username: credentials[:username], password: credentials[:password] })
 
     if response[:error_code].present?
       DanbooruLogger.info("Inkbunny login failed (#{response[:error_code]} #{response[:error_message]})")
@@ -100,8 +100,10 @@ class Source::Extractor::Inkbunny < Source::Extractor
     Cache.delete("inkbunny-session-id")
   end
 
+  # Send params in the POST body so the session ID isn't in the URL. These requests aren't cached because the
+  # credentials are in the POST body, and the HTTP cache doesn't include the body in the cache key.
   def request(url, **params)
-    response = http.cache(1.minute).parsed_get(url, params: params.merge(sid: cached_session_id)) || {}
+    response = http.parsed_post(url, form: params.merge(sid: cached_session_id)) || {}
 
     # https://wiki.inkbunny.net/wiki/API#Error_Codes
     # 2 - Invalid Session ID sent as variable 'sid'.
@@ -109,7 +111,7 @@ class Source::Extractor::Inkbunny < Source::Extractor
     if response[:error_code] == 2
       DanbooruLogger.info("Inkbunny session ID stale; logging in again")
       clear_cached_session_id!
-      response = http.cache(1.minute).parsed_get(url, params: params.merge(sid: cached_session_id)) || {}
+      response = http.parsed_post(url, form: params.merge(sid: cached_session_id)) || {}
     end
 
     response
