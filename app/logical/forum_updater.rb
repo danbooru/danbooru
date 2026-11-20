@@ -9,6 +9,6 @@ class ForumUpdater
   end
 
   def update(message)
-    forum_topic.forum_posts.create(body: message, skip_mention_notifications: true, creator: User.system)
+    forum_topic.forum_posts.create(body: message, skip_mention_notifications: true, creator: User.system, is_deleted: forum_topic.is_deleted?)
   end
 end

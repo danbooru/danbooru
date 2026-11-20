@@ -380,6 +380,16 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
     end
 
+    context "in a deleted forum topic" do
+      should "create a deleted forum post on rejection" do
+        bur = create(:bulk_update_request)
+        bur.forum_topic.update!(is_deleted: true, updater: create(:moderator_user))
+
+        assert_difference("ForumPost.count", 1) { bur.reject! }
+        assert_equal(true, bur.forum_topic.forum_posts.last.is_deleted?)
+      end
+    end
+
     context "with a reason that the forum post can't be created with" do
       setup do
         @user = create(:user)
