@@ -163,7 +163,7 @@ class MediaFile::Ugoira < MediaFile
   end
 
   memoize def dimensions
-    frames.first.dimensions
+    frames.first&.dimensions || [0, 0]
   end
 
   def preview!(width, height, **options)
@@ -201,16 +201,17 @@ class MediaFile::Ugoira < MediaFile
 
   # @return [Array<Hash>, nil] The 'frames' array from the animation.json file, if present.
   memoize def animation_json_frames
+    # Frames that aren't objects are replaced with empty hashes, so they fail the format check in `animation_json_format`.
     case animation_json
     in Array => frames
-      frames.map(&:with_indifferent_access)
+      frames
     in { frames: Array => frames }
-      frames.map(&:with_indifferent_access)
+      frames
     in { ugokuIllustData: { frames: Array => frames }}
-      frames.map(&:with_indifferent_access)
+      frames
     else
       []
-    end
+    end.map { |frame| frame.is_a?(Hash) ? frame.with_indifferent_access : {}.with_indifferent_access }
   end
 
   # @return [String] The format of the animation.json file.

@@ -2,10 +2,10 @@ require "test_helper"
 require "zip"
 
 class MediaFileUgoiraTest < ActiveSupport::TestCase
-  def create_ugoira_zip(file, frame_count: 2, compression_method: Zip::Entry::STORED, frame_data: File.binread("test/files/jpg/test.jpg"))
+  def create_ugoira_zip(file, frame_count: 2, compression_method: Zip::Entry::STORED, frame_data: File.binread("test/files/jpg/test.jpg"), animation_json: nil)
     Zip::File.open(file.path, create: true, suppress_extra_fields: true) do |zip|
       frames = frame_count.times.map { |n| { file: "#{"%06d" % n}.jpg", delay: 100 } }
-      zip.get_output_stream(Zip::Entry.new(zip, "animation.json", compression_method: Zip::Entry::STORED)) { |f| f.write(frames.to_json) }
+      zip.get_output_stream(Zip::Entry.new(zip, "animation.json", compression_method: Zip::Entry::STORED)) { |f| f.write(animation_json || frames.to_json) }
 
       frames.each do |frame|
         zip.get_output_stream(Zip::Entry.new(zip, frame[:file], compression_method:)) { |f| f.write(frame_data) }
@@ -622,6 +622,31 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         MediaFile.open(file.path) do |ugoira|
           assert_equal("invalid zip file", ugoira.error)
           assert_equal([], Dir.children(ugoira.tmpdir.path))
+        end
+      end
+    end
+
+    should "be rejected if it has no frames" do
+      Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+        create_ugoira_zip(file, frame_count: 0)
+
+        MediaFile.open(file.path) do |ugoira|
+          assert_equal([0, 0], ugoira.dimensions)
+          assert_equal("must have at least two frames", ugoira.error)
+          assert_raises(MediaAsset::Error, "File is corrupt") { MediaAsset.validate_media_file!(ugoira, create(:user)) }
+        end
+      end
+    end
+
+    should "be rejected if animation.json has frames that aren't objects" do
+      ["[1, 2]", "[null, null]", '{"frames": ["a", "b"]}', '{"ugokuIllustData": {"frames": [1, 2]}}'].each do |animation_json|
+        Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+          create_ugoira_zip(file, animation_json:)
+
+          MediaFile.open(file.path) do |ugoira|
+            assert_equal("unrecognized animation.json format", ugoira.error)
+            assert_raises(MediaAsset::Error, "File is corrupt") { MediaAsset.validate_media_file!(ugoira, create(:user)) }
+          end
         end
       end
     end
