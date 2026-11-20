@@ -19,43 +19,43 @@
     <%= form_tag(dmca_path) do %>
       <p>
         <label>Your name (required)</label><br>
-        <input name="dmca[name]" class="w-1/2" required></input>
+        <input name="dmca[name]" class="w-1/2" maxlength="200" value="<%= @dmca.name %>" required></input>
       </p>
 
       <p>
         <label>Your email address (required)</label><br>
-        <input name="dmca[email]" class="w-1/2" type="email" required></input>
+        <input name="dmca[email]" class="w-1/2" type="email" maxlength="200" value="<%= @dmca.email %>" required></input>
       </p>
 
       <p>
         <label>Your contact information (physical address and phone number)</label><br>
-        <textarea name="dmca[address]" class="w-1/2"></textarea>
+        <textarea name="dmca[address]" class="w-1/2" maxlength="1000"><%= @dmca.address %></textarea>
       </p>
 
       <p>
         <label>A list of links to each <%= @danbooru %> post you would like to have removed (one per line). Please list each individual post, not a tag search or profile page.</label><br>
-        <textarea name="dmca[infringing_urls]" class="w-full h-150px" required></textarea>
+        <textarea name="dmca[infringing_urls]" class="w-full h-150px" maxlength="50000" required><%= @dmca.infringing_urls %></textarea>
       </p>
 
       <p>
         <label>A list of links to the original location of each of these works on your Twitter, Pixiv, or other accounts or personal websites (one per line).</label><br>
-        <textarea name="dmca[original_urls]" class="w-full h-150px" required></textarea>
+        <textarea name="dmca[original_urls]" class="w-full h-150px" maxlength="50000" required><%= @dmca.original_urls %></textarea>
       </p>
 
       <p>
         <label>Proof that you are the artist or copyright holder. Proof can include either an email address or message listed on one of your social media profiles (provide a link or describe it below), or a screenshot or .psd file of one of your original works (provide a link below)</label><br>
-        <textarea name="dmca[proof]" class="w-full h-16"></textarea>
+        <textarea name="dmca[proof]" class="w-full h-16" maxlength="10000"><%= @dmca.proof %></textarea>
       </p>
 
       <p>
-        <input type="checkbox" name="perjury_agree" required>
+        <input type="checkbox" name="perjury_agree" <%= "checked" if params[:perjury_agree] %> required>
         <label for="dmca[perjury_agree]">
           Under penalty of perjury, I attest that the information in this notification is accurate and that I am, or am authorized to act on behalf of, the owner of the rights being infringed by the material listed above.
         </label>
       </p>
 
       <p>
-        <input type="checkbox" name="good_faith_agree" required>
+        <input type="checkbox" name="good_faith_agree" <%= "checked" if params[:good_faith_agree] %> required>
         <label for="dmca[good_faith_agree]">
           I have a good faith belief that the use of the work(s) described above in the material(s) listed here is not authorized by the copyright owner, an agent of the copyright owner, or the law.
         </label>
@@ -63,7 +63,7 @@
 
       <p>
         <label>Your signature (Type your full legal name. This must be your legal name, not a pseudonym or artist handle)</label><br>
-        <input name="dmca[signature]" class="w-1/2" required></input>
+        <input name="dmca[signature]" class="w-1/2" maxlength="200" value="<%= @dmca.signature %>" required></input>
       </p>
 
       <p>

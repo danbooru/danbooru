@@ -1,0 +1,103 @@
+<% page_title "DMCA Request ##{@dmca_request.id}" %>
+<%= render "secondary_links" %>
+
+<div id="c-dmca-requests">
+  <div id="a-show" class="flex flex-col gap-4 sm:items-center fixed-width-container">
+    <h1>DMCA Request #<%= @dmca_request.id %></h1>
+
+    <div class="card-elevated px-4 py-2 flex flex-col items-start gap-4 break-words">
+      <table class="aligned-vertical table-xs">
+        <tr>
+          <th>Status</th>
+          <td>
+            <%= link_to @dmca_request.status.capitalize, dmca_requests_path(search: { status: @dmca_request.status }) %>
+            (<%= link_to "history", mod_actions_path(search: { subject_type: "DmcaRequest", subject_id: @dmca_request.id }) %>)
+          </td>
+        </tr>
+        <tr>
+          <th>Date</th>
+          <td><%= time_ago_in_words_tagged @dmca_request.created_at %></td>
+        </tr>
+        <% if @dmca_request.purged? %>
+          <tr>
+            <th>Personal info</th>
+            <td><em>Purged</em></td>
+          </tr>
+        <% else %>
+          <tr>
+            <th>Name</th>
+            <td>
+              <%= @dmca_request.name %>
+              <%= link_to "»", dmca_requests_path(search: { name: @dmca_request.name }) %>
+            </td>
+          </tr>
+          <tr>
+            <th>Email</th>
+            <td>
+              <%= @dmca_request.email %>
+              <%= link_to "»", dmca_requests_path(search: { email: @dmca_request.email }) %>
+            </td>
+          </tr>
+          <tr>
+            <th>Address</th>
+            <td>
+              <% if @dmca_request.address.present? %>
+                <%= @dmca_request.address %>
+              <% else %>
+                <em>None</em>
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <th>Signature</th>
+            <td><%= @dmca_request.signature %></td>
+          </tr>
+        <% end %>
+      </table>
+
+      <div>
+        <h2>Infringing URLs</h2>
+        <ul>
+          <% @dmca_request.infringing_urls.split.each do |url| %>
+            <li><%= external_link_to url %></li>
+          <% end %>
+        </ul>
+      </div>
+
+      <div>
+        <% if @dmca_request.post_ids.present? %>
+          <h2>Posts (<%= link_to "view all", posts_path(tags: "id:#{@dmca_request.post_ids.join(",")} status:any") %>)</h2>
+          <ul>
+            <% @dmca_request.post_ids.each do |post_id| %>
+              <li><%= link_to "post ##{post_id}", post_path(post_id) %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <h2>Posts</h2>
+          <em>None</em>
+        <% end %>
+      </div>
+
+      <div>
+        <h2>Original URLs</h2>
+        <ul>
+          <% @dmca_request.original_urls.split.each do |url| %>
+            <li><%= external_link_to url %></li>
+          <% end %>
+        </ul>
+      </div>
+
+      <% if @dmca_request.proof.present? %>
+        <div>
+          <h2>Proof</h2>
+          <p class="whitespace-pre-wrap"><%= @dmca_request.proof %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex flex-wrap gap-2 items-center">
+      <%= button_to "Mark as handled", dmca_request_path(@dmca_request), method: :put, params: { "dmca_request[status]": "handled" }, class: "button-primary", disabled: @dmca_request.handled? %>
+      <%= button_to "Reject", dmca_request_path(@dmca_request), method: :put, params: { "dmca_request[status]": "rejected" }, class: "button-outline-danger", disabled: @dmca_request.rejected? %>
+    </div>
+  </div>
+</div>

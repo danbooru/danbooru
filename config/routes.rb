@@ -310,6 +310,7 @@ Rails.application.routes.draw do
   resource :dmca, only: [:create, :show] do
     get :template
   end
+  resources :dmca_requests, only: [:index, :show, :update]
 
   # Legacy Danbooru 1 API endpoints
   get "/tag/index.xml", controller: "legacy", action: "tags", format: "xml"
