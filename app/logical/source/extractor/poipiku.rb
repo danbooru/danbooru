@@ -19,7 +19,7 @@ class Source::Extractor
       end
 
       # Direct URL given, try to retrieve a fresh signed URL or return the given one if unable
-      if parsed_url.image_hash.present?
+      if parsed_url.original_file_ext.present?
         image = images.find { it.image_hash == parsed_url.image_hash }
 
         # Hashless images can only be found by post ID
