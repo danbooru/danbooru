@@ -47,7 +47,7 @@ class MediaFile::Video < MediaFile
   def is_supported?
     return false if video_streams.size != 1
     # Don't allow videos with fake dimensions in the container. If no frames could be decoded, the video is corrupt instead.
-    return false if video.display_dimensions.present? && video.display_dimensions != [exif_metadata.width, exif_metadata.height]
+    return false if video.display_dimensions.present? && video.display_dimensions != container_display_dimensions
     return false if audio_streams.size > 1
     return false if is_webm? && exif_metadata["Matroska:DocType"] != "webm"
     return false if is_webm? && !video_codec.in?(%w[vp8 vp9 av1])
@@ -73,6 +73,16 @@ class MediaFile::Video < MediaFile
 
   def video
     FFmpeg.new(self)
+  end
+
+  # The width and height the container says the video is displayed at. Anamorphic WebMs have the coded size in
+  # Track1:ImageWidth and the displayed size in Track1:DisplayWidth. MP4s only have the displayed size, in Track1:ImageWidth.
+  #
+  # @return [Array<(Integer, Integer)>]
+  def container_display_dimensions
+    width = exif_metadata.find { |name, _value| name.match?(/\ATrack\d+:DisplayWidth\z/) }&.second || exif_metadata.width
+    height = exif_metadata.find { |name, _value| name.match?(/\ATrack\d+:DisplayHeight\z/) }&.second || exif_metadata.height
+    [width, height]
   end
 
   def preview_frame
