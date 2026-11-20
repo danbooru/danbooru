@@ -67,6 +67,38 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 404
     end
 
+    context "for a multipart form" do
+      setup do
+        @user = create(:user)
+        login_as(@user)
+      end
+
+      should "treat fields as UTF-8 regardless of their charset" do
+        post wiki_pages_path, headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: multipart_body("wiki_page[title]" => ["text/plain; charset=UTF-16LE", "abcd"], "wiki_page[body]" => ["text/plain; charset=Shift_JIS", "あ"])
+
+        assert_redirected_to wiki_page_path(WikiPage.last)
+        assert_equal("abcd", WikiPage.last.title)
+        assert_equal("あ", WikiPage.last.body)
+        assert_equal(Encoding::UTF_8, WikiPage.last.body.encoding)
+      end
+
+      should "return 400 for fields that aren't valid UTF-8" do
+        assert_no_difference("WikiPage.count") do
+          post wiki_pages_path(format: :json), headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: multipart_body("wiki_page[title]" => ["text/plain", "test"], "wiki_page[body]" => ["text/plain; charset=Shift_JIS", "あ".encode("Shift_JIS")])
+        end
+
+        assert_response 400
+      end
+
+      should "return 400 for fields containing a NUL byte" do
+        assert_no_difference("WikiPage.count") do
+          post wiki_pages_path(format: :json), headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: multipart_body("wiki_page[title]" => ["text/plain", "test"], "wiki_page[body]" => ["text/plain", "a\0b"])
+        end
+
+        assert_response 400
+      end
+    end
+
     context "on a RecordNotFound error" do
       should "return 404 Not Found even with a bad file extension" do
         get post_path("bad.json")
@@ -802,5 +834,15 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal(%w[is_deleted], comments[true].keys)
       end
     end
+  end
+
+  # @param fields [Hash<String, (String, String)>] A hash of field names to [content type, value] pairs.
+  # @return [String] A multipart/form-data body with the boundary "xyz".
+  def multipart_body(fields)
+    parts = fields.map do |name, (content_type, value)|
+      "--xyz\r\nContent-Disposition: form-data; name=\"#{name}\"\r\nContent-Type: #{content_type}\r\n\r\n".b + value.b + "\r\n".b
+    end
+
+    parts.join.b + "--xyz--\r\n".b
   end
 end
