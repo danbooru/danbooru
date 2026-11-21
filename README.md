@@ -34,6 +34,15 @@ touch .env.local config/danbooru_local_config.rb
 sudo docker compose up
 ```
 
+The first account you sign up with becomes a Superadmin account. To create more accounts, back up your data, and
+otherwise manage your instance from the command line, use `bin/booructl`:
+
+```sh
+sudo docker compose run --rm danbooru bin/booructl help
+```
+
+See [Managing your instance](docs/DOCKER.md#managing-your-instance) for a cheatsheet.
+
 When you're done, you can run the following to delete everything:
 
 ```sh
