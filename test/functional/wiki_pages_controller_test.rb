@@ -66,6 +66,23 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(other_names_present: "true").with { @miku }
       should respond_to_search(other_names_present: "false").with { [@picasso, @vocaloid, @deleted, @tagme] }
 
+      context "for a wiki with other names but no body" do
+        setup do
+          @no_body = as(@user) { create(:wiki_page, title: "no_body", other_names: ["空"], body: "") }
+        end
+
+        should respond_to_search(body_present: "false").with { @no_body }
+        should respond_to_search(body_present: "true").with { [@picasso, @miku, @vocaloid, @deleted, @tagme] }
+        should respond_to_search(body_present: "false", other_names_present: "true").with { @no_body }
+      end
+
+      should "render the body and other names search fields" do
+        get wiki_pages_path
+        assert_response :success
+        assert_select "select[name='search[body_present]']"
+        assert_select "select[name='search[other_names_present]']"
+      end
+
       should respond_to_search(has_embedded_media: "true").with { [@miku] }
       should respond_to_search(has_embedded_media: "false").with { [@picasso, @vocaloid, @deleted, @tagme] }
 
