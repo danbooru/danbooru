@@ -1583,7 +1583,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a static image tagged with animated_gif" do
         should "remove the tag" do
-          @media_asset = create(:media_asset, file: "test/files/gif/test-static-32x32.gif")
+          @media_asset = create(:media_asset, file: "lib/media-file/test/files/gif/test-static-32x32.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme animated animated_gif")
           assert_equal("tagme", @post.tag_string)
@@ -1592,7 +1592,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a static image tagged with animated_png" do
         should "remove the tag" do
-          @media_asset = create(:media_asset, file: "test/files/png/test.png")
+          @media_asset = create(:media_asset, file: "lib/media-file/test/files/png/test.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme animated animated_png")
           assert_equal("tagme", @post.tag_string)
@@ -1601,7 +1601,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated gif missing the animated_gif tag" do
         should "automatically add the animated_gif tag" do
-          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52.gif")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/gif/test-animated-86x52.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif tagme", @post.tag_string)
@@ -1610,7 +1610,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated png missing the animated_png tag" do
         should "automatically add the animated_png tag" do
-          @media_asset = MediaAsset.upload!("test/files/apng/normal-256x256.png")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/apng/normal-256x256.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_png tagme", @post.tag_string)
@@ -1619,7 +1619,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a static image tagged with animated_webp" do
         should "remove the tag" do
-          @media_asset = create(:media_asset, file: "test/files/webp/test.webp")
+          @media_asset = create(:media_asset, file: "lib/media-file/test/files/webp/test.webp")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme animated animated_webp")
           assert_equal("tagme", @post.tag_string)
@@ -1628,7 +1628,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an animated webp missing the animated_webp tag" do
         should "automatically add the animated_webp tag" do
-          @media_asset = MediaAsset.upload!("test/files/webp/nyancat.webp")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/webp/nyancat.webp")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_webp tagme", @post.tag_string)
@@ -1637,14 +1637,14 @@ class PostTest < ActiveSupport::TestCase
 
       context "a greyscale image missing the greyscale tag" do
         should "automatically add the greyscale tag for a monochrome JPEG file" do
-          @media_asset = MediaAsset.upload!("test/files/jpg/test-grey-no-profile.jpg")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/jpg/test-grey-no-profile.jpg")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("greyscale tagme", @post.tag_string)
         end
 
         should "automatically add the greyscale tag for a monochrome AVIF file" do
-          @media_asset = MediaAsset.upload!("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("greyscale tagme", @post.tag_string)
@@ -1653,7 +1653,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an exif-rotated image missing the exif_rotation tag" do
         should "automatically add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/jpg/test-rotation-90cw.jpg")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/jpg/test-rotation-90cw.jpg")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("exif_rotation tagme", @post.tag_string)
@@ -1662,7 +1662,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a PNG with a valid exif orientation flag" do
         should "automatically add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-good-chunk.png")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/png/test-rotation-good-chunk.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("exif_rotation tagme", @post.tag_string)
@@ -1671,7 +1671,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a PNG with an invalid exif orientation flag" do
         should "not add the exif_rotation tag" do
-          @media_asset = MediaAsset.upload!("test/files/png/test-rotation-bad-chunk.png")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/png/test-rotation-bad-chunk.png")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("tagme", @post.tag_string)
@@ -1680,12 +1680,12 @@ class PostTest < ActiveSupport::TestCase
 
       context "a non-repeating GIF missing the non-repeating_animation tag" do
         should "automatically add the non-repeating_animation tag" do
-          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52-loop-1.gif")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/gif/test-animated-86x52-loop-1.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
 
-          @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52-loop-2.gif")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/gif/test-animated-86x52-loop-2.gif")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
@@ -1694,7 +1694,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a silent video with the sound tag" do
         should "automatically remove the sound tag" do
-          @media_asset = MediaAsset.upload!("test/files/mp4/test-silent-audio.mp4")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/mp4/test-silent-audio.mp4")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "sound")
           assert_equal("animated", @post.tag_string)
@@ -1703,7 +1703,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "an audible video without the sound tag" do
         should "automatically add the sound tag" do
-          @media_asset = MediaAsset.upload!("test/files/mp4/test-audio.mp4")
+          @media_asset = MediaAsset.upload!("lib/media-file/test/files/mp4/test-audio.mp4")
           @post.update!(md5: @media_asset.md5)
           @post.reload.update!(tag_string: "tagme")
           assert_equal("animated sound tagme", @post.tag_string)

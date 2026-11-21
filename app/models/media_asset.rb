@@ -3,18 +3,19 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
+  # The file types that can be uploaded. Ugoiras have the file type "zip". These are separate from the types the
+  # media_file library can read (see lib/media-file/lib/media_file/config.rb), so the library can support a new type
+  # before the site allows uploading it.
   FILE_TYPES = %w[jpg png gif webp avif mp4 webm swf zip]
+
+  # The MIME types of the files that can be uploaded. Uploads are checked by MIME type instead of file type, because
+  # ugoiras and other .zip files both have the file type "zip", but only ugoiras are "video/x-ugoira".
   FILE_MIME_TYPES = %w[image/jpeg image/png image/gif image/webp image/avif video/mp4 video/webm application/x-shockwave-flash video/x-ugoira]
+
   FILE_KEY_LENGTH = 9
   VARIANTS = %i[180x180 360x360 720x720 sample full original]
-  MAX_FILE_SIZE = Danbooru.config.max_file_size.to_i
+  MAX_FILE_SIZE = MediaFile.config.max_file_size
   MAX_VIDEO_DURATION = Danbooru.config.max_video_duration.to_i
-  MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
-  MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
-  MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
-
-  # The max memory for images that can't be decoded as a stream (see `MediaFile::Image#full_decode_size`).
-  MAX_FULL_DECODE_SIZE = 200.megabytes
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
 
   attribute :id
@@ -134,12 +135,19 @@ class MediaAsset < ApplicationRecord
       in :"720x720"
         media_file.preview!(width, height, format: :webp, quality: 75)
       in :sample if media_asset.is_ugoira?
-        media_file.convert
+        # Open a new handle to the webm, because `store_file!` closes the file after storing it, and the ugoira still
+        # uses the webm for its preview frame.
+        MediaFile.open(media_file.webm.path)
       in :sample | :full if media_asset.is_static_image?
         media_file.preview!(width, height, format: :jpeg, quality: 85)
       in :original
         media_file
       end
+    end
+
+    # @return [String] The MIME type of this variant's file, like "video/webm" for a ugoira's sample.
+    def mime_type
+      Mime::Type.lookup_by_extension(file_ext).to_s
     end
 
     def file_url(custom_filename = "")
@@ -305,8 +313,8 @@ class MediaAsset < ApplicationRecord
         media_asset = create!(file: media_file, status: :processing)
         yield media_asset if block_given?
 
-        # XXX shouldn't generate thumbnail twice (very slow for ugoira)
-        task1 = Danbooru.async { media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags) if media_asset.has_variant?(:"360x360") }
+        # XXX shouldn't generate the 360x360 thumbnail twice
+        task1 = Danbooru.async { media_asset.update!(ai_tags: AutotaggerClient.new.evaluate!(media_file.preview!(360, 360))) if media_asset.has_variant?(:"360x360") }
         task2 = Danbooru.async { media_asset.update!(media_metadata: MediaMetadata.new(file: media_file)) }
         media_asset.distribute_files!(media_file)
         task1.wait!
@@ -347,7 +355,7 @@ class MediaAsset < ApplicationRecord
 
         # If the file was blocked by the sandbox, delete any of its files that were already stored, so it can't be
         # downloaded from the site. Other failed uploads keep their files.
-        if media_asset && ExternalCommand::SyscallError.find_in(e)
+        if media_asset && MediaFile::ExternalCommand::SyscallError.find_in(e)
           begin
             media_asset.delete_files!
           rescue StandardError => delete_error
@@ -363,16 +371,19 @@ class MediaAsset < ApplicationRecord
       # escaped, so they can't add fake lines to the log.
       #
       # @param error [Exception] The error from processing the file.
-      # @param media_file [MediaFile, nil] The file.
+      # @param media_file [MediaFile, MediaFile::Archive, nil] The file.
       # @param user [User] The user who uploaded or searched for the file.
       # @param action [String] What the user was doing, like "Upload #123".
       # @param details [Hash] Other things to log, like the source URL.
       def handle_blocked_file(error, media_file:, user:, action:, **details)
-        blocked_error = ExternalCommand::SyscallError.find_in(error)
+        blocked_error = MediaFile::ExternalCommand::SyscallError.find_in(error)
         return if blocked_error.nil?
 
         begin
-          quarantine_path = media_file&.quarantine!
+          if media_file
+            quarantine_path = "/trash/quarantine/#{media_file.md5}.#{media_file.file_ext}"
+            Danbooru.config.storage_manager.store(media_file.file, quarantine_path)
+          end
         rescue StandardError => e
           quarantine_path = "failed to save: #{e.message}"
         end
@@ -382,40 +393,47 @@ class MediaAsset < ApplicationRecord
         Rails.logger.error("#{action} by user ##{user.id} (#{user.name}) was blocked by the sandbox: #{blocked_error.message} (#{(details + file_details).join(", ")})")
       end
 
+      # Handle an error from processing a file: log and quarantine the file if a program was blocked by the sandbox, and
+      # return the error message to show the user.
+      #
+      # @param (see handle_blocked_file)
+      # @return [String] The message to show the user (see `error_message_for`).
+      def handle_processing_error(error, media_file:, user:, action:, **details)
+        handle_blocked_file(error, media_file:, user:, action:, **details)
+        error_message_for(error)
+      end
+
+      # The error message to show users when processing a file fails. Errors from the media_file library that weren't
+      # caused by the file, like ffmpeg crashing, can have details that aren't for users, like file paths, so they're
+      # logged and users get a generic message. Blocked syscalls are already logged by `handle_blocked_file`.
+      # Errors from generating the variants in parallel are wrapped in a `Concurrent::MultipleErrors`, whose message includes
+      # every error and its backtrace, so only the first error is shown.
+      #
+      # @param error [Exception] The error from processing the file.
+      # @return [String] The message to show the user.
+      def error_message_for(error)
+        error = error.errors.first if error.is_a?(Concurrent::MultipleErrors)
+        return error.message unless error.is_a?(MediaFile::Error)
+
+        DanbooruLogger.log(error) unless error.is_a?(MediaFile::InvalidFileError) || error.is_a?(MediaFile::ExternalCommand::SyscallError)
+        error.user_message
+      end
+
+      # Check that the file can be uploaded. The limits on size, dimensions, and memory are checked by `MediaFile#validate!`.
+      #
+      # @param media_file [MediaFile] The file.
+      # @param uploader [User] The user uploading the file. Admins can upload videos of any length.
+      # @raise [Error] If the file can't be uploaded.
       def validate_media_file!(media_file, uploader)
-        if !media_file.mime_type.to_s.in?(FILE_MIME_TYPES)
+        if !media_file.mime_type.in?(FILE_MIME_TYPES)
           raise Error, "File is not an image or video"
         elsif media_file.is_flash?
           raise Error, "Flash files are not supported"
-        # Check the size and dimensions before `is_supported?` and `is_corrupt?`, which decode the whole file.
-        elsif media_file.file_size > MAX_FILE_SIZE
-          raise Error, "File size too large (size: #{media_file.file_size.to_fs(:human_size)}; max size: #{MAX_FILE_SIZE.to_fs(:human_size)})"
-        # Check the frame count before the dimensions, because getting a video's dimensions requires reading every frame.
-        elsif media_file.is_video? && media_file.packet_count > FFmpeg::MAX_PACKET_COUNT
-          raise Error, "Video has too many frames (max: #{FFmpeg::MAX_PACKET_COUNT})"
-        elsif media_file.resolution > MAX_IMAGE_RESOLUTION
-          raise Error, "Image resolution is too large (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)"
-        elsif media_file.width.to_i > MAX_IMAGE_WIDTH
-          raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
-        elsif media_file.height.to_i > MAX_IMAGE_HEIGHT
-          raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
-        elsif media_file.full_decode_size > MAX_FULL_DECODE_SIZE
-          raise Error, "Image is too large to decode (size: #{media_file.full_decode_size.to_fs(:human_size)}; max size: #{MAX_FULL_DECODE_SIZE.to_fs(:human_size)})"
-        # Check the metadata before `is_supported?`, which needs the metadata to check AVIFs.
-        elsif media_file.exif_metadata["Danbooru:ExifToolError"].present?
-          raise Error, "File has too much metadata"
-        elsif !media_file.is_supported?
-          raise Error, "File type is not supported"
-        elsif media_file.is_corrupt?
-          raise Error, "File is corrupt"
-        # Checked after `is_corrupt?`, because corrupt files often have no dimensions, and "corrupt" is the better error.
-        elsif media_file.width.to_i <= 0 || media_file.height.to_i <= 0
-          raise Error, "Couldn't read the file's dimensions"
-        elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
-          raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
         end
-      rescue MediaFile::Ugoira::Error => e
-        raise Error, e.message
+
+        media_file.validate!(max_duration: uploader.is_admin? ? nil : MAX_VIDEO_DURATION)
+      rescue MediaFile::InvalidFileError => e
+        raise Error, e.user_message
       end
     end
 
@@ -423,9 +441,9 @@ class MediaAsset < ApplicationRecord
       deleted? || expunged?
     end
 
-    # @return [Mime::Type] The file's MIME type.
+    # @return [String] The file's MIME type. Ugoiras are "video/x-ugoira", not "application/zip" like other .zip files.
     def mime_type
-      Mime::Type.lookup_by_extension(file_ext)
+      Mime::Type.lookup_by_extension(is_ugoira? ? "ugoira" : file_ext).to_s
     end
 
     def file=(file_or_path)
@@ -491,7 +509,7 @@ class MediaAsset < ApplicationRecord
       return [] if !has_variant?("360x360")
 
       variant("360x360").open_file! do |media_file|
-        media_file.ai_tags
+        AutotaggerClient.new.evaluate!(media_file)
       end
     end
 

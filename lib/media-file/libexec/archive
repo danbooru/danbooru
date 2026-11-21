@@ -1,0 +1,380 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Reads and writes archive files in a separate process, so a bug in libarchive or rubyzip triggered by a malicious file
+# can't affect the Rails process. Rails runs this in the ExternalCommand sandbox through `MediaFile::Archive` and
+# `MediaFile::Ugoira`; don't run it directly on untrusted files.
+#
+# This doesn't load Rails or Bundler, so it starts quickly. Rails passes the paths to the bundled gems with `-I`.
+#
+# Usage:
+#
+#   libexec/archive list <max-pathname-size> (<zip|rar|7z|ugoira> <file> <max-entries>)...  # List the first files in archives.
+#   libexec/archive extract <zip|rar|7z|ugoira> <file> <dir>                                # Extract an archive to an empty directory.
+#   libexec/archive ugoira <file> <dir>                              # Validate a ugoira .zip, then extract it if it's valid.
+#   libexec/archive create-ugoira <file> <mtime> <name> <path>...    # Create an uncompressed ugoira .zip from the given files.
+#                                                                # <mtime> is the files' timestamp, e.g. "2024-10-17T03:31:43".
+#
+# Prints the result as a JSON object on success, or {"error": "..."} and exits with status 1 if the file is invalid.
+# `list` takes several archives, so validating an upload with many archives only starts one process. It prints
+# {"archives": [...]}, with a result or an error for each archive.
+
+require "json"
+require "rbconfig"
+
+# rubyzip requires RubyGems, but only uses it on JRuby. Loading RubyGems takes about 50ms, most of this script's startup
+# time, so it's marked as already loaded instead. Rails runs this with --disable-gems, so nothing else loads it.
+$LOADED_FEATURES << File.join(RbConfig::CONFIG["rubylibdir"], "rubygems.rb")
+
+class ArchiveCommand
+  class Error < StandardError; end
+
+  MAX_UGOIRA_FRAMES = 500
+  MAX_ANIMATION_JSON_SIZE = 50 * 1024
+  # The errors shown to users. libarchive's and rubyzip's own errors, and the details of why a zip's structure is
+  # invalid, aren't useful to users, so they get a generic error.
+  INVALID_ARCHIVE = "invalid or corrupt archive"
+  INVALID_ZIP = "invalid zip file"
+  ENCRYPTED_ARCHIVE = "encrypted archives aren't supported"
+
+  # Metadata files made by macOS and Windows, which are skipped (in lowercase).
+  SYSTEM_FILES = %w[.ds_store thumbs.db desktop.ini].freeze
+
+  # @param args [Array<String>] The command line arguments.
+  # @return [Hash] The result to print as JSON.
+  def self.run(command, *args)
+    case [command, *args]
+    in ["list" | "extract", *]
+      load_libarchive
+    in ["ugoira" | "create-ugoira", *]
+      require "zlib"
+      require "zip"
+    end
+
+    case [command, *args]
+    in ["list", max_pathname_size, *archives] if archives.size % 3 == 0
+      results = archives.each_slice(3).map do |format, file, max_entries|
+        list(format, file, Integer(max_entries), Integer(max_pathname_size))
+      rescue Error => e
+        error_result(e.message)
+      end
+      { archives: results }
+    in ["extract", format, file, dir]
+      extract(format, file, dir)
+    in ["ugoira", file, dir]
+      ugoira(file, dir)
+    in ["create-ugoira", file, mtime, *entries] if entries.size.even?
+      create_ugoira(file, mtime, entries.each_slice(2).to_a)
+    end
+  end
+
+  # Load libarchive. Only `list` and `extract` use it, so the other commands don't spend time loading it.
+  #
+  # libarchive converts filenames to the current locale's charset, and fails on names it can't convert. The sandbox
+  # doesn't pass LANG, so the locale would be ASCII, and archives with non-ASCII names in 7z files or in zips with the
+  # UTF-8 flag would fail. C.UTF-8 is built into glibc, so it doesn't need any locale files.
+  def self.load_libarchive
+    require "ffi-libarchive"
+    Archive::C.attach_function :archive_read_support_format_by_code, [:pointer, :int], :int
+    Archive::C.attach_function :archive_entry_is_encrypted, [:pointer], :int
+    Archive::C.attach_function :setlocale, [:int, :string], :pointer
+    raise "can't set the locale to C.UTF-8" if Archive::C.setlocale(0, "C.UTF-8").null? # 0 is LC_CTYPE
+  end
+
+  # The libarchive formats to enable for each file type detected by `FileTypeDetector`. Only these formats are enabled,
+  # with no compression filters, so libarchive can't read a file as a different format (e.g. a tar file disguised as a zip).
+  def self.formats(file_type)
+    case file_type
+    in "zip" | "ugoira" then [Archive::FORMAT_ZIP]
+    in "rar" then [Archive::FORMAT_RAR, 0x100000] # ARCHIVE_FORMAT_RAR_V5
+    in "7z" then [Archive::FORMAT_7ZIP]
+    else raise Error, "Unsupported archive format (.#{file_type})"
+    end
+  end
+
+  # Don't overwrite files, and don't allow symlinks or paths containing '..'. File ownership, permissions, and timestamps
+  # aren't extracted. Absolute paths are rejected before extracting.
+  def self.extract_flags
+    Archive::EXTRACT_NO_OVERWRITE | Archive::EXTRACT_SECURE_SYMLINKS | Archive::EXTRACT_SECURE_NODOTDOT
+  end
+
+  # Open a file with libarchive, with only the given formats enabled and no compression filters. ffi-libarchive's
+  # `Archive::Reader.open_filename` enables every format and filter libarchive supports.
+  #
+  # @return [Archive::Reader] The reader.
+  def self.open_reader(file, formats)
+    reader = Archive::Reader.allocate
+    Archive::BaseArchive.instance_method(:initialize).bind_call(reader, Archive::C.method(:archive_read_new), Archive::C.method(:archive_read_finish))
+    reader.instance_variable_set(:@strip_components, 0)
+    archive = reader.send(:archive)
+
+    formats.each do |format|
+      raise Archive::Error, archive if Archive::C.archive_read_support_format_by_code(archive, format) != Archive::C::OK
+    end
+
+    raise Archive::Error, archive if Archive::C.archive_read_open_filename(archive, file, 1024) != Archive::C::OK
+    reader
+  rescue StandardError
+    reader&.close
+    raise
+  end
+
+  # Iterate over the entries in an archive with libarchive, with only the given format enabled.
+  def self.each_entry(format, file)
+    reader = open_reader(file, formats(format))
+
+    while (entry = reader.next_header)
+      yield reader, entry
+    end
+  rescue Archive::Error => e
+    raise Error, libarchive_error(e.message)
+  ensure
+    reader&.close
+  end
+
+  # List the first files in an archive. Reading stops after `max_entries` files, so an archive with millions of files
+  # can't make it run for a long time or print a lot of output. Directories and skipped files count too, up to 10 times
+  # `max_entries`, so an archive with millions of empty directories fails fast instead of running until the timeout.
+  # Pathnames longer than `max_pathname_size` bytes are truncated.
+  #
+  # @return [Hash] Up to `max_entries` of the files in the archive.
+  def self.list(format, file, max_entries, max_pathname_size)
+    entries = []
+    entry_count = 0
+
+    each_entry(format, file) do |_reader, entry|
+      raise Error, "too many files" if (entry_count += 1) > max_entries * 10
+
+      raise Error, ENCRYPTED_ARCHIVE if Archive::C.archive_entry_is_encrypted(entry.entry) != 0
+      pathname = utf8(entry.pathname)
+      next if skip?(entry, pathname)
+
+      pathname_too_long = pathname.bytesize > max_pathname_size
+      pathname = pathname.byteslice(0, max_pathname_size).scrub("") if pathname_too_long
+
+      entries << { pathname:, pathname_too_long:, size: entry.size.to_i, filetype: filetype(entry) }
+      break if entries.size >= max_entries
+    end
+
+    { entries: }
+  end
+
+  # Extract the files in an archive. The files are written to numbered files in the directory ("dir/000001"), not to
+  # their paths in the archive, so names that are invalid, duplicated, too long, or that clash with other files or
+  # directories can't make extracting fail or write anywhere else.
+  #
+  # @return [Hash] The path of each extracted file, and its name in the archive, e.g. "subdir/image.jpg".
+  def self.extract(format, file, dir)
+    files = []
+
+    each_entry(format, file) do |reader, entry|
+      pathname = utf8(entry.pathname)
+      raise Error, "Can't extract archive containing absolute path (path: '#{pathname}')" if pathname.start_with?("/")
+      next if skip?(entry, pathname)
+      raise Error, "'#{pathname}' is not a regular file" if filetype(entry) != "file"
+
+      # Remove empty and "." components, e.g. "./a//b.jpg" => "a/b.jpg".
+      components = pathname.split("/").reject { it.empty? || it == "." }
+      raise Error, "'#{pathname}' has an empty path" if components.empty?
+      raise Error, "'#{pathname}' can't contain '..' components" if components.include?("..")
+
+      path = "#{dir}/#{"%06d" % (files.size + 1)}"
+      entry.pathname = path.b
+      if Archive::C.archive_read_extract(reader.send(:archive), entry.entry, extract_flags) != Archive::C::OK
+        raise Error, libarchive_error(reader.error_string)
+      end
+
+      files << { path:, name: components.join("/") }
+    end
+
+    { files: }
+  end
+
+  # Validate a ugoira's .zip structure, and if it's valid, extract it. The structure is checked before anything is
+  # extracted, so the zip is uncompressed, has at most MAX_UGOIRA_FRAMES frames, and has no overlapping files, and
+  # extracting it can't take more space than the .zip itself.
+  #
+  # @return [Hash] The error if the ugoira is invalid. Otherwise, the names of the files in the zip in order, the offset
+  #   of each frame in the zip, and the paths of the extracted files.
+  def self.ugoira(file, dir)
+    # The zip isn't closed, because closing it only writes any changes back to the file. It doesn't hold the file open.
+    zip = Zip::File.open(file)
+    error = ugoira_error(zip, file)
+    return { error: } if error
+
+    files = []
+    zip.entries.each do |entry|
+      files << "#{dir}/#{entry.name}"
+      crc = 0
+
+      File.open(files.last, "wbx") do |output|
+        input = entry.get_input_stream
+        while (chunk = input.read(64 * 1024))
+          crc = Zlib.crc32(chunk, crc)
+          output.write(chunk)
+        end
+      end
+
+      if crc != entry.crc
+        files.each { File.delete(it) }
+        return { error: INVALID_ZIP }
+      end
+    end
+
+    frames = zip.entries.reject { |entry| entry.name == "animation.json" }
+    { names: zip.entries.map(&:name), frame_offsets: frames.map(&:local_header_offset), files: }
+  rescue Zip::Error
+    { error: INVALID_ZIP }
+  end
+
+  # @return [String, nil] The error message if the ugoira's .zip structure is invalid, or nil if it's valid.
+  def self.ugoira_error(zip, file)
+    file_n = 0
+    frame_n = 0
+    offset = 0
+
+    Zip::InputStream.open(file) do |stream|
+      while (entry = stream.get_next_entry)
+        if entry.name == "animation.json"
+          return "animation.json file must come first or last" if file_n != 0 && file_n + 1 != zip.size
+          return "animation.json file is too large" if entry.size > MAX_ANIMATION_JSON_SIZE
+        else
+          return "cannot have more than #{MAX_UGOIRA_FRAMES} frames" if frame_n + 1 > MAX_UGOIRA_FRAMES
+
+          # "000000.jpg", "000001.png", "000002.gif", etc.
+          if !entry.name.match?(/\A#{"%06d" % frame_n}\.(jpg|png|gif)\z/)
+            return "file '#{entry.name}' has invalid name (expected '#{"%06d" % frame_n}#{entry.name[/\.[^.]*\z/]}')"
+          end
+        end
+
+        return INVALID_ZIP if entry.zip64? || entry.comment_size > 0 || entry.extra_size > 0
+        return "ugoira must not be compressed" if entry.compression_method != Zip::Entry::STORED
+        return "ugoira must not be compressed" if entry.compressed_size != entry.size
+        return INVALID_ZIP if entry.ftype != :file || entry.gp_flags != 0 || entry.calculate_local_header_size != entry.name.size + 30
+
+        %i[crc name extra_size comment_size ftype compression_method compressed_size size].each do |field|
+          return INVALID_ZIP if entry.public_send(field) != zip.entries[file_n]&.public_send(field)
+        end
+
+        # Files are extracted from the offsets in the central directory, so they must point to the local headers we
+        # checked here. Otherwise the central directory could point to a different file hidden inside another file.
+        return INVALID_ZIP if zip.entries[file_n].local_header_offset != offset
+        offset += entry.calculate_local_header_size + entry.compressed_size
+
+        if entry.name != "animation.json"
+          # Check the frame's type from its first bytes, so frames that aren't images are never extracted.
+          frame_ext = image_type(stream.read(16).to_s)
+          return "file '#{entry.name}' is not an image file" if frame_ext.nil?
+          return "file '#{entry.name}' has the wrong file extension (expected '#{File.basename(entry.name, ".*")}.#{frame_ext}')" if File.extname(entry.name) != ".#{frame_ext}"
+        end
+
+        file_n += 1
+        frame_n += 1 unless entry.name == "animation.json"
+      end
+    end
+
+    return INVALID_ZIP if file_n != zip.size || file_n != zip.entries.size
+    return INVALID_ZIP if zip.instance_variable_get(:@cdir).instance_variable_get(:@version_needed_for_extract) == Zip::VERSION_NEEDED_TO_EXTRACT_ZIP64 # XXX hack
+
+    nil
+  end
+
+  # The same signatures as `FileTypeDetector#file_ext` for the image types allowed in ugoiras.
+  #
+  # @return [String, nil] "jpg", "png", or "gif", or nil if the header isn't one of these.
+  def self.image_type(header)
+    case header.b
+    in /\A\xff\xd8/n then "jpg"
+    in /\AGIF8[79]a/n then "gif"
+    in /\A\x89PNG\r\n\x1a\n/n then "png"
+    else nil
+    end
+  end
+
+  # Create an uncompressed ugoira .zip, without the UniversalTime extra fields or trailing CRCs libarchive would add.
+  #
+  # @param mtime [String] The timestamp of the files, e.g. "2024-10-17T03:31:43". Zip timestamps have no time zone.
+  # @param entries [Array<(String, String)>] The name of each file in the zip, and the path of the file to add.
+  # @return [Hash] An empty result.
+  def self.create_ugoira(file, mtime, entries)
+    raise Error, "invalid mtime '#{mtime}'" unless mtime.match?(/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\z/)
+    ziptime = Zip::DOSTime.new(*mtime.scan(/\d+/).map(&:to_i))
+
+    Zip::File.open(file, create: true, suppress_extra_fields: true) do |zip|
+      entries.each do |name, path|
+        entry = Zip::Entry.new(zip, name)
+        zip.add(entry, path)
+
+        entry.compression_method = Zip::Entry::STORED
+        entry.unix_perms = 0o0644
+        entry.internal_file_attributes = 0 # 0 for binary filetype, 1 for text
+        entry.instance_variable_set(:@time, ziptime) # set manually to avoid rubyzip creating UniversalTime extra field
+      end
+    end
+
+    {}
+  end
+
+  # Directories aren't listed or extracted, because only the files in them are uploaded. Metadata files made by macOS
+  # and Windows are skipped too, because they're never what the user meant to upload.
+  #
+  # @return [Boolean] True if the entry should be skipped.
+  def self.skip?(entry, pathname)
+    components = pathname.split("/")
+    entry.directory? || components.first == "__MACOSX" || SYSTEM_FILES.include?(components.last.to_s.downcase(:ascii))
+  end
+
+  # @return [String] "file", "directory", or "other" (symlinks, hardlinks, devices, etc). Hardlinks have the filetype
+  #   of a regular file, but they link to another file, which may be anywhere, so they aren't treated as regular files.
+  def self.filetype(entry)
+    if entry.file? && entry.hardlink.nil?
+      "file"
+    elsif entry.directory?
+      "directory"
+    else
+      "other"
+    end
+  end
+
+  # @param message [String] The error from libarchive, e.g. "Passphrase required for this entry".
+  # @return [String] The error to show to the user.
+  def self.libarchive_error(message)
+    message.to_s.match?(/encrypt|passphrase|password/i) ? ENCRYPTED_ARCHIVE : INVALID_ARCHIVE
+  end
+
+  # Error messages can include filenames that are long, aren't valid UTF-8, or contain control characters. Control
+  # characters are replaced, because the error is saved in the database, and Postgres can't store null bytes.
+  #
+  # @return [Hash] The error result.
+  def self.error_result(message)
+    message = utf8(message).gsub(/[[:cntrl:]]/, "?")
+    { error: (message.size > 1000) ? "#{message[0, 997]}..." : message }
+  end
+
+  # @return [String] The pathname as UTF-8, with invalid bytes replaced.
+  #
+  # Names that aren't valid UTF-8 are decoded as Windows-31J (Shift_JIS), because zips made on Japanese Windows store
+  # names in Shift_JIS. Other encodings may be decoded wrong, but the names are only shown to users.
+  def self.utf8(pathname)
+    utf8 = pathname.to_s.dup.force_encoding("UTF-8")
+    return utf8 if utf8.valid_encoding?
+
+    shift_jis = pathname.to_s.dup.force_encoding("Windows-31J")
+    shift_jis.valid_encoding? ? shift_jis.encode("UTF-8") : utf8.scrub("?")
+  rescue EncodingError
+    utf8.scrub("?")
+  end
+end
+
+begin
+  result = ArchiveCommand.run(*ARGV)
+rescue NoMatchingPatternError
+  warn "usage: see the comments at the top of #{__FILE__}"
+  exit 2
+rescue ArchiveCommand::Error => e
+  result = { error: e.message }
+end
+
+result = ArchiveCommand.error_result(result[:error]) if result[:error]
+puts result.to_json
+exit(result[:error] ? 1 : 0)

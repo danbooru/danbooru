@@ -34,7 +34,7 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not show the old md5 of a replacement on a post the user can't see" do
-        @hidden_replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/gif/test-static-32x32.gif"))
+        @hidden_replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("lib/media-file/test/files/gif/test-static-32x32.gif"))
         @hidden_replacement.post.update!(is_banned: true)
         @hidden_replacement.update!(old_file_size: nil, old_media_asset: nil)
         get post_post_events_path(@hidden_replacement.post_id)

@@ -101,7 +101,7 @@ class UploadTest < ActiveSupport::TestCase
       should allow_value("https://example.com/image.jpg").for(:source)
 
       should "not allow files with filenames that aren't valid UTF-8" do
-        file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
+        file = Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
         upload = build(:upload, source: nil, files: { "0" => file })
 
         assert_equal(false, upload.valid?)
@@ -109,7 +109,7 @@ class UploadTest < ActiveSupport::TestCase
       end
 
       should "not allow files with filenames that contain NUL bytes" do
-        file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
+        file = Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg")
         file.stubs(:original_filename).returns("a\0b.jpg")
         upload = build(:upload, source: nil, files: { "0" => file })
 

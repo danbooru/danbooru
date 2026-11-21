@@ -16,8 +16,16 @@ class OpenGraphComponentTest < ViewComponent::TestCase
 
       assert_equal(media_asset.variant(:"720x720").file_url, node.css("meta[property='og:image']").attr("content").value)
       assert_equal(media_asset.variant(:original).file_url, node.css("meta[property='og:video']").attr("content").value)
-      assert_equal(media_asset.mime_type, node.css("meta[property='og:video:type']").attr("content").value)
+      assert_equal("video/mp4", node.css("meta[property='og:video:type']").attr("content").value)
       assert_equal("summary_large_image", node.css("meta[name='twitter:card']").attr("content").value)
+    end
+
+    should "render og video tags for the converted video of ugoiras" do
+      media_asset = create(:media_asset, file_ext: "zip", duration: 5)
+      node = render_inline(OpenGraphComponent.new(media_asset: media_asset, current_user: User.anonymous))
+
+      assert_equal(media_asset.variant(:sample).file_url, node.css("meta[property='og:video']").attr("content").value)
+      assert_equal("video/webm", node.css("meta[property='og:video:type']").attr("content").value)
     end
 
     should "not render tags when the asset isn't visible" do

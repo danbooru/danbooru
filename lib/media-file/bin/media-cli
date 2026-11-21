@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Read, validate, and convert images, videos, and ugoiras. See lib/media_file/cli.rb for the commands.
+#
+# Usage: `bin/media-cli <command> [options] [args]`
+
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
+require "bundler/setup"
+require_relative "../lib/media_file"
+
+exit MediaFile::CLI.run!(*ARGV)

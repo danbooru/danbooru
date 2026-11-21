@@ -6,7 +6,7 @@ class StorageManagerTest < ActiveSupport::TestCase
   SFTP_PORT = 22
 
   def tempfile(data, &_block)
-    file = Danbooru::Tempfile.new
+    file = MediaFile::Tempfile.new
     file.write(data)
     file.flush
 

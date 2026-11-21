@@ -4,6 +4,6 @@ FactoryBot.define do
 
   factory :media_metadata do
     media_asset { association :media_asset, media_metadata: instance }
-    metadata { (test_jpg_metadata ||= MediaFile.open("test/files/jpg/test.jpg").metadata).deep_dup }
+    metadata { (test_jpg_metadata ||= MediaFile.open("lib/media-file/test/files/jpg/test.jpg").metadata).deep_dup }
   end
 end

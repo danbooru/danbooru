@@ -94,5 +94,36 @@ class MediaAssetTest < ActiveSupport::TestCase
         assert(@asset1.ai_tags_match?((1..20).map { "nomatch#{it}" }.push("rating:g").join(" or ")))
       end
     end
+
+    context "validating a media file" do
+      should "fail with a timeout error if reading the image times out" do
+        MediaFile::ExternalCommand.stubs(:run).raises(MediaFile::TimeoutError, "ruby timed out after 60 seconds")
+        image = MediaFile.open("lib/media-file/test/files/jpg/test.jpg")
+
+        error = assert_raises(MediaAsset::Error) { MediaAsset.validate_media_file!(image, create(:user)) }
+        assert_equal("File took too long to process", error.message)
+      end
+
+      should "fail with a too large error for WebPs over the max WebP resolution" do
+        stub_const(MediaFile::Image, :MAX_WEBP_RESOLUTION, 1_000) do
+          image = MediaFile.open("lib/media-file/test/files/webp/test.webp")
+
+          error = assert_raises(MediaAsset::Error) { MediaAsset.validate_media_file!(image, create(:user)) }
+          assert_equal("WebP image is too large to decode (resolution: #{(image.resolution / 1_000_000.0).round(1)} megapixels (#{image.width}x#{image.height}); max: 0 megapixels)", error.message)
+        end
+      end
+    end
+
+    context "#mime_type" do
+      should "return the MIME type of the file" do
+        assert_equal("image/jpeg", build(:media_asset, file_ext: "jpg").mime_type)
+        assert_equal("video/mp4", build(:media_asset, file_ext: "mp4").mime_type)
+        assert_equal("application/x-shockwave-flash", build(:media_asset, file_ext: "swf").mime_type)
+      end
+
+      should "return video/x-ugoira for ugoiras, not application/zip" do
+        assert_equal("video/x-ugoira", build(:media_asset, file_ext: "zip").mime_type)
+      end
+    end
   end
 end

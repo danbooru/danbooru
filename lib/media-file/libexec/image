@@ -1,0 +1,344 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Reads and resizes images with libvips in a separate process, so a bug in libvips or one of the image libraries it uses
+# triggered by a malicious file can't affect the Rails process. Rails runs this in the ExternalCommand sandbox through
+# `MediaFile::Image`; don't run it directly on untrusted files.
+#
+# This doesn't load Rails or Bundler, so it starts quickly. Rails passes the paths to the bundled gems with `-I`.
+#
+# Usage:
+#
+#   libexec/image read <limits> (<jpg|png|gif|webp|avif> <file>)...
+#
+#   e.g. libexec/image read '{"max_resolution":441000000,"max_width":40000,"max_height":40000,"max_in_memory_size":1073741824,"max_webp_resolution":163840000}' jpg a.jpg
+#
+# `read` reads the dimensions and other properties from the images' headers, then decodes them to check if they're
+# corrupt and to hash their pixels. The limits are from `MediaFile.config` and `MediaFile::Image`, which explains them. Images are
+# only decoded if every image is within the limits and they're all the same size. The limits make sure an image is never
+# decoded before Rails rejects it, and requiring the same size makes sure a ugoira's frames can't be bigger than its
+# first frame. It takes several images, so a ugoira with many frames only starts one process. It prints
+# {"images": [...]}, with the result of `info` and `analyze` for each image, or {"error": "<libvips' error>"} for an
+# image whose header can't be read. `too_large` is true for images over the limits, and `error` is libvips' error if an
+# image is corrupt. Images that weren't decoded have no error or pixel hash.
+#
+#   libexec/image resize <jpg|png|gif|webp|avif> <file> <width> <height> <jpeg|webp> <quality> <output>
+#
+# `resize` resizes the image to the exact width and height, and writes it to the output file. It prints {} on success,
+# or {"error": "<libvips' error>"} and exits with status 1 if it can't be written.
+#
+# Prints the result as a JSON object on the last line of output.
+
+require "json"
+require "digest/md5"
+
+# Silence libvips warnings, so they don't get mixed up with the output. This must be set before libvips is loaded.
+ENV["VIPS_WARNING"] = "0"
+
+# Always decode images into memory. By default, libvips puts images whose decoded pixels take more than 100 MB (like a
+# 6000x6000 PNG) in a temp file in /tmp instead, which libexec/image can't write in the sandbox.
+ENV["VIPS_DISC_THRESHOLD"] = "1000g"
+
+require "vips"
+
+class ImageCommand
+  # The image types libexec/image can read. The same as `MediaFile::SUPPORTED_IMAGE_TYPES`, which this script doesn't load.
+  EXTENSIONS = %w[jpg png gif webp avif].freeze
+
+  # The format of the numbers in the arguments.
+  NUMBER = /\A\d+\z/
+
+  # @param args [Array<String>] The command line arguments.
+  # @return [Hash, nil] The result to print as JSON, or nil if the arguments are invalid.
+  def self.run(*args)
+    case args
+    in ["read", limits, *images] if images.size.even? && images.each_slice(2).all? { |ext, _| EXTENSIONS.include?(ext) }
+      limits = parse_limits(limits)
+      return nil if limits.nil?
+
+      setup_vips
+      read(limits, images.each_slice(2).to_a)
+    in ["resize", ext, file, NUMBER => width, NUMBER => height, "jpeg" | "webp" => format, NUMBER => quality, output] if EXTENSIONS.include?(ext)
+      setup_vips
+      rescue_vips_error(file) { resize(ext, file, width.to_i, height.to_i, format, quality.to_i, output) }
+    else
+      nil
+    end
+  end
+
+  # @param json [String] The limits, like the example at the top of this file.
+  # @return [Hash, nil] The limits, or nil if they aren't a JSON object with exactly these keys and integer values.
+  def self.parse_limits(json)
+    limits = JSON.parse(json, symbolize_names: true)
+    limits if limits in { max_resolution: Integer, max_width: Integer, max_height: Integer, max_in_memory_size: Integer, max_webp_resolution: Integer, **nil }
+  rescue JSON::ParserError
+    nil
+  end
+
+  # Read the images' headers, and decode them if they're within the limits and all the same size.
+  #
+  # @param limits [Hash] The upload limits (see `parse_limits`).
+  # @param images [Array<(String, String)>] The extension and path of each image.
+  # @return [Hash] The result for each image.
+  def self.read(limits, images)
+    infos = images.map { |ext, file| rescue_vips_error(file) { info(ext, file) } }
+    decode = infos.zip(images).all? { |info, (ext, _)| within_limits?(info, ext, limits) } && infos.map { it.values_at(:width, :height) }.uniq.size == 1
+
+    infos = infos.zip(images).map do |info, (ext, file)|
+      if info[:error]
+        info
+      elsif decode
+        info.merge(too_large: false, **analyze(ext, file))
+      else
+        info.merge(too_large: !within_limits?(info, ext, limits), error: nil, pixel_hash: nil)
+      end
+    end
+
+    { images: infos }
+  end
+
+  def self.setup_vips
+    GLib.logger.level = Logger::FATAL
+
+    # Don't cache operations. We don't perform the same operation more than once, so this would only use more memory.
+    # https://www.libvips.org/API/current/VipsOperation.html#id-1.3.6.9.10
+    Vips.cache_set_max(0)
+
+    # Don't use multiple threads. They use more memory without making it faster.
+    # https://www.libvips.org/API/current/VipsOperation.html#vips-concurrency-set
+    Vips.concurrency_set(1)
+
+    # Only allow libvips to load the image formats we support (see `MediaFile.new_from_file`), so that if a file of
+    # another type is ever passed to libvips, it won't be parsed by a loader we don't use. This blocks all loaders, then
+    # unblocks the file loaders we use. The loaders are looked up by nickname because their class names depend on how
+    # libvips was built (e.g. the GIF loader may use libnsgif or giflib).
+    #
+    # @see `vips_operation_block_set` in vips/operation.h (libvips 8.13+)
+    Vips.block("VipsForeignLoad", true)
+    %w[jpegload pngload gifload webpload heifload].filter_map { GObject.g_type_name(Vips.type_find("VipsForeignLoad", it)) }.each do |loader|
+      Vips.block(loader, false)
+    end
+  end
+
+  def self.rescue_vips_error(file)
+    yield
+  rescue Vips::Error => e
+    { error: error_message(e, file) }
+  end
+
+  # ruby-vips clears libvips' error buffer when it raises an error, so the message is only about the operation that
+  # failed, e.g. "VipsJpeg: Premature end of JPEG file". Some messages include the file's path, like `VipsForeignLoad:
+  # "/tmp/danbooru-upload-1234.jpg" is not a known file format`, so it's replaced with the file's name, to keep the
+  # server's directories out of the error.
+  #
+  # @return [String] libvips' error message, as valid UTF-8 so it can be printed as JSON.
+  def self.error_message(error, file)
+    # ruby-vips uses the class name as the message when libvips doesn't give one.
+    return "libvips failed without an error message" if error.message == error.class.name
+
+    error.message.scrub.strip.gsub(file, File.basename(file))
+  end
+
+  # Read the image's properties. This only reads the header, so it's safe to call before checking the image's size.
+  #
+  # @return [Hash] The width and height (after applying the EXIF orientation), the frame count and frame delays of
+  #   animated images, and its size in memory (see `in_memory_size`).
+  def self.info(ext, file)
+    image = open_image(ext, file, rotate: false)
+    width, height = displayed_size(ext, image)
+
+    {
+      width:,
+      height:,
+      n_pages: (image.get("n-pages") if image.get_typeof("n-pages") != 0),
+      delay: (image.get("delay") if image.get_typeof("delay") != 0),
+      in_memory_size: in_memory_size(ext, image),
+    }
+  end
+
+  # @return [Array<(Integer, Integer)>] The width and height of the image as it's displayed. JPEGs and PNGs are rotated
+  #   after loading, which swaps the width and height for orientations 5-8 (rotations by 90 or 270 degrees).
+  def self.displayed_size(ext, image)
+    if %w[jpg png].include?(ext) && orientation(image).to_i.between?(5, 8)
+      [image.height, image.width]
+    else
+      [image.width, image.height]
+    end
+  end
+
+  # @return [Integer, nil] The JPEG or PNG's EXIF orientation, or nil if it doesn't have one. The image must be opened
+  #   without rotating it, because rotating it removes the orientation.
+  def self.orientation(image)
+    image.get("orientation") if image.get_typeof("orientation") != 0
+  end
+
+  # @return [Boolean] True if the JPEG or PNG has to be rotated or flipped. Orientation 1 is upright, and 2-8 are rotated
+  #   or flipped.
+  def self.rotated?(image)
+    orientation(image).to_i > 1
+  end
+
+  # The same limits are checked by the app when it validates uploads, which gives the error messages. Change both together.
+  #
+  # @return [Boolean] True if the image's header was read, and it's within the limits for decoding it.
+  def self.within_limits?(info, ext, limits)
+    if ext == "webp"
+      max_resolution = [limits[:max_resolution], limits[:max_webp_resolution]].min
+    else
+      max_resolution = limits[:max_resolution]
+    end
+
+    !info[:error] && info[:width] * info[:height] <= max_resolution && info[:width] <= limits[:max_width] &&
+      info[:height] <= limits[:max_height] && info[:in_memory_size] <= limits[:max_in_memory_size]
+  end
+
+  # libvips decodes most JPEGs and PNGs a few rows at a time. It decodes progressive JPEGs, interlaced PNGs, rotated
+  # JPEGs and PNGs, GIFs, WebPs, and AVIFs all at once, so their size is limited (see `MediaFile::Image::MAX_IN_MEMORY_SIZE`).
+  # This only reads the header.
+  #
+  # @return [Integer] The size in bytes of the decoded image if it's decoded all at once, or 0 if it isn't.
+  def self.in_memory_size(ext, image)
+    interlaced = image.get_typeof("interlaced") != 0 && image.get("interlaced") != 0
+
+    if %w[jpg png].include?(ext) && !interlaced && !rotated?(image)
+      0
+    elsif image.format == :ushort
+      image.width * image.height * image.bands * 2
+    else
+      image.width * image.height * image.bands
+    end
+  end
+
+  # Decode the whole image once to hash its pixels, which also checks that it isn't corrupt. If hashing fails, the image
+  # is decoded again without converting its colors, because a bad color profile doesn't make the image corrupt.
+  #
+  # @return [Hash] The error if the image is corrupt, and the pixel hash, or nil if the pixels couldn't be hashed.
+  def self.analyze(ext, file)
+    { error: nil, pixel_hash: pixel_hash(ext, file) }
+  rescue Vips::Error
+    # Free the image decoded by `pixel_hash` before decoding it again.
+    GC.start
+    { error: error(ext, file), pixel_hash: nil }
+  end
+
+  # @return [String, nil] libvips' error if it can't decode the image, or nil if it can.
+  def self.error(ext, file)
+    # Don't rotate the image, because the orientation doesn't matter for checking if it's corrupt.
+    open_image(ext, file, fail: true, rotate: false).stats
+    nil
+  rescue Vips::Error => e
+    error_message(e, file)
+  end
+
+  # @return [String] The MD5 hash of the image's pixels, as a PAM file (https://netpbm.sourceforge.net/doc/pam.html). A
+  #   PAM file is a header followed by the raw pixels, so the hash only depends on the pixels, not the file format or
+  #   metadata. The pixels are hashed as they're decoded, a strip of rows at a time, without writing the PAM file to disk.
+  # @raise [Vips::Error] If the image can't be decoded, or its colors can't be converted.
+  def self.pixel_hash(ext, file)
+    img = open_image(ext, file, fail: true)
+
+    # Normalize the image to the same colorspace and add an alpha layer if missing,
+    # so that the pixel data stays the same even for different profiles.
+    img = img.icc_transform("srgb") if img.get_typeof("icc-profile-data") != 0
+    img = img.colourspace("srgb") if img.interpretation != :srgb
+    img = img.add_alpha unless img.has_alpha?
+
+    digest = Digest::MD5.new
+    digest << <<~PAM
+      P7
+      WIDTH #{img.width}
+      HEIGHT #{img.height}
+      DEPTH #{img.bands}
+      MAXVAL 255
+      TUPLTYPE RGB_ALPHA
+      ENDHDR
+    PAM
+
+    # Hashing 16 rows at a time is 2-3x faster than hashing each chunk libvips writes (with `rawsave_target`) for images
+    # up to 4 megapixels, and no slower for bigger ones.
+    #
+    # `Region#fetch` frees each strip's buffer only when Ruby's GC runs, and the GC doesn't count the buffers, so it's
+    # run every 8 strips. Otherwise the whole image builds up in memory.
+    rows = 16
+    region = Vips::Region.new(img)
+    (0...img.height).step(rows).with_index do |top, i|
+      digest << region.fetch(0, top, img.width, [rows, img.height - top].min)
+      GC.start if i % 8 == 7
+    end
+
+    digest.hexdigest
+  end
+
+  # Resize the image to the given width and height, and save it to the output file. The image is converted to sRGB,
+  # unless it's CMYK or greyscale without a color profile, and flattened against a white background.
+  #
+  # @see https://www.libvips.org/API/current/Using-vipsthumbnail.md.html
+  # @see https://www.libvips.org/API/current/libvips-resample.html#vips-thumbnail
+  # @return [Hash] An empty result, or the error if the colorspace isn't supported.
+  def self.resize(ext, file, width, height, format, quality, output) # rubocop:disable Metrics/ParameterLists
+    # PNGs aren't rotated here, because rotating them decodes the whole image. They're rotated by `thumbnail_image`, and
+    # PNGs can't be CMYK, so they never need the rotated image. JPEGs can be CMYK, so they're rotated first.
+    image = open_image(ext, file, rotate: ext == "jpg")
+    profile = image.get_typeof("icc-profile-data") != 0
+
+    if %i[srgb rgb16].include?(image.interpretation)
+      resized_image = image.thumbnail_image(width, height:, size: :force, import_profile: "srgb", export_profile: "srgb")
+    elsif image.interpretation == :cmyk && profile
+      resized_image = image.thumbnail_image(width, height:, size: :force, import_profile: "cmyk", export_profile: "srgb")
+    elsif image.interpretation == :cmyk
+      # Leave CMYK without a profile as CMYK to avoid distorting the colors by converting it to sRGB
+      resized_image = image.resize(width / image.width.to_f, vscale: height / image.height.to_f)
+    elsif %i[b-w grey16].include?(image.interpretation) && profile
+      # Convert greyscale to sRGB so that the color profile is properly applied before we strip it.
+      resized_image = image.thumbnail_image(width, height:, size: :force, export_profile: "srgb")
+    elsif %i[b-w grey16].include?(image.interpretation)
+      # Otherwise, leave greyscale without a profile as greyscale because
+      # converting it to sRGB would change it from 1 channel to 3 channels.
+      resized_image = image.thumbnail_image(width, height:, size: :force)
+    else
+      return { error: "unsupported colorspace: #{image.interpretation}" }
+    end
+
+    resized_image = resized_image.flatten(background: 255) if resized_image.has_alpha?
+
+    case format
+    in "jpeg"
+      # https://www.libvips.org/API/current/VipsForeignSave.html#vips-jpegsave
+      resized_image.jpegsave(output, Q: quality, strip: true, interlace: true, optimize_coding: true, optimize_scans: true, trellis_quant: true, overshoot_deringing: true, quant_table: 3)
+    in "webp"
+      # https://www.libvips.org/API/current/VipsForeignSave.html#vips-webpsave
+      resized_image.webpsave(output, Q: quality, preset: :drawing, smart_subsample: false, effort: 4, strip: true)
+    end
+
+    {}
+  end
+
+  # Open the image with sequential access, which uses much less memory than the default access mode. `autorot` doesn't
+  # support it, so images that need rotating are reopened with the default access mode. They're rare, so this uses less
+  # memory overall.
+  #
+  # Only JPEGs and PNGs are rotated by their EXIF orientation. Rotated AVIFs are unsupported (see
+  # `MediaFile::Image#is_supported?`). Only PNG rotation specified before the IDAT chunk (the image data) is valid. Other
+  # rotation metadata is ignored by most browsers, so we ignore it too.
+  #
+  # @param rotate [Boolean] If true, rotate JPEGs and PNGs that have an EXIF orientation flag. This loads the full image
+  #   into memory.
+  # @return [Vips::Image] The image.
+  def self.open_image(ext, file, rotate: true, fail: false)
+    image = Vips::Image.new_from_file(file, access: :sequential, fail:)
+    return image unless rotate && %w[jpg png].include?(ext) && rotated?(image)
+
+    Vips::Image.new_from_file(file, fail:).autorot
+  end
+end
+
+result = ImageCommand.run(*ARGV)
+
+if result.nil?
+  # Not `warn`, because Rails runs this with -W0, which turns `warn` off.
+  $stderr.puts "usage: see the comments at the top of #{__FILE__}" # rubocop:disable Style/StderrPuts
+  exit 2
+end
+
+puts result.to_json
+exit 1 if result[:error]

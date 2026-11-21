@@ -89,7 +89,7 @@ class BigqueryExportService
   end
 
   # Dump the table's records to a gzipped, newline-delimited JSON tempfile.
-  def dump_records!(file = Danbooru::Tempfile.new("danbooru-export-dump-#{model.name}-", binmode: true))
+  def dump_records!(file = MediaFile::Tempfile.new("danbooru-export-dump-#{model.name}-", binmode: true))
     gzip = Zlib::GzipWriter.new(file)
 
     CurrentUser.scoped(User.anonymous) do

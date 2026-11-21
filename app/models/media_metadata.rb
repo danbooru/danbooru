@@ -2,9 +2,9 @@
 
 # MediaMetadata represents the EXIF and other metadata associated with a
 # MediaAsset (an uploaded image or video file). The `metadata` field contains a
-# JSON hash of the file's metadata as returned by ExifTool.
+# JSON hash of the file's metadata as returned by MediaFile::ExifTool.
 #
-# @see ExifTool
+# @see MediaFile::ExifTool
 # @see https://exiftool.org/TagNames/index.html
 class MediaMetadata < ApplicationRecord
   self.table_name = "media_metadata"
@@ -26,7 +26,7 @@ class MediaMetadata < ApplicationRecord
   end
 
   def metadata
-    ExifTool::Metadata.new(self[:metadata])
+    MediaFile::ExifTool::Metadata.new(self[:metadata])
   end
 
   def frame_delays

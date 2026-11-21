@@ -1,0 +1,227 @@
+# frozen_string_literal: true
+
+require "shellwords"
+
+# A wrapper for the exiftool command.
+class MediaFile::ExifTool
+  # @see https://exiftool.org/exiftool_pod.html#OPTIONS
+  DEFAULT_OPTIONS = "
+    -G1 -duplicates -unknown -struct --binary
+    -x 'System:*' -x ExifToolVersion -x FileTypeExtension
+    -x MIMEType -x ImageSize -x MegaPixels
+  ".squish
+
+  attr_reader :file
+
+  # Open a file with MediaFile::ExifTool.
+  #
+  # @param file [File, String] an image or video file
+  def initialize(file)
+    @file = file.is_a?(String) ? File.open(file) : file
+  end
+
+  # Get the file's metadata.
+  #
+  # @param options [String] the options to pass to exiftool
+  # @param max_size [Integer] The maximum size of the metadata, in bytes of JSON. If it's larger, the largest values are
+  #   replaced with "[OVERSIZED]" until it fits. If that isn't enough, the largest keys are dropped. If exiftool prints
+  #   more than ExternalCommand's output limit, the metadata only has a `Danbooru:ExifToolError` entry.
+  # @return [MediaFile::ExifTool::Metadata] the file's metadata
+  def metadata(options: DEFAULT_OPTIONS, max_size: 1.megabyte)
+    output, _status = MediaFile::ExternalCommand.run("exiftool #{options} -json #{file.path.shellescape}", read: [file.path])
+    json = MediaFile.parse_json(output).first
+    json = json.except("SourceFile")
+
+    total_size = json.to_json.bytesize
+
+    savings = json.transform_values { |value| value.to_json.bytesize - "[OVERSIZED]".to_json.bytesize }.select { _2 > 0 }
+    oversized_keys = savings.sort_by { -_2 }.take_while { total_size > max_size && (total_size -= _2) }.map(&:first)
+    json = json.merge(oversized_keys.index_with("[OVERSIZED]"))
+
+    # Each entry takes up `"key":value,` in the JSON.
+    entry_sizes = json.to_h { |key, value| [key, { key => value }.to_json.bytesize - 1] }
+    dropped_keys = entry_sizes.sort_by { -_2 }.take_while { total_size > max_size && (total_size -= _2) }.map(&:first)
+    json = json.except(*dropped_keys)
+
+    MediaFile::ExifTool::Metadata.new(json.with_indifferent_access)
+  rescue MediaFile::ExternalCommand::OutputLimitError => e
+    MediaFile::ExifTool::Metadata.new({ "Danbooru:ExifToolError" => e.message }.with_indifferent_access)
+  end
+
+  # A class representing the set of metadata returned by ExifTool for a file.
+  # Behaves like a Hash, but with extra helper methods for interpreting the metadata.
+  #
+  # @see https://exiftool.org/TagNames/index.html
+  class Metadata
+    attr_reader :metadata
+
+    delegate_missing_to :metadata
+
+    # @param [Hash] a hash of metadata as returned by ExifTool
+    def initialize(metadata)
+      @metadata = metadata
+    end
+
+    def merge(...)
+      Metadata.new(metadata.merge(...))
+    end
+
+    def reject(...)
+      Metadata.new(metadata.reject(...))
+    end
+
+    def is_animated?
+      frame_count.to_i > 1 || is_animated_webp? || is_animated_avif?
+    end
+
+    def is_animated_gif?
+      file_ext == :gif && is_animated?
+    end
+
+    def is_animated_png?
+      file_ext == :png && is_animated?
+    end
+
+    def is_animated_webp?
+      file_ext == :webp && metadata["RIFF:Duration"].present?
+    end
+
+    def is_animated_avif?
+      file_ext == :avif && metadata["QuickTime:CompatibleBrands"].to_a.include?("avis")
+    end
+
+    # @see https://exiftool.org/TagNames/JPEG.html
+    # @see https://exiftool.org/TagNames/PNG.html
+    # @see https://danbooru.donmai.us/posts?tags=exif:File:ColorComponents=1
+    # @see https://danbooru.donmai.us/posts?tags=exif:PNG:ColorType=Grayscale
+    def is_greyscale?
+      metadata["File:ColorComponents"] == 1 ||
+        metadata["PNG:ColorType"] == "Grayscale" ||
+        metadata["PNG:ColorType"] == "Grayscale with Alpha" ||
+        metadata["QuickTime:ChromaFormat"].to_s.include?("Monochrome") # "Monochrome 4:0:0"
+    end
+
+    # https://exiftool.org/TagNames/EXIF.html
+    def is_rotated?
+      case file_ext
+      when :jpg
+        metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"])
+      when :png
+        # PNGs can have EXIF orientation metadata, but it's only valid if it appears before the IDAT chunk
+        # (the actual image data). Metadata found after the IDAT chunk is ignored by most browsers.
+        metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"]) &&
+          metadata["ExifTool:Warning"].to_s.exclude?("found after PNG IDAT")
+      when :avif
+        metadata["QuickTime:Rotation"].present?
+      else
+        false
+      end
+    end
+
+    # AVIF files can be cropped with the "CleanAperture" (aka "clap") tag.
+    def is_cropped?
+      file_ext == :avif && metadata["QuickTime:CleanAperture"].present?
+    end
+
+    # AVIF files can be mirrored with the "imir" transform.
+    def is_mirrored?
+      file_ext == :avif && metadata["QuickTime:Mirroring"].present?
+    end
+
+    # AVIF files can contain an auxiliary image (for example, an alpha image).
+    def has_auxiliary_image?
+      file_ext == :avif && metadata["QuickTime:AuxiliaryImageType"].present?
+    end
+
+    # AVIF files can be a collection of smaller images combined in a grid to
+    # form a larger image. This is done to reduce memory usage during encoding.
+    #
+    # https://0xc0000054.github.io/pdn-avif/using-image-grids.html
+    def is_grid_image?
+      file_ext == :avif && metadata["Meta:PrimaryItemReference"].to_i > 1 && !is_animated_avif?
+    end
+
+    # Some animations technically have a finite loop count, but loop for hundreds
+    # or thousands of times. Only count animations with a low loop count as non-repeating.
+    def is_non_repeating_animation?
+      loop_count.in?(0..10)
+    end
+
+    # https://danbooru.donmai.us/posts?tags=exif:PNG:Software=NovelAI
+    # https://danbooru.donmai.us/posts?tags=exif:"PNG:Title=AI generated image"
+    # https://danbooru.donmai.us/posts?tags=exif:PNG:Parameters
+    # https://danbooru.donmai.us/posts?tags=exif:PNG:Sd-metadata
+    # https://danbooru.donmai.us/posts?tags=exif:PNG:Dream
+    def is_ai_generated?
+      metadata["PNG:Software"] == "NovelAI" ||
+        metadata["PNG:Title"] == "AI generated image" ||
+        metadata["PNG:Description"]&.match?(/masterpiece|best quality/) ||
+        metadata.key?("PNG:Parameters") ||
+        metadata.key?("PNG:Sd-metadata") ||
+        metadata.key?("PNG:Dream")
+    end
+
+    # True if the video has audible sound. False if the video doesn't have an audio track, or the audio track is inaudible.
+    def has_sound?
+      metadata["FFmpeg:AudioPeakLoudness"].to_f >= 0.0003 # -70 dB
+    end
+
+    def width
+      metadata.find { |name, _value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageWidth\z/) }&.second
+    end
+
+    def height
+      metadata.find { |name, _value| name.match?(/\A(File|PNG|GIF|RIFF|Flash|Track\d+):ImageHeight\z/) }&.second
+    end
+
+    # @see http://www.vurdalakov.net/misc/gif/netscape-looping-application-extension
+    # @see https://wiki.mozilla.org/APNG_Specification#.60acTL.60:_The_Animation_Control_Chunk
+    # @see https://danbooru.donmai.us/posts?tags=-exif:GIF:AnimationIterations=Infinite+animated_gif
+    # @see https://danbooru.donmai.us/posts?tags=-exif:PNG:AnimationPlays=inf+animated_png
+    def loop_count
+      return Float::INFINITY if metadata["GIF:AnimationIterations"] == "Infinite"
+      return Float::INFINITY if metadata["PNG:AnimationPlays"] == "inf"
+      return Float::INFINITY if metadata["RIFF:AnimationLoopCount"] == "inf"
+      return metadata["GIF:AnimationIterations"] if key?("GIF:AnimationIterations")
+      return metadata["PNG:AnimationPlays"] if key?("PNG:AnimationPlays")
+      return metadata["RIFF:AnimationLoopCount"] if key?("RIFF:AnimationLoopCount")
+
+      # If the AnimationIterations tag isn't present, then it's counted as a loop count of 0.
+      return 0 if is_animated_gif? && !key?("GIF:AnimationIterations")
+
+      nil
+    end
+
+    def frame_count
+      if file_ext == :gif
+        fetch("GIF:FrameCount", 1)
+      elsif file_ext == :png
+        fetch("PNG:AnimationFrames", 1)
+      else
+        nil
+      end
+    end
+
+    def file_ext
+      if key?("File:ColorComponents")
+        :jpg
+      elsif key?("PNG:ColorType")
+        :png
+      elsif key?("GIF:GIFVersion")
+        :gif
+      elsif metadata["QuickTime:CompatibleBrands"].to_a.include?("avif") || metadata["QuickTime:CompatibleBrands"].to_a.include?("avis")
+        :avif
+      elsif key?("QuickTime:MovieHeaderVersion")
+        :mp4
+      elsif keys.grep(/\ARIFF:/).any?
+        :webp
+      elsif key?("Matroska:DocType")
+        :webm
+      elsif key?("Flash:FlashVersion")
+        :swf
+      elsif key?("ZIP:ZipCompression")
+        :ugoira
+      end
+    end
+  end
+end

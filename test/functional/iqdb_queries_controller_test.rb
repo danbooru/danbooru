@@ -15,16 +15,30 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       context "for a file that makes a program call a blocked syscall" do
         should "show an error, log the search, and quarantine the file" do
-          ExifTool.any_instance.stubs(:metadata).raises(ExternalCommand::SyscallError, "exiftool called a blocked syscall")
+          MediaFile::ExifTool.any_instance.stubs(:metadata).raises(MediaFile::ExternalCommand::SyscallError, "exiftool called a blocked syscall")
           Rails.logger.stubs(:error)
           Rails.logger.expects(:error).with { |message| message.start_with?("IQDB search by user ##{@user.id} (#{@user.name}) was blocked by the sandbox: exiftool called a blocked syscall") }
 
-          file = Rack::Test::UploadedFile.new(Rails.root.join("test/files/jpg/test.jpg"))
+          file = Rack::Test::UploadedFile.new(Rails.root.join("lib/media-file/test/files/jpg/test.jpg"))
           post_auth iqdb_queries_path, @user, params: { search: { file: file }}
 
           assert_response :success
           assert_includes(response.body, "The file couldn&#39;t be processed")
           assert_nothing_raised { Danbooru.config.storage_manager.open("/trash/quarantine/ecef68c44edb8a0d6a3070b5f8e8ee76.jpg") }
+        end
+      end
+
+      context "for a file whose preview fails" do
+        should "show an error without the details, and log the error" do
+          MediaFile::Video.any_instance.stubs(:preview!).raises(MediaFile::FFmpeg::Error, "ffmpeg failed: /tmp/media-file-video-preview-123.png: Permission denied")
+          DanbooruLogger.expects(:log).with(instance_of(MediaFile::FFmpeg::Error))
+
+          file = Rack::Test::UploadedFile.new(Rails.root.join("lib/media-file/test/files/mp4/test-300x300-av1.mp4"))
+          post_auth iqdb_queries_path, @user, params: { search: { file: file }}
+
+          assert_response :success
+          assert_includes(response.body, "The file couldn&#39;t be processed")
+          assert_not_includes(response.body, "Permission denied")
         end
       end
 
@@ -213,7 +227,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           mock_iqdb_matches(@matches)
 
           # Make the call to `@post.file(:preview)` work.
-          Post.any_instance.stubs(:file).returns(File.open("test/files/jpg/test.jpg"))
+          Post.any_instance.stubs(:file).returns(File.open("lib/media-file/test/files/jpg/test.jpg"))
 
           get_auth iqdb_queries_path, @user, params: { post_id: @post.id }
 
@@ -223,7 +237,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
 
         should "render a response for /posts/:id/similar" do
           mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
-          Post.any_instance.stubs(:file).returns(File.open("test/files/jpg/test.jpg"))
+          Post.any_instance.stubs(:file).returns(File.open("lib/media-file/test/files/jpg/test.jpg"))
 
           get_auth post_similar_path(@post), @user
 
@@ -233,7 +247,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
 
         should "ignore unknown search params" do
           mock_iqdb_matches([{ post_id: @post.id, score: 95.0 }])
-          Post.any_instance.stubs(:file).returns(File.open("test/files/jpg/test.jpg"))
+          Post.any_instance.stubs(:file).returns(File.open("lib/media-file/test/files/jpg/test.jpg"))
 
           get_auth iqdb_queries_path, @user, params: { search: { post_id: @post.id, foo: "x" }}
 
@@ -267,7 +281,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           @matches = [{ post_id: @post.id, score: 90.0 }]
           mock_iqdb_matches(@matches)
 
-          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
+          file = Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg")
           post_auth iqdb_queries_path(format: :json), @user, params: { search: { file: file }}
 
           assert_response :success
@@ -279,7 +293,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           MediaFile::Image.any_instance.expects(:preview!).never
           IqdbClient.any_instance.expects(:request).never
 
-          file = Rack::Test::UploadedFile.new("test/files/png/test.png")
+          file = Rack::Test::UploadedFile.new("lib/media-file/test/files/png/test.png")
           post_auth iqdb_queries_path, @user, params: { search: { file: file }}
 
           assert_response :success
@@ -289,7 +303,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         should "fail for a corrupt image" do
           IqdbClient.any_instance.expects(:request).never
 
-          file = Rack::Test::UploadedFile.new("test/files/png/test-corrupt.png")
+          file = Rack::Test::UploadedFile.new("lib/media-file/test/files/png/test-corrupt.png")
           post_auth iqdb_queries_path, @user, params: { search: { file: file }}
 
           assert_response :success
@@ -299,7 +313,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         should "fail for an invalid ugoira" do
           IqdbClient.any_instance.expects(:request).never
 
-          file = Rack::Test::UploadedFile.new("test/files/ugoira/ugoira-compressed.zip")
+          file = Rack::Test::UploadedFile.new("lib/media-file/test/files/ugoira/ugoira-compressed.zip")
           post_auth iqdb_queries_path, @user, params: { search: { file: file }}
 
           assert_response :success

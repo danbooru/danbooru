@@ -6,7 +6,6 @@ class Upload < ApplicationRecord
   class Error < StandardError; end
 
   # The list of allowed archive file types.
-  ARCHIVE_FILE_TYPES = %i[zip rar 7z]
 
   # The maximum number of files allowed per upload. If you change this, you should also change `RACK_MULTIPART_FILE_LIMIT` in config/puma.rb.
   MAX_FILES_PER_UPLOAD = 100
@@ -97,45 +96,21 @@ class Upload < ApplicationRecord
       return if files.blank? || errors.any?
 
       begin
-        Danbooru::Archive.list!(archive_files.map(&:first))
-      rescue Danbooru::Archive::Error => e
-        errors.add(:base, "#{archive_files.map { |_archive, filename| "'#{filename}'" }.to_sentence} couldn't be read (#{e.message})")
-        return
-      rescue ExternalCommand::SyscallError => e
+        MediaFile::Archive.list!(archive_files.map(&:first))
+      rescue MediaFile::InvalidFileError => e
         handle_blocked_archives(e, archive_files, action: "Upload")
-        errors.add(:base, "#{archive_files.map { |_archive, filename| "'#{filename}'" }.to_sentence} couldn't be read (#{Danbooru::Archive::INVALID_ARCHIVE})")
+        errors.add(:base, "#{archive_files.map { |_archive, filename| "'#{filename}'" }.to_sentence} couldn't be read (#{e.user_message})")
         return
       end
-
-      invalid_archive = false
 
       archive_files.each do |archive, filename|
-        if !archive.file_ext.in?(ARCHIVE_FILE_TYPES)
-          errors.add(:base, "'#{filename}' is not a supported file type")
-        elsif archive.file_count == 0
-          errors.add(:base, "'#{filename}' doesn't contain any files")
-        elsif archive.exists? { |_, count| count > MAX_FILES_PER_UPLOAD }
-          # XXX Potential zip bomb containing thousands of files; don't process it any further.
-          errors.add(:base, "'#{filename}' contains too many files (max #{MAX_FILES_PER_UPLOAD} files per upload)")
-          next
-        elsif archive.uncompressed_size > MediaAsset::MAX_FILE_SIZE
-          errors.add(:base, "'#{filename}' is too large (uncompressed size: #{archive.uncompressed_size.to_fs(:human_size)}; max size: #{MediaAsset::MAX_FILE_SIZE.to_fs(:human_size)})")
-        elsif archive.entries.any?(&:pathname_too_long?)
-          errors.add(:base, "'#{filename}' contains a path that's too long (max #{Danbooru::Archive::MAX_PATHNAME_SIZE} bytes)")
-        elsif (entry = archive.entries.find { |entry| entry.pathname.starts_with?("/") })
-          errors.add(:base, "'#{entry.pathname}' in '#{filename}' can't start with '/'")
-        elsif (entry = archive.entries.find(&:directory_traversal?))
-          errors.add(:base, "'#{entry.pathname}' in '#{filename}' can't contain '..' components")
-        elsif (entry = archive.entries.find { |entry| !entry.file? && !entry.directory? })
-          errors.add(:base, "'#{entry.pathname}' in '#{filename}' isn't a regular file")
-        end
-      rescue Danbooru::Archive::Error => e
-        invalid_archive = true
-        errors.add(:base, "'#{filename}' couldn't be read (#{e.message})")
+        archive.validate!(name: filename, max_files: MAX_FILES_PER_UPLOAD, max_size: MediaAsset::MAX_FILE_SIZE)
+      rescue MediaFile::InvalidFileError => e
+        errors.add(:base, e.user_message)
       end
 
-      # The file count of an invalid archive is unknown.
-      return if invalid_archive
+      # The file count of an invalid archive may be unknown.
+      return if errors.any?
 
       total_files = archive_files.map(&:first).sum(&:file_count) + (files.size - archive_files.size)
       if total_files > MAX_FILES_PER_UPLOAD
@@ -217,7 +192,7 @@ class Upload < ApplicationRecord
       raise Error, "No file or source given" # Should never happen
     end
   rescue Exception => e
-    update!(status: "error", error: e.message)
+    update!(status: "error", error: MediaAsset.error_message_for(e))
   end
 
   def process_source_upload!
@@ -242,14 +217,12 @@ class Upload < ApplicationRecord
     tmpdirs = []
 
     upload_media_assets = uploaded_files.flat_map do |file, original_filename|
-      if file.is_a?(Danbooru::Archive)
+      if file.is_a?(MediaFile::Archive)
         begin
           tmpdir, extracted_files = file.extract!
-        rescue Danbooru::Archive::Error => e
-          raise Error, "'#{original_filename}' couldn't be extracted (#{e.message})"
-        rescue ExternalCommand::SyscallError => e
+        rescue MediaFile::InvalidFileError => e
           handle_blocked_archives(e, [[file, original_filename]], action: "Upload ##{id}")
-          raise Error, "'#{original_filename}' couldn't be extracted (#{Danbooru::Archive::INVALID_ARCHIVE})"
+          raise Error, "'#{original_filename}' couldn't be extracted (#{e.user_message})"
         end
         tmpdirs << tmpdir
 
@@ -272,32 +245,33 @@ class Upload < ApplicationRecord
   # The list of files uploaded from disk, with their filenames.
   def uploaded_files
     files.map do |_index, file|
-      if FileTypeDetector.new(file.tempfile).file_ext.in?(ARCHIVE_FILE_TYPES)
+      if MediaFile::FileTypeDetector.new(file.tempfile).file_ext.in?(MediaFile::SUPPORTED_ARCHIVE_TYPES)
         # Only read one more file than the limit, enough to tell if the archive has too many files.
-        [Danbooru::Archive.open!(file.tempfile, max_entries: MAX_FILES_PER_UPLOAD + 1), file.original_filename]
+        [MediaFile::Archive.open!(file.tempfile, max_entries: MAX_FILES_PER_UPLOAD + 1), file.original_filename]
       else
         [MediaFile.open(file.tempfile), file.original_filename]
       end
     end
   end
 
-  # Log and quarantine the archives if bin/archive was killed by the sandbox, because they may be an attempt to exploit
+  # Log and quarantine the archives if libexec/archive was killed by the sandbox, because they may be an attempt to exploit
   # libarchive or rubyzip. When several archives are listed by one process, all of them are quarantined, because we
   # don't know which one did it.
   #
-  # @param error [ExternalCommand::SyscallError] The error from bin/archive.
-  # @param archives [Array<(Danbooru::Archive, String)>] The archives bin/archive was reading, with their filenames.
+  # @param error [MediaFile::Archive::InvalidArchiveError] The error from libexec/archive. Nothing is done unless it was caused
+  #   by a blocked syscall.
+  # @param archives [Array<(MediaFile::Archive, String)>] The archives libexec/archive was reading, with their filenames.
   # @param action [String] What the user was doing, like "Upload #123".
   def handle_blocked_archives(error, archives, action:)
     archives.each do |archive, filename|
-      MediaAsset.handle_blocked_file(error, media_file: MediaFile.new(archive.file), user: uploader, action:, source: "file://#{filename}")
+      MediaAsset.handle_blocked_file(error, media_file: archive, user: uploader, action:, source: "file://#{filename}")
     end
   end
 
   # The list of archive files uploaded from disk, with their filenames.
   def archive_files
     uploaded_files.select do |file, _original_filename|
-      file.is_a?(Danbooru::Archive)
+      file.is_a?(MediaFile::Archive)
     end
   end
 

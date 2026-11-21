@@ -145,6 +145,12 @@ jobs:
         #     *)      bin/rails test "test/$TEST_SUITE" ;;
         #   esac
 
+      - name: Run media_file tests
+        if: ${{ !cancelled() && (inputs.test_suite || 'all') == 'all' }}
+        working-directory: lib/media-file
+        run: |
+          bin/rake test
+
       # https://github.com/marketplace/actions/codecov
       - name: Upload coverage reports to Codecov
         if: ${{ !cancelled() }}

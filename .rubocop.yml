@@ -36,6 +36,8 @@ AllCops:
     - "bin/rdbg"
     - "lib/dtext_rb/bin/bundle"
     - "lib/dtext_rb/bin/rake"
+    - "lib/media-file/bin/bundle"
+    - "lib/media-file/bin/rake"
 
 Bundler/OrderedGems:
   Enabled: false

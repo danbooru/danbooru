@@ -325,6 +325,9 @@ RUN <<EOS
 EOS
 
 COPY --link Gemfile Gemfile.lock ./
+# Bundler needs the gemspec of lib/media-file to install the app's gems.
+COPY --link lib/media-file/media_file.gemspec lib/media-file/
+COPY --link lib/media-file/lib/media_file/version.rb lib/media-file/lib/media_file/
 
 ARG JOBS
 RUN <<EOS
@@ -379,9 +382,6 @@ ENV MALLOC_CONF=background_thread:true,narenas:2,dirty_decay_ms:1000,muzzy_decay
 
 # https://github.com/ruby/ruby/blob/master/doc/yjit/yjit.md
 ENV RUBY_YJIT_ENABLE=1
-
-# Disable libvips warning messages
-ENV VIPS_WARNING=0
 
 # https://github.com/shopify/bootsnap#environment-variables
 ENV BOOTSNAP_CACHE_DIR=/home/danbooru/bootsnap

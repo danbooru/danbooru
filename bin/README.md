@@ -9,7 +9,6 @@ These scripts are specific to this project.
 
 | Script | Description |
 |--------|-------------|
-| `archive` | Read, extract, and create archive files. Run in the upload sandbox by `Danbooru::Archive` and `MediaFile::Ugoira`. |
 | `build-docker-image` | Build a Docker image from the current Git commit. |
 | `danbooru-dev-entrypoint` | Entrypoint for containers started with `bin/dev` / `docker-compose.dev.yaml`. |
 | `dev` | Shortcut for `docker compose -f docker-compose.dev.yaml`. |
@@ -19,8 +18,7 @@ These scripts are specific to this project.
 | `generate-source-tests` | Generate skeleton parsing and extracting tests for a URL strategy. |
 | `github-print-test-results` | Parse JUnit test output and print GitHub workflow annotations and a summary. |
 | `media-bench` | Measure how long it takes to process media files like an upload does. |
-| `media-conv` | Convert media files using Danbooru's media conversion logic. |
-| `media-ls` | List properties of media files (like `ls`, but using Danbooru's media file logic). |
+| `media-cli` | Read, validate, and convert images, videos, and ugoiras. Runs `lib/media-file/bin/media-cli`. |
 | `setup` | Install Docker and Git, clone the repo, and initialize config files for a fresh install. |
 | `test-sources` | Run all of a specific site's parsing & extractor tests. |
 | `update` | Update Ruby gems and npm packages and run pending migrations. |

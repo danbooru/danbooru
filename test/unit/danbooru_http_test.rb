@@ -446,7 +446,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "delete the temp file if the download fails" do
-        file = Danbooru::Tempfile.new
+        file = MediaFile::Tempfile.new
         path = file.path
 
         assert_raises(Danbooru::Http::FileTooLargeError) do
@@ -465,7 +465,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "delete the temp file if the server returns an error" do
-        file = Danbooru::Tempfile.new
+        file = MediaFile::Tempfile.new
         path = file.path
 
         assert_raises(Danbooru::Http::DownloadError) do
