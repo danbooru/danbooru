@@ -24,6 +24,10 @@ class BulkUpdateRequest::Command::Nuke < BulkUpdateRequest::Command
     query.tag_names
   end
 
+  def edited_pools
+    [affected_pool].compact
+  end
+
   def process!(**)
     if query.is_simple_tag?
       TagImplication.active.where(consequent_name: @tag_or_pool).find_each(&:reject!)

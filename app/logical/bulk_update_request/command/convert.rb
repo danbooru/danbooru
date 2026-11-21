@@ -24,6 +24,15 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     @to_query ||= PostQuery.normalize(@consequent)
   end
 
+  def searched_pools
+    from_query.is_single_pool? ? [pool].compact : []
+  end
+
+  # Converting a pool deletes it, after its posts are updated.
+  def edited_pools
+    searched_pools
+  end
+
   def approval_level(tags: nil) # rubocop:disable Lint/UnusedMethodArgument
     return User::Levels::MODERATOR if from_query.is_single_favgroup?
     User::Levels::ADMIN

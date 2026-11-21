@@ -150,7 +150,13 @@ class BulkUpdateRequest < ApplicationRecord
   def validate_approval
     # The approval checks look at the tags' current state, but an approved BUR that hasn't been processed yet can still
     # change it (e.g. `imply a -> b` before `alias a -> big_tag`).
-    processing_bur = BulkUpdateRequest.where(status: "processing").where.not(id: id).where_array_includes_any(:tags, tags).first
+    processing_burs = BulkUpdateRequest.where(status: "processing").where.not(id: id)
+    processing_bur = processing_burs.where_array_includes_any(:tags, tags).first
+
+    # A processing BUR could also add posts to a pool this BUR searches, sneaking them into this BUR. Pools aren't stored
+    # on the BUR, so check them against each processing BUR. Few BURs are processing at once.
+    pools = processor.affected_pools
+    processing_bur ||= processing_burs.find { |bur| bur.processor.affected_pools.intersect?(pools) } if pools.present?
 
     if processing_bur.present?
       errors.add(:base, "Can't approve this request while BUR ##{processing_bur.id} is still being processed")

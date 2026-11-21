@@ -15,6 +15,7 @@ class BulkUpdateRequest::Processor
   delegate :script, :forum_topic, :approver, to: :bulk_update_request
   validate :validate_script_length
   validate :validate_duplicate_lines
+  validate :validate_edited_pools
   validate :validate_script
 
   # @param bulk_update_request [BulkUpdateRequest] the BUR
@@ -68,6 +69,25 @@ class BulkUpdateRequest::Processor
     throw :abort if errors.present?
   end
 
+  # A line can't search a pool changed by an earlier line, or the earlier line could sneak posts into it. For example,
+  # `update tag -> pool:123` followed by `update pool:123 -> foo` would add `foo` to every post with `tag`, not just the
+  # posts the approver saw in the pool. Searching a pool in several lines, or before the line that changes it, is fine.
+  def validate_edited_pools
+    edited_pools = []
+
+    commands.each do |command|
+      (command.searched_pools & edited_pools).each do |pool|
+        errors.add(:base, "Can't use {{pool:#{pool.name}}} after an earlier line changes it (move this line before the change, or split it into separate requests)")
+      end
+
+      (command.edited_pools & edited_pools).each do |pool|
+        errors.add(:base, "Can't change {{pool:#{pool.name}}} in more than one line (split it into separate requests)")
+      end
+
+      edited_pools += command.edited_pools
+    end
+  end
+
   # Schedule the bulk update request to be processed later, in the background.
   def process_later!
     ProcessBulkUpdateRequestJob.perform_later(bulk_update_request)
@@ -101,6 +121,12 @@ class BulkUpdateRequest::Processor
   # @return [Array<String>] the list of tags
   def affected_tags
     commands.flat_map(&:affected_tags).sort.uniq
+  end
+
+  # The pools searched or changed by the script. Used to avoid approving BURs that touch the same pool at the same time.
+  # @return [Array<Pool>] the list of pools
+  def affected_pools
+    commands.flat_map { |command| command.searched_pools + command.edited_pools }.uniq
   end
 
   # Convert the BUR to DText format.

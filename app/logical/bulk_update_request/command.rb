@@ -8,6 +8,8 @@
 # * `validate(context:, errors:)` — adds validation errors to `errors`
 # * `to_dtext` — returns a dtext string representation of the command
 # * `affected_tags` — returns an array of tag names touched by this command
+# * `searched_pools` (optional) — returns an array of pools whose posts are searched by this command
+# * `edited_pools` (optional) — returns an array of pools changed by this command
 # * `process!(**opts)` — executes the command
 #
 # The `self.parse` factory method tries each subclass regex against a raw script line
@@ -55,6 +57,16 @@ class BulkUpdateRequest::Command
   # @return [Array<String>] the names of all tags affected by this command
   def affected_tags
     raise NotImplementedError
+  end
+
+  # @return [Array<Pool>] the pools whose posts are searched by this command
+  def searched_pools
+    []
+  end
+
+  # @return [Array<Pool>] the pools changed by this command
+  def edited_pools
+    []
   end
 
   # @param tags [Array<Tag>, nil] preloaded tags to look up instead of querying individually. Used to filter for approvable BURs by the controller without hitting n+1 issues.

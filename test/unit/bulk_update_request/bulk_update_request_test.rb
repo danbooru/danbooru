@@ -81,6 +81,46 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
       end
 
+      context "while another BUR with the same pool is still processing" do
+        setup do
+          @pool = create(:pool, name: "cute_pool")
+          @other_pool = create(:pool, name: "other_pool")
+        end
+
+        should "not allow approving a BUR that searches a pool another BUR searches" do
+          processing = create(:bulk_update_request, script: "update pool:cute_pool -> foo")
+          processing.approve!(@admin)
+          bur = create(:bulk_update_request, script: "convert pool:#{@pool.id} -> cute")
+
+          bur.approve!(@admin)
+
+          assert_includes(bur.errors.full_messages, "Can't approve this request while BUR ##{processing.id} is still being processed")
+          assert_equal("pending", bur.reload.status)
+        end
+
+        should "not allow approving a BUR that searches a pool another BUR adds posts to" do
+          processing = create(:bulk_update_request, script: "update bar -> pool:cute_pool")
+          processing.approve!(@admin)
+          bur = create(:bulk_update_request, script: "update pool:cute_pool -> foo")
+
+          bur.approve!(@admin)
+
+          assert_includes(bur.errors.full_messages, "Can't approve this request while BUR ##{processing.id} is still being processed")
+          assert_equal("pending", bur.reload.status)
+        end
+
+        should "allow approving a BUR that uses a different pool" do
+          processing = create(:bulk_update_request, script: "update pool:other_pool -> foo")
+          processing.approve!(@admin)
+          bur = create(:bulk_update_request, script: "update pool:cute_pool -> baz")
+
+          bur.approve!(@admin)
+
+          assert_equal([], bur.errors.full_messages)
+          assert_equal("processing", bur.reload.status)
+        end
+      end
+
       context "that has both implications and unimplications" do
         should "process them sequentially" do
           @bur = create_bur!("imply foo -> bar\nunimply foo -> bar", @admin)
@@ -153,6 +193,53 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
             script: @script,
             errors: ["Invalid line: create alias bbb > 111"],
           )
+        end
+      end
+
+      context "a script that searches a pool after an earlier line changes it" do
+        should "fail" do
+          pool = create(:pool, name: "cute_pool")
+
+          assert_invalid_bur(
+            script: "update bar -> pool:#{pool.id}\nupdate pool:cute_pool -> foo",
+            errors: ["Can't use {{pool:cute_pool}} after an earlier line changes it (move this line before the change, or split it into separate requests)"],
+          )
+          assert_invalid_bur(
+            script: "convert pool:cute_pool -> cute\nupdate pool:#{pool.id} -> foo",
+            errors: ["Can't use {{pool:cute_pool}} after an earlier line changes it (move this line before the change, or split it into separate requests)"],
+          )
+        end
+      end
+
+      context "a script that changes the same pool in more than one line" do
+        should "fail" do
+          create(:pool, name: "cute_pool")
+
+          assert_invalid_bur(
+            script: "update bar -> pool:cute_pool\nupdate baz -> -pool:cute_pool",
+            errors: ["Can't change {{pool:cute_pool}} in more than one line (split it into separate requests)"],
+          )
+        end
+      end
+
+      context "a script that searches a pool before changing it, or in more than one line" do
+        should "validate" do
+          pool = create(:pool, name: "cute_pool")
+
+          assert_equal(true, build(:bulk_update_request, script: "update pool:cute_pool -> foo\nconvert pool:#{pool.id} -> cute").valid?)
+          assert_equal(true, build(:bulk_update_request, script: "update pool:cute_pool -> foo\nnuke pool:cute_pool").valid?)
+          assert_equal(true, build(:bulk_update_request, script: "update pool:cute_pool -> foo\nupdate pool:#{pool.id} bar -> baz").valid?)
+        end
+
+        should "process a search of a pool followed by converting it" do
+          post = create(:post, tag_string: "bar")
+          pool = create(:pool, name: "cute_pool", post_ids: [post.id])
+
+          bur = create_bur!("update pool:cute_pool -> foo\nconvert pool:#{pool.id} -> cute", @admin)
+
+          assert_equal("approved", bur.reload.status)
+          assert_equal("bar cute foo", post.reload.tag_string)
+          assert_equal(true, pool.reload.is_deleted?)
         end
       end
 
