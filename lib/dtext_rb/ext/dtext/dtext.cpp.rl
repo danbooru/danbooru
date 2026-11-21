@@ -119,7 +119,7 @@ action media_embeds_enabled { options.f_media_embeds }
 action in_quote { dstack_is_open(BLOCK_QUOTE) }
 action in_expand { dstack_is_open(BLOCK_EXPAND) }
 action in_spoiler { dstack_is_open(BLOCK_SPOILER) }
-action below_max_depth { dstack.size() < MAX_NESTING_DEPTH }
+action below_max_depth { parent_depth + dstack.size() < MAX_NESTING_DEPTH }
 action is_allowed_emoji { is_allowed_emoji({ f1, f2 + 1 }) }
 action save_tag_attribute { tag_attributes[{ a1, a2 }] = { b1, b2 }; }
 
@@ -1619,6 +1619,7 @@ StateMachine::StateMachine(const auto string, int initial_state, const DTextOpti
 
 std::string StateMachine::parse_basic_inline(const std::string_view dtext) {
   StateMachine sm(dtext, dtext_en_basic_inline, options);
+  sm.parent_depth = parent_depth + dstack.size();
   return sm.parse();
 }
 

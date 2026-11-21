@@ -866,6 +866,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           end
         end
 
+        should "render a post whose artist commentary has deeply nested DText" do
+          @post.artist_commentary.update!(original_description: %{#{"[expand]\n" * 100}#{"*" * 100} "#{"[b]" * 100}x":[http://example.com]})
+          get post_path(@post)
+
+          assert_response :success
+        end
+
         should "render for an anonymous user" do
           get post_path(@post)
 

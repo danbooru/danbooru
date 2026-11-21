@@ -148,6 +148,9 @@ public:
   bool header_mode = false;
   TagAttributes tag_attributes;
 
+  // When parsing a link title, the nesting depth of the link, so tags in the title count towards the same limit.
+  size_t parent_depth = 0;
+
   std::string input;
   std::string output;
   std::vector<int> stack;

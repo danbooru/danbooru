@@ -39,6 +39,7 @@ class DTextTest < ActiveSupport::TestCase
       should "parse the most deeply nested HTML that DText can produce" do
         assert_nothing_raised { format_text("#{"[expand]" * 200}\n#{"*" * 200} a") }
         assert_nothing_raised { DText.new("#{"[quote]" * 200}\n#{"*" * 200} #{"[b]" * 200}a").excerpt }
+        assert_nothing_raised { format_text(%{#{"[expand]" * 200}\n#{"*" * 200} "#{"[b]" * 200}a":[http://example.com]}) }
       end
 
       should "raise an error for HTML nested more deeply than DText can produce" do

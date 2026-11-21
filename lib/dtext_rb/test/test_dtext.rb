@@ -613,6 +613,12 @@ class DTextTest < Minitest::Test
     assert_parse("#{"<details><summary>Show</summary><div>" * 100}<p>#{"[expand]" * 50}x</p>#{"</div></details>" * 100}", "#{"[expand]" * 150}x")
     assert_parse(%{<table class="striped">#{"<tr>" * 99}#{"</tr>" * 99}</table>}, "[table]#{"[tr]" * 150}x")
 
+    # Tags in link titles count towards the same limit as the tags around the link.
+    link = '<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">'
+    assert_parse("<p>#{"<strong>" * 99}#{link}[i]x[/i]</a>#{"</strong>" * 99}</p>", %{#{"[b]" * 99}"[i]x[/i]":[http://example.com]})
+    assert_parse("<p>#{"<strong>" * 98}#{link}<em>[u]x</em></a>#{"</strong>" * 98}</p>", %{#{"[b]" * 98}"[i][u]x":[http://example.com]})
+    assert_parse("<p>#{"<strong>" * 99}#{link}[i]x[/i]</a>#{"</strong>" * 99}</p>", "#{"[b]" * 99}[url=http://example.com][i]x[/i][/url]")
+
     # Tags nested less than 100 levels deep still work.
     assert_parse("<p>#{"<strong>" * 50}x#{"</strong>" * 50}</p>", "#{"[b]" * 50}x#{"[/b]" * 50}")
     assert_parse("#{"<blockquote>" * 50}<p>x</p>#{"</blockquote>" * 50}", "#{"[quote]" * 50}x#{"[/quote]" * 50}")
