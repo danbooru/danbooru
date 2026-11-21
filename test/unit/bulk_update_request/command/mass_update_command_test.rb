@@ -30,7 +30,7 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
         )
         assert_invalid_bur(
           script: "update xyz -> newfavgroup:xyz",
-          errors: ["Can't mass update [[xyz]] -> [[newfavgroup:xyz]] ('newfavgroup:' metatag is not allowed)"],
+          errors: ["Can't mass update [[xyz]] -> {{newfavgroup:xyz}} ('newfavgroup:' metatag is not allowed)"],
         )
         assert_invalid_bur(
           script: "update xyz -> status:banned",
@@ -81,15 +81,15 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
         )
         assert_invalid_bur(
           script: 'update xyz -> newpool:"foo',
-          errors: ["Can't mass update [[xyz]] -> [[newpool:\"foo]] ('newpool:' metatag has an unclosed quote)"],
+          errors: ["Can't mass update [[xyz]] -> {{newpool:\"foo}} ('newpool:' metatag has an unclosed quote)"],
         )
         assert_invalid_bur(
           script: 'update xyz -> newfavgroup:"foo',
-          errors: ["Can't mass update [[xyz]] -> [[newfavgroup:\"foo]] ('newfavgroup:' metatag has an unclosed quote)"],
+          errors: ["Can't mass update [[xyz]] -> {{newfavgroup:\"foo}} ('newfavgroup:' metatag has an unclosed quote)"],
         )
         assert_invalid_bur(
           script: 'update xyz -> char:"foo',
-          errors: ["Can't mass update [[xyz]] -> [[char:\"foo]] ('char:' metatag has an unclosed quote)"],
+          errors: ["Can't mass update [[xyz]] -> {{char:\"foo}} ('char:' metatag has an unclosed quote)"],
         )
       end
 

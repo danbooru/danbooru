@@ -154,7 +154,10 @@ class PostQuery
 
   # True if this search consists only of a single non-negated tag, with no other metatags or operators.
   def is_simple_tag?
-    ast.tag?
+    return false unless ast.tag?
+
+    prefix, colon = ast.name.partition(":")
+    !(colon.present? && prefix.in?(PostEdit::METATAGS))
   end
 
   # True if the search contains a single tag. It may have other metatags or wildcards, and the tag may be negated.

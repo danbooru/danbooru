@@ -42,12 +42,17 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   end
 
   def validate(errors:, **)
-    prefix, unprefixed_name = @consequent.split(":", 2)
-
-    if !((from_query.is_single_pool? || from_query.is_single_favgroup?) && to_query.is_simple_tag?)
+    if !(from_query.is_single_pool? || from_query.is_single_favgroup?)
       errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (must convert a pool or favgroup to a tag)")
-    elsif unprefixed_name.present? && TagCategory.mapping.key?(prefix)
+      return
+    end
+
+    prefix, unprefixed_name = @consequent.downcase.split(":", 2)
+
+    if to_query.ast.tag? && unprefixed_name.present? && TagCategory.mapping.key?(prefix)
       errors.add(:base, "Can't #{to_dtext} (change the category in a separate line)")
+    elsif !to_query.is_simple_tag?
+      errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (must convert a pool or favgroup to a tag)")
     elsif from_query.pool.nil? && from_query.favgroup.nil?
       errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
     end

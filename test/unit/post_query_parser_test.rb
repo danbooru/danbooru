@@ -533,5 +533,21 @@ class PostQueryParserTest < ActiveSupport::TestCase
         assert_equal("none", to_infix("("))
       end
     end
+
+    context "#is_simple_tag?" do
+      should "return true for plain tags and false for search or post-edit metatags" do
+        assert_equal(true, PostQuery.normalize("1girl").is_simple_tag?)
+        assert_equal(true, PostQuery.normalize("re:zero").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("rating:g").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("pool:123").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("newpool:foo").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("newfavgroup:foo").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("newfavgroup:").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("char:chen").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("copy:touhou").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("-1girl").is_simple_tag?)
+        assert_equal(false, PostQuery.normalize("1girl 1boy").is_simple_tag?)
+      end
+    end
   end
 end
