@@ -19,6 +19,38 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
         )
       end
 
+      should "not allow disallowed metatags in mass update destinations" do
+        assert_invalid_bur(
+          script: "update xyz -> favgroup:xyz",
+          errors: ["Can't mass update [[xyz]] -> {{favgroup:xyz}} ('favgroup:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> -favgroup:xyz",
+          errors: ["Can't mass update [[xyz]] -> {{-favgroup:xyz}} ('-favgroup:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> newfavgroup:xyz",
+          errors: ["Can't mass update [[xyz]] -> [[newfavgroup:xyz]] ('newfavgroup:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> status:banned",
+          errors: ["Can't mass update [[xyz]] -> {{status:banned}} ('status:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> score:5",
+          errors: ["Can't mass update [[xyz]] -> {{score:5}} ('score:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> -rating:s",
+          errors: ["Can't mass update [[xyz]] -> {{-rating:s}} ('-rating:' metatag is not allowed)"],
+        )
+      end
+
+      should "allow safe post-edit metatags and regular tags with colons in mass update destinations" do
+        assert_equal(true, build(:bulk_update_request, script: "update xyz -> rating:s source:https://example.com pool:foo -pool:bar newpool:baz parent:1 -parent:2 child:3 -child:4 char:a -char:b re:zero").valid?)
+        assert_equal(true, build(:bulk_update_request, script: "update favgroup:xyz -> foo").valid?)
+      end
+
       should "render simple tags as wiki links in dtext" do
         @bur = build(:bulk_update_request, script: "mass update bunny_ears -> rabbit_ears")
         create(:tag_alias, consequent_name: "bunny_ears", antecedent_name: "rabbit_ears")

@@ -3,6 +3,8 @@
 # Applies a tag edit to all posts matching a search query.
 # The left-hand side is a post search and the right-hand side is a string that will be added to that post's tag string.
 class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
+  ALLOWED_METATAGS = %w[parent -parent child -child rating source pool -pool newpool] + TagCategory.categories
+
   def self.regex
     /\A(?:mass update|update) (?<first_search>.+?) -> (?<second_search>.*)\z/i
   end
@@ -51,6 +53,10 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     if from_query.is_null_search?
       errors.add(:base, "Can't mass update {{#{@first_search}}} -> {{#{@second_search}}} (the search {{#{@first_search}}} has a syntax error)")
     end
+
+    disallowed_metatags.each do |metatag|
+      errors.add(:base, "Can't #{to_dtext} ('#{metatag}:' metatag is not allowed)")
+    end
   end
 
   def self.mass_update(antecedent, consequent, user: User.system)
@@ -62,5 +68,19 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
         end
       end
     end
+  end
+
+  private
+
+  def disallowed_metatags
+    edit = tag_edit
+
+    metatags = edit.metatag_terms.map(&:name).reject { |name| name.in?(ALLOWED_METATAGS) }
+    metatags += edit.tag_terms.select { |tag| Tag.new(name: tag.name).metatag? }.map do |tag|
+      prefix = tag.name.split(":", 2).first
+      tag.negated ? "-#{prefix}" : prefix
+    end
+
+    metatags.uniq
   end
 end
