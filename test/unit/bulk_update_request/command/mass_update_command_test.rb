@@ -44,6 +44,53 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
           script: "update xyz -> -rating:s",
           errors: ["Can't mass update [[xyz]] -> {{-rating:s}} ('-rating:' metatag is not allowed)"],
         )
+        assert_invalid_bur(
+          script: "update xyz -> -newpool:xyz",
+          errors: ["Can't mass update [[xyz]] -> {{-newpool:xyz}} ('-newpool:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> -newfavgroup:xyz",
+          errors: ["Can't mass update [[xyz]] -> {{-newfavgroup:xyz}} ('-newfavgroup:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> -char:",
+          errors: ["Can't mass update [[xyz]] -> {{-char:}} ('-char:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> -char:newfavgroup:xyz",
+          errors: ["Can't mass update [[xyz]] -> {{-char:newfavgroup:xyz}} ('-newfavgroup:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> -char:pool:xyz",
+          errors: ["Can't mass update [[xyz]] -> {{-char:pool:xyz}} ('-pool:' metatag is not allowed)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> --pool:xyz",
+          errors: ["Can't mass update [[xyz]] -> {{--pool:xyz}} ('--pool:' metatag is not allowed)"],
+        )
+      end
+
+      should "not allow unclosed quotes on metatags in mass update destinations" do
+        assert_invalid_bur(
+          script: 'update xyz -> pool:"foo',
+          errors: ["Can't mass update [[xyz]] -> {{pool:\"foo}} ('pool:' metatag has an unclosed quote)"],
+        )
+        assert_invalid_bur(
+          script: 'update xyz -> -pool:"foo',
+          errors: ["Can't mass update [[xyz]] -> {{-pool:\"foo}} ('-pool:' metatag has an unclosed quote)"],
+        )
+        assert_invalid_bur(
+          script: 'update xyz -> newpool:"foo',
+          errors: ["Can't mass update [[xyz]] -> [[newpool:\"foo]] ('newpool:' metatag has an unclosed quote)"],
+        )
+        assert_invalid_bur(
+          script: 'update xyz -> newfavgroup:"foo',
+          errors: ["Can't mass update [[xyz]] -> [[newfavgroup:\"foo]] ('newfavgroup:' metatag has an unclosed quote)"],
+        )
+        assert_invalid_bur(
+          script: 'update xyz -> char:"foo',
+          errors: ["Can't mass update [[xyz]] -> [[char:\"foo]] ('char:' metatag has an unclosed quote)"],
+        )
       end
 
       should "allow safe post-edit metatags and regular tags with colons in mass update destinations" do

@@ -19,7 +19,7 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
   end
 
   def tag_edit
-    PostEdit.new(nil, "", "", @second_search)
+    @tag_edit ||= PostEdit.new(nil, "", "", @second_search)
   end
 
   def affected_tags
@@ -57,6 +57,10 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     disallowed_metatags.each do |metatag|
       errors.add(:base, "Can't #{to_dtext} ('#{metatag}:' metatag is not allowed)")
     end
+
+    tag_edit.unclosed_metatags.each do |metatag|
+      errors.add(:base, "Can't #{to_dtext} ('#{metatag}:' metatag has an unclosed quote)")
+    end
   end
 
   def self.mass_update(antecedent, consequent, user: User.system)
@@ -73,14 +77,7 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
   private
 
   def disallowed_metatags
-    edit = tag_edit
-
-    metatags = edit.metatag_terms.map(&:name).reject { |name| name.in?(ALLOWED_METATAGS) }
-    metatags += edit.tag_terms.select { |tag| Tag.new(name: tag.name).metatag? }.map do |tag|
-      prefix = tag.name.split(":", 2).first
-      tag.negated ? "-#{prefix}" : prefix
-    end
-
-    metatags.uniq
+    metatags = tag_edit.metatag_terms.map(&:name).reject { |name| name.in?(ALLOWED_METATAGS) }
+    (metatags + tag_edit.invalid_metatags).uniq
   end
 end

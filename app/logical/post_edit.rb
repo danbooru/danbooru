@@ -116,6 +116,28 @@ class PostEdit
     def deprecated_added_tag_names
       ::Tag.deprecated.where(name: user_added_tag_names).map(&:name)
     end
+
+    # @return [Array<String>] Metatags in the edit that aren't valid edit metatags (e.g. `score:5`, `-rating:s`, `-newpool:foo`).
+    def invalid_metatags
+      tag_terms.filter_map do |tag|
+        prefix, colon, value = tag.name.partition(":")
+        next unless colon.present? && (prefix.in?(METATAGS) || prefix.in?(PostQueryBuilder::METATAGS))
+
+        name = tag.negated ? "-#{prefix}" : prefix
+        name unless name.in?(METATAGS) && value.start_with?('"', "'")
+      end.uniq
+    end
+
+    # @return [Array<String>] Valid edit metatags in the edit that failed to parse because of an unclosed quote (e.g. `pool:"foo`).
+    def unclosed_metatags
+      tag_terms.filter_map do |tag|
+        prefix, colon, value = tag.name.partition(":")
+        next unless colon.present? && value.start_with?('"', "'")
+
+        name = tag.negated ? "-#{prefix}" : prefix
+        name if name.in?(METATAGS)
+      end.uniq
+    end
   end
 
   concerning :ParserMethods do
@@ -165,5 +187,5 @@ class PostEdit
     end
   end
 
-  memoize :tag_names, :new_tag_names, :user_added_tag_names, :user_removed_tag_names, :invalid_added_tags, :deprecated_added_tag_names, :terms, :tag_terms, :metatag_terms
+  memoize :tag_names, :new_tag_names, :user_added_tag_names, :user_removed_tag_names, :invalid_added_tags, :deprecated_added_tag_names, :invalid_metatags, :unclosed_metatags, :terms, :tag_terms, :metatag_terms
 end
