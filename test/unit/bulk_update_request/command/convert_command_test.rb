@@ -12,61 +12,70 @@ class ConvertCommandTest < ActiveSupport::TestCase
 
   context "the convert command" do
     context "on creation" do
-      should "refuse to convert a tag without wiki to a new pool" do
-        @post = create(:post, tag_string: "bar cute")
-        @wiki = create(:wiki_page, title: "cute_pool", body: "", is_deleted: true)
+      should "refuse to convert to a pool or favgroup" do
+        @pool = create(:pool, name: "cute_pool", description: "asd")
+        @favgroup = create(:favorite_group)
 
         assert_invalid_bur(
           script: "convert cute -> pool:cute_pool",
-          errors: ["Can't convert [[cute]] -> {{pool:cute_pool}} (either the tag or the pool must have a description)"],
+          errors: ["Can't convert {{cute}} -> {{pool:cute_pool}} (must convert a pool or favgroup to a tag)"],
         )
-      end
-
-      should "refuse to convert a pool to another pool" do
-        @pool = create(:pool, name: "cute_pool", description: "asd")
         assert_invalid_bur(
           script: "convert pool:cute_pool -> pool:cute_pool2",
-          errors: ["Can't convert {{pool:cute_pool}} -> {{pool:cute_pool2}} (convert takes exactly one pool and one tag)"],
+          errors: ["Can't convert {{pool:cute_pool}} -> {{pool:cute_pool2}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> pool:cute_pool",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> {{pool:cute_pool}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert tag1 -> favgroup:#{@favgroup.id}",
+          errors: ["Can't convert {{tag1}} -> {{favgroup:#{@favgroup.id}}} (must convert a pool or favgroup to a tag)"],
         )
       end
 
       should "refuse to convert a tag to another tag" do
         assert_invalid_bur(
           script: "convert tag1 -> tag2",
-          errors: ["Can't convert {{tag1}} -> {{tag2}} (convert takes exactly one pool and one tag)"],
+          errors: ["Can't convert {{tag1}} -> {{tag2}} (must convert a pool or favgroup to a tag)"],
         )
       end
 
-      should "refuse to accept too many arguments on the right side" do
+      should "refuse to accept too many arguments" do
         assert_invalid_bur(
-          script: "convert tag1 -> tag2 pool:1",
-          errors: ["Can't convert {{tag1}} -> {{tag2 pool:1}} (convert takes exactly one pool and one tag)"],
+          script: "convert pool:1 -> tag2 pool:2",
+          errors: ["Can't convert {{pool:1}} -> {{tag2 pool:2}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert tag1 pool:1 -> tag2",
+          errors: ["Can't convert {{tag1 pool:1}} -> {{tag2}} (must convert a pool or favgroup to a tag)"],
         )
       end
 
-      should "refuse to convert a pool to a tag with a category prefix" do
+      should "refuse to convert to a tag with a category prefix" do
         @pool = create(:pool, name: "cute_pool", description: "asd")
+        @favgroup = create(:favorite_group)
 
         assert_invalid_bur(
           script: "convert pool:cute_pool -> copy:cute_series",
           errors: ["Can't convert {{pool:cute_pool}} -> [[copy:cute_series]] (change the category in a separate line)"],
         )
-      end
-
-      should "refuse to convert a tag with a category prefix to a pool" do
-        @pool = create(:pool, name: "cute_pool", description: "asd")
-        create(:tag, name: "cute_series")
-
         assert_invalid_bur(
-          script: "convert copy:cute_series -> pool:cute_pool",
-          errors: ["Can't convert [[copy:cute_series]] -> {{pool:cute_pool}} (change the category in a separate line)"],
+          script: "convert favgroup:#{@favgroup.id} -> copy:cute_series",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[copy:cute_series]] (change the category in a separate line)"],
         )
       end
 
-      should "refuse to accept too many arguments on the left side" do
+      should "refuse to convert a nonexistent or private favgroup" do
+        favgroup = create(:private_favorite_group)
+
         assert_invalid_bur(
-          script: "convert tag1 pool:1 -> tag2",
-          errors: ["Can't convert {{tag1 pool:1}} -> {{tag2}} (convert takes exactly one pool and one tag)"],
+          script: "convert favgroup:999999 -> cute",
+          errors: ["Can't convert {{favgroup:999999}} -> [[cute]] ({{favgroup:999999}} does not exist)"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{favgroup.id} -> cute",
+          errors: ["Can't convert {{favgroup:#{favgroup.id}}} -> [[cute]] ({{favgroup:#{favgroup.id}}} does not exist)"],
         )
       end
     end
@@ -115,33 +124,25 @@ class ConvertCommandTest < ActiveSupport::TestCase
         assert_equal("This pool has been moved to [[cute]].", @pool.description)
       end
 
-      should "convert a tag to a new pool" do
-        description = "foo [[aaa]] bar"
-        @post = create(:post, tag_string: "bar cute")
-        @wiki = create(:wiki_page, title: "cute", body: description)
+      should "allow moderators to convert a favgroup to a tag" do
+        mod = create(:mod_user)
+        post = create(:post, tag_string: "bar")
+        favgroup = create(:favorite_group, post_ids: [post.id])
 
-        @bur = create_bur!("convert cute -> pool:cute_pool", @admin)
+        create_bur!("convert favgroup:#{favgroup.id} -> cute", mod)
 
-        pool = Pool.find_by_name("cute_pool")
-        assert_equal(description, pool.description)
-        assert_equal("bar", @post.reload.tag_string)
-        assert_equal([@post.id], pool.post_ids)
-        assert_equal("This tag has been moved to {{pool:cute_pool}}.", @wiki.reload.body)
+        assert_equal("bar cute", post.reload.tag_string)
+        assert_equal([post.id], favgroup.reload.post_ids)
       end
 
-      should "convert a tag to an existing pool" do
-        @post = create(:post, tag_string: "bar cute")
-        @wiki = create(:wiki_page, title: "cute", body: "a b c")
-        other_post = create(:post)
-        @pool = create(:pool, name: "cute_pool", description: "d e f", is_deleted: true, post_ids: [other_post.id])
+      should "not allow moderators to approve pool conversions" do
+        mod = create(:mod_user)
+        create(:pool, name: "cute_pool", description: "asd")
 
-        @bur = create_bur!("convert cute -> pool:cute_pool", @admin)
-
-        assert_equal("d e f", @pool.reload.description)
-        assert_equal(false, @pool.is_deleted?)
-        assert_equal("bar", @post.reload.tag_string)
-        assert_equal([other_post.id, @post.id], @pool.post_ids)
-        assert_equal("This tag has been moved to {{pool:cute_pool}}.", @wiki.reload.body)
+        bur = create(:bulk_update_request, script: "convert pool:cute_pool -> cute")
+        bur.approve!(mod)
+        assert_includes(bur.errors.full_messages, "Can't approve convert {{pool:cute_pool}} -> [[cute]] (requires Admin)")
+        assert_equal("pending", bur.reload.status)
       end
     end
   end

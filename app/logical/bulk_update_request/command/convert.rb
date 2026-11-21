@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Converts a tag to a pool, or a pool to a tag.
+# Converts a pool or favorite group to a tag.
 class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   def self.regex
     /\Aconvert (?<antecedent>.+?) -> (?<consequent>.*)\z/i
@@ -9,16 +9,11 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   def initialize(params)
     @antecedent = params[:antecedent]
     @consequent = params[:consequent]
-
-    if tag_to_pool?
-      @antecedent = Tag.normalize_name(@antecedent)
-    elsif pool_to_tag?
-      @consequent = Tag.normalize_name(@consequent)
-    end
+    @consequent = Tag.normalize_name(@consequent) if to_query.is_simple_tag?
   end
 
   def affected_tags
-    from_query.tag_names + to_query.tag_names
+    to_query.tag_names
   end
 
   def from_query
@@ -29,74 +24,42 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     @to_query ||= PostQuery.normalize(@consequent)
   end
 
-  def tag_to_pool?
-    from_query.is_simple_tag? && to_query.is_single_pool?
-  end
-
-  def pool_to_tag?
-    from_query.is_single_pool? && to_query.is_simple_tag?
+  def approval_level(tags: nil) # rubocop:disable Lint/UnusedMethodArgument
+    return User::Levels::MODERATOR if from_query.is_single_favgroup?
+    User::Levels::ADMIN
   end
 
   def process!(**)
-    if tag_to_pool?
-      convert_tag_to_pool
-    elsif pool_to_tag?
+    if from_query.is_single_pool?
       convert_pool_to_tag
+    elsif from_query.is_single_favgroup?
+      BulkUpdateRequest::Command::MassUpdate.mass_update(from_query, to_query)
     end
   end
 
   def to_dtext
-    if tag_to_pool?
-      "convert [[#{@antecedent}]] -> {{#{@consequent}}}"
-    elsif pool_to_tag?
-      "convert {{#{@antecedent}}} -> [[#{@consequent}]]"
-    end
+    "convert {{#{@antecedent}}} -> [[#{@consequent}]]"
   end
 
   def validate(errors:, **)
-    prefix, unprefixed_name = (tag_to_pool? ? @antecedent : @consequent).split(":", 2)
+    prefix, unprefixed_name = @consequent.split(":", 2)
 
-    if (tag_to_pool? || pool_to_tag?) && unprefixed_name.present? && TagCategory.mapping.key?(prefix)
+    if !((from_query.is_single_pool? || from_query.is_single_favgroup?) && to_query.is_simple_tag?)
+      errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (must convert a pool or favgroup to a tag)")
+    elsif unprefixed_name.present? && TagCategory.mapping.key?(prefix)
       errors.add(:base, "Can't #{to_dtext} (change the category in a separate line)")
-    elsif tag_to_pool?
-      if from_query.tag.nil?
-        errors.add(:base, "Can't #{to_dtext} (tag [[#{@antecedent}]] doesn't exist)")
-      elsif from_query.tag&.wiki_page&.body.blank? && to_query.pool&.description.blank?
-        errors.add(:base, "Can't #{to_dtext} (either the tag or the pool must have a description)")
-      end
-    elsif pool_to_tag?
-      if from_query.pool.nil?
-        errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
-      end
-    else
-      errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (convert takes exactly one pool and one tag)")
+    elsif from_query.pool.nil? && from_query.favgroup.nil?
+      errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
     end
   end
 
   private
-
-  def convert_tag_to_pool
-    pool = to_query.pool || Pool.new(name: to_query.find_metatag(:pool))
-    pool.is_deleted = false
-
-    wiki_page = WikiPage.find_by_title(from_query) || WikiPage.new(title: from_query.tag_name)
-
-    pool.description = wiki_page.body if pool.description.blank? && wiki_page.body.present?
-    pool.save
-
-    wiki_page.body = "This tag has been moved to {{pool:#{pool.name}}}."
-    wiki_page.save
-
-    # at the end so that the pool can be created first
-    BulkUpdateRequest::Command::MassUpdate.mass_update(@antecedent, "#{@consequent} -#{@antecedent}")
-  end
 
   def convert_pool_to_tag
     pool = from_query.pool
     wiki_page = WikiPage.find_by_title(to_query) || WikiPage.new(title: to_query.tag_name)
 
     wiki_page.is_deleted = false
-
     wiki_page.body = pool.description if wiki_page.body.blank?
     wiki_page.save
 

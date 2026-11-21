@@ -123,6 +123,11 @@ class PostQuery
     Pool.find_by_name(find_metatag(:pool)) if is_single_pool?
   end
 
+  # The only favorite group in the query, if the query contains a single favorite group.
+  def favgroup
+    FavoriteGroup.visible(current_user).find_by_name_or_id(find_metatag(:favgroup), current_user) if is_single_favgroup?
+  end
+
   # True if this search would return all posts (normally because the search is the empty string).
   def is_empty_search?
     ast.all?
@@ -159,6 +164,10 @@ class PostQuery
 
   def is_single_pool?
     is_metatag?(:pool)
+  end
+
+  def is_single_favgroup?
+    is_metatag?(:favgroup)
   end
 
   # True if the search depends on the current user because of permissions or privacy settings.
