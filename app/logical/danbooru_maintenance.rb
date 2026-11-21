@@ -15,6 +15,7 @@ module DanbooruMaintenance
   def daily
     queue PrunePostDisapprovalsJob
     queue PruneBulkUpdateRequestsJob
+    queue PruneApiKeysJob
     queue BigqueryExportAllJob
     queue VacuumDatabaseJob
   end
