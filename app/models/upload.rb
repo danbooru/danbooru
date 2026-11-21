@@ -245,7 +245,7 @@ class Upload < ApplicationRecord
   # The list of files uploaded from disk, with their filenames.
   def uploaded_files
     files.map do |_index, file|
-      if MediaFile::FileTypeDetector.new(file.tempfile).file_ext.in?(MediaFile::Archive::FILE_TYPES)
+      if MediaFile::FileTypeDetector.new(file.tempfile).file_ext.in?(MediaFile::SUPPORTED_ARCHIVE_TYPES)
         # Only read one more file than the limit, enough to tell if the archive has too many files.
         [MediaFile::Archive.open!(file.tempfile, max_entries: MAX_FILES_PER_UPLOAD + 1), file.original_filename]
       else

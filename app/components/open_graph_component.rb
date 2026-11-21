@@ -23,12 +23,21 @@ class OpenGraphComponent < ApplicationComponent
     @current_user = current_user
   end
 
-  memoize def video_url
+  # @return [MediaAsset::Variant, nil] The video shown in the embed. Ugoiras show their sample, which is a WebM.
+  memoize def video_variant
     if is_video?
-      variant("original").file_url
+      variant("original")
     elsif is_ugoira?
-      variant("sample").file_url
+      variant("sample")
     end
+  end
+
+  def video_url
+    video_variant&.file_url
+  end
+
+  def video_mime_type
+    video_variant&.mime_type
   end
 
   memoize def image_url

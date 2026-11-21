@@ -4,10 +4,9 @@
 # Mime::Type.register "text/richtext", :rtf
 Mime::Type.register_alias "application/xml", :sitemap
 
-# XXX remove after upgrading to rack 3.0.0.
-Mime::Type.register "image/webp", :webp
-Mime::Type.register "image/avif", :avif
+# The media types Rails doesn't know about. The types come from the media_file library (see `MediaFile::MIME_TYPES`).
+%i[avif swf ugoira].each do |file_ext|
+  Mime::Type.register MediaFile::MIME_TYPES.fetch(file_ext), file_ext
+end
 
-Mime::Type.register "application/x-shockwave-flash", :swf
 Mime::Type.register "application/vnd.microsoft.portable-executable", :exe
-Mime::Type.register "video/x-ugoira", :ugoira

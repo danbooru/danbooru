@@ -113,5 +113,17 @@ class MediaAssetTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "#mime_type" do
+      should "return the MIME type of the file" do
+        assert_equal("image/jpeg", build(:media_asset, file_ext: "jpg").mime_type)
+        assert_equal("video/mp4", build(:media_asset, file_ext: "mp4").mime_type)
+        assert_equal("application/x-shockwave-flash", build(:media_asset, file_ext: "swf").mime_type)
+      end
+
+      should "return video/x-ugoira for ugoiras, not application/zip" do
+        assert_equal("video/x-ugoira", build(:media_asset, file_ext: "zip").mime_type)
+      end
+    end
   end
 end

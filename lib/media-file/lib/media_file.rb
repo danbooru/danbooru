@@ -14,6 +14,8 @@ require "shellwords"
 require "tempfile"
 require "tmpdir"
 
+require_relative "media_file/config"
+
 # A MediaFile represents an image, video, or flash file. It contains methods for
 # detecting the file type, for generating a preview image, for getting metadata,
 # and for resizing images.
@@ -49,58 +51,6 @@ class MediaFile
     def user_message
       "File took too long to process"
     end
-  end
-
-  # The MIME types of the file types we detect. Other files are "application/octet-stream".
-  MIME_TYPES = {
-    jpg: "image/jpeg",
-    png: "image/png",
-    gif: "image/gif",
-    webp: "image/webp",
-    avif: "image/avif",
-    mp4: "video/mp4",
-    webm: "video/webm",
-    swf: "application/x-shockwave-flash",
-    zip: "application/zip",
-    ugoira: "video/x-ugoira",
-  }.freeze
-
-  # The settings for the library. Apps using the library set these with `MediaFile.configure`.
-  #
-  # @!attribute logger [Logger] Where to log errors from the external programs, like a helper script crashing.
-  # @!attribute sandbox [Boolean] If false, run the external programs without Landlock and seccomp. Only turn this off
-  #   when the kernel doesn't support Landlock, like in some development environments. Defaults to true, unless the
-  #   MEDIA_FILE_DISABLE_SANDBOX environment variable is "true".
-  # @!attribute max_file_size [Integer] The largest file the external programs can write, in bytes.
-  # @!attribute max_image_resolution [Integer] The largest image that will be decoded, in pixels.
-  # @!attribute max_image_width [Integer] The widest image that will be decoded, in pixels.
-  # @!attribute max_image_height [Integer] The tallest image that will be decoded, in pixels.
-  # @!attribute max_concurrency [Integer] The number of threads ffmpeg can use to encode videos.
-  Config = Struct.new(:logger, :sandbox, :max_file_size, :max_image_resolution, :max_image_width, :max_image_height, :max_concurrency, keyword_init: true)
-
-  # @return [Config] The library's settings.
-  def self.config
-    @config ||= Config.new(
-      logger: Logger.new($stderr, level: :info),
-      sandbox: ENV["MEDIA_FILE_DISABLE_SANDBOX"] != "true",
-      max_file_size: 100.megabytes,
-      max_image_resolution: 21_000 * 21_000,
-      max_image_width: 40_000,
-      max_image_height: 40_000,
-      max_concurrency: Concurrent.available_processor_count.to_i.clamp(1..),
-    )
-  end
-
-  # Change the library's settings.
-  #
-  # @yieldparam config [Config] The settings.
-  def self.configure
-    yield config
-  end
-
-  # @return [Logger] The logger set in `MediaFile.config`.
-  def self.logger
-    config.logger
   end
 
   # Like JSON.parse, but returns nil instead of raising an error if the input is nil, blank, or contains a syntax error.
@@ -153,16 +103,13 @@ class MediaFile
   # @param options [Hash] Extra options for the MediaFile subclass.
   # @return [MediaFile] The media file.
   def self.new_from_file(file, file_ext = MediaFile.file_ext(file), frame_delays: nil, **options)
-    case file_ext
-    in :jpg | :gif | :png | :webp | :avif
+    if file_ext.in?(SUPPORTED_IMAGE_TYPES)
       MediaFile::Image.new(file, **options)
-    in :swf
-      MediaFile::Flash.new(file, **options)
-    in :webm | :mp4
+    elsif file_ext.in?(SUPPORTED_VIDEO_TYPES)
       MediaFile::Video.new(file, **options)
-    in :ugoira
-      MediaFile::Ugoira.new(file, **options)
-    in :zip if frame_delays.present?
+    elsif file_ext == :swf
+      MediaFile::Flash.new(file, **options)
+    elsif file_ext == :ugoira || (file_ext == :zip && frame_delays.present?)
       MediaFile::Ugoira.new(file, frame_delays:, **options)
     else
       MediaFile.new(file, **options)
@@ -353,12 +300,12 @@ class MediaFile
 
   # @return [Boolean] true if the file is an image
   def is_image?
-    file_ext.in?(%i[jpg png gif webp avif])
+    file_ext.in?(SUPPORTED_IMAGE_TYPES)
   end
 
   # @return [Boolean] true if the file is a video
   def is_video?
-    file_ext.in?([:webm, :mp4])
+    file_ext.in?(SUPPORTED_VIDEO_TYPES)
   end
 
   # @return [Boolean] True if the file is a MP4.

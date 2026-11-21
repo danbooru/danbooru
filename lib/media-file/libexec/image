@@ -42,7 +42,7 @@ ENV["VIPS_DISC_THRESHOLD"] = "1000g"
 require "vips"
 
 class ImageCommand
-  # The image types libexec/image can read.
+  # The image types libexec/image can read. The same as `MediaFile::SUPPORTED_IMAGE_TYPES`, which this script doesn't load.
   EXTENSIONS = %w[jpg png gif webp avif].freeze
 
   # The format of the numbers in the arguments.

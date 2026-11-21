@@ -24,9 +24,6 @@ class MediaFile
       end
     end
 
-    # The archive types that can be read. Ugoiras are .zip files too, but they're read by `MediaFile::Ugoira` instead.
-    FILE_TYPES = %i[zip rar 7z].freeze
-
     # The default number of entries to read. Archives with more files are only read up to this many files.
     MAX_ENTRIES = 1_000
 
@@ -268,7 +265,7 @@ class MediaFile
     # @param name [String] The name of the archive in error messages, like the name of the file the user uploaded.
     # @raise [InvalidArchiveError] If the archive can't be read, or isn't safe to extract.
     def validate!(max_files:, max_size:, name: File.basename(path))
-      raise InvalidArchiveError, "'#{name}' is not a supported file type" unless file_ext.in?(FILE_TYPES)
+      raise InvalidArchiveError, "'#{name}' is not a supported file type" unless file_ext.in?(MediaFile::SUPPORTED_ARCHIVE_TYPES)
 
       begin
         entries

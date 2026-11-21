@@ -3,8 +3,15 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
+  # The file types that can be uploaded. Ugoiras have the file type "zip". These are separate from the types the
+  # media_file library can read (see lib/media-file/lib/media_file/config.rb), so the library can support a new type
+  # before the site allows uploading it.
   FILE_TYPES = %w[jpg png gif webp avif mp4 webm swf zip]
+
+  # The MIME types of the files that can be uploaded. Uploads are checked by MIME type instead of file type, because
+  # ugoiras and other .zip files both have the file type "zip", but only ugoiras are "video/x-ugoira".
   FILE_MIME_TYPES = %w[image/jpeg image/png image/gif image/webp image/avif video/mp4 video/webm application/x-shockwave-flash video/x-ugoira]
+
   FILE_KEY_LENGTH = 9
   VARIANTS = %i[180x180 360x360 720x720 sample full original]
   MAX_FILE_SIZE = MediaFile.config.max_file_size
@@ -136,6 +143,11 @@ class MediaAsset < ApplicationRecord
       in :original
         media_file
       end
+    end
+
+    # @return [String] The MIME type of this variant's file, like "video/webm" for a ugoira's sample.
+    def mime_type
+      Mime::Type.lookup_by_extension(file_ext).to_s
     end
 
     def file_url(custom_filename = "")
@@ -429,9 +441,9 @@ class MediaAsset < ApplicationRecord
       deleted? || expunged?
     end
 
-    # @return [Mime::Type] The file's MIME type.
+    # @return [String] The file's MIME type. Ugoiras are "video/x-ugoira", not "application/zip" like other .zip files.
     def mime_type
-      Mime::Type.lookup_by_extension(file_ext)
+      Mime::Type.lookup_by_extension(is_ugoira? ? "ugoira" : file_ext).to_s
     end
 
     def file=(file_or_path)
