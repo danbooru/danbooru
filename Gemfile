@@ -7,12 +7,12 @@ gem "json", "~> 3"
 gem "pg", "~> 1"
 gem "simple_form", "~> 5"
 gem "sanitize", "~> 7"
-gem "ruby-vips", "~> 2", require: false # Used by bin/image.
 gem "diff-lcs", "~> 2", require: false
 gem "bcrypt", "~> 3", require: "bcrypt"
 gem "aws-sdk-sqs", "~> 1", require: false
 gem "responders", "~> 3"
 gem "dtext_rb", path: "lib/dtext_rb", require: "dtext"
+gem "media_file", path: "lib/media-file"
 gem "memoist", "~> 0.16"
 gem "daemons", "~> 1"
 gem "bootsnap", "~> 1", require: false
@@ -47,7 +47,6 @@ gem "debug", "~> 1", require: false
 gem "faker", "~> 3", require: false
 gem "resolv", "~> 0.7"
 gem "rover-df", "~> 1"
-gem "ffi-libarchive", "~> 1", require: false # Used by bin/archive.
 gem "pry-rails", "~> 0.3"
 gem "drb", "~> 2"
 gem "net-sftp", "~> 4", require: false
@@ -59,7 +58,6 @@ gem "rotp", "~> 6"
 gem "rqrcode", "~> 3"
 gem "kramdown", "~> 2"
 gem "abbrev", "~> 0.1"
-gem "rubyzip", "~> 3", require: false # Used by bin/archive.
 gem "webrick", "~> 1"
 gem "useragent", "~> 0.16"
 gem "dotenv-rails", "~> 3", require: false # This is loaded in application.rb

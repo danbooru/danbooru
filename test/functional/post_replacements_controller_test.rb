@@ -7,12 +7,12 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         should "fail, log the replacement, quarantine the file, and delete its stored files" do
           @post = create(:post)
           user = create(:moderator_user)
-          md5 = Digest::MD5.file("test/files/mp4/test-300x300-av1.mp4").hexdigest
-          MediaFile::Video.any_instance.stubs(:preview!).raises(ExternalCommand::SyscallError, "ffmpeg called a blocked syscall")
+          md5 = Digest::MD5.file("lib/media-file/test/files/mp4/test-300x300-av1.mp4").hexdigest
+          MediaFile::Video.any_instance.stubs(:preview!).raises(MediaFile::ExternalCommand::SyscallError, "ffmpeg called a blocked syscall")
           Rails.logger.stubs(:error)
           Rails.logger.expects(:error).with { |message| message.start_with?("Replacement of post ##{@post.id} by user ##{user.id} (#{user.name}) was blocked by the sandbox: ffmpeg called a blocked syscall") }
 
-          file = Rack::Test::UploadedFile.new(Rails.root.join("test/files/mp4/test-300x300-av1.mp4"))
+          file = Rack::Test::UploadedFile.new(Rails.root.join("lib/media-file/test/files/mp4/test-300x300-av1.mp4"))
           post_auth post_replacements_path, user, params: { post_id: @post.id, post_replacement: { replacement_file: file }}
 
           assert_not_equal(md5, @post.reload.md5)
@@ -71,7 +71,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           post_auth post_replacements_path, create(:moderator_user), params: {
             post_id: @post.id,
             post_replacement: {
-              replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"),
+              replacement_file: Rack::Test::UploadedFile.new("lib/media-file/test/files/png/test.png"),
               final_source: "blah",
             },
           }
@@ -85,7 +85,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
       context "replacing a post with a file with an invalid filename" do
         should "fail if the filename isn't valid UTF-8" do
           @post = create(:post, file_size: 789)
-          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
+          file = Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
 
           assert_no_difference("PostReplacement.count") do
             post_auth post_replacements_path(format: :json), create(:moderator_user), params: { post_id: @post.id, post_replacement: { replacement_file: file }}
@@ -98,7 +98,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
         should "fail if the filename contains a NUL byte" do
           @post = create(:post, file_size: 789)
-          body = "--xyz\r\nContent-Disposition: form-data; name=\"post_replacement[replacement_file]\"; filename=\"a%00b.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".b + File.binread("test/files/jpg/test.jpg") + "\r\n--xyz--\r\n".b
+          body = "--xyz\r\nContent-Disposition: form-data; name=\"post_replacement[replacement_file]\"; filename=\"a%00b.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".b + File.binread("lib/media-file/test/files/jpg/test.jpg") + "\r\n--xyz--\r\n".b
 
           assert_no_difference("PostReplacement.count") do
             post_auth post_replacements_path(post_id: @post.id, format: :json), create(:moderator_user), headers: { "Content-Type": "multipart/form-data; boundary=xyz" }, params: body
@@ -111,7 +111,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
         should "succeed if the filename has non-ASCII characters" do
           @post = create(:post)
-          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "あ.jpg")
+          file = Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg", original_filename: "あ.jpg")
 
           assert_difference("PostReplacement.count", 1) do
             post_auth post_replacements_path, create(:moderator_user), params: { post_id: @post.id, post_replacement: { replacement_file: file }}
@@ -130,7 +130,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           post_auth post_replacements_path, create(:moderator_user), params: {
             post_id: @post2.id,
             post_replacement: {
-              replacement_file: Rack::Test::UploadedFile.new("test/files/jpg/test.jpg"),
+              replacement_file: Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg"),
             },
           }
 
@@ -199,7 +199,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           # XXX Stub the https://danbooru.donmai.us/media_assets/:id response.
           image_url = "https://cdn.donmai.us/original/ec/ef/ecef68c44edb8a0d6a3070b5f8e8ee76.jpg"
           Source::Extractor::Danbooru2.any_instance.stubs(:api_response).returns({ media_asset: { variants: [{ type: "original", url: image_url }] }})
-          Source::Extractor::Danbooru2.any_instance.stubs(:download_file!).with(image_url).returns(MediaFile.open("test/files/jpg/test.jpg"))
+          Source::Extractor::Danbooru2.any_instance.stubs(:download_file!).with(image_url).returns(MediaFile.open("lib/media-file/test/files/jpg/test.jpg"))
 
           @post = create(:post)
 
@@ -229,7 +229,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           post_auth post_replacements_path, create(:moderator_user), params: {
             post_id: @post.id,
             post_replacement: {
-              replacement_file: Rack::Test::UploadedFile.new("test/files/jpg/test.jpg"),
+              replacement_file: Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg"),
             },
           }
 
@@ -284,7 +284,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
             post_auth post_replacements_path, create(:moderator_user), params: {
               post_id: @post.id,
               post_replacement: {
-                replacement_file: Rack::Test::UploadedFile.new("test/files/ugoira/animation.json"),
+                replacement_file: Rack::Test::UploadedFile.new("lib/media-file/test/files/ugoira/animation.json"),
               },
             }
 
@@ -347,8 +347,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         @admin = create(:admin_user)
         @mod = create(:moderator_user)
 
-        @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"), replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
-        @admin_replacement = create(:post_replacement, creator: @admin, replacement_file: Rack::Test::UploadedFile.new("test/files/jpg/test.jpg"))
+        @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"), replacement_file: Rack::Test::UploadedFile.new("lib/media-file/test/files/png/test.png"))
+        @admin_replacement = create(:post_replacement, creator: @admin, replacement_file: Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg"))
       end
 
       should "render" do
@@ -363,7 +363,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a replacement on a post the user can't see" do
         setup do
-          @hidden_replacement = create(:post_replacement, creator: @mod, replacement_file: Rack::Test::UploadedFile.new("test/files/gif/test-static-32x32.gif"))
+          @hidden_replacement = create(:post_replacement, creator: @mod, replacement_file: Rack::Test::UploadedFile.new("lib/media-file/test/files/gif/test-static-32x32.gif"))
           @hidden_replacement.post.update!(is_banned: true)
         end
 

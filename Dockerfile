@@ -325,6 +325,9 @@ RUN <<EOS
 EOS
 
 COPY --link Gemfile Gemfile.lock ./
+# Bundler needs the gemspec of lib/media-file to install the app's gems.
+COPY --link lib/media-file/media_file.gemspec lib/media-file/
+COPY --link lib/media-file/lib/media_file/version.rb lib/media-file/lib/media_file/
 
 ARG JOBS
 RUN <<EOS

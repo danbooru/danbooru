@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# The runtime dependencies are in media_file.gemspec, so apps that use the library install them too.
+gemspec
+
+group :development, :test do
+  gem "erubi", "~> 1" # Used by MediaFile#test_case.
+  gem "minitest", "~> 6"
+  gem "mocha", "~> 3"
+  gem "rake", "~> 13"
+  gem "shoulda-context", "~> 2"
+end

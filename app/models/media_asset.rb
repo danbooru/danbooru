@@ -12,25 +12,6 @@ class MediaAsset < ApplicationRecord
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
-
-  # Images are decoded by bin/image, which can use at most 4 GB of memory (`ExternalCommand::MEMORY_LIMIT`). An image
-  # that needs more fails partway through decoding, which looks the same as a corrupt file. The two limits below reject
-  # images that would need too much memory before they're decoded, so they're reported as too large instead.
-  #
-  # Most JPEGs and PNGs are decoded a few rows at a time, so their size in memory is 0 and only the limits above apply.
-  # Progressive JPEGs, interlaced PNGs, rotated JPEGs and PNGs, GIFs, WebPs, and AVIFs are decoded all at once, so the
-  # whole decoded image has to fit in memory. This is the max size of that decoded image (see
-  # `MediaFile::Image#in_memory_size`).
-  #
-  # Measured with libvips 8.18 at this limit, PNGs need about 1.8 GB and progressive JPEGs under 3 GB. The largest GIF
-  # (46 MP) and AVIF (36 MP) on Danbooru need 1 GB and 2.3 GB.
-  MAX_IN_MEMORY_SIZE = 1.gigabyte
-
-  # The max resolution of WebPs. libvips' WebP loader keeps about five copies of the image in memory while decoding it,
-  # so WebPs run out of memory long before they reach MAX_IN_MEMORY_SIZE. Measured with libvips 8.18, 12803x12803 is the
-  # largest WebP that fits, and 12900x12900 runs out of memory.
-  MAX_WEBP_RESOLUTION = 12_800 * 12_800
-
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
 
   attribute :id
@@ -324,7 +305,7 @@ class MediaAsset < ApplicationRecord
         yield media_asset if block_given?
 
         # XXX shouldn't generate the 360x360 thumbnail twice
-        task1 = Danbooru.async { media_asset.update!(ai_tags: media_file.preview!(360, 360).ai_tags) if media_asset.has_variant?(:"360x360") }
+        task1 = Danbooru.async { media_asset.update!(ai_tags: AutotaggerClient.new.evaluate!(media_file.preview!(360, 360))) if media_asset.has_variant?(:"360x360") }
         task2 = Danbooru.async { media_asset.update!(media_metadata: MediaMetadata.new(file: media_file)) }
         media_asset.distribute_files!(media_file)
         task1.wait!
@@ -365,7 +346,7 @@ class MediaAsset < ApplicationRecord
 
         # If the file was blocked by the sandbox, delete any of its files that were already stored, so it can't be
         # downloaded from the site. Other failed uploads keep their files.
-        if media_asset && ExternalCommand::SyscallError.find_in(e)
+        if media_asset && MediaFile::ExternalCommand::SyscallError.find_in(e)
           begin
             media_asset.delete_files!
           rescue StandardError => delete_error
@@ -386,11 +367,14 @@ class MediaAsset < ApplicationRecord
       # @param action [String] What the user was doing, like "Upload #123".
       # @param details [Hash] Other things to log, like the source URL.
       def handle_blocked_file(error, media_file:, user:, action:, **details)
-        blocked_error = ExternalCommand::SyscallError.find_in(error)
+        blocked_error = MediaFile::ExternalCommand::SyscallError.find_in(error)
         return if blocked_error.nil?
 
         begin
-          quarantine_path = media_file&.quarantine!
+          if media_file
+            quarantine_path = "/trash/quarantine/#{media_file.md5}.#{media_file.file_ext}"
+            Danbooru.config.storage_manager.store(media_file.file, quarantine_path)
+          end
         rescue StandardError => e
           quarantine_path = "failed to save: #{e.message}"
         end
@@ -410,8 +394,8 @@ class MediaAsset < ApplicationRecord
         elsif media_file.file_size > MAX_FILE_SIZE
           raise Error, "File size too large (size: #{media_file.file_size.to_fs(:human_size)}; max size: #{MAX_FILE_SIZE.to_fs(:human_size)})"
         # Check the frame count before the dimensions, because getting a video's dimensions requires reading every frame.
-        elsif media_file.is_video? && media_file.packet_count > FFmpeg::MAX_PACKET_COUNT
-          raise Error, "Video has too many frames (max: #{FFmpeg::MAX_PACKET_COUNT})"
+        elsif media_file.is_video? && media_file.packet_count > MediaFile::FFmpeg::MAX_PACKET_COUNT
+          raise Error, "Video has too many frames (max: #{MediaFile::FFmpeg::MAX_PACKET_COUNT})"
         end
 
         # Read the file and its metadata at the same time, because both start an external program. Wait for both
@@ -427,10 +411,10 @@ class MediaAsset < ApplicationRecord
           raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
         elsif media_file.height.to_i > MAX_IMAGE_HEIGHT
           raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
-        elsif media_file.in_memory_size > MAX_IN_MEMORY_SIZE
-          raise Error, "Image is too large to decode (size: #{media_file.in_memory_size.to_fs(:human_size)}; max size: #{MAX_IN_MEMORY_SIZE.to_fs(:human_size)})"
-        elsif media_file.file_ext == :webp && media_file.resolution > MAX_WEBP_RESOLUTION
-          raise Error, "WebP image is too large to decode (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_WEBP_RESOLUTION / 1_000_000} megapixels)"
+        elsif media_file.in_memory_size > MediaFile::Image::MAX_IN_MEMORY_SIZE
+          raise Error, "Image is too large to decode (size: #{media_file.in_memory_size.to_fs(:human_size)}; max size: #{MediaFile::Image::MAX_IN_MEMORY_SIZE.to_fs(:human_size)})"
+        elsif media_file.file_ext == :webp && media_file.resolution > MediaFile::Image::MAX_WEBP_RESOLUTION
+          raise Error, "WebP image is too large to decode (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MediaFile::Image::MAX_WEBP_RESOLUTION / 1_000_000} megapixels)"
         # Check the metadata before `is_supported?`, which needs the metadata to check AVIFs.
         elsif media_file.exif_metadata["Danbooru:ExifToolError"].present?
           raise Error, "File has too much metadata"
@@ -521,7 +505,7 @@ class MediaAsset < ApplicationRecord
       return [] if !has_variant?("360x360")
 
       variant("360x360").open_file! do |media_file|
-        media_file.ai_tags
+        AutotaggerClient.new.evaluate!(media_file)
       end
     end
 

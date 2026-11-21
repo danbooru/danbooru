@@ -121,7 +121,7 @@ class IqdbClient
       preview = media_file.preview!(180, 180)
       file = HTTP::FormData::File.new(preview)
       request(:post, "query", form: { file: file }, params: { limit: limit })
-    rescue ExternalCommand::SyscallError => e
+    rescue MediaFile::ExternalCommand::SyscallError => e
       MediaAsset.handle_blocked_file(e, media_file:, user: CurrentUser.user, action: "IQDB search")
       raise Error, "The file couldn't be processed"
     ensure

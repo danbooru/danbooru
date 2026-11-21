@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class UploadsChromeTest < ChromeSystemTestCase
   def upload_test_file
-    attach_file(Rails.root.join("test/files/jpg/test.jpg").to_s) do
+    attach_file(Rails.root.join("lib/media-file/test/files/jpg/test.jpg").to_s) do
       find(".dropzone-container").click
     end
 
@@ -108,7 +108,7 @@ class UploadsChromeTest < ChromeSystemTestCase
       should "wrap the tags on spaces in the Source tab" do
         tag = "i redownloaded ibispaint x on my phone. it feels more comfortable to use than i remember."
         Source::Extractor::Null.any_instance.stubs(:tags).returns([[tag, "https://example.com/tagged/#{tag}"]])
-        upload = create(:completed_file_upload, uploader: @user, upload_media_assets: [build(:upload_media_asset, media_asset: build(:media_asset, file: "test/files/jpg/test.jpg"), source_url: "https://example.com/file.jpg", status: "active")])
+        upload = create(:completed_file_upload, uploader: @user, upload_media_assets: [build(:upload_media_asset, media_asset: build(:media_asset, file: "lib/media-file/test/files/jpg/test.jpg"), source_url: "https://example.com/file.jpg", status: "active")])
 
         page.current_window.resize_to(500, 900)
         visit upload_path(upload)

@@ -16,8 +16,9 @@ OptionParser.new do |opts|
 
     Usage: #{File.basename($PROGRAM_NAME)} [options] [FILE|DIR ...]
 
-    Validates each file, gets its metadata, and generates its thumbnails and samples. Defaults to test/files. Prints each
-    file as it's processed to stderr, and a summary to stdout. Nothing is saved to the database or to storage.
+    Validates each file, gets its metadata, and generates its thumbnails and samples. Defaults to
+    lib/media-file/test/files. Prints each file as it's processed to stderr, and a summary to stdout.
+    Nothing is saved to the database or to storage.
   EOS
 
   opts.on("-n", "--iterations=N", Integer, "Process each file N times (default: 3)") { options[:iterations] = it }
@@ -53,7 +54,7 @@ rescue StandardError, NotImplementedError => e
   e
 end
 
-paths = (ARGV.presence || ["test/files"]).flat_map { File.directory?(it) ? Dir.glob("#{it}/**/*").select { File.file?(it) } : it }.sort
+paths = (ARGV.presence || ["lib/media-file/test/files"]).flat_map { File.directory?(it) ? Dir.glob("#{it}/**/*").select { File.file?(it) } : it }.sort
 jobs = Queue.new
 options[:iterations].times { |pass| paths.each_with_index { |path, i| jobs << [path, i + 1, pass + 1] } }
 jobs.close

@@ -5,7 +5,6 @@
 # locales as you wish. All of these examples are active by default:
 ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.uncountable "general"
-  inflect.acronym "FFmpeg"
   inflect.acronym "CLI"
   inflect.acronym "URL"
   inflect.acronym "URLs"

@@ -5,11 +5,11 @@ and shouldn't be edited. Others are custom scripts created for this project.
 
 ## Project Scripts
 
-These scripts are specific to this project.
+These scripts are specific to this project. The scripts for media files (`archive`, `image`, `media-ls`, and `media-conv`)
+are in `lib/media-file/bin`.
 
 | Script | Description |
 |--------|-------------|
-| `archive` | Read, extract, and create archive files. Run in the upload sandbox by `Danbooru::Archive` and `MediaFile::Ugoira`. |
 | `build-docker-image` | Build a Docker image from the current Git commit. |
 | `danbooru-dev-entrypoint` | Entrypoint for containers started with `bin/dev` / `docker-compose.dev.yaml`. |
 | `dev` | Shortcut for `docker compose -f docker-compose.dev.yaml`. |
@@ -18,10 +18,7 @@ These scripts are specific to this project.
 | `generate-changelog` | Generate a changelog from Git commits between two refs. |
 | `generate-source-tests` | Generate skeleton parsing and extracting tests for a URL strategy. |
 | `github-print-test-results` | Parse JUnit test output and print GitHub workflow annotations and a summary. |
-| `image` | Read and resize images with libvips. Run in the upload sandbox by `MediaFile::Image`. |
 | `media-bench` | Measure how long it takes to process media files like an upload does. |
-| `media-conv` | Convert media files using Danbooru's media conversion logic. |
-| `media-ls` | List properties of media files (like `ls`, but using Danbooru's media file logic). |
 | `setup` | Install Docker and Git, clone the repo, and initialize config files for a fresh install. |
 | `test-sources` | Run all of a specific site's parsing & extractor tests. |
 | `update` | Update Ruby gems and npm packages and run pending migrations. |

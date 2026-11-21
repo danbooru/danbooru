@@ -21,7 +21,7 @@ FactoryBot.define do
     factory :post_with_file do
       transient do
         filename { "jpg/test.jpg" }
-        media_file { MediaFile.open("test/files/#{filename}") }
+        media_file { MediaFile.open("lib/media-file/test/files/#{filename}") }
       end
 
       md5 { media_file.md5 }

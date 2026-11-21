@@ -62,6 +62,7 @@ BCrypt::Engine.cost = BCrypt::Engine::MIN_COST
 
 Rails.root.glob("test/factories/*.rb").each { |file| require file }
 Rails.root.glob("test/test_helpers/*.rb").each { |file| require file }
+require Rails.root.join("lib/media-file/test/media_file_helper").to_s
 
 Minitest::Reporters.use!([
   Minitest::Reporters::ProgressReporter.new,

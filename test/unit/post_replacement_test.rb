@@ -4,7 +4,7 @@ class PostReplacementTest < ActiveSupport::TestCase
   context "PostReplacement" do
     context "during validation" do
       should "not allow files with filenames that aren't valid UTF-8" do
-        file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
+        file = Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg", original_filename: "a\xFF.jpg".b)
         replacement = build(:post_replacement, replacement_file: file)
 
         assert_equal(false, replacement.valid?)
@@ -12,7 +12,7 @@ class PostReplacementTest < ActiveSupport::TestCase
       end
 
       should "not allow files with filenames that contain NUL bytes" do
-        file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
+        file = Rack::Test::UploadedFile.new("lib/media-file/test/files/jpg/test.jpg")
         file.stubs(:original_filename).returns("a\0b.jpg")
         replacement = build(:post_replacement, replacement_file: file)
 

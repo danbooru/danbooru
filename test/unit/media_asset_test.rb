@@ -97,16 +97,16 @@ class MediaAssetTest < ActiveSupport::TestCase
 
     context "validating a media file" do
       should "fail with a timeout error if reading the image times out" do
-        ExternalCommand.stubs(:run).raises(ExternalCommand::TimeoutError, "ruby timed out after 60 seconds")
-        image = MediaFile.open("test/files/jpg/test.jpg")
+        MediaFile::ExternalCommand.stubs(:run).raises(MediaFile::ExternalCommand::TimeoutError, "ruby timed out after 60 seconds")
+        image = MediaFile.open("lib/media-file/test/files/jpg/test.jpg")
 
         error = assert_raises(MediaAsset::Error) { MediaAsset.validate_media_file!(image, create(:user)) }
         assert_equal("Image took too long to process", error.message)
       end
 
       should "fail with a too large error for WebPs over the max WebP resolution" do
-        stub_const(MediaAsset, :MAX_WEBP_RESOLUTION, 1_000) do
-          image = MediaFile.open("test/files/webp/test.webp")
+        stub_const(MediaFile::Image, :MAX_WEBP_RESOLUTION, 1_000) do
+          image = MediaFile.open("lib/media-file/test/files/webp/test.webp")
 
           error = assert_raises(MediaAsset::Error) { MediaAsset.validate_media_file!(image, create(:user)) }
           assert_equal("WebP image is too large to decode (resolution: #{(image.resolution / 1_000_000.0).round(1)} megapixels (#{image.width}x#{image.height}); max: 0 megapixels)", error.message)
