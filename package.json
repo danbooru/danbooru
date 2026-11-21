@@ -35,7 +35,7 @@
     "postcss-import": "^17.0.1",
     "postcss-loader": "^8.2.1",
     "postcss-preset-env": "^11.6.2",
-    "sass": "^1.107.1",
+    "sass": "^1.108.1",
     "sass-loader": "^17.1.0",
     "shakapacker": "^10.3.2",
     "terser-webpack-plugin": "^5.6.1",
