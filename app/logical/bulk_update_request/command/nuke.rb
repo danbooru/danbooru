@@ -17,7 +17,7 @@ class BulkUpdateRequest::Command::Nuke < BulkUpdateRequest::Command
   def affected_pool
     pool_name = query.find_metatag(:pool)
     return nil unless pool_name
-    Pool.find_by_name(pool_name)
+    Pool.find_by_name(pool_name.escape_wildcards)
   end
 
   def affected_tags

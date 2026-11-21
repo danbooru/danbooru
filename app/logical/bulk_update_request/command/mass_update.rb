@@ -61,6 +61,32 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     tag_edit.unclosed_metatags.each do |metatag|
       errors.add(:base, "Can't #{to_dtext} ('#{metatag}:' metatag has an unclosed quote)")
     end
+
+    from_query.select_metatags(*PostQuery::ORDER_METATAGS, :limit, :random).map(&:name).uniq.each do |name|
+      errors.add(:base, "Can't #{to_dtext} ('#{name}:' metatag is not allowed in the search)")
+    end
+
+    # Pools are looked up by exact name, so wildcards (`pool:cute_*`) and special values (`pool:any`) are rejected.
+    from_query.select_metatags(:pool).each do |metatag|
+      if Pool.find_by_name(metatag.value.escape_wildcards).nil?
+        errors.add(:base, "Can't #{to_dtext} ({{#{metatag}}} does not exist)")
+      end
+    end
+
+    from_query.select_metatags(:favgroup).each do |metatag|
+      if FavoriteGroup.visible(User.anonymous).find_by_name_or_id(metatag.value, User.anonymous).nil?
+        errors.add(:base, "Can't #{to_dtext} ({{#{metatag}}} does not exist)")
+      end
+    end
+
+    # Post edits look up pools by wildcard, so `pool:cute_*` would add posts to whichever pool matched first.
+    tag_edit.metatag_terms.each do |metatag|
+      if metatag.name.in?(%w[pool -pool]) && Pool.find_by_name(metatag.value.escape_wildcards).nil?
+        errors.add(:base, "Can't #{to_dtext} ({{#{metatag.name}:#{metatag.value}}} does not exist)")
+      elsif metatag.name == "newpool" && metatag.value.include?("*")
+        errors.add(:base, "Can't #{to_dtext} (pool names can't contain asterisks)")
+      end
+    end
   end
 
   def self.mass_update(antecedent, consequent, user: User.system)

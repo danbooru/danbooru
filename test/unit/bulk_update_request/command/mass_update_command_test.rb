@@ -93,9 +93,85 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
         )
       end
 
+      should "not allow searches for pools that don't exist" do
+        create(:pool, name: "cute_pool")
+
+        assert_invalid_bur(
+          script: "update pool:nonexistent -> foo",
+          errors: ["Can't mass update {{pool:nonexistent}} -> [[foo]] ({{pool:nonexistent}} does not exist)"],
+        )
+        assert_invalid_bur(
+          script: "update pool:cute_* -> foo",
+          errors: ["Can't mass update {{pool:cute_*}} -> [[foo]] ({{pool:cute_*}} does not exist)"],
+        )
+        assert_invalid_bur(
+          script: "update pool:any -> foo",
+          errors: ["Can't mass update {{pool:any}} -> [[foo]] ({{pool:any}} does not exist)"],
+        )
+      end
+
+      should "not allow searches for favgroups that don't exist or aren't public" do
+        private_favgroup = create(:favorite_group, creator: create(:gold_user), is_public: false)
+
+        assert_invalid_bur(
+          script: "update favgroup:any -> foo",
+          errors: ["Can't mass update {{favgroup:any}} -> [[foo]] ({{favgroup:any}} does not exist)"],
+        )
+        assert_invalid_bur(
+          script: "update favgroup:#{private_favgroup.id} -> foo",
+          errors: ["Can't mass update {{favgroup:#{private_favgroup.id}}} -> [[foo]] ({{favgroup:#{private_favgroup.id}}} does not exist)"],
+        )
+      end
+
+      should "not allow order, limit, or random metatags in mass update searches" do
+        pool = create(:pool, name: "cute_pool")
+
+        assert_invalid_bur(
+          script: "update bar order:score -> foo",
+          errors: ["Can't mass update {{bar order:score}} -> [[foo]] ('order:' metatag is not allowed in the search)"],
+        )
+        assert_invalid_bur(
+          script: "update ordpool:#{pool.name} -> foo",
+          errors: ["Can't mass update {{ordpool:#{pool.name}}} -> [[foo]] ('ordpool:' metatag is not allowed in the search)"],
+        )
+        assert_invalid_bur(
+          script: "update bar limit:5 -> foo",
+          errors: ["Can't mass update {{bar limit:5}} -> [[foo]] ('limit:' metatag is not allowed in the search)"],
+        )
+      end
+
+      should "not allow adding posts to or removing posts from pools that don't exist" do
+        create(:pool, name: "cute_pool")
+
+        assert_invalid_bur(
+          script: "update xyz -> pool:cute_*",
+          errors: ["Can't mass update [[xyz]] -> {{pool:cute_*}} ({{pool:cute_*}} does not exist)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> pool:none",
+          errors: ["Can't mass update [[xyz]] -> {{pool:none}} ({{pool:none}} does not exist)"],
+        )
+        assert_invalid_bur(
+          script: "update xyz -> newpool:cute_*",
+          errors: ["Can't mass update [[xyz]] -> {{newpool:cute_*}} (pool names can't contain asterisks)"],
+        )
+      end
+
+      should "allow searches for pools and favgroups that exist" do
+        pool = create(:pool, name: "Cute_Pool")
+        favgroup = create(:favorite_group)
+
+        assert_equal(true, build(:bulk_update_request, script: "update pool:cute_pool -> foo").valid?)
+        assert_equal(true, build(:bulk_update_request, script: "update pool:#{pool.id} -> foo").valid?)
+        assert_equal(true, build(:bulk_update_request, script: "update bar -pool:cute_pool -> foo").valid?)
+        assert_equal(true, build(:bulk_update_request, script: "update favgroup:#{favgroup.id} -> foo").valid?)
+      end
+
       should "allow safe post-edit metatags and regular tags with colons in mass update destinations" do
+        create(:pool, name: "foo")
+        create(:pool, name: "bar")
+
         assert_equal(true, build(:bulk_update_request, script: "update xyz -> rating:s source:https://example.com pool:foo -pool:bar newpool:baz parent:1 -parent:2 child:3 -child:4 char:a -char:b re:zero").valid?)
-        assert_equal(true, build(:bulk_update_request, script: "update favgroup:xyz -> foo").valid?)
       end
 
       should "render simple tags as wiki links in dtext" do
@@ -139,12 +215,6 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
         @bur = create_bur!("mass update source:imageboard -> source:Imageboard", @admin)
 
         assert_equal("Imageboard", @post.reload.source)
-        assert_equal("approved", @bur.reload.status)
-      end
-
-      should "not raise a validation error for updates containing nonexisting pools" do
-        @bur = create_bur!("update pool:123 -> test", @admin)
-
         assert_equal("approved", @bur.reload.status)
       end
     end

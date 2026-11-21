@@ -58,7 +58,7 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
       errors.add(:base, "Can't #{to_dtext} (#{target_tag.errors.full_messages.join("; ")})")
     elsif to_query.tag&.is_deprecated?
       errors.add(:base, "Can't #{to_dtext} ([[#{to_query.tag_name}]] is deprecated)")
-    elsif from_query.is_single_pool? && from_query.pool.nil?
+    elsif from_query.is_single_pool? && pool.nil?
       errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
     elsif from_query.is_single_favgroup?
       favgroup = from_query.favgroup
@@ -74,8 +74,13 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
 
   private
 
+  # Look up the pool by exact name, so wildcards (`pool:cute_*`) and special values (`pool:any`) don't match.
+  def pool
+    Pool.find_by_name(from_query.find_metatag(:pool).escape_wildcards)
+  end
+
   def convert_pool_to_tag
-    pool = from_query.pool
+    pool = self.pool
     wiki_page = WikiPage.find_by_title(to_query) || WikiPage.new(title: to_query.tag_name)
 
     wiki_page.is_deleted = false

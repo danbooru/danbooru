@@ -25,6 +25,15 @@ class NukeCommandTest < ActiveSupport::TestCase
           errors: ["Can't nuke {{pool:12345678}} (pool doesn't exist)"],
         )
       end
+
+      should "raise an error when trying to nuke a wildcard pool" do
+        create(:pool, name: "cute_pool")
+
+        assert_invalid_bur(
+          script: "nuke pool:cute_*",
+          errors: ["Can't nuke {{pool:cute_*}} (pool doesn't exist)"],
+        )
+      end
     end
 
     context "on approval" do

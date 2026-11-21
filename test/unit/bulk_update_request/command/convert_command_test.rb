@@ -50,6 +50,19 @@ class ConvertCommandTest < ActiveSupport::TestCase
         )
       end
 
+      should "refuse to convert wildcard pools" do
+        create(:pool, name: "cute_pool")
+
+        assert_invalid_bur(
+          script: "convert pool:cute_* -> cute",
+          errors: ["Can't convert {{pool:cute_*}} -> [[cute]] ({{pool:cute_*}} does not exist)"],
+        )
+        assert_invalid_bur(
+          script: "convert pool:any -> cute",
+          errors: ["Can't convert {{pool:any}} -> [[cute]] ({{pool:any}} does not exist)"],
+        )
+      end
+
       should "refuse to convert a tag to another tag" do
         assert_invalid_bur(
           script: "convert tag1 -> tag2",
