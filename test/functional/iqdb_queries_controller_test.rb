@@ -28,6 +28,20 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a file whose preview fails" do
+        should "show an error without the details, and log the error" do
+          MediaFile::Video.any_instance.stubs(:preview!).raises(MediaFile::FFmpeg::Error, "ffmpeg failed: /tmp/danbooru-video-preview-123.png: Permission denied")
+          DanbooruLogger.expects(:log).with(instance_of(MediaFile::FFmpeg::Error))
+
+          file = Rack::Test::UploadedFile.new(Rails.root.join("lib/media-file/test/files/mp4/test-300x300-av1.mp4"))
+          post_auth iqdb_queries_path, @user, params: { search: { file: file }}
+
+          assert_response :success
+          assert_includes(response.body, "The file couldn&#39;t be processed")
+          assert_not_includes(response.body, "Permission denied")
+        end
+      end
+
       should "be rate limited" do
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         create(:rate_limit, action: "iqdb_queries:show", key: @user.cache_key, limited: true)

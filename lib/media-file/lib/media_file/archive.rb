@@ -16,11 +16,16 @@ class MediaFile
   class Archive
     extend Memoist
 
-    class Error < StandardError; end
+    # An archive that can't be read. By default, the message doesn't say why, because the details aren't useful to users.
+    # bin/archive uses the same message.
+    class InvalidArchiveError < MediaFile::InvalidFileError
+      def initialize(message = "invalid or corrupt archive")
+        super
+      end
+    end
 
-    # The error shown to users when an archive can't be read. The details aren't useful to users. bin/archive uses the
-    # same error.
-    INVALID_ARCHIVE = "invalid or corrupt archive"
+    # The archive types that can be read. Ugoiras are .zip files too, but they're read by `MediaFile::Ugoira` instead.
+    FILE_TYPES = %i[zip rar 7z].freeze
 
     # The default number of entries to read. Archives with more files are only read up to this many files.
     MAX_ENTRIES = 1_000
@@ -52,18 +57,17 @@ class MediaFile
     # @param timeout [Integer] The maximum number of seconds the command can run.
     # @param file_size_limit [Integer, nil] The largest file the command can write. By default, the max upload size.
     # @return [Hash] The parsed JSON output of the command. Has an "error" key if the archive is invalid.
-    # @raise [Error] If the command crashed, timed out, or printed too much.
+    # @raise [InvalidArchiveError] If the command crashed, or printed too much.
+    # @raise [MediaFile::TimeoutError] If the command timed out.
     # @raise [MediaFile::ExternalCommand::SyscallError] If the command was killed by the sandbox. This isn't wrapped, so the file
     #   can be quarantined (see `MediaAsset.handle_blocked_file`).
     def self.run!(*args, read: [], write: [], timeout: MediaFile::ExternalCommand::TIMEOUT, file_size_limit: MediaFile.config.max_file_size.to_i)
       result = MediaFile::ExternalCommand.run_script("bin/archive", *args, gems: %w[ffi ffi-libarchive rubyzip], read:, write:, timeout:, memory_limit: MEMORY_LIMIT, file_size_limit:)
-      raise Error, INVALID_ARCHIVE unless result && (result["error"].nil? || result["error"].is_a?(String))
+      raise InvalidArchiveError unless result && (result["error"].nil? || result["error"].is_a?(String))
 
       result
-    rescue MediaFile::ExternalCommand::TimeoutError
-      raise Error, "timed out"
     rescue MediaFile::ExternalCommand::OutputLimitError
-      raise Error, "too many files"
+      raise InvalidArchiveError, "too many files"
     end
 
     # Check that the files bin/archive says it extracted are regular files directly inside the directory it was given,
@@ -75,21 +79,21 @@ class MediaFile
     # @param paths [Array<String>] The paths of the extracted files.
     # @param directory [String] The directory the files were extracted to.
     # @return [Array<String>] The paths.
-    # @raise [Error] If any path isn't directly inside the directory, or isn't a regular file.
+    # @raise [InvalidArchiveError] If any path isn't directly inside the directory, or isn't a regular file.
     def self.verify_extracted_files!(paths, directory)
-      raise Error, INVALID_ARCHIVE unless paths.is_a?(Array) && paths.all?(String)
+      raise InvalidArchiveError unless paths.is_a?(Array) && paths.all?(String)
 
       paths.each do |path|
         # The path is compared as a string, not resolved, so the directory can be under a symlink (e.g. /tmp on macOS).
         # bin/archive can't replace the directory itself, or create symlinks or hardlinks, so a path directly inside it
         # that isn't a symlink can't point anywhere else.
-        raise Error, INVALID_ARCHIVE if File.dirname(path) != directory.to_s || !File.lstat(path).file?
+        raise InvalidArchiveError if File.dirname(path) != directory.to_s || !File.lstat(path).file?
       end
 
       File.chmod(0o600, *paths)
       paths
     rescue SystemCallError
-      raise Error, INVALID_ARCHIVE
+      raise InvalidArchiveError
     end
 
     # Read the file lists of several archives with one call to bin/archive, instead of starting a process for each
@@ -98,24 +102,27 @@ class MediaFile
     #
     # @param archives [Array<MediaFile::Archive>] The archives.
     # @return [Array<MediaFile::Archive>] The archives.
-    # @raise [Error] If bin/archive failed, for example because it timed out.
+    # @raise [InvalidArchiveError] If bin/archive failed.
+    #   If bin/archive called a blocked syscall, the SyscallError is the error's `cause`.
     def self.list!(archives)
       pending = archives.reject(&:listed?)
       return archives if pending.empty?
 
       args = pending.flat_map { [it.file_ext, it.path, it.max_entries] }
       result = run!("list", MAX_PATHNAME_SIZE, *args, read: pending.map(&:path), timeout: LIST_TIMEOUT)
-      raise Error, result["error"] if result["error"]
+      raise InvalidArchiveError, result["error"] if result["error"]
 
       results = result["archives"]
-      raise Error, INVALID_ARCHIVE unless results.is_a?(Array) && results.size == pending.size
+      raise InvalidArchiveError unless results.is_a?(Array) && results.size == pending.size
 
       pending.zip(results) do |archive, listing|
-        listing = { "error" => INVALID_ARCHIVE } unless valid_listing?(listing, archive.max_entries)
+        listing = { "error" => InvalidArchiveError.new.message } unless valid_listing?(listing, archive.max_entries)
         archive.listing = listing
       end
 
       archives
+    rescue MediaFile::ExternalCommand::SyscallError
+      raise InvalidArchiveError
     end
 
     # Check that a file list from bin/archive has the expected format, in case bin/archive was compromised by a
@@ -143,7 +150,7 @@ class MediaFile
     # @param max_entries [Integer] The most entries to read from the archive. See `#entries`.
     # @yieldparam [MediaFile::Archive] The archive.
     # @return [MediaFile::Archive] The archive, or the block's result if given a block.
-    # @raise [Error] If the file can't be opened, or the block raises an error.
+    # @raise [InvalidArchiveError] If the file can't be opened, or the block raises an error.
     def self.open!(filelike, max_entries: MAX_ENTRIES, &block)
       file = filelike.respond_to?(:path) ? filelike : File.open(filelike, binmode: true)
       archive = new(file, max_entries:)
@@ -154,8 +161,12 @@ class MediaFile
       ensure
         file.close unless file.equal?(filelike)
       end
-    rescue StandardError => e
-      raise Error, e
+    rescue MediaFile::InvalidFileError
+      raise
+    # Other errors, like a missing file or a bug in the block, can have details that aren't for users, like file paths.
+    # The original error is kept as the `cause`.
+    rescue StandardError
+      raise InvalidArchiveError
     end
 
     # Extract the archive to the given directory. If a block is given, extract the archive to a temp directory and
@@ -179,10 +190,10 @@ class MediaFile
     end
 
     # @return [Hash] The first `max_entries` entries in the archive.
-    # @raise [Error] If the archive is invalid.
+    # @raise [InvalidArchiveError] If the archive is invalid.
     def listing
       self.class.list!([self]) unless listed?
-      raise Error, @listing["error"] if @listing["error"]
+      raise InvalidArchiveError, @listing["error"] if @listing["error"]
 
       @listing
     end
@@ -207,6 +218,8 @@ class MediaFile
     # @param directory [String] The directory to extract the files to. By default, this is a temp directory the caller must clean up.
     # @yieldparam [String, Hash{String => String}] The name of the temp directory, and the path and name in the archive of each extracted file.
     # @return [(String, Hash{String => String})] The path to the directory, and the path and name in the archive of each extracted file.
+    # @raise [InvalidArchiveError] If the archive couldn't be extracted. If bin/archive called a blocked syscall, the
+    #   SyscallError is the error's `cause`.
     def extract!(directory = nil, &block)
       raise ArgumentError, "can't pass directory and block at the same time" if block_given? && directory.present?
 
@@ -225,24 +238,59 @@ class MediaFile
           FileUtils.rm_rf(dir) if dir && result.nil?
         end
       end
+    rescue MediaFile::ExternalCommand::SyscallError
+      raise InvalidArchiveError
     end
 
     # Extract the archive to a directory with bin/archive. See `extract!` for details.
     #
     # @return [Hash{String => String}] The path on disk and the name in the archive of each extracted file.
-    # @raise [Error] If the archive couldn't be extracted.
+    # @raise [InvalidArchiveError] If the archive couldn't be extracted.
     def extract_to!(directory)
       # libarchive won't extract through symlinks (EXTRACT_SECURE_SYMLINKS), so a directory under a symlink like /tmp on
       # macOS has to be resolved first.
       directory = File.realpath(directory)
       result = self.class.run!("extract", file_ext, path, directory, read: [path], write: [directory])
-      raise Error, result["error"] if result["error"]
+      raise InvalidArchiveError, result["error"] if result["error"]
 
       files = result["files"]
-      raise Error, INVALID_ARCHIVE unless files.is_a?(Array) && files.all? { it in { path: String, name: String, **nil } }
+      raise InvalidArchiveError unless files.is_a?(Array) && files.all? { it in { path: String, name: String, **nil } }
 
       self.class.verify_extracted_files!(files.pluck("path"), directory)
       files.to_h { [it["path"], it["name"]] }
+    end
+
+    # Check that the archive can be read and is safe to extract. Only the first `max_entries` files are checked, so
+    # `max_entries` must be more than `max_files` to detect archives with too many files.
+    #
+    # @param max_files [Integer] The most files the archive can contain.
+    # @param max_size [Integer] The largest total uncompressed size of the files, in bytes.
+    # @param name [String] The name of the archive in error messages, like the name of the file the user uploaded.
+    # @raise [InvalidArchiveError] If the archive can't be read, or isn't safe to extract.
+    def validate!(max_files:, max_size:, name: File.basename(path))
+      raise InvalidArchiveError, "'#{name}' is not a supported file type" unless file_ext.in?(FILE_TYPES)
+
+      begin
+        entries
+      rescue MediaFile::InvalidFileError => e
+        raise InvalidArchiveError, "'#{name}' couldn't be read (#{e.user_message})"
+      end
+
+      if file_count == 0
+        raise InvalidArchiveError, "'#{name}' doesn't contain any files"
+      elsif file_count > max_files
+        raise InvalidArchiveError, "'#{name}' contains too many files (max #{max_files} files)"
+      elsif uncompressed_size > max_size
+        raise InvalidArchiveError, "'#{name}' is too large (uncompressed size: #{uncompressed_size.to_fs(:human_size)}; max size: #{max_size.to_fs(:human_size)})"
+      elsif entries.any?(&:pathname_too_long?)
+        raise InvalidArchiveError, "'#{name}' contains a path that's too long (max #{MAX_PATHNAME_SIZE} bytes)"
+      elsif (entry = entries.find { it.pathname.starts_with?("/") })
+        raise InvalidArchiveError, "'#{entry.pathname}' in '#{name}' can't start with '/'"
+      elsif (entry = entries.find(&:directory_traversal?))
+        raise InvalidArchiveError, "'#{entry.pathname}' in '#{name}' can't contain '..' components"
+      elsif (entry = entries.find { !it.file? && !it.directory? })
+        raise InvalidArchiveError, "'#{entry.pathname}' in '#{name}' isn't a regular file"
+      end
     end
 
     # @return [Integer] The number of files in the archive, up to `max_entries`.
@@ -264,6 +312,15 @@ class MediaFile
     memoize def file_ext
       MediaFile::FileTypeDetector.new(file).file_ext
     end
+
+    # @return [String] The MD5 hash of the archive file, as a hex string.
+    memoize def md5
+      Digest::MD5.file(path).hexdigest
+    end
+
+    # @!method file_size
+    #   @return [Integer] The size of the archive file in bytes.
+    delegate :size, to: :file, prefix: true
   end
 
   # An entry represents a single file in an archive.

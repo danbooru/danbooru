@@ -14,7 +14,8 @@
 # @see https://github.com/pixiv/zip_player (Pixiv's Javascript ugoira player)
 # @see https://marcan.st/talks/2014_pixiv_ugoku_player/
 class MediaFile::Ugoira < MediaFile
-  class Error < StandardError; end
+  # A ugoira with an invalid .zip file.
+  class InvalidUgoiraError < MediaFile::InvalidFileError; end
 
   MIN_DELAY = 10 # The mininum delay allowed for a single frame in a ugoira. 10ms is the minimum on Pixiv.
   MAX_DELAY = 30_000 # The maximum delay allowed for a single frame in a ugoira. 30s is the max on Pixiv.
@@ -109,7 +110,7 @@ class MediaFile::Ugoira < MediaFile
         verify_zip_info!(result) if result["error"].nil?
         result
       end
-    rescue MediaFile::Archive::Error
+    rescue MediaFile::Archive::InvalidArchiveError
       @zip_info = { "error" => "invalid zip file" }
     end
   end
@@ -117,14 +118,14 @@ class MediaFile::Ugoira < MediaFile
   # Check the output of bin/archive, in case it was compromised by a malicious file. The files must be inside the
   # temp directory, and the names and frame offsets must match them.
   #
-  # @raise [MediaFile::Archive::Error] If the output is invalid.
+  # @raise [MediaFile::Archive::InvalidArchiveError] If the output is invalid.
   def verify_zip_info!(result)
     files = MediaFile::Archive.verify_extracted_files!(result["files"], tmpdir.path)
     names = result["names"]
     frame_offsets = result["frame_offsets"]
 
-    raise MediaFile::Archive::Error unless names == files.map { File.basename(it) }
-    raise MediaFile::Archive::Error unless frame_offsets.is_a?(Array) && frame_offsets.all? { it.is_a?(Integer) && it.between?(0, file.size) } && frame_offsets.size == (names - ["animation.json"]).size
+    raise MediaFile::Archive::InvalidArchiveError unless names == files.map { File.basename(it) }
+    raise MediaFile::Archive::InvalidArchiveError unless frame_offsets.is_a?(Array) && frame_offsets.all? { it.is_a?(Integer) && it.between?(0, file.size) } && frame_offsets.size == (names - ["animation.json"]).size
   end
 
   # @return [String, nil] Return the error message if the .zip file is invalid, or nil if it is valid.
@@ -260,7 +261,7 @@ class MediaFile::Ugoira < MediaFile
   #   delays and metadata (if present).
   def files
     synchronize do
-      raise Error, zip_error if zip_error.present?
+      raise InvalidUgoiraError, zip_error if zip_error.present?
 
       @files ||= zip_info["files"].map { |filename| File.open(filename) }
     end

@@ -1,4 +1,5 @@
 require "test_helper"
+require "zlib"
 
 class MediaFilePngTest < ActiveSupport::TestCase
   context "Previews" do
@@ -483,6 +484,15 @@ class MediaFilePngTest < ActiveSupport::TestCase
     should "be the size of the decoded image for interlaced PNGs" do
       assert_equal(64 * 32 * 3, MediaFile.open("test/files/png/test-interlaced.png").in_memory_size)
       assert_equal(64 * 32 * 3 * 2, MediaFile.open("test/files/png/test-interlaced-16bit.png").in_memory_size)
+    end
+  end
+
+  context "Validating a PNG" do
+    should "fail for an image that's too large to decode in memory" do
+      stub_const(MediaFile::Image, :MAX_IN_MEMORY_SIZE, 1_000) do
+        error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/png/test-interlaced.png").validate! }
+        assert_equal("Image is too large to decode (size: 6 KB; max size: 1000 Bytes)", error.user_message)
+      end
     end
   end
 end

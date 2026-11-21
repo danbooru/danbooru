@@ -2,6 +2,15 @@ require "test_helper"
 require "zip"
 
 class DanbooruArchiveTest < ActiveSupport::TestCase
+  def validate!(path, name: File.basename(path), max_files: 100, max_size: 100.megabytes)
+    MediaFile::Archive.open!(path, max_entries: max_files + 1).validate!(name:, max_files:, max_size:)
+  end
+
+  def assert_invalid(message, path, **)
+    error = assert_raises(MediaFile::Archive::InvalidArchiveError) { validate!(path, **) }
+    assert_equal(message, error.user_message)
+  end
+
   context "MediaFile::Archive" do
     context ".open! method" do
       should "work without a block" do
@@ -16,11 +25,29 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
 
       should "raise an error if the block raises an error" do
-        assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.open!("test/files/ugoira/ugoira.zip") { raise "failed" } }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/ugoira/ugoira.zip") { raise "failed" } }
+      end
+
+      should "not show users the message of errors that aren't from reading the archive" do
+        error = assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/does_not_exist.zip") }
+        assert_equal("invalid or corrupt archive", error.user_message)
+        assert_instance_of(Errno::ENOENT, error.cause)
+
+        error = assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/ugoira/ugoira.zip") { raise "failed: /tmp/secret" } }
+        assert_equal("invalid or corrupt archive", error.user_message)
+      end
+
+      should "keep the message of errors from reading the archive" do
+        error = assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/archive/ugoira.tar", &:entries) }
+        assert_equal("Unsupported archive format (.bin)", error.user_message)
+
+        MediaFile::Archive.any_instance.stubs(:entries).raises(MediaFile::Archive::InvalidArchiveError, "encrypted archives aren't supported")
+        error = assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/ugoira/ugoira.zip", &:entries) }
+        assert_equal("encrypted archives aren't supported", error.user_message)
       end
 
       should "raise an error if the file doesn't exist" do
-        assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.open!("test/files/does_not_exist.zip") }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/does_not_exist.zip") }
       end
     end
 
@@ -51,7 +78,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         tmpdir = Dir.mktmpdir
         Dir.stubs(:mktmpdir).returns(tmpdir)
 
-        assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.extract!("test/files/archive/long-path.tar.gz") }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.extract!("test/files/archive/long-path.tar.gz") }
         assert_equal(false, File.exist?(tmpdir))
       ensure
         FileUtils.rm_rf(tmpdir)
@@ -71,7 +98,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
       should "not delete the given directory if extracting the archive fails" do
         Dir.mktmpdir do |tmpdir|
-          assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.extract!("test/files/archive/long-path.tar.gz", tmpdir) }
+          assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.extract!("test/files/archive/long-path.tar.gz", tmpdir) }
           assert_equal(true, File.exist?(tmpdir))
         end
       end
@@ -137,6 +164,92 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
     end
 
+    context "an archive that makes bin/archive call a blocked syscall" do
+      should "raise an invalid archive error caused by the blocked syscall when listing the files" do
+        MediaFile::Archive.stubs(:run!).raises(MediaFile::ExternalCommand::SyscallError, "ruby called a blocked syscall")
+        archive = MediaFile::Archive.open!("test/files/ugoira/ugoira.zip")
+
+        error = assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.list!([archive]) }
+        assert_equal("invalid or corrupt archive", error.message)
+        assert_instance_of(MediaFile::ExternalCommand::SyscallError, error.cause)
+      end
+
+      should "raise an invalid archive error caused by the blocked syscall when extracting the files" do
+        MediaFile::Archive.stubs(:run!).raises(MediaFile::ExternalCommand::SyscallError, "ruby called a blocked syscall")
+        archive = MediaFile::Archive.open!("test/files/ugoira/ugoira.zip")
+
+        error = assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.extract! { nil } }
+        assert_equal("invalid or corrupt archive", error.message)
+        assert_instance_of(MediaFile::ExternalCommand::SyscallError, error.cause)
+
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.extract! }
+      end
+    end
+
+    context "#validate! method" do
+      should "pass for a valid archive" do
+        assert_nothing_raised { validate!("test/files/archive/directory.zip") }
+        assert_nothing_raised { validate!("test/files/archive/ugoira.rar") }
+        assert_nothing_raised { validate!("test/files/archive/ugoira.7z") }
+      end
+
+      should "use the given name in error messages" do
+        assert_invalid("'upload.7z' contains too many files (max 100 files)", "test/files/archive/bomb-10k-files.7z", name: "upload.7z")
+      end
+
+      should "fail for an unsupported archive type" do
+        assert_invalid("'ugoira.tar' is not a supported file type", "test/files/archive/ugoira.tar")
+      end
+
+      should "fail for a corrupt archive" do
+        MediaFile::Tempfile.create(["danbooru-archive-", ".7z"]) do |file|
+          File.binwrite(file.path, File.binread("test/files/archive/ugoira.7z").byteslice(0, 2000))
+          assert_invalid("'#{File.basename(file.path)}' couldn't be read (invalid or corrupt archive)", file.path)
+        end
+      end
+
+      should "fail for an archive without any files" do
+        MediaFile::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          Zip::OutputStream.open(file.path) do |zip|
+            zip.put_next_entry("dir/")
+            zip.put_next_entry("__MACOSX/._a.jpg")
+            zip.write("x")
+          end
+
+          assert_invalid("'#{File.basename(file.path)}' doesn't contain any files", file.path)
+        end
+      end
+
+      should "fail for an archive with too many files" do
+        assert_invalid("'bomb-10k-files.7z' contains too many files (max 100 files)", "test/files/archive/bomb-10k-files.7z")
+      end
+
+      should "fail for a decompression bomb" do
+        assert_invalid("'bomb-1-1G.rar' is too large (uncompressed size: 1000 MB; max size: 100 MB)", "test/files/archive/bomb-1-1G.rar")
+      end
+
+      should "fail for an archive containing a path that's too long" do
+        MediaFile::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          Zip::File.open(file.path, create: true) { |zip| zip.add("#{"#{"a" * 200}/" * 6}test.jpg", "test/files/jpg/test.jpg") }
+          assert_invalid("'#{File.basename(file.path)}' contains a path that's too long (max 1024 bytes)", file.path)
+        end
+      end
+
+      should "fail for an archive containing absolute paths" do
+        assert_invalid("'/tmp/foo/foo.txt' in 'absolute-path.7z' can't start with '/'", "test/files/archive/absolute-path.7z")
+      end
+
+      should "fail for an archive containing '..' paths" do
+        error = assert_raises(MediaFile::Archive::InvalidArchiveError) { validate!("test/files/archive/zip-slip.zip") }
+        assert_match(/\A'.*' in 'zip-slip\.zip' can't contain '\.\.' components\z/, error.user_message)
+      end
+
+      should "fail for an archive containing hardlinks or symlinks" do
+        assert_invalid("'b.jpg' in 'hardlink.rar' isn't a regular file", "test/files/archive/hardlink.rar")
+        assert_invalid("'passwd' in 'symlink.zip' isn't a regular file", "test/files/archive/symlink.zip")
+      end
+    end
+
     context "#uncompressed_size method" do
       should "work" do
         archive = MediaFile::Archive.open!("test/files/ugoira/ugoira.zip")
@@ -153,9 +266,9 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
     context "an unsupported archive format" do
       should "not be read" do
-        assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.open!("test/files/archive/ugoira.tar").entries }
-        assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.open!("test/files/archive/ugoira.tar.gz").entries }
-        assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.open!("test/files/archive/long-path.tar.gz").extract! { nil } }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/archive/ugoira.tar").entries }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/archive/ugoira.tar.gz").entries }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/archive/long-path.tar.gz").extract! { nil } }
       end
     end
 
@@ -164,8 +277,17 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         archive = MediaFile::Archive.open!("test/files/archive/tar-disguised-as-ugoira.tar")
 
         assert_equal(:ugoira, archive.file_ext)
-        assert_raises(MediaFile::Archive::Error) { archive.entries }
-        assert_raises(MediaFile::Archive::Error) { archive.extract! { nil } }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.entries }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.extract! { nil } }
+      end
+    end
+
+    context "#md5 and #file_size methods" do
+      should "return the MD5 and size of the archive file" do
+        archive = MediaFile::Archive.open!("test/files/archive/directory.zip")
+
+        assert_equal("017ef6a8d5397de06ea9f1245bdc554e", archive.md5)
+        assert_equal(498, archive.file_size)
       end
     end
 
@@ -183,12 +305,12 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       archive = MediaFile::Archive.open!("test/files/archive/zip-slip.zip")
 
       assert_equal(true, archive.entries.any?(&:directory_traversal?))
-      assert_raises(MediaFile::Archive::Error) { archive.extract! }
+      assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.extract! }
     end
 
     should "detect paths that are too long" do
       Dir.mktmpdir do |tmpdir|
-        assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.extract!("test/files/archive/long-path.tar.gz", tmpdir) }
+        assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.extract!("test/files/archive/long-path.tar.gz", tmpdir) }
         assert_equal([], Dir.children(tmpdir))
       end
     end
@@ -197,7 +319,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       archive = MediaFile::Archive.open!("test/files/archive/symlink.zip")
 
       assert_equal(true, archive.entries.any? { |e| !e.file? && !e.directory? })
-      assert_raises(MediaFile::Archive::Error) { archive.extract! }
+      assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.extract! }
     end
 
     should "not trust paths outside the directory from a compromised bin/archive" do
@@ -206,7 +328,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
 
         ["/etc/passwd", "#{dir}/../../etc/passwd", "#{dir}/link.jpg", "#{dir}/missing.jpg"].each do |path|
           MediaFile::ExternalCommand.stubs(:run).returns([{ files: [path] }.to_json, nil])
-          assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.extract!("test/files/ugoira/ugoira.zip", dir) }
+          assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.extract!("test/files/ugoira/ugoira.zip", dir) }
         end
       end
     end
@@ -250,7 +372,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
             end
           end
 
-          error = assert_raises(MediaFile::Archive::Error, names.inspect) { MediaFile::Archive.extract!(file.path) { nil } }
+          error = assert_raises(MediaFile::Archive::InvalidArchiveError, names.inspect) { MediaFile::Archive.extract!(file.path) { nil } }
           assert_match(/\A'.*' has an empty path\z/, error.message)
         end
       end
@@ -270,8 +392,8 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
         MediaFile::ExternalCommand.stubs(:run).returns([output.is_a?(String) ? output : output.to_json, nil])
         archive = MediaFile::Archive.open!("test/files/ugoira/ugoira.zip")
 
-        assert_raises(MediaFile::Archive::Error, output.inspect) { archive.entries }
-        assert_raises(MediaFile::Archive::Error, output.inspect) { archive.uncompressed_size }
+        assert_raises(MediaFile::Archive::InvalidArchiveError, output.inspect) { archive.entries }
+        assert_raises(MediaFile::Archive::InvalidArchiveError, output.inspect) { archive.uncompressed_size }
       end
 
       MediaFile::ExternalCommand.stubs(:run).returns([{ archives: [{ entries: [entry] }] }.to_json, nil])
@@ -283,7 +405,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       archive = MediaFile::Archive.open!("test/files/archive/hardlink.rar")
 
       assert_equal([["a.txt", "file"], ["b.jpg", "other"]], archive.entries.map { [it.pathname, it.filetype] })
-      error = assert_raises(MediaFile::Archive::Error) { archive.extract! }
+      error = assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.extract! }
       assert_equal("'b.jpg' is not a regular file", error.message)
     end
 
@@ -291,7 +413,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       archive = MediaFile::Archive.open!("test/files/archive/absolute-path.7z")
 
       assert_equal(true, archive.entries.any? { |e| e.pathname.starts_with?("/") })
-      assert_raises(MediaFile::Archive::Error) { archive.extract! }
+      assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.extract! }
     end
 
     should "stop listing archives with large numbers of files after the max entries" do
@@ -310,7 +432,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
           zip.write("data")
         end
 
-        error = assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.open!(file.path, max_entries: 4).entries }
+        error = assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!(file.path, max_entries: 4).entries }
         assert_equal("too many files", error.message)
         assert_equal(1, MediaFile::Archive.open!(file.path, max_entries: 6).file_count)
       end
@@ -320,21 +442,21 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       # lzma2-4gb-dictionary.7z contains test.txt ("hello world" repeated 50 times). It was created with
       # `7z a -m0=lzma2 -mhc=off`, then edited to declare a 4 GB LZMA2 dictionary (property byte at offset 0x4e set to
       # 40), with the header CRCs updated.
-      error = assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.open!("test/files/archive/lzma2-4gb-dictionary.7z").extract! { nil } }
+      error = assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.open!("test/files/archive/lzma2-4gb-dictionary.7z").extract! { nil } }
       assert_equal("invalid or corrupt archive", error.message)
     end
 
     should "raise an error if listing the files takes too long" do
       stub_const(MediaFile::Archive, :LIST_TIMEOUT, 0.seconds) do
-        error = assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.open!("test/files/ugoira/ugoira.zip").entries }
-        assert_equal("timed out", error.message)
+        error = assert_raises(MediaFile::TimeoutError) { MediaFile::Archive.open!("test/files/ugoira/ugoira.zip").entries }
+        assert_equal("File took too long to process", error.user_message)
       end
     end
 
     should "raise an error if an extracted file is larger than the max file size" do
       MediaFile.config.stubs(:max_file_size).returns(1_000)
 
-      assert_raises(MediaFile::Archive::Error) { MediaFile::Archive.extract!("test/files/ugoira/ugoira.zip") { nil } }
+      assert_raises(MediaFile::Archive::InvalidArchiveError) { MediaFile::Archive.extract!("test/files/ugoira/ugoira.zip") { nil } }
     end
 
     should "make extracted files readable even if the archive says they aren't" do

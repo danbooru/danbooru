@@ -18,6 +18,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_not_equal(md5, @post.reload.md5)
           stored_files = Dir.glob("#{Danbooru.config.storage_manager.base_dir}/**/*#{md5}*").map { it.delete_prefix(Danbooru.config.storage_manager.base_dir.to_s) }
           assert_equal(["/trash/quarantine/#{md5}.mp4"], stored_files)
+          assert_equal("The file couldn't be processed", flash[:notice])
         end
       end
 

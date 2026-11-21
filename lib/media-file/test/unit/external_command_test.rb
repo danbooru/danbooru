@@ -19,6 +19,26 @@ class ExternalCommandTest < ActiveSupport::TestCase
     end
   end
 
+  context "MediaFile::ExternalCommand::SyscallError.find_in" do
+    should "find the blocked syscall in the error, the errors it wraps, or the errors that caused it" do
+      blocked = MediaFile::ExternalCommand::SyscallError.new("ruby called a blocked syscall")
+      caused = begin
+        begin
+          raise blocked
+        rescue MediaFile::ExternalCommand::SyscallError
+          raise MediaFile::Archive::InvalidArchiveError
+        end
+      rescue MediaFile::Archive::InvalidArchiveError => e
+        e
+      end
+
+      assert_equal(blocked, MediaFile::ExternalCommand::SyscallError.find_in(blocked))
+      assert_equal(blocked, MediaFile::ExternalCommand::SyscallError.find_in(caused))
+      assert_equal(blocked, MediaFile::ExternalCommand::SyscallError.find_in(Concurrent::MultipleErrors.new([StandardError.new, caused])))
+      assert_nil(MediaFile::ExternalCommand::SyscallError.find_in(MediaFile::Archive::InvalidArchiveError.new))
+    end
+  end
+
   context "MediaFile::ExternalCommand.run" do
     should "return the output and status of the command" do
       output, status = MediaFile::ExternalCommand.run("echo hello")
@@ -204,7 +224,7 @@ class ExternalCommandTest < ActiveSupport::TestCase
     should "kill commands that close their output and keep running" do
       stub_const(MediaFile::ExternalCommand, :PROFILES, PROFILES) do
         started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-        error = assert_raises(MediaFile::ExternalCommand::TimeoutError) { MediaFile::ExternalCommand.run(%{ruby -e '$stdout.close; $stderr.close; sleep 30'}, timeout: 1) }
+        error = assert_raises(MediaFile::TimeoutError) { MediaFile::ExternalCommand.run(%{ruby -e '$stdout.close; $stderr.close; sleep 30'}, timeout: 1) }
 
         assert_equal("ruby timed out after 1 seconds", error.message)
         assert_operator(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at, :<, 10)
@@ -240,7 +260,7 @@ class ExternalCommandTest < ActiveSupport::TestCase
 
     should "kill commands that run longer than the timeout" do
       started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      error = assert_raises(MediaFile::ExternalCommand::TimeoutError) { MediaFile::ExternalCommand.run("sleep 30", timeout: 1) }
+      error = assert_raises(MediaFile::TimeoutError) { MediaFile::ExternalCommand.run("sleep 30", timeout: 1) }
 
       assert_equal("sleep timed out after 1 seconds", error.message)
       assert_operator(Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at, :<, 10)
@@ -532,6 +552,25 @@ class ExternalCommandTest < ActiveSupport::TestCase
       media_file.stubs(:file_ext).returns(:bin)
 
       assert_match(/unsupported file type/, MediaFile::FFmpeg.new(media_file).metadata[:error])
+    end
+  end
+
+  context "Errors" do
+    should "not show users which program timed out" do
+      error = assert_raises(MediaFile::TimeoutError) { MediaFile::ExternalCommand.run("sleep 30", timeout: 1) }
+
+      assert_equal("sleep timed out after 1 seconds", error.message)
+      assert_equal("File took too long to process", error.user_message)
+    end
+
+    should "not show users the details of sandbox errors" do
+      assert_equal("The file couldn't be processed", MediaFile::ExternalCommand::SyscallError.new("exiftool called a blocked syscall").user_message)
+      assert_equal("The file couldn't be processed", MediaFile::ExternalCommand::Error.new("can't run ffmpeg: /usr/bin/ffmpeg can't be sandboxed").user_message)
+    end
+
+    should "not show users the output of ffmpeg" do
+      error = MediaFile::FFmpeg::Error.new("ffmpeg failed: [h264 @ 0x55d5c] /tmp/danbooru-video-preview-123.png: Permission denied")
+      assert_equal("The file couldn't be processed", error.user_message)
     end
   end
 end

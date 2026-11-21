@@ -360,4 +360,13 @@ class MediaFileWebpTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "Validating a WebP" do
+    should "fail for a WebP over the max WebP resolution" do
+      stub_const(MediaFile::Image, :MAX_WEBP_RESOLUTION, 1_000) do
+        error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/webp/test.webp").validate! }
+        assert_equal("WebP image is too large to decode (resolution: 0.0 megapixels (128x128); max: 0 megapixels)", error.user_message)
+      end
+    end
+  end
 end

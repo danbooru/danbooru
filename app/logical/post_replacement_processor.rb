@@ -53,8 +53,7 @@ class PostReplacementProcessor
     post.save!
     post.update_iqdb
   rescue Exception => exception
-    MediaAsset.handle_blocked_file(exception, media_file:, user: replacement.creator, action: "Replacement of post ##{post.id}", source: replacement.replacement_url.presence)
-    replacement.errors.add(:base, exception.message)
+    replacement.errors.add(:base, MediaAsset.handle_processing_error(exception, media_file:, user: replacement.creator, action: "Replacement of post ##{post.id}", source: replacement.replacement_url.presence))
     raise ActiveRecord::Rollback
   ensure
     media_file&.close

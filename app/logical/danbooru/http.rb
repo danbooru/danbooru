@@ -256,11 +256,11 @@ module Danbooru
       # Download a file from `url` and return a {MediaFile}.
       #
       # @param url [String] the URL to download
-      # @param file [Danbooru::Tempfile] the file to download the URL to
+      # @param file [MediaFile::Tempfile] the file to download the URL to
       # @raise [DownloadError] if the server returns a non-200 OK response
       # @raise [FileTooLargeError] if the file exceeds Danbooru's maximum download size.
       # @return [Array<(HTTP::Response, MediaFile)>] the HTTP response and the downloaded file
-      def download_media(url, file: Danbooru::Tempfile.new("danbooru-download-#{url.parameterize.truncate(96)}-", binmode: true))
+      def download_media(url, file: MediaFile::Tempfile.new("danbooru-download-#{url.parameterize.truncate(96)}-", binmode: true))
         response = request(:get, url, buffer: false)
         raise DownloadError.new("#{url} failed with code #{response.status}", response: response) if response.status != 200
 

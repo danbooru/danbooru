@@ -14,14 +14,21 @@ require "io/nonblock"
 # Commands are started with setpriv(1), which applies the sandbox and then runs the command. This is much faster than
 # forking the Rails process to apply the sandbox, because forking a large process is slow.
 class MediaFile::ExternalCommand
-  class Error < StandardError; end
-  class TimeoutError < Error; end
+  class Error < MediaFile::Error; end
   class OutputLimitError < Error; end
 
   class SyscallError < Error
-    # @return [SyscallError, nil] The error if it's a SyscallError or wraps one, like the errors raised by `parallel_each`.
+    # @return [SyscallError, nil] The error if it's a SyscallError, or if it wraps or was caused by one, like the errors
+    #   raised by `parallel_each` or an archive that couldn't be read because of a blocked syscall.
     def self.find_in(error)
-      [error, *(error.errors if error.is_a?(Concurrent::MultipleErrors))].find { it.is_a?(SyscallError) }
+      errors = error.is_a?(Concurrent::MultipleErrors) ? error.errors : [error]
+
+      errors.each do |e|
+        e = e.cause until e.nil? || e.is_a?(SyscallError)
+        return e if e
+      end
+
+      nil
     end
   end
 
@@ -116,7 +123,7 @@ class MediaFile::ExternalCommand
   # @param file_size_limit [Integer, nil] The maximum size in bytes of any file the command writes, or nil for no limit.
   # @param profile_name [String, nil] The name of the sandbox profile in PROFILES to use, if it isn't the program's name.
   # @return [Array<(String, Process::Status)>] The combined stdout and stderr of the command, and its exit status.
-  # @raise [TimeoutError] If the command ran longer than the timeout.
+  # @raise [MediaFile::TimeoutError] If the command ran longer than the timeout.
   # @raise [OutputLimitError] If the command printed more than the output limit.
   # @raise [SyscallError] If the command was killed for using a blocked system call.
   # @raise [Error] If the command couldn't be started, or if Landlock isn't supported and the sandbox isn't disabled.
@@ -270,7 +277,7 @@ class MediaFile::ExternalCommand
   # Read the command's output until it closes it.
   #
   # @return [String] The output, as binary.
-  # @raise [TimeoutError] If the command runs past the deadline.
+  # @raise [MediaFile::TimeoutError] If the command runs past the deadline.
   # @raise [OutputLimitError] If the command prints too much.
   def read_output!(output, deadline)
     buffer = "".b
@@ -288,7 +295,7 @@ class MediaFile::ExternalCommand
   end
 
   def timed_out!
-    raise TimeoutError, "#{program} timed out after #{timeout.to_i} seconds"
+    raise MediaFile::TimeoutError, "#{program} timed out after #{timeout.to_i} seconds"
   end
 
   # @return [Float] The number of seconds left until the deadline, or 0 if it has passed.

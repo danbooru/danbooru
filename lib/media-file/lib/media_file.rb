@@ -23,6 +23,34 @@ require "tmpdir"
 class MediaFile
   extend Memoist
 
+  # The base class of every error raised by the library. Its message may include internal details, like file paths or
+  # the output of ffmpeg, so it isn't shown to users.
+  class Error < StandardError
+    # @return [String] The message to show users.
+    def user_message
+      "The file couldn't be processed"
+    end
+  end
+
+  # An error caused by the file itself, like a corrupt or invalid file. Its message is written for users.
+  class InvalidFileError < Error
+    def user_message
+      message
+    end
+  end
+
+  # A file that took too long to process, usually because it's very large or made to be slow to decode. The message
+  # says which program timed out, for logs. Users only see that the file took too long.
+  class TimeoutError < InvalidFileError
+    def initialize(message = "File took too long to process")
+      super
+    end
+
+    def user_message
+      "File took too long to process"
+    end
+  end
+
   # The MIME types of the file types we detect. Other files are "application/octet-stream".
   MIME_TYPES = {
     jpg: "image/jpeg",
@@ -90,8 +118,8 @@ class MediaFile
 
   attr_accessor :file
 
-  # delegate all File methods to `file`.
-  delegate *(File.instance_methods - MediaFile.instance_methods), to: :file
+  # Delegate all File methods to `file`, except `close`, which is defined below.
+  delegate(*(File.instance_methods - MediaFile.instance_methods - [:close]), to: :file)
 
   # Open a file or filename and return a MediaFile object. If a block is given,
   # pass the file to the block and return the result after closing the file.
@@ -245,6 +273,55 @@ class MediaFile
   # @return [Boolean] True if the file is over the upload limits (see `MediaFile::Image::MAX_IN_MEMORY_SIZE`).
   def is_too_large?
     false
+  end
+
+  # Check that the file can be processed safely, using the limits in `MediaFile.config`. The checks are ordered so that
+  # a file that's too large is rejected before it's decoded, so it can't use too much time or memory first.
+  #
+  # @param max_duration [Numeric, nil] The longest a video or animation can be in seconds, or nil for no limit.
+  # @raise [InvalidFileError] If the file is too large, unsupported, or corrupt. The message is written for users.
+  def validate!(max_duration: nil)
+    config = MediaFile.config
+
+    # Check the file size before reading the file. Reading the dimensions only decodes images that are within the
+    # limits checked below (see `MediaFile::Image.read!`).
+    if file_size > config.max_file_size
+      raise InvalidFileError, "File size too large (size: #{file_size.to_fs(:human_size)}; max size: #{config.max_file_size.to_fs(:human_size)})"
+    # Check the frame count before the dimensions, because getting a video's dimensions requires reading every frame.
+    elsif is_video? && packet_count > MediaFile::FFmpeg::MAX_PACKET_COUNT
+      raise InvalidFileError, "Video has too many frames (max: #{MediaFile::FFmpeg::MAX_PACKET_COUNT})"
+    end
+
+    # Read the file and its metadata at the same time, because both start an external program. Wait for both before
+    # checking them, so neither is still running if a check fails.
+    reads = [Concurrent::Promises.future_on(:io) { dimensions }, Concurrent::Promises.future_on(:io) { exif_metadata }]
+    reads.each(&:wait)
+    reads.each(&:value!)
+
+    # These are the same limits `bin/image` checks before decoding an image (see `within_limits?`). Change both together.
+    if resolution > config.max_image_resolution
+      raise InvalidFileError, "Image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{width}x#{height}); max: #{config.max_image_resolution / 1_000_000} megapixels)"
+    elsif width.to_i > config.max_image_width
+      raise InvalidFileError, "Image width is too large (width: #{width}; max width: #{config.max_image_width})"
+    elsif height.to_i > config.max_image_height
+      raise InvalidFileError, "Image height is too large (height: #{height}; max height: #{config.max_image_height})"
+    elsif in_memory_size > MediaFile::Image::MAX_IN_MEMORY_SIZE
+      raise InvalidFileError, "Image is too large to decode (size: #{in_memory_size.to_fs(:human_size)}; max size: #{MediaFile::Image::MAX_IN_MEMORY_SIZE.to_fs(:human_size)})"
+    elsif file_ext == :webp && resolution > MediaFile::Image::MAX_WEBP_RESOLUTION
+      raise InvalidFileError, "WebP image is too large to decode (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{width}x#{height}); max: #{MediaFile::Image::MAX_WEBP_RESOLUTION / 1_000_000} megapixels)"
+    # Check the metadata before `is_supported?`, which needs the metadata to check AVIFs.
+    elsif exif_metadata["Danbooru:ExifToolError"].present?
+      raise InvalidFileError, "File has too much metadata"
+    elsif !is_supported?
+      raise InvalidFileError, "File type is not supported"
+    elsif is_corrupt?
+      raise InvalidFileError, "File is corrupt"
+    # Checked after `is_corrupt?`, because corrupt files often have no dimensions, and "corrupt" is the better error.
+    elsif width.to_i <= 0 || height.to_i <= 0
+      raise InvalidFileError, "Couldn't read the file's dimensions"
+    elsif max_duration && duration.to_i > max_duration
+      raise InvalidFileError, "Duration must be less than #{max_duration} seconds"
+    end
   end
 
   # @return [Boolean] True if the file is supported by Danbooru. Certain files may be unsupported because they use features we don't support.

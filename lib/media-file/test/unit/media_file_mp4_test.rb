@@ -2326,4 +2326,33 @@ class MediaFileMp4Test < ActiveSupport::TestCase
       assert_equal(false, file.is_corrupt?)
     end
   end
+
+  context "Validating an MP4" do
+    should "pass for a valid file" do
+      MediaFile.open("test/files/mp4/test-300x300-av1.mp4") { |file| assert_nothing_raised { file.validate! } }
+    end
+
+    should "fail for a video with too many frames before reading the frames" do
+      MediaFile::FFmpeg.any_instance.stubs(:packet_count).returns(MediaFile::FFmpeg::MAX_PACKET_COUNT + 1)
+      MediaFile::FFmpeg.any_instance.expects(:metadata).never
+
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/mp4/test-300x300-av1.mp4").validate! }
+      assert_equal("Video has too many frames (max: #{MediaFile::FFmpeg::MAX_PACKET_COUNT})", error.user_message)
+    end
+
+    should "fail for a video longer than the max duration" do
+      MediaFile.open("test/files/mp4/test-300x300-av1.mp4") do |file|
+        error = assert_raises(MediaFile::InvalidFileError) { file.validate!(max_duration: 4) }
+        assert_equal("Duration must be less than 4 seconds", error.user_message)
+
+        assert_nothing_raised { file.validate!(max_duration: 5) }
+        assert_nothing_raised { file.validate!(max_duration: nil) }
+      end
+    end
+
+    should "fail for a corrupt file" do
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/mp4/test-corrupt.mp4").validate! }
+      assert_equal("File is corrupt", error.user_message)
+    end
+  end
 end

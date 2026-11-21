@@ -200,7 +200,7 @@ class PumaTest < ActiveSupport::TestCase
   end
 
   def spawn_server(**env)
-    log_file = Danbooru::Tempfile.new("danbooru-puma-test-")
+    log_file = MediaFile::Tempfile.new("danbooru-puma-test-")
     dir = Dir.mktmpdir
     port = reserve_port
     uri = "http://localhost:#{port}"

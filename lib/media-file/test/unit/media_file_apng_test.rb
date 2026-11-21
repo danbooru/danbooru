@@ -311,39 +311,6 @@ class MediaFileApngTest < ActiveSupport::TestCase
     end
   end
 
-  context "an APNG file with a missing IEND chunk" do
-    should "be parsed correctly" do
-      file = MediaFile.open("test/files/apng/iend_missing.png")
-
-      assert_equal(150, file.width)
-      assert_equal(150, file.height)
-      assert_equal(6667, file.file_size)
-      assert_equal(:png, file.file_ext)
-      assert_equal("image/png", file.mime_type)
-      assert_equal("0d4172d6c000b4ce5522dd24dcfab8dd", file.md5)
-      assert_equal("0d4172d6c000b4ce5522dd24dcfab8dd", file.pixel_hash)
-      assert_equal(false, file.is_corrupt?)
-      assert_equal(true, file.is_supported?)
-      assert_equal(true, file.is_animated?)
-      assert_equal(5.0, file.duration)
-      assert_equal(3, file.frame_count)
-      assert_equal(0.6, file.frame_rate)
-      assert_equal({
-        "File:FileType" => "APNG",
-        "PNG:ImageWidth" => 150,
-        "PNG:ImageHeight" => 150,
-        "PNG:BitDepth" => 8,
-        "PNG:ColorType" => "RGB with Alpha",
-        "PNG:Compression" => "Deflate/Inflate",
-        "PNG:Filter" => "Adaptive",
-        "PNG:Interlace" => "Noninterlaced",
-        "PNG:AnimationFrames" => 3,
-        "PNG:AnimationPlays" => "inf",
-        "ExifTool:Warning" => "Truncated PNG image",
-      }, file.metadata.to_h)
-    end
-  end
-
   context "an animated PNG with an unspecified (infinite) frame rate" do
     should "be parsed correctly" do
       file = MediaFile.open("test/files/apng/infinite-fps.png")

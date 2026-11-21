@@ -1,6 +1,6 @@
 require "test_helper"
 
-class MediaFileDupesTest < ActiveSupport::TestCase
+class MediaFileDupesMetadataTest < ActiveSupport::TestCase
   context "a solid black 100x200 grayscale PNG" do
     should "be parsed correctly" do
       file = MediaFile.open("test/files/dupes/black-100x200.png")

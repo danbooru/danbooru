@@ -459,7 +459,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
           assert_kind_of(MediaFile::Ugoira, ugoira)
           assert_equal("ugoira must not be compressed", ugoira.error)
           assert_equal([], Dir.children(ugoira.tmpdir.path))
-          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+          assert_raises(MediaFile::Ugoira::InvalidUgoiraError) { ugoira.dimensions }
         end
       end
     end
@@ -471,7 +471,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         MediaFile.open(file) do |ugoira|
           assert_equal("cannot have more than 500 frames", ugoira.error)
           assert_equal([], Dir.children(ugoira.tmpdir.path))
-          assert_raises(MediaFile::Ugoira::Error) { ugoira.frames }
+          assert_raises(MediaFile::Ugoira::InvalidUgoiraError) { ugoira.frames }
         end
       end
     end
@@ -485,7 +485,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
           MediaFile.open(outer) do |ugoira|
             assert_equal("file '000000.jpg' is not an image file", ugoira.error)
             assert_equal([], Dir.children(ugoira.tmpdir.path))
-            assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+            assert_raises(MediaFile::Ugoira::InvalidUgoiraError) { ugoira.dimensions }
           end
         end
       end
@@ -500,7 +500,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
 
           assert_equal("file '000000.jpg' is not an image file", ugoira.error)
           assert_equal([], Dir.children(ugoira.tmpdir.path))
-          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+          assert_raises(MediaFile::Ugoira::InvalidUgoiraError) { ugoira.dimensions }
         end
       end
     end
@@ -512,7 +512,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         MediaFile.open(file) do |ugoira|
           assert_equal("file '000000.jpg' has the wrong file extension (expected '000000.png')", ugoira.error)
           assert_equal([], Dir.children(ugoira.tmpdir.path))
-          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+          assert_raises(MediaFile::Ugoira::InvalidUgoiraError) { ugoira.dimensions }
         end
       end
     end
@@ -524,7 +524,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         MediaFile.open(file) do |ugoira|
           assert_equal("file '000000.jpg' has the wrong file extension (expected '000000.gif')", ugoira.error)
           assert_equal([], Dir.children(ugoira.tmpdir.path))
-          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+          assert_raises(MediaFile::Ugoira::InvalidUgoiraError) { ugoira.dimensions }
         end
       end
     end
@@ -538,7 +538,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
 
           assert_equal("file '000000.jpg' is not an image file", ugoira.error)
           assert_equal([], Dir.children(ugoira.tmpdir.path))
-          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+          assert_raises(MediaFile::Ugoira::InvalidUgoiraError) { ugoira.dimensions }
         end
       end
     end
@@ -552,7 +552,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
 
           assert_equal("file '000000.jpg' is not an image file", ugoira.error)
           assert_equal([], Dir.children(ugoira.tmpdir.path))
-          assert_raises(MediaFile::Ugoira::Error) { ugoira.dimensions }
+          assert_raises(MediaFile::Ugoira::InvalidUgoiraError) { ugoira.dimensions }
         end
       end
     end
@@ -728,7 +728,7 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     should "not limit the first pass of two-pass encoding to the default command timeout" do
       MediaFile::Image.stubs(:read!)
       MediaFile::Image.any_instance.stubs(:dimensions).returns([500, 335])
-      MediaFile::ExternalCommand.expects(:run).with(regexp_matches(/ -pass 1 /), has_entry(:timeout, MediaFile::FFmpeg::ENCODE_TIMEOUT)).raises(MediaFile::ExternalCommand::TimeoutError, "pass 1 timed out")
+      MediaFile::ExternalCommand.expects(:run).with(regexp_matches(/ -pass 1 /), has_entry(:timeout, MediaFile::FFmpeg::ENCODE_TIMEOUT)).raises(MediaFile::TimeoutError, "pass 1 timed out")
       ugoira = MediaFile::Ugoira.new(["test/files/jpg/test.jpg", "test/files/jpg/test.jpg"], frame_delays: [100, 100])
 
       error = assert_raises(MediaFile::FFmpeg::Error) { ugoira.convert(format: :webm) }
@@ -859,6 +859,19 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
         assert_equal([1000, 2000, 3000, 4000, 5000], video.frame_durations)
         assert_equal(15.0, video.duration)
         assert_equal(15.0, video.playback_duration)
+      end
+    end
+  end
+
+  context "Validating a ugoira" do
+    should "pass for a valid ugoira" do
+      MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") { |ugoira| assert_nothing_raised { ugoira.validate! } }
+    end
+
+    should "fail with a message for users for an invalid zip file" do
+      MediaFile.open("test/files/ugoira/invalid_ugoira.zip", frame_delays: [100, 100]) do |ugoira|
+        error = assert_raises(MediaFile::InvalidFileError) { ugoira.validate! }
+        assert_equal("invalid zip file", error.user_message)
       end
     end
   end

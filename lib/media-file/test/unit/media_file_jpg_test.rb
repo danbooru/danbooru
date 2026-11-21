@@ -17,8 +17,8 @@ class MediaFileJpgTest < ActiveSupport::TestCase
       MediaFile::ExternalCommand.stubs(:run).with { |_command, write:, **| output = write.first }.returns([{ error: "VipsJpeg: Premature end of input file" }.to_json, nil])
       MediaFile.logger.expects(:info).with(regexp_matches(%r{\Abin/image resize failed: .*VipsJpeg: Premature end of input file}))
 
-      error = assert_raises(MediaFile::Image::Error) { file.resize!(150, 150) }
-      assert_equal("libvips error", error.message)
+      error = assert_raises(MediaFile::Image::ResizeError) { file.resize!(150, 150) }
+      assert_equal("libvips error", error.user_message)
       assert_equal(false, File.exist?(output))
     end
 
@@ -30,7 +30,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
         File.write(output, "<html>")
       end.returns([{}.to_json, nil])
 
-      assert_raises(MediaFile::Image::Error) { image.resize!(150, 150) }
+      assert_raises(MediaFile::Image::ResizeError) { image.resize!(150, 150) }
       assert_equal(false, File.exist?(output))
     end
   end
@@ -1227,6 +1227,69 @@ class MediaFileJpgTest < ActiveSupport::TestCase
     should "be the size of the decoded image for rotated JPEGs" do
       file = MediaFile.open("test/files/jpg/test-rotation-90cw.jpg")
       assert_equal(file.width * file.height * 3, file.in_memory_size)
+    end
+  end
+
+  context "Validating a JPEG" do
+    should "pass for a valid file" do
+      MediaFile.open("test/files/jpg/test.jpg") { |file| assert_nothing_raised { file.validate! } }
+    end
+
+    should "fail for a file that's too large before reading it" do
+      MediaFile.config.stubs(:max_file_size).returns(1_000)
+      MediaFile::Image.any_instance.expects(:dimensions).never
+
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/jpg/test.jpg").validate! }
+      assert_equal("File size too large (size: 27.4 KB; max size: 1000 Bytes)", error.user_message)
+    end
+
+    should "fail for an image that's too large before decoding it" do
+      MediaFile.config.stubs(:max_image_resolution).returns(1_000_000)
+      MediaFile::Image.any_instance.stubs(:dimensions).returns([2_000, 1_000])
+      MediaFile::Image.any_instance.expects(:is_corrupt?).never
+
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/jpg/test.jpg").validate! }
+      assert_equal("Image resolution is too large (resolution: 2.0 megapixels (2000x1000); max: 1 megapixels)", error.user_message)
+    end
+
+    should "fail for an image that's too wide" do
+      MediaFile.config.stubs(:max_image_width).returns(100)
+
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/jpg/test.jpg").validate! }
+      assert_equal("Image width is too large (width: 500; max width: 100)", error.user_message)
+    end
+
+    should "fail for an image that's too tall" do
+      MediaFile.config.stubs(:max_image_height).returns(100)
+
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/jpg/test.jpg").validate! }
+      assert_equal("Image height is too large (height: 335; max height: 100)", error.user_message)
+    end
+
+    should "fail for a file with more metadata than exiftool can print" do
+      stub_const(MediaFile::ExternalCommand, :OUTPUT_LIMIT, 100) do
+        error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/jpg/test.jpg").validate! }
+        assert_equal("File has too much metadata", error.user_message)
+      end
+    end
+
+    should "fail for a corrupt file" do
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/jpg/test-corrupt.jpg").validate! }
+      assert_equal("File is corrupt", error.user_message)
+    end
+
+    should "fail for a file whose dimensions can't be read" do
+      MediaFile::Image.any_instance.stubs(:dimensions).returns([0, 0])
+
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/jpg/test.jpg").validate! }
+      assert_equal("Couldn't read the file's dimensions", error.user_message)
+    end
+
+    should "fail without saying which program timed out if reading the file times out" do
+      MediaFile::ExternalCommand.stubs(:run).raises(MediaFile::TimeoutError, "ruby timed out after 60 seconds")
+
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/jpg/test.jpg").validate! }
+      assert_equal("File took too long to process", error.user_message)
     end
   end
 end

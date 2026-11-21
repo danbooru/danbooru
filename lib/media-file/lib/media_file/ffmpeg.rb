@@ -6,7 +6,7 @@ require "shellwords"
 class MediaFile::FFmpeg
   extend Memoist
 
-  class Error < StandardError; end
+  class Error < MediaFile::Error; end
 
   # The maximum number of packets in all streams combined. Reading the metadata for each packet and its frame takes about
   # 1KB of memory, so this limits it to about 100MB. 100k packets is about 12 minutes of 60 FPS video with audio.
@@ -647,7 +647,7 @@ class MediaFile::FFmpeg
     end
 
     output.force_encoding("ASCII-8BIT")
-  rescue MediaFile::ExternalCommand::TimeoutError, MediaFile::ExternalCommand::OutputLimitError => e
+  rescue MediaFile::TimeoutError, MediaFile::ExternalCommand::OutputLimitError => e
     raise Error, e.message
   end
 end

@@ -9,8 +9,12 @@
 # @see https://github.com/libvips/ruby-vips
 # @see https://libvips.github.io/libvips/API/current
 class MediaFile::Image < MediaFile
-  class Error < StandardError; end
-  class TimeoutError < Error; end
+  # An image that libvips couldn't resize. libvips' own error messages aren't shown to users.
+  class ResizeError < MediaFile::InvalidFileError
+    def initialize(message = "libvips error")
+      super
+    end
+  end
 
   # Images are decoded by bin/image, which can use at most 4 GB of memory (`MediaFile::ExternalCommand::MEMORY_LIMIT`). An
   # image that needs more fails partway through decoding, which looks the same as a corrupt file. The two limits below
@@ -41,14 +45,12 @@ class MediaFile::Image < MediaFile
   # Run a bin/image command in the sandbox, with the default 4 GB memory limit (see `MAX_IN_MEMORY_SIZE`).
   #
   # @return [Hash, nil] The JSON output of the command, with symbol keys, or nil if it crashed or printed too much.
-  # @raise [TimeoutError] If the command timed out.
+  # @raise [MediaFile::TimeoutError] If the command timed out.
   # @raise [MediaFile::ExternalCommand::SyscallError] If the command was killed by the sandbox. It isn't wrapped, so the file can
   #   be quarantined.
   def self.run!(*args, read:, write: [], timeout: MediaFile::ExternalCommand::TIMEOUT)
     result = MediaFile::ExternalCommand.run_script("bin/image", *args, gems: %w[ffi ruby-vips logger], read:, write:, timeout:, file_size_limit: MediaFile.config.max_file_size.to_i)
     result&.deep_symbolize_keys
-  rescue MediaFile::ExternalCommand::TimeoutError
-    raise TimeoutError, "Image took too long to process"
   rescue MediaFile::ExternalCommand::OutputLimitError
     MediaFile.logger.info("bin/image printed too much output: #{args.first}")
     nil
@@ -206,7 +208,7 @@ class MediaFile::Image < MediaFile
   end
 
   # @return [MediaFile::Image] The image resized to the exact width and height.
-  # @raise [Error] If the image couldn't be resized.
+  # @raise [ResizeError] If the image couldn't be resized.
   def resize!(width, height, format: :jpeg, quality: 85)
     output_file = MediaFile::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format}"])
     result = MediaFile::Image.run!("resize", file_ext, path, width, height, format, quality, output_file.path, read: [path], write: [output_file.path])
@@ -215,7 +217,7 @@ class MediaFile::Image < MediaFile
     # compromised, so check that it wrote an image of the right type.
     unless result && result[:error].nil? && MediaFile.file_ext(output_file) == { jpeg: :jpg, webp: :webp }.fetch(format.to_sym)
       MediaFile.logger.info("bin/image resize failed: #{result.inspect.truncate(1000)}") unless result.nil?
-      raise Error, "libvips error"
+      raise ResizeError
     end
 
     MediaFile::Image.new(output_file)

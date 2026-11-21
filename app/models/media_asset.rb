@@ -7,11 +7,8 @@ class MediaAsset < ApplicationRecord
   FILE_MIME_TYPES = %w[image/jpeg image/png image/gif image/webp image/avif video/mp4 video/webm application/x-shockwave-flash video/x-ugoira]
   FILE_KEY_LENGTH = 9
   VARIANTS = %i[180x180 360x360 720x720 sample full original]
-  MAX_FILE_SIZE = Danbooru.config.max_file_size.to_i
+  MAX_FILE_SIZE = MediaFile.config.max_file_size
   MAX_VIDEO_DURATION = Danbooru.config.max_video_duration.to_i
-  MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
-  MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
-  MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
 
   attribute :id
@@ -362,7 +359,7 @@ class MediaAsset < ApplicationRecord
       # escaped, so they can't add fake lines to the log.
       #
       # @param error [Exception] The error from processing the file.
-      # @param media_file [MediaFile, nil] The file.
+      # @param media_file [MediaFile, MediaFile::Archive, nil] The file.
       # @param user [User] The user who uploaded or searched for the file.
       # @param action [String] What the user was doing, like "Upload #123".
       # @param details [Hash] Other things to log, like the source URL.
@@ -384,52 +381,47 @@ class MediaAsset < ApplicationRecord
         Rails.logger.error("#{action} by user ##{user.id} (#{user.name}) was blocked by the sandbox: #{blocked_error.message} (#{(details + file_details).join(", ")})")
       end
 
+      # Handle an error from processing a file: log and quarantine the file if a program was blocked by the sandbox, and
+      # return the error message to show the user.
+      #
+      # @param (see handle_blocked_file)
+      # @return [String] The message to show the user (see `error_message_for`).
+      def handle_processing_error(error, media_file:, user:, action:, **details)
+        handle_blocked_file(error, media_file:, user:, action:, **details)
+        error_message_for(error)
+      end
+
+      # The error message to show users when processing a file fails. Errors from the media_file library that weren't
+      # caused by the file, like ffmpeg crashing, can have details that aren't for users, like file paths, so they're
+      # logged and users get a generic message. Blocked syscalls are already logged by `handle_blocked_file`.
+      # Errors from generating the variants in parallel are wrapped in a `Concurrent::MultipleErrors`, whose message includes
+      # every error and its backtrace, so only the first error is shown.
+      #
+      # @param error [Exception] The error from processing the file.
+      # @return [String] The message to show the user.
+      def error_message_for(error)
+        error = error.errors.first if error.is_a?(Concurrent::MultipleErrors)
+        return error.message unless error.is_a?(MediaFile::Error)
+
+        DanbooruLogger.log(error) unless error.is_a?(MediaFile::InvalidFileError) || error.is_a?(MediaFile::ExternalCommand::SyscallError)
+        error.user_message
+      end
+
+      # Check that the file can be uploaded. The limits on size, dimensions, and memory are checked by `MediaFile#validate!`.
+      #
+      # @param media_file [MediaFile] The file.
+      # @param uploader [User] The user uploading the file. Admins can upload videos of any length.
+      # @raise [Error] If the file can't be uploaded.
       def validate_media_file!(media_file, uploader)
-        if !media_file.mime_type.to_s.in?(FILE_MIME_TYPES)
+        if !media_file.mime_type.in?(FILE_MIME_TYPES)
           raise Error, "File is not an image or video"
         elsif media_file.is_flash?
           raise Error, "Flash files are not supported"
-        # Check the file size before reading the file. Reading the dimensions only decodes images that are within the
-        # limits checked below (see `MediaFile::Image.read!`).
-        elsif media_file.file_size > MAX_FILE_SIZE
-          raise Error, "File size too large (size: #{media_file.file_size.to_fs(:human_size)}; max size: #{MAX_FILE_SIZE.to_fs(:human_size)})"
-        # Check the frame count before the dimensions, because getting a video's dimensions requires reading every frame.
-        elsif media_file.is_video? && media_file.packet_count > MediaFile::FFmpeg::MAX_PACKET_COUNT
-          raise Error, "Video has too many frames (max: #{MediaFile::FFmpeg::MAX_PACKET_COUNT})"
         end
 
-        # Read the file and its metadata at the same time, because both start an external program. Wait for both
-        # before checking them, so neither is still running if a check fails.
-        reads = [Danbooru.async { media_file.dimensions }, Danbooru.async { media_file.exif_metadata }]
-        reads.each(&:wait)
-        reads.each(&:value!)
-
-        # These are the same limits `bin/image` checks before decoding an image (see `within_limits?`). Change both together.
-        if media_file.resolution > MAX_IMAGE_RESOLUTION
-          raise Error, "Image resolution is too large (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)"
-        elsif media_file.width.to_i > MAX_IMAGE_WIDTH
-          raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
-        elsif media_file.height.to_i > MAX_IMAGE_HEIGHT
-          raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
-        elsif media_file.in_memory_size > MediaFile::Image::MAX_IN_MEMORY_SIZE
-          raise Error, "Image is too large to decode (size: #{media_file.in_memory_size.to_fs(:human_size)}; max size: #{MediaFile::Image::MAX_IN_MEMORY_SIZE.to_fs(:human_size)})"
-        elsif media_file.file_ext == :webp && media_file.resolution > MediaFile::Image::MAX_WEBP_RESOLUTION
-          raise Error, "WebP image is too large to decode (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MediaFile::Image::MAX_WEBP_RESOLUTION / 1_000_000} megapixels)"
-        # Check the metadata before `is_supported?`, which needs the metadata to check AVIFs.
-        elsif media_file.exif_metadata["Danbooru:ExifToolError"].present?
-          raise Error, "File has too much metadata"
-        elsif !media_file.is_supported?
-          raise Error, "File type is not supported"
-        elsif media_file.is_corrupt?
-          raise Error, "File is corrupt"
-        # Checked after `is_corrupt?`, because corrupt files often have no dimensions, and "corrupt" is the better error.
-        elsif media_file.width.to_i <= 0 || media_file.height.to_i <= 0
-          raise Error, "Couldn't read the file's dimensions"
-        elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
-          raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
-        end
-      rescue MediaFile::Ugoira::Error, MediaFile::Image::TimeoutError => e
-        raise Error, e.message
+        media_file.validate!(max_duration: uploader.is_admin? ? nil : MAX_VIDEO_DURATION)
+      rescue MediaFile::InvalidFileError => e
+        raise Error, e.user_message
       end
     end
 

@@ -334,7 +334,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           end
 
           create_upload!("lib/media-file/test/files/jpg/test.jpg", user: @user)
-          assert_equal("exiftool called a blocked syscall", Upload.last.error)
+          assert_equal("The file couldn't be processed", Upload.last.error)
         end
 
         should "save the file in the quarantine folder" do
@@ -378,6 +378,15 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal("failed", media_asset.status)
           assert_nothing_raised { Danbooru.config.storage_manager.open(media_asset.variant(:original).file_path) }
+        end
+
+        should "log the error and not show its details to the user" do
+          MediaFile::Video.any_instance.stubs(:preview!).raises(MediaFile::FFmpeg::Error, "ffmpeg failed: /tmp/danbooru-video-preview-123.png: Permission denied")
+          DanbooruLogger.expects(:log).with(instance_of(MediaFile::FFmpeg::Error))
+          create_upload!("lib/media-file/test/files/mp4/test-300x300-av1.mp4", user: @user)
+
+          assert_equal("The file couldn't be processed", UploadMediaAsset.last.error)
+          assert_equal("The file couldn't be processed", Upload.last.error)
         end
       end
 
@@ -550,7 +559,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should "fail for an archive containing more than 100 files" do
           create_upload!("lib/media-file/test/files/archive/bomb-10k-files.7z", user: @user)
           assert_response 422
-          assert_match("'bomb-10k-files.7z' contains too many files (max 100 files per upload)", response.parsed_body.dig("errors", "base", 0))
+          assert_match("'bomb-10k-files.7z' contains too many files (max 100 files)", response.parsed_body.dig("errors", "base", 0))
         end
 
         should "fail for a decompression bomb" do
@@ -572,7 +581,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for an archive containing a path that's too long" do
-          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          MediaFile::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
             Zip::File.open(file.path, create: true) { |zip| zip.add("#{"#{"a" * 200}/" * 6}test.jpg", "lib/media-file/test/files/jpg/test.jpg") }
             create_upload!(file.path, user: @user)
 
@@ -582,7 +591,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for a corrupt archive" do
-          Danbooru::Tempfile.create(["danbooru-archive-", ".7z"]) do |file|
+          MediaFile::Tempfile.create(["danbooru-archive-", ".7z"]) do |file|
             File.binwrite(file.path, File.binread("lib/media-file/test/files/archive/ugoira.7z").byteslice(0, 2000))
             create_upload!(file.path, user: @user)
 
@@ -803,7 +812,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           create(:upload_media_asset, upload: create(:upload, uploader: @user), status: "pending")
 
           stub_const(Upload, :MAX_QUEUED_ASSETS, 0) do
-            Danbooru::Tempfile.create(["danbooru-archive-", ".7z"]) do |corrupt|
+            MediaFile::Tempfile.create(["danbooru-archive-", ".7z"]) do |corrupt|
               File.binwrite(corrupt.path, File.binread("lib/media-file/test/files/archive/ugoira.7z").byteslice(0, 2000))
               post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => Rack::Test::UploadedFile.new(corrupt.path) }}}
 
@@ -827,6 +836,14 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(["'directory.zip' couldn't be read (invalid or corrupt archive)"], response.parsed_body.dig("errors", "base"))
           quarantined = Danbooru.config.storage_manager.open("/trash/quarantine/017ef6a8d5397de06ea9f1245bdc554e.zip")
           assert_equal(File.binread("lib/media-file/test/files/archive/directory.zip"), quarantined.read)
+        end
+
+        should "fail if reading the archives takes too long" do
+          MediaFile::Archive.stubs(:run!).raises(MediaFile::TimeoutError, "ruby timed out after 10 seconds")
+          create_upload!("lib/media-file/test/files/archive/directory.zip", user: @user)
+
+          assert_response 422
+          assert_equal(["'directory.zip' couldn't be read (File took too long to process)"], response.parsed_body.dig("errors", "base"))
         end
 
         should "log and quarantine the archives if bin/archive calls a blocked syscall while extracting them" do
@@ -857,7 +874,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "report which archive is invalid when uploading multiple archives" do
-          Danbooru::Tempfile.create(["danbooru-archive-", ".7z"]) do |corrupt|
+          MediaFile::Tempfile.create(["danbooru-archive-", ".7z"]) do |corrupt|
             File.binwrite(corrupt.path, File.binread("lib/media-file/test/files/archive/ugoira.7z").byteslice(0, 2000))
             files = { "0" => Rack::Test::UploadedFile.new("lib/media-file/test/files/archive/directory.zip"), "1" => Rack::Test::UploadedFile.new(corrupt.path), "2" => Rack::Test::UploadedFile.new("lib/media-file/test/files/archive/symlink.zip") }
             post_auth uploads_path(format: :json), @user, params: { upload: { files: }}
@@ -871,7 +888,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "keep files with non-ASCII names separate" do
-          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          MediaFile::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
             Zip::File.open(file.path, create: true) do |zip|
               zip.add("あ.jpg", "lib/media-file/test/files/jpg/test.jpg")
               zip.add("い.png", "lib/media-file/test/files/png/test.png")
@@ -886,7 +903,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "decode Shift_JIS file names" do
-          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          MediaFile::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
             # Zips made on Japanese Windows store names in Shift_JIS without the UTF-8 flag.
             Zip::OutputStream.open(file.path) do |zip|
               %w[画像２.jpg 画像１０.png 画像１.gif].zip(%w[jpg/test.jpg png/test.png gif/test.gif]).each do |entry_name, path|
@@ -904,7 +921,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not count directories toward the file limit" do
-          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          MediaFile::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
             Zip::OutputStream.open(file.path) do |zip|
               20.times { |n| zip.put_next_entry("dir#{n}/") }
               zip.put_next_entry("dir0/test.jpg")
@@ -919,7 +936,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "ignore macOS and Windows metadata files" do
-          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          MediaFile::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
             Zip::OutputStream.open(file.path) do |zip|
               { "a.jpg" => File.binread("lib/media-file/test/files/jpg/test.jpg"), "__MACOSX/._a.jpg" => "\x00\x05\x16\x07", "__MACOSX/sub/._b.jpg" => "x", "sub/.DS_Store" => "Bud1", "Thumbs.db" => "x", "desktop.ini" => "x" }.each do |name, data|
                 zip.put_next_entry(name)
@@ -933,7 +950,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for an archive without any files" do
-          Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+          MediaFile::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
             Zip::OutputStream.open(file.path) do |zip|
               zip.put_next_entry("dir/")
               zip.put_next_entry("__MACOSX/._a.jpg")
@@ -965,7 +982,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail with a readable error for a ugoira with a null byte in a file name" do
-          Danbooru::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
+          MediaFile::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
             write_raw_zip(file, [
               { name: "animation.json", data: [{ file: "000000.jpg", delay: 100 }].to_json },
               { name: "000000\0.jpg", data: File.binread("lib/media-file/test/files/jpg/test.jpg") },

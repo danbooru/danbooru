@@ -1224,4 +1224,11 @@ class MediaFileAvifTest < ActiveSupport::TestCase
       assert_equal(1, libheif.heif_have_decoder_for_format(4), "libheif should have an AV1 decoder")
     end
   end
+
+  context "Validating an AVIF" do
+    should "fail for a rotated image" do
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/avif/kimono.rotate90.avif").validate! }
+      assert_equal("File type is not supported", error.user_message)
+    end
+  end
 end

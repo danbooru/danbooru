@@ -1,12 +1,12 @@
 require "test_helper"
 
-class MediaFileWebmTest < ActiveSupport::TestCase
+class MediaFileMkvTest < ActiveSupport::TestCase
   context "Previews" do
     should "be generated properly" do
       should_generate_previews(
         "mkv",
         "test/files/mkv/test-512x512-3-video-streams.mkv" => [150, 150, "63fd4ca2f76cdb1dc548bff4c11d2028"],
-        "test/files/mkv/test-512x512.mkv" => [150, 150, "136b63fc719803c2525c74ed5067b6d4"],
+        "test/files/mkv/test-512x512.mkv" => [150, 150, "e9056d14f71c158da648c72ce567949a"],
       )
     end
   end
@@ -74,6 +74,13 @@ class MediaFileWebmTest < ActiveSupport::TestCase
   context "an MKV file with multiple video streams" do
     should "count the packets in all streams" do
       assert_equal(30, MediaFile::FFmpeg.new(MediaFile.open("test/files/mkv/test-512x512-3-video-streams.mkv")).packet_count)
+    end
+  end
+
+  context "Validating an MKV" do
+    should "fail because MKV files aren't supported" do
+      error = assert_raises(MediaFile::InvalidFileError) { MediaFile.open("test/files/mkv/test-512x512.mkv").validate! }
+      assert_equal("File type is not supported", error.user_message)
     end
   end
 end
