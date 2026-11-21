@@ -9,9 +9,9 @@
 #
 # Usage:
 #
-#   bin/image read <limits> (<jpg|png|gif|webp|avif> <file>)...
+#   libexec/image read <limits> (<jpg|png|gif|webp|avif> <file>)...
 #
-#   e.g. bin/image read '{"max_resolution":441000000,"max_width":40000,"max_height":40000,"max_in_memory_size":1073741824,"max_webp_resolution":163840000}' jpg a.jpg
+#   e.g. libexec/image read '{"max_resolution":441000000,"max_width":40000,"max_height":40000,"max_in_memory_size":1073741824,"max_webp_resolution":163840000}' jpg a.jpg
 #
 # `read` reads the dimensions and other properties from the images' headers, then decodes them to check if they're
 # corrupt and to hash their pixels. The limits are from `MediaFile.config` and `MediaFile::Image`, which explains them. Images are
@@ -22,7 +22,7 @@
 # image whose header can't be read. `too_large` is true for images over the limits, and `error` is libvips' error if an
 # image is corrupt. Images that weren't decoded have no error or pixel hash.
 #
-#   bin/image resize <jpg|png|gif|webp|avif> <file> <width> <height> <jpeg|webp> <quality> <output>
+#   libexec/image resize <jpg|png|gif|webp|avif> <file> <width> <height> <jpeg|webp> <quality> <output>
 #
 # `resize` resizes the image to the exact width and height, and writes it to the output file. It prints {} on success,
 # or {"error": "<libvips' error>"} and exits with status 1 if it can't be written.
@@ -36,13 +36,13 @@ require "digest/md5"
 ENV["VIPS_WARNING"] = "0"
 
 # Always decode images into memory. By default, libvips puts images whose decoded pixels take more than 100 MB (like a
-# 6000x6000 PNG) in a temp file in /tmp instead, which bin/image can't write in the sandbox.
+# 6000x6000 PNG) in a temp file in /tmp instead, which libexec/image can't write in the sandbox.
 ENV["VIPS_DISC_THRESHOLD"] = "1000g"
 
 require "vips"
 
 class ImageCommand
-  # The image types bin/image can read.
+  # The image types libexec/image can read.
   EXTENSIONS = %w[jpg png gif webp avif].freeze
 
   # The format of the numbers in the arguments.

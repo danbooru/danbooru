@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# A class for reading and extracting .zip, .rar, and .7z archives. The archives are read by `bin/archive` in a separate
+# A class for reading and extracting .zip, .rar, and .7z archives. The archives are read by `libexec/archive` in a separate
 # process inside the ExternalCommand sandbox, so a bug in libarchive or rubyzip can't be exploited by a malicious file
 # to take over the Rails process.
 #
@@ -9,7 +9,7 @@
 #     puts dir, filenames
 #   end
 #
-# @see bin/archive
+# @see libexec/archive
 # @see https://github.com/chef/ffi-libarchive
 # @see https://github.com/libarchive/libarchive/wiki/ManualPages
 class MediaFile
@@ -17,7 +17,7 @@ class MediaFile
     extend Memoist
 
     # An archive that can't be read. By default, the message doesn't say why, because the details aren't useful to users.
-    # bin/archive uses the same message.
+    # libexec/archive uses the same message.
     class InvalidArchiveError < MediaFile::InvalidFileError
       def initialize(message = "invalid or corrupt archive")
         super
@@ -33,7 +33,7 @@ class MediaFile
     # The longest pathname listed by `#entries`, in bytes. Longer pathnames are truncated.
     MAX_PATHNAME_SIZE = 1024
 
-    # The most address space bin/archive can use. Ruby reserves about 400 MB at startup, and decompressing needs about
+    # The most address space libexec/archive can use. Ruby reserves about 400 MB at startup, and decompressing needs about
     # as much memory as the archive's dictionary size, which is at most 128 MB for a 100 MB archive. Archives that
     # declare a bigger dictionary fail to extract.
     MEMORY_LIMIT = 1.gigabyte
@@ -49,9 +49,9 @@ class MediaFile
 
     delegate :path, to: :file
 
-    # Run a bin/archive command in the sandbox.
+    # Run a libexec/archive command in the sandbox.
     #
-    # @param args [Array<String>] The arguments to bin/archive.
+    # @param args [Array<String>] The arguments to libexec/archive.
     # @param read [Array<String>] The files the command can read.
     # @param write [Array<String>] The files and directories the command can write to.
     # @param timeout [Integer] The maximum number of seconds the command can run.
@@ -62,7 +62,7 @@ class MediaFile
     # @raise [MediaFile::ExternalCommand::SyscallError] If the command was killed by the sandbox. This isn't wrapped, so the file
     #   can be quarantined (see `MediaAsset.handle_blocked_file`).
     def self.run!(*args, read: [], write: [], timeout: MediaFile::ExternalCommand::TIMEOUT, file_size_limit: MediaFile.config.max_file_size.to_i)
-      result = MediaFile::ExternalCommand.run_script("bin/archive", *args, gems: %w[ffi ffi-libarchive rubyzip], read:, write:, timeout:, memory_limit: MEMORY_LIMIT, file_size_limit:)
+      result = MediaFile::ExternalCommand.run_script("libexec/archive", *args, gems: %w[ffi ffi-libarchive rubyzip], read:, write:, timeout:, memory_limit: MEMORY_LIMIT, file_size_limit:)
       raise InvalidArchiveError unless result && (result["error"].nil? || result["error"].is_a?(String))
 
       result
@@ -70,10 +70,10 @@ class MediaFile
       raise InvalidArchiveError, "too many files"
     end
 
-    # Check that the files bin/archive says it extracted are regular files directly inside the directory it was given,
-    # then make them readable. bin/archive parses untrusted files, so its output can't be trusted, otherwise a
-    # compromised bin/archive could make us read other files on the server. The files keep the permissions from the
-    # archive when they're extracted, which may make them unreadable. They're fixed here instead of in bin/archive,
+    # Check that the files libexec/archive says it extracted are regular files directly inside the directory it was given,
+    # then make them readable. libexec/archive parses untrusted files, so its output can't be trusted, otherwise a
+    # compromised libexec/archive could make us read other files on the server. The files keep the permissions from the
+    # archive when they're extracted, which may make them unreadable. They're fixed here instead of in libexec/archive,
     # because the sandbox can't limit which files chmod can change.
     #
     # @param paths [Array<String>] The paths of the extracted files.
@@ -85,7 +85,7 @@ class MediaFile
 
       paths.each do |path|
         # The path is compared as a string, not resolved, so the directory can be under a symlink (e.g. /tmp on macOS).
-        # bin/archive can't replace the directory itself, or create symlinks or hardlinks, so a path directly inside it
+        # libexec/archive can't replace the directory itself, or create symlinks or hardlinks, so a path directly inside it
         # that isn't a symlink can't point anywhere else.
         raise InvalidArchiveError if File.dirname(path) != directory.to_s || !File.lstat(path).file?
       end
@@ -96,14 +96,14 @@ class MediaFile
       raise InvalidArchiveError
     end
 
-    # Read the file lists of several archives with one call to bin/archive, instead of starting a process for each
+    # Read the file lists of several archives with one call to libexec/archive, instead of starting a process for each
     # archive. Each archive keeps its list, so `#entries` doesn't read it again. If one archive is invalid, its
     # `#entries` raises the error.
     #
     # @param archives [Array<MediaFile::Archive>] The archives.
     # @return [Array<MediaFile::Archive>] The archives.
-    # @raise [InvalidArchiveError] If bin/archive failed.
-    #   If bin/archive called a blocked syscall, the SyscallError is the error's `cause`.
+    # @raise [InvalidArchiveError] If libexec/archive failed.
+    #   If libexec/archive called a blocked syscall, the SyscallError is the error's `cause`.
     def self.list!(archives)
       pending = archives.reject(&:listed?)
       return archives if pending.empty?
@@ -125,7 +125,7 @@ class MediaFile
       raise InvalidArchiveError
     end
 
-    # Check that a file list from bin/archive has the expected format, in case bin/archive was compromised by a
+    # Check that a file list from libexec/archive has the expected format, in case libexec/archive was compromised by a
     # malicious file, so that it fails like any other invalid archive.
     #
     # @return [Boolean] True if the file list is valid, or if it's a valid error.
@@ -218,7 +218,7 @@ class MediaFile
     # @param directory [String] The directory to extract the files to. By default, this is a temp directory the caller must clean up.
     # @yieldparam [String, Hash{String => String}] The name of the temp directory, and the path and name in the archive of each extracted file.
     # @return [(String, Hash{String => String})] The path to the directory, and the path and name in the archive of each extracted file.
-    # @raise [InvalidArchiveError] If the archive couldn't be extracted. If bin/archive called a blocked syscall, the
+    # @raise [InvalidArchiveError] If the archive couldn't be extracted. If libexec/archive called a blocked syscall, the
     #   SyscallError is the error's `cause`.
     def extract!(directory = nil, &block)
       raise ArgumentError, "can't pass directory and block at the same time" if block_given? && directory.present?
@@ -242,7 +242,7 @@ class MediaFile
       raise InvalidArchiveError
     end
 
-    # Extract the archive to a directory with bin/archive. See `extract!` for details.
+    # Extract the archive to a directory with libexec/archive. See `extract!` for details.
     #
     # @return [Hash{String => String}] The path on disk and the name in the archive of each extracted file.
     # @raise [InvalidArchiveError] If the archive couldn't be extracted.

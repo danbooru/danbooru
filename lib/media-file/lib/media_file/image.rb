@@ -2,10 +2,10 @@
 
 # A MediaFile for a JPEG, PNG, GIF, WebP, or AVIF file. Uses libvips for reading and resizing images.
 #
-# The images are read by `bin/image` in a separate process inside the ExternalCommand sandbox, so a bug in libvips or
+# The images are read by `libexec/image` in a separate process inside the ExternalCommand sandbox, so a bug in libvips or
 # the image libraries it uses can't be exploited by a malicious file to take over the Rails process.
 #
-# @see bin/image
+# @see libexec/image
 # @see https://github.com/libvips/ruby-vips
 # @see https://libvips.github.io/libvips/API/current
 class MediaFile::Image < MediaFile
@@ -16,7 +16,7 @@ class MediaFile::Image < MediaFile
     end
   end
 
-  # Images are decoded by bin/image, which can use at most 4 GB of memory (`MediaFile::ExternalCommand::MEMORY_LIMIT`). An
+  # Images are decoded by libexec/image, which can use at most 4 GB of memory (`MediaFile::ExternalCommand::MEMORY_LIMIT`). An
   # image that needs more fails partway through decoding, which looks the same as a corrupt file. The two limits below
   # reject images that would need too much memory before they're decoded, so they're reported as too large instead.
   #
@@ -42,21 +42,21 @@ class MediaFile::Image < MediaFile
     @info_lock = Mutex.new
   end
 
-  # Run a bin/image command in the sandbox, with the default 4 GB memory limit (see `MAX_IN_MEMORY_SIZE`).
+  # Run a libexec/image command in the sandbox, with the default 4 GB memory limit (see `MAX_IN_MEMORY_SIZE`).
   #
   # @return [Hash, nil] The JSON output of the command, with symbol keys, or nil if it crashed or printed too much.
   # @raise [MediaFile::TimeoutError] If the command timed out.
   # @raise [MediaFile::ExternalCommand::SyscallError] If the command was killed by the sandbox. It isn't wrapped, so the file can
   #   be quarantined.
   def self.run!(*args, read:, write: [], timeout: MediaFile::ExternalCommand::TIMEOUT)
-    result = MediaFile::ExternalCommand.run_script("bin/image", *args, gems: %w[ffi ruby-vips logger], read:, write:, timeout:, file_size_limit: MediaFile.config.max_file_size.to_i)
+    result = MediaFile::ExternalCommand.run_script("libexec/image", *args, gems: %w[ffi ruby-vips logger], read:, write:, timeout:, file_size_limit: MediaFile.config.max_file_size.to_i)
     result&.deep_symbolize_keys
   rescue MediaFile::ExternalCommand::OutputLimitError
-    MediaFile.logger.info("bin/image printed too much output: #{args.first}")
+    MediaFile.logger.info("libexec/image printed too much output: #{args.first}")
     nil
   end
 
-  # Read and decode several images with one call to bin/image, like the frames of a ugoira. Images over the upload
+  # Read and decode several images with one call to libexec/image, like the frames of a ugoira. Images over the upload
   # limits aren't decoded.
   #
   # @return [void]
@@ -75,17 +75,17 @@ class MediaFile::Image < MediaFile
     results = output&.dig(:images)
 
     unless results.is_a?(Array) && results.size == images.size
-      MediaFile.logger.info("bin/image returned an invalid result: #{output.inspect.truncate(1000)}") unless output.nil?
+      MediaFile.logger.info("libexec/image returned an invalid result: #{output.inspect.truncate(1000)}") unless output.nil?
       results = []
     end
 
     images.each_with_index { |image, i| image.info = parse_info(results[i]) }
   end
 
-  # bin/image parses untrusted files, so a compromised bin/image could print anything. Anything that isn't a number is
+  # libexec/image parses untrusted files, so a compromised libexec/image could print anything. Anything that isn't a number is
   # treated as 0, and anything that isn't an MD5 hash isn't used as the pixel hash.
   #
-  # @param result [Hash, nil] The result for one image from `bin/image read`, or nil if bin/image crashed.
+  # @param result [Hash, nil] The result for one image from `libexec/image read`, or nil if libexec/image crashed.
   # @return [Hash] The image's width, height, frame count, frame delays, size in memory, whether it's over the upload
   #   limits, the error to show users, and pixel hash. The width and height are 0 if the image's header couldn't be read.
   def self.parse_info(result)
@@ -213,10 +213,10 @@ class MediaFile::Image < MediaFile
     output_file = MediaFile::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format}"])
     result = MediaFile::Image.run!("resize", file_ext, path, width, height, format, quality, output_file.path, read: [path], write: [output_file.path])
 
-    # libvips' own error isn't shown to users, like in `.parse_info`. bin/image could write anything if it were
+    # libvips' own error isn't shown to users, like in `.parse_info`. libexec/image could write anything if it were
     # compromised, so check that it wrote an image of the right type.
     unless result && result[:error].nil? && MediaFile.file_ext(output_file) == { jpeg: :jpg, webp: :webp }.fetch(format.to_sym)
-      MediaFile.logger.info("bin/image resize failed: #{result.inspect.truncate(1000)}") unless result.nil?
+      MediaFile.logger.info("libexec/image resize failed: #{result.inspect.truncate(1000)}") unless result.nil?
       raise ResizeError
     end
 
@@ -253,7 +253,7 @@ class MediaFile::Image < MediaFile
 
   # @return [String] The MD5 hash of the image's pixels, as a PAM file (https://netpbm.sourceforge.net/doc/pam.html), or
   #   the file's MD5 if the image is animated or can't be decoded. A PAM file is a header followed by the raw pixels, so
-  #   the hash only depends on the pixels, not the file format or metadata. See `bin/image`.
+  #   the hash only depends on the pixels, not the file format or metadata. See `libexec/image`.
   def pixel_hash
     return md5 if is_animated?
 
@@ -262,7 +262,7 @@ class MediaFile::Image < MediaFile
 
   private
 
-  # @return [Hash] The image's properties, read by bin/image (see `.parse_info`). It's locked so that bin/image only
+  # @return [Hash] The image's properties, read by libexec/image (see `.parse_info`). It's locked so that libexec/image only
   #   runs once when it's read from several threads, like when generating previews in parallel.
   def info
     @info_lock.synchronize do

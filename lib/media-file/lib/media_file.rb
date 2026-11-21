@@ -69,7 +69,8 @@ class MediaFile
   #
   # @!attribute logger [Logger] Where to log errors from the external programs, like a helper script crashing.
   # @!attribute sandbox [Boolean] If false, run the external programs without Landlock and seccomp. Only turn this off
-  #   when the kernel doesn't support Landlock, like in some development environments.
+  #   when the kernel doesn't support Landlock, like in some development environments. Defaults to true, unless the
+  #   MEDIA_FILE_DISABLE_SANDBOX environment variable is "true".
   # @!attribute max_file_size [Integer] The largest file the external programs can write, in bytes.
   # @!attribute max_image_resolution [Integer] The largest image that will be decoded, in pixels.
   # @!attribute max_image_width [Integer] The widest image that will be decoded, in pixels.
@@ -81,7 +82,7 @@ class MediaFile
   def self.config
     @config ||= Config.new(
       logger: Logger.new($stderr, level: :info),
-      sandbox: true,
+      sandbox: ENV["MEDIA_FILE_DISABLE_SANDBOX"] != "true",
       max_file_size: 100.megabytes,
       max_image_resolution: 21_000 * 21_000,
       max_image_width: 40_000,
@@ -319,7 +320,7 @@ class MediaFile
     reads.each(&:wait)
     reads.each(&:value!)
 
-    # These are the same limits `bin/image` checks before decoding an image (see `within_limits?`). Change both together.
+    # These are the same limits `libexec/image` checks before decoding an image (see `within_limits?`). Change both together.
     if resolution > config.max_image_resolution
       raise InvalidFileError, "Image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{width}x#{height}); max: #{config.max_image_resolution / 1_000_000} megapixels)"
     elsif width.to_i > config.max_image_width

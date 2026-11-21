@@ -164,7 +164,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
     end
 
-    context "an archive that makes bin/archive call a blocked syscall" do
+    context "an archive that makes libexec/archive call a blocked syscall" do
       should "raise an invalid archive error caused by the blocked syscall when listing the files" do
         MediaFile::Archive.stubs(:run!).raises(MediaFile::ExternalCommand::SyscallError, "ruby called a blocked syscall")
         archive = MediaFile::Archive.open!("test/files/ugoira/ugoira.zip")
@@ -322,7 +322,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       assert_raises(MediaFile::Archive::InvalidArchiveError) { archive.extract! }
     end
 
-    should "not trust paths outside the directory from a compromised bin/archive" do
+    should "not trust paths outside the directory from a compromised libexec/archive" do
       Dir.mktmpdir do |dir|
         File.symlink("/etc/passwd", "#{dir}/link.jpg")
 
@@ -378,7 +378,7 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
     end
 
-    should "raise an error for malformed output from a compromised bin/archive" do
+    should "raise an error for malformed output from a compromised libexec/archive" do
       entry = { pathname: "a.jpg", pathname_too_long: false, size: 1, filetype: "file" }
       malformed = [
         "[]", { error: 1 }, { archives: nil }, { archives: [] }, { archives: [1] }, { archives: [{ error: 1 }] },

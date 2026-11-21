@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Runs lib/media-file/bin/media-cli, so it can be run from the root of the app. See `bin/media-cli --help`.
+load File.expand_path("../lib/media-file/bin/media-cli", __dir__)

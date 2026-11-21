@@ -83,7 +83,7 @@ class MediaFile::Ugoira < MediaFile
     return "must have at least two frames" if frames.size < 2
     return "frames must have the same file type" if frames.map(&:file_ext).uniq.size > 1
 
-    # bin/image only decodes the frames if they're all the same size, so that a frame can't be larger than the first
+    # libexec/image only decodes the frames if they're all the same size, so that a frame can't be larger than the first
     # frame (whose size is checked by `MediaAsset.validate_media_file!`).
     return "frames must have the same dimensions" if frames.map(&:dimensions).uniq.size > 1
 
@@ -96,8 +96,8 @@ class MediaFile::Ugoira < MediaFile
     nil
   end
 
-  # Check the structure of the .zip file, and extract it if it's valid. This is done in one call to bin/archive in the
-  # sandbox. See `ArchiveCommand.ugoira` in bin/archive for the checks.
+  # Check the structure of the .zip file, and extract it if it's valid. This is done in one call to libexec/archive in the
+  # sandbox. See `ArchiveCommand.ugoira` in libexec/archive for the checks.
   #
   # @return [Hash] The error if the ugoira is invalid, or the names of the files in the .zip, the frame offsets, and the
   #   paths of the extracted files. Empty if the ugoira isn't a .zip file.
@@ -115,7 +115,7 @@ class MediaFile::Ugoira < MediaFile
     end
   end
 
-  # Check the output of bin/archive, in case it was compromised by a malicious file. The files must be inside the
+  # Check the output of libexec/archive, in case it was compromised by a malicious file. The files must be inside the
   # temp directory, and the names and frame offsets must match them.
   #
   # @raise [MediaFile::Archive::InvalidArchiveError] If the output is invalid.
@@ -245,7 +245,7 @@ class MediaFile::Ugoira < MediaFile
     end
   end
 
-  # @return [Array<MediaFile>] The list of images in the ugoira. They're all read with one call to bin/image, instead
+  # @return [Array<MediaFile>] The list of images in the ugoira. They're all read with one call to libexec/image, instead
   #   of one call per frame.
   def frames
     synchronize do

@@ -3,9 +3,10 @@
 Danbooru's library for reading, validating, and resizing uploaded images, videos, and ugoiras. It doesn't depend on
 Rails, so it can be used on its own.
 
-Untrusted files are only parsed by external programs (ffmpeg, ffprobe, mkvmerge, exiftool, and the `bin/archive` and
-`bin/image` helper scripts) running in a sandbox (see `MediaFile::ExternalCommand`). The sandbox needs Linux 5.13+ with
-Landlock enabled. Set `MediaFile.config.sandbox = false` on kernels without it.
+Untrusted files are only parsed by external programs (ffmpeg, ffprobe, mkvmerge, exiftool, and the `libexec/archive` and
+`libexec/image` helper scripts) running in a sandbox (see `MediaFile::ExternalCommand`). The sandbox needs Linux 5.13+ with
+Landlock enabled. On kernels without it, set `MediaFile.config.sandbox = false`, or set the
+`MEDIA_FILE_DISABLE_SANDBOX=true` environment variable.
 
 # Installation
 
@@ -34,8 +35,12 @@ end
 ```
 
 ```bash
-bin/media-ls -l test/files/jpg     # List the properties of media files.
-bin/media-conv -o out.webm test/files/ugoira/ugoira-95239241-danbooru.zip   # Convert a ugoira to a video.
+bin/media-cli --help                         # List the commands.
+bin/media-cli analyze -l test/files/jpg      # List the properties of media files.
+bin/media-cli validate test/files/jpg/test.jpg   # Check that a file can be processed safely.
+bin/media-cli preview -s 300x300 test/files/jpg/test.jpg   # Make a thumbnail.
+bin/media-cli convert -o out.webm test/files/ugoira/ugoira-95239241-danbooru.zip   # Convert a ugoira to a video.
+bin/media-cli doctor                         # Check that the programs the library needs are installed.
 ```
 
 # Development

@@ -5,8 +5,7 @@ and shouldn't be edited. Others are custom scripts created for this project.
 
 ## Project Scripts
 
-These scripts are specific to this project. The scripts for media files (`archive`, `image`, `media-ls`, and `media-conv`)
-are in `lib/media-file/bin`.
+These scripts are specific to this project.
 
 | Script | Description |
 |--------|-------------|
@@ -19,6 +18,7 @@ are in `lib/media-file/bin`.
 | `generate-source-tests` | Generate skeleton parsing and extracting tests for a URL strategy. |
 | `github-print-test-results` | Parse JUnit test output and print GitHub workflow annotations and a summary. |
 | `media-bench` | Measure how long it takes to process media files like an upload does. |
+| `media-cli` | Read, validate, and convert images, videos, and ugoiras. Runs `lib/media-file/bin/media-cli`. |
 | `setup` | Install Docker and Git, clone the repo, and initialize config files for a fresh install. |
 | `test-sources` | Run all of a specific site's parsing & extractor tests. |
 | `update` | Update Ruby gems and npm packages and run pending migrations. |

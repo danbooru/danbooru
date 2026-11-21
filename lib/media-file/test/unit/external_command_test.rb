@@ -379,9 +379,9 @@ class ExternalCommandTest < ActiveSupport::TestCase
       Dir.mktmpdir do |dir|
         command = "#{RbConfig.ruby.shellescape} --disable-gems -e 'Dir.mkdir(ARGV[0])' #{File.join(dir, "new").shellescape}"
 
-        # bin/image runs the same Ruby as bin/archive, but it doesn't write files, so it can't create directories.
-        assert_raises(MediaFile::ExternalCommand::SyscallError) { MediaFile::ExternalCommand.run(command, write: [dir], profile_name: "bin/image") }
-        assert_equal(true, MediaFile::ExternalCommand.run(command, write: [dir], profile_name: "bin/archive").last.success?)
+        # libexec/image runs the same Ruby as libexec/archive, but it doesn't write files, so it can't create directories.
+        assert_raises(MediaFile::ExternalCommand::SyscallError) { MediaFile::ExternalCommand.run(command, write: [dir], profile_name: "libexec/image") }
+        assert_equal(true, MediaFile::ExternalCommand.run(command, write: [dir], profile_name: "libexec/archive").last.success?)
         assert_equal(true, Dir.exist?(File.join(dir, "new")))
       end
     end

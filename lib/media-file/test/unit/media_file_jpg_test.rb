@@ -15,14 +15,14 @@ class MediaFileJpgTest < ActiveSupport::TestCase
       file = MediaFile.open("test/files/jpg/test-blank.jpg")
       output = nil
       MediaFile::ExternalCommand.stubs(:run).with { |_command, write:, **| output = write.first }.returns([{ error: "VipsJpeg: Premature end of input file" }.to_json, nil])
-      MediaFile.logger.expects(:info).with(regexp_matches(%r{\Abin/image resize failed: .*VipsJpeg: Premature end of input file}))
+      MediaFile.logger.expects(:info).with(regexp_matches(%r{\Alibexec/image resize failed: .*VipsJpeg: Premature end of input file}))
 
       error = assert_raises(MediaFile::Image::ResizeError) { file.resize!(150, 150) }
       assert_equal("libvips error", error.user_message)
       assert_equal(false, File.exist?(output))
     end
 
-    should "reject resized images of the wrong type from a compromised bin/image" do
+    should "reject resized images of the wrong type from a compromised libexec/image" do
       image = MediaFile.open("test/files/jpg/test.jpg")
       output = nil
       MediaFile::ExternalCommand.stubs(:run).with do |_command, write:, **|
@@ -35,7 +35,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
     end
   end
 
-  context "Reading an image in bin/image" do
+  context "Reading an image in libexec/image" do
     should "not load file types we don't support" do
       MediaFile::Tempfile.create(["danbooru-test-", ".ppm"]) do |file|
         file.write("P5\n1 1\n255\n\x00")
@@ -48,7 +48,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
       end
     end
 
-    should "treat malformed output from a compromised bin/image as an error" do
+    should "treat malformed output from a compromised libexec/image as an error" do
       outputs = [
         "not json",
         { images: "x" }.to_json,
@@ -93,7 +93,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
       image = MediaFile.open("test/files/jpg/test.jpg")
       image.exif_metadata
       MediaFile::ExternalCommand.stubs(:run).raises(MediaFile::ExternalCommand::OutputLimitError)
-      MediaFile.logger.expects(:info).with(regexp_matches(%r{\Abin/image printed too much output}))
+      MediaFile.logger.expects(:info).with(regexp_matches(%r{\Alibexec/image printed too much output}))
 
       assert_equal("libvips error", image.error)
     end

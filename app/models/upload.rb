@@ -254,13 +254,13 @@ class Upload < ApplicationRecord
     end
   end
 
-  # Log and quarantine the archives if bin/archive was killed by the sandbox, because they may be an attempt to exploit
+  # Log and quarantine the archives if libexec/archive was killed by the sandbox, because they may be an attempt to exploit
   # libarchive or rubyzip. When several archives are listed by one process, all of them are quarantined, because we
   # don't know which one did it.
   #
-  # @param error [MediaFile::Archive::InvalidArchiveError] The error from bin/archive. Nothing is done unless it was caused
+  # @param error [MediaFile::Archive::InvalidArchiveError] The error from libexec/archive. Nothing is done unless it was caused
   #   by a blocked syscall.
-  # @param archives [Array<(MediaFile::Archive, String)>] The archives bin/archive was reading, with their filenames.
+  # @param archives [Array<(MediaFile::Archive, String)>] The archives libexec/archive was reading, with their filenames.
   # @param action [String] What the user was doing, like "Upload #123".
   def handle_blocked_archives(error, archives, action:)
     archives.each do |archive, filename|

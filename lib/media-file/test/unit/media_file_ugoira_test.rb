@@ -603,11 +603,11 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
       end
     end
 
-    should "not trust invalid frame data from a compromised bin/archive" do
+    should "not trust invalid frame data from a compromised libexec/archive" do
       MediaFile::Tempfile.create(["danbooru-ugoira-", ".zip"]) do |file|
         create_ugoira_zip(file)
 
-        # Run bin/archive for real, then tamper with its output.
+        # Run libexec/archive for real, then tamper with its output.
         [[{}, nil], [{ files: ["/etc/passwd"] }, "invalid zip file"], [{ names: ["000000.jpg", "../x", "animation.json"] }, "invalid zip file"], [{ frame_offsets: ["0", 1] }, "invalid zip file"], [{ frame_offsets: [0, 2**40] }, "invalid zip file"], [{ frame_offsets: [0] * 1000 }, "invalid zip file"]].each do |tampered, expected_error|
           MediaFile.open(file.path) do |ugoira|
             output = MediaFile::Archive.run!("ugoira", file.path, ugoira.tmpdir.path, read: [file.path], write: [ugoira.tmpdir.path])

@@ -9,10 +9,10 @@
 #
 # Usage:
 #
-#   bin/archive list <max-pathname-size> (<zip|rar|7z|ugoira> <file> <max-entries>)...  # List the first files in archives.
-#   bin/archive extract <zip|rar|7z|ugoira> <file> <dir>                                # Extract an archive to an empty directory.
-#   bin/archive ugoira <file> <dir>                              # Validate a ugoira .zip, then extract it if it's valid.
-#   bin/archive create-ugoira <file> <mtime> <name> <path>...    # Create an uncompressed ugoira .zip from the given files.
+#   libexec/archive list <max-pathname-size> (<zip|rar|7z|ugoira> <file> <max-entries>)...  # List the first files in archives.
+#   libexec/archive extract <zip|rar|7z|ugoira> <file> <dir>                                # Extract an archive to an empty directory.
+#   libexec/archive ugoira <file> <dir>                              # Validate a ugoira .zip, then extract it if it's valid.
+#   libexec/archive create-ugoira <file> <mtime> <name> <path>...    # Create an uncompressed ugoira .zip from the given files.
 #                                                                # <mtime> is the files' timestamp, e.g. "2024-10-17T03:31:43".
 #
 # Prints the result as a JSON object on success, or {"error": "..."} and exits with status 1 if the file is invalid.

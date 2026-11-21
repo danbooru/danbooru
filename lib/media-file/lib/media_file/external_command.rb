@@ -2,8 +2,8 @@
 
 require "io/nonblock"
 
-# Runs the external programs that we use on untrusted files (ffmpeg, ffprobe, mkvmerge, exiftool, bin/archive for
-# archives and ugoiras, and bin/image for images) in a sandbox, with time, memory, and output limits, so that a
+# Runs the external programs that we use on untrusted files (ffmpeg, ffprobe, mkvmerge, exiftool, libexec/archive for
+# archives and ugoiras, and libexec/image for images) in a sandbox, with time, memory, and output limits, so that a
 # malicious file can't make them run forever, use all the memory, or do anything else if it manages to exploit a bug in
 # the program.
 #
@@ -58,7 +58,7 @@ class MediaFile::ExternalCommand
     ],
   }.freeze
 
-  # What the Ruby helper scripts (bin/archive and bin/image) need on top of the base profile. They're run with this exact
+  # What the Ruby helper scripts (libexec/archive and libexec/image) need on top of the base profile. They're run with this exact
   # Ruby. Ruby's timer thread waits on an eventfd with epoll, and Ruby turns off transparent huge pages.
   RUBY_PROFILE = {
     execute: [RbConfig.ruby],
@@ -93,14 +93,14 @@ class MediaFile::ExternalCommand
     # Extracting archives creates directories and sets the umask, libarchive truncates a file when it fails partway
     # through extracting it (for example, when it runs out of memory), and writing zips renames temp files into place.
     # Landlock only lets them write in the given directories.
-    "bin/archive" => RUBY_PROFILE.merge(
+    "libexec/archive" => RUBY_PROFILE.merge(
       syscalls: RUBY_PROFILE[:syscalls] + %w[umask mkdir mkdirat rename renameat renameat2 unlink unlinkat ftruncate],
     ),
-    # bin/image only writes the output files it's given, which it creates by opening them. It reads libvips, its
+    # libexec/image only writes the output files it's given, which it creates by opening them. It reads libvips, its
     # modules, and mozjpeg from /usr/local/lib (see the Dockerfile). jemalloc keeps the address space of freed memory by
     # default, which counts against the memory limit, so the largest WebPs would run out of address space while hashing
     # their pixels.
-    "bin/image" => RUBY_PROFILE.merge(
+    "libexec/image" => RUBY_PROFILE.merge(
       read: RUBY_PROFILE[:read] + %w[/usr/local/lib],
       environment: { "MALLOC_CONF" => [ENV.fetch("MALLOC_CONF", nil), "retain:false"].compact_blank.join(",") },
     ),
@@ -131,10 +131,10 @@ class MediaFile::ExternalCommand
     new(...).run
   end
 
-  # Run one of our Ruby helper scripts, like bin/archive or bin/image, with the sandbox profile of the same name. It's
+  # Run one of our Ruby helper scripts, like libexec/archive or libexec/image, with the sandbox profile of the same name. It's
   # run with this exact Ruby, without Bundler, so it starts quickly. The gems it uses are passed with `-I`.
   #
-  # @param script [String] The script, relative to the root of the media_file gem, like "bin/image".
+  # @param script [String] The script, relative to the root of the media_file gem, like "libexec/image".
   # @param args [Array] The arguments to the script.
   # @param gems [Array<String>] The names of the bundled gems the script uses.
   # @param read [Array<String>] The files and directories the script can read.

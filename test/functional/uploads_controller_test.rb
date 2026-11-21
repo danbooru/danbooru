@@ -822,7 +822,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           end
         end
 
-        should "log and quarantine the archives if bin/archive calls a blocked syscall while reading them" do
+        should "log and quarantine the archives if libexec/archive calls a blocked syscall while reading them" do
           MediaFile::Archive.stubs(:run!).raises(MediaFile::ExternalCommand::SyscallError, "ruby called a blocked syscall")
           Rails.logger.stubs(:error)
           Rails.logger.expects(:error).with do |message|
@@ -846,7 +846,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(["'directory.zip' couldn't be read (File took too long to process)"], response.parsed_body.dig("errors", "base"))
         end
 
-        should "log and quarantine the archives if bin/archive calls a blocked syscall while extracting them" do
+        should "log and quarantine the archives if libexec/archive calls a blocked syscall while extracting them" do
           MediaFile::Archive.any_instance.stubs(:extract_to!).raises(MediaFile::ExternalCommand::SyscallError, "ruby called a blocked syscall")
           Rails.logger.stubs(:error)
           Rails.logger.expects(:error).with do |message|
