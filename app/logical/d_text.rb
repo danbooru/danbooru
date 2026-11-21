@@ -895,10 +895,15 @@ class DText
 
   # Parse a string of HTML to a document object.
   # @param html [String]
-  # @param max_tree_depth [Integer] The max depth of the HTML tree, or -1 for no limit. Raises an ArgumentError if the HTML is deeper than this.
+  # @param max_tree_depth [Integer] The max depth of the HTML tree, or -1 for no limit.
   # @return [Nokogiri::HTML5::DocumentFragment]
+  # @raise [DText::Error] If the HTML is nested more deeply than `max_tree_depth`.
   def self.parse_html(html, max_tree_depth: 400)
     Nokogiri::HTML5.fragment(html, max_tree_depth:)
+  rescue ArgumentError => e
+    raise if e.message.exclude?("Document tree depth limit exceeded")
+
+    raise Error, "HTML is nested too deeply (max depth: #{max_tree_depth})"
   end
 
   # @param dtext [String] The DText input.

@@ -43,7 +43,15 @@ class DTextTest < ActiveSupport::TestCase
       end
 
       should "raise an error for HTML nested more deeply than DText can produce" do
-        assert_raises(ArgumentError) { DText.parse_html("<div>" * 1_000) }
+        error = assert_raises(DText::Error) { DText.parse_html("<div>" * 1_000) }
+        assert_equal("HTML is nested too deeply (max depth: 400)", error.message)
+      end
+
+      should "not raise an error when formatting DText that produces HTML nested too deeply" do
+        dtext = DText.new("x")
+        dtext.stubs(:to_html).returns("<div>" * 1_000)
+
+        assert_equal("", dtext.format_text)
       end
     end
 
