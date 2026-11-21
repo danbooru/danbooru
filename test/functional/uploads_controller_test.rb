@@ -381,7 +381,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "log the error and not show its details to the user" do
-          MediaFile::Video.any_instance.stubs(:preview!).raises(MediaFile::FFmpeg::Error, "ffmpeg failed: /tmp/danbooru-video-preview-123.png: Permission denied")
+          MediaFile::Video.any_instance.stubs(:preview!).raises(MediaFile::FFmpeg::Error, "ffmpeg failed: /tmp/media-file-video-preview-123.png: Permission denied")
           DanbooruLogger.expects(:log).with(instance_of(MediaFile::FFmpeg::Error))
           create_upload!("lib/media-file/test/files/mp4/test-300x300-av1.mp4", user: @user)
 

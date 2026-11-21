@@ -175,10 +175,14 @@ class ExternalCommandTest < ActiveSupport::TestCase
 
     should "kill the command and not leak files if it can't wait for the command" do
       MediaFile::ExternalCommand::LibC.stubs(:pidfd_open!).raises(Errno::EPERM)
+      GC.start
       open_files = Dir.children("/proc/self/fd").size
 
       assert_raises(Errno::EPERM) { MediaFile::ExternalCommand.run("sleep 32") }
-      assert_equal(open_files, Dir.children("/proc/self/fd").size)
+
+      # Other files can be closed while this runs, for example when temp files from other tests are garbage collected.
+      GC.start
+      assert_operator(Dir.children("/proc/self/fd").size, :<=, open_files)
       assert_empty(`ps -eo args`.lines.map(&:strip).grep(/\Asleep 32\z/))
     end
 
@@ -208,11 +212,15 @@ class ExternalCommandTest < ActiveSupport::TestCase
     end
 
     should "not leak files if the sandbox can't be built" do
+      GC.start
       open_files = Dir.children("/proc/self/fd").size
       MediaFile::Seccomp.stubs(:allow).raises(Errno::EINVAL)
 
       assert_raises(Errno::EINVAL) { MediaFile::ExternalCommand.run("echo hello") }
-      assert_equal(open_files, Dir.children("/proc/self/fd").size)
+
+      # Other files can be closed while this runs, for example when temp files from other tests are garbage collected.
+      GC.start
+      assert_operator(Dir.children("/proc/self/fd").size, :<=, open_files)
     end
 
     should "kill commands that are interrupted by another timeout" do
@@ -569,7 +577,7 @@ class ExternalCommandTest < ActiveSupport::TestCase
     end
 
     should "not show users the output of ffmpeg" do
-      error = MediaFile::FFmpeg::Error.new("ffmpeg failed: [h264 @ 0x55d5c] /tmp/danbooru-video-preview-123.png: Permission denied")
+      error = MediaFile::FFmpeg::Error.new("ffmpeg failed: [h264 @ 0x55d5c] /tmp/media-file-video-preview-123.png: Permission denied")
       assert_equal("The file couldn't be processed", error.user_message)
     end
   end

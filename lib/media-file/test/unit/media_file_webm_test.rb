@@ -27,7 +27,7 @@ class MediaFileWebmTest < ActiveSupport::TestCase
       MediaFile::FFmpeg.stubs(:shell!).raises(MediaFile::FFmpeg::Error)
 
       assert_raises(MediaFile::FFmpeg::Error) { MediaFile::FFmpeg.new(file).smart_video_preview! }
-      assert_equal([], Dir.glob("#{Dir.tmpdir}/danbooru-video-preview-#{file.md5}-*"))
+      assert_equal([], Dir.glob("#{Dir.tmpdir}/media-file-video-preview-#{file.md5}-*"))
     end
   end
 

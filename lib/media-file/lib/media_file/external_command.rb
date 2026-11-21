@@ -142,11 +142,11 @@ class MediaFile::ExternalCommand
   # @return [Hash, nil] The JSON object the script printed on the last line of its output, or nil if it crashed. The
   #   script parses untrusted files, so the caller must check the result.
   # @raise (see MediaFile::ExternalCommand.run)
-  def self.run_script(script, *args, gems:, read: [], **options)
+  def self.run_script(script, *args, gems:, read: [], file_size_limit: MediaFile.config.max_file_size.to_i, **options)
     path = File.expand_path("../../#{script}", __dir__)
     gem_paths = gems.flat_map { Gem.loaded_specs.fetch(it).full_require_paths }
     command = [RbConfig.ruby, "--disable-gems", "-W0", *gem_paths.map { "-I#{it}" }, path, *args].map { it.to_s.shellescape }.join(" ")
-    output, _status = run(command, read: [path, *gem_paths, *read], profile_name: script, **options)
+    output, _status = run(command, read: [path, *gem_paths, *read], profile_name: script, file_size_limit:, **options)
 
     # The result is on the last line, in case a library printed a warning before it. If it crashed, the output is a
     # backtrace. It's logged, but not shown to the user. It's escaped, because it can include text from the file, which
@@ -154,7 +154,7 @@ class MediaFile::ExternalCommand
     result = MediaFile.parse_json(output.lines.last.to_s)
     return result if result.is_a?(Hash)
 
-    MediaFile.logger.info("#{script} crashed: #{output.truncate(2000).inspect}")
+    MediaFile.logger.warn("#{script} crashed: #{output.truncate(2000).inspect}")
     nil
   end
 

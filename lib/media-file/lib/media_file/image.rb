@@ -37,11 +37,6 @@ class MediaFile::Image < MediaFile
   # Set by `.read!`, which reads several images at once.
   attr_writer :info
 
-  def initialize(...)
-    super
-    @info_lock = Mutex.new
-  end
-
   # Run a libexec/image command in the sandbox, with the default 4 GB memory limit (see `MAX_IN_MEMORY_SIZE`).
   #
   # @return [Hash, nil] The JSON output of the command, with symbol keys, or nil if it crashed or printed too much.
@@ -49,10 +44,10 @@ class MediaFile::Image < MediaFile
   # @raise [MediaFile::ExternalCommand::SyscallError] If the command was killed by the sandbox. It isn't wrapped, so the file can
   #   be quarantined.
   def self.run!(*args, read:, write: [], timeout: MediaFile::ExternalCommand::TIMEOUT)
-    result = MediaFile::ExternalCommand.run_script("libexec/image", *args, gems: %w[ffi ruby-vips logger], read:, write:, timeout:, file_size_limit: MediaFile.config.max_file_size.to_i)
+    result = MediaFile::ExternalCommand.run_script("libexec/image", *args, gems: %w[ffi ruby-vips logger], read:, write:, timeout:)
     result&.deep_symbolize_keys
   rescue MediaFile::ExternalCommand::OutputLimitError
-    MediaFile.logger.info("libexec/image printed too much output: #{args.first}")
+    MediaFile.logger.warn("libexec/image printed too much output: #{args.first}")
     nil
   end
 
@@ -75,7 +70,7 @@ class MediaFile::Image < MediaFile
     results = output&.dig(:images)
 
     unless results.is_a?(Array) && results.size == images.size
-      MediaFile.logger.info("libexec/image returned an invalid result: #{output.inspect.truncate(1000)}") unless output.nil?
+      MediaFile.logger.warn("libexec/image returned an invalid result: #{output.inspect.truncate(1000)}") unless output.nil?
       results = []
     end
 
@@ -210,13 +205,13 @@ class MediaFile::Image < MediaFile
   # @return [MediaFile::Image] The image resized to the exact width and height.
   # @raise [ResizeError] If the image couldn't be resized.
   def resize!(width, height, format: :jpeg, quality: 85)
-    output_file = MediaFile::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format}"])
+    output_file = MediaFile::Tempfile.new(["media-file-image-preview-#{md5}-", ".#{format}"])
     result = MediaFile::Image.run!("resize", file_ext, path, width, height, format, quality, output_file.path, read: [path], write: [output_file.path])
 
     # libvips' own error isn't shown to users, like in `.parse_info`. libexec/image could write anything if it were
     # compromised, so check that it wrote an image of the right type.
     unless result && result[:error].nil? && MediaFile.file_ext(output_file) == { jpeg: :jpg, webp: :webp }.fetch(format.to_sym)
-      MediaFile.logger.info("libexec/image resize failed: #{result.inspect.truncate(1000)}") unless result.nil?
+      MediaFile.logger.warn("libexec/image resize failed: #{result.inspect.truncate(1000)}") unless result.nil?
       raise ResizeError
     end
 
@@ -265,23 +260,20 @@ class MediaFile::Image < MediaFile
   # @return [Hash] The image's properties, read by libexec/image (see `.parse_info`). It's locked so that libexec/image only
   #   runs once when it's read from several threads, like when generating previews in parallel.
   def info
-    @info_lock.synchronize do
+    synchronize(:info) do
       MediaFile::Image.read!([self]) if @info.nil?
       @info
     end
   end
 
+  # @return [MediaFile::FFmpeg] The FFmpeg instance for this file. It's cached, because it caches what ffmpeg returns.
   def video
-    MediaFile::FFmpeg.new(self)
+    synchronize(:video) { @video ||= MediaFile::FFmpeg.new(self) }
   end
 
   def preview_frame
-    if is_animated?
-      @preview_frame ||= video.smart_video_preview || self
-    else
-      @preview_frame ||= self
+    synchronize(:preview_frame) do
+      @preview_frame ||= is_animated? ? (video.smart_video_preview || self) : self
     end
   end
-
-  memoize :video, :metadata, :is_animated_gif?, :is_animated_png?
 end

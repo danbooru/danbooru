@@ -7,7 +7,7 @@ require "optparse"
 #
 # Usage: `bin/media-cli <command> [options] [args]`
 class MediaFile::CLI
-  attr_reader :stdout, :stderr
+  attr_reader :env, :stdout, :stderr
 
   # @see #initialize
   # @return [Boolean] True if the command succeeded, false if it failed.
@@ -31,7 +31,7 @@ class MediaFile::CLI
     command, *args = @argv
 
     case command
-    when "analyze" then return MediaFile::CLI::Analyze.run!(*args, env: @env, stdout:, stderr:)
+    when "analyze" then MediaFile::CLI::Analyze.new(args, cli: self).run
     when "validate" then validate(args)
     when "preview" then preview(args)
     when "convert" then convert(args)
@@ -57,6 +57,28 @@ class MediaFile::CLI
     false
   end
 
+  # Parse a command's options. Prints the help and exits for --help. Commands can redefine -h, like `analyze` does for
+  # --human-readable, because later options take precedence.
+  #
+  # @param args [Array<String>] The arguments. The options are removed from it.
+  # @param usage [String] The usage line, like "validate [options] FILE...".
+  # @param description [String] What the command does.
+  # @param into [Hash, nil] If given, the options are stored in this hash, like `OptionParser#parse!`.
+  # @yieldparam opts [OptionParser] The parser, to add the command's options to.
+  def parse_options!(args, usage, description, into: nil)
+    OptionParser.new do |opts|
+      opts.banner = "Usage: media-cli #{usage}\n\n#{description}\n"
+      opts.separator ""
+
+      opts.on("-h", "--help", "Show this help message") do
+        stdout.puts opts
+        raise SystemExit
+      end
+
+      yield opts if block_given?
+    end.parse!(args, into:)
+  end
+
   private
 
   def usage
@@ -80,25 +102,6 @@ class MediaFile::CLI
     EOS
   end
 
-  # Parse the command's options. Prints the help and exits for --help.
-  #
-  # @param args [Array<String>] The arguments. The options are removed from it.
-  # @param usage [String] The usage line, like "validate [options] FILE...".
-  # @param description [String] What the command does.
-  # @yieldparam opts [OptionParser] The parser, to add the command's options to.
-  def parse_options!(args, usage, description)
-    OptionParser.new do |opts|
-      opts.banner = "Usage: media-cli #{usage}\n\n#{description}\n"
-      opts.separator ""
-      yield opts if block_given?
-
-      opts.on("-h", "--help", "Show this help message") do
-        stdout.puts opts
-        raise SystemExit
-      end
-    end.parse!(args)
-  end
-
   # Raise an error if no files were given.
   def require_files!(args)
     raise ArgumentError, "no files given (see `media-cli #{@argv.first} --help`)" if args.empty?
@@ -106,13 +109,15 @@ class MediaFile::CLI
 
   def validate(args)
     max_duration = nil
+    frame_delays = nil
     parse_options!(args, "validate [options] FILE...", "Check that files can be processed safely. Prints \"ok\" or why each file is invalid.") do |opts|
       opts.on("--max-duration=SECONDS", Integer, "The longest a video or animation can be (default: no limit)") { max_duration = it }
+      opts.on("--frame-delays=MS[,MS...]", /\A\d+(?:,\d+)*\z/, "The frame delays of ugoiras without an animation.json file, in milliseconds") { |delays| frame_delays = delays.split(",").map(&:to_i) }
     end
     require_files!(args)
 
     args.each do |path|
-      MediaFile.open(path) { |file| file.validate!(max_duration:) }
+      MediaFile.open(path, frame_delays:) { |file| file.validate!(max_duration:) }
       stdout.puts "#{path}: ok"
     rescue MediaFile::InvalidFileError => e
       stdout.puts "#{path}: #{e.message}"

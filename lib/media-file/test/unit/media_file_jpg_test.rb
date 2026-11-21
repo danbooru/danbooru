@@ -15,7 +15,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
       file = MediaFile.open("test/files/jpg/test-blank.jpg")
       output = nil
       MediaFile::ExternalCommand.stubs(:run).with { |_command, write:, **| output = write.first }.returns([{ error: "VipsJpeg: Premature end of input file" }.to_json, nil])
-      MediaFile.logger.expects(:info).with(regexp_matches(%r{\Alibexec/image resize failed: .*VipsJpeg: Premature end of input file}))
+      MediaFile.logger.expects(:warn).with(regexp_matches(%r{\Alibexec/image resize failed: .*VipsJpeg: Premature end of input file}))
 
       error = assert_raises(MediaFile::Image::ResizeError) { file.resize!(150, 150) }
       assert_equal("libvips error", error.user_message)
@@ -46,6 +46,20 @@ class MediaFileJpgTest < ActiveSupport::TestCase
         assert_equal("libvips error", image.error)
         assert_equal(image.md5, image.pixel_hash)
       end
+    end
+
+    should "log a warning if libexec/image crashes" do
+      MediaFile::ExternalCommand.stubs(:run).returns(["Traceback (most recent call last):\nboom", nil])
+      MediaFile.logger.expects(:warn).with(regexp_matches(%r{\Alibexec/image crashed: }))
+
+      assert_equal("libvips error", MediaFile.open("test/files/jpg/test.jpg").error)
+    end
+
+    should "log a warning if libexec/image prints an invalid result" do
+      MediaFile::ExternalCommand.stubs(:run).returns([{ images: "x" }.to_json, nil])
+      MediaFile.logger.expects(:warn).with(regexp_matches(%r{\Alibexec/image returned an invalid result: }))
+
+      assert_equal("libvips error", MediaFile.open("test/files/jpg/test.jpg").error)
     end
 
     should "treat malformed output from a compromised libexec/image as an error" do
@@ -93,7 +107,7 @@ class MediaFileJpgTest < ActiveSupport::TestCase
       image = MediaFile.open("test/files/jpg/test.jpg")
       image.exif_metadata
       MediaFile::ExternalCommand.stubs(:run).raises(MediaFile::ExternalCommand::OutputLimitError)
-      MediaFile.logger.expects(:info).with(regexp_matches(%r{\Alibexec/image printed too much output}))
+      MediaFile.logger.expects(:warn).with(regexp_matches(%r{\Alibexec/image printed too much output}))
 
       assert_equal("libvips error", image.error)
     end
@@ -1227,6 +1241,16 @@ class MediaFileJpgTest < ActiveSupport::TestCase
     should "be the size of the decoded image for rotated JPEGs" do
       file = MediaFile.open("test/files/jpg/test-rotation-90cw.jpg")
       assert_equal(file.width * file.height * 3, file.in_memory_size)
+    end
+  end
+
+  context "Reading a JPEG from several threads" do
+    should "compute the MD5 once" do
+      file = MediaFile.open("test/files/jpg/test.jpg")
+      Digest::MD5.expects(:file).with { sleep 0.1 }.once.returns(stub(hexdigest: "ecef68c44edb8a0d6a3070b5f8e8ee76"))
+
+      md5s = 4.times.map { Thread.new { file.md5 } }.map(&:value)
+      assert_equal(["ecef68c44edb8a0d6a3070b5f8e8ee76"] * 4, md5s)
     end
   end
 

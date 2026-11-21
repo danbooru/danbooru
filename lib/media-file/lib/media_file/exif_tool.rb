@@ -5,11 +5,11 @@ require "shellwords"
 # A wrapper for the exiftool command.
 class MediaFile::ExifTool
   # @see https://exiftool.org/exiftool_pod.html#OPTIONS
-  DEFAULT_OPTIONS = %q{
+  DEFAULT_OPTIONS = "
     -G1 -duplicates -unknown -struct --binary
     -x 'System:*' -x ExifToolVersion -x FileTypeExtension
     -x MIMEType -x ImageSize -x MegaPixels
-  }.squish
+  ".squish
 
   attr_reader :file
 

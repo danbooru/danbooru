@@ -21,7 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "ffi", "~> 1"
   spec.add_dependency "ffi-libarchive", "~> 1" # Used by libexec/archive.
   spec.add_dependency "logger", "~> 1"
-  spec.add_dependency "memoist", "~> 0.16"
   spec.add_dependency "ruby-vips", "~> 2" # Used by libexec/image.
   spec.add_dependency "rubyzip", "~> 3" # Used by libexec/archive.
   spec.metadata["rubygems_mfa_required"] = "true"

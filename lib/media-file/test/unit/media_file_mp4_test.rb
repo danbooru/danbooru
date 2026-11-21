@@ -2327,6 +2327,25 @@ class MediaFileMp4Test < ActiveSupport::TestCase
     end
   end
 
+  context "Reading an MP4 from several threads" do
+    should "run ffprobe once for the metadata" do
+      ffmpeg = MediaFile::FFmpeg.new(MediaFile.open("test/files/mp4/test-300x300-av1.mp4"))
+      MediaFile::FFmpeg.stubs(:shell!).with { |command, **| command.include?("-count_packets") }.returns({ streams: [{ nb_read_packets: "10" }] }.to_json)
+      MediaFile::FFmpeg.expects(:shell!).with { |command, **| sleep 0.1 if command.include?("-show_entries format=") }.once.returns({ format: { duration: "5.8" }}.to_json)
+
+      durations = 4.times.map { Thread.new { ffmpeg.metadata.dig(:format, :duration) } }.map(&:value)
+      assert_equal(["5.8"] * 4, durations)
+    end
+
+    should "make the preview frame once" do
+      video = MediaFile.open("test/files/mp4/test-300x300-av1.mp4")
+      MediaFile::FFmpeg.any_instance.expects(:smart_video_preview!).with { sleep 0.1 }.once.returns(MediaFile.open("test/files/jpg/test.jpg"))
+
+      sizes = 4.times.map { Thread.new { video.preview!(100, 100).dimensions } }.map(&:value)
+      assert_equal([[100, 67]] * 4, sizes)
+    end
+  end
+
   context "Validating an MP4" do
     should "pass for a valid file" do
       MediaFile.open("test/files/mp4/test-300x300-av1.mp4") { |file| assert_nothing_raised { file.validate! } }

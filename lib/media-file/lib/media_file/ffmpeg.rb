@@ -4,8 +4,6 @@ require "shellwords"
 
 # A wrapper for the ffmpeg command.
 class MediaFile::FFmpeg
-  extend Memoist
-
   class Error < MediaFile::Error; end
 
   # The maximum number of packets in all streams combined. Reading the metadata for each packet and its frame takes about
@@ -50,7 +48,7 @@ class MediaFile::FFmpeg
   # @return [MediaFile] the preview image
   # @raise [Error] The error if generating the preview image fails (probably because FFmpeg couldn't decode the GIF or video)
   def smart_video_preview!
-    vp = MediaFile::Tempfile.new(["danbooru-video-preview-#{file.md5}-", ".png"], binmode: true)
+    vp = MediaFile::Tempfile.new(["media-file-video-preview-#{file.md5}-", ".png"], binmode: true)
 
     # https://ffmpeg.org/ffmpeg.html#Main-options
     # https://ffmpeg.org/ffmpeg-filters.html#thumbnail
@@ -84,7 +82,12 @@ class MediaFile::FFmpeg
   # @see https://gist.github.com/nrk/2286511
   #
   # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
-  memoize def metadata
+  def metadata
+    file.synchronize(:ffprobe_metadata) { @metadata ||= read_metadata }
+  end
+
+  # @see #metadata
+  def read_metadata
     raise Error, "too many frames (max: #{MAX_PACKET_COUNT})" if packet_count > MAX_PACKET_COUNT
 
     output = MediaFile::FFmpeg.shell!("ffprobe -v quiet -print_format json -show_entries #{METADATA_FIELDS} #{input_args}", read: [file.path], output_limit: METADATA_OUTPUT_LIMIT)
@@ -98,11 +101,15 @@ class MediaFile::FFmpeg
   # because the full metadata includes every stream, so a file with many streams could otherwise get around the limit.
   #
   # @return [Integer] The number of packets, or 0 if reading the file failed.
-  memoize def packet_count
-    output = MediaFile::FFmpeg.shell!("ffprobe -v quiet -count_packets -show_entries stream=nb_read_packets -print_format json #{input_args}", read: [file.path])
-    MediaFile.parse_json(output).to_h["streams"].to_a.sum { it["nb_read_packets"].to_i }
-  rescue Error
-    0
+  def packet_count
+    file.synchronize(:packet_count) do
+      @packet_count ||= begin
+        output = MediaFile::FFmpeg.shell!("ffprobe -v quiet -count_packets -show_entries stream=nb_read_packets -print_format json #{input_args}", read: [file.path])
+        MediaFile.parse_json(output).to_h["streams"].to_a.sum { it["nb_read_packets"].to_i }
+      rescue Error
+        0
+      end
+    end
   end
 
   # The largest width and height of the frames in the first video stream, as they're displayed. The width is scaled by
@@ -149,8 +156,8 @@ class MediaFile::FFmpeg
 
   # @return [Float, nil] The duration of the video in seconds, according to the container metadata. May not match the
   #   true duration of the video in case the container metadata is wrong or the video is truncated.
-  memoize def container_duration
-    metadata.dig(:format, :duration).to_f if metadata.dig(:format, :duration).present?
+  def container_duration
+    metadata.dig(:format, :duration).presence&.to_f
   end
 
   # @return [Float, nil] The duration of the video in seconds, according to where the packets in the longest video
@@ -158,7 +165,7 @@ class MediaFile::FFmpeg
   #   order (B-frames, interleaved streams), so this is the latest packet end, not the last packet. Other video streams
   #   are ignored because the static image in an animated AVIF is a stream with one packet lasting a default of one
   #   second. Nil if no packets have timestamps.
-  memoize def packet_duration
+  def packet_duration
     longest_video_stream = video_streams.max_by { it[:packets].size }
     timed_packets = [longest_video_stream, *audio_streams].compact.flat_map { it[:packets] }.select { it[:pts_time].present? }
     ends = timed_packets.map { it[:pts_time].to_d + it[:duration_time].to_d }
@@ -166,14 +173,14 @@ class MediaFile::FFmpeg
   end
 
   # @return [Float, nil] The true duration of the video in seconds, as determined by actually playing it.
-  memoize def playback_duration
+  def playback_duration
     playback_info[:out_time_us].to_f / 1_000_000.0 if playback_info[:out_time_us].present?
   end
 
   # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown. If the video has multiple
   #   streams, this will be the frame count of the longest stream. Note that a static AVIF image can contain up to four
   #   streams: one for the static image, one for an auxiliary video, and an optional alpha channel stream for each.
-  memoize def frame_count
+  def frame_count
     frame_count = video_streams.pluck(:frames).map(&:size).max
 
     frame_count || playback_info[:frame].to_i
@@ -182,7 +189,7 @@ class MediaFile::FFmpeg
   # @return [Array<Integer>] The duration of each video frame in milliseconds. The durations may be different if the
   #   video has a variable frame rate. If there are multiple video streams, this will be the first stream, and if there
   #   are no video streams, this will be an empty array.
-  memoize def frame_durations
+  def frame_durations
     # video_stream[:frames].pluck(:duration) # XXX Duration is only available for .webm files, not .mp4
     video_stream[:frames].pluck(:best_effort_timestamp_time).push(duration).each_cons(2).map do |before, after|
       ((after.to_f - before.to_f) * 1000).round
@@ -230,7 +237,7 @@ class MediaFile::FFmpeg
   end
 
   # @return [Array<Hash>] An array of hashes for each video stream in the file.
-  memoize def video_streams
+  def video_streams
     streams("video")
   end
 
@@ -258,7 +265,7 @@ class MediaFile::FFmpeg
   end
 
   # @return [Array<Hash>] An array of hashes for each audio stream in the file.
-  memoize def audio_streams
+  def audio_streams
     streams("audio")
   end
 
@@ -350,15 +357,15 @@ class MediaFile::FFmpeg
 
   # @return [Array<Hash>] An array of hashes for each video or audio frame in the file. Note that videos can have
   #   multiple video or audio streams, so each frame has a stream index to distinguish each stream.
-  memoize def frames
-    metadata[:packets_and_frames].to_a.select { |data| data[:type] == "frame" }
+  def frames
+    @frames ||= metadata[:packets_and_frames].to_a.select { |data| data[:type] == "frame" }
   end
 
   # @return [Array<Hash>] An array of hashes for each video or audio packet in the file. A packet is a compressed chunk
   #   of data which may contain multiple frames. Note that videos can have multiple video or audio streams, so each
   #   packet has a stream index to distinguish each stream.
-  memoize def packets
-    metadata[:packets_and_frames].to_a.select { |data| data[:type] == "packet" }
+  def packets
+    @packets ||= metadata[:packets_and_frames].to_a.select { |data| data[:type] == "packet" }
   end
 
   # @return [Array<Hash>] An array of hashes for each video packet in the file.
@@ -372,12 +379,12 @@ class MediaFile::FFmpeg
   end
 
   # @return [Integer] The total compressed size of all video streams in bytes, or 0 if there are no video streams.
-  memoize def video_size
+  def video_size
     video_packets.pluck("size").sum(&:to_i)
   end
 
   # @return [Integer] The total compressed size of all audio streams in bytes, or 0 if there are no audio streams.
-  memoize def audio_size
+  def audio_size
     audio_packets.pluck("size").sum(&:to_i)
   end
 
@@ -387,12 +394,17 @@ class MediaFile::FFmpeg
   end
 
   # @return [String, nil] The error message if the video is unplayable, or nil if no error.
-  memoize def error
+  def error
     metadata[:error] || playback_info[:error]
   end
 
   # @return [Hash] Decode the full video and return a hash containing the frame count, fps, runtime, and the sizes of the decompressed video and audio streams.
-  memoize def playback_info
+  def playback_info
+    file.synchronize(:playback_info) { @playback_info ||= read_playback_info }
+  end
+
+  # @see #playback_info
+  def read_playback_info
     # https://ffmpeg.org/ffmpeg-filters.html#silencedetect
     # https://ffmpeg.org/ffmpeg-filters.html#ebur128-1
     # XXX `-c copy` is faster, but it doesn't decompress the stream so it can't detect corrupt videos.
@@ -456,6 +468,8 @@ class MediaFile::FFmpeg
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
   end
+
+  private :read_metadata, :read_playback_info
 
   # The options for reading the input file.
   def input_args
@@ -566,7 +580,7 @@ class MediaFile::FFmpeg
 
     filters = ["null", scale_filter, pad_filter].compact.join(",")
 
-    MediaFile::Tempdir.create(["danbooru-ffmpeg-"]) do |tmpdir|
+    MediaFile::Tempdir.create(["media-file-ffmpeg-"]) do |tmpdir|
       input_args = concat_input_args(images.zip(durations), File.join(tmpdir.path, "files.txt"))
 
       # `-xerror` makes ffmpeg fail if an image can't be read, instead of silently stopping at that image.

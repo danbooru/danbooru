@@ -6,7 +6,6 @@ source "https://rubygems.org"
 gemspec
 
 group :development, :test do
-  gem "erubi", "~> 1" # Used by MediaFile#test_case.
   gem "minitest", "~> 6"
   gem "mocha", "~> 3"
   gem "rake", "~> 13"

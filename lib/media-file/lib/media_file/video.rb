@@ -17,7 +17,7 @@ class MediaFile::Video < MediaFile
 
   # @return [Array<(Integer, Integer)>] The width and height of the video, as it is displayed.
   def dimensions
-    video.display_dimensions || [0, 0]
+    @dimensions ||= video.display_dimensions || [0, 0]
   end
 
   def metadata
@@ -67,8 +67,9 @@ class MediaFile::Video < MediaFile
 
   private
 
+  # @return [MediaFile::FFmpeg] The FFmpeg instance for this file. It's cached, because it caches what ffmpeg returns.
   def video
-    MediaFile::FFmpeg.new(self)
+    synchronize(:video) { @video ||= MediaFile::FFmpeg.new(self) }
   end
 
   # The width and height the container says the video is displayed at. Anamorphic WebMs have the coded size in
@@ -82,8 +83,6 @@ class MediaFile::Video < MediaFile
   end
 
   def preview_frame
-    @preview_frame ||= video.smart_video_preview!
+    synchronize(:preview_frame) { @preview_frame ||= video.smart_video_preview! }
   end
-
-  memoize :video, :dimensions, :metadata, :duration, :has_audio?
 end

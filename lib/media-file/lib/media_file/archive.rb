@@ -14,8 +14,6 @@
 # @see https://github.com/libarchive/libarchive/wiki/ManualPages
 class MediaFile
   class Archive
-    extend Memoist
-
     # An archive that can't be read. By default, the message doesn't say why, because the details aren't useful to users.
     # libexec/archive uses the same message.
     class InvalidArchiveError < MediaFile::InvalidFileError
@@ -52,14 +50,14 @@ class MediaFile
     # @param read [Array<String>] The files the command can read.
     # @param write [Array<String>] The files and directories the command can write to.
     # @param timeout [Integer] The maximum number of seconds the command can run.
-    # @param file_size_limit [Integer, nil] The largest file the command can write. By default, the max upload size.
+    # @param options [Hash] The other options for `ExternalCommand.run_script`, like `file_size_limit: nil` for no limit.
     # @return [Hash] The parsed JSON output of the command. Has an "error" key if the archive is invalid.
     # @raise [InvalidArchiveError] If the command crashed, or printed too much.
     # @raise [MediaFile::TimeoutError] If the command timed out.
     # @raise [MediaFile::ExternalCommand::SyscallError] If the command was killed by the sandbox. This isn't wrapped, so the file
     #   can be quarantined (see `MediaAsset.handle_blocked_file`).
-    def self.run!(*args, read: [], write: [], timeout: MediaFile::ExternalCommand::TIMEOUT, file_size_limit: MediaFile.config.max_file_size.to_i)
-      result = MediaFile::ExternalCommand.run_script("libexec/archive", *args, gems: %w[ffi ffi-libarchive rubyzip], read:, write:, timeout:, memory_limit: MEMORY_LIMIT, file_size_limit:)
+    def self.run!(*args, read: [], write: [], timeout: MediaFile::ExternalCommand::TIMEOUT, **options)
+      result = MediaFile::ExternalCommand.run_script("libexec/archive", *args, gems: %w[ffi ffi-libarchive rubyzip], read:, write:, timeout:, memory_limit: MEMORY_LIMIT, **options)
       raise InvalidArchiveError unless result && (result["error"].nil? || result["error"].is_a?(String))
 
       result
@@ -184,6 +182,7 @@ class MediaFile
     def initialize(file, max_entries: MAX_ENTRIES)
       @file = file
       @max_entries = max_entries
+      @lock = Monitor.new
     end
 
     # @return [Hash] The first `max_entries` entries in the archive.
@@ -202,8 +201,8 @@ class MediaFile
 
     # @return [Array<MediaFile::Archive::Entry>] The first `max_entries` entries in the archive. The rest of the archive
     #   isn't read, so it isn't checked for errors.
-    memoize def entries
-      listing["entries"].map { |entry| Entry.new(**entry.symbolize_keys) }
+    def entries
+      @lock.synchronize { @entries ||= listing["entries"].map { |entry| Entry.new(**entry.symbolize_keys) } }
     end
 
     # Extract the files in the archive to a directory. The files are saved as numbered files in the directory, not under
@@ -221,7 +220,7 @@ class MediaFile
       raise ArgumentError, "can't pass directory and block at the same time" if block_given? && directory.present?
 
       if block_given?
-        Dir.mktmpdir(["danbooru-archive-", "-#{File.basename(file.path)}"]) do |dir|
+        Dir.mktmpdir(["media-file-archive-", "-#{File.basename(file.path)}"]) do |dir|
           filenames = extract_to!(dir)
           yield dir, filenames
         end
@@ -229,7 +228,7 @@ class MediaFile
         [directory, extract_to!(directory)]
       else
         begin
-          dir = Dir.mktmpdir(["danbooru-archive-", "-#{File.basename(file.path)}"])
+          dir = Dir.mktmpdir(["media-file-archive-", "-#{File.basename(file.path)}"])
           result = [dir, extract_to!(dir)]
         ensure
           FileUtils.rm_rf(dir) if dir && result.nil?
@@ -306,13 +305,13 @@ class MediaFile
     end
 
     # @return [Symbol] The archive format as detected by us (:zip, :rar, :7z, etc).
-    memoize def file_ext
-      MediaFile::FileTypeDetector.new(file).file_ext
+    def file_ext
+      @lock.synchronize { @file_ext ||= MediaFile::FileTypeDetector.new(file).file_ext }
     end
 
     # @return [String] The MD5 hash of the archive file, as a hex string.
-    memoize def md5
-      Digest::MD5.file(path).hexdigest
+    def md5
+      @lock.synchronize { @md5 ||= Digest::MD5.file(path).hexdigest }
     end
 
     # @!method file_size

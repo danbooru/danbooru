@@ -20,17 +20,12 @@ class MediaFile::Ugoira < MediaFile
   MIN_DELAY = 10 # The mininum delay allowed for a single frame in a ugoira. 10ms is the minimum on Pixiv.
   MAX_DELAY = 30_000 # The maximum delay allowed for a single frame in a ugoira. 30s is the max on Pixiv.
 
-  # @return [Concurrent::ReentrantReadWriteLock] A lock to make sure we don't extract the .zip file more than once when
-  #   called from multiple threads (such as during upload when generating samples in parallel).
-  attr_reader :lock
-
   # Open a ugoira. The ugoira can be a .zip file or an unpacked array of files. One of the files may be an
   # animation.json file containing the frame delays, or the delays can be passed in separately.
   #
   # @param file_or_files [File, Array<File>, Array<String>] The .zip file, or an array of files or filenames.
   # @param frame_delays [Array<Integer>] The frame delays in milliseconds.
   def initialize(file_or_files, frame_delays: nil, **options)
-    @lock = Concurrent::ReentrantReadWriteLock.new
     @frame_delays = frame_delays
 
     if file_or_files.respond_to?(:path)
@@ -47,7 +42,7 @@ class MediaFile::Ugoira < MediaFile
   # Close the ugoira and delete all extracted files. The caller should call this when done with the ugoira, otherwise
   # there may be a long delay before the object is garbage collected and the files are deleted.
   def close
-    synchronize do
+    synchronize(:zip) do
       super
       @preview_frame&.close
       @webm&.close
@@ -64,7 +59,7 @@ class MediaFile::Ugoira < MediaFile
   end
 
   # @return [String, nil] Return the error message if the ugoira is invalid, or nil if it is valid.
-  memoize def error
+  def error
     return zip_error if zip_error.present?
     return "number of files is inconsistent with animation.json" if animation_json.present? && files.size != animation_json_frames.size + 1
     return "unrecognized animation.json format" if animation_json_format == "unknown"
@@ -102,7 +97,7 @@ class MediaFile::Ugoira < MediaFile
   # @return [Hash] The error if the ugoira is invalid, or the names of the files in the .zip, the frame offsets, and the
   #   paths of the extracted files. Empty if the ugoira isn't a .zip file.
   def zip_info
-    synchronize do
+    synchronize(:zip) do
       @zip_info ||= if file.nil?
         {}
       else
@@ -143,12 +138,12 @@ class MediaFile::Ugoira < MediaFile
   end
 
   # @return [String, nil] The MIME type of the frames in the ugoira (image/jpeg, image/png, or image/gif).
-  memoize def frame_mime_type
+  def frame_mime_type
     frames.first&.mime_type
   end
 
   # @return [MediaFile::ExifTool::Metadata] The metadata for the file.
-  memoize def metadata
+  def metadata
     data = super.reject { |key, _value| key.starts_with?("ZIP:") }
 
     data.merge(
@@ -167,7 +162,7 @@ class MediaFile::Ugoira < MediaFile
     zip_info["frame_offsets"]
   end
 
-  memoize def dimensions
+  def dimensions
     frames.first&.dimensions || [0, 0]
   end
 
@@ -190,7 +185,7 @@ class MediaFile::Ugoira < MediaFile
   end
 
   # @return [String] The pixel hash of the ugoira.
-  memoize def pixel_hash
+  def pixel_hash
     data = {
       frames: frames.map.with_index do |frame, i|
         { pixel_hash: frame.pixel_hash, duration: frame_delays[i] }
@@ -201,7 +196,7 @@ class MediaFile::Ugoira < MediaFile
   end
 
   # @return [Array<Hash>, nil] The 'frames' array from the animation.json file, if present.
-  memoize def animation_json_frames
+  def animation_json_frames
     # Frames that aren't objects are replaced with empty hashes, so they fail the format check in `animation_json_format`.
     case animation_json
     in Array => frames
@@ -240,7 +235,7 @@ class MediaFile::Ugoira < MediaFile
 
   # @return [Hash, Array, nil] The contents of the animation.json file, if present. May be in gallery-dl, PixivUtil2, or PixivTookit format.
   def animation_json
-    synchronize do
+    synchronize(:zip) do
       @animation_json ||= MediaFile.parse_json(files.find { |file| file.path.ends_with?(".json") }&.read)
     end
   end
@@ -248,7 +243,7 @@ class MediaFile::Ugoira < MediaFile
   # @return [Array<MediaFile>] The list of images in the ugoira. They're all read with one call to libexec/image, instead
   #   of one call per frame.
   def frames
-    synchronize do
+    synchronize(:zip) do
       # Reading many frames can take as long as encoding them, so it gets the same timeout. 500 noisy 1920x1080 frames
       # take about a minute to read.
       @frames ||= files.filter_map { |file| MediaFile.open(file) unless file.path.ends_with?(".json") }.tap do |frames|
@@ -260,7 +255,7 @@ class MediaFile::Ugoira < MediaFile
   # @return [Array<File>] The list of all files in the ugoira, including the animation.json file containing the frame
   #   delays and metadata (if present).
   def files
-    synchronize do
+    synchronize(:zip) do
       raise InvalidUgoiraError, zip_error if zip_error.present?
 
       @files ||= zip_info["files"].map { |filename| File.open(filename) }
@@ -269,8 +264,8 @@ class MediaFile::Ugoira < MediaFile
 
   # @return [String] The path to the temporary directory where the ugoira was extracted.
   def tmpdir
-    synchronize do
-      @tmpdir ||= MediaFile::Tempdir.create(["danbooru-ugoira-", "-#{File.basename(file&.path.to_s)}"])
+    synchronize(:zip) do
+      @tmpdir ||= MediaFile::Tempdir.create(["media-file-ugoira-", "-#{File.basename(file&.path.to_s)}"])
     end
   end
 
@@ -291,7 +286,7 @@ class MediaFile::Ugoira < MediaFile
   # @param mtime [Time] The timestamp to set on the files in the zip file.
   # @param data [Hash] Extra data to include in the animation.json file.
   # @return [MediaFile] The new ugoira.
-  def create_copy(file: MediaFile::Tempfile.new(%w[danbooru-ugoira- .zip]), mtime: Time.utc(1980, 1, 1), data: {})
+  def create_copy(file: MediaFile::Tempfile.new(%w[media-file-ugoira- .zip]), mtime: Time.utc(1980, 1, 1), data: {})
     animation_meta = {
       **data,
       width: width,
@@ -302,7 +297,7 @@ class MediaFile::Ugoira < MediaFile
       end,
     }
 
-    MediaFile::Tempdir.create(["danbooru-ugoira-"]) do |tmpdir|
+    MediaFile::Tempdir.create(["media-file-ugoira-"]) do |tmpdir|
       zip_path = "#{tmpdir.path}/ugoira.zip"
       animation_json_path = "#{tmpdir.path}/animation.json"
       File.write(animation_json_path, animation_meta.to_json)
@@ -324,8 +319,8 @@ class MediaFile::Ugoira < MediaFile
   # @param format [Symbol] The video container format (:webm, :mkv, or :mp4). Default: :webm.
   # @param output_file [File] The file to write the video to.
   # @return [MediaFile] The video.
-  def convert(format: :webm, output_file: MediaFile::Tempfile.new(["danbooru-ugoira-conversion-#{File.basename(file&.path.to_s)}", ".#{format}"], binmode: true), **options)
-    synchronize do
+  def convert(format: :webm, output_file: MediaFile::Tempfile.new(["media-file-ugoira-conversion-#{File.basename(file&.path.to_s)}", ".#{format}"], binmode: true), **options)
+    synchronize(:zip) do
       raise NotImplementedError, "can't convert ugoira to video: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
       raise "can't convert ugoira to video: no ugoira frame data was provided" unless frame_delays.present?
 
@@ -340,7 +335,7 @@ class MediaFile::Ugoira < MediaFile
   # @return [MediaFile] The ugoira converted to a webm, for its sample and its preview frame. Converting is slow, so it's
   #   only done once. It's closed when the ugoira is closed.
   def webm
-    synchronize do
+    synchronize(:webm) do
       @webm ||= convert
     end
   end
@@ -348,12 +343,8 @@ class MediaFile::Ugoira < MediaFile
   private
 
   def preview_frame
-    synchronize do
+    synchronize(:preview_frame) do
       @preview_frame ||= MediaFile::FFmpeg.new(webm).smart_video_preview!
     end
-  end
-
-  def synchronize(&block)
-    lock.with_write_lock(&block)
   end
 end

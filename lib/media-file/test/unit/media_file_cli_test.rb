@@ -1,4 +1,5 @@
 require "test_helper"
+require "prism"
 
 class MediaFileCliTest < ActiveSupport::TestCase
   def run_cli(*args)
@@ -61,6 +62,37 @@ class MediaFileCliTest < ActiveSupport::TestCase
     end
   end
 
+  context "The analyze command with --frame-delays" do
+    should "read ugoiras without an animation.json file" do
+      result, stdout, _stderr = run_cli(*%w[analyze -j -c frame_count,duration --frame-delays=100,200,300,400,500 test/files/ugoira/ugoira.zip])
+
+      assert_equal(true, result)
+      assert_equal([{ "frame_count" => 5, "duration" => 1.5 }], MediaFile.parse_json(stdout))
+    end
+
+    should "fail for invalid frame delays" do
+      result, _stdout, stderr = run_cli(*%w[analyze --frame-delays=100,x test/files/ugoira/ugoira.zip])
+
+      assert_equal(false, result)
+      assert_match(/invalid argument: --frame-delays=100,x/, stderr)
+    end
+  end
+
+  context "The analyze command with --test-case" do
+    should "print a test that checks the file's properties" do
+      result, stdout, _stderr = run_cli("analyze", "--test-case", "test/files/jpg/test.jpg")
+
+      assert_equal(true, result)
+      assert_equal(true, Prism.parse(stdout).success?, stdout)
+      assert_includes(stdout, %{should "be parsed correctly" do\n  file = MediaFile.open("test/files/jpg/test.jpg")\n})
+      assert_includes(stdout, %{  assert_equal(500, file.width)\n})
+      assert_includes(stdout, %{  assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", file.md5)\n})
+      assert_includes(stdout, %{  assert_nil(file.duration)\n})
+      assert_includes(stdout, %{    "File:FileType" => "JPEG",\n})
+      assert_includes(stdout, "  }, file.metadata.to_h)\n")
+    end
+  end
+
   context "The validate command" do
     should "print ok for valid files" do
       result, stdout, _stderr = run_cli("validate", "test/files/jpg/test.jpg", "test/files/png/test.png")
@@ -81,6 +113,13 @@ class MediaFileCliTest < ActiveSupport::TestCase
 
       assert_equal(false, result)
       assert_equal("test/files/mp4/test-300x300-av1.mp4: Duration must be less than 4 seconds\n", stdout)
+    end
+
+    should "use the frame delays for ugoiras without an animation.json file" do
+      result, stdout, _stderr = run_cli(*%w[validate --frame-delays=100,200,300,400,500 test/files/ugoira/ugoira.zip])
+
+      assert_equal(true, result)
+      assert_equal("test/files/ugoira/ugoira.zip: ok\n", stdout)
     end
 
     should "fail without any files" do

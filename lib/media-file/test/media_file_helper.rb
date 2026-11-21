@@ -45,8 +45,8 @@ module MediaFileTestHelper
   #   or fails
   def generate_preview(file_name)
     MediaFile.open(file_name) do |file|
-      file.preview(150, 150)
-    rescue NotImplementedError
+      file.preview!(150, 150)
+    rescue MediaFile::Error, NotImplementedError
       nil
     end
   end

@@ -9,7 +9,7 @@ require "ffi"
 require "fileutils"
 require "json"
 require "logger"
-require "memoist"
+require "monitor"
 require "shellwords"
 require "tempfile"
 require "tmpdir"
@@ -23,8 +23,6 @@ require_relative "media_file/config"
 # A MediaFile is a wrapper around a File object, and supports all methods
 # supported by a File.
 class MediaFile
-  extend Memoist
-
   # The base class of every error raised by the library. Its message may include internal details, like file paths or
   # the output of ffmpeg, so it isn't shown to users.
   class Error < StandardError
@@ -152,9 +150,19 @@ class MediaFile
   # Initialize a MediaFile from a regular File.
   #
   # @param file [File] The image file.
-  def initialize(file, **options)
+  def initialize(file, **_options)
     @file = file
-    @exif_lock = Mutex.new
+    @locks = Concurrent::Map.new
+  end
+
+  # Run the block while holding the lock named `name`. Anything that starts a program or reads the file is cached inside
+  # its own lock (`synchronize(:md5) { @md5 ||= ... }`), so it only runs once, even when the file is used from several
+  # threads at once, like during an upload. Each value has its own lock, so different values can still be computed at
+  # the same time, like the dimensions and the metadata in `validate!`. The locks are reentrant.
+  #
+  # @param name [Symbol] The name of the lock, usually the name of the value it protects.
+  def synchronize(name, &)
+    @locks.compute_if_absent(name) { Monitor.new }.synchronize(&)
   end
 
   # Close the file if it is open.
@@ -190,7 +198,7 @@ class MediaFile
 
   # @return [String] the MD5 hash of the file, as a hex string.
   def md5
-    Digest::MD5.file(file.path).hexdigest
+    synchronize(:md5) { @md5 ||= Digest::MD5.file(file.path).hexdigest }
   end
 
   # @return [String] The MD5 hash of the image's pixel data, or just the file's MD5 if we can't compute a hash of the image data.
@@ -211,13 +219,12 @@ class MediaFile
 
   # @return [Symbol] the detected file extension
   def file_ext
-    MediaFile.file_ext(file)
+    synchronize(:file_ext) { @file_ext ||= MediaFile.file_ext(file) }
   end
 
-  # @return [Integer] the size of the file in bytes
-  def file_size
-    file.size
-  end
+  # @!method file_size
+  #   @return [Integer] The size of the file in bytes.
+  delegate :size, to: :file, prefix: true
 
   # @return [MediaFile::ExifTool::Metadata] The metadata for the file. Subclasses may override this to add
   #   extra non-ExifTool metadata, such as error messages, Ugoira frame delays, or ffprobe metadata.
@@ -229,9 +236,7 @@ class MediaFile
   # @return [MediaFile::ExifTool::Metadata] The metadata for the file, as returned by MediaFile::ExifTool. It's locked so that ExifTool only
   #   runs once when it's read from several threads, like during upload validation.
   def exif_metadata
-    @exif_lock.synchronize do
-      @exif_metadata ||= MediaFile::ExifTool.new(file).metadata
-    end
+    synchronize(:exif_metadata) { @exif_metadata ||= MediaFile::ExifTool.new(file).metadata }
   end
 
   # @return [String] The MIME type of the file, or "application/octet-stream" if unknown.
@@ -367,70 +372,19 @@ class MediaFile
     false
   end
 
-  # Return a preview of the file, sized to fit within the given width and height (preserving the aspect ratio).
+  # Return a preview of the file, sized to fit within the given width and height (keeping the aspect ratio). Videos and
+  # ugoiras resize their preview frame, a single frame made by ffmpeg. It's resized directly, without checking if it's
+  # animated.
   #
-  # @param width [Integer] the max width of the image
-  # @param height [Integer] the max height of the image
-  # @param options [Hash] extra options when generating the preview
-  # @return [MediaFile, nil] a preview file, or nil if we can't generate a preview for this file type (e.g. Flash files)
-  def preview(width, height, **options)
-    preview!(width, height, **options)
-  rescue StandardError
-    nil
-  end
-
-  # Like `preview`, but raises an exception if generating the preview fails for any reason. Videos and ugoiras resize
-  # their preview frame, a single frame made by ffmpeg. It's resized directly, without checking if it's animated.
+  # @param max_width [Integer] The max width of the preview.
+  # @param max_height [Integer] The max height of the preview.
+  # @param options [Hash] The format and quality (see `MediaFile::Image#resize!`).
+  # @return [MediaFile::Image] The preview.
+  # @raise [MediaFile::Error] If the preview couldn't be generated.
+  # @raise [NotImplementedError] If previews aren't supported for this file type, like Flash files.
   def preview!(max_width, max_height, **options)
     w, h = MediaFile.scale_dimensions(*preview_frame.dimensions, max_width, max_height)
     preview_frame.resize!(w, h, **options)
-  end
-
-  def attributes
-    {
-      path: path,
-      width: width,
-      height: height,
-      file_size: file_size,
-      file_ext: file_ext,
-      mime_type: mime_type,
-      md5: md5,
-      pixel_hash: pixel_hash,
-      is_corrupt?: is_corrupt?,
-      is_supported?: is_supported?,
-      is_animated?: is_animated?,
-      duration: duration,
-      frame_count: frame_count,
-      frame_rate: frame_rate,
-      metadata: metadata,
-    }.stringify_keys
-  end
-
-  def as_json(options = nil)
-    attributes.as_json(options)
-  end
-
-  memoize def test_case
-    template = Erubi::Engine.new <<~TEST.chomp
-      should "be parsed correctly" do
-        file = MediaFile.open(<%= path.inspect %>)
-
-      <% attributes.except("path").each do |key, value| -%>
-      <% if value.is_a?(MediaFile::ExifTool::Metadata) -%>
-      <% entries = value.to_h.map { |k, v| "    \#{k.inspect} => \#{v.inspect}," }.join("\n") -%>
-        assert_equal({
-      <%= entries %>
-        }, file.<%= key %>.to_h)
-      <% elsif value.nil? -%>
-        assert_nil(file.<%= key %>)
-      <% else -%>
-        assert_equal(<%= value.inspect %>, file.<%= key %>)
-      <% end -%>
-      <% end -%>
-      end
-    TEST
-
-    eval(template.src)
   end
 
   # Scale `width` and `height` to fit within `max_width` and `max_height`.
@@ -452,8 +406,6 @@ class MediaFile
   def preview_frame
     raise NotImplementedError
   end
-
-  memoize :file_ext, :file_size, :md5, :mime_type
 end
 
 require_relative "media_file/version"

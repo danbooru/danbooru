@@ -16,14 +16,23 @@ class MediaFile::CLI::Analyze
     error dirname path name metadata
   ]
 
+  # The properties checked by the tests printed by --test-case.
+  TEST_CASE_PROPERTIES = %i[
+    width height file_size file_ext mime_type md5 pixel_hash is_corrupt? is_supported? is_animated? duration frame_count
+    frame_rate metadata
+  ]
+
   attr_reader :columns, :groups, :colors, :sort_specs, :options
 
-  # Initialize default options. The actual options are populated by `parse_options!` when `run!` is called.
-  def initialize(*argv, env: ENV, stdout: $stdout, stderr: $stderr)
+  # Initialize default options. The actual options are populated by `parse_options!` when `run` is called.
+  #
+  # @param argv [Array<String>] The command's arguments.
+  # @param cli [MediaFile::CLI] The `media-cli` command, which parses the options and handles errors.
+  def initialize(argv, cli:)
     @argv = argv.dup
-    @env = env
-    @stdout = stdout
-    @stderr = stderr
+    @cli = cli
+    @env = cli.env
+    @stdout = cli.stdout
     @paths = []
     @columns = []
     @format = "table"
@@ -46,12 +55,8 @@ class MediaFile::CLI::Analyze
     }
   end
 
-  def self.run!(...)
-    new(...).run!
-  end
-
-  # @return [Boolean] Runs the CLI and returns true if the command succeeded, false if it failed with an error.
-  def run!
+  # Print the files' properties. Errors are handled by `MediaFile::CLI#run!`.
+  def run
     parse_options!
 
     case @format
@@ -61,48 +66,33 @@ class MediaFile::CLI::Analyze
       render_detailed
     when "json"
       render_json
+    when "test_case"
+      render_test_case
     end
-
-    true
-  rescue Errno::EPIPE
-    true # Ignore EPIPE errors when the output is piped to a command like `head` that closes the pipe early.
-  rescue SystemExit => e
-    e.success?
-  rescue StandardError => e
-    @stderr.puts e.message
-    false
   end
 
   # Parse the command-line options. Raise an exceptions if the options are invalid.
   def parse_options!
-    OptionParser.new do |opts|
-      program_name = "media-cli analyze"
+    @cli.parse_options!(@argv, "analyze [options] [FILE|DIR ...]", "List the properties of media files, like `ls` or `exiftool`.", into: @options) do |opts|
       terminal_width = @env.fetch("COLUMNS", 80).to_i
-
-      opts.banner = <<~EOS
-        #{program_name} - List properties of media files
-
-        Usage: #{program_name} [options] [FILE|DIR ...]
-      EOS
 
       # --columns=type,size,dimensions -> ["type", "size", "dimensions"]
       opts.accept(:columns) do |value|
         columns = value.split(",")
         invalid = columns - AVAILABLE_COLUMNS
 
-        raise "invalid columns: #{invalid.join(", ")}" if invalid.present?
+        raise OptionParser::InvalidArgument, "invalid columns: #{invalid.join(", ")}" if invalid.present?
         columns
       end
 
       # --sort=dir:desc,type:asc,name -> { "dir" => -1, "type" => 1, "name" => 1 }
       opts.accept(:sort) do |value|
         value.scan(/([^,:]+)(?::(asc|desc))?/).to_h do |column, direction|
-          raise "invalid sort option: #{column}:#{direction}" unless column.in?(AVAILABLE_COLUMNS) && direction.in?(["asc", "desc", nil])
+          raise OptionParser::InvalidArgument, "invalid sort option: #{column}:#{direction}" unless column.in?(AVAILABLE_COLUMNS) && direction.in?(["asc", "desc", nil])
           [column, (direction == "desc") ? -1 : 1]
         end
       end
 
-      opts.separator ""
       opts.on("-d", "--detailed", "Detailed exiftool-like output")
       opts.on("-j", "--json", "JSON output")
       opts.on("-l", "--long", "`ls --long`-like output")
@@ -114,17 +104,12 @@ class MediaFile::CLI::Analyze
       opts.on("-c", "--columns=COL[,...]", :columns, "Select output columns (default: #{default_columns.join(",")})")
       opts.on("-g", "--group=COL[,...]", :columns, "Group output by column(s) (default: #{@options[:group].join(",")})")
       opts.on("-s", "--sort=COL[:asc|:desc]", :sort, "Sort output by column(s) (default: dir:desc,name:asc)")
-
-      opts.on("--help", "Show this help message") do
-        @stdout.puts opts
-        raise SystemExit
-      end
+      opts.on("--frame-delays=MS[,MS...]", /\A\d+(?:,\d+)*\z/, "The frame delays of ugoiras without an animation.json file, in milliseconds") { |delays| delays.split(",").map(&:to_i) }
+      opts.on("--test-case", "Print a test for each file that checks its properties")
 
       opts.separator ""
       opts.separator "Supported output columns:"
       opts.separator AVAILABLE_COLUMNS.join(", ").scan(/.{1,#{terminal_width - 4}}(?:, |$)/).join("\n").indent(4)
-
-      opts.parse!(@argv, into: @options)
     end
 
     @paths = @argv.presence || [Dir.pwd]
@@ -132,7 +117,9 @@ class MediaFile::CLI::Analyze
     @groups = @options[:group]
     @sort_specs = @options[:sort]
 
-    if @options[:json]
+    if @options[:"test-case"]
+      @format = "test_case"
+    elsif @options[:json]
       @format = "json"
     elsif @options[:detailed]
       @format = "detailed"
@@ -148,7 +135,7 @@ class MediaFile::CLI::Analyze
     when "auto"
       @colors = ls_colors if @stdout.tty? && @env["NO_COLOR"].blank?
     else
-      raise "invalid color option: #{@options[:color]}"
+      raise ArgumentError, "invalid color option: #{@options[:color]}"
     end
   end
 
@@ -168,7 +155,7 @@ class MediaFile::CLI::Analyze
   def expanded_paths
     @expanded_paths ||= @paths.flat_map do |path|
       if !File.exist?(path)
-        raise "#{path.inspect}: no such file or directory"
+        raise Errno::ENOENT, path
       elsif File.directory?(path) && @options[:recursive]
         Find.find(path).reject { |entry| entry == path }
       elsif File.directory?(path)
@@ -255,6 +242,29 @@ class MediaFile::CLI::Analyze
     @stdout.puts JSON.pretty_generate(json)
   end
 
+  # Print a test for each file that checks its properties, for adding a new file to the tests in test/unit.
+  def render_test_case
+    expanded_paths.select { File.file?(it) }.each do |path|
+      MediaFile.open(path, frame_delays: @options[:"frame-delays"]) do |file|
+        assertions = TEST_CASE_PROPERTIES.map do |name|
+          value = file.public_send(name)
+
+          if name == :metadata
+            entries = value.to_h.map { |key, val| "    #{key.inspect} => #{val.inspect}," }
+            "  assert_equal({\n#{entries.join("\n")}\n  }, file.metadata.to_h)"
+          elsif value.nil?
+            "  assert_nil(file.#{name})"
+          else
+            "  assert_equal(#{value.inspect}, file.#{name})"
+          end
+        end
+
+        relative_path = Pathname.new(path).relative_path_from(Pathname.pwd).to_s
+        @stdout.puts "should \"be parsed correctly\" do\n  file = MediaFile.open(#{relative_path.inspect})\n\n#{assertions.join("\n")}\nend"
+      end
+    end
+  end
+
   # @return [Hash<String, String>] The mapping of file patterns to ANSI color codes
   def ls_colors
     # LS_COLORS="*.mkv=01;35:*.webm=01;35"
@@ -279,6 +289,7 @@ class MediaFile::CLI::Analyze
       @units = cli.options[:units]
       @precision = cli.options[:precision]
       @human_readable = cli.options[:human_readable]
+      @frame_delays = cli.options[:"frame-delays"]
 
       # Preload the column values so we can close the file as soon as we've calculated all the requested columns.
       @attributes = (@columns | @sort_specs.keys | @groups).index_with do |column|
@@ -290,7 +301,7 @@ class MediaFile::CLI::Analyze
 
     # @return [MediaFile, nil] The MediaFile object for this entry, or nil if it's a not a regular file (a directory, device file, etc).
     def media
-      @media ||= MediaFile.open(@path) if File.file?(@path)
+      @media ||= MediaFile.open(@path, frame_delays: @frame_delays) if File.file?(@path)
     end
 
     # @return [Object] The value of the named output column.
@@ -307,9 +318,17 @@ class MediaFile::CLI::Analyze
       when "permissions"
         format_permissions
       when "user"
-        Etc.getpwuid(stat.uid).name rescue stat.uid.to_s
+        begin
+          Etc.getpwuid(stat.uid).name
+        rescue ArgumentError # The user doesn't exist.
+          stat.uid.to_s
+        end
       when "group"
-        Etc.getgrgid(stat.gid).name rescue stat.gid.to_s
+        begin
+          Etc.getgrgid(stat.gid).name
+        rescue ArgumentError # The group doesn't exist.
+          stat.gid.to_s
+        end
       when "size"
         stat.size
       when "mtime"
@@ -377,7 +396,7 @@ class MediaFile::CLI::Analyze
       type = { file: "-", directory: "d", link: "l", characterSpecial: "c", blockSpecial: "b", socket: "s", fifo: "p" }[stat.ftype.to_sym]
 
       perms = [0o400, 0o200, 0o100, 0o040, 0o020, 0o010, 0o004, 0o002, 0o001].zip("rwxrwxrwx".chars).map do |bit, char|
-        (stat.mode & bit == 0) ? "-" : char
+        stat.mode.nobits?(bit) ? "-" : char
       end
 
       "#{type}#{perms.join}"
@@ -391,10 +410,12 @@ class MediaFile::CLI::Analyze
         base, labels = 1024.0, %w[KiB MiB GiB TiB PiB]
       end
 
-      begin
+      unit = nil
+      loop do
         value /= base
         unit = labels.shift
-      end until value < base || unit.nil?
+        break if value < base || unit.nil?
+      end
 
       "#{format("%.#{@precision}f", value)} #{unit}"
     end

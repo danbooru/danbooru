@@ -30,7 +30,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
 
       context "for a file whose preview fails" do
         should "show an error without the details, and log the error" do
-          MediaFile::Video.any_instance.stubs(:preview!).raises(MediaFile::FFmpeg::Error, "ffmpeg failed: /tmp/danbooru-video-preview-123.png: Permission denied")
+          MediaFile::Video.any_instance.stubs(:preview!).raises(MediaFile::FFmpeg::Error, "ffmpeg failed: /tmp/media-file-video-preview-123.png: Permission denied")
           DanbooruLogger.expects(:log).with(instance_of(MediaFile::FFmpeg::Error))
 
           file = Rack::Test::UploadedFile.new(Rails.root.join("lib/media-file/test/files/mp4/test-300x300-av1.mp4"))

@@ -12,7 +12,6 @@ PATH
       ffi (~> 1)
       ffi-libarchive (~> 1)
       logger (~> 1)
-      memoist (~> 0.16)
       ruby-vips (~> 2)
       rubyzip (~> 3)
 

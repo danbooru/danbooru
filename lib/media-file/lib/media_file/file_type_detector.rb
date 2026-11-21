@@ -4,8 +4,6 @@
 #
 # @see https://en.wikipedia.org/wiki/List_of_file_signatures
 class MediaFile::FileTypeDetector
-  extend Memoist
-
   attr_reader :file
 
   # @param [File] The file to detect.
@@ -14,7 +12,7 @@ class MediaFile::FileTypeDetector
   end
 
   # @return [Symbol] The file's extension (e.g. :jpg, :png, etc). Returns `:bin` if the file type is unknown.
-  memoize def file_ext
+  def file_ext
     header = file.pread(16, 0)
 
     case header
