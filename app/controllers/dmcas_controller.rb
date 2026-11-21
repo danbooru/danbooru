@@ -2,33 +2,24 @@
 
 class DmcasController < ApplicationController
   def show
-    authorize nil, policy_class: DmcaPolicy
+    @dmca = DmcaRequest.new
+    authorize @dmca, policy_class: DmcaPolicy
   end
 
   def create
     raise ActionController::BadRequest, "dmca parameter is required" if params[:dmca].blank?
 
-    @dmca = params[:dmca].slice(:name, :email, :address, :infringing_urls, :original_urls, :proof, :perjury_agree, :good_faith_agree, :signature)
+    @dmca = DmcaRequest.new(params.slice(:dmca).permit(dmca: %i[name email address infringing_urls original_urls proof signature])[:dmca])
     authorize @dmca, policy_class: DmcaPolicy
 
-    Dmail.create_automated(to: User.owner, title: "DMCA Complaint from #{@dmca[:name]}", body: <<~EOS)
-      Name: #{@dmca[:name]}
-      Email: #{@dmca[:email]}
-      Address: #{@dmca[:address]}
-
-      Infringing URLs:
-      #{@dmca[:infringing_urls].to_s.split.map { |url| "* #{url}" }.join("\n")}
-
-      Original URLs:
-      #{@dmca[:original_urls].to_s.split.map { |url| "* #{url}" }.join("\n")}
-
-      Proof: #{@dmca[:proof]}
-      Signature: #{@dmca[:signature]}
-    EOS
-
-    UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: Danbooru.config.dmca_email).deliver_now
-    email_address = Danbooru::EmailAddress.parse(@dmca[:email])
-    UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now if email_address.present? && !email_address.undeliverable?
+    if @dmca.save
+      UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: Danbooru.config.dmca_email).deliver_later
+      email_address = Danbooru::EmailAddress.parse(@dmca.email)
+      UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca.email).deliver_later if email_address.present? && !email_address.undeliverable?
+    else
+      flash.now[:notice] = @dmca.errors.full_messages.join("; ")
+      render :show, status: 422
+    end
   end
 
   def template

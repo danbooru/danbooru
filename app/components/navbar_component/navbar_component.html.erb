@@ -29,13 +29,21 @@
       <%= nav_link_to("Forum", main_app.forum_topics_path, class: ("forum-updated font-italic" if current_user.has_forum_been_updated?)) if Danbooru.config.forum_enabled?.to_s.truthy? %>
 
       <% if current_user.is_moderator? %>
-        <% if ModerationReport.pending.count > 0 %>
-          <%= nav_link_to("Reports #{tag.span(ModerationReport.pending.count, class: "badge-blue")}".html_safe, main_app.moderation_reports_path(search: { status: "pending" }), id: "reports") %>
+        <% if pending_report_count > 0 %>
+          <%= nav_link_to("Reports #{tag.span(pending_report_count, class: "badge-blue")}".html_safe, main_app.moderation_reports_path(search: { status: "pending" }), id: "reports") %>
         <% else %>
           <%= nav_link_to("Reports", main_app.moderation_reports_path) %>
         <% end %>
 
         <%= nav_link_to("Dashboard", main_app.moderator_dashboard_path) %>
+      <% end %>
+
+      <% if current_user.is_superadmin? %>
+        <% if pending_dmca_count > 0 %>
+          <%= nav_link_to("DMCA #{tag.span(pending_dmca_count, class: "badge-blue")}".html_safe, main_app.dmca_requests_path(search: { status: "pending" }), id: "dmca") %>
+        <% else %>
+          <%= nav_link_to("DMCA", main_app.dmca_requests_path, id: "dmca") %>
+        <% end %>
       <% end %>
 
       <%= nav_link_to("More »", main_app.site_map_path) %>

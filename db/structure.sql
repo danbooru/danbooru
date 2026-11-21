@@ -556,6 +556,47 @@ ALTER SEQUENCE public.dmails_id_seq OWNED BY public.dmails.id;
 
 
 --
+-- Name: dmca_requests; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.dmca_requests (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    public_id character varying NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    name character varying,
+    email character varying,
+    address character varying,
+    infringing_urls text NOT NULL,
+    original_urls text NOT NULL,
+    danbooru_urls character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    proof text,
+    signature character varying,
+    post_ids integer[] DEFAULT '{}'::integer[] NOT NULL
+);
+
+
+--
+-- Name: dmca_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.dmca_requests_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: dmca_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.dmca_requests_id_seq OWNED BY public.dmca_requests.id;
+
+
+--
 -- Name: dtext_links; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2831,6 +2872,13 @@ ALTER TABLE ONLY public.dmails ALTER COLUMN id SET DEFAULT nextval('public.dmail
 
 
 --
+-- Name: dmca_requests id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.dmca_requests ALTER COLUMN id SET DEFAULT nextval('public.dmca_requests_id_seq'::regclass);
+
+
+--
 -- Name: dtext_links id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3253,6 +3301,14 @@ ALTER TABLE ONLY public.comments
 
 ALTER TABLE ONLY public.dmails
     ADD CONSTRAINT dmails_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: dmca_requests dmca_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.dmca_requests
+    ADD CONSTRAINT dmca_requests_pkey PRIMARY KEY (id);
 
 
 --
@@ -4189,6 +4245,34 @@ CREATE INDEX index_dmails_on_to_tsvector_english_body ON public.dmails USING gin
 --
 
 CREATE INDEX index_dmails_on_to_tsvector_english_title ON public.dmails USING gin (to_tsvector('english'::regconfig, title));
+
+
+--
+-- Name: index_dmca_requests_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dmca_requests_on_created_at ON public.dmca_requests USING btree (created_at);
+
+
+--
+-- Name: index_dmca_requests_on_post_ids; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dmca_requests_on_post_ids ON public.dmca_requests USING gin (post_ids);
+
+
+--
+-- Name: index_dmca_requests_on_public_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_dmca_requests_on_public_id ON public.dmca_requests USING btree (public_id);
+
+
+--
+-- Name: index_dmca_requests_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dmca_requests_on_status ON public.dmca_requests USING btree (status);
 
 
 --
@@ -7306,6 +7390,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261114000000'),
 ('20261104064770'),
 ('20261104064769'),
 ('20261104064768'),
@@ -7671,3 +7756,4 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20100205162521'),
 ('20100204214746'),
 ('20100204211522');
+

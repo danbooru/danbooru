@@ -1,0 +1,62 @@
+<% page_title "DMCA Requests" %>
+<%= render "secondary_links" %>
+
+<div id="c-dmca-requests">
+  <div id="a-index">
+    <h1>DMCA Requests</h1>
+
+    <%= search_form_for(dmca_requests_path) do |f| %>
+      <%= f.input :name, label: "Name", input_html: { value: params[:search][:name] } %>
+      <%= f.input :email, label: "Email", input_html: { value: params[:search][:email] } %>
+      <%= f.input :infringing_urls_matches, label: "Infringing URL", input_html: { value: params[:search][:infringing_urls_matches] } %>
+      <%= f.input :status, label: "Status", collection: DmcaRequest.statuses.keys, include_blank: true, selected: params[:search][:status] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <%= table_for @dmca_requests, class: "striped autofit", width: "100%" do |t| %>
+      <% t.column "Request" do |dmca_request| %>
+        <%= link_to "DMCA ##{dmca_request.id}", dmca_request %>
+      <% end %>
+
+      <% t.column "From", td: { class: "col-expand break-words" } do |dmca_request| %>
+        <% if dmca_request.purged? %>
+          <em>Purged</em>
+        <% else %>
+          <%= dmca_request.name %>
+          <%= link_to "»", dmca_requests_path(search: { name: dmca_request.name }) %>
+          <div class="text-muted"><%= dmca_request.email %></div>
+        <% end %>
+      <% end %>
+
+      <% t.column "Infringing URLs" do |dmca_request| %>
+        <%= link_to pluralize(dmca_request.infringing_urls.split.size, "URL"), dmca_request %>
+      <% end %>
+
+      <% t.column "Status" do |dmca_request| %>
+        <%= link_to dmca_request.status.capitalize, dmca_requests_path(search: { status: dmca_request.status }) %>
+      <% end %>
+
+      <% t.column "Submitted" do |dmca_request| %>
+        <%= time_ago_in_words_tagged(dmca_request.created_at) %>
+      <% end %>
+
+      <% t.column column: "control" do |dmca_request| %>
+        <%= render PopupMenuComponent.new do |menu| %>
+          <% menu.with_item do %>
+            <%= link_to "Mark as handled", dmca_request_path(dmca_request, dmca_request: { status: "handled" }), method: :put %>
+          <% end %>
+
+          <% menu.with_item do %>
+            <%= link_to "Reject", dmca_request_path(dmca_request, dmca_request: { status: "rejected" }), method: :put %>
+          <% end %>
+
+          <% menu.with_item do %>
+            <%= link_to "History", mod_actions_path(search: { subject_type: "DmcaRequest", subject_id: dmca_request.id }) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@dmca_requests) %>
+  </div>
+</div>

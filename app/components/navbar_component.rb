@@ -26,6 +26,14 @@ class NavbarComponent < ApplicationComponent
     end
   end
 
+  def pending_report_count
+    @pending_report_count ||= ModerationReport.pending.count
+  end
+
+  def pending_dmca_count
+    @pending_dmca_count ||= DmcaRequest.pending.count
+  end
+
   def nav_link_to(*args, **options, &block)
     klass = options.delete(:class)
     url = args.last

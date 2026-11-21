@@ -182,6 +182,10 @@
           <li><%= link_to("Moderation Reports", moderation_reports_path) %></li>
         <% end %>
 
+        <% if policy(DmcaRequest).index? %>
+          <li><%= link_to("DMCA Requests", dmca_requests_path) %></li>
+        <% end %>
+
         <% if policy(NewsUpdate).index? %>
           <li><%= link_to("News Updates", news_updates_path) %></li>
         <% end %>

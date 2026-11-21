@@ -2,14 +2,24 @@
 
 class ModActionPolicy < ApplicationPolicy
   def show?
-    user.is_moderator? || !record.category.to_sym.in?(ModAction::MOD_ONLY_CATEGORIES)
+    category = record.category.to_sym
+
+    if user.is_superadmin?
+      true
+    elsif user.is_moderator?
+      !category.in?(ModAction::SUPERADMIN_ONLY_CATEGORIES)
+    else
+      !category.in?(ModAction::MOD_ONLY_CATEGORIES + ModAction::SUPERADMIN_ONLY_CATEGORIES)
+    end
   end
 
   def visible(relation)
-    if user.is_moderator?
+    if user.is_superadmin?
       relation
+    elsif user.is_moderator?
+      relation.where.not(category: ModAction::SUPERADMIN_ONLY_CATEGORIES)
     else
-      relation.where.not(category: ModAction::MOD_ONLY_CATEGORIES)
+      relation.where.not(category: ModAction::MOD_ONLY_CATEGORIES + ModAction::SUPERADMIN_ONLY_CATEGORIES)
     end
   end
 

@@ -1,0 +1,5 @@
+<% content_for(:secondary_links) do %>
+  <%= subnav_link_to "Listing", dmca_requests_path %>
+  <%= subnav_link_to "Pending", dmca_requests_path(search: { status: "pending" }) %>
+  <%= subnav_link_to "History", mod_actions_path(search: { subject_type: "DmcaRequest" }) %>
+<% end %>

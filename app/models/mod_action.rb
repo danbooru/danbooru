@@ -11,6 +11,11 @@ class ModAction < ApplicationRecord
     backup_code_send
   ]
 
+  SUPERADMIN_ONLY_CATEGORIES = %i[
+    dmca_request_handled
+    dmca_request_rejected
+  ]
+
   dtext_attribute :description, inline: true # defines :dtext_description
 
   belongs_to :creator, class_name: "User"
@@ -92,13 +97,15 @@ class ModAction < ApplicationRecord
     site_credential_disable: 407,
     email_address_update: 501,
     backup_code_send: 606,
+    dmca_request_handled: 706,
+    dmca_request_rejected: 707,
     mass_update: 1000, # XXX unused
   }
 
   normalizes :category, with: ->(category) { category.to_s.parameterize.underscore.presence }
 
   def self.model_types
-    %w[Artist Comment CommentVote ForumPost ForumTopic IpBan ModerationReport NewsUpdate Pool Post PostVote SiteCredential Tag TagAlias TagImplication User]
+    %w[Artist Comment CommentVote DmcaRequest ForumPost ForumTopic IpBan ModerationReport NewsUpdate Pool Post PostVote SiteCredential Tag TagAlias TagImplication User]
   end
 
   def self.search(params, current_user)
