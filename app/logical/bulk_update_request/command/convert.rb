@@ -9,7 +9,7 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   def initialize(params)
     @antecedent = params[:antecedent]
     @consequent = params[:consequent]
-    @consequent = Tag.normalize_name(@consequent) if to_query.is_simple_tag?
+    @consequent = Tag.normalize_name(@consequent) if PostQuery.normalize(@consequent, apply_aliases: false).is_simple_tag?
   end
 
   def affected_tags
