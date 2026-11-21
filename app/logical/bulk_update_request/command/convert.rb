@@ -48,11 +48,16 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     end
 
     prefix, unprefixed_name = @consequent.downcase.split(":", 2)
+    target_tag = Tag.new(name: @consequent)
 
     if to_query.ast.tag? && unprefixed_name.present? && TagCategory.mapping.key?(prefix)
       errors.add(:base, "Can't #{to_dtext} (change the category in a separate line)")
     elsif !to_query.is_simple_tag?
       errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (must convert a pool or favgroup to a tag)")
+    elsif target_tag.invalid?(:name)
+      errors.add(:base, "Can't #{to_dtext} (#{target_tag.errors.full_messages.join("; ")})")
+    elsif to_query.tag&.is_deprecated?
+      errors.add(:base, "Can't #{to_dtext} ([[#{to_query.tag_name}]] is deprecated)")
     elsif from_query.pool.nil? && from_query.favgroup.nil?
       errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
     end

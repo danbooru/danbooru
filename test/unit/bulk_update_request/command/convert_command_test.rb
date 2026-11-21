@@ -32,6 +32,22 @@ class ConvertCommandTest < ActiveSupport::TestCase
           script: "convert tag1 -> favgroup:#{@favgroup.id}",
           errors: ["Can't convert {{tag1}} -> {{favgroup:#{@favgroup.id}}} (must convert a pool or favgroup to a tag)"],
         )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> newpool:cute_pool2",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> {{newpool:cute_pool2}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> newfavgroup:cute_fg",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> {{newfavgroup:cute_fg}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert pool:cute_pool -> newfavgroup:cute_fg",
+          errors: ["Can't convert {{pool:cute_pool}} -> {{newfavgroup:cute_fg}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> newfavgroup:",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> {{newfavgroup:}} (must convert a pool or favgroup to a tag)"],
+        )
       end
 
       should "refuse to convert a tag to another tag" do
@@ -64,6 +80,26 @@ class ConvertCommandTest < ActiveSupport::TestCase
           script: "convert favgroup:#{@favgroup.id} -> copy:cute_series",
           errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[copy:cute_series]] (change the category in a separate line)"],
         )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> (copy:cute_series)",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> {{(copy:cute_series)}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> ~copy:cute_series",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> {{~copy:cute_series}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert pool:cute_pool -> (copy:cute_series)",
+          errors: ["Can't convert {{pool:cute_pool}} -> {{(copy:cute_series)}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> (cute)",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[(cute)]] ('(cute)' cannot begin with a '(')"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> ~cute",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[~cute]] ('~cute' cannot begin with a '~')"],
+        )
       end
 
       should "refuse to convert a nonexistent or private favgroup" do
@@ -76,6 +112,20 @@ class ConvertCommandTest < ActiveSupport::TestCase
         assert_invalid_bur(
           script: "convert favgroup:#{favgroup.id} -> cute",
           errors: ["Can't convert {{favgroup:#{favgroup.id}}} -> [[cute]] ({{favgroup:#{favgroup.id}}} does not exist)"],
+        )
+      end
+
+      should "refuse to convert to an invalid or deprecated tag" do
+        favgroup = create(:favorite_group)
+        create(:tag, name: "old_tag", is_deprecated: true)
+
+        assert_invalid_bur(
+          script: "convert favgroup:#{favgroup.id} -> foo,bar",
+          errors: ["Can't convert {{favgroup:#{favgroup.id}}} -> [[foo,bar]] ('foo,bar' cannot contain commas (','))"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{favgroup.id} -> old_tag",
+          errors: ["Can't convert {{favgroup:#{favgroup.id}}} -> [[old_tag]] ([[old_tag]] is deprecated)"],
         )
       end
     end
