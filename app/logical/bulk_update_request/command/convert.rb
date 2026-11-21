@@ -41,7 +41,7 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     "convert {{#{@antecedent}}} -> [[#{@consequent}]]"
   end
 
-  def validate(errors:, **)
+  def validate(context:, errors:, approver: nil, **)
     if !(from_query.is_single_pool? || from_query.is_single_favgroup?)
       errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (must convert a pool or favgroup to a tag)")
       return
@@ -58,8 +58,17 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
       errors.add(:base, "Can't #{to_dtext} (#{target_tag.errors.full_messages.join("; ")})")
     elsif to_query.tag&.is_deprecated?
       errors.add(:base, "Can't #{to_dtext} ([[#{to_query.tag_name}]] is deprecated)")
-    elsif from_query.pool.nil? && from_query.favgroup.nil?
+    elsif from_query.is_single_pool? && from_query.pool.nil?
       errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
+    elsif from_query.is_single_favgroup?
+      favgroup = from_query.favgroup
+
+      if favgroup.nil?
+        errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
+      elsif context == :approval && !approver.is_admin? && favgroup.post_count > Tag::SMALL_TAG_THRESHOLD
+        # Checked here instead of in `approval_level` to avoid extra queries on BUR listings.
+        errors.add(:base, "Can't approve #{to_dtext} ({{#{@antecedent}}} is too large; requires Admin)")
+      end
     end
   end
 

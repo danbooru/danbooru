@@ -194,6 +194,21 @@ class ConvertCommandTest < ActiveSupport::TestCase
         assert_includes(bur.errors.full_messages, "Can't approve convert {{pool:cute_pool}} -> [[cute]] (requires Admin)")
         assert_equal("pending", bur.reload.status)
       end
+
+      should "not allow moderators to approve large favgroup conversions" do
+        mod = create(:mod_user)
+        favgroup = build(:favorite_group, post_ids: (1..(Tag::SMALL_TAG_THRESHOLD + 1)).to_a)
+        favgroup.save!(validate: false)
+
+        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> cute")
+
+        bur.approve!(mod)
+        assert_includes(bur.errors.full_messages, "Can't approve convert {{favgroup:#{favgroup.id}}} -> [[cute]] ({{favgroup:#{favgroup.id}}} is too large; requires Admin)")
+        assert_equal("pending", bur.reload.status)
+
+        bur.approve!(@admin)
+        assert_equal("processing", bur.reload.status)
+      end
     end
   end
 end
