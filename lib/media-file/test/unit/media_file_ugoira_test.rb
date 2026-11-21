@@ -863,6 +863,16 @@ class MediaFileUgoiraTest < ActiveSupport::TestCase
     end
   end
 
+  context "Converting a ugoira when ffmpeg or mkvmerge isn't installed" do
+    should "raise an error" do
+      MediaFile.stubs(:dependency_versions).returns({ vips: "8.18.7", ffmpeg: "9.0.2", mkvmerge: nil, exiftool: "13.55" })
+      ugoira = MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip")
+
+      error = assert_raises(NotImplementedError) { ugoira.convert }
+      assert_equal("can't convert ugoira to video: ffmpeg or mkvmerge not installed", error.message)
+    end
+  end
+
   context "Validating a ugoira" do
     should "pass for a valid ugoira" do
       MediaFile.open("test/files/ugoira/ugoira-95239241-danbooru.zip") { |ugoira| assert_nothing_raised { ugoira.validate! } }

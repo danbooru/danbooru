@@ -177,7 +177,28 @@ class MediaFile
 
   # @return [Boolean] true if we can generate video previews.
   def self.videos_enabled?
-    system("ffmpeg -version > /dev/null") && system("mkvmerge --version > /dev/null")
+    dependency_versions.values_at(:ffmpeg, :mkvmerge).all?
+  end
+
+  # The versions of the programs the library runs. They're only checked once, because they don't change while the
+  # program is running.
+  #
+  # @return [Hash{Symbol => String, nil}] The version of each program, or nil if it isn't installed.
+  def self.dependency_versions
+    @dependency_versions ||= {
+      vips: program_output("vips", "--version").to_s[/vips-([0-9.]+)/, 1], # "vips-8.18.7"
+      ffmpeg: program_output("ffmpeg", "-version").to_s[/ffmpeg version ([0-9.]+)/, 1], # "ffmpeg version 9.0.2 Copyright..."
+      mkvmerge: program_output("mkvmerge", "--version").to_s.chomp.presence, # "mkvmerge v97.0 ('You Don't Have A Clue') 64-bit"
+      exiftool: program_output("exiftool", "-ver").to_s.chomp.presence, # "13.55"
+    }
+  end
+
+  # @return [String, nil] The output of a program, or nil if it isn't installed or fails.
+  private_class_method def self.program_output(*command)
+    output = IO.popen(command, err: File::NULL, &:read)
+    output if $?.success?
+  rescue SystemCallError
+    nil
   end
 
   # Initialize a MediaFile from a regular File.

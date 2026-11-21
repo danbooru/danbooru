@@ -205,41 +205,19 @@ class ServerStatus
     end
 
     def libvips_version
-      version = `vips --version`
-      version[/vips-([0-9.]+)/, 1]
-    rescue StandardError
-      nil
+      MediaFile.dependency_versions[:vips]
     end
 
     def ffmpeg_version
-      version = `ffmpeg -version`
-      version[/ffmpeg version ([0-9.]+)/, 1]
-    rescue StandardError
-      nil
-    end
-
-    def ffmpeg_installed?
-      ffmpeg_version.present?
+      MediaFile.dependency_versions[:ffmpeg]
     end
 
     def mkvmerge_version
-      `mkvmerge --version`.chomp
-    rescue StandardError
-      nil
-    end
-
-    def mkvmerge_installed?
-      mkvmerge_version.present?
+      MediaFile.dependency_versions[:mkvmerge]
     end
 
     def exiftool_version
-      `exiftool -ver`.chomp
-    rescue StandardError
-      nil
-    end
-
-    def exiftool_installed?
-      exiftool_version.present?
+      MediaFile.dependency_versions[:exiftool]
     end
 
     def jemalloc_version
@@ -251,11 +229,11 @@ class ServerStatus
     end
 
     def instance_error
-      if !exiftool_installed?
+      if exiftool_version.nil?
         "ExifTool not installed"
-      elsif !ffmpeg_installed?
+      elsif ffmpeg_version.nil?
         "FFmpeg not installed"
-      elsif !mkvmerge_installed?
+      elsif mkvmerge_version.nil?
         "Mkvmerge not installed"
       else
         nil
@@ -328,5 +306,5 @@ class ServerStatus
     end
   end
 
-  memoize :redis_info, :kernel_version, :distro_version, :ffmpeg_version, :libvips_version
+  memoize :redis_info, :kernel_version, :distro_version
 end

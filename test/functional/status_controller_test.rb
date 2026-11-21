@@ -44,6 +44,24 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
       assert_not(response.parsed_body["server"].key?("kernel_version"))
     end
 
+    should "show the versions of the programs used for uploads to superadmins" do
+      get_auth status_path(format: :json), create(:superadmin_user)
+
+      assert_response :success
+      assert_match(/\A\d+\.\d+\.\d+\z/, response.parsed_body.dig("version", "libvips_version"))
+      assert_match(/\A\d+\.\d+/, response.parsed_body.dig("version", "ffmpeg_version"))
+      assert_match(/\Amkvmerge v\d+/, response.parsed_body.dig("version", "mkvmerge_version"))
+      assert_match(/\A\d+\.\d+\z/, response.parsed_body.dig("version", "exiftool_version"))
+    end
+
+    should "show an error if a program used for uploads isn't installed" do
+      MediaFile.stubs(:dependency_versions).returns({ vips: "8.18.7", ffmpeg: "9.0.2", mkvmerge: nil, exiftool: "13.55" })
+      get_auth status_path, create(:superadmin_user)
+
+      assert_response :success
+      assert_includes(response.body, "Mkvmerge not installed")
+    end
+
     should "show sensitive details to superadmins" do
       get_auth status_path(format: :json), create(:superadmin_user)
 
