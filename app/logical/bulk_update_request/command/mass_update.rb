@@ -26,8 +26,16 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     from_query.tag_names + tag_edit.tag_terms.map(&:name) + tag_edit.tag_categorization_terms.map(&:value)
   end
 
-  def process!(**)
-    self.class.mass_update(@first_search, @second_search)
+  def searched_pools
+    from_query.select_metatags(:pool).filter_map { |metatag| Pool.find_by_name(metatag.value.escape_wildcards) }
+  end
+
+  def edited_pools
+    tag_edit.metatag_terms.select { |metatag| metatag.name.in?(%w[pool -pool newpool]) }.filter_map { |metatag| Pool.find_by_name(metatag.value.escape_wildcards) }
+  end
+
+  def process!(approved_at: nil, **)
+    self.class.mass_update(@first_search, @second_search, approved_at: approved_at)
   end
 
   def to_dtext
@@ -87,15 +95,43 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
         errors.add(:base, "Can't #{to_dtext} (pool names can't contain asterisks)")
       end
     end
+
+    # Changing the pool while searching it would make the next batch fail with "was modified after approval".
+    if searched_pools.intersect?(edited_pools)
+      errors.add(:base, "Can't #{to_dtext} (can't change the pool being searched; use convert instead to move a pool to a tag)")
+    end
   end
 
-  def self.mass_update(antecedent, consequent, user: User.system)
+  def self.mass_update(antecedent, consequent, user: User.system, approved_at: nil)
+    query = antecedent.is_a?(PostQuery) ? antecedent : PostQuery.normalize(antecedent) if approved_at.present?
+
     CurrentUser.scoped(user) do
-      Post.anon_tag_match(antecedent).reorder(nil).parallel_find_each do |post|
-        post.with_lock do
-          post.tag_string += " #{consequent}"
-          post.save
+      # Each batch is limited to the IDs found before the check, so posts added to a pool mid-update aren't updated.
+      Post.anon_tag_match(antecedent).reorder(nil).in_batches(use_ranges: false) do |batch|
+        validate_unmodified!(query, approved_at) if approved_at.present?
+
+        batch.parallel_find_each do |post|
+          post.with_lock do
+            post.tag_string += " #{consequent}"
+            post.save
+          end
         end
+      end
+    end
+  end
+
+  def self.validate_unmodified!(query, approved_at)
+    query.select_metatags(:pool).each do |metatag|
+      pool = Pool.find_by_name(metatag.value.escape_wildcards)
+      if pool.present? && pool.updated_at > approved_at
+        raise BulkUpdateRequest::Processor::Error, "{{#{metatag}}} was modified after approval"
+      end
+    end
+
+    query.select_metatags(:favgroup).each do |metatag|
+      favgroup = FavoriteGroup.visible(User.anonymous).find_by_name_or_id(metatag.value, User.anonymous)
+      if favgroup.present? && favgroup.updated_at > approved_at
+        raise BulkUpdateRequest::Processor::Error, "{{#{metatag}}} was modified after approval"
       end
     end
   end

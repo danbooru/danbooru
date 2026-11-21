@@ -42,6 +42,7 @@ class BulkUpdateRequest::Command
   #
   # @param approver [User] the user approving the BUR (required by some commands)
   # @param forum_topic [ForumTopic] the forum topic associated with the BUR (required by some commands)
+  # @param approved_at [Time, nil] when the BUR was approved (used by some commands to detect post-approval modifications)
   def process!(**)
     raise NotImplementedError
   end

@@ -222,6 +222,65 @@ class ConvertCommandTest < ActiveSupport::TestCase
         bur.approve!(@admin)
         assert_equal("processing", bur.reload.status)
       end
+
+      should "fail if the favgroup was modified after approval" do
+        mod = create(:mod_user)
+        post1 = create(:post, tag_string: "bar")
+        post2 = create(:post, tag_string: "bar")
+        favgroup = create(:favorite_group, post_ids: [post1.id])
+
+        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> cute")
+        bur.approve!(mod)
+
+        travel 1.second do
+          favgroup.update!(post_ids: [post2.id])
+        end
+
+        error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
+        assert_equal("{{favgroup:#{favgroup.id}}} was modified after approval", error.message)
+        assert_equal("failed", bur.reload.status)
+        assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
+        assert_equal("bar", post1.reload.tag_string)
+        assert_equal("bar", post2.reload.tag_string)
+      end
+
+      should "fail if the favgroup was made private after approval" do
+        mod = create(:mod_user)
+        post = create(:post, tag_string: "bar")
+        favgroup = create(:favorite_group, creator: create(:gold_user), post_ids: [post.id])
+
+        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> cute")
+        bur.approve!(mod)
+
+        favgroup.update!(is_public: false)
+
+        error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
+        assert_equal("Can't convert {{favgroup:#{favgroup.id}}} -> [[cute]] ({{favgroup:#{favgroup.id}}} does not exist)", error.message)
+        assert_equal("failed", bur.reload.status)
+        assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
+        assert_equal("bar", post.reload.tag_string)
+      end
+
+      should "fail if the pool was modified after approval" do
+        post1 = create(:post, tag_string: "bar")
+        post2 = create(:post, tag_string: "bar")
+        pool = create(:pool, name: "cute_pool", description: "asd", post_ids: [post1.id])
+
+        bur = create(:bulk_update_request, script: "convert pool:cute_pool -> cute")
+        bur.approve!(@admin)
+
+        travel 1.second do
+          pool.update!(post_ids: [post2.id])
+        end
+
+        error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
+        assert_equal("{{pool:cute_pool}} was modified after approval", error.message)
+        assert_equal("failed", bur.reload.status)
+        assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
+        assert_equal(false, pool.reload.is_deleted?)
+        assert_equal("bar", post1.reload.tag_string)
+        assert_equal("bar", post2.reload.tag_string)
+      end
     end
   end
 end

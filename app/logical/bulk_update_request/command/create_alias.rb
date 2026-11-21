@@ -18,7 +18,7 @@ class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
     [@old_name, @new_name]
   end
 
-  def process!(approver:, forum_topic:)
+  def process!(approver:, forum_topic:, **)
     TagAlias.approve!(antecedent_name: @old_name, consequent_name: @new_name, approver: approver, forum_topic: forum_topic)
   end
 

@@ -15,7 +15,7 @@ class BulkUpdateRequest::Command::CreateImplication < BulkUpdateRequest::Command
     [@antecedent, @consequent]
   end
 
-  def process!(approver:, forum_topic:)
+  def process!(approver:, forum_topic:, **)
     TagImplication.approve!(antecedent_name: @antecedent, consequent_name: @consequent, approver: approver, forum_topic: forum_topic)
   end
 

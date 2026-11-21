@@ -29,11 +29,11 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     User::Levels::ADMIN
   end
 
-  def process!(**)
+  def process!(approved_at: nil, **)
     if from_query.is_single_pool?
-      convert_pool_to_tag
+      convert_pool_to_tag(approved_at: approved_at)
     elsif from_query.is_single_favgroup?
-      BulkUpdateRequest::Command::MassUpdate.mass_update(from_query, to_query)
+      convert_favgroup_to_tag(approved_at: approved_at)
     end
   end
 
@@ -79,16 +79,23 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     Pool.find_by_name(from_query.find_metatag(:pool).escape_wildcards)
   end
 
-  def convert_pool_to_tag
+  def convert_pool_to_tag(approved_at: nil)
     pool = self.pool
-    wiki_page = WikiPage.find_by_title(to_query) || WikiPage.new(title: to_query.tag_name)
+    raise BulkUpdateRequest::Processor::Error, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)" if pool.nil?
 
+    BulkUpdateRequest::Command::MassUpdate.mass_update(from_query, to_query, approved_at: approved_at)
+
+    wiki_page = WikiPage.find_by_title(to_query) || WikiPage.new(title: to_query.tag_name)
     wiki_page.is_deleted = false
     wiki_page.body = pool.description if wiki_page.body.blank?
     wiki_page.save
 
-    BulkUpdateRequest::Command::MassUpdate.mass_update(from_query, to_query)
-
     pool.update(is_deleted: true, description: "This pool has been moved to [[#{@consequent}]].", post_ids: [])
+  end
+
+  def convert_favgroup_to_tag(approved_at: nil)
+    raise BulkUpdateRequest::Processor::Error, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)" if from_query.favgroup.nil?
+
+    BulkUpdateRequest::Command::MassUpdate.mass_update(from_query, to_query, approved_at: approved_at)
   end
 end

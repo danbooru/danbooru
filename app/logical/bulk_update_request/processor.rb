@@ -76,13 +76,21 @@ class BulkUpdateRequest::Processor
   # Process the bulk update request immediately.
   def process!
     CurrentUser.scoped(User.system) do
+      # Read this before updating the status, which changes `updated_at` if the BUR wasn't already marked as processing.
+      approved_at = bulk_update_request.updated_at
       bulk_update_request.update!(status: "processing")
 
       commands.each do |command|
-        command.process!(approver: approver, forum_topic: forum_topic)
+        command.process!(approver: approver, forum_topic: forum_topic, approved_at: approved_at)
       end
 
       bulk_update_request.update!(status: "approved")
+    rescue Error => e
+      bulk_update_request.update!(status: "failed")
+      if forum_topic.present? && bulk_update_request.forum_post.present?
+        bulk_update_request.forum_updater.update("The #{bulk_update_request.bulk_update_request_link} (forum ##{bulk_update_request.forum_post.id}) failed: #{e.message}.")
+      end
+      raise
     rescue StandardError
       bulk_update_request.update!(status: "failed")
       raise
