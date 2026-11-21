@@ -340,4 +340,24 @@ class MediaFileWebpTest < ActiveSupport::TestCase
       }, file.metadata.to_h)
     end
   end
+
+  context "#in_memory_size" do
+    should "be the size of the decoded image" do
+      file = MediaFile.open("test/files/webp/test.webp")
+      assert_equal(file.width * file.height * 3, file.in_memory_size)
+    end
+  end
+
+  context "a WebP over the max WebP resolution" do
+    should "be too large instead of corrupt, without being decoded" do
+      stub_const(MediaAsset, :MAX_WEBP_RESOLUTION, 1_000) do
+        file = MediaFile.open("test/files/webp/test.webp")
+
+        assert_equal(true, file.is_too_large?)
+        assert_equal(false, file.is_supported?)
+        assert_equal(false, file.is_corrupt?)
+        assert_equal(file.md5, file.pixel_hash)
+      end
+    end
+  end
 end

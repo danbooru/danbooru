@@ -355,6 +355,17 @@ class ExternalCommandTest < ActiveSupport::TestCase
       assert_equal([], syscalls & %w[socket connect bind listen accept accept4 execveat getxattr lgetxattr fgetxattr])
     end
 
+    should "use the profile given for the command, instead of the profile for the program" do
+      Dir.mktmpdir do |dir|
+        command = "#{RbConfig.ruby.shellescape} --disable-gems -e 'Dir.mkdir(ARGV[0])' #{File.join(dir, "new").shellescape}"
+
+        # bin/image runs the same Ruby as bin/archive, but it doesn't write files, so it can't create directories.
+        assert_raises(ExternalCommand::SyscallError) { ExternalCommand.run(command, write: [dir], profile_name: "bin/image") }
+        assert_equal(true, ExternalCommand.run(command, write: [dir], profile_name: "bin/archive").last.success?)
+        assert_equal(true, Dir.exist?(File.join(dir, "new")))
+      end
+    end
+
     should "raise an error if the command calls a blocked syscall" do
       stub_const(ExternalCommand, :PROFILES, PROFILES) do
         error = assert_raises(ExternalCommand::SyscallError) { ExternalCommand.run("unshare --user true") }

@@ -59,10 +59,6 @@ options[:iterations].times { |pass| paths.each_with_index { |path, i| jobs << [p
 jobs.close
 results = Queue.new
 
-# Exit immediately on Ctrl-C. A normal exit can hang forever if it happens during `pixel_hash`, because Ruby stops the
-# thread that runs libvips' callbacks while libvips is still waiting for them.
-trap("INT") { exit!(130) }
-
 started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 cpu_before = Process.times
 

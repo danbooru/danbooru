@@ -20,12 +20,103 @@ class MediaFileJpgTest < ActiveSupport::TestCase
   end
 
   context "Resizing an image" do
-    should "delete the temp file if saving the image fails" do
+    should "log libvips' error, raise a generic error, and delete the temp file if saving the image fails" do
       file = MediaFile.open("test/files/jpg/test-blank.jpg")
-      Vips::Image.any_instance.stubs(:jpegsave).raises(Vips::Error)
+      output = nil
+      ExternalCommand.stubs(:run).with { |_command, write:, **| output = write.first }.returns([{ error: "VipsJpeg: Premature end of input file" }.to_json, nil])
+      DanbooruLogger.expects(:info).with(regexp_matches(%r{\Abin/image resize failed: .*VipsJpeg: Premature end of input file}))
 
-      assert_raises(Vips::Error) { file.resize!(150, 150) }
-      assert_equal([], Dir.glob("#{Dir.tmpdir}/danbooru-image-preview-#{file.md5}-*"))
+      error = assert_raises(MediaFile::Image::Error) { file.resize!(150, 150) }
+      assert_equal("libvips error", error.message)
+      assert_equal(false, File.exist?(output))
+    end
+
+    should "reject resized images of the wrong type from a compromised bin/image" do
+      image = MediaFile.open("test/files/jpg/test.jpg")
+      output = nil
+      ExternalCommand.stubs(:run).with do |_command, write:, **|
+        output = write.first
+        File.write(output, "<html>")
+      end.returns([{}.to_json, nil])
+
+      assert_raises(MediaFile::Image::Error) { image.resize!(150, 150) }
+      assert_equal(false, File.exist?(output))
+    end
+  end
+
+  context "Reading an image in bin/image" do
+    should "not load file types we don't support" do
+      Danbooru::Tempfile.create(["danbooru-test-", ".ppm"]) do |file|
+        file.write("P5\n1 1\n255\n\x00")
+        file.flush
+
+        image = MediaFile::Image.new(file)
+        image.stubs(:file_ext).returns(:png)
+        assert_equal("libvips error", image.error)
+        assert_equal(image.md5, image.pixel_hash)
+      end
+    end
+
+    should "treat malformed output from a compromised bin/image as an error" do
+      outputs = [
+        "not json",
+        { images: "x" }.to_json,
+        { images: [] }.to_json,
+        { images: [{ width: "x", height: [], n_pages: {}, delay: [{}], in_memory_size: true, pixel_hash: "../../etc/passwd" }] }.to_json,
+      ]
+
+      outputs.each do |output|
+        image = MediaFile.open("test/files/jpg/test.jpg")
+        image.exif_metadata
+        ExternalCommand.stubs(:run).returns([output, nil])
+
+        assert_equal("libvips error", image.error, output)
+        assert_equal(image.md5, image.pixel_hash, output)
+        # Falls back to the dimensions from the EXIF metadata.
+        assert_equal([500, 335], image.dimensions, output)
+        ExternalCommand.unstub(:run)
+      end
+    end
+
+    should "read the limits as a JSON object" do
+      file = "test/files/jpg/test.jpg"
+      limits = { max_resolution: 1_000, max_width: 1_000, max_height: 1_000, max_in_memory_size: 1_000, max_webp_resolution: 1_000 }
+
+      assert_equal(true, MediaFile::Image.run!("read", limits.to_json, "jpg", file, read: [file]).dig(:images, 0, :too_large))
+      assert_equal(false, MediaFile::Image.run!("read", limits.merge(max_resolution: 1_000_000).to_json, "jpg", file, read: [file]).dig(:images, 0, :too_large))
+    end
+
+    should "return nil for invalid arguments" do
+      file = "test/files/jpg/test.jpg"
+      limits = { max_resolution: 1_000_000, max_width: 1_000, max_height: 1_000, max_in_memory_size: 1_000, max_webp_resolution: 1_000 }
+
+      assert_nil(MediaFile::Image.run!("resize", "jpg", file, "x", 1, "jpeg", 85, File::NULL, read: [file]))
+      assert_nil(MediaFile::Image.run!("read", "not json", "jpg", file, read: [file]))
+      assert_nil(MediaFile::Image.run!("read", limits.except(:max_width).to_json, "jpg", file, read: [file]))
+      assert_nil(MediaFile::Image.run!("read", limits.merge(max_width: "1000").to_json, "jpg", file, read: [file]))
+      assert_nil(MediaFile::Image.run!("read", limits.merge(extra: 1).to_json, "jpg", file, read: [file]))
+      assert_nil(MediaFile::Image.run!("read", limits.to_json, "bmp", file, read: [file]))
+    end
+
+    should "log and treat output that's too long as an error" do
+      image = MediaFile.open("test/files/jpg/test.jpg")
+      image.exif_metadata
+      ExternalCommand.stubs(:run).raises(ExternalCommand::OutputLimitError)
+      DanbooruLogger.expects(:info).with(regexp_matches(%r{\Abin/image printed too much output}))
+
+      assert_equal("libvips error", image.error)
+    end
+
+    should "not decode images that are over the upload limits" do
+      stub_const(MediaAsset, :MAX_IMAGE_RESOLUTION, 1_000) do
+        image = MediaFile.open("test/files/jpg/test.jpg")
+
+        assert_equal([500, 335], image.dimensions)
+        assert_equal(true, image.is_too_large?)
+        assert_equal(false, image.is_supported?)
+        assert_equal(false, image.is_corrupt?)
+        assert_equal(image.md5, image.pixel_hash)
+      end
     end
   end
 
@@ -1130,6 +1221,22 @@ class MediaFileJpgTest < ActiveSupport::TestCase
         "ICC-meas:MeasurementFlare" => "0.999%",
         "ICC-meas:MeasurementIlluminant" => "D65",
       }, file.metadata.to_h)
+    end
+  end
+
+  context "#in_memory_size" do
+    should "be 0 for JPEGs that are decoded a few rows at a time" do
+      assert_equal(0, MediaFile.open("test/files/jpg/test.jpg").in_memory_size)
+    end
+
+    should "be the size of the decoded image for progressive JPEGs" do
+      file = MediaFile.open("test/files/jpg/test-exif-small.jpg")
+      assert_equal(file.width * file.height * 3, file.in_memory_size)
+    end
+
+    should "be the size of the decoded image for rotated JPEGs" do
+      file = MediaFile.open("test/files/jpg/test-rotation-90cw.jpg")
+      assert_equal(file.width * file.height * 3, file.in_memory_size)
     end
   end
 end

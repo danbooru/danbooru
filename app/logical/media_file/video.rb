@@ -20,10 +20,6 @@ class MediaFile::Video < MediaFile
     video.display_dimensions || [0, 0]
   end
 
-  def preview!(max_width, max_height, **options)
-    preview_frame.preview!(max_width, max_height, **options)
-  end
-
   def metadata
     super.merge({
       "FFmpeg:Error" => error,

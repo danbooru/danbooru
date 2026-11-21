@@ -18,6 +18,7 @@ These scripts are specific to this project.
 | `generate-changelog` | Generate a changelog from Git commits between two refs. |
 | `generate-source-tests` | Generate skeleton parsing and extracting tests for a URL strategy. |
 | `github-print-test-results` | Parse JUnit test output and print GitHub workflow annotations and a summary. |
+| `image` | Read and resize images with libvips. Run in the upload sandbox by `MediaFile::Image`. |
 | `media-bench` | Measure how long it takes to process media files like an upload does. |
 | `media-conv` | Convert media files using Danbooru's media conversion logic. |
 | `media-ls` | List properties of media files (like `ls`, but using Danbooru's media file logic). |

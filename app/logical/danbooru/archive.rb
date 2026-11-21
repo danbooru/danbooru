@@ -37,11 +37,6 @@ module Danbooru
     # it happens during the upload request.
     LIST_TIMEOUT = 10.seconds
 
-    SCRIPT = Rails.root.join("bin/archive").to_s
-
-    # The bundled gems used by bin/archive. They're passed with `-I`, so it doesn't have to load Bundler.
-    GEM_PATHS = %w[ffi ffi-libarchive rubyzip].flat_map { |name| Gem.loaded_specs.fetch(name).full_require_paths }.freeze
-
     attr_reader :file, :max_entries
 
     # Set by `.list!`, which reads the file lists of several archives at once.
@@ -61,18 +56,8 @@ module Danbooru
     # @raise [ExternalCommand::SyscallError] If the command was killed by the sandbox. This isn't wrapped, so the file
     #   can be quarantined (see `MediaAsset.handle_blocked_file`).
     def self.run!(*args, read: [], write: [], timeout: ExternalCommand::TIMEOUT, file_size_limit: Danbooru.config.max_file_size.to_i)
-      command = [RbConfig.ruby, "--disable-gems", "-W0", *GEM_PATHS.map { "-I#{it}" }, SCRIPT, *args].map { it.to_s.shellescape }.join(" ")
-      output, _status = ExternalCommand.run(command, read: [SCRIPT, *GEM_PATHS, *read], write:, timeout:, memory_limit: MEMORY_LIMIT, file_size_limit:)
-      result = output.parse_json
-
-      # The output is a Ruby backtrace if bin/archive crashed. Log it, but don't show it to the user. It's escaped,
-      # because it can include filenames from the archive, which could add fake lines to the log.
-      unless result.is_a?(Hash)
-        DanbooruLogger.info("bin/archive crashed: #{output.truncate(2000).inspect}")
-        raise Error, INVALID_ARCHIVE
-      end
-
-      raise Error, INVALID_ARCHIVE unless result["error"].nil? || result["error"].is_a?(String)
+      result = ExternalCommand.run_script("bin/archive", *args, gems: %w[ffi ffi-libarchive rubyzip], read:, write:, timeout:, memory_limit: MEMORY_LIMIT, file_size_limit:)
+      raise Error, INVALID_ARCHIVE unless result && (result["error"].nil? || result["error"].is_a?(String))
 
       result
     rescue ExternalCommand::TimeoutError

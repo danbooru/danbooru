@@ -205,7 +205,10 @@ class ServerStatus
     end
 
     def libvips_version
-      Vips::LIBRARY_VERSION
+      version = `vips --version`
+      version[/vips-([0-9.]+)/, 1]
+    rescue StandardError
+      nil
     end
 
     def ffmpeg_version
@@ -325,5 +328,5 @@ class ServerStatus
     end
   end
 
-  memoize :redis_info, :kernel_version, :distro_version, :ffmpeg_version
+  memoize :redis_info, :kernel_version, :distro_version, :ffmpeg_version, :libvips_version
 end
