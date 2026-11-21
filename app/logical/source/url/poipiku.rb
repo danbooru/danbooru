@@ -39,6 +39,17 @@ class Source::URL::Poipiku < Source::URL
       @signature = params["Signature"]
       @key_pair_id = params["Key-Pair-Id"]
 
+    # Old style hashless image, returned on some old posts
+    # https://cdn.poipiku.com/000003310/000007036.jpeg?Expires=XXX&Signature=XXX&Key-Pair-Id=XXX (original)
+    # https://cdn.poipiku.com/000003310/000007036.jpeg_640.jpg (sample)
+    in "cdn", "poipiku.com", user_id, /^(\d+)\.([a-z]+)/
+      @user_id = user_id.to_i
+      @post_id = $1.to_i
+      @original_file_ext = $2
+      @expires = params["Expires"]
+      @signature = params["Signature"]
+      @key_pair_id = params["Key-Pair-Id"]
+
     # https://img.poipiku.com/user_img02/006849873/008271386_016865825_S968sAh7Y.jpeg_640.jpg (sample)
     # https://img-org.poipiku.com/user_img02/006849873/008271386_016865825_S968sAh7Y.jpeg (original)
     # https://poipiku.com/6849873/8271386.html (page URL)
