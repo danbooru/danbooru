@@ -96,6 +96,49 @@ class UploadsChromeTest < ChromeSystemTestCase
         assert_visible "#iqdb-similar"
       end
 
+      should "show an error without submitting the form if the rating is not selected" do
+        fill_in "post_tag_string", with: "tagme"
+
+        assert_no_difference("Post.count") do
+          assert_no_navigation { click_button "Post" }
+          assert_notice "Rating not selected"
+        end
+
+        assert_selector ".post_rating.field_with_errors"
+
+        find(".post_rating label", text: "General").click
+        click_button "Post"
+
+        assert_selector "#c-posts #a-show"
+        assert_equal "g", Post.last.rating
+      end
+
+      should "submit the form if the rating is given in the tags" do
+        fill_in "post_tag_string", with: "tagme rating:g"
+        click_button "Post"
+
+        assert_selector "#c-posts #a-show"
+        assert_equal "g", Post.last.rating
+      end
+
+      should "show an error without submitting the form if the tags don't contain a rating" do
+        fill_in "post_tag_string", with: "tagme rating: blarating:g"
+
+        assert_no_difference("Post.count") do
+          assert_no_navigation { click_button "Post" }
+          assert_notice "Rating not selected"
+        end
+      end
+
+      should "submit the form if the rating is selected" do
+        fill_in "post_tag_string", with: "tagme"
+        find(".post_rating label", text: "Sensitive").click
+        click_button "Post"
+
+        assert_selector "#c-posts #a-show"
+        assert_equal "s", Post.last.rating
+      end
+
       should "show the artist commentary fields under the Source tab" do
         click_link "Source"
 

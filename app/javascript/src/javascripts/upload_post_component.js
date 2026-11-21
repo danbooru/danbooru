@@ -1,5 +1,6 @@
 import AlpineCookieStorage from "./alpine_cookie_storage";
 import Draggable from "./draggable";
+import Notice from "./notice";
 import Utility, { clamp } from "./utility";
 
 export default class UploadPostComponent {
@@ -22,6 +23,25 @@ export default class UploadPostComponent {
   initialize() {
     this.initializeDraggable();
     this.initializeSimilar();
+
+    // Bound with jQuery instead of Alpine because the form can be moved out of the component into the edit dialog.
+    this.$container.find(".upload-form").on("submit.danbooru", event => this.checkRating(event));
+  }
+
+  // Check that the rating button was pressed, or the tag string contains a rating.
+  // Invalid ratings still go through, but are stopped server-side. The cost of reimplementing parsing logic
+  // in javascript is not worth it when this covers the average user's case of forgetting to press the button.
+  checkRating(event) {
+    let $form = $(event.currentTarget);
+    let ratingSelected = $form.find("input[name='post[rating]']:checked").length > 0;
+    let tagString = $form.find("#post_tag_string").val();
+
+    if (!ratingSelected && !/\brating:\S/i.test(tagString)) {
+      event.preventDefault();
+      event.stopPropagation(); // Stop rails-ujs from disabling the submit button.
+      $form.find(".post_rating").addClass("field_with_errors");
+      Notice.error("Rating not selected");
+    }
   }
 
   showSimilarTab() {
