@@ -31,7 +31,7 @@ class PoolVersionsController < ApplicationController
   private
 
   def set_timeout
-    PoolVersion.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")
+    PoolVersion.connection.execute("SET statement_timeout = #{Integer(CurrentUser.user.statement_timeout)}")
     yield
   ensure
     PoolVersion.connection.execute("SET statement_timeout = 0")
