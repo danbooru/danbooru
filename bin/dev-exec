@@ -1,0 +1,34 @@
+#!/bin/sh
+# Run a command in the devcontainer, in the folder that matches the current folder on the host. Works in
+# git worktrees inside the repo too. Inside the devcontainer, it runs the command directly.
+#
+#   bin/dev-exec bin/rails test test/unit/post_test.rb
+#   cd .claude/worktrees/foo && bin/dev-exec bin/rubocop app/models/post.rb
+#   bin/dev-exec          # open a shell
+
+set -e
+[ $# -eq 0 ] && set -- bash
+here=$(pwd -P)
+
+case "$here/" in
+  /danbooru/*) exec "$@" ;;
+esac
+
+docker=docker
+docker version > /dev/null 2>&1 || docker="sudo docker"
+
+# Find the devcontainer whose /danbooru mount contains the current folder.
+for id in $($docker ps -q --filter label=com.docker.compose.service=devcontainer); do
+  root=$($docker inspect "$id" --format '{{range .Mounts}}{{if eq .Destination "/danbooru"}}{{.Source}}{{end}}{{end}}')
+  case "$here/" in
+    "$root"/*) [ -n "$root" ] && container=$id && break ;;
+  esac
+done
+
+if [ -z "$container" ]; then
+  echo "No running devcontainer has $here mounted at /danbooru. Open the repo in VS Code to start it." >&2
+  exit 1
+fi
+
+if [ -t 0 ] && [ -t 1 ]; then flags=-it; else flags=-i; fi
+exec $docker exec $flags -w "/danbooru${here#"$root"}" "$container" "$@"

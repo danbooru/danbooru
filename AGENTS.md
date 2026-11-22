@@ -48,6 +48,15 @@ This file provides guidance for coding agents working in this repository. It's m
 | `bin/dev exec <container> <CMD>` | Run a command in a specific container. |
 | `bin/rdbg -A danbooru 12345` | Attach debugger to Rails server running in `danbooru` container on port 12345. |
 | `bin/rbtrace --firehose --exec <CMD>` | Trace execution of a Ruby process (see `bin/rbtrace --help` for more options). |
+| `bin/dev-exec <CMD>` | Run a command in the devcontainer, in the folder matching the current one. |
+
+## Devcontainer
+
+- Ruby, Rails, and the other tools run in the devcontainer, where the repo is mounted at `/danbooru`. If you're on the host (your working directory isn't under `/danbooru`), prefix commands with `bin/dev-exec`, e.g. `bin/dev-exec bin/rails test test/unit/post_test.rb`. Use it instead of `docker exec` or `bin/dev exec devcontainer`.
+- `bin/dev-exec` works from worktrees inside the repo. If the worktree's branch doesn't have it yet, run the main checkout's `bin/dev-exec` from inside the worktree.
+- Git records each worktree's absolute path, which differs between the host (e.g. `~/src/danbooru/...`) and the devcontainer (`/danbooru/...`). Run git commands for a worktree on the same side it was created on. If you work from the host, create worktrees inside the repo folder so they're visible in the devcontainer and `bin/dev-exec` can find them.
+- `tmp/` in the devcontainer is a tmpfs, separate from `tmp/` on the host. Files written there from the devcontainer aren't visible on the host.
+- Put a `timeout` on commands that wait for something, like the server starting. The site is served at `http://localhost:3000`, on both the host and in the devcontainer.
 
 ## Contributing guidelines
 
