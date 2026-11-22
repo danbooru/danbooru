@@ -20,6 +20,11 @@ class ArtistVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render when comparing against the current version" do
+        get artist_versions_path, params: { type: "current" }
+        assert_response :success
+      end
+
       should "ignore orders with Unicode characters" do
         get artist_versions_path(search: { order: "id_aſc" })
         assert_response :success

@@ -2,7 +2,7 @@
 
 module WikiPageVersionsHelper
   def wiki_version_show_diff(wiki_page_version, type)
-    other = wiki_page_version.send(type)
+    other = (type == "current") ? wiki_page_version.current : wiki_page_version.previous
     other.present? && ((wiki_page_version.body != other.body) || wiki_page_version.other_names_changed(type))
   end
 
@@ -14,7 +14,7 @@ module WikiPageVersionsHelper
   end
 
   def wiki_version_title_diff(wiki_page_version, type)
-    other = wiki_page_version.send(type)
+    other = (type == "current") ? wiki_page_version.current : wiki_page_version.previous
     if other.present? && (wiki_page_version.title != other.title)
       if type == "previous"
         name_diff = diff_name_html(wiki_page_version.title, other.title)

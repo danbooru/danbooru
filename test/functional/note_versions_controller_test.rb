@@ -21,6 +21,11 @@ class NoteVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render when comparing against the current version" do
+        get note_versions_path, params: { type: "current" }
+        assert_response :success
+      end
+
       should "only allow comparing against the previous or current version" do
         assert_no_difference("NoteVersion.count") do
           get note_versions_path, params: { type: "destroy" }

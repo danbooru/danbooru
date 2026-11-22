@@ -2,7 +2,7 @@
 
 module NoteVersionsHelper
   def note_version_position_diff(note_version, type)
-    other = note_version.send(type)
+    other = (type == "current") ? note_version.current : note_version.previous
 
     html = "#{note_version.x},#{note_version.y}"
     if other.nil? || (note_version.x == other.x && note_version.y == other.y)
@@ -15,7 +15,7 @@ module NoteVersionsHelper
   end
 
   def note_version_size_diff(note_version, type)
-    other = note_version.send(type)
+    other = (type == "current") ? note_version.current : note_version.previous
 
     html = "#{note_version.width}x#{note_version.height}"
     if other.nil? || (note_version.width == other.width && note_version.height == other.height)
@@ -28,7 +28,7 @@ module NoteVersionsHelper
   end
 
   def note_version_body_diff(note_version, type)
-    other = note_version.send(params[:type]) # set_version_comparison limits params[:type] to previous or current.
+    other = (type == "current") ? note_version.current : note_version.previous
     if type == "previous"
       diff_body_html(note_version, other, :body)
     else

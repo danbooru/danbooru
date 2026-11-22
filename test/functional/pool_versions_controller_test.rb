@@ -42,6 +42,11 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#pool-version-#{@versions[2].id}"
       end
 
+      should "render when comparing against the current version" do
+        get pool_versions_path, params: { type: "current" }
+        assert_response :success
+      end
+
       should "list all versions that match the search criteria" do
         get pool_versions_path, params: { search: { updater_id: @user2.id }}
         assert_response :success

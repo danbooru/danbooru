@@ -2,7 +2,7 @@
 
 module ArtistVersionsHelper
   def artist_version_other_names_diff(artist_version, type, show_unchanged: false)
-    other = artist_version.send(type)
+    other = (type == "current") ? artist_version.current : artist_version.previous
     this_names = artist_version.other_names
     if other.present?
       other_names = other.other_names
@@ -18,7 +18,7 @@ module ArtistVersionsHelper
   end
 
   def artist_version_urls_diff(artist_version, type, show_unchanged: false)
-    other = artist_version.send(type)
+    other = (type == "current") ? artist_version.current : artist_version.previous
     this_urls = artist_version.urls
     if other.present?
       other_urls = other.urls
@@ -34,7 +34,7 @@ module ArtistVersionsHelper
   end
 
   def artist_version_name_diff(artist_version, type)
-    other = artist_version.send(type)
+    other = (type == "current") ? artist_version.current : artist_version.previous
     if other.present? && (artist_version.name != other.name)
       if type == "previous"
         name_diff = diff_name_html(artist_version.name, other.name)
@@ -48,7 +48,7 @@ module ArtistVersionsHelper
   end
 
   def artist_version_group_name_diff(artist_version, type)
-    other = artist_version.send(type)
+    other = (type == "current") ? artist_version.current : artist_version.previous
     if artist_version.group_name.to_s != other&.group_name.to_s
       other_group_name = (other.present? ? other.group_name : artist_version.group_name)
       if type == "previous"

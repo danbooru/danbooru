@@ -20,6 +20,11 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render when comparing against the current version" do
+        get wiki_page_versions_path, params: { type: "current" }
+        assert_response :success
+      end
+
       should respond_to_search.with { @versions.reverse }
       should respond_to_search(title_like: "supreme").with { [@versions[2], @versions[1]] }
       should respond_to_search(body_matches: "blah").with { [@versions[2], @versions[1]] }
