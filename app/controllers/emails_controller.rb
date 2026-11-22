@@ -12,7 +12,9 @@ class EmailsController < ApplicationController
 
   def show
     if params[:user_id]
-      @email_address = authorize EmailAddress.find_by_user_id!(params[:user_id])
+      @user = User.find(params.expect(:user_id))
+      authorize EmailAddress.new(user_id: @user.id)
+      @email_address = @user.email_address || raise(ActiveRecord::RecordNotFound)
     else
       @email_address = authorize EmailAddress.find(params[:id])
     end
@@ -51,21 +53,26 @@ class EmailsController < ApplicationController
   end
 
   def verify
-    @user = User.find(params[:user_id])
-    @email_address = @user.email_address
+    @user = User.find(params.expect(:user_id))
 
-    if @email_address.blank?
-      skip_authorization
-      redirect_to edit_user_email_path(@user)
-    elsif params[:email_verification_key].present? && @email_address == EmailAddress.find_by_token_for!(:verification, params[:email_verification_key])
+    if params[:email_verification_key].present?
+      @email_address = EmailAddress.find_by_token_for(:verification, params[:email_verification_key].to_s)
+      raise Pundit::NotAuthorizedError unless @email_address.present? && @email_address.user_id == @user.id
+
       skip_authorization
       @email_address.request = request
       @email_address.verify!
       flash[:notice] = "Email address verified"
       redirect_to @email_address.user
     else
-      authorize @email_address
-      respond_with(@user)
+      authorize EmailAddress.new(user_id: @user.id)
+      @email_address = @user.email_address
+
+      if @email_address.blank?
+        redirect_to edit_user_email_path(@user)
+      else
+        respond_with(@user)
+      end
     end
   end
 

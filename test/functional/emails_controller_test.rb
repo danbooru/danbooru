@@ -36,8 +36,41 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "return 404 for a user without an email address when authorized" do
+        @user.email_address.destroy!
+        get_auth user_email_path(@user), @user, as: :json
+        assert_response 404
+      end
+
       should "not show email addresses to other users" do
         get_auth user_email_path(@user), @other_user, as: :json
+        assert_response 403
+      end
+
+      should "return 403 for an anonymous user whether or not the user has an email address" do
+        get user_email_path(@user)
+        assert_response 403
+
+        @user.email_address.destroy!
+        get user_email_path(@user)
+        assert_response 403
+      end
+
+      should "return 403 for another user even when the target user has no email address" do
+        @user.email_address.destroy!
+        get_auth user_email_path(@user), @other_user, as: :json
+        assert_response 403
+      end
+
+      should "return 404 for a moderator viewing a lower-level user without an email, and 403 for another moderator without an email" do
+        @mod1 = create(:moderator_user)
+        @mod2 = create(:moderator_user)
+        @user.email_address.destroy!
+
+        get_auth user_email_path(@user), @mod1, as: :json
+        assert_response 404
+
+        get_auth user_email_path(@mod2), @mod1, as: :json
         assert_response 403
       end
     end
@@ -527,6 +560,34 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       context "for an unauthorized user" do
         should "fail" do
           get_auth verify_user_email_path(@user), @other_user
+          assert_response 403
+        end
+
+        should "return 403 for an anonymous user whether or not the user has an email address" do
+          get verify_user_email_path(@user)
+          assert_response 403
+
+          @user.email_address.destroy!
+          get verify_user_email_path(@user)
+          assert_response 403
+        end
+
+        should "return 403 for another user when the target user has no email address" do
+          @user.email_address.destroy!
+          get_auth verify_user_email_path(@user), @other_user
+          assert_response 403
+        end
+
+        should "return 403 with an invalid or mismatched verification key when the target user has no email address" do
+          @user.email_address.destroy!
+
+          get verify_user_email_path(@user, email_verification_key: "invalid")
+          assert_response 403
+
+          get verify_user_email_path(@user, email_verification_key: @other_user.email_address.verification_key)
+          assert_response 403
+
+          get verify_user_email_path(@user), params: { email_verification_key: ["invalid"] }
           assert_response 403
         end
       end
