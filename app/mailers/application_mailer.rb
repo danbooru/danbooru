@@ -35,6 +35,8 @@ class ApplicationMailer < ActionMailer::Base
   end
 
   def self.with_request(request, **params)
+    return with(params) if request.nil?
+
     with(
       request: {
         url: "#{request.method} #{request.url}",

@@ -9,6 +9,10 @@ class ModAction < ApplicationRecord
     moderation_report_rejected
     email_address_update
     backup_code_send
+    user_password_change
+    user_password_reset
+    user_2fa_disable
+    user_logout
   ]
 
   dtext_attribute :description, inline: true # defines :dtext_description
@@ -37,6 +41,10 @@ class ModAction < ApplicationRecord
     user_approval_privilege: 8,
     user_upload_privilege: 9,
     user_ban_update: 10,
+    user_password_change: 11,
+    user_password_reset: 12,
+    user_2fa_disable: 13,
+    user_logout: 14,
     user_account_upgrade: 19, # XXX unused
     user_feedback_update: 21,
     user_feedback_delete: 22,

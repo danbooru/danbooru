@@ -3,7 +3,7 @@
 class UserNameChangeRequest < ApplicationRecord
   belongs_to :user
 
-  attr_accessor :updater, :is_deletion
+  attr_accessor :updater, :is_deletion, :skip_dmail
 
   validate :not_limited, on: :create
   validates :original_name, presence: true
@@ -47,7 +47,7 @@ class UserNameChangeRequest < ApplicationRecord
   end
 
   def send_dmail
-    return if updater.nil? || user == updater
+    return if skip_dmail || updater.nil? || user == updater
     Dmail.create_automated(to: user, disable_email_notifications: true, title: "Your username has been changed", body: <<~EOS)
       Your username has been changed from #{original_name} to #{desired_name}. Your old name was either no longer valid or it violated site rules. You can change it to something else after one week. Please make sure your name follows the [[help:community rules|community rules]].
     EOS

@@ -313,6 +313,20 @@ booructl status                                    # Check that Postgres, Redis,
 # Users
 booructl user create alice --level Admin           # Create a user (prompts for the password)
 booructl user set-level alice Moderator            # Promote or demote a user
+booructl user show alice                           # Show a user's level, email, 2FA, bans, and sessions
+booructl user show alice@example.com               # Look up a user by email (or by ID with "#123" or id:123)
+booructl user ban alice --duration 3days --reason "Spam"  # Ban a user (1day, 3days, 7days, 1month, ..., forever)
+booructl user unban alice                          # Unban a user
+booructl user rename alice alicia                  # Change a user's name (use --no-dmail to not notify them)
+booructl user set-email alice alice@example.com    # Change a user's email (or remove it with --remove)
+booructl user deactivate alice                     # Deactivate a user's account
+
+# Account recovery
+booructl user reset-link alice                     # Print a password reset link to send to the user
+booructl user set-password alice                   # Set a user's password (prompts for the password)
+booructl user disable-2fa alice                    # Disable 2FA for a user who lost their 2FA device and backup codes
+booructl user send-backup-code alice               # Email one of the user's 2FA backup codes to them
+booructl user logout alice --api-keys              # Log a user out everywhere and delete their API keys
 
 # Backing up
 booructl db backup > danbooru-database.pg_dump     # Back up the database
