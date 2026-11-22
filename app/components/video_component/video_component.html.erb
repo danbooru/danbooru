@@ -17,9 +17,9 @@
   <% variants.each do |variant| %>
     <% variant = media_asset.variant(variant) %>
     <% if variant.file_ext == "zip" %>
-      <%= tag.canvas "data-src": variant.file_url, class: "video-variant max-w-full h-full object-contain", width: media_asset.image_width, height: media_asset.image_height, "data-variant": variant.type, "data-frame-delays": frame_delays.to_json, "data-frame-offsets": frame_offsets&.to_json, "data-file-size": media_asset.file_size, "x-show": "player.quality === $el.dataset.variant", "x-cloak": (default_quality != variant.type).presence %>
+      <%= tag.canvas "data-src": file_url(variant), class: "video-variant max-w-full h-full object-contain", width: media_asset.image_width, height: media_asset.image_height, "data-variant": variant.type, "data-frame-delays": frame_delays.to_json, "data-frame-offsets": frame_offsets&.to_json, "data-file-size": media_asset.file_size, "x-show": "player.quality === $el.dataset.variant", "x-cloak": (default_quality != variant.type).presence %>
     <% else %>
-      <%= tag.video src: variant.file_url, class: "video-variant max-w-full h-full", width: media_asset.image_width, height: media_asset.image_height, loop: true, "data-variant": variant.type, "x-show": "player.quality === $el.dataset.variant", "x-cloak": (default_quality != variant.type).presence %>
+      <%= tag.video src: file_url(variant), class: "video-variant max-w-full h-full", width: media_asset.image_width, height: media_asset.image_height, loop: true, "data-variant": variant.type, "x-show": "player.quality === $el.dataset.variant", "x-cloak": (default_quality != variant.type).presence %>
     <% end %>
   <% end %>
 
