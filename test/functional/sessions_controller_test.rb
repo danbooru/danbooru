@@ -144,6 +144,26 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @user.user_events.failed_login.exists?(login_session_id: nil))
       end
 
+      should "check a dummy password hash when given an unregistered email" do
+        BCrypt::Password.any_instance.expects(:==).once.returns(false)
+        post session_path, params: { session: { name: "foo@gmail.com", password: "" }}
+
+        assert_response 401
+        assert_nil(session[:user_id])
+        assert_nil(session[:login_id])
+        assert_nil(session[:last_authenticated_at])
+      end
+
+      should "check a dummy password hash when given a nonexistent username" do
+        BCrypt::Password.any_instance.expects(:==).once.returns(false)
+        post session_path, params: { session: { name: "dne", password: "" }}
+
+        assert_response 401
+        assert_nil(session[:user_id])
+        assert_nil(session[:login_id])
+        assert_nil(session[:last_authenticated_at])
+      end
+
       should "not log the user in when given an incorrect email" do
         post session_path, params: { session: { name: "foo@gmail.com", password: "password" }}
 
@@ -261,6 +281,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow deleted users to login" do
         @user.update!(is_deleted: true)
+        BCrypt::Password.any_instance.expects(:==).once.returns(true)
         post session_path, params: { session: { name: @user.name, password: "password" }}
 
         assert_response 401
@@ -507,12 +528,59 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(@user.id, session[:user_id])
         end
 
-        should "count logins by email address and by name against the same account" do
-          5.times { |n| login(@user.name, "wrong", "10.0.#{n}.1") }
-          5.times { |n| login("foobar@gmail.com", "wrong", "10.1.#{n}.1") }
+        should "not share a rate limit between a user's email address and username" do
+          10.times do |n|
+            login("foobar@gmail.com", "wrong", "10.0.#{n}.1")
+            assert_response 401
+          end
+
+          login("foobar@gmail.com", "wrong", "10.1.0.1")
+          assert_response 429
+
+          login(@user.name, "wrong", "10.1.1.1")
+          assert_response 401
+
+          login(@user.name, "password", "10.1.2.1")
+          assert_redirected_to root_path
+          assert_equal(@user.id, session[:user_id])
+        end
+
+        should "not share a rate limit between a user's username and email address" do
+          10.times do |n|
+            login(@user.name, "wrong", "10.0.#{n}.1")
+            assert_response 401
+          end
+
+          login(@user.name, "wrong", "10.1.0.1")
+          assert_response 429
+
+          login("foobar@gmail.com", "wrong", "10.1.1.1")
+          assert_response 401
+
+          login("foobar@gmail.com", "password", "10.1.2.1")
+          assert_redirected_to root_path
+          assert_equal(@user.id, session[:user_id])
+        end
+
+        should "share a rate limit across normalized variants of the same email address" do
+          5.times { |n| login("Foo.Bar+nospam@Googlemail.com", "wrong", "10.0.#{n}.1") }
+          5.times { |n| login("f.o.o.b.a.r+other@gmail.com", "wrong", "10.1.#{n}.1") }
+
+          login("foobar@gmail.com", "password", "10.2.0.1")
+          assert_response 429
+        end
+
+        should "share a rate limit across normalized variants of the same username" do
+          5.times { |n| login(@user.name.upcase, "wrong", "10.0.#{n}.1") }
+          5.times { |n| login(" #{@user.name} ", "wrong", "10.1.#{n}.1") }
 
           login(@user.name, "password", "10.2.0.1")
           assert_response 429
+        end
+
+        should "rate limit very long names without error" do
+          login(SecureRandom.hex(2000), "wrong", "10.0.0.1")
+          assert_response 401
         end
 
         should "limit each account separately" do

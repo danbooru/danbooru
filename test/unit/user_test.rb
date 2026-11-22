@@ -152,6 +152,17 @@ class UserTest < ActiveSupport::TestCase
       assert_equal(false, @user.authenticate_password("password2"))
     end
 
+    should "check bcrypt even when authenticating a deleted user" do
+      @user.update!(is_deleted: true)
+      BCrypt::Password.any_instance.expects(:==).once.returns(true)
+      assert_equal(false, @user.authenticate_password("password"))
+    end
+
+    should "verify a dummy password against bcrypt and always return false" do
+      BCrypt::Password.any_instance.expects(:==).once.returns(true)
+      assert_equal(false, User.verify_dummy_password?(""))
+    end
+
     context "password" do
       should "be at least 8 characters long for new users" do
         assert_equal(["Password is too short (minimum is 8 characters)"], build(:user, password: "1234567").tap(&:validate).errors.full_messages)

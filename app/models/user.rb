@@ -364,6 +364,25 @@ class User < ApplicationRecord
   end
 
   concerning :AuthenticationMethods do
+    class_methods do
+      # Check a password against a dummy hash so failed logins for nonexistent accounts take the same time as real ones.
+      #
+      # @param password [String] The password to check.
+      # @return [Boolean] Always false.
+      def verify_dummy_password?(password)
+        @dummy_password_hash = BCrypt::Password.create("") if @dummy_password_hash&.cost != BCrypt::Engine.cost
+        (@dummy_password_hash == hash_password(password)) && false
+      end
+
+      # @param password [String] The password to hash.
+      # @return [String] The pre-bcrypt SHA1 digest of the password.
+      def hash_password(password)
+        Digest::SHA1.hexdigest("choujin-steiner--#{password}--")
+      end
+    end
+
+    delegate :hash_password, to: :class
+
     # @return [Array<(User, ApiKey)>, Boolean] Return a (User, ApiKey) pair if the API key is correct, or false if it isn't.
     def authenticate_api_key(key)
       return false if is_deleted?
@@ -373,12 +392,8 @@ class User < ApplicationRecord
 
     # @return [User, Boolean] Return the user if the password is correct, or false if it isn't.
     def authenticate_password(password)
-      return false if is_deleted?
-      BCrypt::Password.new(bcrypt_password_hash) == hash_password(password) && self
-    end
-
-    def hash_password(password)
-      Digest::SHA1.hexdigest("choujin-steiner--#{password}--")
+      password_correct = BCrypt::Password.new(bcrypt_password_hash) == hash_password(password)
+      !is_deleted? && password_correct && self
     end
   end
 

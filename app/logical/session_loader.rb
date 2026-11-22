@@ -31,16 +31,16 @@ class SessionLoader
   def login(name_or_email, password)
     user = User.find_by_name_or_email(name_or_email)
 
-    # Limit attempts per account, to stop password guessing spread across many IPs. Nonexistent accounts are limited
-    # by name, so the limit doesn't reveal which accounts exist. The latter is not a real concern for us but it
-    # helps slowing down bots that are not aware that our account list is public.
+    # Limit attempts per submitted name or email, to stop password guessing spread across many IPs without revealing
+    # whether an email address belongs to an account.
     #
     # Non-proxy IPs the user has logged in from before skip this limit, so attackers can't lock users out by using up
     # the limit. These are still limited per IP by SessionLoaderPolicy.
-    account_key = user&.cache_key || "login/#{name_or_email.to_s.downcase}"
-    RateLimiter.new("sessions:login", [account_key], rate: 1.0 / 5.minutes, burst: 10).limit! unless trusted_ip?(user)
+    RateLimiter.new("sessions:login", [login_rate_limit_key(name_or_email)], rate: 1.0 / 5.minutes, burst: 10).limit! unless trusted_ip?(user)
 
-    if user.present? && user.authenticate_password(password)
+    password_valid = user.present? ? user.authenticate_password(password) : User.verify_dummy_password?(password)
+
+    if password_valid
       # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
       if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy? && user.totp.nil?
         UserEvent.create_from_request!(user, :failed_login, request)
@@ -210,6 +210,16 @@ class SessionLoader
   end
 
   private
+
+  # Normalize and hash the submitted name or email so variants of the same identifier share one rate limit without
+  # linking an email address to its account or storing raw login inputs in the database.
+  #
+  # @param name_or_email [String] The submitted username or email address.
+  # @return [String] The rate limit key.
+  def login_rate_limit_key(name_or_email)
+    normalized = Danbooru::EmailAddress.canonicalize(name_or_email)&.to_s || User.normalize_name(name_or_email)
+    "login/#{Digest::SHA256.hexdigest(normalized)}"
+  end
 
   # @return [Boolean] True if the user has logged in from this IP's subnet before, and the IP isn't a proxy or Tor.
   def trusted_ip?(user)
