@@ -46,6 +46,9 @@ Rails.application.configure do
     # Allow being <iframe>'d in development (for VS Code and Codespaces), but not in production.
     policy.frame_ancestors :self unless Rails.env.local?
 
+    # Block forms from submitting to other sites. Unlike most directives, this doesn't fall back to default-src.
+    policy.form_action :self
+
     policy.report_uri "/csp_reports"
   end
 

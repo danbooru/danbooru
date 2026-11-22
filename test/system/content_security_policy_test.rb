@@ -30,6 +30,7 @@ class ContentSecurityPolicyChromeTest < ChromeSystemTestCase
         "connect-src blocked https://blocked.example.com/fetch",
         "connect-src blocked wss://blocked.example.com/websocket",
         "font-src blocked https://blocked.example.com/font.woff2",
+        "form-action blocked https://challenges.cloudflare.com/csp-test-form",
         "frame-src blocked https://blocked.example.com",
         "img-src blocked https://blocked.example.com/image.png",
         "media-src blocked https://blocked.example.com/video.mp4",

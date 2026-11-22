@@ -45,6 +45,9 @@
     <p style="font-family: csp-test-blocked-font">An external font.</p>
     <iframe src="https://blocked.example.com/frame"></iframe>
     <object data="https://blocked.example.com/object.swf" type="application/x-shockwave-flash"></object>
+    <%# Cloudflare is allowed in frames, but not as a form target. The iframe keeps a regression from navigating the page away. %>
+    <iframe name="csp-test-form-target" hidden></iframe>
+    <form class="csp-test-form" action="https://challenges.cloudflare.com/csp-test-form" method="post" target="csp-test-form-target"></form>
   </div>
 </div>
 
@@ -78,6 +81,7 @@
     // Blocked.
     new WebSocket("wss://blocked.example.com/websocket");
     try { new Worker(URL.createObjectURL(new Blob([""], { type: "text/javascript" }))); } catch (e) {}
+    document.querySelector(".csp-test-form").submit();
 
     cspTest.done = true;
   })();
