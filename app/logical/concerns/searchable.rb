@@ -95,8 +95,8 @@ module Searchable
   # @example SELECT * FROM posts WHERE id <= 42
   #   Post.where_operator(:id, :lteq, 42)
   #
-  # @param field [String, Arel::Nodes::Node] the name of a table column, an
-  #   Arel node, or raw SQL
+  # @param field [Symbol, String, Arel::Nodes::Node] the name of a table column, an
+  #   Arel node, or an `Arel.sql` fragment (see #arel_node)
   # @param operator [Symbol] the name of an Arel::Predications method (:eq,
   #   :gt, :lt, :between, :in, :matches (LIKE), etc).
   # @return ActiveRecord::Relation
@@ -226,7 +226,7 @@ module Searchable
     return none if values.empty?
 
     query = values.map { it.downcase.to_escaped_for_tsquery }.join(" | ")
-    where_array_to_tsvector_matches("lower(#{qualified_column_for(attr)})", query)
+    where_array_to_tsvector_matches(Arel.sql("lower(#{qualified_column_for(attr)})"), query)
   end
 
   def where_text_includes_lower(attr, values)
@@ -234,7 +234,7 @@ module Searchable
   end
 
   def where_array_count(attr, value)
-    qualified_column = "cardinality(#{qualified_column_for(attr)})"
+    qualified_column = Arel.sql("cardinality(#{qualified_column_for(attr)})")
     where_numeric_matches(qualified_column, value)
   end
 
@@ -978,9 +978,21 @@ module Searchable
     end
   end
 
+  # @param attr [Symbol, String, Arel::Attributes::Attribute, Arel::Nodes::SqlLiteral] The name of a column, an Arel
+  #   attribute like `Tag.arel_table[:words]`, or an `Arel.sql` fragment.
+  # @return [String] The column name qualified with the table name, like `"posts"."id"`, or the SQL fragment as is.
+  # @raise [ArgumentError] If `attr` is a string that isn't the name of a column.
   def qualified_column_for(attr)
-    return attr if attr.to_s.include?(".")
-    "#{table_name}.#{column_for_attribute(attr).name}"
+    case attr
+    when Arel::Nodes::SqlLiteral
+      attr
+    when Arel::Attributes::Attribute
+      "#{connection.quote_table_name(attr.relation.table_alias || attr.relation.name)}.#{connection.quote_column_name(attr.name)}"
+    else
+      raise ArgumentError, "#{attr.inspect} is not a column of #{table_name}; use Arel.sql for raw SQL" unless has_attribute?(attr)
+
+      "#{quoted_table_name}.#{connection.quote_column_name(column_for_attribute(attr).name)}"
+    end
   end
 
   # @param patterns [Array<String>] An array of wildcard patterns to escape for a tsquery search.
@@ -994,18 +1006,19 @@ module Searchable
     end
   end
 
-  # Convert a column name or a raw SQL fragment to an Arel node.
+  # Convert a column name to an Arel node.
   #
-  # @param field [String, Arel::Nodes::Node] an Arel node, the name of a table
-  #   column, or a raw SQL fragment
-  # @return Arel::Expressions the Arel node
+  # @param field [Symbol, String, Arel::Nodes::Node, Arel::Attributes::Attribute, Arel::Nodes::SqlLiteral] The name of a
+  #   column, an Arel node, or an `Arel.sql` fragment.
+  # @return [Arel::Expressions] The Arel node.
+  # @raise [ArgumentError] If `field` is a string that isn't the name of a column.
   def arel_node(field)
-    if field.is_a?(Arel::Nodes::Node)
+    if Arel.arel_node?(field)
       field
     elsif has_attribute?(field)
       arel_table[field]
     else
-      Arel.sql(field.to_s)
+      raise ArgumentError, "#{field.inspect} is not a column of #{table_name}; use Arel.sql for raw SQL"
     end
   end
 

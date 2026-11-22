@@ -153,7 +153,7 @@ class AutocompleteService
     query = Tag.parse_query(string)
 
     name_matches = Tag.nonempty.where_all_in_array_like(:words, query)
-    alias_matches = Tag.nonempty.where(name: TagAlias.active.joins(:antecedent_tag).where_all_in_array_like("tags.words", query).select(:consequent_name))
+    alias_matches = Tag.nonempty.where(name: TagAlias.active.joins(:antecedent_tag).where_all_in_array_like(Tag.arel_table[:words], query).select(:consequent_name))
     union = "((#{name_matches.to_sql}) UNION (#{alias_matches.to_sql})) AS tags"
     tags = Tag.from(union).includes(:consequent_aliases).order(post_count: :desc, name: :asc).limit(100)
 

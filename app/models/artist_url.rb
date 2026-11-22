@@ -60,7 +60,7 @@ class ArtistURL < ApplicationRecord
   def self.normalized_url_like(url)
     url = url.downcase.gsub(%r{\Ahttps?://|/\z}i, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
     url += "/" unless url.include?("*")
-    where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", url) # this is indexed
+    where_like(Arel.sql("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'"), url) # this is indexed
   end
 
   def self.normalized_url_equals_any(urls)

@@ -71,7 +71,7 @@ class BulkUpdateRequest < ApplicationRecord
       end
 
       if params[:score].present?
-        q = q.where_numeric_matches(:score, params[:score])
+        q = q.where_numeric_matches(arel_table[:score], params[:score])
       end
 
       case params[:order]

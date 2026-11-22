@@ -710,6 +710,40 @@ class SearchableTest < ActiveSupport::TestCase
     end
   end
 
+  context "the where_* helpers" do
+    should "accept column names, Arel nodes, and Arel.sql fragments" do
+      post = create(:post, score: 42, tag_string: "foo")
+
+      assert_equal([post], Post.where_operator(:score, :eq, 42).to_a)
+      assert_equal([post], Post.where_operator("score", :eq, 42).to_a)
+      assert_equal([post], Post.where_operator(Post.arel_table[:score], :eq, 42).to_a)
+      assert_equal([post], Post.where_operator(Arel.sql("posts.score"), :eq, 42).to_a)
+      assert_equal([post], Post.where_array_includes_any(Arel.sql("string_to_array(posts.tag_string, ' ')"), ["foo"]).to_a)
+    end
+
+    should "accept column names for helpers that build SQL strings" do
+      artist = create(:artist, other_names: ["Foo"])
+      media_metadata = create(:media_metadata, metadata: { "File:FileType" => "PNG" })
+
+      assert_equal([artist], Artist.where_array_count(:other_names, 1).to_a)
+      assert_equal([artist], Artist.where_any_in_array_iequals(:other_names, ["foo"]).to_a)
+      assert_equal([media_metadata], MediaMetadata.where_json_has_key(:metadata, "File:FileType").to_a)
+      assert_equal([media_metadata], MediaMetadata.where_json_has_key(Arel.sql("media_metadata.metadata"), "File:FileType").to_a)
+      assert_equal([media_metadata], MediaMetadata.where_json_has_key(MediaMetadata.arel_table[:metadata], "File:FileType").to_a)
+      assert_equal([artist], Artist.where_array_count(Artist.arel_table.alias("a")[:other_names], 1).from("artists a").select("a.*").to_a)
+    end
+
+    should "raise an error for strings that aren't column names" do
+      assert_raises(ArgumentError) { Post.where_operator("score = 0 OR 1=1 --", :eq, 42) }
+      assert_raises(ArgumentError) { Post.where_operator(:nonexistent, :eq, 42) }
+      assert_raises(ArgumentError) { Post.where_like("posts.source", "foo") }
+      assert_raises(ArgumentError) { MediaMetadata.where_json_has_key("metadata; select 1", "foo") }
+      assert_raises(ArgumentError) { MediaMetadata.where_json_has_key("media_metadata.metadata", "foo") }
+      assert_raises(ArgumentError) { Artist.where_any_in_array_iequals("other_names) OR (1=1", ["foo"]) }
+      assert_raises(ArgumentError) { Artist.where_array_count("cardinality(other_names)", 1) }
+    end
+  end
+
   context "every model's search" do
     should "quote values in the generated SQL" do
       Rails.application.eager_load!

@@ -374,7 +374,7 @@ class Tag < ApplicationRecord
       abbrev = abbrev.downcase.delete_prefix("/")
       return none if abbrev !~ /\A[a-z0-9*]*\z/
 
-      where_like("array_initials(words)", abbrev)
+      where_like(Arel.sql("array_initials(words)"), abbrev)
     end
 
     def named_or_aliased(names)

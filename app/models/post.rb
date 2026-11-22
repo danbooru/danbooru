@@ -1195,27 +1195,27 @@ class Post < ApplicationRecord
         when "md5"
           attribute_matches(value, :md5, :md5, exact: policy(current_user).search_modes[:md5] != :all)
         when "pixelhash"
-          attribute_matches(value, "media_assets.pixel_hash", :md5, exact: MediaAsset.policy(current_user).search_modes[:pixel_hash] != :all).joins(:media_asset)
+          attribute_matches(value, MediaAsset.arel_table[:pixel_hash], :md5, exact: MediaAsset.policy(current_user).search_modes[:pixel_hash] != :all).joins(:media_asset)
         when "width"
-          attribute_matches(value, "media_assets.image_width").joins(:media_asset)
+          attribute_matches(value, MediaAsset.arel_table[:image_width]).joins(:media_asset)
         when "height"
-          attribute_matches(value, "media_assets.image_height").joins(:media_asset)
+          attribute_matches(value, MediaAsset.arel_table[:image_height]).joins(:media_asset)
         when "mpixels"
-          attribute_matches(value, "(media_assets.image_width * media_assets.image_height) / 1000000.0", :float).joins(:media_asset)
+          attribute_matches(value, Arel.sql("(media_assets.image_width * media_assets.image_height) / 1000000.0"), :float).joins(:media_asset)
         when "ratio"
-          attribute_matches(value, "ROUND(media_assets.image_width::numeric / media_assets.image_height::numeric, 2)", :ratio).joins(:media_asset)
+          attribute_matches(value, Arel.sql("ROUND(media_assets.image_width::numeric / media_assets.image_height::numeric, 2)"), :ratio).joins(:media_asset)
         when "score"
           attribute_matches(value, :score)
         when "upvotes"
           attribute_matches(value, :up_score)
         when "downvotes"
-          attribute_matches(value, "ABS(posts.down_score)")
+          attribute_matches(value, Arel.sql("ABS(posts.down_score)"))
         when "favcount"
           attribute_matches(value, :fav_count)
         when "filesize"
-          attribute_matches(value, "media_assets.file_size", :filesize).joins(:media_asset)
+          attribute_matches(value, MediaAsset.arel_table[:file_size], :filesize).joins(:media_asset)
         when "filetype"
-          attribute_matches(value, "media_assets.file_ext", :enum).joins(:media_asset)
+          attribute_matches(value, MediaAsset.arel_table[:file_ext], :enum).joins(:media_asset)
         when "date"
           attribute_matches(value, :created_at, :date)
         when "age"
@@ -1225,7 +1225,7 @@ class Post < ApplicationRecord
         when "tagcount"
           attribute_matches(value, :tag_count)
         when "duration"
-          attribute_matches(value, "media_assets.duration", :duration).joins(:media_asset)
+          attribute_matches(value, MediaAsset.arel_table[:duration], :duration).joins(:media_asset)
         when "is"
           is_matches(value, current_user)
         when "has"
@@ -1299,7 +1299,7 @@ class Post < ApplicationRecord
           category = TagCategory.short_name_mapping[short_category]
           attribute_matches(value, :"tag_count_#{category}")
         when *PostQueryBuilder::COUNT_METATAGS
-          attribute_matches(value, name.to_sym)
+          attribute_matches(value, arel_table[name])
         when "random"
           all # handled elsewhere
         when "limit"
@@ -1322,7 +1322,7 @@ class Post < ApplicationRecord
         when *AutocompleteService::POST_STATUSES
           status_matches(value, current_user)
         when *MediaAsset::FILE_TYPES
-          attribute_matches(value, "media_assets.file_ext", :enum).joins(:media_asset)
+          attribute_matches(value, MediaAsset.arel_table[:file_ext], :enum).joins(:media_asset)
         when *Post::RATINGS.values.map(&:downcase)
           rating_matches(value)
         when *Post::RATING_ALIASES.keys
@@ -1771,11 +1771,11 @@ class Post < ApplicationRecord
       end
 
       def tags_include(*tags)
-        where_array_includes_all("string_to_array(posts.tag_string, ' ')", tags)
+        where_array_includes_all(Arel.sql("string_to_array(posts.tag_string, ' ')"), tags)
       end
 
       def raw_tag_match(tag)
-        Post.where_array_includes_all("string_to_array(posts.tag_string, ' ')", [tag])
+        Post.where_array_includes_all(Arel.sql("string_to_array(posts.tag_string, ' ')"), [tag])
       end
 
       # Perform a tag search as an anonymous user. No tag limit is enforced.
