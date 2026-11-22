@@ -60,6 +60,17 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
         get diff_pool_version_path(@pool.versions.last.id)
         assert_response :success
       end
+
+      should "only allow comparing against the previous or current version" do
+        @pool = as(@user) { create(:pool) }
+        as(@user) { @pool.update(name: "blah") }
+
+        assert_no_difference("PoolVersion.count") do
+          get diff_pool_version_path(@pool.versions.last.id), params: { type: "destroy" }
+        end
+
+        assert_response :success
+      end
     end
   end
 end

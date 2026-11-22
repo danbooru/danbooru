@@ -6,6 +6,7 @@
       x-show="notice.isOpen"
       x-transition.opacity.400ms
       x-cloak>
+  <%# Messages are HTML, so callers must escape user text. uploadError() does, and `j` in .js.erb templates is escaped by ERB first. %>
   <span class="prose flex-1" x-html="notice.message"><%= message %></span>
   <a href="#" id="close-notice-link" class="flex self-center text-lg" data-shortcut="esc" x-on:click.prevent="notice.close()"><%= helpers.close_icon %></a>
 </div>

@@ -28,7 +28,7 @@ module NoteVersionsHelper
   end
 
   def note_version_body_diff(note_version, type)
-    other = note_version.send(params[:type])
+    other = note_version.send(params[:type]) # set_version_comparison limits params[:type] to previous or current.
     if type == "previous"
       diff_body_html(note_version, other, :body)
     else

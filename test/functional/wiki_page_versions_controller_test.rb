@@ -56,6 +56,16 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
         get diff_wiki_page_versions_path
         assert_redirected_to wiki_pages_path
       end
+
+      should "only allow comparing against the previous or current version" do
+        version = @wiki_page.versions.last
+
+        assert_no_difference("WikiPageVersion.count") do
+          get diff_wiki_page_versions_path, params: { thispage: version.id, type: "destroy" }
+        end
+
+        assert_response :success
+      end
     end
   end
 end

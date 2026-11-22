@@ -21,6 +21,14 @@ class NoteVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "only allow comparing against the previous or current version" do
+        assert_no_difference("NoteVersion.count") do
+          get note_versions_path, params: { type: "destroy" }
+        end
+
+        assert_response :success
+      end
+
       should respond_to_search.with { @versions.reverse }
       should respond_to_search(body_matches: "blah").with { @versions[1] }
       should respond_to_search(version: 1).with { @versions[0] }

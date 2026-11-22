@@ -256,6 +256,21 @@ class DanbooruArchiveTest < ActiveSupport::TestCase
       end
     end
 
+    should "not extract files that are bigger than their size in the archive's headers" do
+      Danbooru::Tempfile.create(["danbooru-archive-", ".zip"]) do |file|
+        Zip::OutputStream.open(file.path) do |zip|
+          zip.put_next_entry("big.txt", nil, nil, Zip::Entry::STORED)
+          zip.write("a" * 1_000_000)
+        end
+
+        # Make the headers say the file is 10 bytes instead of 1,000,000.
+        File.binwrite(file.path, File.binread(file.path).gsub([1_000_000].pack("V"), [10].pack("V")))
+
+        assert_equal(10, Danbooru::Archive.open!(file.path).uncompressed_size)
+        assert_raises(Danbooru::Archive::Error) { Danbooru::Archive.extract!(file.path) { nil } }
+      end
+    end
+
     should "raise an error for malformed output from a compromised bin/archive" do
       entry = { pathname: "a.jpg", pathname_too_long: false, size: 1, filetype: "file" }
       malformed = [

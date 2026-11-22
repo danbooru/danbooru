@@ -1,5 +1,6 @@
 <% if @saved_search.errors.any? %>
   Danbooru.Notice.error("<%= j @saved_search.errors.full_messages.join(', ') %>");
 <% else %>
+  <%# ERB HTML-escapes the query before `j` escapes it for JavaScript, so it shows as text in the notice. %>
   Danbooru.Notice.info("Search '<%= j @saved_search.query %>' was saved");
 <% end %>

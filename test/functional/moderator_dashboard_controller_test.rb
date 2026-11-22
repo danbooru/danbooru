@@ -30,6 +30,17 @@ class ModeratorDashboardControllerTest < ActionDispatch::IntegrationTest
         get_auth moderator_dashboard_path, @admin, params: { search: { foo: "x" }}
         assert_response :success
       end
+
+      should "not show moderator-only mod actions to members" do
+        create(:mod_action, category: "email_address_update", description: "changed email for secret_user_name")
+
+        get_auth moderator_dashboard_path, @user
+        assert_response :success
+        assert_no_match(/secret_user_name/, response.body)
+
+        get_auth moderator_dashboard_path, @admin
+        assert_match(/secret_user_name/, response.body)
+      end
     end
   end
 end

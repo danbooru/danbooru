@@ -14,7 +14,7 @@ class UserPromotion
   def initialize(user, promoter, new_level)
     @user = user
     @promoter = promoter
-    @new_level = new_level.to_i
+    @new_level = new_level.to_i # A missing level becomes 0 (Anonymous), which User's level validation rejects.
   end
 
   # @param validate [Boolean] if false, skip permission checks. Only for use from the command line.

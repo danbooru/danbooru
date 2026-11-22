@@ -27,7 +27,7 @@ class WikiPageVersionsController < ApplicationController
       end
       set_version_comparison
       @thispage = authorize WikiPageVersion.find(page_id)
-      @otherpage = @thispage.send(params[:type])
+      @otherpage = @thispage.send(params[:type]) # set_version_comparison limits params[:type] to previous or current.
     else
       @thispage = authorize WikiPageVersion.find(params[:thispage])
       @otherpage = WikiPageVersion.find(params[:otherpage])

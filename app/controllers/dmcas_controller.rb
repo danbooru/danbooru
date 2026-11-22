@@ -28,6 +28,7 @@ class DmcasController < ApplicationController
 
     UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: Danbooru.config.dmca_email).deliver_now
     email_address = Danbooru::EmailAddress.parse(@dmca[:email])
+    # The Mail gem encodes line breaks in addresses, so the address can't add headers.
     UserMailer.with_request(request, dmca: @dmca).dmca_complaint(to: @dmca[:email]).deliver_now if email_address.present? && !email_address.undeliverable?
   end
 

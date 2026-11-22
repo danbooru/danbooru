@@ -7,7 +7,7 @@ class WebhooksController < ApplicationController
     skip_authorization
 
     case params[:source]
-    in _
+    in _ # Payment webhooks aren't enabled, so every request is rejected.
       head 400
     end
   end

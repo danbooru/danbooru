@@ -89,7 +89,7 @@ class ServerStatus
     def http_headers
       headers = request.headers.env.select { |key| key.starts_with?("HTTP_") }
       headers = headers.transform_keys { |key| key.delete_prefix("HTTP_").tr("_", "-").startcase }
-      headers = headers.except("Cookie")
+      headers = headers.except("Cookie") # Authorization is kept: it's the requester's own header, and the page isn't cached.
       headers = headers.transform_values { |v| v.encode("UTF-8", invalid: :replace, undef: :replace) }
       headers = headers.compact_blank
       headers

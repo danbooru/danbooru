@@ -111,6 +111,15 @@ class UserMailerTest < ActionMailer::TestCase
         mail = UserMailer.with(dmca: dmca).dmca_complaint(to: dmca[:email])
         assert_emails(1) { mail.deliver_now }
       end
+
+      should "not allow line breaks in the address to add headers" do
+        dmca = { name: "John Doe", email: "test@example.com\r\nBcc: victim@example.com" }
+        mail = UserMailer.with(dmca: dmca).dmca_complaint(to: dmca[:email])
+
+        headers = mail.encoded.split("\r\n\r\n", 2).first
+        assert_no_match(/^Bcc:/i, headers)
+        assert_nil(mail.bcc)
+      end
     end
   end
 end

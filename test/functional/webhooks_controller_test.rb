@@ -17,6 +17,16 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
           assert_response 400
         end
       end
+
+      context "for a request from a payment processor" do
+        should "fail" do
+          post receive_webhooks_path(source: "stripe")
+          assert_response 400
+
+          post receive_webhooks_path(source: "shopify")
+          assert_response 400
+        end
+      end
     end
   end
 end

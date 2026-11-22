@@ -118,6 +118,7 @@ class Upload < ApplicationRecord
           # XXX Potential zip bomb containing thousands of files; don't process it any further.
           errors.add(:base, "'#{filename}' contains too many files (max #{MAX_FILES_PER_UPLOAD} files per upload)")
           next
+        # The sizes come from the archive's headers, but extracting fails if a file is bigger than its header says.
         elsif archive.uncompressed_size > MediaAsset::MAX_FILE_SIZE
           errors.add(:base, "'#{filename}' is too large (uncompressed size: #{archive.uncompressed_size.to_fs(:human_size)}; max size: #{MediaAsset::MAX_FILE_SIZE.to_fs(:human_size)})")
         elsif archive.entries.any?(&:pathname_too_long?)

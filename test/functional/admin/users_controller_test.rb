@@ -68,6 +68,16 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
           end
         end
 
+        context "when the level is missing" do
+          should "not demote the user to anonymous" do
+            put_auth admin_user_path(@user), @mod, params: { user: { name: "foo" }}
+
+            assert_response(403)
+            assert_equal(20, @user.reload.level)
+            assert_equal(false, @user.mod_actions.user_level_change.exists?)
+          end
+        end
+
         context "when promoting the user to an invalid level" do
           should "fail" do
             put_auth admin_user_path(@user), @mod, params: { user: { level: "0" }}
