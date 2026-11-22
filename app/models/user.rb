@@ -241,6 +241,8 @@ class User < ApplicationRecord
       end
 
       def find_by_name_or_email(name_or_email)
+        return nil if name_or_email.blank? || name_or_email.to_s.length > Danbooru::EmailAddress::MAX_LENGTH
+
         find_by_name(name_or_email) || find_by_email(name_or_email)
       end
 
@@ -662,8 +664,10 @@ class User < ApplicationRecord
     class_methods do
       # @param email_address [String] The user's email address.
       def find_by_email(email_address)
-        normalized_address = Danbooru::EmailAddress.canonicalize(email_address).to_s
-        User.joins(:email_address).find_by(email_address: { normalized_address: normalized_address })
+        normalized_address = Danbooru::EmailAddress.canonicalize(email_address)
+        return nil if normalized_address.blank?
+
+        User.joins(:email_address).find_by(email_address: { normalized_address: normalized_address.to_s })
       end
     end
 

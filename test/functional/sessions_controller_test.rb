@@ -581,6 +581,9 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         should "rate limit very long names without error" do
           login(SecureRandom.hex(2000), "wrong", "10.0.0.1")
           assert_response 401
+
+          login("#{"a" * 4000}@example.com", "wrong", "10.0.1.1")
+          assert_response 401
         end
 
         should "limit each account separately" do

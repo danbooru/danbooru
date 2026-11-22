@@ -17,6 +17,9 @@ module Danbooru
     # Matches the whole string, so that multi-line strings containing an email address on one line are not valid.
     EMAIL_REGEX = /\A#{EMAIL_PATTERN}\z/
 
+    # Maximum length of an email address per RFC 5321.
+    MAX_LENGTH = 254
+
     # Sites that ignore dots in email addresses, e.g. where `foo.bar@gmail.com` is the same as `foobar@gmail.com`.
     IGNORE_DOTS = %w[gmail.com]
 
@@ -266,6 +269,9 @@ module Danbooru
     # @param address [String]
     # @return [Danbooru::EmailAddress]
     def self.correct(address)
+      address = address.to_s
+      return nil if address.length > MAX_LENGTH
+
       address = address.gsub(/[[:space:]]+/, " ").strip
 
       address = address.gsub(%r{[\\/]$}, "") # @qq.com\ -> @qq.com, @web.de/ -> @web.de
@@ -329,7 +335,8 @@ module Danbooru
     # @param address [String] The email address.
     # @return [Boolean] True if the email address is syntactically valid.
     def self.is_valid?(address)
-      address.to_s.match?(EMAIL_REGEX)
+      address = address.to_s
+      address.length <= MAX_LENGTH && address.match?(EMAIL_REGEX)
     end
 
     concerning :DeliverableMethods do

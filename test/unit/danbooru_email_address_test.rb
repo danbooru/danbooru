@@ -18,6 +18,16 @@ class DanbooruEmailAddressTest < ActiveSupport::TestCase
           assert_nil(Danbooru::EmailAddress.parse(address))
         end
       end
+
+      should "reject email addresses longer than 254 characters" do
+        assert_equal(true, Danbooru::EmailAddress.is_valid?("#{"a" * 242}@example.com"))
+
+        too_long = "#{"a" * 243}@example.com"
+        assert_equal(false, Danbooru::EmailAddress.is_valid?(too_long))
+        assert_nil(Danbooru::EmailAddress.parse(too_long))
+        assert_nil(Danbooru::EmailAddress.canonicalize(too_long))
+        assert_nil(Danbooru::EmailAddress.correct(too_long))
+      end
     end
 
     context "#undeliverable?" do
