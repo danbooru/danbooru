@@ -199,6 +199,18 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal({ tag_implication.id => tag_implication }, references[:tag_implications])
         assert_equal({ bur.id => bur }, references[:bulk_update_requests])
       end
+
+      should "limit the number of tag request embeds loaded per page" do
+        burs = create_list(:bulk_update_request, DText::MAX_TAG_REQUEST_EMBEDS + 2)
+        message = burs.map { |bur| "[bur:#{bur.id}]" }.join("\n")
+
+        references = DText.preprocess([message])
+        assert_equal(burs.first(DText::MAX_TAG_REQUEST_EMBEDS).map(&:id).sort, references[:bulk_update_requests].keys.sort)
+
+        # The limit applies across all messages preprocessed together.
+        batch_references = DText.preprocess(burs.map { |bur| "[bur:#{bur.id}]" })
+        assert_equal(burs.first(DText::MAX_TAG_REQUEST_EMBEDS).map(&:id).sort, batch_references[:bulk_update_requests].keys.sort)
+      end
     end
 
     context "#format_text" do
@@ -296,6 +308,45 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("<p>bulk update request #0 does not exist.</p>", format_text("[bur:0]"))
         assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-alias-id-link" href="/tag_aliases/0">alias #0</a> does not exist.</p>', format_text("[ta:0]"))
         assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-implication-id-link" href="/tag_implications/0">implication #0</a> does not exist.</p>', format_text("[ti:0]"))
+      end
+
+      should "only expand each tag request embed once per document" do
+        bur = create(:bulk_update_request, script: "alias foo -> bar")
+        ta = create(:tag_alias, antecedent_name: "a1", consequent_name: "b1")
+        ti = create(:tag_implication, antecedent_name: "a2", consequent_name: "b2")
+
+        bur_html = format_text("[bur:#{bur.id}]\n[bur:#{bur.id}]\n[bur:0#{bur.id}]")
+        assert_equal(1, bur_html.scan("is pending approval.").size)
+        assert_equal(2, bur_html.scan(%{<p><a class="dtext-link dtext-id-link dtext-bulk-update-request-id-link" href="/bulk_update_requests/#{bur.id}">BUR ##{bur.id}</a></p>}).size)
+
+        ta_html = format_text("[ta:#{ta.id}]\n[ta:#{ta.id}]")
+        assert_equal(1, ta_html.scan("has been approved.").size)
+        assert_equal(1, ta_html.scan(%{<p><a class="dtext-link dtext-id-link dtext-tag-alias-id-link" href="/tag_aliases/#{ta.id}">alias ##{ta.id}</a></p>}).size)
+
+        ti_html = format_text("[ti:#{ti.id}]\n[ti:#{ti.id}]")
+        assert_equal(1, ti_html.scan("has been approved.").size)
+        assert_equal(1, ti_html.scan(%{<p><a class="dtext-link dtext-id-link dtext-tag-implication-id-link" href="/tag_implications/#{ti.id}">implication ##{ti.id}</a></p>}).size)
+      end
+
+      should "limit the number of tag request embeds expanded per document" do
+        burs = create_list(:bulk_update_request, DText::MAX_TAG_REQUEST_EMBEDS + 2, script: "alias foo -> bar")
+        dtext = burs.map { |bur| "[bur:#{bur.id}]" }.join("\n")
+
+        html = format_text(dtext)
+        assert_equal(DText::MAX_TAG_REQUEST_EMBEDS, html.scan("is pending approval.").size)
+        burs.drop(DText::MAX_TAG_REQUEST_EMBEDS).each do |bur|
+          assert_includes(html, %{<p><a class="dtext-link dtext-id-link dtext-bulk-update-request-id-link" href="/bulk_update_requests/#{bur.id}">BUR ##{bur.id}</a></p>})
+        end
+      end
+
+      should "limit the number of tag request embeds expanded across messages sharing references" do
+        bur = create(:bulk_update_request, script: "alias foo -> bar")
+        messages = Array.new(DText::MAX_TAG_REQUEST_EMBEDS + 2, "[bur:#{bur.id}]")
+        references = DText.preprocess(messages)
+
+        htmls = messages.map { |message| DText.new(message).format_text(references:) }
+        assert_equal(DText::MAX_TAG_REQUEST_EMBEDS, htmls.count { |html| html.include?("is pending approval.") })
+        assert_equal(2, htmls.count { |html| html == %{<p><a class="dtext-link dtext-id-link dtext-bulk-update-request-id-link" href="/bulk_update_requests/#{bur.id}">BUR ##{bur.id}</a></p>} })
       end
 
       should "link artist tags to the artist page instead of the wiki page" do

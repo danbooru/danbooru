@@ -14,6 +14,9 @@ class DText
   DEFAULT_EMOJI_MAP = Danbooru.config.dtext_emojis
   DEFAULT_EMOJI_LIST = DEFAULT_EMOJI_MAP.keys.map(&:downcase)
 
+  # Maximum number of [ta:N], [ti:N], and [bur:N] embeds expanded per page.
+  MAX_TAG_REQUEST_EMBEDS = 20
+
   # post #1234, pixiv #1234, etc. The canonical list is in lib/dtext_rb/ext/dtext/dtext.cpp.rl.
   SHORTLINKS = %w[
     alias appeal artist asset ban bur comment dmail favgroup feedback flag forum implication mod\ action modreport
@@ -34,9 +37,9 @@ class DText
     references = references.reduce({}) { |all, hash| all.merge(hash) { |_key, left, right| left + right } }
     references.transform_values!(&:uniq)
 
-    tag_aliases = TagAlias.where(id: references[:tag_aliases]).to_a
-    tag_implications = TagImplication.where(id: references[:tag_implications]).to_a
-    bulk_update_requests = BulkUpdateRequest.includes(:approver).where(id: references[:bulk_update_requests]).to_a
+    tag_aliases = TagAlias.where(id: references[:tag_aliases]&.first(MAX_TAG_REQUEST_EMBEDS)).to_a
+    tag_implications = TagImplication.where(id: references[:tag_implications]&.first(MAX_TAG_REQUEST_EMBEDS)).to_a
+    bulk_update_requests = BulkUpdateRequest.includes(:approver).where(id: references[:bulk_update_requests]&.first(MAX_TAG_REQUEST_EMBEDS)).to_a
 
     references[:wiki_pages] ||= []
     references[:wiki_pages] += tag_aliases.pluck(:antecedent_name, :consequent_name).flatten
@@ -112,8 +115,12 @@ class DText
       replace_media_embed!(node, posts: references[:posts], media_assets: references[:media_assets], current_user:)
     end
 
+    seen = Set.new
+    references[:tag_request_embeds] ||= 0
     fragment.css("tag-request-embed").each do |node|
-      replace_tag_request_embed!(node, tag_aliases: references[:tag_aliases], tag_implications: references[:tag_implications], bulk_update_requests: references[:bulk_update_requests])
+      expand = references[:tag_request_embeds] < MAX_TAG_REQUEST_EMBEDS && seen.add?([node["data-type"], node["data-id"].to_i])
+      references[:tag_request_embeds] += 1 if expand
+      replace_tag_request_embed!(node, tag_aliases: references[:tag_aliases], tag_implications: references[:tag_implications], bulk_update_requests: references[:bulk_update_requests], expand:)
     end
 
     fragment.css("a.dtext-wiki-link").each do |node|
@@ -221,9 +228,15 @@ class DText
   end
 
   # Replace a <tag-request-embed> node with the contents of the alias, implication, or bulk update request.
-  def replace_tag_request_embed!(node, tag_aliases:, tag_implications:, bulk_update_requests:)
+  def replace_tag_request_embed!(node, tag_aliases:, tag_implications:, bulk_update_requests:, expand: true)
     type = node["data-type"]
     id = node["data-id"].to_i
+
+    if !expand
+      shortlink = { "tag-alias" => "alias", "tag-implication" => "implication", "bulk-update-request" => "BUR" }[type]
+      node.replace(DText.parse("#{shortlink} ##{id}"))
+      return
+    end
 
     case type
     when "tag-alias"
@@ -391,9 +404,9 @@ class DText
     # <tag-request-embed data-type="bulk-update-request data-id="1234"></tag-request-embed>
     posts = embed_ids["media-embed", "post"]
     media_assets = embed_ids["media-embed", "asset"]
-    tag_aliases = embed_ids["tag-request-embed", "tag-alias"]
-    tag_implications = embed_ids["tag-request-embed", "tag-implication"]
-    bulk_update_requests = embed_ids["tag-request-embed", "bulk-update-request"]
+    tag_aliases = embed_ids["tag-request-embed", "tag-alias"].first(MAX_TAG_REQUEST_EMBEDS)
+    tag_implications = embed_ids["tag-request-embed", "tag-implication"].first(MAX_TAG_REQUEST_EMBEDS)
+    bulk_update_requests = embed_ids["tag-request-embed", "bulk-update-request"].first(MAX_TAG_REQUEST_EMBEDS)
 
     { wiki_pages:, posts:, media_assets:, tag_aliases:, tag_implications:, bulk_update_requests: }
   rescue DText::Error
