@@ -48,7 +48,7 @@ class BulkUpdateRequest < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, current_user: current_user)
 
-      statuses = params[:status].to_s.split(",")
+      statuses = limit_search_list!(:status, params[:status].to_s.split(","))
 
       if statuses.present?
         q = q.where(status: statuses)

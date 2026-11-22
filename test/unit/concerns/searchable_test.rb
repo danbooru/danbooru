@@ -294,6 +294,58 @@ class SearchableTest < ActiveSupport::TestCase
       end
     end
 
+    context "for list params with too many items" do
+      setup do
+        @max = Searchable::MAX_SEARCH_LIST_ITEMS
+        @words = (1..(@max + 1)).map { |i| "x#{i}" }
+      end
+
+      should "allow lists up to the limit" do
+        assert_search_equals(@p1, source_array: ["a1", *@words.take(@max - 1)])
+        assert_search_equals(@p1, source_comma: ["a1", *@words.take(@max - 1)].join(","))
+        assert_search_equals(@p1, source: ["a1", *@words.take(@max - 1)])
+      end
+
+      should "raise an error for array params" do
+        assert_raises(Searchable::SearchError) { Post.search({ source: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_eq: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_not_eq: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_array: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_lower_array: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_array: [@words] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ uploader: { name: @words }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_include_any_array: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_include_all_lower_array: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_match: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { TagImplication.search({ category: @words.map { "0" }}, User.anonymous).load }
+      end
+
+      should "raise an error for comma or space-separated params" do
+        assert_raises(Searchable::SearchError) { Post.search({ source_comma: @words.join(",") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_space: @words.join(" ") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_lower_comma: @words.join(",") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_lower_space: @words.join(" ") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_include_any: @words.join(" ") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_include_all: @words.join(" ") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_include_any_lower: @words.join(" ") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_include_all_lower: @words.join(" ") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { PostFlag.search({ status: @words.join(",") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { PostFlag.search({ status_not: @words.join(" ") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { UserEvent.search({ ip_addr: @words.map { "1.1.1.1" }.join(",") }, create(:admin_user)).load }
+        assert_raises(Searchable::SearchError) { Tag.search({ name_normalize: @words.join(",") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { BulkUpdateRequest.search({ status: @words.join(",") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { TagImplication.search({ category: @words.map { "0" }.join(" ") }, User.anonymous).load }
+      end
+
+      should "raise an error for exact match attributes" do
+        PostPolicy.any_instance.stubs(:searchable_attributes).returns([{ source: :exact }])
+
+        assert_raises(Searchable::SearchError) { Post.search({ source_array: @words }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_comma: @words.join(",") }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_space: @words.join(" ") }, User.anonymous).load }
+      end
+    end
+
     context "for an inet attribute" do
       subject { UserEvent }
 

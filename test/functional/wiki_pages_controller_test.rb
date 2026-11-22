@@ -39,6 +39,19 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_equal("application/json", response.media_type)
       end
 
+      should "return an error for list params with too many items" do
+        names = (1..(Searchable::MAX_SEARCH_LIST_ITEMS + 1)).map { "name#{it}" }
+
+        get wiki_pages_path(format: :json, search: { other_names_match: names })
+        assert_response 422
+
+        get wiki_pages_path(format: :json, search: { other_names_include_any: names.join(" ") })
+        assert_response 422
+
+        get wiki_pages_path(format: :json, search: { other_names_include_any: names.take(Searchable::MAX_SEARCH_LIST_ITEMS).join(" ") })
+        assert_response :success
+      end
+
       should "redirect the legacy title param to the show page" do
         get wiki_pages_path(title: "tagme")
         assert_redirected_to wiki_pages_path(search: { title_normalize: "tagme" }, redirect: true)
