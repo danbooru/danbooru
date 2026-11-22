@@ -709,4 +709,42 @@ class SearchableTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "every model's search" do
+    should "quote values in the generated SQL" do
+      Rails.application.eager_load!
+      user = create(:superadmin_user)
+      value = "zqx'zqx"
+      suffixes = %w[
+        _eq _not_eq _gt _gteq _lt _lteq _not _like _ilike _not_like _not_ilike _regex _not_regex _comma _space _lower_comma
+        _lower_space _matches _has_key _include_any _include_all _include_any_lower _include_all_lower _count
+      ]
+      array_suffixes = %w[_array _lower_array _include_any_array _include_all_array _include_any_lower_array _include_all_lower_array]
+      models = ApplicationRecord.descendants.select { |model| model.respond_to?(:search) && !model.abstract_class? }
+
+      models.each do |model|
+        model.policy(user).search_modes.each_key do |attr|
+          searches = [
+            { attr => value },
+            { attr => { name: value, id: value }},
+            { "has_#{attr}" => value },
+            { "any_#{attr.to_s.singularize}_matches_regex" => value },
+            *suffixes.map { |suffix| { "#{attr}#{suffix}" => value } },
+            *array_suffixes.map { |suffix| { "#{attr}#{suffix}" => [value] } },
+          ]
+
+          searches.each do |params|
+            sql = begin
+              model.search(params.with_indifferent_access, user).to_sql
+            rescue Searchable::SearchError, ArgumentError, NoMethodError, TypeError
+              # Some malformed values raise errors before any SQL is built.
+              next
+            end
+
+            assert_not_includes(sql, value, "#{model.name}.search(#{params.inspect}) didn't quote the value")
+          end
+        end
+      end
+    end
+  end
 end
