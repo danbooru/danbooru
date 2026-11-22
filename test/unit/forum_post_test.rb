@@ -256,6 +256,30 @@ class ForumPostTest < ActiveSupport::TestCase
       should_not allow_value("[expand][code]#{"a\n" * 1001}[/code][/expand]").for(:body)
       should_not allow_value("[expand][expand][code]#{"a\n" * 1001}[/code][/expand][/expand]").for(:body)
 
+      should "not allow removing the BUR from a BUR's forum post" do
+        bur = create(:bulk_update_request)
+        forum_post = bur.forum_post
+
+        forum_post.body = "no bur here"
+        assert_equal(false, forum_post.valid?)
+        assert_includes(forum_post.errors[:body], "must contain [bur:#{bur.id}]")
+
+        forum_post.body = "[code][bur:#{bur.id}][/code]"
+        assert_equal(false, forum_post.valid?)
+
+        forum_post.body = "[bur:#{bur.id}]\n\nnew reason"
+        assert_equal(true, forum_post.valid?)
+      end
+
+      should "allow editing an old BUR forum post that doesn't contain the BUR" do
+        bur = create(:bulk_update_request)
+        forum_post = bur.forum_post
+        forum_post.update_columns(body: "old bulk update request")
+
+        forum_post.body = "edited bulk update request"
+        assert_equal(true, forum_post.valid?)
+      end
+
       should "not allow posts with more than 500 lines" do
         forum_post = build(:forum_post, body: "a\n" * 501).tap(&:validate)
 

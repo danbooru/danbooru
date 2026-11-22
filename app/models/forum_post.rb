@@ -91,6 +91,17 @@ class ForumPost < ApplicationRecord
     elsif dtext_body.more_lines_than?(MAX_TOTAL_LINES, expanded: true)
       errors.add(:body, "can't be more than #{MAX_TOTAL_LINES} lines long.")
     end
+
+    # Don't let the BUR be removed from its forum post, otherwise the BUR can't be seen or voted on in the forum. Old BUR
+    # posts from before BURs were embedded with [bur:id] don't contain it, so only check posts that already contain it.
+    if bulk_update_request.present?
+      bur_id = bulk_update_request.id.to_s
+      had_bur = bur_id.in?(DText.parse_dtext_references(body_was.to_s)[:bulk_update_requests])
+
+      if had_bur && !bur_id.in?(DText.parse_dtext_references(body)[:bulk_update_requests])
+        errors.add(:body, "must contain [bur:#{bulk_update_request.id}]")
+      end
+    end
   end
 
   def validate_deletion_of_original_post
