@@ -1170,9 +1170,19 @@ class Post < ApplicationRecord
       def with_stats(tables)
         return all if tables.empty?
 
-        relation = all
-        tables.each do |table|
-          relation = relation.send("with_#{table}_stats")
+        relation = tables.reduce(all) do |rel, table|
+          case table
+          when "comment" then rel.with_comment_stats
+          when "note" then rel.with_note_stats
+          when "flag" then rel.with_flag_stats
+          when "appeal" then rel.with_appeal_stats
+          when "approval" then rel.with_approval_stats
+          when "disapproval" then rel.with_disapproval_stats
+          when "replacement" then rel.with_replacement_stats
+          when "child" then rel.with_child_stats
+          when "pool" then rel.with_pool_stats
+          else raise ArgumentError, "unknown stats table: #{table.inspect}"
+          end
         end
 
         from(relation.arel.as("posts"))
