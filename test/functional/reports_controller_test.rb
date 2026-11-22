@@ -388,6 +388,99 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_equal([0], response.parsed_body.pluck("forum_posts"))
         end
+
+        should "not reveal the creator of deleted comments when grouping by creator" do
+          author = create(:user)
+          comment = create(:comment, creator: author, is_deleted: true)
+
+          get_auth report_path("comments", format: :json, search: { id: comment.id, group: "creator" }), @user
+          assert_response :success
+          assert_equal([], response.parsed_body)
+
+          get_auth report_path("comments", format: :json, search: { id: comment.id, group: "creator", period: "day" }), @user
+          assert_response :success
+          assert_equal([], response.parsed_body)
+
+          get_auth report_path("comments", format: :json, search: { id: comment.id, group: "creator" }), author
+          assert_response :success
+          assert_equal([author.pretty_name], response.parsed_body.pluck("creator"))
+
+          get_auth report_path("comments", format: :json, search: { id: comment.id, group: "creator" }), create(:moderator_user)
+          assert_response :success
+          assert_equal([author.pretty_name], response.parsed_body.pluck("creator"))
+        end
+
+        should "not count deleted comments by other users in the commenters column" do
+          author1 = create(:user)
+          author2 = create(:user)
+          deleted1 = create(:comment, creator: author1, is_deleted: true)
+          deleted2 = create(:comment, creator: author2, is_deleted: true)
+
+          get_auth report_path("comments", format: :json, search: { id: "#{deleted1.id},#{deleted2.id}", columns: "commenters" }), @user
+          assert_response :success
+          assert_equal([0], response.parsed_body.pluck("commenters"))
+
+          get_auth report_path("comments", format: :json, search: { id: "#{deleted1.id},#{deleted2.id}", columns: "commenters" }), author1
+          assert_response :success
+          assert_equal([1], response.parsed_body.pluck("commenters"))
+
+          get_auth report_path("comments", format: :json, search: { id: "#{deleted1.id},#{deleted2.id}", columns: "commenters" }), create(:moderator_user)
+          assert_response :success
+          assert_equal([2], response.parsed_body.pluck("commenters"))
+        end
+
+        should "not reveal hidden attributes of deleted comments when grouping by them" do
+          comment = create(:comment, is_deleted: true, is_sticky: true, do_not_bump_post: true)
+
+          get_auth report_path("comments", format: :json, search: { id: comment.id, group: "is_sticky" }), @user
+          assert_response :success
+          assert_equal([], response.parsed_body)
+
+          get_auth report_path("comments", format: :json, search: { id: comment.id, group: "do_not_bump_post" }), @user
+          assert_response :success
+          assert_equal([], response.parsed_body)
+
+          get_auth report_path("comments", format: :json, search: { id: comment.id, group: "is_sticky" }), create(:moderator_user)
+          assert_response :success
+          assert_equal([true], response.parsed_body.pluck("is_sticky"))
+        end
+
+        should "not let members compare flaggers in the post flags report" do
+          flagger = create(:user)
+          flag1 = create(:post_flag, creator: flagger)
+          flag2 = create(:post_flag, creator: flagger)
+          own_flag = create(:post_flag, creator: @user)
+
+          get_auth report_path("post_flags", format: :json, search: { id: "#{flag1.id},#{flag2.id}", columns: "flaggers" }), @user
+          assert_response :success
+          assert_equal([0], response.parsed_body.pluck("flaggers"))
+
+          get_auth report_path("post_flags", format: :json, search: { id: "#{own_flag.id},#{flag1.id}", columns: "flaggers" }), @user
+          assert_response :success
+          assert_equal([1], response.parsed_body.pluck("flaggers"))
+
+          get_auth report_path("post_flags", format: :json, search: { id: "#{flag1.id},#{flag2.id}", columns: "flags" }), @user
+          assert_response :success
+          assert_equal([2], response.parsed_body.pluck("flags"))
+        end
+
+        should "not let moderators compare flaggers on their own uploads in the post flags report" do
+          mod = create(:moderator_user)
+          flagger = create(:user)
+          other_flagger = create(:user)
+          own_post = create(:post, uploader: mod)
+          other_post = create(:post)
+          flag_on_own_post = create(:post_flag, post: own_post, creator: flagger)
+          flag_on_other_post = create(:post_flag, post: other_post, creator: other_flagger)
+
+          get_auth report_path("post_flags", format: :json, search: { id: "#{flag_on_own_post.id},#{flag_on_other_post.id}", columns: "flaggers" }), mod
+          assert_response :success
+          assert_equal([1], response.parsed_body.pluck("flaggers"))
+
+          get_auth report_path("post_flags", format: :json, search: { id: flag_on_own_post.id, columns: "flaggers" }), mod
+          assert_response :success
+          assert_equal([0], response.parsed_body.pluck("flaggers"))
+        end
       end
 
       context "users report" do

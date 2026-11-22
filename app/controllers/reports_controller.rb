@@ -143,11 +143,19 @@ class ReportsController < ApplicationController
       @columns = @available_columns.slice(*@columns)
       @columns = [@available_columns.first].to_h if @columns.blank?
 
+      relation = @model.visible(CurrentUser.user).search(params[:search], CurrentUser.user)
+      relation = relation.visible_for_search(@group.split(".").first.to_sym, CurrentUser.user) if @group.present?
+      @columns.each_value do |sql|
+        # Extract the column name from expressions like "COUNT(distinct creator_id)" or "SUM(file_size)".
+        column = sql.downcase[/\((?:distinct )?([a-z_]+)\)/, 1]
+        relation = relation.visible_for_search(column.to_sym, CurrentUser.user) if column
+      end
+
       if @period.present?
-        @dataframe = @model.visible(CurrentUser.user).search(params[:search], CurrentUser.user).timeseries(period: @period, from: @from, to: @to, groups: [@group].compact_blank, group_limit: @group_limit, columns: @columns)
+        @dataframe = relation.timeseries(period: @period, from: @from, to: @to, groups: [@group].compact_blank, group_limit: @group_limit, columns: @columns)
         @x_axis = "date"
       else
-        @dataframe = @model.visible(CurrentUser.user).search(params[:search], CurrentUser.user).aggregate(from: @from, to: @to, groups: [@group].compact_blank, limit: @group_limit, columns: @columns)
+        @dataframe = relation.aggregate(from: @from, to: @to, groups: [@group].compact_blank, limit: @group_limit, columns: @columns)
         @x_axis = @group_column
       end
 
