@@ -2,12 +2,12 @@
 
 module PoolVersionsHelper
   def pool_version_show_diff(pool_version, type)
-    other = pool_version.send(type)
+    other = (type == "current") ? pool_version.current : pool_version.previous
     other.present? && pool_version.description != other.description
   end
 
   def pool_version_name_diff(pool_version, type)
-    other = pool_version.send(type)
+    other = (type == "current") ? pool_version.current : pool_version.previous
     if other.present? && (pool_version.name != other.name)
       if type == "previous"
         name_diff = diff_name_html(pool_version.name, other.name)
@@ -21,7 +21,7 @@ module PoolVersionsHelper
   end
 
   def pool_version_post_diff(pool_version, type)
-    other = pool_version.send(type)
+    other = (type == "current") ? pool_version.current : pool_version.previous
     diff = {}
 
     if other.present? && type == "previous"

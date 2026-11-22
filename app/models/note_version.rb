@@ -32,17 +32,17 @@ class NoteVersion < ApplicationRecord
   end
 
   def was_moved(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     x != other.x || y != other.y
   end
 
   def was_resized(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     width != other.width || height != other.height
   end
 
   def was_deleted(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       !is_active && other.is_active
     else
@@ -51,7 +51,7 @@ class NoteVersion < ApplicationRecord
   end
 
   def was_undeleted(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       is_active && !other.is_active
     else

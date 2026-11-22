@@ -47,12 +47,12 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def other_names_changed(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     other_names != other.other_names
   end
 
   def was_deleted(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       is_deleted && !other.is_deleted
     else
@@ -61,7 +61,7 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def was_undeleted(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       !is_deleted && other.is_deleted
     else
@@ -70,7 +70,7 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def was_locked(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       is_locked && !other.is_locked
     else
@@ -79,7 +79,7 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def was_unlocked(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       !is_locked && other.is_locked
     else

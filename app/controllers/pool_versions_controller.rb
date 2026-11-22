@@ -24,7 +24,7 @@ class PoolVersionsController < ApplicationController
       @other_version = PoolVersion.find(params[:other_id])
     else
       set_version_comparison
-      @other_version = @pool_version.send(params[:type]) # set_version_comparison limits params[:type] to previous or current.
+      @other_version = (params[:type] == "current") ? @pool_version.current : @pool_version.previous
     end
   end
 

@@ -4,7 +4,7 @@ module PostVersionsHelper
   def post_version_diff(post_version, type)
     return "" if type == "previous" && post_version.version == 1
 
-    other = post_version.send(type)
+    other = (type == "current") ? post_version.current : post_version.previous
 
     added_tags = post_version.added_tags.compact
     added_tags << "rating:#{post_version_value(post_version.rating)}" if post_version.rating_changed

@@ -124,12 +124,12 @@ class PoolVersion < ApplicationRecord
   end
 
   def posts_changed(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     post_ids != other.post_ids
   end
 
   def was_deleted(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       is_deleted && !other.is_deleted
     else
@@ -138,7 +138,7 @@ class PoolVersion < ApplicationRecord
   end
 
   def was_undeleted(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       !is_deleted && other.is_deleted
     else
@@ -147,7 +147,7 @@ class PoolVersion < ApplicationRecord
   end
 
   def was_activated(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       is_active && !other.is_active
     else
@@ -156,7 +156,7 @@ class PoolVersion < ApplicationRecord
   end
 
   def was_deactivated(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       !is_active && other.is_active
     else

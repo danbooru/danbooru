@@ -49,17 +49,17 @@ class ArtistVersion < ApplicationRecord
   end
 
   def other_names_changed(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     other_names != other.other_names
   end
 
   def urls_changed(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     ((urls - other.urls) | (other.urls - urls)).length.positive?
   end
 
   def was_deleted(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       is_deleted && !other.is_deleted
     else
@@ -68,7 +68,7 @@ class ArtistVersion < ApplicationRecord
   end
 
   def was_undeleted(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       !is_deleted && other.is_deleted
     else
@@ -77,7 +77,7 @@ class ArtistVersion < ApplicationRecord
   end
 
   def was_banned(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       is_banned && !other.is_banned
     else
@@ -86,7 +86,7 @@ class ArtistVersion < ApplicationRecord
   end
 
   def was_unbanned(type)
-    other = send(type)
+    other = (type == "current") ? current : previous
     if type == "previous"
       !is_banned && other.is_banned
     else

@@ -40,7 +40,7 @@ module ApplicationHelper
   end
 
   def status_diff_html(record, type)
-    other = record.send(type)
+    other = (type == "current") ? record.current : record.previous
 
     if other.blank?
       return (type == "previous") ? "New" : ""

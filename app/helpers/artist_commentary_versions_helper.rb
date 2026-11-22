@@ -2,7 +2,7 @@
 
 module ArtistCommentaryVersionsHelper
   def commentary_version_field_diff(commentary_version, type, field)
-    other = commentary_version.send(params[:type]) # set_version_comparison limits params[:type] to previous or current.
+    other = (type == "current") ? commentary_version.current : commentary_version.previous
     if type == "previous"
       diff_body_html(commentary_version, other, field)
     else
