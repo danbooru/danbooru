@@ -49,6 +49,15 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#pool-version-#{@versions[1].id}"
         assert_select "#pool-version-#{@versions[2].id}", false
       end
+
+      should "show reordered posts as a change" do
+        as(@user) { @pool.update!(post_ids: "4 3 2 1") }
+        version = @pool.versions.last
+
+        get pool_versions_path, params: { search: { pool_id: @pool.id }}
+        assert_response :success
+        assert_select "#pool-version-#{version.id} .version-statuses", text: /Posts/
+      end
     end
 
     context "diff action" do
