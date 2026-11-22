@@ -14,8 +14,21 @@ class Source::Extractor
     PASSWORDS = %w[y yes]
 
     def image_urls
-      api_html&.css("img.DetailIllustItemImage").to_a.pluck(:src).filter_map do |url|
-        Source::URL.parse(url)&.full_image_url
+      images = api_html&.css("img.DetailIllustItemImage").to_a.pluck(:src).filter_map do |url|
+        Source::URL.parse(url)
+      end
+
+      # Direct URL given, try to retrieve a fresh signed URL or return the given one if unable
+      if parsed_url.original_file_ext.present?
+        image = images.find { it.image_hash == parsed_url.image_hash }
+
+        # Hashless images can only be found by post ID
+        image ||= images.find { it.image_hash.blank? && it.post_id == parsed_url.post_id } if parsed_url.image_hash.blank?
+
+        image ||= parsed_url if parsed_url.signature.present?
+        [image&.full_image_url].compact
+      else
+        images.map(&:full_image_url)
       end
     end
 
