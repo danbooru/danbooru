@@ -11,8 +11,11 @@ module ApplicationHelper
     post_preview_show_votes
   ]
 
+  # Use the revert listing when searching for the versions of a single record (e.g. `search[post_id]=1234`), or the
+  # standard listing otherwise (e.g. `search[post_id]=1,2,3`).
   def listing_type(*fields, member_check: true, types: [:revert, :standard])
-    ((fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?)) ? types[0] : types[1])
+    single_record = fields.any? { |field| params.dig(:search, field).to_s.match?(/\A\d+\z/) }
+    (single_record && (!member_check || CurrentUser.is_member?)) ? types[0] : types[1]
   end
 
   def diff_list_html(this_list, other_list, ul_class: ["diff-list"], li_class: [], show_unchanged: true)
