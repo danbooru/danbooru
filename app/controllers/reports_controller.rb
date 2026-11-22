@@ -142,6 +142,7 @@ class ReportsController < ApplicationController
       @group_column = @group.to_s.split(".").second || @group
       @columns = @available_columns.slice(*@columns)
       @columns = [@available_columns.first].to_h if @columns.blank?
+      @columns = @columns.transform_values { |sql| Arel.sql(sql) }
 
       relation = @model.visible(CurrentUser.user).search(params[:search], CurrentUser.user)
       relation = relation.visible_for_search(@group.split(".").first.to_sym, CurrentUser.user) if @group.present?
