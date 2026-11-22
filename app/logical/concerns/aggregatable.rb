@@ -20,6 +20,7 @@ module Aggregatable
       raise Error, "The date range can't be longer than #{MAX_TIMESERIES_BUCKETS} #{period.pluralize}. Choose a longer period or a shorter date range."
     end
 
+    date_range = date_range(from, to)
     from = from.to_date
     to = to.to_date
 
@@ -27,19 +28,19 @@ module Aggregatable
     dates_table = Arel::Table.new("dates")
     subquery_table = Arel::Table.new("subquery")
 
-    # SELECT date_trunc('day', posts.created_at) AS date FROM posts WHERE created_at BETWEEN from AND to GROUP BY date
-    subquery = select(date_trunc(period, date_column).as("date")).where(date_column => (from..to)).group(Arel.sql("date")).reorder(nil)
+    # SELECT date_trunc('day', posts.created_at) AS date FROM posts WHERE created_at >= from AND created_at < to + 1 day GROUP BY date
+    subquery = select(date_trunc(period, date_column).as("date")).where(date_column => date_range).group(Arel.sql("date")).reorder(nil)
 
     group_fields.each do |name|
       subquery = join_group_association(subquery, name)
 
-      # SELECT date_trunc('day', posts.created_at) AS date, uploader_id FROM posts WHERE created_at BETWEEN from AND to GROUP BY date, uploader_id
+      # SELECT date_trunc('day', posts.created_at) AS date, uploader_id FROM posts WHERE created_at >= from AND created_at < to + 1 day GROUP BY date, uploader_id
       column = group_column(name)
       subquery = subquery.select(column).group(column)
     end
 
     columns.each do |name, sql|
-      # SELECT date_trunc('day', posts.created_at) AS date, uploader_id, COUNT(*) AS count FROM posts WHERE created_at BETWEEN from AND to GROUP BY date, uploader_id
+      # SELECT date_trunc('day', posts.created_at) AS date, uploader_id, COUNT(*) AS count FROM posts WHERE created_at >= from AND created_at < to + 1 day GROUP BY date, uploader_id
       subquery = subquery.select(column_alias(arel_node(sql), name))
     end
 
@@ -56,13 +57,13 @@ module Aggregatable
       column = group_column(field)
       groups_table = Arel::Table.new(column.name.to_s.pluralize)
 
-      # CROSS JOIN (SELECT uploader_id FROM posts WHERE created_at BETWEEN from AND to AND uploader_id IS NOT NULL GROUP BY uploader_id ORDER BY COUNT(*) DESC LIMIT 10) AS uploader_ids
-      join = select(column).where(date_column => (from..to)).where(column.not_eq(nil)).group(column).reorder(Arel.sql("COUNT(*) DESC")).limit(group_limit)
+      # CROSS JOIN (SELECT uploader_id FROM posts WHERE created_at >= from AND created_at < to + 1 day AND uploader_id IS NOT NULL GROUP BY uploader_id ORDER BY COUNT(*) DESC LIMIT 10) AS uploader_ids
+      join = select(column).where(date_column => date_range).where(column.not_eq(nil)).group(column).reorder(Arel.sql("COUNT(*) DESC")).limit(group_limit)
       join = join_group_association(join, field)
 
       # SELECT dates.date, uploader_ids.uploader_id
       # FROM (SELECT date_trunc('day', dates) AS date FROM generate_series('2022-01-01', '2022-02-15', '1 day'::interval) AS dates) AS dates
-      # CROSS JOIN (SELECT uploader_id FROM posts WHERE created_at BETWEEN from AND to GROUP BY uploader_ids ORDER BY COUNT(*) DESC LIMIT 10) AS uploader_ids
+      # CROSS JOIN (SELECT uploader_id FROM posts WHERE created_at >= from AND created_at < to + 1 day GROUP BY uploader_ids ORDER BY COUNT(*) DESC LIMIT 10) AS uploader_ids
       query = query.select(groups_table[column.name])
       query = query.joins(Arel::Nodes::StringJoin.new(Arel.sql("CROSS JOIN ?", join.arel.as(groups_table.name))))
 
@@ -87,7 +88,7 @@ module Aggregatable
     #     SELECT date_trunc('day', dates) AS date FROM generate_series(from, to, '1 day'::interval) AS dates
     #   ) AS dates
     #   CROSS JOIN (
-    #     SELECT uploader_id FROM posts WHERE created_at BETWEEN from AND to AND uploader_id IS NOT NULL GROUP BY uploader_id ORDER BY COUNT(*) DESC LIMIT 10
+    #     SELECT uploader_id FROM posts WHERE created_at >= from AND created_at < to + 1 day AND uploader_id IS NOT NULL GROUP BY uploader_id ORDER BY COUNT(*) DESC LIMIT 10
     #   ) AS uploader_ids
     #   LEFT OUTER JOIN (
     #     SELECT
@@ -95,7 +96,7 @@ module Aggregatable
     #       uploader_id,
     #       COUNT(*) AS count
     #     FROM posts
-    #     WHERE created_at BETWEEN from AND to
+    #     WHERE created_at >= from AND created_at < to + 1 day
     #     GROUP BY date, uploader_id
     #   ) subquery ON subquery.date = dates.date AND subquery.uploader_id = uploader_ids.uploader_id
     #   ORDER BY date DESC
@@ -110,7 +111,7 @@ module Aggregatable
 
     group_fields = groups.map { |name| reflections[name.to_s]&.foreign_key || name.to_s }
 
-    query = where(date_column => (from..to)).reorder(order).limit(limit)
+    query = where(date_column => date_range(from, to)).reorder(order).limit(limit)
 
     group_fields.each do |name|
       column = group_column(name)
@@ -167,6 +168,11 @@ module Aggregatable
     else
       raise ArgumentError, "#{name.inspect} is not a column of #{table_name}"
     end
+  end
+
+  # @return [Range] The range from `from` to `to`. If `to` is a date, the range includes the whole day, not only midnight.
+  def date_range(from, to)
+    to.instance_of?(Date) ? (from...to.next_day) : (from..to)
   end
 
   # Join the association for a group like "uploader.level", aliased by the association's name (e.g. "INNER JOIN users uploader ...").

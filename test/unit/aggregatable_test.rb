@@ -66,13 +66,23 @@ class AggregatableTest < ActiveSupport::TestCase
       assert_equal 1, dataframe.each_row.find { |row| row["date"] == Time.utc(2026, 3, 16) }["count"]
     end
 
+    should "count records created at any time on the end date" do
+      create(:post, created_at: Time.utc(2026, 3, 3, 23, 59)) # on the end date, must be counted
+      create(:post, created_at: Time.utc(2026, 3, 4)) # after the end date, must not be counted
+
+      dataframe = Post.timeseries(period: "day", from: Date.new(2026, 3, 2), to: Date.new(2026, 3, 3))
+
+      assert_equal [Time.utc(2026, 3, 3), Time.utc(2026, 3, 2)], dataframe["date"].to_a
+      assert_equal [1, 0], dataframe["count"].to_a
+    end
+
     context "with groups" do
       setup do
         @alice = create(:user)
         @bob = create(:builder_user)
         create(:post, uploader: @alice, created_at: Time.utc(2026, 3, 2, 1))
         create(:post, uploader: @alice, created_at: Time.utc(2026, 3, 2, 2))
-        create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 3))
+        create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 3, 1))
       end
 
       should "count each group's records in each bucket" do
@@ -137,6 +147,25 @@ class AggregatableTest < ActiveSupport::TestCase
       dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: ["uploader"], limit: 1)
 
       assert_equal([@alice], dataframe["uploader"].to_a)
+    end
+
+    should "count records created at any time on the end date" do
+      create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 4, 23, 59)) # on the end date, must be counted
+      create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 5)) # after the end date, must not be counted
+
+      dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: ["uploader"])
+
+      assert_equal([@alice, @bob], dataframe["uploader"].to_a)
+      assert_equal([2, 2], dataframe["count"].to_a)
+    end
+
+    should "not count records created after the end time when the end is a time" do
+      create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 3, 6)) # after the end time, must not be counted
+
+      dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Time.utc(2026, 3, 3, 1), groups: ["uploader"])
+
+      assert_equal([@alice, @bob], dataframe["uploader"].to_a)
+      assert_equal([2, 1], dataframe["count"].to_a)
     end
   end
 
