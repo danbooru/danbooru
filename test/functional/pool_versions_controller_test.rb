@@ -13,6 +13,15 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("post_id must be an integer", response.parsed_body["message"])
       end
 
+      should "return 422 for name and updater params that aren't strings" do
+        get pool_versions_path, params: { search: { name_contains: ["a"] }}, as: :json
+        assert_response 422
+        assert_equal("name_contains must be a string", response.parsed_body["message"])
+
+        get pool_versions_path, params: { search: { updater_name: ["a"] }}, as: :json
+        assert_response 422
+      end
+
       should "return nothing for post IDs that are too large" do
         get pool_versions_path, params: { search: { post_id: "2147483648" }}, as: :json
         assert_response :success

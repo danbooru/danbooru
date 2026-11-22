@@ -18,7 +18,7 @@ class ArtistURL < ApplicationRecord
 
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
-    q = q.urls_match(params[:url_matches])
+    q = q.urls_match(parse_search_params!(params, url_matches: [:string])[:url_matches])
 
     case params[:order]
     when /\A(id|artist_id|url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/

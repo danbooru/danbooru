@@ -286,6 +286,67 @@ class SearchableTest < ActiveSupport::TestCase
         assert_raises(Searchable::SearchError) { ModerationReport.search({ Comment: "abc" }, User.anonymous).load }
       end
 
+      should "raise a search error for lists sent to operators that take a single value" do
+        assert_raises(Searchable::SearchError) { Post.search({ source_like: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_ilike: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_not_like: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_not_ilike: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_regex: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_not_regex: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_comma: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_space: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_lower_comma: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_lower_space: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_present: ["true"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score: ["1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score_eq: ["1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score_gt: ["1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ score_present: ["true"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ created_at_eq: ["x"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { PostFlag.search({ status_id_eq: ["0"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_include_any: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ any_other_name_matches_regex: ["a1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_name_count: ["1"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { UserEvent.search({ metadata_has_key: ["a"] }, User.anonymous).load }
+      end
+
+      should "raise a search error for nested lists and hashes" do
+        assert_raises(Searchable::SearchError) { Post.search({ source_like: { "x" => "1" }}, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source: [["a1"]] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_array: [{ "x" => "1" }] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_lower_array: [["a1"]] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Post.search({ source_lower_array: [nil] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { WikiPage.search({ other_names_include_any_array: [["a1"]] }, User.anonymous).load }
+      end
+
+      should "accept numbers and booleans from JSON request bodies" do
+        assert_search_equals(@p1, source_like: "a*")
+        assert_search_equals([], source_like: 1)
+        assert_search_equals(@p1, score: 1)
+        assert_search_equals(@p1, score_eq: 1)
+        assert_search_equals([@p2, @p1], score_lt: 3)
+        assert_search_equals(@p1, is_deleted: true)
+        assert_search_equals([@p3, @p2], is_deleted: false)
+        assert_search_equals([@p2, @p1], source_array: ["a1", "b2"])
+        assert_search_equals([@p2, @p1], source_lower_array: ["A1", "B2"])
+        assert_search_equals(@p1, source_lower_array: "A1")
+        assert_search_equals([@p3, @p2, @p1], source_present: true)
+        assert_search_equals([@p3, @p2, @p1], score_present: true)
+      end
+
+      should "raise a search error for invalid integers in integer array searches" do
+        assert_raises(Searchable::SearchError) { FavoriteGroup.search({ post_ids_include_any_array: ["x"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { FavoriteGroup.search({ post_ids_include_all_array: ["1", "x"] }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { FavoriteGroup.search({ post_ids_include_any: "x" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { FavoriteGroup.search({ post_ids_include_all: "1 x" }, User.anonymous).load }
+      end
+
+      should "raise a search error for invalid durations" do
+        assert_raises(Searchable::SearchError) { Ban.search({ duration_eq: "x" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Ban.search({ duration_gt: "1 fortnight" }, User.anonymous).load }
+        assert_raises(Searchable::SearchError) { Ban.search({ duration_lteq: ["1d"] }, User.anonymous).load }
+      end
+
       should "return nothing for numbers too large for the column" do
         assert_search_equals([], id: "99999999999999999999")
         assert_search_equals([], id: ">99999999999999999999")
@@ -440,6 +501,26 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals([@wp2, @wp1], other_name_count: 2)
       end
 
+      context "of integers" do
+        subject { FavoriteGroup }
+
+        should "work" do
+          @p1, @p2, @p3 = create_list(:post, 3)
+          @fg1 = create(:favorite_group, post_ids: [@p1.id, @p2.id])
+          @fg2 = create(:favorite_group, post_ids: [@p3.id])
+
+          assert_search_equals(@fg1, post_ids_include_any: "#{@p1.id} 0")
+          assert_search_equals(@fg1, post_ids_include_all: "#{@p1.id} #{@p2.id}")
+          assert_search_equals(@fg1, post_ids_include_any_array: [@p1.id.to_s, "0"])
+          assert_search_equals(@fg1, post_ids_include_any_array: [@p1.id, 0])
+          assert_search_equals(@fg1, post_ids_include_all_array: [@p1.id.to_s, @p2.id.to_s])
+          assert_search_equals(@fg1, post_ids_include_any_lower: "#{@p1.id} 0")
+          assert_search_equals(@fg1, post_ids_include_any_lower_array: [@p1.id, 0])
+          assert_search_equals(@fg1, any_post_id_matches_regex: "^#{@p1.id}$")
+          assert_search_equals([], post_ids_include_any_array: ["99999999999999999999"])
+        end
+      end
+
       should "support multiple operators on the same attribute" do
         assert_search_equals(@wp1, other_names_include_any: "a1", other_name_count: 2)
         assert_search_equals(@wp2, other_names_include_any: "c3", other_name_count: 2)
@@ -585,6 +666,25 @@ class SearchableTest < ActiveSupport::TestCase
         @ai_tag2 = create(:ai_tag)
 
         assert_search_equals([@ai_tag1], post: { id: @post.id })
+      end
+    end
+
+    context "for an interval attribute" do
+      subject { Ban }
+
+      should "work" do
+        @ban1 = create(:ban, duration: 1.day)
+        @ban2 = create(:ban, duration: 1.week)
+
+        assert_search_equals(@ban1, duration: "1d")
+        assert_search_equals(@ban1, duration_eq: "1d")
+        assert_search_equals(@ban1, duration_eq: "1 day")
+        assert_search_equals(@ban1, duration_eq: 1.day.to_i)
+        assert_search_equals(@ban2, duration_not_eq: "1d")
+        assert_search_equals(@ban2, duration_gt: "1d")
+        assert_search_equals([@ban2, @ban1], duration_gteq: "1d")
+        assert_search_equals(@ban1, duration_lt: "2d")
+        assert_search_equals(@ban1, duration_lteq: "1d")
       end
     end
 

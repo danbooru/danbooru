@@ -158,9 +158,11 @@ class PostQueryBuilder
       relation = relation.order_matches(post_query.find_metatag(:order))
     end
 
-    if count = post_query.find_metatag(:random)
-      count = Integer(count).clamp(0, PostSets::Post::MAX_PER_PAGE)
-      relation = relation.random(count)
+    if (value = post_query.find_metatag(:random))
+      count = Integer(value, 10, exception: false)
+      raise PostQuery::Error, "'random:#{value}' must be a number" if count.nil?
+
+      relation = relation.random(count.clamp(0, PostSets::Post::MAX_PER_PAGE))
     end
 
     relation = relation.includes(includes) if includes.present?

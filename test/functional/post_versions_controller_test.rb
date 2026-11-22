@@ -33,6 +33,12 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response 422
       end
 
+      should "return 422 for an updater_name param that isn't a string" do
+        get_auth post_versions_path, @user, params: { search: { updater_name: ["a"] }}, as: :json
+        assert_response 422
+        assert_equal("updater_name must be a string", response.parsed_body["message"])
+      end
+
       should "list all versions" do
         get_auth post_versions_path, @user
         assert_response :success

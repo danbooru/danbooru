@@ -23,6 +23,18 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(name_contains: "beautiful smile").with { @mod_favgroup }
       should respond_to_search(name_contains: "smiling beauty").with { [] }
       should respond_to_search(name_matches: "eautiful").with { [] }
+
+      should "return 422 for post IDs that aren't integers" do
+        get favorite_groups_path, params: { search: { post_ids_include_any_array: ["x"] }}, as: :json
+        assert_response 422
+        assert_equal("post_ids_include_any_array must be a list of integers", response.parsed_body["message"])
+      end
+
+      should "search post IDs by regex" do
+        get favorite_groups_path(format: :json, search: { any_post_id_matches_regex: "x" })
+        assert_response :success
+        assert_equal([], response.parsed_body)
+      end
       should respond_to_search(name_matches: "beautiful smile").with { @mod_favgroup }
       should respond_to_search(name_matches: "smiling beauty").with { @mod_favgroup }
 
