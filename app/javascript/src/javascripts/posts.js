@@ -353,6 +353,18 @@ Post.tag = function(post_id, tags) {
   Post.update(post_id, "tag-script", { post: { old_tag_string: "", tag_string: tag_string }});
 }
 
+// Favorite or unfavorite a post. This uses the favorites endpoint instead of a `fav:me` tag edit, so it doesn't create a
+// post version or add automatic tags.
+Post.favorite = async function(post_id, favorite) {
+  try {
+    let request = favorite ? { type: "POST", url: "/favorites.js", data: { post_id } } : { type: "DELETE", url: `/favorites/${post_id}.js` };
+    let script = await $.ajax(request);
+    $.globalEval(script, { nonce: Utility.meta("csp-nonce") });
+  } catch (err) {
+    Notice.error(`Couldn't ${favorite ? "favorite" : "unfavorite"} post #${post_id}`);
+  }
+}
+
 Post.update = async function(post_id, mode, params) {
   try {
     Post.pending_update_count += 1;

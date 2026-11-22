@@ -148,9 +148,9 @@ PostModeMenu.click = function(e) {
   var post_id = $(e.target).closest("article").data("id");
 
   if (s === "add-fav") {
-    Post.tag(post_id, "fav:me");
+    Post.favorite(post_id, true);
   } else if (s === "remove-fav") {
-    Post.tag(post_id, "-fav:me");
+    Post.favorite(post_id, false);
   } else if (s === "edit") {
     PostModeMenu.open_edit(post_id);
   } else if (s === "tag-script") {

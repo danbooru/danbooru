@@ -82,6 +82,23 @@ class TagScriptChromeTest < ChromeSystemTestCase
         visit posts_path
       end
 
+      should "favorite and unfavorite posts without editing their tags" do
+        version_count = @post.versions.count
+
+        switch_mode "Favorite"
+        click_post(@post)
+        assert_notice "You have favorited this post"
+        assert_equal(true, Favorite.exists?(post: @post, user: @user))
+
+        switch_mode "Unfavorite"
+        click_post(@post)
+        assert_notice "You have unfavorited this post"
+        assert_equal(false, Favorite.exists?(post: @post, user: @user))
+
+        assert_equal(version_count, @post.versions.count)
+        assert_equal("1girl tagme", @post.reload.tag_string)
+      end
+
       should "show the tag script field and a notice when switching to tag script mode" do
         switch_mode "Tag script"
 
