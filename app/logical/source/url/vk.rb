@@ -167,6 +167,9 @@ class Source::URL::Vk < Source::URL
       "https://vk.com/#{username}"
     elsif page_type == "id"
       "https://vk.com/#{id}"
+    elsif page_type.in?(%w[club public event])
+      # Group IDs are negative in wall URLs (https://vk.com/club111670353 => https://vk.com/wall-111670353).
+      "https://vk.com/wall-#{owner_id}"
     elsif owner_id.present?
       "https://vk.com/wall#{owner_id}"
     end

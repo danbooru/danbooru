@@ -44,5 +44,9 @@ module Source::Tests::URL
     should parse_url("https://sun9-69.userapi.com/impg/VJBWV0vYZJLRhFBkQxaVtVo9_givXP6BycJJow/RBoOQ0nHMNc.jpg?size=1200x1600&quality=96&sign=73e562b2f74629cba714f7a348d0e815&type=album").into(site_name: "Vk")
     should parse_url("https://vk.ru/album455763461_00?z=photo455763461_457250373%2Falbum455763461_00").into(page_url: "https://vk.com/?z=photo455763461_457250373/album455763461_00")
     should parse_url("https://vk.ru/wall-185765571_2635").into(page_url: "https://vk.com/wall-185765571_2635")
+    should parse_url("https://vk.com/club111670353").into(profile_url: "https://vk.com/wall-111670353")
+    should parse_url("https://vk.com/public111347180").into(profile_url: "https://vk.com/wall-111347180")
+    should parse_url("https://vk.com/event111347180").into(profile_url: "https://vk.com/wall-111347180")
+    should parse_url("https://vk.com/id194141788").into(profile_url: "https://vk.com/id194141788")
   end
 end
