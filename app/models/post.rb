@@ -1064,22 +1064,24 @@ class Post < ApplicationRecord
       # @param limit [Integer] The maximum number of posts to return.
       # @return [ActiveRecord::Relation<Post>] The set of random posts.
       def random(limit = 1)
-        random_md5s = <<~SQL
+        md5_below = reselect(:md5).where("posts.md5 < md5((n + r)::text)").reorder(md5: :desc).limit(1)
+        md5_above = reselect(:md5).where("posts.md5 >= md5((n + r)::text)").reorder(md5: :asc).limit(1)
+
+        random_md5s = Arel.sql(<<~SQL.squish, md5_below.arel.ast, md5_above.arel.ast, Integer(limit) + 1)
           WITH RECURSIVE random_md5s (n, r, md5) AS (
               SELECT 0, random(), NULL::text
             UNION ALL
               SELECT
                 n+1,
                 r+1,
-                (((#{reselect(:md5).where("posts.md5 < md5((n + r)::text)").reorder(md5: :desc).limit(1).to_sql}) UNION ALL
-                  (#{reselect(:md5).where("posts.md5 >= md5((n + r)::text)").reorder(md5: :asc).limit(1).to_sql})) LIMIT 1)
+                (((?) UNION ALL (?)) LIMIT 1)
               FROM random_md5s
-              WHERE n+1 < #{limit + 1}
+              WHERE n+1 < ?
           )
           SELECT DISTINCT md5 FROM random_md5s
         SQL
 
-        where("posts.md5 IN (#{random_md5s})").reorder("random()")
+        where(Arel.sql("posts.md5 IN (?)", random_md5s)).reorder("random()")
       end
 
       def sample(query, sample_size)
@@ -1145,8 +1147,9 @@ class Post < ApplicationRecord
       end
 
       def with_pool_stats
-        pool_posts = Pool.joins("CROSS JOIN unnest(post_ids) AS post_id").select(:id, :is_deleted, :category, "post_id")
-        relation = joins("LEFT OUTER JOIN (#{pool_posts.to_sql}) pools ON pools.post_id = posts.id").group(:id).select("posts.*")
+        pool_posts = Pool.joins("CROSS JOIN unnest(post_ids) AS post_id").select(:id, :is_deleted, :category, "post_id").arel.as("pools")
+        join = arel_table.join(pool_posts, Arel::Nodes::OuterJoin).on(pool_posts[:post_id].eq(arel_table[:id]))
+        relation = joins(join.join_sources).group(:id).select("posts.*")
 
         relation = relation.select("COUNT(pools.id) AS pool_count")
         relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = TRUE) AS deleted_pool_count")
@@ -1497,8 +1500,8 @@ class Post < ApplicationRecord
 
       def ordpool_matches(pool_name)
         # XXX unify with Pool#posts
-        pool_posts = Pool.named(pool_name).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
-        joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
+        pool_posts = Pool.named(pool_name).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index).arel.as("pool_posts")
+        joins(arel_table.join(pool_posts).on(pool_posts[:post_id].eq(arel_table[:id])).join_sources).order("pool_posts.pool_index ASC")
       end
 
       def favgroup_matches(query, current_user)
@@ -1518,8 +1521,8 @@ class Post < ApplicationRecord
       def ordfavgroup_matches(query, current_user)
         # XXX unify with FavoriteGroup#posts
         favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
-        favgroup_posts = favgroup.joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index)
-        joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
+        favgroup_posts = favgroup.joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index).arel.as("favgroup_posts")
+        joins(arel_table.join(favgroup_posts).on(favgroup_posts[:post_id].eq(arel_table[:id])).join_sources).order("favgroup_posts.favgroup_index ASC")
       end
 
       def favorites_include(username, current_user = User.anonymous)
@@ -1614,14 +1617,14 @@ class Post < ApplicationRecord
         subquery = subquery.where("post_id = posts.id").select(1)
 
         if username.downcase == "any"
-          where("EXISTS (#{subquery.to_sql})")
+          where(subquery.arel.exists)
         elsif username.downcase == "none"
-          where("NOT EXISTS (#{subquery.to_sql})")
+          where.not(subquery.arel.exists)
         else
           user = User.find_by_name(username)
           return none if user.nil?
           subquery = subquery.visible_for_search(field, current_user).where(field => user)
-          where("EXISTS (#{subquery.to_sql})")
+          where(subquery.arel.exists)
         end
       end
 

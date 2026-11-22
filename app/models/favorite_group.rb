@@ -129,8 +129,8 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def posts
-    favgroup_posts = FavoriteGroup.where(id: id).joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index)
-    Post.joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
+    favgroup_posts = FavoriteGroup.where(id: id).joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index).arel.as("favgroup_posts")
+    Post.joins(Post.arel_table.join(favgroup_posts).on(favgroup_posts[:post_id].eq(Post.arel_table[:id])).join_sources).order("favgroup_posts.favgroup_index ASC")
   end
 
   def add(post)

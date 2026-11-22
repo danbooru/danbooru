@@ -154,7 +154,7 @@ class AutocompleteService
 
     name_matches = Tag.nonempty.where_all_in_array_like(:words, query)
     alias_matches = Tag.nonempty.where(name: TagAlias.active.joins(:antecedent_tag).where_all_in_array_like(Tag.arel_table[:words], query).select(:consequent_name))
-    union = "((#{name_matches.to_sql}) UNION (#{alias_matches.to_sql})) AS tags"
+    union = Arel::Nodes::TableAlias.new(Arel::Nodes::Union.new(name_matches.arel, alias_matches.arel), "tags")
     tags = Tag.from(union).includes(:consequent_aliases).order(post_count: :desc, name: :asc).limit(100)
 
     results = tags.map do |tag|
@@ -198,7 +198,7 @@ class AutocompleteService
   def tag_wildcard_matches(string)
     name_matches = Tag.nonempty.name_matches(string).order(post_count: :desc).limit(limit)
     alias_matches = Tag.nonempty.alias_matches(string).order(post_count: :desc).limit(limit)
-    union = "((#{name_matches.to_sql}) UNION (#{alias_matches.to_sql})) AS tags"
+    union = Arel::Nodes::TableAlias.new(Arel::Nodes::Union.new(name_matches.arel, alias_matches.arel), "tags")
     tags = Tag.from(union).order(post_count: :desc).limit(limit).includes(:consequent_aliases)
 
     tags.map do |tag|

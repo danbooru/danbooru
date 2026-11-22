@@ -183,8 +183,8 @@ class Pool < ApplicationRecord
 
   # XXX unify with PostQueryBuilder ordpool search
   def posts
-    pool_posts = Pool.where(id: id).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
-    Post.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
+    pool_posts = Pool.where(id: id).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index).arel.as("pool_posts")
+    Post.joins(Post.arel_table.join(pool_posts).on(pool_posts[:post_id].eq(Post.arel_table[:id])).join_sources).order("pool_posts.pool_index ASC")
   end
 
   def post_count
