@@ -8,7 +8,9 @@
           <th>Forum</th>
 
           <% if @bulk_update_request.forum_post.present? %>
-            <td><%= link_to @bulk_update_request.forum_topic.title, @bulk_update_request.forum_post || @bulk_update_rqeuest.forum_topic %></td>
+            <td><%= link_to @bulk_update_request.forum_post.topic.title, @bulk_update_request.forum_post %></td>
+          <% elsif @bulk_update_request.forum_topic.present? %>
+            <td><%= link_to @bulk_update_request.forum_topic.title, @bulk_update_request.forum_topic %></td>
           <% else %>
             <td><em>None</em></td>
           <% end %>

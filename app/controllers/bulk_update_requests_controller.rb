@@ -4,8 +4,8 @@ class BulkUpdateRequestsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @bulk_update_requests = authorize BulkUpdateRequest.paginated_search(params, count_pages: true)
-    @bulk_update_requests = @bulk_update_requests.includes(:user, :approver, :forum_topic, forum_post: [:votes]) if request.format.html?
+    @bulk_update_requests = authorize BulkUpdateRequest.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @bulk_update_requests = @bulk_update_requests.includes(:user, :approver, :forum_topic, forum_post: [:topic, :votes]) if request.format.html?
     respond_with(@bulk_update_requests)
   end
 

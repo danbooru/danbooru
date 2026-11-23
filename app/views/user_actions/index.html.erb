@@ -37,7 +37,13 @@
               <%= link_to_user user %> was <%= link_to (model.forever? ? "banned forever" : "banned for #{model.humanized_duration}"), model %> by <%= link_to_user model.banner %> (<%= format_text(model.reason.chomp(".").strip, inline: true) %>).
             </div>
           <% when "BulkUpdateRequest" %>
-            <%= link_to_user user %> created a <%= link_to "new BUR", model %> in <%= link_to model.forum_topic.title, model.forum_post %>.
+            <% if model.forum_post.present? %>
+              <%= link_to_user user %> created a <%= link_to "new BUR", model %> in <%= link_to model.forum_post.topic.title, model.forum_post %>.
+            <% elsif model.forum_topic.present? %>
+              <%= link_to_user user %> created a <%= link_to "new BUR", model %> in <%= link_to model.forum_topic.title, model.forum_topic %>.
+            <% else %>
+              <%= link_to_user user %> created a <%= link_to "new BUR", model %>.
+            <% end %>
           <% when "Comment" %>
             <% if model.is_deleted? && !policy(model).can_see_deleted? %>
               [deleted] posted a <%= link_to "deleted comment", model %> on <%= link_to model.post.dtext_shortlink, model.post %>.

@@ -167,12 +167,115 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(has_approver: "true").with { @approved_bur }
         should respond_to_search(has_approver: "false").with { [@rejected_bur, @other_bur, @bulk_update_request] }
       end
+
+      should "not show a BUR in a private topic to users who can't see the topic" do
+        admin_topic = create(:forum_topic, title: "Secret admin topic", min_level: User::Levels::ADMIN)
+        admin_bur = as(@admin) { create(:bulk_update_request, user: @admin, forum_topic: admin_topic, script: "create alias secret_a -> secret_b") }
+        create(:forum_post_vote, forum_post: admin_bur.forum_post, creator: @admin, score: 1)
+
+        get bulk_update_requests_path(search: { id: admin_bur.id }), as: :json
+        assert_response :success
+        assert_equal([], response.parsed_body)
+
+        get_auth bulk_update_requests_path(search: { id: admin_bur.id }), @user
+        assert_response :success
+        assert_select "#bulk-update-request-#{admin_bur.id}", count: 0
+        assert_not_includes(response.body, "Secret admin topic")
+
+        get_auth bulk_update_requests_path(search: { id: admin_bur.id }), @mod
+        assert_response :success
+        assert_select "#bulk-update-request-#{admin_bur.id}", count: 0
+        assert_not_includes(response.body, "Secret admin topic")
+
+        get_auth bulk_update_requests_path(search: { id: admin_bur.id }), @admin
+        assert_response :success
+        assert_select "#bulk-update-request-#{admin_bur.id}", count: 1
+        assert_includes(response.body, "Secret admin topic")
+        assert_includes(response.body, "+1 /")
+      end
+
+      should "not show a BUR in a deleted topic to users who can't see deleted posts" do
+        deleted_topic = create(:forum_topic, title: "Deleted topic title")
+        deleted_bur = as(@mod) { create(:bulk_update_request, user: @mod, forum_topic: deleted_topic, script: "create alias del_a -> del_b") }
+        create(:forum_post_vote, forum_post: deleted_bur.forum_post, creator: @mod, score: 1)
+        deleted_topic.soft_delete!(updater: @mod)
+
+        get bulk_update_requests_path(search: { id: deleted_bur.id })
+        assert_response :success
+        assert_select "#bulk-update-request-#{deleted_bur.id}", count: 0
+        assert_not_includes(response.body, "Deleted topic title")
+        assert_not_includes(response.body, "+1 /")
+
+        get bulk_update_requests_path(search: { id: deleted_bur.id }), as: :json
+        assert_response :success
+        assert_equal([], response.parsed_body)
+
+        get_auth bulk_update_requests_path(search: { id: deleted_bur.id }), @mod
+        assert_response :success
+        assert_select "#bulk-update-request-#{deleted_bur.id}", count: 1
+        assert_includes(response.body, "Deleted topic title")
+        assert_includes(response.body, "+1 /")
+      end
+
+      should "not allow searching by score for a BUR in a private or deleted topic" do
+        deleted_topic = create(:forum_topic, title: "Deleted topic title")
+        deleted_bur = as(@mod) { create(:bulk_update_request, user: @mod, forum_topic: deleted_topic, script: "create alias del_a -> del_b") }
+        create(:forum_post_vote, forum_post: deleted_bur.forum_post, creator: @mod, score: 1)
+        deleted_topic.soft_delete!(updater: @mod)
+
+        get bulk_update_requests_path(search: { id: deleted_bur.id, score: 1 }), as: :json
+        assert_response :success
+        assert_equal([], response.parsed_body)
+
+        get_auth bulk_update_requests_path(search: { id: deleted_bur.id, score: 1 }), @mod, as: :json
+        assert_response :success
+        assert_equal([deleted_bur.id], response.parsed_body.pluck("id"))
+      end
     end
 
     context "#show" do
       should "render" do
         get bulk_update_request_path(@bulk_update_request)
         assert_response :success
+      end
+
+      should "not allow viewing a BUR in a private topic for users who can't see the topic" do
+        private_topic = create(:mod_up_forum_topic, title: "Secret mod topic")
+        private_bur = as(@mod) { create(:bulk_update_request, user: @mod, forum_topic: private_topic, script: "create alias secret_a -> secret_b") }
+        voter = create(:moderator_user, name: "secret_voter")
+        create(:forum_post_vote, forum_post: private_bur.forum_post, creator: voter, score: 1)
+
+        get bulk_update_request_path(private_bur)
+        assert_response 403
+
+        get_auth bulk_update_request_path(private_bur), @user
+        assert_response 403
+
+        get_auth bulk_update_request_path(private_bur), @mod
+        assert_response :success
+        assert_includes(response.body, "Secret mod topic")
+        assert_includes(response.body, "secret_voter")
+        assert_select ".forum-post-votes", count: 1
+      end
+
+      should "not allow viewing a BUR in a deleted topic for users who can't see deleted posts" do
+        deleted_topic = create(:forum_topic, title: "Deleted topic title")
+        deleted_bur = as(@mod) { create(:bulk_update_request, user: @mod, forum_topic: deleted_topic, script: "create alias del_a -> del_b") }
+        voter = create(:moderator_user, name: "deleted_topic_voter")
+        create(:forum_post_vote, forum_post: deleted_bur.forum_post, creator: voter, score: 1)
+        deleted_topic.soft_delete!(updater: @mod)
+
+        get bulk_update_request_path(deleted_bur)
+        assert_response 403
+
+        get_auth bulk_update_request_path(deleted_bur), @user
+        assert_response 403
+
+        get_auth bulk_update_request_path(deleted_bur), @mod
+        assert_response :success
+        assert_includes(response.body, "Deleted topic title")
+        assert_includes(response.body, "deleted_topic_voter")
+        assert_select ".forum-post-votes", count: 1
       end
     end
 

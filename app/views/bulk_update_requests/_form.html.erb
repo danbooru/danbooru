@@ -7,7 +7,7 @@
     </details>
 
     <p>
-      <% if @bulk_update_request.new_record? && @bulk_update_request.forum_topic.present? %>
+      <% if @bulk_update_request.new_record? && @bulk_update_request.forum_topic.present? && policy(@bulk_update_request).show? %>
         This request will be attached to
         <%= link_to "topic ##{@bulk_update_request.forum_topic_id}: #{@bulk_update_request.forum_topic.title}", @bulk_update_request.forum_topic %>.
         <%= f.input :forum_topic_id, as: :hidden, input_html: { value: params.dig(:bulk_update_request, :forum_topic_id) } %>

@@ -105,6 +105,36 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
           assert_equal([@other_flag.id], response.parsed_body.pluck("model_id"))
         end
       end
+
+      context "for a BUR in a private forum topic" do
+        setup do
+          @mod = create(:moderator_user)
+          @admin = create(:admin_user)
+          @admin_topic = create(:forum_topic, title: "Secret admin topic", min_level: User::Levels::ADMIN)
+          @bur = as(@admin) { create(:bulk_update_request, user: @admin, forum_topic: @admin_topic) }
+        end
+
+        should "not show the topic title to a moderator" do
+          get_auth user_actions_path(search: { model_type: "BulkUpdateRequest", user_id: @admin.id }), @mod
+
+          assert_response :success
+          assert_not_includes(response.body, "Secret admin topic")
+        end
+
+        should "show the topic title to an admin" do
+          get_auth user_actions_path(search: { model_type: "BulkUpdateRequest", user_id: @admin.id }), @admin
+
+          assert_response :success
+          assert_includes(response.body, "Secret admin topic")
+        end
+
+        should "render when the BUR has no forum topic" do
+          @bur.update!(forum_topic: nil, forum_post: nil)
+          get_auth user_actions_path(search: { model_type: "BulkUpdateRequest", user_id: @admin.id }), @admin
+
+          assert_response :success
+        end
+      end
     end
   end
 end

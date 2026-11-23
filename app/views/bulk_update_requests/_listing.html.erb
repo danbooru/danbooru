@@ -3,7 +3,7 @@
 <%= table_for bulk_update_requests, width: "100%" do |t| %>
   <% t.column "Request" do |request| %>
       <% if request.forum_post.present? %>
-        <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", request.forum_post %></p>
+        <p><%= link_to "Topic ##{request.forum_post.topic_id}: #{request.forum_post.topic.title}", request.forum_post %></p>
       <% elsif request.forum_topic.present? %>
         <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", request.forum_topic %></p>
       <% end %>
