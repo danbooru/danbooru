@@ -6,11 +6,11 @@ class FavoriteGroupPolicy < ApplicationPolicy
   end
 
   def create?
-    !user.is_anonymous?
+    unbanned?
   end
 
   def update?
-    record.creator_id == user.id
+    unbanned? && record.creator_id == user.id
   end
 
   def add_post?

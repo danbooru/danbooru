@@ -546,6 +546,7 @@ class Post < ApplicationRecord
 
           # XXX race condition
           if favgroup.nil?
+            raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, FavoriteGroup).create?
             FavoriteGroup.create!(name: name, creator: CurrentUser.user, post_ids: [id])
           else
             raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?

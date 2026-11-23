@@ -59,6 +59,14 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
         get_auth new_favorite_group_path, @user
         assert_response :success
       end
+
+      should "not allow banned or restricted users" do
+        get_auth new_favorite_group_path, create(:banned_user)
+        assert_response 403
+
+        get_auth new_favorite_group_path, create(:restricted_user)
+        assert_response 403
+      end
     end
 
     context "create action" do
@@ -74,12 +82,34 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
         post_auth favorite_groups_path, @user, params: { favorite_group: attributes_for(:favorite_group) }
         assert_redirected_to favorite_group_path(FavoriteGroup.last)
       end
+
+      should "not allow banned or restricted users to create favgroups" do
+        assert_no_difference("FavoriteGroup.count") do
+          post_auth favorite_groups_path, create(:banned_user), params: { favorite_group: attributes_for(:favorite_group) }
+          assert_response 403
+
+          post_auth favorite_groups_path, create(:restricted_user), params: { favorite_group: attributes_for(:favorite_group) }
+          assert_response 403
+        end
+      end
     end
 
     context "edit action" do
       should "render" do
         get_auth edit_favorite_group_path(@favgroup), @user
         assert_response :success
+      end
+
+      should "not allow banned or restricted users to edit their own favgroups" do
+        banned_user = create(:banned_user)
+        banned_favgroup = create(:favorite_group, creator: banned_user)
+        get_auth edit_favorite_group_path(banned_favgroup), banned_user
+        assert_response 403
+
+        restricted_user = create(:restricted_user)
+        restricted_favgroup = create(:favorite_group, creator: restricted_user)
+        get_auth edit_favorite_group_path(restricted_favgroup), restricted_user
+        assert_response 403
       end
     end
 
@@ -98,6 +128,20 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 403
         assert_not_equal("foo", @favgroup.reload.name)
+      end
+
+      should "not allow banned or restricted users to update their own favgroups" do
+        banned_user = create(:banned_user)
+        banned_favgroup = create(:favorite_group, creator: banned_user)
+        put_auth favorite_group_path(banned_favgroup), banned_user, params: { favorite_group: { name: "foo" }}
+        assert_response 403
+        assert_not_equal("foo", banned_favgroup.reload.name)
+
+        restricted_user = create(:restricted_user)
+        restricted_favgroup = create(:favorite_group, creator: restricted_user)
+        put_auth favorite_group_path(restricted_favgroup), restricted_user, params: { favorite_group: { name: "foo" }}
+        assert_response 403
+        assert_not_equal("foo", restricted_favgroup.reload.name)
       end
 
       should "not allow non-Gold users to enable private favgroups" do
@@ -119,6 +163,20 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       should "not destroy favgroups belonging to other users" do
         delete_auth favorite_group_path(@favgroup), create(:user)
         assert_response 403
+      end
+
+      should "not allow banned or restricted users to destroy their own favgroups" do
+        banned_user = create(:banned_user)
+        banned_favgroup = create(:favorite_group, creator: banned_user)
+        delete_auth favorite_group_path(banned_favgroup), banned_user
+        assert_response 403
+        assert(FavoriteGroup.exists?(banned_favgroup.id))
+
+        restricted_user = create(:restricted_user)
+        restricted_favgroup = create(:favorite_group, creator: restricted_user)
+        delete_auth favorite_group_path(restricted_favgroup), restricted_user
+        assert_response 403
+        assert(FavoriteGroup.exists?(restricted_favgroup.id))
       end
     end
 
@@ -146,6 +204,22 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
         assert_equal([], @favgroup.reload.post_ids)
       end
+
+      should "not allow banned or restricted users to add posts to their own favgroups" do
+        @post = create(:post)
+
+        banned_user = create(:banned_user)
+        banned_favgroup = create(:favorite_group, creator: banned_user)
+        put_auth add_post_favorite_group_path(banned_favgroup), banned_user, params: { post_id: @post.id, format: "js" }
+        assert_response 403
+        assert_equal([], banned_favgroup.reload.post_ids)
+
+        restricted_user = create(:restricted_user)
+        restricted_favgroup = create(:favorite_group, creator: restricted_user)
+        put_auth add_post_favorite_group_path(restricted_favgroup), restricted_user, params: { post_id: @post.id, format: "js" }
+        assert_response 403
+        assert_equal([], restricted_favgroup.reload.post_ids)
+      end
     end
 
     context "remove_post action" do
@@ -170,12 +244,40 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
         assert_equal([@post.id], @favgroup.reload.post_ids)
       end
+
+      should "not allow banned or restricted users to remove posts from their own favgroups" do
+        @post = create(:post)
+
+        banned_user = create(:banned_user)
+        banned_favgroup = create(:favorite_group, creator: banned_user, post_ids: [@post.id])
+        put_auth remove_post_favorite_group_path(banned_favgroup), banned_user, params: { post_id: @post.id, format: "js" }
+        assert_response 403
+        assert_equal([@post.id], banned_favgroup.reload.post_ids)
+
+        restricted_user = create(:restricted_user)
+        restricted_favgroup = create(:favorite_group, creator: restricted_user, post_ids: [@post.id])
+        put_auth remove_post_favorite_group_path(restricted_favgroup), restricted_user, params: { post_id: @post.id, format: "js" }
+        assert_response 403
+        assert_equal([@post.id], restricted_favgroup.reload.post_ids)
+      end
     end
 
     context "edit order action" do
       should "render" do
         get_auth edit_favorite_group_order_path(@favgroup), @user
         assert_response :success
+      end
+
+      should "not allow banned or restricted users to edit order of their own favgroups" do
+        banned_user = create(:banned_user)
+        banned_favgroup = create(:favorite_group, creator: banned_user)
+        get_auth edit_favorite_group_order_path(banned_favgroup), banned_user
+        assert_response 403
+
+        restricted_user = create(:restricted_user)
+        restricted_favgroup = create(:favorite_group, creator: restricted_user)
+        get_auth edit_favorite_group_order_path(restricted_favgroup), restricted_user
+        assert_response 403
       end
     end
   end
