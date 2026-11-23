@@ -6,7 +6,7 @@
 # branch name, the git tag, and the 'latest' tag for the latest commit to
 # master.
 #
-# The production image is built and pushed first, then the development image.
+# The production image is built and pushed first, then the development image (only on master).
 # We separate these steps in two jobs because development images are less likely to be cached,
 # and our deployment process was blocked several times in the past by the ubuntu snapshot repo
 # being under a DDoS attack exactly when we needed it.
@@ -57,9 +57,11 @@ jobs:
     with:
       docker-target: production
 
+  # Build the development image. Only on master, where the tests and the devcontainer use it.
   development:
     name: 2. Dev Image
     needs: production
+    if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/docker-build.yaml
     secrets: inherit
     with:
