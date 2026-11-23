@@ -58,9 +58,15 @@
       word-break: initial;
     }
 
-    .tn {
+    tn, .tn { // stylelint-disable-line selector-type-no-unknown
       font-size: 0.8em;
       color: var(--note-tn-color);
+    }
+
+    // Translator notes look like paragraphs.
+    tn { // stylelint-disable-line selector-type-no-unknown
+      display: block;
+      margin-bottom: 1em;
     }
 
     ruby {

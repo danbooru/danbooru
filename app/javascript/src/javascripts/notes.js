@@ -511,8 +511,6 @@ class Note {
 
     set_text(text) {
       text = text ?? "";
-      text = text.replace(/<tn>/g, '<p class="tn">');
-      text = text.replace(/<\/tn>/g, '</p>');
       text = text.replace(/\n/g, '<br>');
 
       if (this.note.embed) {

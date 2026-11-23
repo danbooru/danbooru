@@ -95,6 +95,92 @@ class NotesChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "a note containing <tn> tags and newlines" do
+      setup do
+        as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: %{<b title="a <tn> b">line one</b>\nline two<tn>translator note</tn>}) }
+        visit post_path(@post)
+        find(".note-box").hover
+      end
+
+      should "show <tn> tags as paragraphs" do
+        assert_selector ".note-body > tn", text: "translator note"
+        find(".note-body > tn").assert_matches_style(display: "block")
+      end
+
+      should "render newlines as line breaks" do
+        assert_selector ".note-body > br", visible: :all, count: 1
+        assert_selector ".note-body", text: "line one\nline two"
+      end
+
+      should "leave <tn> inside attributes alone" do
+        assert_selector %{.note-body > b[title="a <tn> b"]}, text: "line one"
+      end
+
+      should "not turn text inside attributes into elements" do
+        html = %{<b title="<tn><i class=inner>">text</i></b>}
+        evaluate_script("Array.from(Danbooru.Note.notes)[0].body.display_text(#{html.to_json})")
+
+        assert_selector %{.note-body > b[title="<tn><i class=inner>"]}, text: "text"
+        assert_no_selector ".note-body .inner", visible: :all
+        assert_no_selector ".note-body tn", visible: :all
+      end
+    end
+
+    context "a note with nested <tn> tags" do
+      should "show both <tn> tags as paragraphs" do
+        as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: "text<tn>outer note<tn>inner note</tn></tn>") }
+        visit post_path(@post)
+        find(".note-box").hover
+
+        assert_selector ".note-body > tn", text: "outer note"
+        assert_selector ".note-body > tn > tn", text: "inner note"
+        find(".note-body > tn > tn").assert_matches_style(display: "block")
+      end
+    end
+
+    context "a note with a <tn> tag inside a <p> tag" do
+      should "show the <tn> tag as a paragraph inside the <p> tag" do
+        as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: "<p>text<tn>translator note</tn></p>") }
+        visit post_path(@post)
+        find(".note-box").hover
+
+        assert_selector ".note-body > p > tn", text: "translator note"
+        find(".note-body > p > tn").assert_matches_style(display: "block")
+      end
+    end
+
+    context "a note with a <tn> tag with a style attribute" do
+      should "show the <tn> tag as a paragraph with the style applied" do
+        as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: %{text<tn style="color: rgb(255, 0, 0)">translator note</tn>}) }
+        visit post_path(@post)
+        find(".note-box").hover
+
+        assert_selector ".note-body > tn", text: "translator note"
+        find(".note-body > tn").assert_matches_style(display: "block", color: "rgb(255, 0, 0)")
+      end
+    end
+
+    context "an embedded note containing <tn> tags and newlines" do
+      setup do
+        @post = create(:post, has_embedded_notes: true)
+        as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: %{<b title="a <tn> b">line one</b>\nline two<tn>translator note</tn>}) }
+        visit post_path(@post)
+      end
+
+      should "show <tn> tags as paragraphs" do
+        assert_selector ".note-box.embedded .note-box-inner-border > tn", text: "translator note"
+        find(".note-box-inner-border > tn").assert_matches_style(display: "block")
+      end
+
+      should "render newlines as line breaks" do
+        assert_selector ".note-box-inner-border > br", visible: :all, count: 1
+      end
+
+      should "leave <tn> inside attributes alone" do
+        assert_selector %{.note-box-inner-border > b[title="a <tn> b"]}, text: "line one"
+      end
+    end
+
     context "an existing note" do
       setup do
         @note = as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: "Existing note") }
