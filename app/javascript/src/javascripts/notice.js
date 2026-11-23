@@ -6,6 +6,13 @@ export default class Notice {
     this.timeout = null;
   }
 
+  // Render the message into `element`. Messages are HTML, so callers must escape user text.
+  //
+  // @param {HTMLElement} element - The element to render the message into.
+  render(element) {
+    element.innerHTML = this.message;
+  }
+
   show(message, autoclose = true, type = "info") {
     this.message = message;
     this.type = type;

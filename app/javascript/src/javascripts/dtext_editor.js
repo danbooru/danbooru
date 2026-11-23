@@ -618,13 +618,11 @@ export default class DTextEditor {
     return this.mirrorRange;
   }
 
-  // @returns {String} The HTML representation of the DText input.
-  async html() {
-    if (this.previewMode) {
-      return await this.fetchHtml();
-    } else {
-      return "";
-    }
+  // Render the preview HTML into `element` in preview mode, or clear it in edit mode.
+  //
+  // @param {HTMLElement} element - The element to render the preview into.
+  async renderHtml(element) {
+    element.innerHTML = this.previewMode ? await this.fetchHtml() : "";
   }
 
   // Render the inline editor's preview HTML into `element`, scrolled to the same relative position as the input.
