@@ -1,7 +1,7 @@
 <div
   id="blacklist-box"
   class="mb-4 card-outlined max-w-full <%= inline ? "inline-flex sm:flex-col sm:w-full thin-x-scrollbar inline-blacklist" : "sidebar-blacklist" %>"
-  x-data="{ blacklist: new Danbooru.Blacklist($root) }"
+  x-data="blacklistComponent($root)"
   x-init="blacklist.initialize(<%= rules.to_json %>)"
   x-show="blacklist.visible"
   x-cloak>

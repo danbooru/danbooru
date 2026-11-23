@@ -1,3 +1,5 @@
+import Alpine from "alpinejs";
+
 export default class Notice {
   constructor(message = "") {
     this.message = message;
@@ -45,3 +47,16 @@ export default class Notice {
     $(() => Notice.notice.show(message, false, "error"));
   }
 }
+
+// The global notice at the top of the page. The initial message is read from the server-rendered HTML instead of taken
+// as an argument, so injected HTML can't use `x-data="noticeComponent('<html>')"` to render arbitrary HTML.
+Alpine.data("noticeComponent", () => ({
+  notice: null,
+
+  init() {
+    this.notice = new Notice(this.$el.querySelector(".prose").innerHTML.trim());
+
+    // Attach the notice to the root element for access with `Notice.notice`.
+    this.$el.notice = this.notice;
+  },
+}));

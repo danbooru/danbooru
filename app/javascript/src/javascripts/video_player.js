@@ -2,6 +2,7 @@ import { clamp, round } from "./utility";
 import debounce from "lodash/debounce";
 import UgoiraRenderer from './ugoira_renderer.js';
 import VideoRenderer from './video_renderer.js';
+import Alpine from "alpinejs";
 
 export default class VideoPlayer {
   MAX_PLAYBACK_RATE = 2.0;
@@ -425,3 +426,8 @@ export default class VideoPlayer {
     }
   }
 }
+
+// The video player. Used as `x-data="videoPlayerComponent($el)"`.
+Alpine.data("videoPlayerComponent", (container) => ({
+  player: new VideoPlayer(container),
+}));

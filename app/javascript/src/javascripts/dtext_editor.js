@@ -676,3 +676,8 @@ export default class DTextEditor {
     }
   }
 }
+
+// The DText editor. Used as `x-data="dtextEditorComponent($root)"`.
+Alpine.data("dtextEditorComponent", (root) => ({
+  editor: new DTextEditor(root),
+}));

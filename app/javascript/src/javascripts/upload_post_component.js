@@ -1,3 +1,4 @@
+import Alpine from "alpinejs";
 import AlpineCookieStorage from "./alpine_cookie_storage";
 import Draggable from "./draggable";
 import Notice from "./notice";
@@ -76,3 +77,8 @@ export default class UploadPostComponent {
     }).done(script => $.globalEval(script, { nonce: Utility.meta("csp-nonce") }));
   }
 }
+
+// The upload page. Used as `x-data="uploadPostComponent($el)"`.
+Alpine.data("uploadPostComponent", (container) => ({
+  upload: new UploadPostComponent(container),
+}));

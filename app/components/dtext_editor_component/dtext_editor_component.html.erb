@@ -7,7 +7,7 @@
   <% end %>
 
   <div class="dtext-editor dtext-editor-inline"
-       x-data="{ editor: new Danbooru.DTextEditor($root) }"
+       x-data="dtextEditorComponent($root)"
        x-init="editor.initialize(<%= { inline: true, domains: domains, previewTimeout: PREVIEW_TIMEOUT_MS }.to_json %>)"
        x-on:keydown.ctrl.p.prevent="$refs.toggle.click()"
        spellcheck="true">
@@ -34,7 +34,7 @@
 <% else %>
   <div class="dtext-editor relative w-fit <%= editor_html[:class] %>"
        x-bind:class="{ 'dtext-editor-loading inert': editor.loading }"
-       x-data="{ editor: new Danbooru.DTextEditor($root) }"
+       x-data="dtextEditorComponent($root)"
        x-init="editor.initialize(<%= { inline: inline?, mediaEmbeds: media_embeds?, domains: domains, previewTimeout: PREVIEW_TIMEOUT_MS }.to_json %>)"
        <% if media_embeds? %>
         x-on:dragover.prevent="true"

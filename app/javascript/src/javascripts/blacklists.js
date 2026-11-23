@@ -1,5 +1,6 @@
 import { splitWords } from './utility';
 import Cookie from './cookie';
+import Alpine from 'alpinejs';
 
 // A blacklist represents a set of blacklist rules that match against a set of posts.
 class Blacklist {
@@ -280,5 +281,10 @@ class Rule {
 
 Blacklist.Post = Post;
 Blacklist.Rule = Rule;
+
+// The blacklist box. Used as `x-data="blacklistComponent($root)"`.
+Alpine.data("blacklistComponent", (root) => ({
+  blacklist: new Blacklist(root),
+}));
 
 export default Blacklist;
