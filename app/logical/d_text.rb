@@ -816,9 +816,10 @@ class DText
   # @param length [Integer] the max length of the output
   # @param lines [Integer] the max number of lines in the output
   # @param separator [String, Regexp, nil] if present, truncate at the last match of this pattern (e.g. a whitespace character) instead of mid-word
+  # @param html [String] the output of `format_text`, if it was already rendered
   # @return [String] a plain text string
-  def excerpt(length: 160, lines: 1, separator: nil)
-    html = DText.parse_html(format_text)
+  def excerpt(length: 160, lines: 1, separator: nil, html: format_text)
+    html = DText.parse_html(html)
     plaintext = DText.html_to_plaintext(html, lines:)
 
     plaintext.strip.split(/\r\n|\r|\n/).first(lines).join("\n").truncate(length, separator:)
