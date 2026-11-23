@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=CSP+Test">
     <p style="font-family: csp-test-data-font">A data: font.</p>
     <p style="font-family: csp-test-google-font">A Google font.</p>
+    <p class="csp-test-alpine" x-data="{ count: 1 }" x-text="'Alpine count: ' + count" x-on:click="count++">Alpine didn't run.</p>
 
     <h2>Blocked</h2>
     <script>cspTest.allowed.inlineScriptWithoutNonce = true;</script>

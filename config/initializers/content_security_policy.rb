@@ -20,10 +20,9 @@ Rails.application.configure do
     policy.base_uri   :self
     policy.object_src :none
 
-    # :unsafe_eval is for Alpine.
     # :wasm_unsafe_eval is for the Ruffle player.
     # https://challenges.cloudflare.com is for Cloudflare Turnstile CAPTCHAs.
-    policy.script_src :self, :unsafe_eval, :wasm_unsafe_eval, "challenges.cloudflare.com", "static.cloudflareinsights.com"
+    policy.script_src :self, :wasm_unsafe_eval, "challenges.cloudflare.com", "static.cloudflareinsights.com"
 
     # :blob is for Ugoira frames.
     # :data is for the DText external link icon and the autocorrect underline in CSS.
