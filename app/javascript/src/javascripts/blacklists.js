@@ -229,6 +229,11 @@ class Rule {
     return this.blacklist.showAll || this.posts.size > 0;
   }
 
+  // @returns {Number} - The number of distinct posts matching this rule. A post can appear more than once on a page.
+  get postCount() {
+    return new Set(Array.from(this.posts, post => post.post.dataset.id)).size;
+  }
+
   get enabled() {
     return JSON.parse(localStorage.getItem(`blacklist.enabled:${this.string}`)) ?? true;
   }

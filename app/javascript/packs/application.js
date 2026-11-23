@@ -64,7 +64,7 @@ import TimeSeriesComponent from "../src/javascripts/time_series_component.js";
 import UploadPostComponent from "../src/javascripts/upload_post_component.js";
 import UploadMediaAsset from "../src/javascripts/upload_media_assets.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
-import Utility from "../src/javascripts/utility.js";
+import Utility, { emojiMatches } from "../src/javascripts/utility.js";
 import VideoPlayer from "../src/javascripts/video_player.js";
 
 let Danbooru = {};
@@ -119,9 +119,10 @@ window.Danbooru = Danbooru;
 Alpine.plugin(morph);
 Alpine.plugin(persist)
 
-// Let Alpine expressions call these as `$copyToClipboard(text)` and `$printPage(url)`.
+// Let Alpine expressions call these as `$copyToClipboard(text)`, `$printPage(url)`, and `$emojiMatches(name, search)`.
 Alpine.magic("copyToClipboard", () => Utility.copyToClipboard);
 Alpine.magic("printPage", () => Utility.printPage);
+Alpine.magic("emojiMatches", () => emojiMatches);
 
 $(document).on("alpine:initialized", () => { Alpine._initialized = true; });
 $(() => Alpine.start());

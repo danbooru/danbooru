@@ -81,6 +81,46 @@ class DtextEditorChromeTest < ChromeSystemTestCase
         end
       end
 
+      should "focus the emoji search box when the emoji menu is opened" do
+        find(".new-comment a[title='Insert emoji']").click
+
+        assert_selector ".emoji-search:focus"
+      end
+
+      should "focus the image URL box when the image menu is opened" do
+        find(".new-comment a[title='Insert image']").click
+
+        assert_selector "input[placeholder='Paste image URL']:focus"
+      end
+
+      should "filter the emoji menu by the search term, and insert the clicked emoji" do
+        stub_const(DText, :DEFAULT_EMOJI_MAP, { "smile" => "😄", "Smirk" => "😏", "heart" => "❤️" }) do
+          visit post_path(@post)
+          find(".new-comment .expand-comment-response").click
+          find(@full_editor_selector).set("hello ")
+
+          find(".new-comment a[title='Insert emoji']").click
+          find(".emoji-search:focus").set(":sm")
+
+          assert_selector ".popup-menu-content emoji[title=':smile:']", visible: :visible
+          assert_selector ".popup-menu-content emoji[title=':Smirk:']", visible: :visible
+          assert_no_selector ".popup-menu-content emoji[title=':heart:']", visible: :visible
+
+          find(".popup-menu-content emoji[title=':Smirk:']").click
+
+          assert_no_selector ".emoji-search", visible: :visible
+          assert_equal "hello :Smirk:", find(@full_editor_selector).value
+        end
+      end
+
+      should "insert an uploaded image from the image menu" do
+        find(".new-comment a[title='Insert image']").click
+        find(".popup-menu-content input[type=file]", visible: :all).attach_file(Rails.root.join("test/files/jpg/test.jpg").to_s, make_visible: true)
+
+        assert_field @full_editor_field[:id], with: /\A\* !asset #\d+\z/
+        assert_no_selector ".popup-menu-content", visible: :visible
+      end
+
       context "the edit/preview toggle" do
         should "work" do
           @full_editor_field.set("[[1girl]]")
@@ -161,6 +201,14 @@ class DtextEditorChromeTest < ChromeSystemTestCase
 
         assert_visible "input#ban_reason"
         assert_equal "[[1girl]]", find_field("Reason").value
+      end
+
+      should "focus the preview in preview mode, and the input in edit mode" do
+        find("a[title^='Preview']").click
+        assert_selector ".dtext-preview:focus"
+
+        find("a[title^='Edit']").click
+        assert_selector "input#ban_reason:focus"
       end
 
       should "vertically center the preview toggle icon in the input" do

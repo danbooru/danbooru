@@ -10,6 +10,7 @@ class PopupMenuComponent {
       appendTo: "parent",
       animation: null,
       content: PopupMenuComponent.content,
+      onMount: PopupMenuComponent.onMount,
     });
 
     $(document).on("click.danbooru", ".popup-menu-content", PopupMenuComponent.onMenuItemClicked);
@@ -19,6 +20,11 @@ class PopupMenuComponent {
     let $content = $(element).parents(".popup-menu").find(".popup-menu-content");
     $content.show();
     return $content.get(0);
+  }
+
+  // Focuses the element marked with `data-autofocus` (like an emoji search box) when the menu is opened.
+  static onMount(instance) {
+    instance.popper.querySelector("[data-autofocus]")?.focus();
   }
 
   // Hides the menu when a menu item is clicked.

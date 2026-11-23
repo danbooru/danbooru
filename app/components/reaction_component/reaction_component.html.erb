@@ -2,16 +2,16 @@
   <% if policy(model).try(:reactable?) && distinct_reactions.size <= ReactionComponent::MAX_REACTIONS %>
     <%= render PopupMenuComponent.new(hide_on_click: false) do |menu| %>
       <% menu.with_button do %>
-        <%= add_reaction_icon(class: "h-4", "x-on:click": "$nextTick(() => $refs.search.focus())") %>
+        <%= add_reaction_icon(class: "h-4") %>
       <% end %>
 
       <% menu.with_item do %>
         <div>
-          <input type="text" placeholder="Search emoji..." class="reaction-search w-full mb-2" x-ref="search" x-model="search" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
+          <input type="text" placeholder="Search emoji..." class="reaction-search w-full mb-2" data-autofocus x-model="search" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
 
           <div class="max-w-full grid grid-cols-10 gap-1">
             <% Reaction::REACTIONS.each do |id, (name, url)| %>
-              <%= link_to reaction_icon(id), reactions_path(reaction: { model_type: model.class.name, model_id: model.id, reaction_id: id }, format: "js"), remote: true, method: :post, "x-show": "'#{j name}'.toLowerCase().includes(search.toLowerCase().replace(/[^a-zA-Z0-9]/g, ''))", title: ":#{name}:" %>
+              <%= link_to reaction_icon(id), reactions_path(reaction: { model_type: model.class.name, model_id: model.id, reaction_id: id }, format: "js"), remote: true, method: :post, "x-show": "$emojiMatches('#{j name}', search)", title: ":#{name}:" %>
             <% end %>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import Autocomplete from "./autocomplete";
 import Notice from "./notice";
-import { uploadFilesOrURL } from "./utility";
+import { emojiMatches, uploadFilesOrURL } from "./utility";
+import Alpine from "alpinejs";
 import { computePosition, autoPlacement, inline, shift } from "@floating-ui/dom";
 
 // @see app/components/dtext_editor_component.rb
@@ -90,6 +91,19 @@ export default class DTextEditor {
   // Toggle between "edit" and "preview" modes.
   toggleMode() {
     this.mode = this.mode === "edit" ? "preview" : "edit";
+  }
+
+  // Toggle the inline editor between edit and preview modes, then focus the input or the preview.
+  //
+  // @param {HTMLElement} preview - The preview element.
+  async toggleInlineMode(preview) {
+    this.toggleMode();
+    await Alpine.nextTick();
+    if (this.editMode) {
+      this.focus();
+    } else {
+      preview.focus();
+    }
   }
 
   // @returns {Boolean} True if the editor is in edit mode.
@@ -313,7 +327,7 @@ export default class DTextEditor {
 
   // @returns {Boolean} True if the given emoji matches the current search term in the emoji picker.
   emojiMatches(emoji) {
-    return emoji.toLowerCase().includes(this.emojiSearch.toLowerCase().replace(/[^a-zA-Z0-9]/g, ''));
+    return emojiMatches(emoji, this.emojiSearch);
   }
 
   // @returns {Boolean} True if the editor is currently loading (either uploading files or loading the preview).

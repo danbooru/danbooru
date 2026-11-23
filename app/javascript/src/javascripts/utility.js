@@ -80,6 +80,12 @@ Utility.keydown = function(keys, namespace, handler, selector = document) {
   $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
 };
 
+// @returns {Boolean} True if the emoji or reaction name matches the search term in an emoji picker. Punctuation
+//   in the search term is ignored, so `:smile:` matches `smile`.
+export function emojiMatches(name, search) {
+  return name.toLowerCase().includes(search.toLowerCase().replace(/[^a-zA-Z0-9]/g, ''));
+}
+
 export function splitWords(string) {
   return string?.match(/\S+/g) || [];
 }

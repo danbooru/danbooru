@@ -24,7 +24,7 @@
     <a class="dtext-inline-toggle inactive-link"
        x-ref="toggle"
        x-on:mousedown.prevent
-       x-on:click="editor.toggleMode(); $nextTick(() => editor.editMode ? editor.focus() : $refs.preview.focus())"
+       x-on:click="editor.toggleInlineMode($refs.preview)"
        x-bind:title="editor.editMode ? 'Preview (Ctrl+P)' : 'Edit (Ctrl+P)'"
        title="Preview (Ctrl+P)">
       <%= eye_icon(class: "text-sm", "x-show": "editor.editMode") %>
@@ -74,12 +74,12 @@
           <span x-data="{ imageCaption: '', imageSize: 'small' }">
             <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert image", tabindex: -1 }) do |menu| %>
               <% menu.with_button do %>
-                <%= image_icon("x-on:click": "$nextTick(() => $refs?.imageUrl?.focus())") %>
+                <%= image_icon %>
               <% end %>
 
               <% menu.with_item do %>
                 <div class="flex flex-col w-320px gap-2">
-                  <input type="text" placeholder="Paste image URL" class="w-full" x-ref="imageUrl" x-on:paste.prevent="editor.insertImages($event.clipboardData.getData('text'), imageSize, imageCaption)">
+                  <input type="text" placeholder="Paste image URL" class="w-full" data-autofocus x-on:paste.prevent="editor.insertImages($event.clipboardData.getData('text'), imageSize, imageCaption)">
                   <input type="file" id="file-picker-<%= object_id %>" class="hidden" x-on:change="editor.insertImages($event.target.files, imageSize, imageCaption)" accept="image/*,video/*" multiple>
                   <input type="text" placeholder="Enter image caption (optional)" class="w-full" x-model="imageCaption">
 
@@ -108,12 +108,12 @@
 
         <%= render PopupMenuComponent.new(hide_on_click: false, button_html: { title: "Insert emoji", tabindex: -1 }) do |menu| %>
           <% menu.with_button do %>
-            <%= add_reaction_icon("x-on:click": "$nextTick(() => $refs?.emojiPicker?.focus())") %>
+            <%= add_reaction_icon %>
           <% end %>
 
           <% menu.with_item do %>
             <div>
-              <input type="text" placeholder="Search emoji..." class="emoji-search w-full mb-2" x-ref="emojiPicker" x-model="editor.emojiSearch" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
+              <input type="text" placeholder="Search emoji..." class="emoji-search w-full mb-2" data-autofocus x-model="editor.emojiSearch" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
 
               <div class="h-225px w-320px thin-scrollbar prose">
                 <% DText::DEFAULT_EMOJI_MAP.each do |name, value| %>
