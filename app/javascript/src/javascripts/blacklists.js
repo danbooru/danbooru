@@ -1,6 +1,6 @@
 import { splitWords } from './utility';
 import Cookie from './cookie';
-import Alpine from 'alpinejs';
+import Alpine from '@alpinejs/csp';
 
 // A blacklist represents a set of blacklist rules that match against a set of posts.
 class Blacklist {

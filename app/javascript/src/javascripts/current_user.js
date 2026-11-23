@@ -1,4 +1,4 @@
-import Alpine from "alpinejs";
+import Alpine from "@alpinejs/csp";
 
 export default class CurrentUser {
   static data(key) {

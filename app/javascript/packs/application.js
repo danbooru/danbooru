@@ -10,7 +10,7 @@ import "core-js";
 import jQuery from 'jquery';
 
 require('jquery-hotkeys');
-import Alpine from 'alpinejs';
+import Alpine from '@alpinejs/csp';
 import morph from '@alpinejs/morph';
 import persist from '@alpinejs/persist'
 

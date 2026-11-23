@@ -37,8 +37,8 @@ default: &default
   # ['app/assets', 'engine/foo/app/assets']
   #
   # XXX Transpile @alpinejs/morph with Babel to fix an issue with it not working in iOS <14.
-  # XXX Transpile alpinejs to fix an issue with it not working in Firefox <72 (use of nullish coalescing operator).
-  additional_paths: ["app/components", "public/images", "public/logos", "node_modules/alpinejs", "node_modules/@alpinejs/morph"]
+  # XXX Transpile @alpinejs/csp to fix an issue with it not working in Firefox <72 (use of nullish coalescing operator).
+  additional_paths: ["app/components", "public/images", "public/logos", "node_modules/@alpinejs/csp", "node_modules/@alpinejs/morph"]
 
   # Reload manifest.json on all requests so we reload latest compiled packs
   cache_manifest: false

@@ -2,7 +2,7 @@ import { delegate, hideAll } from 'tippy.js';
 import Notice from './notice';
 import capitalize from "lodash/capitalize";
 import escape from "lodash/escape";
-import Alpine from 'alpinejs';
+import Alpine from '@alpinejs/csp';
 
 let Utility = {};
 
