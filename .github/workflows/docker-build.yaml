@@ -62,23 +62,6 @@ jobs:
       TAG_PREFIX: ${{ inputs.docker-target == 'development' && 'development-' || '' }}
       CACHE_TAG: ${{ inputs.docker-target == 'development' && 'buildcache-development' || 'buildcache' }}
     steps:
-      # https://github.com/docker/setup-qemu-action
-      # https://github.com/docker/setup-buildx-action#with-qemu
-      #- name: Set up QEMU
-      #  uses: docker/setup-qemu-action@v1
-      #  with:
-      #    platforms: arm64
-
-      # https://github.com/docker/setup-buildx-action
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
-        with:
-          # https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories
-          # ubuntu-latest on public repositories has 4 vCPU
-          buildkitd-config-inline: |
-            [worker.oci]
-            max-parallelism = 4
-
       # https://github.com/docker/login-action
       # https://github.com/docker/build-push-action/blob/master/docs/advanced/push-multi-registries.md
       - name: Login to Github Container Registry
@@ -145,9 +128,10 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Skip the tag we're copying from, since it already points to the image.
           args=()
           while IFS= read -r tag; do
-            if [ -n "$tag" ]; then
+            if [ -n "$tag" ] && [ "$tag" != "$EXISTING_IMAGE" ]; then
               args+=(--tag "$tag")
             fi
           done <<< "$TAGS"
@@ -155,6 +139,25 @@ jobs:
           echo "Retagging $EXISTING_IMAGE as:"
           echo "$TAGS"
           docker buildx imagetools create "${args[@]}" "$EXISTING_IMAGE"
+
+      # https://github.com/docker/setup-qemu-action
+      # https://github.com/docker/setup-buildx-action#with-qemu
+      #- name: Set up QEMU
+      #  uses: docker/setup-qemu-action@v1
+      #  with:
+      #    platforms: arm64
+
+      # Only needed for building. Retagging uses the runner's preinstalled buildx.
+      # https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
+        if: steps.existing.outputs.exists != 'true'
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        with:
+          # https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+          # ubuntu-latest on public repositories has 4 vCPU
+          buildkitd-config-inline: |
+            [worker.oci]
+            max-parallelism = 4
 
       # https://github.com/docker/build-push-action
       - name: Build image
