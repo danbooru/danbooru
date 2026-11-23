@@ -459,6 +459,7 @@ RUN <<EOS
   passwd -d danbooru
 
   touch /home/danbooru/.sudo_as_admin_successful
+  chown danbooru:danbooru /danbooru /home/danbooru/.sudo_as_admin_successful
 EOS
 
 
@@ -467,17 +468,13 @@ EOS
 # for building JS/CSS files, and includes tools and libraries needed for building certain Ruby gems.
 FROM development-base AS development
 
+COPY --link --from=danbooru-base /etc/ld.so.cache /etc/ld.so.cache
 COPY --link --from=danbooru-base /usr/local /usr/local
-COPY --link --from=danbooru-base $GEM_HOME $GEM_HOME
+COPY --link --chown=1000:1000 --from=danbooru-base $GEM_HOME $GEM_HOME
 COPY --link --from=build-node /usr/local /usr/local
-COPY --link --from=build-assets /danbooru/node_modules /node_modules
-COPY --link --from=production /home/danbooru/bootsnap /home/danbooru/bootsnap
-COPY --link --from=production /danbooru /danbooru
-
-RUN <<EOS
-  ldconfig
-  chown danbooru:danbooru /danbooru /node_modules /home/danbooru /home/danbooru/bootsnap /home/danbooru/.sudo_as_admin_successful $GEM_HOME
-EOS
+COPY --link --chown=1000:1000 --from=build-assets /danbooru/node_modules /node_modules
+COPY --link --chown=1000:1000 --from=production /home/danbooru/bootsnap /home/danbooru/bootsnap
+COPY --link --chown=1000:1000 --from=production /danbooru /danbooru
 
 ARG DOCKER_IMAGE_REVISION=""
 ARG DOCKER_IMAGE_BUILD_DATE=""
