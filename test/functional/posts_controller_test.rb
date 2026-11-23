@@ -969,6 +969,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select "a.post-tooltip-source[href=?]", posts_path(tags: 'source:"file://C:\\\\a \"b\"\\\\"')
         end
+
+        should "render the tooltip without the preview param" do
+          get_auth post_path(@post, variant: "tooltip"), @user
+
+          assert_response :success
+          assert_select ".post-tooltip-body:not(.has-preview)"
+        end
       end
 
       context "a deleted post" do

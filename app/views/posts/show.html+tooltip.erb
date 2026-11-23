@@ -40,9 +40,9 @@
   <% end %>
 </div>
 
-<div class="post-tooltip-body thin-scrollbar text-xs flex <%= "has-preview gap-1" if params[:preview].truthy? %>">
+<div class="post-tooltip-body thin-scrollbar text-xs flex <%= "has-preview gap-1" if params[:preview].to_s.truthy? %>">
   <div class="flex-none">
-    <% if params[:preview].truthy? %>
+    <% if params[:preview].to_s.truthy? %>
       <%= post_preview(@post, show_deleted: true, compact: true, classes: "blacklist-initialized") %>
     <% end %>
   </div>
