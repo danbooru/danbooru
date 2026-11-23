@@ -1,25 +1,25 @@
-<% page_title @title %>
+<% page_title @report.title %>
 
 <div id="c-reports">
   <div id="a-show">
-    <h1><%= @title %></h1>
+    <h1><%= @report.title %></h1>
     <%= link_to "« Back", reports_path, class: "text-xs" %>
 
     <%= search_form_for(current_page_path) do |f| %>
-      <% if @report == "posts" %>
-        <%= f.input :tags, label: "Tags", input_html: { value: @report_params[:tags], data: { autocomplete: "tag-query" } } %>
+      <% if @report.name == "posts" %>
+        <%= f.input :tags, label: "Tags", input_html: { value: @report.params[:tags], data: { autocomplete: "tag-query" } } %>
       <% end %>
 
-      <%= f.input :from, as: :date, html5: true, wrapper_html: { "x-data": "{ from: '' }" }, input_html: { value: @from.to_date, "x-model.fill": "from" },
+      <%= f.input :from, as: :date, html5: true, wrapper_html: { "x-data": "{ from: '' }" }, input_html: { value: @report.from.to_date, "x-model.fill": "from" },
                   hint: ((link_to "All Time", "#", "x-on:click.prevent": "from = #{first_danbirthday.to_date.iso8601.to_json}") if first_danbirthday), hint_html: { class: "inline-hint" } %>
-      <%= f.input :to, as: :date, html5: true, input_html: { value: @to.to_date } %>
-      <%= f.input :period, collection: %w[day week month year].map { [_1.capitalize, _1] }, include_blank: true, selected: @period %>
-      <%= f.input :group, label: "Group By", collection: @available_groups.map { |group| [group.parameterize.titleize, group] }, include_blank: true, selected: @group if @available_groups.present? %>
-      <%= f.input :group_limit, label: "Top", collection: [10, 25, 50, 100], selected: @group_limit if @group %>
-      <%= f.input :mode, as: :hidden, input_html: { value: @report_params[:mode] } %>
+      <%= f.input :to, as: :date, html5: true, input_html: { value: @report.to.to_date } %>
+      <%= f.input :period, collection: %w[day week month year].map { [_1.capitalize, _1] }, include_blank: true, selected: @report.period %>
+      <%= f.input :group, label: "Group By", collection: @report.available_groups.map { |group| [group.parameterize.titleize, group] }, include_blank: true, selected: @report.group if @report.available_groups.present? %>
+      <%= f.input :group_limit, label: "Top", collection: [10, 25, 50, 100], selected: @report.group_limit if @report.group %>
+      <%= f.input :mode, as: :hidden, input_html: { value: @report.params[:mode] } %>
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= render TimeSeriesComponent.new(@dataframe, x_axis: @x_axis, mode: @mode) %>
+    <%= render TimeSeriesComponent.new(@report.dataframe, x_axis: @report.x_axis, mode: @report.mode) %>
   </div>
 </div>

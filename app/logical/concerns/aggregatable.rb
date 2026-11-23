@@ -9,9 +9,9 @@ module Aggregatable
 
   class Error < StandardError; end
 
-  # @param columns [Hash{Symbol => Arel::Nodes::Node}] The aggregate columns to select, e.g. `{ count: Arel.sql("COUNT(*)") }`.
+  # @param columns [Hash{Symbol => Symbol, Array, Arel::Nodes::Node}] The aggregate columns to select, e.g. `{ posts: :count, uploaders: [:count_distinct, :uploader_id] }`. See `aggregate_function`.
   # @param groups [Array<String>] The columns or associations to group by, e.g. `["uploader", "uploader.level", "rating"]`.
-  def timeseries(period: "day", date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], group_limit: 10, columns: { count: Arel.sql("COUNT(*)") })
+  def timeseries(period: "day", date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], group_limit: 10, columns: { count: :count })
     raise Error, "The period must be one of: #{PERIODS.join(", ")}." if !period.in?(PERIODS)
     raise Error, "The group limit can't be more than #{MAX_GROUP_LIMIT}." if !group_limit.to_i.in?(0..MAX_GROUP_LIMIT)
     raise ArgumentError if all.group_values.present?
@@ -39,9 +39,9 @@ module Aggregatable
       subquery = subquery.select(column).group(column)
     end
 
-    columns.each do |name, sql|
+    columns.each do |name, function|
       # SELECT date_trunc('day', posts.created_at) AS date, uploader_id, COUNT(*) AS count FROM posts WHERE created_at >= from AND created_at < to + 1 day GROUP BY date, uploader_id
-      subquery = subquery.select(column_alias(arel_node(sql), name))
+      subquery = subquery.select(column_alias(aggregate_function(function), name))
     end
 
     # SELECT date_trunc('day', dates) AS date FROM generate_series(from, to, '1 day'::interval) AS dates
@@ -104,9 +104,9 @@ module Aggregatable
     build_dataframe(query, groups)
   end
 
-  # @param columns [Hash{Symbol => Arel::Nodes::Node}] The aggregate columns to select, e.g. `{ count: Arel.sql("COUNT(*)") }`.
+  # @param columns [Hash{Symbol => Symbol, Array, Arel::Nodes::Node}] The aggregate columns to select, e.g. `{ posts: :count, uploaders: [:count_distinct, :uploader_id] }`. See `aggregate_function`.
   # @param groups [Array<String>] The columns or associations to group by, e.g. `["uploader", "uploader.level", "rating"]`.
-  def aggregate(date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], limit: 50, columns: { count: Arel.sql("COUNT(*)") }, order: arel_node(columns.first.second).desc)
+  def aggregate(date_column: :created_at, from: first[date_column], to: Time.now.utc, groups: [], limit: 50, columns: { count: :count }, order: aggregate_function(columns.first.second).desc)
     raise Error, "The group limit can't be more than #{MAX_GROUP_LIMIT}." if !limit.to_i.in?(0..MAX_GROUP_LIMIT)
 
     group_fields = groups.map { |name| reflections[name.to_s]&.foreign_key || name.to_s }
@@ -119,11 +119,30 @@ module Aggregatable
       query = query.select(column).group(column).where(column.not_eq(nil))
     end
 
-    columns.each do |name, sql|
-      query = query.select(column_alias(arel_node(sql), name))
+    columns.each do |name, function|
+      query = query.select(column_alias(aggregate_function(function), name))
     end
 
     build_dataframe(query, groups)
+  end
+
+  # Build an aggregate function for a column passed to `timeseries` or `aggregate`.
+  #
+  # @param function [Symbol, Array, Arel::Nodes::Node] `:count`, `[:count_distinct, column]`, `[:sum, column]`, or an Arel node.
+  # @return [Arel::Nodes::Node] `COUNT(*)`, `COUNT(DISTINCT posts.uploader_id)`, `SUM(media_assets.file_size)`, or the node itself.
+  def aggregate_function(function)
+    case function
+    in :count
+      Arel.star.count
+    in [:count_distinct, Symbol => column] if has_attribute?(column)
+      arel_table[column].count(true)
+    in [:sum, Symbol => column] if has_attribute?(column)
+      arel_table[column].sum
+    in _ if Arel.arel_node?(function)
+      function
+    else
+      raise ArgumentError, "Unknown aggregate function: #{function.inspect}"
+    end
   end
 
   def group_by_period(period = "day", column = :created_at)

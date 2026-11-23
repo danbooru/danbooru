@@ -116,6 +116,28 @@ class AggregatableTest < ActiveSupport::TestCase
         assert_equal([0, 2], dataframe["count"].to_a)
       end
     end
+
+    should "aggregate structured columns" do
+      travel_to(Time.utc(2026, 3, 21)) do
+        uploader = create(:user)
+        create(:post, uploader: uploader, file_size: 100, created_at: Time.utc(2026, 3, 20))
+        create(:post, uploader: uploader, file_size: 200, created_at: Time.utc(2026, 3, 20))
+        create(:post, file_size: 300, created_at: Time.utc(2026, 3, 20))
+
+        columns = { posts: :count, uploaders: [:count_distinct, :uploader_id], size: [:sum, :file_size] }
+        dataframe = Post.timeseries(period: "day", from: Date.new(2026, 3, 20), to: Date.new(2026, 3, 20), columns: columns)
+
+        assert_equal [3], dataframe["posts"].to_a
+        assert_equal [2], dataframe["uploaders"].to_a
+        assert_equal [600], dataframe["size"].to_a
+      end
+    end
+
+    should "raise an error for unknown aggregate functions" do
+      assert_raises(ArgumentError) do
+        Post.timeseries(period: "day", from: Date.new(2026, 3, 20), to: Date.new(2026, 3, 20), columns: { count: "COUNT(*)" })
+      end
+    end
   end
 
   context "Aggregatable#aggregate" do
@@ -166,6 +188,31 @@ class AggregatableTest < ActiveSupport::TestCase
 
       assert_equal([@alice, @bob], dataframe["uploader"].to_a)
       assert_equal([2, 1], dataframe["count"].to_a)
+    end
+
+    should "aggregate structured columns" do
+      uploader = create(:user)
+      create(:post, uploader: uploader, file_size: 100)
+      create(:post, uploader: uploader, file_size: 200)
+      create(:post, file_size: 300)
+
+      columns = { posts: :count, uploaders: [:count_distinct, :uploader_id], size: [:sum, :file_size] }
+      dataframe = Post.aggregate(from: 1.day.ago, to: 1.day.from_now, columns: columns)
+
+      assert_equal [3], dataframe["posts"].to_a
+      assert_equal [2], dataframe["uploaders"].to_a
+      assert_equal [600], dataframe["size"].to_a
+    end
+
+    should "order by the first column when grouping" do
+      uploader = create(:user)
+      create_list(:post, 2, uploader: uploader)
+      create(:post)
+
+      dataframe = Post.aggregate(from: 1.day.ago, to: 1.day.from_now, groups: ["uploader"], columns: { posts: :count })
+
+      assert_equal [2, 1], dataframe["posts"].to_a
+      assert_equal uploader, dataframe["uploader"].first
     end
   end
 
