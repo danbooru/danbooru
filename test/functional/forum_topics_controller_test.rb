@@ -59,6 +59,18 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_no_match(/too long</, response.body)
       end
 
+      should "not show more than 200 posts per page" do
+        as(@user) { create_list(:forum_post, 200, creator: @user, topic: @forum_topic) }
+
+        get forum_topic_path(@forum_topic, limit: 1000)
+        assert_response :success
+        assert_select "article.forum-post", count: 200
+
+        get forum_topic_path(@forum_topic, limit: 1000, page: 2)
+        assert_response :success
+        assert_select "article.forum-post", count: 1
+      end
+
       should "show cancel buttons on the inline forum post forms" do
         as(@user) { create(:forum_post, creator: @user, topic: @forum_topic) }
         get_auth forum_topic_path(@forum_topic), @user
