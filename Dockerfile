@@ -361,10 +361,7 @@ COPY --link public/fonts ./public/fonts
 COPY --link app/components/ ./app/components
 COPY --link app/javascript/ ./app/javascript
 
-RUN <<EOS
-  RAILS_ENV=production NODE_ENV=production npx webpack --mode production -c config/webpack/webpack.config.js
-  rm -f public/packs/**/*.{gz,br}
-EOS
+RUN RAILS_ENV=production NODE_ENV=production npx webpack --mode production -c config/webpack/webpack.config.js
 
 
 
