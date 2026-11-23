@@ -4,7 +4,7 @@
   <div id="a-new">
     <h1>New Credential</h1>
 
-    <%= edit_form_for(@site_credential, html: { "x-data": '{ site: "", valid: false }', "x-on:input": "$nextTick(() => valid = $root.checkValidity())" }) do |f| %>
+    <%= edit_form_for(@site_credential, validate: true, html: { "x-data": '{ site: "" }' }) do |f| %>
       <%= f.input :site, as: :select, collection: SiteCredential.sites.keys, include_blank: true, selected: params.dig(:site_credential, :site), input_html: { "x-model": "site" } %>
 
       <% SiteCredential::SITES.each do |site| %>
@@ -21,7 +21,7 @@
           </div>
         <% end %>
 
-      <%= f.submit_button disabled: true, "x-bind:disabled": "!valid" %>
+      <%= f.submit_button %>
     <% end %>
   </div>
 </div>

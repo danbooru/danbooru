@@ -1,13 +1,13 @@
 <div
   id="blacklist-box"
   class="mb-4 card-outlined max-w-full <%= inline ? "inline-flex sm:flex-col sm:w-full thin-x-scrollbar inline-blacklist" : "sidebar-blacklist" %>"
-  x-data="{ blacklist: new Danbooru.Blacklist($root) }"
+  x-data="blacklistComponent($root)"
   x-init="blacklist.initialize(<%= rules.to_json %>)"
   x-show="blacklist.visible"
   x-cloak>
   <%= tag.div class: "flex items-center gap-1 p-2", "x-bind:class": (inline ? "{ 'sm:border-b': !blacklist.collapsed }" : "{ 'border-b': !blacklist.collapsed }") do %>
     <label class="flex items-center gap-1 font-header font-bold cursor-pointer select-none">
-      <input type="checkbox" class="toggle-switch" x-model="blacklist.enabled" x-effect="$el.indeterminate = blacklist.partiallyEnabled" data-shortcut="b">
+      <input type="checkbox" class="toggle-switch" x-model="blacklist.enabled" x-effect="blacklist.updateIndeterminate($el)" data-shortcut="b">
       Blacklisted
     </label>
 
@@ -62,7 +62,7 @@
            x-show="rule.visible">
         <input type="checkbox" class="toggle-switch" x-model="rule.enabled">
         <%= link_to rule, posts_path(tags: rule), title: rule, class: "truncate", tabindex: "-1", "x-bind:class": "{ 'inactive-link': !rule.enabled }", "x-on:click.prevent": "rule.toggle()" %>
-        <span class="whitespace-nowrap post-count" x-text="Alpine.raw(rule.posts).map(post => post.post.dataset.id).size"></span>
+        <span class="whitespace-nowrap post-count" x-text="rule.postCount"></span>
       </div>
     <% end %>
   <% end %>

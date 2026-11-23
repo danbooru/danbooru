@@ -82,6 +82,31 @@ class BlacklistChromeTest < ChromeSystemTestCase
         end
       end
 
+      context "the blacklist box" do
+        should "show the number of posts matching each rule" do
+          create(:post, tag_string: "1girl")
+          visit posts_path
+          toggle_blacklist_enabled
+
+          assert_selector "#blacklist-box a", text: "1girl"
+          assert_equal "2", find("#blacklist-box a", text: "1girl").sibling(".post-count").text
+        end
+
+        should "show the Blacklisted toggle as partially checked when some rules are disabled" do
+          create(:post, tag_string: "2girls")
+          visit posts_path
+          toggle_blacklist_enabled
+          assert_post_not_blacklisted @blacklisted_post
+
+          toggle = find("#blacklist-box input[data-shortcut='b']", visible: :all)
+          assert_equal false, toggle.evaluate_script("this.indeterminate")
+
+          find("#blacklist-box a", text: "1girl").click
+          assert_post_hidden @blacklisted_post
+          assert_equal true, toggle.evaluate_script("this.indeterminate")
+        end
+      end
+
       context "blacklist.showall" do
         should "only show rules matching posts by default, and all rules when enabled" do
           toggle_blacklist_enabled

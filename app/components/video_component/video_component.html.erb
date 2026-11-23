@@ -11,7 +11,7 @@
             "x-bind:data-muted": "player.muted.toString()",
             "x-bind:data-volume": "player.volume.toString()",
             "x-bind:data-playback-rate": "player.playbackRate.toString()",
-            "x-data": "{ player: new Danbooru.VideoPlayer($el) }",
+            "x-data": "videoPlayerComponent($el)",
             "x-init": "player.initialize()",
             **html_options.except(:class) do %>
   <% variants.each do |variant| %>

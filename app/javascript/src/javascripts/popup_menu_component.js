@@ -10,15 +10,30 @@ class PopupMenuComponent {
       appendTo: "parent",
       animation: null,
       content: PopupMenuComponent.content,
+      onMount: PopupMenuComponent.onMount,
     });
 
     $(document).on("click.danbooru", ".popup-menu-content", PopupMenuComponent.onMenuItemClicked);
+    $(document).on("keydown.danbooru", ".popup-menu-content", PopupMenuComponent.onKeyDown);
   }
 
   static content(element) {
     let $content = $(element).parents(".popup-menu").find(".popup-menu-content");
     $content.show();
     return $content.get(0);
+  }
+
+  // Focuses the element marked with `data-autofocus` (like an emoji search box) when the menu is opened.
+  static onMount(instance) {
+    instance.popper.querySelector("[data-autofocus]")?.focus();
+  }
+
+  // Hides the menu when Escape is pressed inside it, like in an emoji search box. The global Escape shortcut doesn't
+  // work inside text inputs.
+  static onKeyDown(event) {
+    if (event.key === "Escape") {
+      $(event.target).parents("[data-tippy-root]").get(0)?._tippy?.hide();
+    }
   }
 
   // Hides the menu when a menu item is clicked.

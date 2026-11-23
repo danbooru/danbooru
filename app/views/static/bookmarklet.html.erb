@@ -6,7 +6,7 @@
     <div class="card fixed-width-container p-4 mx-auto prose">
       <p class="text-center">
         <% bookmarklet = "javascript:void(location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer))" %>
-        <%= link_to "Post to #{Danbooru.config.app_name}", bookmarklet, class: "text-xl font-bold text-center button-outline-primary", "x-data": "{}", "x-on:click.prevent": "Danbooru.Notice.info('Drag this link to your bookmarks toolbar.')" %>
+        <%= link_to "Post to #{Danbooru.config.app_name}", bookmarklet, class: "text-xl font-bold text-center button-outline-primary", "x-data": "{}", "x-on:click.prevent": "$notice('Drag this link to your bookmarks toolbar.')" %>
       </p>
 
       <p class="fineprint text-center">Drag this link to your bookmarks toolbar</p>

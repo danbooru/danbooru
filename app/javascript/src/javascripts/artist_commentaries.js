@@ -1,6 +1,16 @@
 import Notice from "./notice";
+import Alpine from "alpinejs";
 
 let ArtistCommentary = {};
+
+// The "Copy from" form in the artist commentary dialog.
+Alpine.data("commentaryFetcher", () => ({
+  from: "Source",
+
+  fetchCommentary() {
+    ArtistCommentary.fetch_commentary();
+  },
+}));
 
 ArtistCommentary.initialize_all = function() {
   if ($("#c-posts").length && $("#a-show").length) {

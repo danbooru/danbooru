@@ -1,12 +1,11 @@
 <div id="notice"
       class="notice flex fixed top-2 left-2 right-2 p-2 mx-auto max-w-720px max-h-150px thin-scrollbar z-9999 shadow-lg sm:text-sm"
-      x-init="$root.notice = $data.notice"
-      x-data="{ notice: new Danbooru.Notice(<%= message.to_json %>) }"
+      x-data="noticeComponent"
       x-bind:class="notice.type === 'error' ? 'notice-error' : 'notice-info'"
       x-show="notice.isOpen"
       x-transition.opacity.400ms
       x-cloak>
   <%# Messages are HTML, so callers must escape user text. uploadError() does, and `j` in .js.erb templates is escaped by ERB first. %>
-  <span class="prose flex-1" x-html="notice.message"><%= message %></span>
+  <span class="prose flex-1" x-effect="notice.render($el)"><%= message %></span>
   <a href="#" id="close-notice-link" class="flex self-center text-lg" data-shortcut="esc" x-on:click.prevent="notice.close()"><%= helpers.close_icon %></a>
 </div>

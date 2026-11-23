@@ -64,7 +64,8 @@ import TimeSeriesComponent from "../src/javascripts/time_series_component.js";
 import UploadPostComponent from "../src/javascripts/upload_post_component.js";
 import UploadMediaAsset from "../src/javascripts/upload_media_assets.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
-import Utility from "../src/javascripts/utility.js";
+import Utility, { emojiMatches } from "../src/javascripts/utility.js";
+import escape from "lodash/escape";
 import VideoPlayer from "../src/javascripts/video_player.js";
 
 let Danbooru = {};
@@ -119,9 +120,18 @@ window.Danbooru = Danbooru;
 Alpine.plugin(morph);
 Alpine.plugin(persist)
 
-// Let Alpine expressions call these as `$copyToClipboard(text)` and `$printPage(url)`.
+// Let Alpine expressions call these as `$copyToClipboard(text)`, `$printPage(url)`, `$emojiMatches(name, search)`,
+// and `$notice(text)`. `$notice` takes plain text, not HTML.
 Alpine.magic("copyToClipboard", () => Utility.copyToClipboard);
 Alpine.magic("printPage", () => Utility.printPage);
+Alpine.magic("emojiMatches", () => emojiMatches);
+Alpine.magic("notice", () => (text) => Notice.info(escape(text)));
+
+// The news ticker. Used as `x-data="newsUpdateComponent(id)"`. Remembers the last dismissed news update in a cookie.
+Alpine.data("newsUpdateComponent", (id) => ({
+  id,
+  seen: Alpine.$persist(0).as("news-ticker").using(Cookie),
+}));
 
 $(document).on("alpine:initialized", () => { Alpine._initialized = true; });
 $(() => Alpine.start());

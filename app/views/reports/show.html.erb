@@ -10,8 +10,8 @@
         <%= f.input :tags, label: "Tags", input_html: { value: @report_params[:tags], data: { autocomplete: "tag-query" } } %>
       <% end %>
 
-      <%= f.input :from, as: :date, html5: true, input_html: { value: @from.to_date },
-                  hint: ((link_to "All Time", "#", "x-data": "{}", "x-on:click.prevent": "document.getElementById('search_from').value = #{first_danbirthday.to_date.iso8601.to_json}") if first_danbirthday), hint_html: { class: "inline-hint" } %>
+      <%= f.input :from, as: :date, html5: true, wrapper_html: { "x-data": "{ from: '' }" }, input_html: { value: @from.to_date, "x-model.fill": "from" },
+                  hint: ((link_to "All Time", "#", "x-on:click.prevent": "from = #{first_danbirthday.to_date.iso8601.to_json}") if first_danbirthday), hint_html: { class: "inline-hint" } %>
       <%= f.input :to, as: :date, html5: true, input_html: { value: @to.to_date } %>
       <%= f.input :period, collection: %w[day week month year].map { [_1.capitalize, _1] }, include_blank: true, selected: @period %>
       <%= f.input :group, label: "Group By", collection: @available_groups.map { |group| [group.parameterize.titleize, group] }, include_blank: true, selected: @group if @available_groups.present? %>

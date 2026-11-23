@@ -1,5 +1,6 @@
 import { splitWords } from './utility';
 import Cookie from './cookie';
+import Alpine from 'alpinejs';
 
 // A blacklist represents a set of blacklist rules that match against a set of posts.
 class Blacklist {
@@ -47,6 +48,13 @@ class Blacklist {
   // @returns {Boolean} - True if some but not all rules are enabled.
   get partiallyEnabled() {
     return this.visibleRules.some(rule => rule.enabled) && !this.visibleRules.every(rule => rule.enabled);
+  }
+
+  // Show the "Blacklisted" checkbox as partially checked when some but not all rules are enabled.
+  //
+  // @param {HTMLInputElement} checkbox - The checkbox to update.
+  updateIndeterminate(checkbox) {
+    checkbox.indeterminate = this.partiallyEnabled;
   }
 
   get showAll() {
@@ -222,6 +230,11 @@ class Rule {
     return this.blacklist.showAll || this.posts.size > 0;
   }
 
+  // @returns {Number} - The number of distinct posts matching this rule. A post can appear more than once on a page.
+  get postCount() {
+    return new Set(Array.from(this.posts, post => post.post.dataset.id)).size;
+  }
+
   get enabled() {
     return JSON.parse(localStorage.getItem(`blacklist.enabled:${this.string}`)) ?? true;
   }
@@ -268,5 +281,10 @@ class Rule {
 
 Blacklist.Post = Post;
 Blacklist.Rule = Rule;
+
+// The blacklist box. Used as `x-data="blacklistComponent($root)"`.
+Alpine.data("blacklistComponent", (root) => ({
+  blacklist: new Blacklist(root),
+}));
 
 export default Blacklist;

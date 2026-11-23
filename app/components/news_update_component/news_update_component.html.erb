@@ -1,7 +1,7 @@
 <div
   id="news-updates"
   class="flex gap-1 p-1 items-center leading-none text-center text-xs"
-  x-data="{ seen: $persist(0).as('news-ticker').using(Danbooru.Cookie), id: <%= news_update.id %> }"
+  x-data="newsUpdateComponent(<%= news_update.id %>)"
   x-show="seen != id">
 
   <div class="flex-grow-1 prose">

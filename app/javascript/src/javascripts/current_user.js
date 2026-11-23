@@ -1,3 +1,5 @@
+import Alpine from "alpinejs";
+
 export default class CurrentUser {
   static data(key) {
     return $("body").data(`current-user-${key}`);
@@ -19,3 +21,10 @@ export default class CurrentUser {
     return getComputedStyle(document.body).getPropertyValue("--theme-background").trim() === "dark";
   }
 }
+
+// The theme setting on the settings page. Switches the page to the selected theme before the settings are saved.
+Alpine.data("themePicker", () => ({
+  preview(theme) {
+    CurrentUser.theme = theme;
+  },
+}));

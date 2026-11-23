@@ -39,7 +39,8 @@
               collection_wrapper_class: "flex flex-wrap",
               item_wrapper_class: "theme-swatch w-16",
               item_label_class: "cursor-pointer !m-0",
-              input_html: { class: "hidden", "x-on:change": "Danbooru.CurrentUser.theme = $el.value" },
+              wrapper_html: { "x-data": "themePicker" },
+              input_html: { class: "hidden", "x-on:change": "preview($el.value)" },
               label_method: ->(theme) {
                 tag.div(class: "theme-swatch-preview mx-auto w-12 h-12 rounded-lg", data: { current_user_theme: theme }) +
                   tag.div(theme.titleize, class: "mt-2 text-xs text-center text-balance leading-normal")
