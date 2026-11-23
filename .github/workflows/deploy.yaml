@@ -26,10 +26,8 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      # https://github.com/marketplace/actions/kubectl-tool-installer
-      - name: Install Kubectl
-        uses: Azure/setup-kubectl@bda439f5f36b99b262ebdcd3613869bddb064c8e # v5.2.0
-
+      # kubectl is preinstalled on GitHub's Ubuntu runners.
+      # https://github.com/actions/runner-images/tree/main/images/ubuntu
       - name: Configure Kubectl
         run: |
           mkdir -p ~/.kube
@@ -40,7 +38,8 @@ jobs:
 
       - name: Deploy
         run: |
-          kubectl rollout restart deploy/downbooru && kubectl rollout status deploy/downbooru
-          kubectl rollout restart deploy/danbooru-cron && kubectl rollout status deploy/danbooru-cron
-          kubectl rollout restart deploy/danbooru-jobs && kubectl rollout status deploy/danbooru-jobs
-          kubectl rollout restart deploy/danbooru && kubectl rollout status deploy/danbooru
+          kubectl rollout restart deploy/downbooru deploy/danbooru-cron deploy/danbooru-jobs deploy/danbooru
+          kubectl rollout status deploy/downbooru
+          kubectl rollout status deploy/danbooru-cron
+          kubectl rollout status deploy/danbooru-jobs
+          kubectl rollout status deploy/danbooru
