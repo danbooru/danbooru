@@ -156,6 +156,24 @@ RelatedTag.show = function(e) {
   e?.preventDefault();
 }
 
+// The general related tags column. Clicking the header expands or collapses it, and loads the related tags for the
+// current tag when it's expanded.
+Alpine.data("relatedTagsColumn", (collapsed) => ({
+  collapsed,
+
+  toggle(event) {
+    this.collapsed = !this.collapsed;
+
+    if (!this.collapsed) {
+      RelatedTag.update_related_tags(event);
+    }
+  },
+
+  update(event) {
+    RelatedTag.update_related_tags(event);
+  },
+}));
+
 $(function() {
   RelatedTag.initialize_all();
 });

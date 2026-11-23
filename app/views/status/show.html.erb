@@ -119,14 +119,14 @@
       Browser <span><span class="chip-green text-success text-sm">Ok</span></span>
     </h2>
 
-    <details x-data="{ metadata: {} }" x-init="metadata = await Danbooru.Device.flatMetadata()">
+    <details x-data="browserMetadata">
       <summary x-text="metadata['browser.userAgent']"></summary>
 
       <table class="striped aligned-vertical table-sm">
-        <template x-for="[key, value] in Object.entries(metadata)">
+        <template x-for="[key, value] in entries">
           <tr>
             <th x-text="key"></th>
-            <td x-text="value ?? 'undefined'"></td>
+            <td x-text="value"></td>
           </tr>
         </template>
       </table>

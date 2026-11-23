@@ -93,6 +93,13 @@ class DtextEditorChromeTest < ChromeSystemTestCase
         assert_selector "input[placeholder='Paste image URL']:focus"
       end
 
+      should "close the emoji menu when Escape is pressed in the emoji search box" do
+        find(".new-comment a[title='Insert emoji']").click
+        find(".emoji-search:focus").send_keys(:escape)
+
+        assert_no_selector ".emoji-search", visible: :visible
+      end
+
       should "filter the emoji menu by the search term, and insert the clicked emoji" do
         stub_const(DText, :DEFAULT_EMOJI_MAP, { "smile" => "😄", "Smirk" => "😏", "heart" => "❤️" }) do
           visit post_path(@post)

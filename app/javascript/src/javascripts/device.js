@@ -1,4 +1,5 @@
 import { find as lodashFind, memoize } from "lodash";
+import Alpine from "alpinejs";
 
 // Collects information about the user's browser and computer. Used for detecting bots and ban evaders.
 export default class Device {
@@ -204,6 +205,20 @@ export default class Device {
     return this.canvas?.getContext?.("webgl");
   }
 }
+
+// The table of browser metadata on the /status page.
+Alpine.data("browserMetadata", () => ({
+  metadata: {},
+
+  async init() {
+    this.metadata = await Device.flatMetadata();
+  },
+
+  // @returns {Array<[String, String]>} The metadata as a list of [name, value] pairs.
+  get entries() {
+    return Object.entries(this.metadata).map(([name, value]) => [name, value ?? "undefined"]);
+  },
+}));
 
 Device.frameRate = memoize(Device.frameRate);
 Device.userAgentData = memoize(Device.userAgentData);

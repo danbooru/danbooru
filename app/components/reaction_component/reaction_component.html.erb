@@ -7,7 +7,7 @@
 
       <% menu.with_item do %>
         <div>
-          <input type="text" placeholder="Search emoji..." class="reaction-search w-full mb-2" data-autofocus x-model="search" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
+          <input type="text" placeholder="Search emoji..." class="reaction-search w-full mb-2" data-autofocus x-model="search">
 
           <div class="max-w-full grid grid-cols-10 gap-1">
             <% Reaction::REACTIONS.each do |id, (name, url)| %>

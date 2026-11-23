@@ -113,7 +113,7 @@
 
           <% menu.with_item do %>
             <div>
-              <input type="text" placeholder="Search emoji..." class="emoji-search w-full mb-2" data-autofocus x-model="editor.emojiSearch" x-on:keyup.escape="Danbooru.Shortcuts.hide_tooltips()">
+              <input type="text" placeholder="Search emoji..." class="emoji-search w-full mb-2" data-autofocus x-model="editor.emojiSearch">
 
               <div class="h-225px w-320px thin-scrollbar prose">
                 <% DText::DEFAULT_EMOJI_MAP.each do |name, value| %>

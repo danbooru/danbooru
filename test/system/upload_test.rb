@@ -68,6 +68,19 @@ class UploadsChromeTest < ChromeSystemTestCase
         within_window(window) { assert_current_path posts_path(tags: "1girl") }
       end
 
+      should "collapse and expand the related tags when the header is clicked" do
+        create_list(:post, 2, tag_string: "1girl solo")
+        fill_in "post_tag_string", with: "1girl"
+        find(".related-tags-current-tag").click
+        assert_visible ".general-related-tags-column .related-tags-body"
+
+        find(".general-related-tags-column .related-tags-header").click
+        assert_hidden ".general-related-tags-column .related-tags-body"
+
+        find(".general-related-tags-column .related-tags-header").click
+        assert_visible ".general-related-tags-column .related-tags-body"
+      end
+
       should "not follow the related tags header link when clicked" do
         fill_in "post_tag_string", with: "1girl"
         assert_selector ".related-tags-current-tag[href='/posts?tags=1girl']"
