@@ -49,6 +49,13 @@ class Blacklist {
     return this.visibleRules.some(rule => rule.enabled) && !this.visibleRules.every(rule => rule.enabled);
   }
 
+  // Show the "Blacklisted" checkbox as partially checked when some but not all rules are enabled.
+  //
+  // @param {HTMLInputElement} checkbox - The checkbox to update.
+  updateIndeterminate(checkbox) {
+    checkbox.indeterminate = this.partiallyEnabled;
+  }
+
   get showAll() {
     return this._showAll;
   }
