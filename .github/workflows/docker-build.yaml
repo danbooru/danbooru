@@ -148,11 +148,19 @@ jobs:
             [worker.oci]
             max-parallelism = 4
 
+      # Build from a shallow checkout instead of letting BuildKit fetch the repo itself and grab every tag in the repo.
+      - name: Checkout
+        if: steps.existing.outputs.exists != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       # https://github.com/docker/build-push-action
       - name: Build image
         if: steps.existing.outputs.exists != 'true'
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
+          context: .
           push: true
           target: ${{ inputs.docker-target }}
           tags: ${{ steps.metadata.outputs.tags }}
