@@ -358,7 +358,7 @@ COPY --link config/webpack/ ./config/webpack/
 COPY --link public/images ./public/images
 COPY --link public/logos ./public/logos
 COPY --link public/fonts ./public/fonts
-COPY --link app/components/ ./app/components
+COPY --link --exclude=**/*.rb --exclude=**/*.erb app/components/ ./app/components
 COPY --link app/javascript/ ./app/javascript
 
 RUN RAILS_ENV=production NODE_ENV=production npx webpack --mode production -c config/webpack/webpack.config.js
