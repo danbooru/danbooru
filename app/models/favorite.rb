@@ -27,6 +27,6 @@ class Favorite < ApplicationRecord
 
   def unvote_post_on_destroy
     vote = PostVote.active.positive.find_by(post: post, user: user)
-    vote&.soft_delete!(updater: user)
+    vote&.locked_update(is_deleted: true, updater: user)
   end
 end

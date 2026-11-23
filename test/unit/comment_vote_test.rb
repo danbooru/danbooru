@@ -72,6 +72,20 @@ class CommentVoteTest < ActiveSupport::TestCase
           assert_equal(true, vote.is_deleted?)
         end
       end
+
+      context "the same vote more than once" do
+        should "not change the score more than once" do
+          vote1 = create(:comment_vote, comment: @comment, score: 1)
+          vote2 = CommentVote.find(vote1.id)
+
+          assert_equal(1, @comment.reload.score)
+
+          vote1.locked_update(is_deleted: true, updater: vote1.user)
+          vote2.locked_update(is_deleted: true, updater: vote2.user)
+
+          assert_equal(0, @comment.reload.score)
+        end
+      end
     end
   end
 end

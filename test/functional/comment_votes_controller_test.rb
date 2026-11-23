@@ -215,6 +215,20 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
+      should "not subtract the score twice when deleting the same vote concurrently" do
+        vote = create(:comment_vote, comment: @comment, user: @user, score: 1)
+        stale_vote = CommentVote.find(vote.id)
+
+        delete_auth comment_vote_path(vote), @user, xhr: true
+        assert_response :success
+        assert_equal(0, @comment.reload.score)
+
+        CommentVote.stubs(:find).with(vote.id.to_s).returns(stale_vote)
+        delete_auth comment_vote_path(vote), @user, xhr: true
+        assert_response :success
+        assert_equal(0, @comment.reload.score)
+      end
+
       should "allow admins to remove comment votes by other users" do
         @vote = create(:comment_vote)
         assert_equal(1, @vote.comment.score)

@@ -40,7 +40,7 @@ class CommentVotesController < ApplicationController
 
   def destroy
     @comment_vote = authorize CommentVote.find(params[:id])
-    @comment_vote.soft_delete(updater: CurrentUser.user)
+    @comment_vote.locked_update(is_deleted: true, updater: CurrentUser.user)
 
     respond_with(@comment_vote)
   end

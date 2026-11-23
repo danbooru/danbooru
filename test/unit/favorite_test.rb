@@ -43,6 +43,26 @@ class FavoriteTest < ActiveSupport::TestCase
         assert_equal(false, PostVote.active.positive.exists?(post: @p1, user: @user))
         assert_equal(true, PostVote.deleted.positive.exists?(post: @p1, user: @user))
       end
+
+      should "not subtract the upvote twice if the vote was deleted concurrently" do
+        @user = create(:gold_user)
+        favorite = Favorite.create!(post: @p1, user: @user)
+        vote = PostVote.find_by!(post: @p1, user: @user)
+        stale_vote = PostVote.find(vote.id)
+
+        assert_equal(1, @p1.reload.score)
+        assert_equal(1, @p1.up_score)
+
+        vote.locked_update(is_deleted: true, updater: @user)
+        assert_equal(0, @p1.reload.score)
+        assert_equal(0, @p1.up_score)
+
+        PostVote.stubs(:active).returns(stub(positive: stub(find_by: stale_vote)))
+        favorite.destroy!
+
+        assert_equal(0, @p1.reload.score)
+        assert_equal(0, @p1.up_score)
+      end
     end
 
     context "adding a favorite" do
