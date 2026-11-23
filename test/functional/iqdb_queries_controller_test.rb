@@ -23,7 +23,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
           post_auth iqdb_queries_path, @user, params: { search: { file: file }}
 
           assert_response :success
-          assert_includes(response.body, "The file couldn&#39;t be processed")
+          assert_select "#notice", text: /The file couldn't be processed/
           assert_nothing_raised { Danbooru.config.storage_manager.open("/trash/quarantine/ecef68c44edb8a0d6a3070b5f8e8ee76.jpg") }
         end
       end
