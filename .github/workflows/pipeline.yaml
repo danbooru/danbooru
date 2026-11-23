@@ -1,6 +1,6 @@
 # This pipeline aggregates all CI/CD for this repo.
-# On every commit, build and push the Docker images to the GitHub Container registry
-# and to DockerHub (if configured), then run the tests, and tag or deploy depending on the branch.
+# On every commit, build and push the Docker images to the GitHub Container registry,
+# then run the tests, and tag or deploy depending on the branch.
 #
 # The resulting Docker images are tagged with the full commit hash, the git
 # branch name, the git tag, and the 'latest' tag for the latest commit to

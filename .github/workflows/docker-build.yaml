@@ -12,7 +12,6 @@
 # https://docs.github.com/en/actions/sharing-automations/reusing-workflows
 # https://docs.docker.com/reference/cli/docker/buildx/imagetools/inspect/
 # https://docs.docker.com/reference/cli/docker/buildx/imagetools/create/
-# https://docs.docker.com/build/ci/github-actions/copy-image-registries/
 
 name: Docker Build
 
@@ -56,27 +55,18 @@ jobs:
     timeout-minutes: 60
     env:
       GHCR_IMAGE: ghcr.io/${{ github.repository }}
-      DOCKERIO_IMAGE: ${{ (secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '') && 'docker.io/evazion/danbooru' || '' }}
       # A separate package for the build cache, so it's not published under the same package as real images.
       GHCR_BUILDCACHE_IMAGE: ghcr.io/${{ github.repository }}-buildcache
       TAG_PREFIX: ${{ inputs.docker-target == 'development' && 'development-' || '' }}
       CACHE_TAG: ${{ inputs.docker-target == 'development' && 'buildcache-development' || 'buildcache' }}
     steps:
       # https://github.com/docker/login-action
-      # https://github.com/docker/build-push-action/blob/master/docs/advanced/push-multi-registries.md
       - name: Login to Github Container Registry
         uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
-
-      - name: Login to DockerHub
-        if: env.DOCKERIO_IMAGE != ''
-        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Generate Docker tags from the commit and the branch.
       # https://github.com/docker/metadata-action
@@ -86,7 +76,6 @@ jobs:
         with:
           images: |
             ${{ env.GHCR_IMAGE }}
-            ${{ env.DOCKERIO_IMAGE }}
           tags: |
             type=sha,format=long,prefix=${{ env.TAG_PREFIX }}
             type=ref,event=branch,prefix=${{ env.TAG_PREFIX }}
