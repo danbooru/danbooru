@@ -114,8 +114,16 @@ class PumaTest < ActiveSupport::TestCase
       spawn_server(RACK_QUERY_PARSER_PARAMS_LIMIT: 2) do |uri|
         assert_equal(200, request_status(:post, uri, json: { a: 1, b: 2 }))
         assert_equal(400, request_status(:post, uri, json: { a: 1, b: 2, c: 3 }))
-        assert_equal(200, request_status(:post, uri, json: { a: { b: 1, c: 2 }, d: 3 }))
-        assert_equal(400, request_status(:post, uri, json: { a: { b: 1 }, c: 2, d: 3 }))
+        assert_equal(200, request_status(:post, uri, json: { a: { b: 1 }}))
+        assert_equal(400, request_status(:post, uri, json: { a: { b: 1, c: 2 }}))
+        assert_equal(400, request_status(:post, uri, json: { a: { b: 1 }, c: 2 }))
+        assert_equal(200, request_status(:post, uri, json: { a: [1] }))
+        assert_equal(400, request_status(:post, uri, json: { a: [1, 2] }))
+        assert_equal(200, request_status(:post, uri, json: [1, 2]))
+        assert_equal(400, request_status(:post, uri, json: [1, 2, 3]))
+        assert_equal(200, request_status(:post, uri, json: [[], []]))
+        assert_equal(400, request_status(:post, uri, json: [[], [], []]))
+        assert_equal(400, request_status(:post, uri, json: { a: [1, 2], b: false }))
       end
     end
 

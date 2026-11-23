@@ -12,13 +12,29 @@ def parse_json(request_body)
   end
 
   data = ActiveSupport::JSON.decode(request_body, max_nesting: Rack::Utils.param_depth_limit)
-  count = data.is_a?(Hash) ? data.size : 1
-
-  if count > param_limit
-    raise Rack::QueryParser::QueryLimitError, "total number of parameters (#{count}) exceeds limit (#{param_limit})"
-  end
+  count_json_params(data, limit: param_limit)
 
   data.is_a?(Hash) ? data : { _json: data }
+end
+
+# Recursively counts all hash keys and array elements in parsed JSON, raising once the limit is exceeded.
+#
+# @param value [Object] The parsed JSON value
+# @param limit [Integer] Maximum total number of keys and elements allowed
+# @param count [Integer] Running count of keys and elements seen so far
+# @return [Integer]
+def count_json_params(value, limit:, count: 0)
+  children = case value
+  when Hash then value.each_value
+  when Array then value.each
+  else return count
+  end
+
+  count += value.size
+  raise Rack::QueryParser::QueryLimitError, "total number of parameters exceeds limit (#{limit})" if count > limit
+
+  children.each { |item| count = count_json_params(item, limit: limit, count: count) }
+  count
 end
 
 ActionDispatch::Request.parameter_parsers = ActionDispatch::Request.parameter_parsers.merge(json: method(:parse_json))
