@@ -24,7 +24,7 @@ class BulkUpdateRequest::Command::CreateImplication < BulkUpdateRequest::Command
   end
 
   def validate(context:, errors:, **)
-    tag_implication = TagImplication.new(creator: User.system, antecedent_name: @antecedent, consequent_name: @consequent, status: "active")
+    tag_implication = TagImplication.new(id: self.class.next_simulated_id, creator: User.system, antecedent_name: @antecedent, consequent_name: @consequent, status: "active")
     tag_implication.save(context: context)
     if tag_implication.errors.present?
       errors.add(:base, "Can't create implication [[#{tag_implication.antecedent_name}]] -> [[#{tag_implication.consequent_name}]] (#{tag_implication.errors.full_messages.join("; ")})")

@@ -81,18 +81,25 @@ class ConvertCommandTest < ActiveSupport::TestCase
         )
       end
 
-      should "refuse to convert to a tag with a category prefix" do
+      should "allow converting to a tag with a category prefix" do
         @pool = create(:pool, name: "cute_pool", description: "asd")
         @favgroup = create(:favorite_group)
 
-        assert_invalid_bur(
-          script: "convert pool:cute_pool -> copy:cute_series",
-          errors: ["Can't convert {{pool:cute_pool}} -> [[copy:cute_series]] (change the category in a separate line)"],
-        )
-        assert_invalid_bur(
-          script: "convert favgroup:#{@favgroup.id} -> copy:cute_series",
-          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[copy:cute_series]] (change the category in a separate line)"],
-        )
+        pool_bur = create(:bulk_update_request, script: "convert pool:cute_pool -> COPY:Cute_Series")
+        favgroup_bur = create(:bulk_update_request, script: "convert favgroup:#{@favgroup.id} -> meta:cute_tag")
+
+        assert_equal("convert {{pool:cute_pool}} -> [[cute_series|copyright:cute_series]]", pool_bur.processor.to_dtext)
+        assert_equal(["cute_series"], pool_bur.tags)
+        assert_equal("convert {{favgroup:#{@favgroup.id}}} -> [[cute_tag|meta:cute_tag]]", favgroup_bur.processor.to_dtext)
+        assert_equal(["cute_tag"], favgroup_bur.tags)
+      end
+
+      should "refuse malformed or invalid tags with a category prefix" do
+        @pool = create(:pool, name: "cute_pool", description: "asd")
+        @favgroup = create(:favorite_group)
+        create(:tag, name: "old_tag", is_deprecated: true)
+        create(:artist, name: "some_artist")
+
         assert_invalid_bur(
           script: "convert favgroup:#{@favgroup.id} -> (copy:cute_series)",
           errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> {{(copy:cute_series)}} (must convert a pool or favgroup to a tag)"],
@@ -112,6 +119,34 @@ class ConvertCommandTest < ActiveSupport::TestCase
         assert_invalid_bur(
           script: "convert favgroup:#{@favgroup.id} -> ~cute",
           errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[~cute]] ('~cute' cannot begin with a '~')"],
+        )
+        assert_invalid_bur(
+          script: "convert pool:cute_pool -> meta:",
+          errors: ["Can't convert {{pool:cute_pool}} -> {{meta:}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert pool:cute_pool -> meta:foo bar",
+          errors: ["Can't convert {{pool:cute_pool}} -> {{meta:foo bar}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: 'convert pool:cute_pool -> meta:"foo',
+          errors: ['Can\'t convert {{pool:cute_pool}} -> {{meta:"foo}} (must convert a pool or favgroup to a tag)'],
+        )
+        assert_invalid_bur(
+          script: "convert pool:cute_pool -> meta:pool:cute_pool",
+          errors: ["Can't convert {{pool:cute_pool}} -> {{meta:pool:cute_pool}} (must convert a pool or favgroup to a tag)"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> meta:foo,bar",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[foo,bar|meta:foo,bar]] ('foo,bar' cannot contain commas (','))"],
+        )
+        assert_invalid_bur(
+          script: "convert favgroup:#{@favgroup.id} -> meta:old_tag",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[old_tag|meta:old_tag]] ([[old_tag]] is deprecated)"],
+        )
+        assert_invalid_bur(
+          script: "convert pool:cute_pool -> meta:some_artist",
+          errors: ["Can't convert {{pool:cute_pool}} -> [[some_artist|meta:some_artist]] ([[some_artist]] has an artist entry)"],
         )
       end
 
@@ -185,6 +220,91 @@ class ConvertCommandTest < ActiveSupport::TestCase
         assert_equal(description, @wiki.body)
         assert_equal("bar cute", @post.reload.tag_string)
         assert_equal("This pool has been moved to [[cute]].", @pool.description)
+      end
+
+      should "convert a pool to a new tag with a category prefix" do
+        description = "foo [[aaa]] bar"
+        @pool = create(:pool, name: "cute_pool", description: description)
+        @post = create(:post, tag_string: "bar pool:cute_pool")
+
+        @bur = create_bur!("convert pool:cute_pool -> meta:cute", @admin)
+
+        wiki = WikiPage.find_by_title("cute")
+        assert_equal(true, @pool.reload.is_deleted?)
+        assert_equal(description, wiki.body)
+        assert_nil(WikiPage.find_by_title("meta:cute"))
+        assert_equal("bar cute", @post.reload.tag_string)
+        assert_equal(true, Tag.find_by_name("cute").meta?)
+        assert_equal("This pool has been moved to [[cute]].", @pool.description)
+      end
+
+      should "convert a pool to an existing tag and change its category" do
+        @pool = create(:pool, name: "cute_pool", description: "asd")
+        @post = create(:post, tag_string: "bar pool:cute_pool")
+        @tag = create(:tag, name: "cute", category: Tag.categories.general)
+
+        @bur = create_bur!("convert pool:cute_pool -> meta:cute", @admin)
+
+        assert_equal(true, @pool.reload.is_deleted?)
+        assert_equal("bar cute", @post.reload.tag_string)
+        assert_equal(true, @tag.reload.meta?)
+        assert_equal("This pool has been moved to [[cute]].", @pool.description)
+      end
+
+      should "allow moderators to convert a favgroup to a tag with a category prefix" do
+        mod = create(:mod_user)
+        post = create(:post, tag_string: "bar")
+        favgroup = create(:favorite_group, post_ids: [post.id])
+
+        create_bur!("convert favgroup:#{favgroup.id} -> meta:cute", mod)
+
+        assert_equal("bar cute", post.reload.tag_string)
+        assert_equal(true, Tag.find_by_name("cute").meta?)
+        assert_equal([post.id], favgroup.reload.post_ids)
+      end
+
+      should "not allow moderators to change a large tag's category via favgroup conversion" do
+        mod = create(:mod_user)
+        post = create(:post, tag_string: "bar")
+        favgroup = create(:favorite_group, post_ids: [post.id])
+        large_tag = create(:tag, name: "large_tag", category: Tag.categories.general, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
+
+        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> meta:large_tag")
+        bur.approve!(mod)
+        assert_includes(bur.errors.full_messages, "Can't approve convert {{favgroup:#{favgroup.id}}} -> [[large_tag|meta:large_tag]] (requires Admin)")
+        assert_equal("pending", bur.reload.status)
+        assert_equal(true, large_tag.reload.general?)
+
+        bur.approve!(@admin)
+        assert_equal("processing", bur.reload.status)
+      end
+
+      should "allow moderators to convert a favgroup to a large tag already in that category" do
+        mod = create(:mod_user)
+        post = create(:post, tag_string: "bar")
+        favgroup = create(:favorite_group, post_ids: [post.id])
+        create(:tag, name: "large_meta", category: Tag.categories.meta, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
+
+        create_bur!("convert favgroup:#{favgroup.id} -> meta:large_meta", mod)
+
+        assert_equal("bar large_meta", post.reload.tag_string)
+      end
+
+      should "not allow moderators to alias a newly categorized tag from a favgroup conversion to a large general tag" do
+        mod = create(:mod_user)
+        post = create(:post, tag_string: "bar")
+        favgroup = create(:favorite_group, post_ids: [post.id])
+        large_tag = create(:tag, name: "large_general", category: Tag.categories.general, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
+
+        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> char:new_char\nalias new_char -> large_general")
+
+        %i[write write_multi delete delete_multi increment decrement].each { |method| Rails.cache.expects(method).never }
+        assert_no_enqueued_jobs { bur.approve!(mod) }
+
+        assert_includes(bur.errors.full_messages, "Can't approve create alias [[new_char]] -> [[large_general]] (requires Admin)")
+        assert_equal("pending", bur.reload.status)
+        assert_equal(true, large_tag.reload.general?)
+        assert_nil(Tag.find_by_name("new_char"))
       end
 
       should "allow moderators to convert a favgroup to a tag" do

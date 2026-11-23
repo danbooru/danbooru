@@ -27,7 +27,7 @@ class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
   end
 
   def validate(context:, errors:, approver:)
-    tag_alias = TagAlias.new(creator: User.system, antecedent_name: @old_name, consequent_name: @new_name)
+    tag_alias = TagAlias.new(id: self.class.next_simulated_id, creator: User.system, antecedent_name: @old_name, consequent_name: @new_name)
     tag_alias.save(context: context)
     if tag_alias.errors.present?
       errors.add(:base, "Can't create alias [[#{tag_alias.antecedent_name}]] -> [[#{tag_alias.consequent_name}]] (#{tag_alias.errors.full_messages.join("; ")})")

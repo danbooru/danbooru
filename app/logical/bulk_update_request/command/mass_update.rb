@@ -43,10 +43,9 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     rhs = PostQuery.normalize(@second_search, apply_aliases: false)
 
     lhs_link = lhs.is_simple_tag? ? "[[#{@first_search}]]" : "{{#{@first_search}}}"
-    category_term = tag_edit.tag_categorization_terms.first
 
     # Link `char:tag` to the tag's wiki, but keep the prefix in the text so it's clear the category is being changed.
-    if category_term&.value.present? && tag_edit.terms.one?
+    if (category_term = tag_edit.single_categorization_term)
       rhs_link = "[[#{category_term.value}|#{@second_search}]]"
     elsif rhs.is_simple_tag?
       rhs_link = "[[#{@second_search}]]"
@@ -90,7 +89,7 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     # Post edits look up pools by wildcard, so `pool:cute_*` would add posts to whichever pool matched first.
     tag_edit.metatag_terms.each do |metatag|
       if metatag.name.in?(%w[pool -pool]) && Pool.find_by_name(metatag.value.escape_wildcards).nil?
-        errors.add(:base, "Can't #{to_dtext} ({{#{metatag.name}:#{metatag.value}}} does not exist)")
+        errors.add(:base, "Can't #{to_dtext} ({{#{metatag}}} does not exist)")
       elsif metatag.name == "newpool" && metatag.value.include?("*")
         errors.add(:base, "Can't #{to_dtext} (pool names can't contain asterisks)")
       end
@@ -99,6 +98,25 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     # Changing the pool while searching it would make the next batch fail with "was modified after approval".
     if searched_pools.intersect?(edited_pools)
       errors.add(:base, "Can't #{to_dtext} (can't change the pool being searched; use convert instead to move a pool to a tag)")
+    end
+
+    if errors.empty?
+      tag_edit.tag_categorization_terms.each do |term|
+        self.class.simulate_category_change(term.value, term.category)
+      end
+    end
+  end
+
+  # Simulate a tag category change during BUR validation without callbacks, so nothing is written to the cache or
+  # enqueued as jobs before the validation transaction rolls back. Uses a negative ID so `tags_id_seq` isn't advanced.
+  def self.simulate_category_change(name, category)
+    return if name.blank? || category.nil?
+
+    tag = Tag.find_by_name(name)
+    if tag.present?
+      tag.update_column(:category, category) # rubocop:disable Rails/SkipsModelValidations
+    elsif Tag.new(name: name).valid?(:name)
+      Tag.insert({ id: next_simulated_id, name: name, category: category, created_at: Time.zone.now, updated_at: Time.zone.now }) # rubocop:disable Rails/SkipsModelValidations
     end
   end
 

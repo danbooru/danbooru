@@ -17,6 +17,18 @@ class CreateImplicationCommandTest < ActiveSupport::TestCase
         assert_equal(true, @bur.valid?)
       end
 
+      should "not advance tag_implications_id_seq during validation" do
+        create(:tag_implication, antecedent_name: "existing_a", consequent_name: "existing_b")
+        create(:tag, name: "aaa", post_count: 0)
+        create(:tag, name: "bbb", post_count: 0)
+        create(:tag, name: "ccc", post_count: 0)
+        seq_before = TagImplication.connection.select_value("SELECT last_value FROM tag_implications_id_seq")
+
+        bur = build(:bulk_update_request, script: "imply aaa -> bbb\nimply bbb -> ccc")
+        assert_equal(true, bur.valid?, bur.errors.full_messages.join(", "))
+        assert_equal(seq_before, TagImplication.connection.select_value("SELECT last_value FROM tag_implications_id_seq"))
+      end
+
       should "fail for a populated tag without a wiki" do
         create(:tag, name: "a", post_count: 10)
         create(:tag, name: "b", post_count: 100)
