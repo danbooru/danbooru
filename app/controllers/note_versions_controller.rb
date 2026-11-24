@@ -5,7 +5,7 @@ class NoteVersionsController < ApplicationController
 
   def index
     set_version_comparison
-    @note_versions = authorize NoteVersion.paginated_search(params)
+    @note_versions = authorize NoteVersion.paginated_search(params, max_limit: request.format.html? ? 200 : 1_000)
     @note_versions = @note_versions.includes(:updater) if request.format.html?
 
     respond_with(@note_versions)

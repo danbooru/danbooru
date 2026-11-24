@@ -34,6 +34,18 @@ class NoteVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not return more than 200 versions per page in HTML, or 1000 in the API" do
+        NoteVersion.insert_all(Array.new(200) { { note_id: @note.id, post_id: @note.post_id, updater_id: @user.id, x: 0, y: 0, width: 1, height: 1, body: "foo", created_at: Time.zone.now, updated_at: Time.zone.now } }) # rubocop:disable Rails/SkipsModelValidations
+
+        get note_versions_path(limit: 1000), as: :json
+        assert_response :success
+        assert_equal(NoteVersion.count, response.parsed_body.size)
+
+        get note_versions_path(limit: 1000)
+        assert_response :success
+        assert_select "tr[id^=note-version-]", count: 200
+      end
+
       should respond_to_search.with { @versions.reverse }
       should respond_to_search(body_matches: "blah").with { @versions[1] }
       should respond_to_search(version: 1).with { @versions[0] }
