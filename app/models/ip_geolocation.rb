@@ -3,6 +3,8 @@
 # An IpGeolocation contains metadata associated with an IP address, primarily geolocation data.
 
 class IpGeolocation < ApplicationRecord
+  self.ignored_columns += %i[provider ip_type operator checked_at response]
+
   attribute :ip_addr, :ip_address
   attribute :network, :ip_address
 
