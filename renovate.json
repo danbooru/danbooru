@@ -109,6 +109,15 @@
         "redis"
       ],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Renovate can't update the checksums of the source downloads in the Dockerfile, so remind reviewers to update them by hand.",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "prBodyNotes": [
+        "> [!WARNING]\n> Update the `*_SHA256` checksum for this version in the Dockerfile before merging. The Docker build will fail until it's updated. See the comment above the version ARGs in the Dockerfile."
+      ]
     }
   ]
 }

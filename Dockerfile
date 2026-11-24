@@ -42,19 +42,30 @@
 # These versions are used by bin/danbooru-dev-entrypoint to detect whether the current installed docker containers are outdated
 ARG RUBY_VERSION="4.0.10"
 ARG RUBY_MAJOR_VERSION="4.0"
+ARG RUBY_SHA256="b53eef3371fa5d3e3b74340edcd015f06d5d8853968d4e539a5264fce41ed9f1"
 
 # The comments above these ARGs help renovate figure out where to check for new versions of these dependencies.
+#
+# Update the *_SHA256 checksums of the downloads when you update the versions, or else the build will fail. Use the
+# checksums the project publishes when it has them (Ruby, libvips, and Node do), or `curl -fsSL <url> | sha256sum`.
 # github: mozilla/mozjpeg
 ARG MOZJPEG_VERSION="4.1.5"
+ARG MOZJPEG_SHA256="9fcbb7171f6ac383f5b391175d6fb3acde5e64c4c4727274eade84ed0998fcc1"
 # github: libvips/libvips
 ARG VIPS_VERSION="8.18.7"
+ARG VIPS_SHA256="5baaead3b0bb20ffdb9e9ff09aa9fda08620923df77b63b436654cb5e0b3bf94"
 # github: FFmpeg/FFmpeg
 ARG FFMPEG_VERSION="9.0.2"
+ARG FFMPEG_SHA256="6e374ed621e48faa40639307dff48ba6fe574a509977956d2cce9669b7cc27e9"
 # github: exiftool/exiftool
 ARG EXIFTOOL_VERSION="13.55"
+ARG EXIFTOOL_SHA256="5c9d422ad128fab728aacc5cc0aa77095d14cde74931389dd961d3d720e6b316"
 # github: openresty/openresty
 ARG OPENRESTY_VERSION="1.29.2.3"
+ARG OPENRESTY_SHA256="315e49fa4568747fec4bdada9614d2ba287e7aed4b3430d7ea25685e24cc43ff"
 ARG NODE_VERSION="26.13.0"
+ARG NODE_SHA256_AMD64="d28a96af6c38596f6d9d97c0ee531c13d238d757742387d1928de822d959e997"
+ARG NODE_SHA256_ARM64="406fe3fbde1c054adff8b297c16fdb5af6659db327c1ac8acd46b56ef1af9a92"
 ARG UBUNTU_VERSION="resolute-20261105.1@sha256:d66b366dac61b575bee2aef07e9c26e8070096fbe84a3d4d3eb0da069b5d76db"
 # Remember to update the UBUNTU_SNAPSHOT ARG below when UBUNTU_VERSION is updated
 ARG UBUNTU_SNAPSHOT="20261105T000000Z"
@@ -134,10 +145,13 @@ FROM build-base AS build-ruby
 ARG JOBS
 ARG RUBY_VERSION
 ARG RUBY_MAJOR_VERSION
+ARG RUBY_SHA256
 ARG RUBY_BUILD_DEPS="rustc libssl-dev libgmp-dev libyaml-dev libffi-dev libreadline-dev zlib1g-dev"
 RUN <<EOS
   apt-get install -y --no-install-recommends $RUBY_BUILD_DEPS
-  curl -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR_VERSION}/ruby-${RUBY_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
+  curl -fsSL -o ruby.tar.gz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR_VERSION}/ruby-${RUBY_VERSION}.tar.gz"
+  echo "${RUBY_SHA256}  ruby.tar.gz" | sha256sum -c
+  tar --strip-components=1 -xzvf ruby.tar.gz
 
   ./configure --enable-yjit --enable-shared --disable-install-doc
   make -j$JOBS install
@@ -155,10 +169,13 @@ EOS
 FROM build-base AS build-mozjpeg
 ARG JOBS
 ARG MOZJPEG_VERSION
+ARG MOZJPEG_SHA256
 ARG MOZJPEG_BUILD_DEPS="cmake nasm libpng-dev zlib1g-dev"
 RUN <<EOS
   apt-get install -y --no-install-recommends $MOZJPEG_BUILD_DEPS
-  curl -L "https://github.com/mozilla/mozjpeg/archive/refs/tags/v${MOZJPEG_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
+  curl -fsSL -o mozjpeg.tar.gz "https://github.com/mozilla/mozjpeg/archive/refs/tags/v${MOZJPEG_VERSION}.tar.gz"
+  echo "${MOZJPEG_SHA256}  mozjpeg.tar.gz" | sha256sum -c
+  tar --strip-components=1 -xzvf mozjpeg.tar.gz
 
   cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_STATIC=0 -DWITH_ARITH_ENC=1 -DWITH_ARITH_DEC=1 .
   make -j$JOBS install/strip
@@ -173,10 +190,13 @@ EOS
 # Build libvips. Output is in /usr/local.
 FROM build-mozjpeg AS build-vips
 ARG VIPS_VERSION
+ARG VIPS_SHA256
 ARG VIPS_BUILD_DEPS="meson libgirepository1.0-dev libfftw3-dev libwebp-dev liborc-dev liblcms2-dev libpng-dev libexpat1-dev libglib2.0-dev libgif-dev libexif-dev libheif-dev"
 RUN <<EOS
   apt-get install -y --no-install-recommends $VIPS_BUILD_DEPS
-  curl -L "https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz" | tar --strip-components=1 -xJvf -
+  curl -fsSL -o vips.tar.xz "https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz"
+  echo "${VIPS_SHA256}  vips.tar.xz" | sha256sum -c
+  tar --strip-components=1 -xJvf vips.tar.xz
 
   meson setup build --prefix /usr/local --buildtype release --strip -Dcplusplus=false
   meson compile -C build
@@ -194,6 +214,7 @@ EOS
 FROM build-base AS build-ffmpeg
 ARG JOBS
 ARG FFMPEG_VERSION
+ARG FFMPEG_SHA256
 ARG FFMPEG_BUILD_DEPS="nasm libx264-dev libx265-dev libsvtav1enc-dev libvpx-dev libdav1d-dev zlib1g-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
   --disable-ffplay --disable-network --disable-doc --disable-static --enable-shared --enable-gpl \
@@ -222,7 +243,9 @@ ARG FFMPEG_BUILD_OPTIONS="\
 
 RUN <<EOS
   apt-get install -y --no-install-recommends $FFMPEG_BUILD_DEPS
-  curl -L "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${FFMPEG_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
+  curl -fsSL -o ffmpeg.tar.gz "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${FFMPEG_VERSION}.tar.gz"
+  echo "${FFMPEG_SHA256}  ffmpeg.tar.gz" | sha256sum -c
+  tar --strip-components=1 -xzvf ffmpeg.tar.gz
 
   ./configure $FFMPEG_BUILD_OPTIONS
   make -j$JOBS install
@@ -240,10 +263,13 @@ EOS
 FROM build-base AS build-exiftool
 ARG JOBS
 ARG EXIFTOOL_VERSION
+ARG EXIFTOOL_SHA256
 ARG EXIFTOOL_BUILD_DEPS="perl perl-modules-5.40 libarchive-zip-perl"
 RUN <<EOS
   apt-get install -y --no-install-recommends $EXIFTOOL_BUILD_DEPS
-  curl -L "https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
+  curl -fsSL -o exiftool.tar.gz "https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz"
+  echo "${EXIFTOOL_SHA256}  exiftool.tar.gz" | sha256sum -c
+  tar --strip-components=1 -xzvf exiftool.tar.gz
 
   perl Makefile.PL
   make -j$JOBS install
@@ -262,6 +288,7 @@ EOS
 FROM build-base AS build-openresty
 ARG JOBS
 ARG OPENRESTY_VERSION
+ARG OPENRESTY_SHA256
 ARG OPENRESTY_BUILD_DEPS="libssl-dev libpcre2-dev zlib1g-dev"
 ARG OPENRESTY_BUILD_OPTIONS="\
  --with-threads --with-compat --with-pcre-jit --with-file-aio \
@@ -272,7 +299,9 @@ ARG OPENRESTY_BUILD_OPTIONS="\
 
 RUN <<EOS
   apt-get install -y --no-install-recommends $OPENRESTY_BUILD_DEPS
-  curl -L "https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz" | tar --strip-components=1 -xzvf -
+  curl -fsSL -o openresty.tar.gz "https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz"
+  echo "${OPENRESTY_SHA256}  openresty.tar.gz" | sha256sum -c
+  tar --strip-components=1 -xzvf openresty.tar.gz
 
   ./configure -j$JOBS --prefix=/usr/local $OPENRESTY_BUILD_OPTIONS
   make -j$JOBS install
@@ -288,17 +317,21 @@ EOS
 # Install NodeJS. Output is in /usr/local.
 FROM build-base AS build-node
 ARG NODE_VERSION
+ARG NODE_SHA256_AMD64
+ARG NODE_SHA256_ARM64
 ARG TARGETARCH
 RUN <<EOS
   apt-get install -y --no-install-recommends xz-utils
 
   case "$TARGETARCH" in
-    amd64) NODE_ARCH="x64" ;;
-    arm64) NODE_ARCH="arm64" ;;
+    amd64) NODE_ARCH="x64" NODE_SHA256="$NODE_SHA256_AMD64" ;;
+    arm64) NODE_ARCH="arm64" NODE_SHA256="$NODE_SHA256_ARM64" ;;
     *) echo "Unsupported architecture: $TARGETARCH" >&2; exit 1 ;;
   esac
 
-  curl -L "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" | tar --strip-components=1 -xJvf -
+  curl -fsSL -o node.tar.xz "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz"
+  echo "${NODE_SHA256}  node.tar.xz" | sha256sum -c
+  tar --strip-components=1 -xJvf node.tar.xz
 
   cp -rdv ./bin /usr/local
   cp -rdv ./lib /usr/local
