@@ -15,12 +15,22 @@ module Danbooru
       self
     end
 
-    # Like `#map`, but in parallel.
+    # Like `#map`, but in parallel. If an item raises an error, the items that haven't started yet are skipped, and the
+    # error is raised after the items that already started finish.
     def parallel_map(executor = :io, &block)
       return enum_for(:parallel_map, executor) unless block_given?
 
+      failed = Concurrent::AtomicBoolean.new
+
       promises = map do |item|
-        Concurrent::Promises.future_on(executor, item, &block)
+        Concurrent::Promises.future_on(executor) do
+          next if failed.true?
+
+          yield(item)
+        rescue StandardError
+          failed.make_true
+          raise
+        end
       end
 
       Concurrent::Promises.zip_futures_on(executor, *promises).value!

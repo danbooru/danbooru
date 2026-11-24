@@ -65,6 +65,34 @@ class DanbooruEnumerableTest < ActiveSupport::TestCase
 
         assert(time < 1.second)
       end
+
+      should "not start any more items after an item fails" do
+        executor = Concurrent::ThreadPoolExecutor.new(max_threads: 2, max_queue: 0, synchronous: true, fallback_policy: :caller_runs)
+        started = Concurrent::AtomicFixnum.new
+
+        error = assert_raises(Concurrent::MultipleErrors) do
+          100.times.parallel_map(executor) do
+            started.increment
+            sleep(0.01)
+            raise ArgumentError, "failed"
+          end
+        end
+
+        assert_operator(started.value, :<=, 3)
+        assert_equal(started.value, error.errors.size)
+        assert(error.errors.all?(ArgumentError))
+      end
+
+      should "raise the error when only one item fails" do
+        error = assert_raises(ArgumentError) do
+          10.times.parallel_map do |i|
+            raise ArgumentError, "failed" if i == 0
+            i
+          end
+        end
+
+        assert_equal("failed", error.message)
+      end
     end
   end
 end
