@@ -335,6 +335,14 @@ RUN <<EOS
   find . -regextype egrep -regex '.*\.(o|a|c|h|hh|hpp|exe|java|md|po|log|out|gem|rdoc)$' -delete
   find . -regextype egrep -regex '^.*/(Change|CHANGE|NEWS|LICENSE|COPYING|LEGAL|AUTHORS|CONTRIBUTORS|THANK|README|INSTALL|NOTICE|TODO|.github).*$' -delete
   find . -type f -executable -exec strip --strip-unneeded {} \;
+
+  # Delete native extensions precompiled for other Ruby versions, e.g. gems/pg-1.7.0-x86_64-linux/lib/3.4/ when lib/4.0/ exists.
+  ruby -rfileutils -e '
+    version = RUBY_VERSION[/\A\d+\.\d+/]
+    Dir.glob("gems/*/lib{,/*}/#{version}").each do |dir|
+      FileUtils.rm_rf(Dir.glob("#{File.dirname(dir)}/[0-9].[0-9]") - [dir])
+    end
+  '
 EOS
 
 
