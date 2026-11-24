@@ -818,9 +818,12 @@ module Danbooru
       "1x0000000000000000000000000000000AA" if Rails.env.development? # A dummy key that always passes
     end
 
-    # API key for https://ipregistry.co. Used for looking up IP address
-    # information and for detecting proxies during signup.
-    def ip_registry_api_key
+    # The service used for looking up IP address information and for detecting proxies during signup, as a URL with
+    # the service's API key. Nil to disable IP lookups.
+    #
+    # "ipregistry://<key>" for https://ipregistry.co.
+    # "ipapi.is://<key>" for https://ipapi.is. Cheaper than IPRegistry, but it doesn't return carrier names.
+    def ip_intelligence_provider
       nil
     end
 

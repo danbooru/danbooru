@@ -8,7 +8,6 @@ module Danbooru
     attr_reader :ip_address
 
     delegate :ipv4?, :ipv6?, :loopback?, :link_local?, :private?, :prefix, to: :ip_address
-    delegate :ip_info, :is_proxy?, to: :ip_lookup
 
     def self.parse(string)
       new(string)
@@ -28,8 +27,24 @@ module Danbooru
       end
     end
 
-    def ip_lookup
-      @ip_lookup ||= IpLookup.new(self)
+    def ip_intelligence
+      @ip_intelligence ||= IpIntelligence.for(self)
+    end
+
+    # @return [Hash] The IP's geolocation and network information, or an empty hash if the IP is local, a Tor IP, or
+    #   couldn't be looked up.
+    def ip_info
+      return {} if is_local? || is_tor? || ip_intelligence.response.blank?
+
+      { ip_addr: to_s, **ip_intelligence.attributes, is_proxy: is_proxy? }.with_indifferent_access
+    end
+
+    # @return [Boolean] True if this is a proxy, VPN, Tor, or datacenter IP.
+    def is_proxy?
+      return true if is_tor?
+      return false if is_local?
+
+      ip_intelligence.response.present? && ip_intelligence.proxy?
     end
 
     # @return [Boolean] True if this is a non-publicly routable IP address. For IPv6, `private?` includes fc00::/7

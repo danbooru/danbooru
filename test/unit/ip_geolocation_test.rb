@@ -2,7 +2,7 @@ require "test_helper"
 
 class IpGeolocationTest < ActiveSupport::TestCase
   setup do
-    skip "IP Registry credentials not configured" unless IpLookup.enabled?
+    skip "IPRegistry credentials not configured" unless IpIntelligence.for("1.1.1.1").is_a?(IpIntelligence::IpRegistry)
   end
 
   context "IpGeolocation: " do
