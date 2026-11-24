@@ -112,6 +112,8 @@ module Source
       end
 
       memoize def video_data
+        return nil if video_page_url.blank?
+
         # flash files return {"error"=>{"code"=>404, "msg"=>"The submission you are looking for does not have a video."}}
         response = http.headers("X-Requested-With": "XMLHttpRequest").cache(1.minute).get(video_page_url, format: :json)
         update_credentials!(response)
