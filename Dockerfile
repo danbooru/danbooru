@@ -426,7 +426,10 @@ RUN <<EOS
   ln -s packs public/packs-test
   ln -s /tmp tmp
 
-  bundle exec bootsnap precompile --gemfile app test
+  # Fill the Bootsnap cache by booting the app, so it only contains files that are actually loaded. The development
+  # image reuses this cache, so boot the development and test environments too.
+  BOOTSNAP_READONLY=false bin/rails runner -e development 'Rails.application.eager_load!'
+  BOOTSNAP_READONLY=false bin/rails runner -e test 'Rails.application.eager_load!'
 
   # Test that everything works
   vips --version
@@ -437,7 +440,7 @@ RUN <<EOS
   exiftool -ver
   openresty -version
   bin/good_job --help > /dev/null
-  bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
+  BOOTSNAP_READONLY=false bin/rails runner -e production 'puts "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"'
 EOS
 
 ARG DOCKER_IMAGE_REVISION=""
