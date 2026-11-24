@@ -760,7 +760,7 @@ main := |*
     dstack_open_element(BLOCK_QUOTE, "<blockquote>");
   };
 
-  space* close_quote ws* => {
+  (ws | newline)* close_quote ws* => {
     dstack_close_until(BLOCK_QUOTE);
   };
 
@@ -769,7 +769,7 @@ main := |*
     dstack_open_element(BLOCK_SPOILER, "<div class=\"spoiler\">");
   };
 
-  space* (close_spoilers when in_spoiler) ws* => {
+  (ws | newline)* (close_spoilers when in_spoiler) ws* => {
     dstack_close_until(BLOCK_SPOILER);
   };
 
@@ -808,7 +808,7 @@ main := |*
     append_block("</summary><div>");
   };
 
-  space* close_expand ws* => {
+  (ws | newline)* close_expand ws* => {
     dstack_close_until(BLOCK_EXPAND);
   };
 

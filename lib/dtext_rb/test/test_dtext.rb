@@ -2256,6 +2256,17 @@ class DTextTest < Minitest::Test
     assert_inline_parse("a b", "a\fb")
   end
 
+  def test_control_whitespace_before_closing_tags
+    assert_parse("<blockquote><p>a</p><p> </p></blockquote><p>b</p>", "[quote]a\n\n\r[/quote]b")
+    assert_parse("<blockquote><p>a</p><p>  </p></blockquote><p>b</p>", "[quote]a\n\n\r [/quote]b")
+    assert_parse("<blockquote><p>a</p><p>  \t</p></blockquote><p>b</p>", "[quote]a\n\n \r\t[/quote]b")
+    assert_parse("<blockquote><p>a </p></blockquote><p>b</p>", "[quote]a\r[/quote]b")
+    assert_parse("<div class=\"spoiler\"><p>a</p><p> </p></div><p>b</p>", "[spoiler]a\n\n\r[/spoiler]b")
+    assert_parse("<details><summary>Show</summary><div><p>a</p><p>  </p></div></details><p>b</p>", "[expand]a\n\n\r [/expand]b")
+    assert_parse("<blockquote></blockquote>", "[quote]\r[/quote]")
+    assert_parse("<blockquote><p>a</p><p>  </p></blockquote>", "[quote]a\n\n\r \n[/quote]")
+  end
+
   def test_long_whitespace_runs
     assert_fast_parse("a#{" " * 100_000}b")
     assert_fast_parse("a#{"\t" * 100_000}b")
@@ -2269,6 +2280,8 @@ class DTextTest < Minitest::Test
     assert_fast_parse("[table][tr][td]a#{" " * 100_000}b")
     assert_fast_parse("a #{"\n" * 1_000}" * 100)
     assert_fast_parse("a#{" \n" * 50_000}b")
+    assert_fast_parse("a#{"\n\n\r\r\r" * 30_000}b")
+    assert_fast_parse("[quote]a#{"\n\n\r\r\r" * 30_000}b")
   end
 
   def test_many_unclosed_bbcode_links
