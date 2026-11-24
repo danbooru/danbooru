@@ -108,8 +108,9 @@ EOF
 
   apt-get purge -y --allow-remove-essential pkg-config e2fsprogs mount procps python3 tzdata
   apt-get autoremove -y
-  rm -rf /etc/gnutls/config /var/{lib,cache,log} /usr/share/{doc,info}/* /usr/local/*
-  mkdir -p /var/{lib,cache,log}/apt /var/lib/dpkg
+  # Keep /var/lib/dpkg, so that apt-get install in later stages doesn't reinstall packages that are already installed.
+  rm -rf /etc/gnutls/config /var/lib/apt/lists/* /var/lib/dpkg/*-old /var/{cache,log} /usr/share/{doc,info}/* /usr/local/*
+  mkdir -p /var/{cache,log}/apt
   ln -sf /dev/null /var/log/alternatives.log
 
   busybox --install -s
@@ -454,6 +455,7 @@ FROM runtime-base AS development-base
 RUN <<EOS
   apt-get update
   apt-get install -y --no-install-recommends g++ make ragel git sudo gpg socat libyaml-dev libpq-dev gh ripgrep openssh-client strace gdb
+  rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
   groupadd admin -U danbooru
   passwd -d danbooru

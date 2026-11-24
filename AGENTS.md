@@ -27,7 +27,7 @@ This file provides guidance for coding agents working in this repository. It's m
 - Use Ruby scripts instead of Python or Bash when possible. Ruby is the language used by this codebase.
 - Prefer `rg` over `grep`. `rg` is faster.
 - Do not try to run `rm` with insecure variables or paths: it'll be blocked by the command evaluator.
-- Use `sudo apt-get` if you need to install a new package in the devcontainer.
+- Use `sudo apt-get install --update <package>` if you need to install a new package in the devcontainer.
 - Use the debugger instead of guessing at the source of a problem.
 - Don't remove tests if the test is failing and you can't fix it.
 - Place temporary files in `/tmp`. Delete them when you're done.
