@@ -29,6 +29,17 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
     end
+
+    should "return 404 for an unknown sitemap" do
+      get sitemap_path(sitemap: "comments"), as: :xml
+      assert_response 404
+
+      get sitemap_path, as: :xml
+      assert_response 404
+
+      get sitemap_path(sitemap: ["posts"]), as: :xml
+      assert_response 404
+    end
   end
 
   context "dtext_help action" do

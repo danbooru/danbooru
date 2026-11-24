@@ -68,7 +68,7 @@ class StaticController < ApplicationController
       @relation = WikiPage.undeleted
       @search = { is_deleted: "false" }
     else
-      raise NotImplementedError
+      raise ActiveRecord::RecordNotFound, "Sitemap not found"
     end
   end
 end
