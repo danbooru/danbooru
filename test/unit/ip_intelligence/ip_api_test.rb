@@ -46,6 +46,7 @@ class IpIntelligence::IpApiTest < ActiveSupport::TestCase
 
       should "be an ISP IP" do
         assert_equal("isp", @ip.ip_type)
+        assert_nil(@ip.attributes[:operator])
       end
     end
 
@@ -76,6 +77,18 @@ class IpIntelligence::IpApiTest < ActiveSupport::TestCase
       assert_nil(ip_type(is_abuser: true, is_bogon: true))
       assert_nil(ip_type(is_vpn: "true"))
       assert_nil(ip_type)
+    end
+
+    should "use the VPN service as the operator" do
+      mock_ipapi("45.83.91.1", **flags(is_vpn: true, is_datacenter: true), vpn: { service: "NordVPN" }, datacenter: { datacenter: "M247" })
+      mock_ipapi("45.83.91.2", **flags(is_datacenter: true), datacenter: { datacenter: "DigitalOcean" })
+      mock_ipapi("45.83.91.3", **flags(is_mobile: true), vpn: { service: "NordVPN" }, datacenter: { datacenter: "M247" })
+      mock_ipapi("45.83.91.4", **flags(is_vpn: true), vpn: { service: 123 })
+
+      assert_equal("NordVPN", IpIntelligence.for("45.83.91.1", provider: "ipapi.is://ipapi-key").attributes[:operator])
+      assert_nil(IpIntelligence.for("45.83.91.2", provider: "ipapi.is://ipapi-key").attributes[:operator])
+      assert_nil(IpIntelligence.for("45.83.91.3", provider: "ipapi.is://ipapi-key").attributes[:operator])
+      assert_nil(IpIntelligence.for("45.83.91.4", provider: "ipapi.is://ipapi-key").attributes[:operator])
     end
 
     should "save only information about the IP itself" do

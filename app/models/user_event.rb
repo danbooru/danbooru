@@ -114,7 +114,7 @@ class UserEvent < ApplicationRecord
       def create_from_request!(user, category, request, login_session: nil)
         login_session_id = login_session&.login_id || request.session[:login_id]
         ip_addr = request.remote_ip
-        IpGeolocation.create_or_update!(ip_addr)
+        IpGeolocation.find_or_lookup!(ip_addr)
 
         create!(user: user, category: category, ip_addr: ip_addr, login_session_id: login_session_id, session_id: request.session[:session_id], user_agent: request.user_agent)
       end

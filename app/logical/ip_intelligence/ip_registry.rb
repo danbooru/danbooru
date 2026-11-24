@@ -6,13 +6,16 @@
 class IpIntelligence::IpRegistry < IpIntelligence
   memoize def response
     # https://ipregistry.co/docs/authentication
-    http_response = http.headers(Authorization: "ApiKey #{api_key}").get("https://api.ipregistry.co/#{ip_addr}")
+    http_response = Danbooru::Http.headers(Authorization: "ApiKey #{api_key}").get("https://api.ipregistry.co/#{ip_addr}")
     json = http_response.to_s.parse_json if http_response.status == 200
     json.is_a?(Hash) ? json.with_indifferent_access : {}
   end
 
   def attributes
     {
+      provider: "ipregistry",
+      ip_type: ip_type,
+      operator: (response.dig(:carrier, :name) if ip_type == "mobile"),
       network: response.dig(:connection, :route),
       asn: response.dig(:connection, :asn),
       latitude: response.dig(:location, :latitude),

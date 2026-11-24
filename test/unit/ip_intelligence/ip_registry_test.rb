@@ -43,7 +43,14 @@ class IpIntelligence::IpRegistryTest < ActiveSupport::TestCase
 
       should "be a mobile IP, because it has a carrier" do
         assert_equal("mobile", @ip.ip_type)
+        assert_equal("Free", @ip.attributes[:operator])
       end
+    end
+
+    should "use the carrier as the operator only for mobile IPs" do
+      mock_ipregistry("45.83.91.1", connection: { type: "hosting" }, carrier: { name: "Free" })
+
+      assert_nil(IpIntelligence.for("45.83.91.1", provider: "ipregistry://ipregistry-key").attributes[:operator])
     end
 
     should "return the most specific IP type when several flags are set" do

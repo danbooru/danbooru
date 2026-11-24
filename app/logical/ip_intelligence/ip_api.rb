@@ -8,13 +8,16 @@
 class IpIntelligence::IpApi < IpIntelligence
   # The key goes in a POST body instead of a GET param to keep it out of URLs and logs.
   memoize def response
-    http_response = http.post("https://api.ipapi.is", json: { q: ip_addr.to_s, key: api_key })
+    http_response = Danbooru::Http.post("https://api.ipapi.is", json: { q: ip_addr.to_s, key: api_key })
     json = http_response.to_s.parse_json if http_response.status == 200
     json.is_a?(Hash) ? json.with_indifferent_access : {}
   end
 
   def attributes
     {
+      provider: "ipapi",
+      ip_type: ip_type,
+      operator: operator,
       network: response.dig(:asn, :route),
       asn: response.dig(:asn, :asn),
       latitude: response.dig(:location, :latitude),
@@ -60,5 +63,13 @@ class IpIntelligence::IpApi < IpIntelligence
       { "asn" => %w[asn abuser_score route descr country org domain type] },
       { "location" => %w[continent country country_code state city latitude longitude zip accuracy] },
     ])
+  end
+
+  private
+
+  # @return [String, nil] The VPN service for VPN IPs, e.g. "NordVPN". Hosting companies are already in `organization`.
+  def operator
+    name = response.dig(:vpn, :service) if ip_type == "vpn"
+    name.presence if name.is_a?(String)
   end
 end

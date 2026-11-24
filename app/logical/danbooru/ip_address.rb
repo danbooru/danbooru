@@ -27,24 +27,24 @@ module Danbooru
       end
     end
 
-    def ip_intelligence
-      @ip_intelligence ||= IpIntelligence.for(self)
+    # @return [IpGeolocation, nil] The saved information about this IP, looked up from the IP intelligence provider if
+    #   it hasn't been checked recently. Nil if the IP is local or couldn't be looked up.
+    def ip_geolocation
+      return @ip_geolocation if defined?(@ip_geolocation)
+
+      @ip_geolocation = IpGeolocation.find_or_lookup!(self)
     end
 
-    # @return [Hash] The IP's geolocation and network information, or an empty hash if the IP is local, a Tor IP, or
-    #   couldn't be looked up.
+    # @return [Hash] The IP's geolocation and network information, or an empty hash if it's unknown.
     def ip_info
-      return {} if is_local? || is_tor? || ip_intelligence.response.blank?
-
-      { ip_addr: to_s, **ip_intelligence.attributes, is_proxy: is_proxy? }.with_indifferent_access
+      ip_geolocation&.ip_info || {}
     end
 
     # @return [Boolean] True if this is a proxy, VPN, Tor, or datacenter IP.
     def is_proxy?
       return true if is_tor?
-      return false if is_local?
 
-      ip_intelligence.response.present? && ip_intelligence.proxy?
+      ip_geolocation&.is_proxy? || false
     end
 
     # @return [Boolean] True if this is a non-publicly routable IP address. For IPv6, `private?` includes fc00::/7

@@ -3,7 +3,7 @@
 # Looks up an IP's geolocation, network, and type (ISP, mobile, hosting, VPN, etc) from an IP intelligence provider.
 #
 # Each provider is a subclass. Use `IpIntelligence.for` to get the configured provider, which is set as a URL like
-# "ipregistry://<key>" or "ipapi.is://<key>".
+# "ipregistry://<key>" or "ipapi.is://<key>". Lookups are cached by IpGeolocation.find_or_lookup!.
 #
 # @example
 #   IpIntelligence.for("1.1.1.1").attributes
@@ -17,7 +17,7 @@ class IpIntelligence
     "ipapi.is" => IpApi,
   }.freeze
 
-  attr_reader :ip_addr, :api_key, :cache_duration
+  attr_reader :ip_addr, :api_key
 
   # @param ip_addr [String, Danbooru::IpAddress] The IP address to look up.
   # @param provider [String, nil] The provider's URL. Defaults to the configured provider.
@@ -41,11 +41,9 @@ class IpIntelligence
 
   # @param ip_addr [String, Danbooru::IpAddress] The IP address to look up.
   # @param api_key [String, nil] The provider's API key.
-  # @param cache_duration [ActiveSupport::Duration] How long to cache successful responses.
-  def initialize(ip_addr, api_key: nil, cache_duration: 3.days)
+  def initialize(ip_addr, api_key: nil)
     @ip_addr = Danbooru::IpAddress.new(ip_addr)
     @api_key = api_key
-    @cache_duration = cache_duration
   end
 
   # Hide the API key. Inspecting doesn't fetch the response, so it doesn't use up lookup credits.
@@ -54,7 +52,7 @@ class IpIntelligence
     "#<#{self.class.name} #{ivars.join(" ")}>"
   end
 
-  # @return [Hash] The response, normalized to the `ip_geolocations` columns (except `ip_addr` and `is_proxy`).
+  # @return [Hash] The response, normalized to the `ip_geolocations` columns (except `is_proxy`).
   def attributes
     {}
   end
@@ -64,17 +62,12 @@ class IpIntelligence
     {}
   end
 
-  # @return [Danbooru::Http] An HTTP client that caches only successful responses, under a key without the API key.
-  def http
-    Danbooru::Http.cache(cache_duration, key: "#{self.class.name.underscore}:#{ip_addr}", if: ->(response) { response.status == 200 })
-  end
-
   # @return [Hash] An allowlist of the response's fields to save in `ip_geolocations`.
   def saved_response
     {}
   end
 
-  # @return [String, nil] What kind of IP it is, e.g. "isp", "mobile", or "vpn", or nil if unknown.
+  # @return [String, nil] One of IpGeolocation's `ip_type` values, e.g. "isp" or "vpn", or nil if unknown.
   def ip_type
     nil
   end
