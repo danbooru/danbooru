@@ -38,7 +38,7 @@ module Source
 
       def external_image
         if post_data["post_hint"] == "image" && !post_data["is_reddit_media_domain"]
-          Source::URL.parse(post_data["url"])&.full_image_url
+          Source::URL.parse(post_data["url"]).try(:full_image_url)
         end
       end
 
@@ -97,11 +97,11 @@ module Source
           in "a"
             # Format embedded images properly
             if element[:href]
-              parsed_href = Source::URL.parse(element[:href])
+              full_image_url = Source::URL.parse(element[:href]).try(:full_image_url)
 
-              if parsed_href && parsed_href.class != Source::URL::Null && image_urls.include?(parsed_href.full_image_url)
+              if full_image_url.present? && image_urls.include?(full_image_url)
                 element.content = "[image]"
-                element[:href] = parsed_href.full_image_url
+                element[:href] = full_image_url
               end
             end
           in "span"

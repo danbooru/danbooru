@@ -24,7 +24,7 @@ class Source::Extractor::RedditComment < Source::Extractor::Reddit
       case element.name
       in "a"
         # Remove embedded images (if they appear in image_urls)
-        if element[:href] && image_urls.include?(Source::URL.parse(element[:href]).full_image_url)
+        if element[:href] && image_urls.include?(Source::URL.parse(element[:href]).try(:full_image_url))
           element.content = ""
         end
       in "span"

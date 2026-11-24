@@ -405,5 +405,13 @@ module Source::Tests::Extractor
         EOS
       )
     end
+
+    context "A post with an Instagram link in the commentary" do
+      setup { skip "TODO: fill in the expected values" }
+
+      strategy_should_work(
+        "https://www.reddit.com/r/recordoflodosswar/comments/1qdy7hk/my_fanart_of_deedlit/",
+      )
+    end
   end
 end
