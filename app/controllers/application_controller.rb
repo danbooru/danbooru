@@ -232,8 +232,10 @@ class ApplicationController < ActionController::Base
         self.response_body = nil
         @_response_body = nil
         response.delete_header("Content-Type")
-        response.cache_control.clear
       end
+
+      # Don't cache errors, even if the action called `expires_in` before raising the error.
+      response.cache_control.clear
 
       render template, layout: layout, status: status, formats: format
     rescue ActionView::MissingTemplate

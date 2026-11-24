@@ -73,6 +73,16 @@ class RelatedTagsControllerTest < ActionDispatch::IntegrationTest
         assert_not_equal(true, response.cache_control[:public])
       end
 
+      should "not cache error pages" do
+        RelatedTagQuery.any_instance.stubs(:related_tags).raises(ActiveRecord::QueryCanceled)
+
+        get related_tag_path(format: :json), params: { query: "touhou" }
+
+        assert_response 500
+        assert_not_equal(true, response.cache_control[:public])
+        assert_equal(0, response.cache_control[:max_age].to_i)
+      end
+
       should "not cache .json responses for the current user's tags" do
         get related_tag_path(format: :json), params: { user_tags: true }
 
