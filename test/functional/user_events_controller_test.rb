@@ -83,6 +83,21 @@ class UserEventsControllerTest < ActionDispatch::IntegrationTest
         assert_includes(response.parsed_body.pluck("id"), event.id)
       end
 
+      should "not show regular users the IP lookup for their own events" do
+        event = @user.user_events.first
+        create(:ip_geolocation, ip_addr: event.ip_addr, ip_type: "vpn", operator: "NordVPN", response: { "hostname" => "host.example.com" })
+
+        get_auth user_events_path(only: "id,ip_geolocation"), @user, as: :json
+        assert_response :success
+        assert_equal([{ "id" => event.id }], response.parsed_body.select { it["id"] == event.id })
+
+        get_auth user_events_path(search: { ip_geolocation: { ip_type: "vpn" }}), @user, as: :json
+        assert_equal([], response.parsed_body)
+
+        get_auth user_events_path(search: { ip_geolocation: { operator: "NordVPN" }}), @user, as: :json
+        assert_equal([], response.parsed_body)
+      end
+
       should "let moderators search by session and browser" do
         @mod = create(:moderator_user)
         event = @user.user_events.first
