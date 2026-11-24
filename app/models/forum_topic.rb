@@ -7,6 +7,7 @@ class ForumTopic < ApplicationRecord
     "General": 0,
     "Tags": 1,
     "Bugs & Features": 2,
+    "Q&A": 3,
   }, scopes: false, instance_methods: false, validate: true, default: "General"
 
   enum :min_level, {

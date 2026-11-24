@@ -109,6 +109,9 @@ class ForumTopicTest < ActiveSupport::TestCase
       should allow_value(0).for(:category)
       should allow_value(1).for(:category)
       should allow_value(2).for(:category)
+      should allow_value("Q&A").for(:category)
+      should allow_value("q&a").for(:category)
+      should allow_value(3).for(:category)
 
       should allow_value("None").for(:min_level)
       should allow_value("Member").for(:min_level)
