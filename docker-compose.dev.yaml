@@ -62,6 +62,9 @@ x-base-env: &base-env
   SHAKAPACKER_DEV_SERVER_HOST: webpack
   GOOD_JOB_EXECUTION_MODE: external
 
+  # Cache the mounted source files too. The image's Bootsnap cache only matches the gems.
+  BOOTSNAP_READONLY: "false"
+
   DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-true}
 
   # To enable the autotagger service, uncomment this line AND the autotagger service further below.
