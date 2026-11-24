@@ -81,8 +81,12 @@ class RelatedTagCalculator
   # @return [Array<RelatedTag>] The set of frequent tags, ordered by most frequent first.
   memoize def frequent_tags_for_search
     sample_posts = post_query.posts.reorder(:md5).limit(search_sample_size)
-    search_count = post_query.fast_count(timeout: post_query.current_user.statement_timeout)
     frequent_tags_for_post_relation(sample_posts, search_count)
+  end
+
+  # @return [Integer, nil] The number of posts in the search, or nil if counting timed out.
+  memoize def search_count
+    post_query.fast_count(timeout: post_query.current_user.statement_timeout)
   end
 
   # Return the set of tags most frequently appearing in the given set of posts.

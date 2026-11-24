@@ -64,6 +64,15 @@ class RelatedTagsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(response.headers["X-Rate-Limit"])
       end
 
+      should "not publicly cache .json responses when the search times out" do
+        PostQuery.any_instance.stubs(:fast_count).returns(nil)
+
+        get related_tag_path(format: :json), params: { query: "touhou" }
+
+        assert_response :success
+        assert_not_equal(true, response.cache_control[:public])
+      end
+
       should "not cache .json responses for the current user's tags" do
         get related_tag_path(format: :json), params: { user_tags: true }
 

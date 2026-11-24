@@ -140,8 +140,9 @@ class RelatedTagQuery
     4.hours
   end
 
+  # Don't cache timeouts publicly, because the timeout depends on the user's level.
   def cache_publicly?
-    !post_query.is_user_dependent_search?
+    !post_query.is_user_dependent_search? && !related_tag_calculator.search_count.nil?
   end
 
   protected
