@@ -1,13 +1,15 @@
 require "test_helper"
+require "webrick/https"
 
 class DanbooruHttpTest < ActiveSupport::TestCase
   def httpbin_url(path = "")
     "https://httpbingo.org/#{path}"
   end
 
-  # Start a local server that returns the given body for every request, and yield its URL.
-  def with_local_server(body, gzip: false, content_type: "text/html")
-    server = WEBrick::HTTPServer.new(BindAddress: "127.0.0.1", Port: 0, Logger: WEBrick::Log.new(File::NULL), AccessLog: [])
+  # Start a local server that returns the given body for every request, and yield its URL. With `ssl: true`, the server
+  # uses HTTPS with a self-signed certificate.
+  def with_local_server(body, gzip: false, content_type: "text/html", ssl: false)
+    server = WEBrick::HTTPServer.new(BindAddress: "127.0.0.1", Port: 0, Logger: WEBrick::Log.new(File::NULL), AccessLog: [], SSLEnable: ssl, SSLCertName: [["CN", "127.0.0.1"]])
     server.mount_proc("/") do |_request, response|
       response.content_type = content_type
       response["Content-Encoding"] = "gzip" if gzip
@@ -15,7 +17,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
     end
     thread = Thread.new { server.start }
 
-    yield "http://127.0.0.1:#{server.config[:Port]}/"
+    yield "#{ssl ? "https" : "http"}://127.0.0.1:#{server.config[:Port]}/"
   ensure
     server&.shutdown
     thread&.join
@@ -59,10 +61,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal("", response.body.to_s)
       end
 
-      should "return a 5xx error if the SSL certificate is expired" do
-        response = Danbooru::Http.get("https://expired.badssl.com")
-        assert_equal(590, response.status)
-        assert_equal("", response.body.to_s)
+      should "return a 5xx error if the SSL certificate is invalid" do
+        with_local_server("<p>hello</p>", ssl: true) do |url|
+          response = Danbooru::Http.get(url)
+
+          assert_equal(590, response.status)
+          assert_equal("", response.body.to_s)
+        end
       end
 
       should "decompress gzipped responses under the max size" do
