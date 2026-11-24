@@ -435,6 +435,31 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_select "#commented-posts-count", count: 1, text: "2"
       end
 
+      context "for a user with private and deleted forum posts" do
+        setup do
+          @mod = create(:moderator)
+          as(@mod) do
+            create(:forum_post, creator: @mod)
+            create(:forum_post, creator: @mod, is_deleted: true)
+            create(:forum_post, creator: @mod, topic: create(:mod_up_forum_topic, creator: @mod))
+          end
+        end
+
+        should "only count visible forum posts for a normal user" do
+          get user_path(@mod, format: :json)
+
+          assert_response :success
+          assert_equal(1, response.parsed_body["forum_post_count"])
+        end
+
+        should "count all forum posts for a moderator" do
+          get_auth user_path(@mod, format: :json), create(:moderator)
+
+          assert_response :success
+          assert_equal(3, response.parsed_body["forum_post_count"])
+        end
+      end
+
       should "strip '?' from attributes" do
         get_auth user_path(@user), @user, params: { format: :xml }
         xml = Hash.from_xml(response.body)

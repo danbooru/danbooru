@@ -832,7 +832,7 @@ class User < ApplicationRecord
     end
 
     def forum_post_count
-      forum_posts.count
+      forum_posts.visible(CurrentUser.user).count
     end
 
     def comment_count
