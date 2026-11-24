@@ -22,13 +22,12 @@
         your account. Don't give your API key to apps or people you don't trust, and don't post your
         API key in public locations.</p>
 
+        <p>Your API key is only shown once, when it is created. If you lose it, delete it and create
+        a new one.</p>
+
         <p>Example usage:
           <code>
-            <% if @api_keys.present? %>
-              <%= profile_url(format: "json", login: CurrentUser.user.name, api_key: @api_keys.first.key) %>
-            <% else %>
-              <%= profile_url(format: "json", login: CurrentUser.user.name, api_key: "your_api_key_goes_here") %>
-            <% end %>
+            <%= profile_url(format: "json", login: CurrentUser.user.name, api_key: "your_api_key_goes_here") %>
           </code>
         </p>
 
@@ -41,7 +40,6 @@
     <% else %>
       <%= table_for @api_keys, width: "100%", class: "striped autofit" do |t| %>
         <% t.column :name %>
-        <% t.column :key, td: { class: "col-expand" } %>
 
         <% t.column :permissions do |api_key| %>
           <%= safe_join(api_key.permissions, "<br>".html_safe).presence || "All" %>
@@ -58,6 +56,16 @@
 
           <% if api_key.last_ip_address.present? %>
             <br>by <%= api_key.last_ip_address %>
+          <% end %>
+        <% end %>
+
+        <% t.column "Expires" do |api_key| %>
+          <% if api_key.expires_at.nil? %>
+            Never
+          <% elsif api_key.expired? %>
+            <span class="text-error">Expired</span>
+          <% else %>
+            <%= time_ago_in_words_tagged api_key.expires_at %>
           <% end %>
         <% end %>
 
