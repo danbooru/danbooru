@@ -167,8 +167,11 @@ class ApplicationController < ActionController::Base
         render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
       when SessionLoader::AuthenticationFailure, CaptchaService::Error
         render_error_page(401, exception, message: exception.message)
-      when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
+      when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::Redirecting::UnsafeRedirectError
         render_error_page(403, exception, message: exception.message)
+      when ActionController::InvalidCrossOriginRequest
+        # Raised after rendering when another site loads a .js page in a <script> tag. Don't send the error page as Javascript either.
+        render_error_page(403, exception, message: exception.message, format: :html)
       when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
           User::PrivilegeError,
           Pundit::NotAuthorizedError
@@ -222,6 +225,14 @@ class ApplicationController < ActionController::Base
           action: action_name,
           expected: @expected.to_s,
         ].increment
+      end
+
+      # Discard the response if the exception was raised after rendering, e.g. by an after_action.
+      if performed?
+        self.response_body = nil
+        @_response_body = nil
+        response.delete_header("Content-Type")
+        response.cache_control.clear
       end
 
       render template, layout: layout, status: status, formats: format

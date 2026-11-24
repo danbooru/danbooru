@@ -302,6 +302,40 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "on a cross-origin request for a .js response" do
+      setup do
+        login_as(create(:user))
+        ActionController::Base.allow_forgery_protection = true
+      end
+
+      teardown do
+        ActionController::Base.allow_forgery_protection = false
+      end
+
+      should "return a 403 error without rendering the Javascript" do
+        get new_comment_path(format: :js)
+
+        assert_response 403
+        assert_equal("text/html", response.media_type)
+        assert_match(/requested protected JavaScript/, response.body)
+        assert_no_match(/Danbooru\.Notice/, response.body)
+      end
+
+      should "not cache the error response when the page would have been publicly cached" do
+        get related_tag_path(format: :js, query: "touhou")
+
+        assert_response 403
+        assert_equal("text/html", response.media_type)
+        assert_no_match(/public|max-age/, response.headers["Cache-Control"].to_s)
+      end
+
+      should "allow same-origin xhr requests" do
+        get new_comment_path(format: :js), xhr: true
+
+        assert_response :success
+      end
+    end
+
     context "when a user has an invalid username" do
       should "redirect to the name change page" do
         @user = build(:user, name: "foo__bar")
