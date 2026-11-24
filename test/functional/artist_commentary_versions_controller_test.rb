@@ -31,6 +31,18 @@ class ArtistCommentaryVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not return more than 200 versions per page in HTML, or 1000 in the API" do
+        ArtistCommentaryVersion.insert_all(Array.new(200) { { post_id: @commentary.post_id, updater_id: @user.id, created_at: Time.zone.now, updated_at: Time.zone.now } }) # rubocop:disable Rails/SkipsModelValidations
+
+        get artist_commentary_versions_path(limit: 1000), as: :json
+        assert_response :success
+        assert_equal(ArtistCommentaryVersion.count, response.parsed_body.size)
+
+        get artist_commentary_versions_path(limit: 1000)
+        assert_response :success
+        assert_select "table.striped tbody tr", count: 200
+      end
+
       should respond_to_search.with { @other_versions + @versions.reverse }
       should respond_to_search(original_title: "translated").with { @versions[2] }
       should respond_to_search(text_matches: "traslated").with { @versions[1] }

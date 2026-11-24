@@ -5,7 +5,7 @@ class ArtistCommentaryVersionsController < ApplicationController
 
   def index
     set_version_comparison
-    @commentary_versions = authorize ArtistCommentaryVersion.paginated_search(params)
+    @commentary_versions = authorize ArtistCommentaryVersion.paginated_search(params, max_limit: request.format.html? ? 200 : 1_000)
     @commentary_versions = @commentary_versions.includes(:updater, post: [:uploader, :media_asset]) if request.format.html?
 
     respond_with(@commentary_versions)
