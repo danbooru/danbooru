@@ -341,5 +341,14 @@ module Source::Tests::Extractor
         )
       end
     end
+
+    context "A Gelbooru or Rule34 post listing url" do
+      should "not raise an error" do
+        extractor = Source::Extractor.find("https://rule34.xxx/index.php?page=post&s=list&tags=rei_no_butsu+")
+
+        assert_nil(extractor.api_url)
+        assert_equal([], extractor.profile_urls)
+      end
+    end
   end
 end
