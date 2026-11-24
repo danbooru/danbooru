@@ -235,6 +235,15 @@ class DTextTest < ActiveSupport::TestCase
         assert_match(/alias ##{tag_alias.id}/, html[4])
       end
 
+      should "not embed the old asset of a replacement on a post the user can't see" do
+        replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        replacement.post.update!(is_banned: true)
+        old_asset = replacement.old_media_asset
+
+        assert_no_match(/<img src=/, format_text("!asset ##{old_asset.id}", media_embeds: true))
+        assert_match(/<img src=/, DText.new("!asset ##{old_asset.id}", media_embeds: true).format_text(current_user: create(:approver)))
+      end
+
       should "add tag types to wiki links" do
         create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
         assert_match(/tag-type-#{Tag.categories.artist}/, format_text("[[bkub]]"))

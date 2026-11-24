@@ -162,6 +162,54 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(response.parsed_body[:md5])
       end
 
+      should "not show the image for the old asset of a replacement on a post not visible to the current user" do
+        @replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        @replacement.post.update!(is_banned: true)
+        @old_asset = @replacement.old_media_asset
+
+        get media_asset_path(@old_asset), as: :json
+
+        assert_response :success
+        assert_nil(response.parsed_body[:md5])
+        assert_nil(response.parsed_body[:file_key])
+        assert_nil(response.parsed_body[:variants])
+
+        get media_asset_path(@old_asset)
+        assert_response :success
+        assert_no_match(@old_asset.md5, response.body)
+        assert_no_match(@old_asset.file_key, response.body)
+
+        get media_assets_path(search: { id: @old_asset.id }), as: :json
+        assert_response :success
+        assert_equal([@old_asset.id], response.parsed_body.pluck("id"))
+        assert_nil(response.parsed_body.first["md5"])
+
+        get media_assets_path(search: { id: @old_asset.id })
+        assert_response :success
+        assert_no_match(@old_asset.file_key, response.body)
+      end
+
+      should "show the image for the old asset of a replacement to users who can see the post" do
+        @replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        @replacement.post.update!(is_banned: true)
+        @old_asset = @replacement.old_media_asset
+
+        get_auth media_asset_path(@old_asset), create(:approver), as: :json
+
+        assert_response :success
+        assert_equal(@old_asset.md5, response.parsed_body[:md5])
+      end
+
+      should "show the image for the old asset of a replacement on a visible post" do
+        @replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        @old_asset = @replacement.old_media_asset
+
+        get media_asset_path(@old_asset), as: :json
+
+        assert_response :success
+        assert_equal(@old_asset.md5, response.parsed_body[:md5])
+      end
+
       should "embed Flash files in a sandboxed iframe" do
         @media_asset = create(:media_asset, file_ext: "swf")
         get media_asset_path(@media_asset)

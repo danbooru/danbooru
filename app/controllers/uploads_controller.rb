@@ -14,7 +14,7 @@ class UploadsController < ApplicationController
     if request.format.html?
       @uploads = @uploads.includes(:uploader, :posts, upload_media_assets: :media_asset)
     else
-      @uploads = @uploads.includes(upload_media_assets: { media_asset: :post })
+      @uploads = @uploads.includes(upload_media_assets: { media_asset: [:post, :replaced_posts] })
     end
 
     respond_with(@uploads, include: { upload_media_assets: { include: :media_asset }})

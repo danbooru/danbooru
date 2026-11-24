@@ -50,7 +50,7 @@ class DText
     wiki_pages = WikiPage.where(title: references[:wiki_pages]).index_by(&:title)
     tags = Tag.where(name: references[:wiki_pages]).index_by(&:name)
     artists = Artist.where(name: references[:wiki_pages]).index_by(&:name)
-    media_assets = MediaAsset.where(id: references[:media_assets]).index_by(&:id)
+    media_assets = MediaAsset.includes(:post, :replaced_posts).where(id: references[:media_assets]).index_by(&:id)
     posts = Post.includes(:media_asset).where(id: references[:posts]).index_by(&:id)
 
     tag_aliases = tag_aliases.index_by(&:id)

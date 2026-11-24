@@ -47,6 +47,8 @@ class MediaAsset < ApplicationRecord
   attribute :pixel_hash, :md5
 
   has_one :post, foreign_key: :md5, primary_key: :md5, inverse_of: :media_asset
+  has_many :old_post_replacements, class_name: "PostReplacement", foreign_key: :old_media_asset_id, inverse_of: :old_media_asset
+  has_many :replaced_posts, through: :old_post_replacements, source: :post
   has_one :media_metadata, dependent: :destroy
   has_many :upload_media_assets, dependent: :destroy
   has_many :uploads, through: :upload_media_assets

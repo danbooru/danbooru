@@ -5,7 +5,7 @@ class MediaAssetsController < ApplicationController
 
   def index
     @media_assets = authorize MediaAsset.visible(CurrentUser.user).paginated_search(params, limit: per_page, max_limit: PostSets::Post::MAX_PER_PAGE, count_pages: false)
-    @media_assets = @media_assets.includes(:post)
+    @media_assets = @media_assets.includes(:post, :replaced_posts)
     @media_assets = @media_assets.includes(:media_metadata) if request.format.html?
     respond_with(@media_assets)
   end

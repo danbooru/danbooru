@@ -394,6 +394,17 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_no_match(@hidden_replacement.old_md5, response.body)
         end
 
+        should "not show the old media asset's image in the API" do
+          get post_replacements_path(search: { post_id: @hidden_replacement.post_id }, only: "id,old_media_asset"), as: :json
+
+          assert_response :success
+          old_asset = response.parsed_body.first["old_media_asset"]
+          assert_equal(@hidden_replacement.old_media_asset_id, old_asset["id"])
+          assert_not(old_asset.key?("md5"))
+          assert_not(old_asset.key?("file_key"))
+          assert_not(old_asset.key?("variants"))
+        end
+
         should "show the md5s to users who can see the post" do
           get_auth post_replacement_path(@hidden_replacement), create(:approver), as: :json
 

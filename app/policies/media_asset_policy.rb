@@ -13,8 +13,15 @@ class MediaAssetPolicy < ApplicationPolicy
     can_see_image?
   end
 
+  # An asset without a post may be the old file of a replaced post, so it's hidden if the replaced post is hidden.
   def can_see_image?
-    !record.removed? && (record.post.blank? || record.post.visible?(user))
+    return false if record.removed?
+
+    if record.post.present?
+      record.post.visible?(user)
+    else
+      record.replaced_posts.all? { |post| post.visible?(user) }
+    end
   end
 
   def rate_limit_for_image(**_options)
