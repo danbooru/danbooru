@@ -112,6 +112,10 @@ class ApplicationController < ActionController::Base
     @current_item = subject
 
     super
+
+    # If the action rendered a page instead of redirecting (e.g. a form that failed validation), show the notice on this
+    # page only, not again on the next page.
+    flash.discard(:notice) if request.format.html? && !request.get? && !response.redirect?
   end
 
   # Used to redirect a search directly to the result page when a search returns only one result.

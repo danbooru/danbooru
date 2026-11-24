@@ -412,6 +412,10 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "textarea[name='comment[body]']", text: body
         assert_select "#notice", text: /can't include more than 1 image/
+
+        get post_path(@post)
+        assert_response :success
+        assert_select "#notice", text: /can't include more than 1 image/, count: 0
       end
 
       context "that mentions a user" do
