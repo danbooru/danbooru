@@ -1,3 +1,4 @@
+import Notice from "./notice";
 import Utility from "./utility";
 
 class SourceDataComponent {
@@ -13,12 +14,18 @@ class SourceDataComponent {
 
     if (/^https?:\/\//.test(url)) {
       $(".source-data").addClass("loading");
-      let script = await $.get("/source.js", { url: url, ref: ref });
-      $.globalEval(script, { nonce: Utility.meta("csp-nonce") });
-      $(".source-data").removeClass("loading");
 
-      // The source data is above the tag box, so loading it can push the tag box off the screen.
-      $("#post_tag_string:focus")[0]?.scrollIntoView({ block: "nearest" });
+      try {
+        let script = await $.get("/source.js", { url: url, ref: ref });
+        $.globalEval(script, { nonce: Utility.meta("csp-nonce") });
+
+        // The source data is above the tag box, so loading it can push the tag box off the screen.
+        $("#post_tag_string:focus")[0]?.scrollIntoView({ block: "nearest" });
+      } catch (error) {
+        Notice.error(`Error fetching source data (error: ${error.status} ${error.statusText})`);
+      } finally {
+        $(".source-data").removeClass("loading");
+      }
     }
   }
 }

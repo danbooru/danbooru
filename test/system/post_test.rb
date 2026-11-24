@@ -18,6 +18,17 @@ class PostChromeTest < ChromeSystemTestCase
       assert_equal "225", page.driver.with_playwright_page { |playwright_page| playwright_page.context.cookies.find { |cookie| cookie["name"] == "post_preview_size" }&.dig("value") }
     end
 
+    should "stop loading and show an error when fetching the source data fails" do
+      Source::Extractor::Null.any_instance.stubs(:to_h).raises(TypeError, "no implicit conversion of nil into String")
+
+      fast_signin @user
+      visit post_path(@post)
+      find("#post-edit-link").click
+
+      assert_selector "#notice", text: "Error fetching source data (error: 500 Internal Server Error)"
+      assert_selector ".source-data:not(.loading) .source-data-fetch"
+    end
+
     should "show the editing interface" do
       fast_signin @user
       visit post_path(@post)
