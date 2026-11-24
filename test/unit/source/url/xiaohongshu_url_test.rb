@@ -32,5 +32,11 @@ module Source::Tests::URL
     end
 
     should parse_url("http://sns-webpic-qc.xhscdn.com/202405050857/60985d4963cfb500a9b0838667eb3adc/1000g00828idf6nofk05g5ohki5uk137o8beqcv8!nd_dft_wgth_webp_3").into(site_name: "Xiaohongshu")
+
+    should parse_url("https://www.xiaohongshu.com/explore/6421b331000000002702901f").into(page_url: "https://www.rednote.com/discovery/item/6421b331000000002702901f")
+    should parse_url("https://www.rednote.com/search_result/6421b331000000002702901f").into(page_url: "https://www.rednote.com/discovery/item/6421b331000000002702901f")
+    should parse_url("https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8/6421b331000000002702901f?xsec_token=ABC=").into(page_url: "https://www.rednote.com/discovery/item/6421b331000000002702901f?xsec_token=ABC=")
+    should parse_url("https://www.rednote.com/discovery/item/65880524000000000700a643?xsec_token=ABC=").into(page_url: "https://www.rednote.com/discovery/item/65880524000000000700a643?xsec_token=ABC=")
+    should parse_url("https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8").into(page_url: nil)
   end
 end

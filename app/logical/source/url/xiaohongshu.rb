@@ -84,16 +84,10 @@ class Source::URL::Xiaohongshu < Source::URL
   end
 
   def page_url
-    if user_id.present? && post_id.present?
-      url = "https://www.xiaohongshu.com/user/profile/#{user_id}/#{post_id}"
-    elsif post_id.present?
-      url = "https://www.xiaohongshu.com/explore/#{post_id}"
-    end
+    return nil if post_id.blank?
 
-    if url.present? && xsec_token.present?
-      url += "?xsec_token=#{xsec_token}"
-    end
-
+    url = "https://www.rednote.com/discovery/item/#{post_id}"
+    url += "?xsec_token=#{xsec_token}" if xsec_token.present?
     url
   end
 
