@@ -21,5 +21,21 @@ class ReportbooruServiceTest < ActiveSupport::TestCase
 
       assert_equal([], @service.popular_posts(@date))
     end
+
+    should "return nothing when the response is null" do
+      Danbooru::Http.any_instance.expects(:get).with("http://localhost:1234/post_views/rank?date=#{@date}").returns(HTTP::Response.new(status: 200, body: "null", version: "1.1", request: nil))
+      Danbooru::Http.any_instance.expects(:get).with("http://localhost:1234/post_views/rank?date=#{@date.yesterday}").returns(HTTP::Response.new(status: 200, body: "null", version: "1.1", request: nil))
+
+      assert_equal([], @service.popular_posts(@date))
+    end
+  end
+
+  context "#popular_searches" do
+    should "return nothing when the response is null" do
+      Danbooru::Http.any_instance.expects(:get).with("http://localhost:1234/post_searches/rank?date=#{@date}").returns(HTTP::Response.new(status: 200, body: "null", version: "1.1", request: nil))
+      Danbooru::Http.any_instance.expects(:get).with("http://localhost:1234/post_searches/rank?date=#{@date.yesterday}").returns(HTTP::Response.new(status: 200, body: "null", version: "1.1", request: nil))
+
+      assert_equal([], @service.popular_searches(@date))
+    end
   end
 end

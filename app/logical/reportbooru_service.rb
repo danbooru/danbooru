@@ -63,12 +63,14 @@ class ReportbooruService
   # Send a request to Reportbooru
   # @param url [String] the full Reportbooru URL
   # @param expires_in [Integer] the length of time to cache the results
-  # @return [Object] the parsed JSON response
+  # @return [Array] the parsed JSON response, or an empty array on failure
   def request(url, expires_in)
     return [] unless enabled?
 
     response = http.cache(expires_in).get(url)
     return [] if response.status != 200
-    JSON.parse(response.to_s.force_encoding("utf-8"))
+
+    json = response.to_s.force_encoding("utf-8").parse_json
+    json.is_a?(Array) ? json : []
   end
 end
