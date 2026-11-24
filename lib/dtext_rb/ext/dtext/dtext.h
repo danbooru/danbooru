@@ -90,6 +90,11 @@ static const char* element_names[] = {
 };
 #endif
 
+#ifdef DTEXT_COUNT_WORK
+extern thread_local size_t dtext_work;
+extern thread_local size_t dtext_work_limit;
+#endif
+
 class DTextError : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };

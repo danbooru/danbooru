@@ -20,6 +20,9 @@ if ENV["DTEXT_DEBUG"]
   $CXXFLAGS << " -g3 -fsanitize=undefined,leak -DDEBUG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_SANITIZE_VECTOR -D_FORTIFY_SOURCE=3"
 end
 
+# Count how much work the parser does, and return it with `DText.work`. See DTEXT_WORK in dtext.cpp.rl.
+$CXXFLAGS << " -DDTEXT_COUNT_WORK" if ENV["DTEXT_COUNT_WORK"]
+
 create_makefile "dtext/dtext"
 
 # XXX Hack to add a rule to the Makefile to generate dtext.cpp from dtext.cpp.rl.

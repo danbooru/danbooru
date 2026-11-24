@@ -2267,6 +2267,16 @@ class DTextTest < Minitest::Test
     assert_parse("<blockquote><p>a</p><p>  </p></blockquote>", "[quote]a\n\n\r \n[/quote]")
   end
 
+  def test_work_count
+    skip "build with DTEXT_COUNT_WORK=true to test the work counter" unless DText.respond_to?(:work)
+
+    DText.parse("a" * 1_000)
+    assert_operator(DText.work, :>=, 1_000)
+
+    DText.parse("a")
+    assert_operator(DText.work, :<, 100)
+  end
+
   def test_long_whitespace_runs
     assert_fast_parse("a#{" " * 100_000}b")
     assert_fast_parse("a#{"\t" * 100_000}b")

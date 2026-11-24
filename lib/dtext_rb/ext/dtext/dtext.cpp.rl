@@ -2,6 +2,7 @@
 #include "url.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -13,6 +14,20 @@
 #else
 #undef g_debug
 #define g_debug(...)
+#endif
+
+// Counts how much work the parser does, to find inputs that make it do superlinear work. Only enabled when built with
+// -DDTEXT_COUNT_WORK. Each parse resets the count, and `DText.work` returns it.
+#ifdef DTEXT_COUNT_WORK
+thread_local size_t dtext_work = 0;
+thread_local size_t dtext_work_limit = SIZE_MAX;
+static thread_local const char *dtext_last_read = nullptr;
+#define DTEXT_WORK(n) ((dtext_work += (n)) > dtext_work_limit ? throw DTextError("work limit") : (void)0)
+// Count each byte the scanners read once, even when the generated code compares it several times.
+#define DTEXT_READ(p) ((p) != dtext_last_read ? (dtext_last_read = (p), DTEXT_WORK(1)) : (void)0, *(p))
+#else
+#define DTEXT_WORK(n) ((void)0)
+#define DTEXT_READ(p) (*(p))
 #endif
 
 static const size_t MAX_STACK_DEPTH = 512;
@@ -73,6 +88,9 @@ static const std::unordered_map<std::string_view, std::function<bool(std::string
 
 %%{
 machine dtext;
+
+# Count every byte the scanners read, including bytes read again after backtracking.
+getkey DTEXT_READ(p);
 
 variable p p;
 variable pe pe;
@@ -916,10 +934,12 @@ bool StateMachine::dstack_check(element_t expected_element) {
 
 // Return true if the given tag is currently open.
 bool StateMachine::dstack_is_open(element_t element) {
+  DTEXT_WORK(dstack.size());
   return std::find(dstack.begin(), dstack.end(), element) != dstack.end();
 }
 
 int StateMachine::dstack_count(element_t element) {
+  DTEXT_WORK(dstack.size());
   return std::count(dstack.begin(), dstack.end(), element);
 }
 
@@ -928,6 +948,7 @@ bool StateMachine::is_inline_element(element_t type) {
 }
 
 bool StateMachine::is_allowed_emoji(const std::string_view name) {
+  DTEXT_WORK(options.emojis.size() * (name.size() + 1));
   std::string lowercase_name(name);
   std::transform(name.begin(), name.end(), lowercase_name.begin(), &ascii_tolower);
 
@@ -1437,6 +1458,7 @@ bool StateMachine::dstack_close_element(element_t type, const std::string_view t
 
 // Close the last open tag.
 void StateMachine::dstack_rewind() {
+  DTEXT_WORK(1);
   element_t element = dstack_pop();
   g_debug("dstack rewind %s", element_names[element]);
 
@@ -1579,6 +1601,7 @@ static bool is_mention_boundary(unsigned char c) {
 
 // Trim trailing unbalanced ')' characters from the URL.
 std::tuple<std::string_view, std::string_view> StateMachine::trim_url(const std::string_view url) {
+  DTEXT_WORK(url.size());
   std::string_view trimmed = url;
   auto open_parens = std::count(url.begin(), url.end(), '(');
   auto close_parens = std::count(url.begin(), url.end(), ')');
@@ -1633,6 +1656,11 @@ std::string StateMachine::parse_basic_inline(const std::string_view dtext) {
 }
 
 StateMachine::ParseResult StateMachine::parse_dtext(const std::string_view dtext, DTextOptions options) {
+#ifdef DTEXT_COUNT_WORK
+  dtext_work = 0;
+  dtext_last_read = nullptr;
+#endif
+
   StateMachine sm(dtext, dtext_en_main, options);
   return { sm.parse(), sm.wiki_pages };
 }

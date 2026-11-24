@@ -114,9 +114,20 @@ static VALUE c_parse_wiki_pages(VALUE self, VALUE input) {
   });
 }
 
+#ifdef DTEXT_COUNT_WORK
+// Return how much work the last parse in this thread did.
+static VALUE c_work(VALUE self) {
+  return SIZET2NUM(dtext_work);
+}
+#endif
+
 extern "C" void Init_dtext() {
   cDText = rb_define_class("DText", rb_cObject);
   cDTextError = rb_define_class_under(cDText, "Error", rb_eStandardError);
   rb_define_singleton_method(cDText, "c_parse", c_parse, 8);
   rb_define_singleton_method(cDText, "c_parse_wiki_pages", c_parse_wiki_pages, 1);
+
+#ifdef DTEXT_COUNT_WORK
+  rb_define_singleton_method(cDText, "work", c_work, 0);
+#endif
 }
