@@ -1009,7 +1009,12 @@ CREATE TABLE public.ip_geolocations (
     country character varying,
     region character varying,
     city character varying,
-    carrier character varying
+    carrier character varying,
+    provider integer DEFAULT 0 NOT NULL,
+    ip_type integer,
+    operator character varying,
+    checked_at timestamp(6) without time zone,
+    response jsonb
 );
 
 
@@ -4780,6 +4785,13 @@ CREATE INDEX index_ip_geolocations_on_carrier ON public.ip_geolocations USING bt
 
 
 --
+-- Name: index_ip_geolocations_on_checked_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_checked_at ON public.ip_geolocations USING btree (checked_at);
+
+
+--
 -- Name: index_ip_geolocations_on_city; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4815,6 +4827,13 @@ CREATE UNIQUE INDEX index_ip_geolocations_on_ip_addr ON public.ip_geolocations U
 
 
 --
+-- Name: index_ip_geolocations_on_ip_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_ip_type ON public.ip_geolocations USING btree (ip_type);
+
+
+--
 -- Name: index_ip_geolocations_on_is_proxy; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4840,6 +4859,13 @@ CREATE INDEX index_ip_geolocations_on_longitude ON public.ip_geolocations USING 
 --
 
 CREATE INDEX index_ip_geolocations_on_network ON public.ip_geolocations USING btree (network);
+
+
+--
+-- Name: index_ip_geolocations_on_operator; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_operator ON public.ip_geolocations USING btree (operator) WHERE (operator IS NOT NULL);
 
 
 --
@@ -7306,6 +7332,8 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261121120001'),
+('20261121120000'),
 ('20261104064770'),
 ('20261104064769'),
 ('20261104064768'),
