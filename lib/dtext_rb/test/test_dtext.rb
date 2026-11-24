@@ -2245,6 +2245,17 @@ class DTextTest < Minitest::Test
     assert_parse('<table class="striped"><tr><td>  a  </td></tr></table>', "[table][tr][td]  a  [/td][/tr][/table]")
   end
 
+  def test_vertical_tabs_and_form_feeds
+    assert_parse("<p>a<br>b</p>", "a\vb")
+    assert_parse("<p>a</p><p>b</p>", "a\v\vb")
+    assert_parse("<p>a</p><p>b</p>", "a\v\r\nb")
+    assert_parse("<p>a b</p>", "a\fb")
+    assert_parse("<p>a<br> b</p>", "a\v\fb")
+    assert_parse(%{<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">http://example.com</a></p><ul><li>b</li></ul>}, "http://example.com\v* b")
+    assert_parse("<pre>a\nb</pre>", "[code]a\vb[/code]")
+    assert_inline_parse("a b", "a\fb")
+  end
+
   def test_long_whitespace_runs
     assert_fast_parse("a#{" " * 100_000}b")
     assert_fast_parse("a#{"\t" * 100_000}b")

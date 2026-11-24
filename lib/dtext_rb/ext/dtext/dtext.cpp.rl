@@ -1591,9 +1591,10 @@ std::tuple<std::string_view, std::string_view> StateMachine::trim_url(const std:
   return { trimmed, { trimmed.end(), url.end() } };
 }
 
-// Replace CRLF sequences with LF.
+// Replace CRLF sequences and vertical tabs with LF, and form feeds with spaces.
 static void replace_newlines(const std::string_view input, std::string& output) {
   size_t pos, last = 0;
+  size_t start = output.size();
 
   while (std::string::npos != (pos = input.find("\r\n", last))) {
     output.append(input, last, pos - last);
@@ -1602,6 +1603,9 @@ static void replace_newlines(const std::string_view input, std::string& output) 
   }
 
   output.append(input, last, pos - last);
+
+  std::replace(output.begin() + start, output.end(), '\v', '\n');
+  std::replace(output.begin() + start, output.end(), '\f', ' ');
 }
 
 StateMachine::StateMachine(const auto string, int initial_state, const DTextOptions options) : options(options) {
