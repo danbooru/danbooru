@@ -13,7 +13,7 @@ class Source::Extractor::CiEn < Source::Extractor
       urls = []
 
       og_url = Source::URL.parse(page&.css("meta[property='og:image']")&.attr("content").to_s)
-      if og_url.image_type != "attachment"
+      if og_url.present? && og_url.image_type != "attachment"
         urls << og_url.to_s
       end
 

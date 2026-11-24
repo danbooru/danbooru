@@ -299,4 +299,15 @@ module Source::Tests::Extractor
       )
     end
   end
+
+  class CiEnExtractorWithoutCredentialsTest < ActiveSupport::TestCase
+    context "An article url that returns a page without an og:image tag" do
+      should "not raise an error" do
+        Source::Extractor::CiEn.any_instance.stubs(:parsed_get).returns(Nokogiri::HTML5.parse("<html><title>メンテナンス中 - Ci-en</title></html>"))
+        extractor = Source::Extractor::CiEn.new("https://ci-en.net/creator/2407/article/35609")
+
+        assert_equal([], extractor.image_urls)
+      end
+    end
+  end
 end
