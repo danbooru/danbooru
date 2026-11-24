@@ -162,7 +162,9 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
-          push: true
+          # zstd-9 is about 18% smaller and faster to unpack, but takes 2x longer to compress.
+          # https://docs.docker.com/build/exporters/#compression
+          outputs: type=image,push=true,compression=zstd,compression-level=9,oci-mediatypes=true
           target: ${{ inputs.docker-target }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
@@ -176,7 +178,7 @@ jobs:
           cache-from: |
             type=registry,ref=${{ env.GHCR_BUILDCACHE_IMAGE }}:buildcache
             type=registry,ref=${{ env.GHCR_BUILDCACHE_IMAGE }}:buildcache-development
-          cache-to: type=registry,ref=${{ env.GHCR_BUILDCACHE_IMAGE }}:${{ env.CACHE_TAG }},mode=max
+          cache-to: type=registry,ref=${{ env.GHCR_BUILDCACHE_IMAGE }}:${{ env.CACHE_TAG }},mode=max,compression=zstd,compression-level=9
 
           # https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories
           # ubuntu-latest on public repositories has 4 vCPU
