@@ -8,6 +8,7 @@
       <%= f.input :region, input_html: { value: params[:search][:region] } %>
       <%= f.input :city, input_html: { value: params[:search][:city] } %>
       <%= f.input :is_proxy, label: "Proxy?", as: :select, include_blank: true, selected: params[:search][:is_proxy] %>
+      <%= f.input :ip_type, label: "IP Type", collection: IpGeolocation::IP_TYPE_NAMES.invert, include_blank: true, selected: params[:search][:ip_type] %>
       <%= f.submit "Search" %>
     <% end %>
 
@@ -20,6 +21,9 @@
       <% t.column :asn %>
       <% t.column :organization %>
       <% t.column :is_proxy %>
+      <% t.column "IP Type" do |ip_geolocation| %>
+        <%= ip_geolocation.ip_type_name %>
+      <% end %>
       <% t.column :continent %>
       <% t.column :country %>
       <% t.column :region %>

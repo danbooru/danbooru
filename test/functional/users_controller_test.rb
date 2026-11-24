@@ -773,7 +773,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "mark users signing up from proxies as restricted" do
-          skip unless IpLookup.enabled?
+          Danbooru.config.stubs(:ip_intelligence_provider).returns("ipregistry://ipregistry-key")
+          mock_request("https://api.ipregistry.co/#{@proxy_ip}", body: { connection: { type: "hosting" }, security: { is_vpn: false }}.to_json)
           self.remote_addr = @proxy_ip
 
           post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1" }}
@@ -801,7 +802,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "not mark users signing up from non-proxies as restricted" do
-          skip unless IpLookup.enabled?
+          Danbooru.config.stubs(:ip_intelligence_provider).returns("ipregistry://ipregistry-key")
+          mock_request("https://api.ipregistry.co/#{@valid_ip}", body: { connection: { type: "isp" }, security: { is_vpn: false }}.to_json)
           self.remote_addr = @valid_ip
 
           post users_path, params: { user: { name: "xxx", password: "xxxxxxx1", password_confirmation: "xxxxxxx1" }}

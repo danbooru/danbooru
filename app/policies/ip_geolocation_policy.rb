@@ -14,6 +14,6 @@ class IpGeolocationPolicy < ApplicationPolicy
   end
 
   def searchable_attributes
-    %i[id created_at updated_at ip_addr network asn is_proxy latitude longitude organization time_zone continent country region city carrier]
+    %i[id created_at updated_at ip_addr network asn is_proxy latitude longitude organization time_zone continent country region city carrier provider ip_type operator checked_at]
   end
 end
