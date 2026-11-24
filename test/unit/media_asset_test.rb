@@ -104,6 +104,15 @@ class MediaAssetTest < ActiveSupport::TestCase
         assert_equal("Image took too long to process", error.message)
       end
 
+      should "fail with a timeout error if reading the video times out" do
+        stub_const(FFmpeg, :DECODE_TIMEOUT, 0.001.seconds) do
+          video = MediaFile.open("test/files/mp4/test-300x300.mp4")
+
+          error = assert_raises(MediaAsset::Error) { MediaAsset.validate_media_file!(video, create(:user)) }
+          assert_equal("Video took too long to process", error.message)
+        end
+      end
+
       should "fail with a too large error for WebPs over the max WebP resolution" do
         stub_const(MediaAsset, :MAX_WEBP_RESOLUTION, 1_000) do
           image = MediaFile.open("test/files/webp/test.webp")

@@ -2314,6 +2314,26 @@ class MediaFileMp4Test < ActiveSupport::TestCase
     end
   end
 
+  context "a video that takes longer than the default command timeout to read" do
+    should "not limit reading the metadata to the default command timeout" do
+      file = MediaFile.open("test/files/mp4/test-300x300.mp4")
+      FFmpeg.any_instance.stubs(:packet_count).returns(1)
+      ExternalCommand.expects(:run).with(regexp_matches(/\Affprobe .*-show_entries format=/), has_entry(:timeout, FFmpeg::DECODE_TIMEOUT)).raises(ExternalCommand::TimeoutError, "ffprobe timed out")
+
+      error = assert_raises(FFmpeg::TimeoutError) { file.dimensions }
+      assert_equal("ffprobe timed out", error.message)
+    end
+
+    should "not limit playing the video to the default command timeout" do
+      file = MediaFile.open("test/files/mp4/test-300x300.mp4")
+      FFmpeg.any_instance.stubs(:metadata).returns({})
+      ExternalCommand.expects(:run).with(regexp_matches(/\Affmpeg .*-progress /), has_entry(:timeout, FFmpeg::DECODE_TIMEOUT)).raises(ExternalCommand::TimeoutError, "ffmpeg timed out")
+
+      error = assert_raises(FFmpeg::TimeoutError) { file.is_corrupt? }
+      assert_equal("ffmpeg timed out", error.message)
+    end
+  end
+
   context "an MP4 file with a fake duration in the container metadata" do
     # A 141 second 16x16 H.264 video (`ffmpeg -f lavfi -i color=c=black:s=16x16:r=1 -t 141 -pix_fmt yuv420p -c:v libx264`)
     # with the duration fields in the mvhd, tkhd, and mdhd boxes changed to 1 timescale unit.

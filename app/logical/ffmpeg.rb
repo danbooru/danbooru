@@ -7,6 +7,7 @@ class FFmpeg
   extend Memoist
 
   class Error < StandardError; end
+  class TimeoutError < Error; end
 
   # The maximum number of packets in all streams combined. Reading the metadata for each packet and its frame takes about
   # 1KB of memory, so this limits it to about 100MB. 100k packets is about 12 minutes of 60 FPS video with audio.
@@ -31,6 +32,10 @@ class FFmpeg
   # The timeout for encoding a video. This is longer than the default command timeout, because two-pass VP9 encoding
   # of a 500-frame 1080p ugoira can take a minute or more.
   ENCODE_TIMEOUT = 5.minutes
+
+  # The timeout for reading the metadata of a video or playing it, which both decode every frame. This is longer than
+  # the default command timeout, because decoding a large video can take a minute or more.
+  DECODE_TIMEOUT = 3.minutes
 
   # The ffmpeg demuxers allowed for each file type. Broken APNGs are read as regular PNGs by image2.
   DEMUXERS = { mp4: "mov", avif: "mov", webm: "matroska", mkv: "matroska", gif: "gif", png: "apng,image2", webp: "image2", jpg: "image2" }.freeze
@@ -83,12 +88,15 @@ class FFmpeg
   # @see https://ffmpeg.org/ffprobe.html
   # @see https://gist.github.com/nrk/2286511
   #
-  # @return [Hash] A hash of the file's metadata. Will be empty if reading the file failed for any reason.
+  # @return [Hash] A hash of the file's metadata, or a hash with the error if reading the file failed.
+  # @raise [TimeoutError] If reading the file timed out.
   memoize def metadata
     raise Error, "too many frames (max: #{MAX_PACKET_COUNT})" if packet_count > MAX_PACKET_COUNT
 
-    output = FFmpeg.shell!("ffprobe -v quiet -print_format json -show_entries #{METADATA_FIELDS} #{input_args}", read: [file.path], output_limit: METADATA_OUTPUT_LIMIT)
+    output = FFmpeg.shell!("ffprobe -v quiet -print_format json -show_entries #{METADATA_FIELDS} #{input_args}", read: [file.path], output_limit: METADATA_OUTPUT_LIMIT, timeout: DECODE_TIMEOUT)
     output.parse_json || {}
+  rescue TimeoutError
+    raise
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
   end
@@ -392,12 +400,13 @@ class FFmpeg
   end
 
   # @return [Hash] Decode the full video and return a hash containing the frame count, fps, runtime, and the sizes of the decompressed video and audio streams.
+  # @raise [TimeoutError] If playing the video timed out.
   memoize def playback_info
     # https://ffmpeg.org/ffmpeg-filters.html#silencedetect
     # https://ffmpeg.org/ffmpeg-filters.html#ebur128-1
     # XXX `-c copy` is faster, but it doesn't decompress the stream so it can't detect corrupt videos.
     output, progress = Danbooru::Tempfile.create do |tempfile|
-      output = FFmpeg.shell!("ffmpeg -hide_banner #{input_args} -progress #{tempfile.path.shellescape} -af silencedetect=noise=0.0001:duration=0.25s,ebur128=metadata=1:dualmono=true:peak=true -f null /dev/null", read: [file.path], write: [tempfile.path])
+      output = FFmpeg.shell!("ffmpeg -hide_banner #{input_args} -progress #{tempfile.path.shellescape} -af silencedetect=noise=0.0001:duration=0.25s,ebur128=metadata=1:dualmono=true:peak=true -f null /dev/null", read: [file.path], write: [tempfile.path], timeout: DECODE_TIMEOUT)
       [output, tempfile.read]
     end
 
@@ -453,6 +462,8 @@ class FFmpeg
     end
 
     { **time_info, **size_info, silence: silence_info, ebur128: ebur128_info.to_h }.with_indifferent_access
+  rescue TimeoutError
+    raise
   rescue Error => e
     { error: e.message.strip }.with_indifferent_access
   end
@@ -647,7 +658,9 @@ class FFmpeg
     end
 
     output.force_encoding("ASCII-8BIT")
-  rescue ExternalCommand::TimeoutError, ExternalCommand::OutputLimitError => e
+  rescue ExternalCommand::TimeoutError => e
+    raise TimeoutError, e.message
+  rescue ExternalCommand::OutputLimitError => e
     raise Error, e.message
   end
 end

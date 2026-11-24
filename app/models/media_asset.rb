@@ -446,6 +446,8 @@ class MediaAsset < ApplicationRecord
         end
       rescue MediaFile::Ugoira::Error, MediaFile::Image::TimeoutError => e
         raise Error, e.message
+      rescue FFmpeg::TimeoutError
+        raise Error, "Video took too long to process"
       end
     end
 
