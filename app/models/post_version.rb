@@ -42,17 +42,18 @@ class PostVersion < ApplicationRecord
       where_array_includes_any(:added_tags, tags).or(where_array_includes_any(:removed_tags, tags))
     end
 
+    # Find versions with a tag matching the given tag, which may contain `*` wildcards.
     def tag_matches(string)
-      tag = string.match(/\S+/)[0]
+      tag = string.scan(/[^[:space:]]+/).first
       return all if tag.nil?
-      tag = "*#{tag}*" unless tag.include?("*")
-      where_ilike(:tags, tag)
+
+      where("EXISTS (SELECT 1 FROM unnest(string_to_array(post_versions.tags, ' ')) AS tag WHERE tag ILIKE ?)", tag.to_escaped_for_sql_like)
     end
 
     def search(params, current_user)
       q = search_attributes(params, current_user: current_user)
 
-      parsed = parse_search_params!(params, changed_tags: :string, all_changed_tags: :string, any_changed_tags: :string)
+      parsed = parse_search_params!(params, changed_tags: :string, all_changed_tags: :string, any_changed_tags: :string, tag_matches: :string)
 
       if parsed[:changed_tags]
         q = q.changed_tags_include_all(parsed[:changed_tags].scan(/[^[:space:]]+/))
@@ -66,8 +67,8 @@ class PostVersion < ApplicationRecord
         q = q.changed_tags_include_any(parsed[:any_changed_tags].scan(/[^[:space:]]+/))
       end
 
-      if params[:tag_matches]
-        q = q.tag_matches(params[:tag_matches])
+      if parsed[:tag_matches]
+        q = q.tag_matches(parsed[:tag_matches])
       end
 
       if params[:updater_name].present?

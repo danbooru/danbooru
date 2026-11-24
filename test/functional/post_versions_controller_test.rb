@@ -24,6 +24,13 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
 
         get_auth post_versions_path, @user, params: { search: { any_changed_tags: { a: "tagme" }}}, as: :json
         assert_response 422
+
+        get_auth post_versions_path, @user, params: { search: { tag_matches: ["tagme"] }}, as: :json
+        assert_response 422
+        assert_equal("tag_matches must be a string", response.parsed_body["message"])
+
+        get_auth post_versions_path, @user, params: { search: { tag_matches: { a: "tagme" }}}, as: :json
+        assert_response 422
       end
 
       should "list all versions" do
@@ -90,6 +97,28 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal @post.versions[0].id, response.parsed_body[0]["id"].to_i
         assert_equal 1, response.parsed_body.length
+      end
+
+      should "match whole tags for search[tag_matches]" do
+        get post_versions_path(search: { post_id: @post.id, tag_matches: "tag" }), as: :json
+        assert_response :success
+        assert_equal([], response.parsed_body.pluck("id"))
+
+        get post_versions_path(search: { post_id: @post.id, tag_matches: "TAG*" }), as: :json
+        assert_response :success
+        assert_equal([@post.versions[0].id], response.parsed_body.pluck("id"))
+
+        get post_versions_path(search: { post_id: @post.id, tag_matches: "2" }), as: :json
+        assert_response :success
+        assert_equal([@post.versions[2].id, @post.versions[1].id], response.parsed_body.pluck("id"))
+
+        get post_versions_path(search: { post_id: @post.id, tag_matches: "　2　" }), as: :json
+        assert_response :success
+        assert_equal([@post.versions[2].id, @post.versions[1].id], response.parsed_body.pluck("id"))
+
+        get post_versions_path(search: { post_id: @post.id, tag_matches: "1*3" }), as: :json
+        assert_response :success
+        assert_equal([], response.parsed_body.pluck("id"))
       end
 
       should "include source changes in added_tags and removed_tags in the API" do
