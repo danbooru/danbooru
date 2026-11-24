@@ -25,6 +25,18 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not return more than 200 versions per page in HTML, or 1000 in the API" do
+        WikiPageVersion.insert_all(Array.new(200) { { wiki_page_id: @wiki_page.id, updater_id: @user.id, title: @wiki_page.title, body: "foo", is_locked: false, created_at: Time.zone.now, updated_at: Time.zone.now } }) # rubocop:disable Rails/SkipsModelValidations
+
+        get wiki_page_versions_path(limit: 1000), as: :json
+        assert_response :success
+        assert_equal(WikiPageVersion.count, response.parsed_body.size)
+
+        get wiki_page_versions_path(limit: 1000)
+        assert_response :success
+        assert_select "tr[id^=wiki-page-version-]", count: 200
+      end
+
       should respond_to_search.with { @versions.reverse }
       should respond_to_search(title_like: "supreme").with { [@versions[2], @versions[1]] }
       should respond_to_search(body_matches: "blah").with { [@versions[2], @versions[1]] }

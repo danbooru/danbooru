@@ -6,7 +6,7 @@ class WikiPageVersionsController < ApplicationController
 
   def index
     set_version_comparison
-    @wiki_page_versions = authorize WikiPageVersion.paginated_search(params)
+    @wiki_page_versions = authorize WikiPageVersion.paginated_search(params, max_limit: request.format.html? ? 200 : 1_000)
     @wiki_page_versions = @wiki_page_versions.includes(:updater, :wiki_page) if request.format.html?
 
     respond_with(@wiki_page_versions)
