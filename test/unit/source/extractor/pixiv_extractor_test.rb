@@ -192,6 +192,23 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A ugoira zip URL for a deleted post" do
+      strategy_should_work(
+        "https://i.pximg.net/img-zip-ugoira/img/2024/09/23/23/59/01/122717101_ugoira1920x1080.zip",
+        image_urls: [],
+        page_url: "https://www.pixiv.net/artworks/122717101",
+        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: Time.parse("2024-09-23T14:59:01.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
     context "A https://www.pixiv.net/*/artworks/* source" do
       strategy_should_work(
         "https://www.pixiv.net/en/artworks/64476642",

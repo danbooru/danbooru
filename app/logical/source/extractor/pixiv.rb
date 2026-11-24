@@ -14,7 +14,7 @@ module Source
         #
         # https://i.pximg.net/img-zip-ugoira/img/2024/10/17/12/31/43/123406986_ugoira1920x1080.zip
         # https://i.pximg.net/img-zip-ugoira/img/2024/10/22/02/32/43/123406986_ugoira1920x1080.zip
-        if parsed_url.ugoira_zip_url? && parsed_url.date != ugoira_zip_url.date
+        if parsed_url.ugoira_zip_url? && parsed_url.date != ugoira_zip_url&.date
           [] # Return nothing because the ugoira has been revised, so we can't be sure we have the correct frame delays.
         # If it's a full image URL, then use it as-is instead of looking it up in the API, because it could be the
         # original version of an image that has since been revised.
