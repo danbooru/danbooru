@@ -966,13 +966,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "promote action" do
       should "work for a moderator" do
-        get_auth promote_user_path(@user), create(:moderator_user)
+        get_auth promote_user_path(@user), create(:moderator_user), reauthenticate: true
 
         assert_response :success
       end
 
       should "not offer the superadmin level to the owner" do
-        get_auth promote_user_path(@user), create(:superadmin_user)
+        get_auth promote_user_path(@user), create(:superadmin_user), reauthenticate: true
 
         assert_response :success
         assert_select "option[value=#{User::Levels::ADMIN}]", count: 1
@@ -980,23 +980,35 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not work for a regular user" do
-        get_auth promote_user_path(@user), @user
+        get_auth promote_user_path(@user), @user, reauthenticate: true
 
         assert_response 403
+      end
+
+      should "redirect to the confirm password page if the moderator hasn't recently reauthenticated" do
+        get_auth promote_user_path(@user), create(:moderator_user)
+
+        assert_redirected_to confirm_password_session_path(url: promote_user_path(@user))
       end
     end
 
     context "demote action" do
       should "work for a moderator" do
-        get_auth demote_user_path(@user), create(:moderator_user)
+        get_auth demote_user_path(@user), create(:moderator_user), reauthenticate: true
 
         assert_response :success
       end
 
       should "not work for a regular user" do
-        get_auth demote_user_path(@user), @user
+        get_auth demote_user_path(@user), @user, reauthenticate: true
 
         assert_response 403
+      end
+
+      should "redirect to the confirm password page if the moderator hasn't recently reauthenticated" do
+        get_auth demote_user_path(@user), create(:moderator_user)
+
+        assert_redirected_to confirm_password_session_path(url: demote_user_path(@user))
       end
     end
   end

@@ -35,8 +35,19 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#update" do
+      should "not change the level if the moderator hasn't recently reauthenticated" do
+        login_as(@mod, reauthenticate: true)
+        travel_to 16.minutes.from_now do
+          put admin_user_path(@user), params: { user: { level: User::Levels::GOLD }}
+        end
+
+        assert_redirected_to confirm_password_session_path(url: admin_user_path(@user))
+        assert_equal(User::Levels::MEMBER, @user.reload.level)
+        assert_equal(false, @user.mod_actions.user_level_change.exists?)
+      end
+
       should "not allow the owner to promote a user to superadmin" do
-        put_auth admin_user_path(@user), create(:superadmin_user), params: { user: { level: User::Levels::SUPERADMIN }}
+        put_auth admin_user_path(@user), create(:superadmin_user), params: { user: { level: User::Levels::SUPERADMIN }}, reauthenticate: true
 
         assert_response 403
         assert_equal(User::Levels::MEMBER, @user.reload.level)
@@ -44,7 +55,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "when a moderator is promoting a basic member" do
         should "allow promoting the user to gold" do
-          put_auth admin_user_path(@user), @mod, params: { user: { level: "30" }}
+          put_auth admin_user_path(@user), @mod, params: { user: { level: "30" }}, reauthenticate: true
 
           assert_redirected_to(edit_admin_user_path(@user))
           assert_equal(30, @user.reload.level)
@@ -58,7 +69,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
         context "when promoting the user to an admin" do
           should "fail" do
-            put_auth admin_user_path(@user), @mod, params: { user: { level: "50" }}
+            put_auth admin_user_path(@user), @mod, params: { user: { level: "50" }}, reauthenticate: true
 
             assert_response(403)
             assert_equal(20, @user.reload.level)
@@ -70,7 +81,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
         context "when the level is missing" do
           should "not demote the user to anonymous" do
-            put_auth admin_user_path(@user), @mod, params: { user: { name: "foo" }}
+            put_auth admin_user_path(@user), @mod, params: { user: { name: "foo" }}, reauthenticate: true
 
             assert_response(403)
             assert_equal(20, @user.reload.level)
@@ -80,7 +91,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
         context "when promoting the user to an invalid level" do
           should "fail" do
-            put_auth admin_user_path(@user), @mod, params: { user: { level: "0" }}
+            put_auth admin_user_path(@user), @mod, params: { user: { level: "0" }}, reauthenticate: true
 
             assert_response(403)
             assert_equal(20, @user.reload.level)
@@ -93,7 +104,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "when a moderator is demoting an admin" do
         should "fail" do
-          put_auth admin_user_path(@admin), @mod, params: { user: { level: "30" }}
+          put_auth admin_user_path(@admin), @mod, params: { user: { level: "30" }}, reauthenticate: true
 
           assert_response(403)
           assert_equal(50, @admin.reload.level)
@@ -105,7 +116,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "when a non-moderator is trying to promote another user" do
         should "fail" do
-          put_auth admin_user_path(@user), create(:approver_user), params: { user: { level: "30" }}
+          put_auth admin_user_path(@user), create(:approver_user), params: { user: { level: "30" }}, reauthenticate: true
 
           assert_response(403)
           assert_equal(20, @user.reload.level)
