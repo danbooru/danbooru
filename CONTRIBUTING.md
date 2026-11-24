@@ -322,13 +322,16 @@ The DText parser is a C++ Ruby extension in `lib/dtext_rb`, generated from a Rag
 - Edit `dtext.cpp.rl`, not the generated `dtext.cpp`. Rebuild with `bin/rake compile` and run `bin/rake test` in `lib/dtext_rb` after every change.
 - Keep existing DText working. There are millions of comments, forum posts, and wiki pages written in it. Test every change to the grammar or pattern rules against a dump of all DText on the site with `lib/dtext_rb/bin/test-dtext`, and make sure the amount of changed output is acceptable.
 - Build with `DTEXT_DEBUG=true` when you change C++ code. It turns on the undefined behavior and leak sanitizers and the standard library debug checks.
-- Don't write rules that scan ahead to the end of the line or the text looking for a closing tag, then backtrack when they don't find one. Many unclosed tags make parsing quadratic. Test with 100-200KB of repeated unclosed tags, and check `bin/rake bench` ([3ebff34b4], [8ece9bcc5], [fc95d7585], [ea6d799de]).
+- Don't write rules that scan ahead looking for a closing tag, then backtrack when they don't find one. Many unclosed tags make parsing quadratic.
+  - Test large amounts of repeated unclosed tags, and check `bin/rake bench` ([3ebff34b4], [8ece9bcc5], [fc95d7585], [ea6d799de]).
+  - Test long runs between other text too (`"a" + " " * n + "b"`), not only on their own. A run that fills the whole input can take a different, fast path.
+  - Watch out for Ragel's `space` class. It also matches `\r`, `\v`, and `\f`, which DText's `ws` doesn't, so a rule using `space*` can read through text that other rules split into many tokens.
+  - Build with `DTEXT_COUNT_WORK=true` and check that `DText.work` per byte stays the same as these inputs grow. It counts the parser's work exactly, so superlinear growth shows up even at a few KB (see [lib/dtext_rb/README.md](lib/dtext_rb/README.md)).
 - Reset the match marks (`c1`, `c2`, and so on) for optional parts of a token. Otherwise they keep positions from an earlier failed match ([692355592]).
-- Don't use `std::regex` or recursion on user input. `std::regex` recurses once per character, so long input overflows the stack ([faedd95a7], [807d8577a], [c1c1dfb43]).
+- Don't use recursion on user input.
 - Use a nesting limit when parsing HTML. Deeply nested HTML is slow or crashes the code that processes it afterwards ([1682ad927], [a889cc6a6]).
 - Escape everything you output with `append_html_escaped` or `append_uri_escaped`, and be careful when classifying links as internal or external ([6d99f50ee]).
-- Don't raise Ruby exceptions (`rb_raise`, `StringValue`, `Check_Type`) while C++ objects are alive. Ruby exceptions use `longjmp`, which skips C++ destructors and leaks memory. Validate all arguments before creating any C++ objects, and raise C++ exceptions as Ruby exceptions only after the C++ stack has unwound, like `rescue` in `rb_dtext.cpp` does ([67bfecd74]).
-- Don't call back into Ruby during parsing. Pass in everything the parser needs before it starts ([67bfecd74]).
+- Don't raise Ruby exceptions (`rb_raise`, `StringValue`, `Check_Type`) while C++ objects are alive. Ruby exceptions use `longjmp`, which skips C++ destructors and leaks memory. Raise C++ exceptions as Ruby exceptions only after the C++ stack has unwound, like `rescue` in `rb_dtext.cpp` does ([67bfecd74]).
 - Keep the input checks in `rb_dtext.cpp`. The parser assumes the input is valid UTF-8 with no null bytes, because it uses null bytes to mark the start and end of the text.
 - Keep per-call work small. DText runs on almost every page, so converting large Ruby objects to C++ on every call adds up ([4d807c399]).
 
