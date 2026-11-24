@@ -2234,6 +2234,32 @@ class DTextTest < Minitest::Test
     assert_fast_parse("[[a|b" * 50_000)
   end
 
+  def test_whitespace_runs
+    assert_parse("<p>a \t b</p>", "a \t b")
+    assert_parse("<p>  a  </p>", "  a  ")
+    assert_parse("<p>a  <br>b</p>", "a  \nb")
+    assert_parse("<p>a</p><p>b</p>", "a  \n\nb")
+    assert_parse("<p>a</p><p>  b</p>", "a  \n  \n  b")
+    assert_parse("<ul><li>a  b</li><li>c</li></ul>", "* a  b\n* c")
+    assert_parse("<blockquote><p>a  </p></blockquote><p>b</p>", "[quote]  a  [/quote]  b")
+    assert_parse('<table class="striped"><tr><td>  a  </td></tr></table>', "[table][tr][td]  a  [/td][/tr][/table]")
+  end
+
+  def test_long_whitespace_runs
+    assert_fast_parse("a#{" " * 100_000}b")
+    assert_fast_parse("a#{"\t" * 100_000}b")
+    assert_fast_parse("#{" " * 100_000}b")
+    assert_fast_parse("a#{" " * 100_000}")
+    assert_fast_parse("a#{" " * 100_000}\nb")
+    assert_fast_parse("a\n#{" " * 100_000}b")
+    assert_fast_parse("[b]a#{" " * 100_000}b")
+    assert_fast_parse("* a#{" " * 100_000}b")
+    assert_fast_parse("[quote]a#{" " * 100_000}b")
+    assert_fast_parse("[table][tr][td]a#{" " * 100_000}b")
+    assert_fast_parse("a #{"\n" * 1_000}" * 100)
+    assert_fast_parse("a#{" \n" * 50_000}b")
+  end
+
   def test_many_unclosed_bbcode_links
     assert_fast_parse("[url=/a]" * 50_000)
     assert_fast_parse("[url=/a]b " * 50_000)

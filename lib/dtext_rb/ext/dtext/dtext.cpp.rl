@@ -643,6 +643,11 @@ inline := |*
     append({ ts, te });
   };
 
+  # Match whitespace runs in one token so they're scanned once by `blank_lines`, not once per character.
+  ws+ => {
+    append({ ts, te });
+  };
+
   any => {
     append_html_escaped(fc);
   };
