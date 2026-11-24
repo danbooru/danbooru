@@ -61,6 +61,15 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
       end
+
+      should "not show software versions that are hidden on /status" do
+        get metrics_path
+
+        assert_response :success
+        assert_includes(response.body, "danbooru_version=")
+        assert_not_includes(response.body, "rails_version=")
+        assert_not_includes(response.body, "ffmpeg_version=")
+      end
     end
 
     context "#statistics action" do
@@ -78,9 +87,32 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#instance action" do
+      setup do
+        ApplicationMetrics.reset_metrics
+      end
+
       should "work for text format" do
         ApplicationMetrics.update_process_metrics
         get instance_metrics_path
+
+        assert_response :success
+      end
+
+      should "not show software versions that are hidden on /status" do
+        ApplicationMetrics.instance.stubs(:instance_metrics).returns(ApplicationMetrics.process_metrics)
+        get instance_metrics_path
+
+        assert_response :success
+        assert_includes(response.body, "danbooru_version=")
+        assert_includes(response.body, "pod_name=")
+        assert_not_includes(response.body, "rails_version=")
+        assert_not_includes(response.body, "ffmpeg_version=")
+      end
+
+      should "cache the metrics on the server even when the query string changes" do
+        ApplicationMetrics.instance.expects(:instance_metrics).once.returns(Danbooru::Metric::Set.new)
+        get instance_metrics_path(foo: 1)
+        get instance_metrics_path(foo: 2)
 
         assert_response :success
       end
