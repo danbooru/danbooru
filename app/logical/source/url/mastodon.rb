@@ -10,14 +10,16 @@ class Source::URL::Mastodon < Source::URL
     credential :access_token, help: %{Your Pawoo access token. Go to https://pawoo.net/settings/applications, create a new application with the 'read' scope, and copy the access token.}
   end
 
-  site "Baraag", url: "https://baraag.net" do
-    credential :access_token, help: %{Your Baraag access token. Go to https://baraag.net/settings/applications, create a new application with the 'read' scope, and copy the access token.}
-  end
+  site "Baraag", url: "https://baraag.net"
 
   attr_reader :username, :user_id, :work_id, :full_image_url, :media_hash
 
   def self.match?(url)
     url.domain.in?(%w[pawoo.net baraag.net])
+  end
+
+  def extractor_class
+    super unless domain == "baraag.net"
   end
 
   def parse

@@ -9,11 +9,6 @@ class SiteCredential < ApplicationRecord
       default_credential: { session_cookie: Danbooru.config.art_street_session_cookie },
       help: %{Your "ArtStreet":https://medibang.com 'MSID' cookie. Go to your profile settings and set your age to 18+ to view R-18 works.},
     }, {
-      id: 200,
-      name: "Baraag",
-      default_credential: { access_token: Danbooru.config.baraag_access_token },
-      help: %{Your "Baraag":https://baraag.net access token. Go to "Preferences > Development":[https://baraag.net/settings/applications], create a new application with the 'read' scope, and copy the access token.},
-    }, {
       id: 300,
       name: "Behance",
       default_credential: { session_cookie: Danbooru.config.behance_session_cookie },

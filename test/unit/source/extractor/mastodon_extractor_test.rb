@@ -74,54 +74,15 @@ module Source::Tests::Extractor
       end
     end
 
-    context "For Baraag," do
-      setup do
-        skip "Baraag keys not set" unless SiteCredential.for_site("Baraag").present?
-      end
+    context "A status whose API returns an HTML page instead of JSON" do
+      should "not raise an error" do
+        Source::Extractor::Mastodon.any_instance.stubs(:parsed_get).returns(Nokogiri::HTML5.parse("<html><title>Error</title></html>"))
+        extractor = Source::Extractor.find("https://pawoo.net/@evazion/19451018")
 
-      context "a baraag.net/$user/$id url" do
-        strategy_should_work(
-          "https://baraag.net/@bardbot/105732813175612920",
-          image_urls: ["https://media.baraag.net/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"],
-          media_files: [{ file_size: 573_353 }],
-          profile_url: "https://baraag.net/@bardbot",
-          username: "bardbot",
-          display_name: "SpicyBardo🔞",
-          published_at: Time.parse("2021-02-15T02:04:53.255000Z"),
-          updated_at: nil,
-          dtext_artist_commentary_desc: "🍌",
-        )
-      end
-
-      context "an old baraag image url" do
-        strategy_should_work(
-          "https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
-          image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
-          media_files: [{ file_size: 363_261 }],
-          published_at: nil,
-          updated_at: nil,
-        )
-      end
-
-      context "a new baraag image url" do
-        strategy_should_work(
-          "https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png",
-          image_urls: ["https://media.baraag.net/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"],
-          media_files: [{ file_size: 363_261 }],
-          published_at: nil,
-          updated_at: nil,
-        )
-      end
-
-      context "a deleted or invalid source" do
-        strategy_should_work(
-          "https://baraag.net/@nonamethankswashere/12345678901234567890",
-          profile_url: "https://baraag.net/@nonamethankswashere",
-          username: "nonamethankswashere",
-          published_at: nil,
-          updated_at: nil,
-          deleted: true,
-        )
+        assert_equal("evazion", extractor.username)
+        assert_equal("https://pawoo.net/@evazion/19451018", extractor.page_url)
+        assert_equal(["https://pawoo.net/@evazion"], extractor.profile_urls)
+        assert_equal([], extractor.image_urls)
       end
     end
   end

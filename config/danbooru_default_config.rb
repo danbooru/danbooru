@@ -540,10 +540,6 @@ module Danbooru
       nil
     end
 
-    def baraag_access_token
-      nil
-    end
-
     # Your Tinami "Tinami2SESSID" cookie. Login to Tinami then use the devtools to find the "Tinami2SESSID" cookie.
     def tinami_session_id
       nil

@@ -90,7 +90,8 @@ class Source::Extractor
     end
 
     memoize def api_response
-      parsed_get(status_api_url) || {}
+      response = parsed_get(status_api_url)
+      response.is_a?(Hash) ? response : {}
     end
 
     def http
