@@ -144,7 +144,7 @@ Rails.application.routes.draw do
   resources :media_metadata, only: [:index]
 
   resources :metrics, only: [:index], defaults: { format: :text } do
-    get "/statistics", on: :collection, to: "metrics#statistics", as: :statistics
+    get "/statistics", on: :collection, to: "metrics#statistics", as: :statistics, defaults: { format: :html }
     get "/instance", on: :collection, to: "metrics#instance", as: :instance
   end
 

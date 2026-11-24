@@ -63,6 +63,20 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "#statistics action" do
+      should "work at /metrics/statistics without an extension" do
+        get statistics_metrics_path
+
+        assert_response :success
+      end
+
+      should "work at /metrics/statistics.json" do
+        get statistics_metrics_path(format: :json)
+
+        assert_response :success
+      end
+    end
+
     context "#instance action" do
       should "work for text format" do
         ApplicationMetrics.update_process_metrics
