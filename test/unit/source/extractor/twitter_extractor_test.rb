@@ -591,6 +591,24 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A tweet with a URL entity without an expanded URL" do
+      strategy_should_work(
+        "https://twitter.com/YuiH_0820/status/730822923158573056",
+        image_urls: %w[https://pbs.twimg.com/media/CiRnk1MUUAA2-Tg.jpg:orig],
+        media_files: [{ file_size: 116_578 }],
+        page_url: "https://x.com/YuiH_0820/status/730822923158573056",
+        profile_url: "https://x.com/YuiH_0820",
+        profile_urls: %w[https://x.com/YuiH_0820 https://x.com/i/user/186952401],
+        display_name: "由衣.H@🔞",
+        username: "YuiH_0820",
+        published_at: Time.parse("2016-05-12T18:12:17.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "LOVE！D.Va～ OverWatch楽しかった～",
+      )
+    end
+
     context "A tweet with alt text" do
       strategy_should_work(
         "https://x.com/maruyo_/status/1521844593804906496",

@@ -102,7 +102,8 @@ class Source::Extractor
         { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="https://x.com/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(e[1]))}">##{CGI.escapeHTML(e[1])}</a>} }
       end
 
-      entities += api_entities[:urls].to_a.pluck(:indices, :expanded_url).map do |e|
+      # Old tweets may have autolinked text without an expanded URL, e.g. "D.Va" => { "url": "D.Va", "display_url": "D.Va" }
+      entities += api_entities[:urls].to_a.select { it[:expanded_url].present? }.pluck(:indices, :expanded_url).map do |e|
         { first: e[0][0], last: e[0][1], text: e[1], html: %{<a href="#{CGI.escapeHTML(e[1])}">#{CGI.escapeHTML(e[1])}</a>} }
       end
 
