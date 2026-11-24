@@ -41,6 +41,12 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response 422
     end
 
+    should "return 422 for an invalid regex in a search param" do
+      get artist_commentaries_path(search: { original_description_regex: "[A-Za-z]![[:word:}]" }), as: :json
+      assert_response 422
+      assert_equal("Invalid regular expression: brackets [] not balanced", response.parsed_body["message"])
+    end
+
     should "return 400 for a missing or invalid required param" do
       get_auth new_forum_post_path(post_id: ["1"], format: :json), create(:user)
       assert_response 400

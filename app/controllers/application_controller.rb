@@ -192,6 +192,8 @@ class ApplicationController < ActionController::Base
         render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
       when ParamTooLongError, Date::Error, Searchable::SearchError, Aggregatable::Error, DText::Error, PostQuery::Error, PostVersion::SearchError, ParameterBuilder::Error, UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
         render_error_page(422, exception, message: exception.message)
+      when ->(e) { e.is_a?(ActiveRecord::StatementInvalid) && e.cause.is_a?(PG::InvalidRegularExpression) }
+        render_error_page(422, exception, message: exception.cause.message.squish.delete_prefix("ERROR: ").upcase_first)
       when RateLimiter::RateLimitError
         render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
       when PageRemovedError
