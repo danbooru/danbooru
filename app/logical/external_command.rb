@@ -2,9 +2,10 @@
 
 require "io/nonblock"
 
-# Runs the external programs that we use on untrusted files (ffmpeg, ffprobe, mkvmerge, exiftool, and bin/archive for
-# archives and ugoiras) in a sandbox, with time, memory, and output limits, so that a malicious file can't make them
-# run forever, use all the memory, or do anything else if it manages to exploit a bug in the program.
+# Runs the external programs that we use on untrusted files (ffmpeg, ffprobe, mkvmerge, exiftool, bin/archive for
+# archives and ugoiras, and bin/image for images) in a sandbox, with time, memory, and output limits, so that a
+# malicious file can't make them run forever, use all the memory, or do anything else if it manages to exploit a bug in
+# the program.
 #
 # The sandbox uses Landlock to limit which files the command can access, and seccomp to limit which system calls it can
 # make. Both work without root and without any special support from Docker or Kubernetes. Both are turned off by
@@ -30,7 +31,8 @@ class ExternalCommand
   # The most output a command can print before it's killed.
   OUTPUT_LIMIT = 16.megabytes
 
-  # The environment variables passed to commands. Commands use jemalloc (see the Dockerfile) to stay under the memory limit.
+  # The environment variables passed to commands, plus the `environment` of their profile. Commands use jemalloc (see the
+  # Dockerfile) to stay under the memory limit.
   ENVIRONMENT = %w[PATH LD_PRELOAD MALLOC_CONF].freeze
 
   # What every command can do: load shared libraries, and use basic syscalls for memory, files, threads, and signals.
@@ -49,7 +51,16 @@ class ExternalCommand
     ],
   }.freeze
 
-  # What each program can do on top of the base profile. Programs not listed here only get the base profile.
+  # What the Ruby helper scripts (bin/archive and bin/image) need on top of the base profile. They're run with this exact
+  # Ruby. Ruby's timer thread waits on an eventfd with epoll, and Ruby turns off transparent huge pages.
+  RUBY_PROFILE = {
+    execute: [RbConfig.ruby],
+    read: [RbConfig::CONFIG["rubylibprefix"], File.join(RbConfig::CONFIG["libdir"], RbConfig::CONFIG["LIBRUBY_SO"])],
+    syscalls: ["eventfd2", "epoll_create1", "epoll_ctl", "epoll_wait", "epoll_pwait", ["prctl", :allow, [[0, :eq, Seccomp::PR_SET_THP_DISABLE]]]],
+  }.freeze
+
+  # What each program can do on top of the base profile. Programs not listed here only get the base profile. The Ruby
+  # helper scripts are looked up by the `profile_name:` they're run with instead, because they all run the same Ruby.
   PROFILES = {
     "ffmpeg" => {
       execute: %w[/usr/local/bin/ffmpeg],
@@ -72,17 +83,20 @@ class ExternalCommand
       # Perl calls symlink("", "") to check if symlinks are supported. Landlock stops it from creating any.
       syscalls: %w[symlink],
     },
-    # For bin/archive. Danbooru::Archive runs it with this exact Ruby, and gives it the script and the gems it uses.
-    RbConfig.ruby => {
-      execute: [RbConfig.ruby],
-      read: [RbConfig::CONFIG["rubylibprefix"], File.join(RbConfig::CONFIG["libdir"], RbConfig::CONFIG["LIBRUBY_SO"])],
-      # Ruby's timer thread waits on an eventfd with epoll. Extracting archives creates directories and sets the umask,
-      # libarchive truncates a file when it fails partway through extracting it (for example, when it runs out of
-      # memory), and writing zips renames temp files into place. Landlock only lets them write in the given directories.
-      syscalls: %w[eventfd2 epoll_create1 epoll_ctl epoll_wait epoll_pwait umask mkdir mkdirat rename renameat renameat2 unlink unlinkat ftruncate] + [
-        ["prctl", :allow, [[0, :eq, Seccomp::PR_SET_THP_DISABLE]]],
-      ],
-    },
+    # Extracting archives creates directories and sets the umask, libarchive truncates a file when it fails partway
+    # through extracting it (for example, when it runs out of memory), and writing zips renames temp files into place.
+    # Landlock only lets them write in the given directories.
+    "bin/archive" => RUBY_PROFILE.merge(
+      syscalls: RUBY_PROFILE[:syscalls] + %w[umask mkdir mkdirat rename renameat renameat2 unlink unlinkat ftruncate],
+    ),
+    # bin/image only writes the output files it's given, which it creates by opening them. It reads libvips, its
+    # modules, and mozjpeg from /usr/local/lib (see the Dockerfile). jemalloc keeps the address space of freed memory by
+    # default, which counts against the memory limit, so the largest WebPs would run out of address space while hashing
+    # their pixels.
+    "bin/image" => RUBY_PROFILE.merge(
+      read: RUBY_PROFILE[:read] + %w[/usr/local/lib],
+      environment: { "MALLOC_CONF" => [ENV.fetch("MALLOC_CONF", nil), "retain:false"].compact_blank.join(",") },
+    ),
   }.freeze
 
   attr_reader :argv, :program, :profile, :read, :write, :timeout, :memory_limit, :output_limit, :file_size_limit
@@ -100,6 +114,7 @@ class ExternalCommand
   # @param memory_limit [Integer] The maximum number of bytes of memory the command can use.
   # @param output_limit [Integer] The maximum number of bytes the command can print to stdout and stderr.
   # @param file_size_limit [Integer, nil] The maximum size in bytes of any file the command writes, or nil for no limit.
+  # @param profile_name [String, nil] The name of the sandbox profile in PROFILES to use, if it isn't the program's name.
   # @return [Array<(String, Process::Status)>] The combined stdout and stderr of the command, and its exit status.
   # @raise [TimeoutError] If the command ran longer than the timeout.
   # @raise [OutputLimitError] If the command printed more than the output limit.
@@ -109,13 +124,40 @@ class ExternalCommand
     new(...).run
   end
 
+  # Run one of our Ruby helper scripts, like bin/archive or bin/image, with the sandbox profile of the same name. It's
+  # run with this exact Ruby, without Bundler, so it starts quickly. The gems it uses are passed with `-I`.
+  #
+  # @param script [String] The script, relative to the Rails root, like "bin/image".
+  # @param args [Array] The arguments to the script.
+  # @param gems [Array<String>] The names of the bundled gems the script uses.
+  # @param read [Array<String>] The files and directories the script can read.
+  # @param options [Hash] The other options for `ExternalCommand.run`.
+  # @return [Hash, nil] The JSON object the script printed on the last line of its output, or nil if it crashed. The
+  #   script parses untrusted files, so the caller must check the result.
+  # @raise (see ExternalCommand.run)
+  def self.run_script(script, *args, gems:, read: [], **options)
+    path = Rails.root.join(script).to_s
+    gem_paths = gems.flat_map { Gem.loaded_specs.fetch(it).full_require_paths }
+    command = [RbConfig.ruby, "--disable-gems", "-W0", *gem_paths.map { "-I#{it}" }, path, *args].map { it.to_s.shellescape }.join(" ")
+    output, _status = run(command, read: [path, *gem_paths, *read], profile_name: script, **options)
+
+    # The result is on the last line, in case a library printed a warning before it. If it crashed, the output is a
+    # backtrace. It's logged, but not shown to the user. It's escaped, because it can include text from the file, which
+    # could add fake lines to the log.
+    result = output.lines.last.to_s.parse_json
+    return result if result.is_a?(Hash)
+
+    DanbooruLogger.info("#{script} crashed: #{output.truncate(2000).inspect}")
+    nil
+  end
+
   # @see ExternalCommand.run
-  def initialize(command, read: [], write: [], timeout: TIMEOUT, memory_limit: MEMORY_LIMIT, output_limit: OUTPUT_LIMIT, file_size_limit: nil) # rubocop:disable Metrics/ParameterLists
+  def initialize(command, read: [], write: [], timeout: TIMEOUT, memory_limit: MEMORY_LIMIT, output_limit: OUTPUT_LIMIT, file_size_limit: nil, profile_name: nil) # rubocop:disable Metrics/ParameterLists
     @argv = command.shellsplit
     @program = argv.first
     raise ArgumentError, "can't run an empty command" if program.nil?
 
-    @profile = PROFILES.fetch(program, {})
+    @profile = PROFILES.fetch(profile_name || program, {})
     @read = read
     @write = write
     @timeout = timeout
@@ -147,7 +189,7 @@ class ExternalCommand
       # status, so we always know whether the command is still running and needs to be killed.
       Thread.handle_interrupt(Object => :never) do
         pid = Process.spawn(
-          ENV.slice(*ENVIRONMENT), *command,
+          ENV.slice(*ENVIRONMENT).merge(profile.fetch(:environment, {})), *command,
           in: stdin, out: output_writer, err: output_writer, unsetenv_others: true, close_others: true,
           # Disable core dumps, otherwise a command that crashes when it hits the memory limit can fill the disk.
           rlimit_as: memory_limit.to_i, rlimit_core: 0, **(file_size_limit ? { rlimit_fsize: file_size_limit.to_i } : {}),

@@ -1,27 +1,118 @@
 # frozen_string_literal: true
 
-# A MediaFile for a JPEG, PNG, or GIF file. Uses libvips for resizing images.
+# A MediaFile for a JPEG, PNG, GIF, WebP, or AVIF file. Uses libvips for reading and resizing images.
 #
+# The images are read by `bin/image` in a separate process inside the ExternalCommand sandbox, so a bug in libvips or
+# the image libraries it uses can't be exploited by a malicious file to take over the Rails process.
+#
+# @see bin/image
 # @see https://github.com/libvips/ruby-vips
 # @see https://libvips.github.io/libvips/API/current
 class MediaFile::Image < MediaFile
+  class Error < StandardError; end
+  class TimeoutError < Error; end
+
+  # Set by `.read!`, which reads several images at once.
+  attr_writer :info
+
+  def initialize(...)
+    super
+    @info_lock = Mutex.new
+  end
+
+  # Run a bin/image command in the sandbox, with the default 4 GB memory limit (see `MediaAsset::MAX_IN_MEMORY_SIZE`).
+  #
+  # @return [Hash, nil] The JSON output of the command, with symbol keys, or nil if it crashed or printed too much.
+  # @raise [TimeoutError] If the command timed out.
+  # @raise [ExternalCommand::SyscallError] If the command was killed by the sandbox. It isn't wrapped, so the file can
+  #   be quarantined.
+  def self.run!(*args, read:, write: [], timeout: ExternalCommand::TIMEOUT)
+    result = ExternalCommand.run_script("bin/image", *args, gems: %w[ffi ruby-vips logger], read:, write:, timeout:, file_size_limit: Danbooru.config.max_file_size.to_i)
+    result&.deep_symbolize_keys
+  rescue ExternalCommand::TimeoutError
+    raise TimeoutError, "Image took too long to process"
+  rescue ExternalCommand::OutputLimitError
+    DanbooruLogger.info("bin/image printed too much output: #{args.first}")
+    nil
+  end
+
+  # Read and decode several images with one call to bin/image, like the frames of a ugoira. Images over the upload
+  # limits aren't decoded.
+  #
+  # @return [void]
+  def self.read!(images, timeout: ExternalCommand::TIMEOUT)
+    images = images.grep(MediaFile::Image)
+    return if images.empty?
+
+    limits = {
+      max_resolution: MediaAsset::MAX_IMAGE_RESOLUTION,
+      max_width: MediaAsset::MAX_IMAGE_WIDTH,
+      max_height: MediaAsset::MAX_IMAGE_HEIGHT,
+      max_in_memory_size: MediaAsset::MAX_IN_MEMORY_SIZE,
+      max_webp_resolution: MediaAsset::MAX_WEBP_RESOLUTION,
+    }
+    output = run!("read", limits.to_json, *images.flat_map { [it.file_ext, it.path] }, read: images.map(&:path), timeout:)
+    results = output&.dig(:images)
+
+    unless results.is_a?(Array) && results.size == images.size
+      DanbooruLogger.info("bin/image returned an invalid result: #{output.inspect.truncate(1000)}") unless output.nil?
+      results = []
+    end
+
+    images.each_with_index { |image, i| image.info = parse_info(results[i]) }
+  end
+
+  # bin/image parses untrusted files, so a compromised bin/image could print anything. Anything that isn't a number is
+  # treated as 0, and anything that isn't an MD5 hash isn't used as the pixel hash.
+  #
+  # @param result [Hash, nil] The result for one image from `bin/image read`, or nil if bin/image crashed.
+  # @return [Hash] The image's width, height, frame count, frame delays, size in memory, whether it's over the upload
+  #   limits, the error to show users, and pixel hash. The width and height are 0 if the image's header couldn't be read.
+  def self.parse_info(result)
+    result = {} unless result.is_a?(Hash)
+    width = Integer(result[:width], exception: false).to_i
+    height = Integer(result[:height], exception: false).to_i
+
+    # libvips' own error isn't shown to users.
+    error = "libvips error" if result[:error] || width <= 0 || height <= 0
+
+    {
+      width:,
+      height:,
+      n_pages: Integer(result[:n_pages], exception: false),
+      delay: Array(result[:delay]).map { Integer(it, exception: false).to_i },
+      in_memory_size: Integer(result[:in_memory_size], exception: false).to_i,
+      too_large: result[:too_large] == true,
+      error:,
+      pixel_hash: result[:pixel_hash].to_s[/\A\h{32}\z/],
+    }
+  end
+  private_class_method :parse_info
+
   def close
     super
     @preview_frame&.close unless @preview_frame == self
     @preview_frame = nil
-    @image&.release
-    @image = nil
   end
 
   def dimensions
-    image.size
-  rescue Vips::Error
-    [metadata.width, metadata.height]
-  rescue StandardError
-    [0, 0]
+    if info[:width] > 0 && info[:height] > 0
+      [info[:width], info[:height]]
+    else
+      [metadata.width, metadata.height]
+    end
   end
 
+  # @return [Boolean] True if the image is over the upload limits (see `MediaAsset::MAX_IN_MEMORY_SIZE`). It isn't
+  #   decoded, so it's too large instead of corrupt.
+  def is_too_large?
+    info[:too_large]
+  end
+
+  # Images that are too large aren't supported.
   def is_supported?
+    return false if is_too_large?
+
     case file_ext
     when :avif
       !metadata.is_rotated? && !metadata.is_mirrored? && !metadata.is_cropped? && !metadata.is_grid_image? && !metadata.has_auxiliary_image? && !metadata.is_animated_avif?
@@ -30,45 +121,21 @@ class MediaFile::Image < MediaFile
     end
   end
 
+  # XXX we should check if animated gifs can be successfully decoded, but ffmpeg sometimes returns errors for
+  # seemingly good gifs, and no errors for known corrupted gifs.
   def is_corrupt?
     error.present?
   end
 
+  # @return [String, nil] The error to show users if the image is corrupt.
   def error
-    # Don't rotate the image, because the orientation doesn't matter for checking if it's corrupt.
-    image = open_image(fail: true, rotate: false)
-    stats = image.stats
-    stats.release
-    image.release
-
-    # XXX we should check if animated gifs can be successfully decoded, but ffmpeg sometimes returns errors for
-    # seemingly good gifs, and no errors for known corrupted gifs.
-    # return video.error if is_animated? && video.error.present?
-
-    nil
-  rescue Vips::Error
-    # XXX Vips has a single global error buffer that is shared between threads and that isn't cleared between operations.
-    # We can't reliably use `e.message` here because it may pick up errors from other threads, or from previous
-    # operations in the same thread.
-    "libvips error"
+    info[:error]
   end
 
-  # Interlaced PNGs and PNGs with an orientation flag can't be decoded as a stream, so the whole image is decoded in
-  # memory. This only reads the header, so it's safe to call before validating the file.
-  def full_decode_size
-    return 0 if file_ext != :png
-
-    png = open_png(rotate: false)
-    interlaced = png.get_typeof("interlaced") != 0 && png.get("interlaced") != 0
-    rotated = png.get_typeof("orientation") != 0 && png.get("orientation") != 1
-    return 0 unless interlaced || rotated
-
-    bytes_per_band = (png.format == :ushort) ? 2 : 1
-    png.width * png.height * png.bands * bytes_per_band
-  rescue Vips::Error
-    0
-  ensure
-    png&.release
+  # @return [Integer] The size in bytes of the decoded image if it's decoded all at once, or 0 if it's decoded a few rows
+  #   at a time (see `MediaAsset::MAX_IN_MEMORY_SIZE`).
+  def in_memory_size
+    info[:in_memory_size]
   end
 
   def metadata
@@ -90,7 +157,7 @@ class MediaFile::Image < MediaFile
   def frame_count
     case file_ext
     when :gif, :webp
-      n_pages
+      info[:n_pages]
     when :png
       exif_metadata.fetch("PNG:AnimationFrames", 1)
     when :avif
@@ -104,9 +171,9 @@ class MediaFile::Image < MediaFile
   #   isn't animated or is corrupt. Note that libvips and ffmpeg may disagree on the duration.
   def vips_duration
     # XXX Browsers typically raise the frame time to 0.1s if it's less than or equal to 0.01s.
-    image.get("delay").sum { |delay| (delay <= 10) ? 100 : delay } / 1000.0
-  rescue Vips::Error
-    nil
+    return nil if info[:delay].empty?
+
+    info[:delay].sum { |delay| (delay <= 10) ? 100 : delay } / 1000.0
   end
 
   # @return [Integer, nil] The duration of the animation as calculated by ffmpeg, or possibly nil if the file
@@ -115,90 +182,33 @@ class MediaFile::Image < MediaFile
     video.duration
   end
 
-  # @return [Integer, nil] The frame count for gif and webp images, or possibly nil if the file doesn't have a frame count or is corrupt.
-  def n_pages
-    image.get("n-pages")
-  rescue Vips::Error
-    nil
-  end
-
   def frame_rate
     return nil if !is_animated? || frame_count.nil? || duration.nil? || duration == 0
     frame_count / duration
   end
 
-  def channels
-    image.bands
-  end
-
-  def colorspace
-    image.interpretation
-  end
-
-  def resize!(max_width, max_height, format: :jpeg, quality: 85, **options)
-    # @see https://www.libvips.org/API/current/Using-vipsthumbnail.md.html
-    # @see https://www.libvips.org/API/current/libvips-resample.html#vips-thumbnail
-    if colorspace.in?(%i[srgb rgb16])
-      resized_image = thumbnail_image(max_width, height: max_height, size: :force, import_profile: "srgb", export_profile: "srgb", **options)
-    elsif colorspace == :cmyk && has_embedded_profile?
-      resized_image = thumbnail_image(max_width, height: max_height, size: :force, import_profile: "cmyk", export_profile: "srgb", **options)
-    elsif colorspace == :cmyk && !has_embedded_profile?
-      # Leave CMYK without a profile as CMYK to avoid distorting the colors by converting it to sRGB
-      hscale = max_width / width.to_f
-      vscale = max_height / height.to_f
-      resized_image = image.resize(hscale, vscale: vscale, **options)
-    elsif colorspace.in?(%i[b-w grey16]) && has_embedded_profile?
-      # Convert greyscale to sRGB so that the color profile is properly applied before we strip it.
-      resized_image = thumbnail_image(max_width, height: max_height, size: :force, export_profile: "srgb", **options)
-    elsif colorspace.in?(%i[b-w grey16])
-      # Otherwise, leave greyscale without a profile as greyscale because
-      # converting it to sRGB would change it from 1 channel to 3 channels.
-      resized_image = thumbnail_image(max_width, height: max_height, size: :force, **options)
-    else
-      raise NotImplementedError
-    end
-
-    if resized_image.has_alpha?
-      flattened_image = resized_image.flatten(background: 255)
-      resized_image.release
-      resized_image = flattened_image
-    end
-
+  # @return [MediaFile::Image] The image resized to the exact width and height.
+  # @raise [Error] If the image couldn't be resized.
+  def resize!(width, height, format: :jpeg, quality: 85)
     output_file = Danbooru::Tempfile.new(["danbooru-image-preview-#{md5}-", ".#{format}"])
-    case format.to_sym
-    when :jpeg
-      # https://www.libvips.org/API/current/VipsForeignSave.html#vips-jpegsave
-      resized_image.jpegsave(output_file.path, Q: quality, strip: true, interlace: true, optimize_coding: true, optimize_scans: true, trellis_quant: true, overshoot_deringing: true, quant_table: 3)
-    when :webp
-      # https://www.libvips.org/API/current/VipsForeignSave.html#vips-webpsave
-      resized_image.webpsave(output_file.path, Q: quality, preset: :drawing, smart_subsample: false, effort: 4, strip: true)
-    when :avif
-      # https://www.libvips.org/API/current/VipsForeignSave.html#vips-heifsave
-      resized_image.heifsave(output_file.path, Q: quality, compression: :av1, effort: 4, strip: true)
-    else
-      raise NotImplementedError
+    result = MediaFile::Image.run!("resize", file_ext, path, width, height, format, quality, output_file.path, read: [path], write: [output_file.path])
+
+    # libvips' own error isn't shown to users, like in `.parse_info`. bin/image could write anything if it were
+    # compromised, so check that it wrote an image of the right type.
+    unless result && result[:error].nil? && MediaFile.file_ext(output_file) == { jpeg: :jpg, webp: :webp }.fetch(format.to_sym)
+      DanbooruLogger.info("bin/image resize failed: #{result.inspect.truncate(1000)}") unless result.nil?
+      raise Error, "libvips error"
     end
 
-    resized_image.release
     MediaFile::Image.new(output_file)
   rescue StandardError
     output_file&.close
     raise
   end
 
-  # Resize the image to fit within the given width and height.
-  # PNGs are resized first and then rotated after, which takes a lot less memory.
-  def thumbnail_image(width, height:, **options)
-    if file_ext == :png
-      open_png(rotate: false).thumbnail_image(width, height:, **options)
-    else
-      image.thumbnail_image(width, height:, **options)
-    end
-  end
-
   def preview!(max_width, max_height, **options)
     w, h = MediaFile.scale_dimensions(width, height, max_width, max_height)
-    MediaFile::Image.new(preview_frame.file).resize!(w, h, **options)
+    preview_frame.resize!(w, h, **options)
   end
 
   def is_animated?
@@ -221,89 +231,24 @@ class MediaFile::Image < MediaFile
     file_ext == :avif && is_animated?
   end
 
-  # Return true if the image has an embedded ICC color profile.
-  def has_embedded_profile?
-    image.get_typeof("icc-profile-data") != 0
-  end
-
-  # @return [String] The MD5 hash of the image's pixels, as a PAM file (https://netpbm.sourceforge.net/doc/pam.html). A
-  #   PAM file is a header followed by the raw pixels, so the hash only depends on the pixels, not the file format or
-  #   metadata. The pixels are hashed as they're decoded, without writing the PAM file to disk.
+  # @return [String] The MD5 hash of the image's pixels, as a PAM file (https://netpbm.sourceforge.net/doc/pam.html), or
+  #   the file's MD5 if the image is animated or can't be decoded. A PAM file is a header followed by the raw pixels, so
+  #   the hash only depends on the pixels, not the file format or metadata. See `bin/image`.
   def pixel_hash
     return md5 if is_animated?
 
-    # Normalize the image to the same colorspace and add an alpha layer if missing,
-    # so that the pixel data stays the same even for different profiles.
-    img = open_image(fail: true)
-    img = img.icc_transform("srgb") if img.get_typeof("icc-profile-data") != 0
-    img = img.colourspace("srgb") if img.interpretation != :srgb
-    img = img.add_alpha unless img.has_alpha?
-
-    digest = Digest::MD5.new
-    digest << <<~PAM
-      P7
-      WIDTH #{img.width}
-      HEIGHT #{img.height}
-      DEPTH #{img.bands}
-      MAXVAL 255
-      TUPLTYPE RGB_ALPHA
-      ENDHDR
-    PAM
-
-    target = Vips::TargetCustom.new
-    target.on_write do |chunk|
-      digest << chunk
-      chunk.bytesize
-    end
-
-    img.rawsave_target(target)
-    digest.hexdigest
-  rescue Vips::Error
-    md5
-  ensure
-    img&.release
+    info[:pixel_hash] || md5
   end
 
   private
 
-  # @return [Vips::Image] the Vips image object for the file
-  def image
-    @image ||= open_image(fail: false)
-  end
-
-  # @param rotate [Boolean] If true, rotate PNGs that have an EXIF orientation flag. This loads the full image into memory.
-  def open_image(rotate: true, **options)
-    case file_ext
-    when :jpg
-      Vips::Image.new_from_file(file.path, access: :sequential, autorotate: true, **options)
-    when :png
-      # pngload cannot rotate the image during load, so we do it after.
-      open_png(rotate:, **options)
-    else
-      # Browser support for WebP/AVIF is not widespread, and vips cannot read some of these flags, so we don't support it either.
-      Vips::Image.new_from_file(file.path, access: :sequential, **options)
+  # @return [Hash] The image's properties, read by bin/image (see `.parse_info`). It's locked so that bin/image only
+  #   runs once when it's read from several threads, like when generating previews in parallel.
+  def info
+    @info_lock.synchronize do
+      MediaFile::Image.read!([self]) if @info.nil?
+      @info
     end
-  end
-
-  # Open with sequential access when the image does not need rotation, otherwise use the default access mode.
-  #
-  # Sequential access uses much less memory than the default access mode but is not supported by `autorot`,
-  # so we only reopen the picture in default mode if we actually need it.
-  # This results in a higher memory usage for rotated pngs, but they are the rare case, so it's an overall gain.
-  #
-  # Note that only rotation specified before the IDAT chunk (actual image data) is considered valid.
-  # Other types of rotation metadata are ignored by most browsers, so we ignore them too.
-  def open_png(rotate: true, **options)
-    image = Vips::Image.new_from_file(file.path, access: :sequential, **options)
-    orientation = image.get("orientation") if image.get_typeof("orientation") != 0
-
-    if rotate && orientation.present? && orientation != 1
-      image.release
-      image = Vips::Image.new_from_file(file.path, **options)
-      image = image.autorot
-    end
-
-    image
   end
 
   def video
@@ -318,5 +263,5 @@ class MediaFile::Image < MediaFile
     end
   end
 
-  memoize :video, :dimensions, :error, :metadata, :is_corrupt?, :is_animated_gif?, :is_animated_png?
+  memoize :video, :metadata, :is_animated_gif?, :is_animated_png?
 end

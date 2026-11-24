@@ -386,9 +386,6 @@ ENV MALLOC_CONF=background_thread:true,narenas:2,dirty_decay_ms:1000,muzzy_decay
 # https://github.com/ruby/ruby/blob/master/doc/yjit/yjit.md
 ENV RUBY_YJIT_ENABLE=1
 
-# Disable libvips warning messages
-ENV VIPS_WARNING=0
-
 # https://github.com/shopify/bootsnap#environment-variables
 ENV BOOTSNAP_CACHE_DIR=/home/danbooru/bootsnap
 ENV BOOTSNAP_READONLY=true

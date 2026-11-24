@@ -7,7 +7,7 @@ gem "json", "~> 3"
 gem "pg", "~> 1"
 gem "simple_form", "~> 5"
 gem "sanitize", "~> 7"
-gem "ruby-vips", "~> 2"
+gem "ruby-vips", "~> 2", require: false # Used by bin/image.
 gem "diff-lcs", "~> 2", require: false
 gem "bcrypt", "~> 3", require: "bcrypt"
 gem "aws-sdk-sqs", "~> 1", require: false
