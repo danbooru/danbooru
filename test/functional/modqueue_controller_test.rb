@@ -141,6 +141,13 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_select "a[href=?]", modqueue_index_path(search: { tags: "status:pending" })
         assert_select "a[href=?]", modqueue_index_path(search: { tags: "user:#{@user.name}" })
       end
+
+      should "bind the q keyboard shortcut to the search input" do
+        get_auth modqueue_index_path, @admin
+
+        assert_response :success
+        assert_select "input[type='text'][name='search[tags]'][data-shortcut='q']"
+      end
     end
   end
 end
