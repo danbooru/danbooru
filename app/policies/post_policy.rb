@@ -10,7 +10,7 @@ class PostPolicy < ApplicationPolicy
   end
 
   def update?
-    unbanned? && record.visible?
+    unbanned? && record.visible?(user)
   end
 
   def create?

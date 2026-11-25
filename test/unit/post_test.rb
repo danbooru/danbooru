@@ -2380,6 +2380,15 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
+  context "PostPolicy#update?" do
+    should "check whether the policy's user can see the post, not the current user" do
+      post = create(:post, is_banned: true)
+
+      assert_equal(true, PostPolicy.new(create(:approver), post).update?)
+      assert_equal(false, PostPolicy.new(create(:user), post).update?)
+    end
+  end
+
   context "Uploading:" do
     context "Uploading a post" do
       should "capture who uploaded the post" do
