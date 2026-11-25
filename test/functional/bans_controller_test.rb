@@ -76,6 +76,16 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "demote mods to member when an admin bans them" do
+        @admin = create(:admin_user)
+        @mod = create(:mod_user)
+        post_auth bans_path, @admin, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @mod.id }}
+
+        assert_redirected_to @mod
+        assert_equal(true, @mod.reload.is_banned?)
+        assert_equal(User::Levels::MEMBER, @mod.level)
+      end
+
       should "not allow mods to ban admins" do
         assert_difference("Ban.count", 0) do
           @admin = create(:admin_user)

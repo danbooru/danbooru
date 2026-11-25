@@ -105,6 +105,43 @@ class BanTest < ActiveSupport::TestCase
       assert_equal(["User is already banned"], ban2.errors.full_messages)
     end
 
+    should "demote a banned moderator to member" do
+      admin = create(:admin_user)
+      mod = create(:moderator_user)
+      create(:ban, user: mod, banner: admin)
+
+      assert_equal(User::Levels::MEMBER, mod.reload.level)
+      assert_equal(true, mod.is_banned?)
+      assert(ModAction.exists?(category: "user_level_change", subject: mod, creator: admin))
+      assert(mod.dmails.exists?(title: "Your account has been updated"))
+    end
+
+    should "demote a banned admin to member" do
+      owner = create(:superadmin_user)
+      admin = create(:admin_user)
+      create(:ban, user: admin, banner: owner)
+
+      assert_equal(User::Levels::MEMBER, admin.reload.level)
+      assert_equal(true, admin.is_banned?)
+    end
+
+    should "not demote banned non-staff users" do
+      builder = create(:builder_user)
+      create(:ban, user: builder, banner: create(:moderator_user))
+
+      assert_equal(User::Levels::BUILDER, builder.reload.level)
+      assert_not(ModAction.exists?(category: "user_level_change", subject: builder))
+    end
+
+    should "not restore the user's level when the ban is removed" do
+      mod = create(:moderator_user)
+      ban = create(:ban, user: mod, banner: create(:admin_user))
+      ban.destroy!
+
+      assert_equal(User::Levels::MEMBER, mod.reload.level)
+      assert_equal(false, mod.is_banned?)
+    end
+
     should "initialize the expiration date" do
       ban = create(:ban)
       assert_not_nil(ban.expires_at)

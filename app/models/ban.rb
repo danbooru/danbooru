@@ -22,6 +22,7 @@ class Ban < ApplicationRecord
   after_create :create_feedback
   after_create :create_dmail
   after_create :delete_user_data
+  after_create :demote_staff
   before_destroy -> { throw :abort if invalid? } # Validations don't run on destroy normally, so we have to do it manually
   after_destroy :create_unban_mod_action
   after_destroy :update_user_on_save
@@ -148,6 +149,11 @@ class Ban < ApplicationRecord
       end
       ModAction.log(%{updated ban #{changes.to_sentence} for <@#{user_name}>}, :user_ban_update, subject: user, user: updater)
     end
+  end
+
+  # Staff powers don't check is_banned, so banned mods and admins are demoted to Member. Unbanning doesn't restore their level.
+  def demote_staff
+    UserPromotion.new(user, banner, User::Levels::MEMBER).promote! if user.is_moderator?
   end
 
   def create_unban_mod_action
