@@ -119,6 +119,15 @@ class SearchableTest < ActiveSupport::TestCase
           assert_search_equals(@g2, asn_present: "true")
           assert_search_equals(@g1, asn_present: "false")
         end
+
+        should "include null values for the _not operator" do
+          @g1 = create(:ip_geolocation, asn: nil)
+          @g2 = create(:ip_geolocation, asn: 1234)
+          @g3 = create(:ip_geolocation, asn: 5678)
+
+          assert_search_equals([@g3, @g1], asn_not: "1234")
+          assert_search_equals(@g1, asn_not: "1000..9999")
+        end
       end
     end
 
@@ -707,6 +716,82 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals([@post], last_comment_bumped_at: ">2026-02-01T00:00:00Z")
         assert_search_equals([], last_comment_bumped_at: "<2026-02-01T00:00:00Z")
       end
+    end
+  end
+
+  context "the where_* helpers" do
+    should "accept column names, Arel nodes, and Arel.sql fragments" do
+      post = create(:post, score: 42, tag_string: "foo")
+
+      assert_equal([post], Post.where_operator(:score, :eq, 42).to_a)
+      assert_equal([post], Post.where_operator("score", :eq, 42).to_a)
+      assert_equal([post], Post.where_operator(Post.arel_table[:score], :eq, 42).to_a)
+      assert_equal([post], Post.where_operator(Arel.sql("posts.score"), :eq, 42).to_a)
+      assert_equal([post], Post.where_array_includes_any(Arel.sql("string_to_array(posts.tag_string, ' ')"), ["foo"]).to_a)
+    end
+
+    should "accept column names for helpers that build SQL strings" do
+      artist = create(:artist, other_names: ["Foo"])
+      media_metadata = create(:media_metadata, metadata: { "File:FileType" => "PNG" })
+
+      assert_equal([artist], Artist.where_array_count(:other_names, 1).to_a)
+      assert_equal([artist], Artist.where_any_in_array_iequals(:other_names, ["foo"]).to_a)
+      assert_equal([media_metadata], MediaMetadata.where_json_has_key(:metadata, "File:FileType").to_a)
+      assert_equal([media_metadata], MediaMetadata.where_json_has_key(Arel.sql("media_metadata.metadata"), "File:FileType").to_a)
+      assert_equal([media_metadata], MediaMetadata.where_json_has_key(MediaMetadata.arel_table[:metadata], "File:FileType").to_a)
+      assert_equal([artist], Artist.where_array_count(Artist.arel_table.alias("a")[:other_names], 1).from("artists a").select("a.*").to_a)
+    end
+
+    should "raise an error for strings that aren't column names" do
+      assert_raises(ArgumentError) { Post.where_operator("score = 0 OR 1=1 --", :eq, 42) }
+      assert_raises(ArgumentError) { Post.where_operator(:nonexistent, :eq, 42) }
+      assert_raises(ArgumentError) { Post.where_like("posts.source", "foo") }
+      assert_raises(ArgumentError) { MediaMetadata.where_json_has_key("metadata; select 1", "foo") }
+      assert_raises(ArgumentError) { MediaMetadata.where_json_has_key("media_metadata.metadata", "foo") }
+      assert_raises(ArgumentError) { Artist.where_any_in_array_iequals("other_names) OR (1=1", ["foo"]) }
+      assert_raises(ArgumentError) { Artist.where_array_count("cardinality(other_names)", 1) }
+    end
+  end
+
+  context "every model's search" do
+    should "quote values in the generated SQL" do
+      Rails.application.eager_load!
+      user = create(:superadmin_user)
+      value = "zqx'zqx"
+      suffixes = %w[
+        _eq _not_eq _gt _gteq _lt _lteq _not _like _ilike _not_like _not_ilike _regex _not_regex _comma _space _lower_comma
+        _lower_space _matches _has_key _include_any _include_all _include_any_lower _include_all_lower _count
+      ]
+      array_suffixes = %w[_array _lower_array _include_any_array _include_all_array _include_any_lower_array _include_all_lower_array]
+      models = ApplicationRecord.descendants.select { |model| model.respond_to?(:search) && !model.abstract_class? }
+      checked = 0
+
+      models.each do |model|
+        model.policy(user).search_modes.each_key do |attr|
+          searches = [
+            { attr => value },
+            { attr => { name: value, id: value }},
+            { "has_#{attr}" => value },
+            { "any_#{attr.to_s.singularize}_matches_regex" => value },
+            *suffixes.map { |suffix| { "#{attr}#{suffix}" => value } },
+            *array_suffixes.map { |suffix| { "#{attr}#{suffix}" => [value] } },
+          ]
+
+          searches.each do |params|
+            sql = begin
+              model.search(params.with_indifferent_access, user).to_sql
+            rescue Searchable::SearchError
+              # Some malformed values raise errors before any SQL is built.
+              next
+            end
+
+            assert_not_includes(sql, value, "#{model.name}.search(#{params.inspect}) didn't quote the value")
+            checked += 1
+          end
+        end
+      end
+
+      assert_operator(checked, :>, 1000)
     end
   end
 end

@@ -265,10 +265,10 @@ class MediaAsset < ApplicationRecord
         if string.include?("=")
           key, value = string.split("=", 2)
           hash = { key => value }
-          joins(:media_metadata).where_json_contains("media_metadata.metadata", hash)
+          joins(:media_metadata).where_json_contains(MediaMetadata.arel_table[:metadata], hash)
         # string = File:ColorComponents
         else
-          joins(:media_metadata).where_json_has_key("media_metadata.metadata", string)
+          joins(:media_metadata).where_json_has_key(MediaMetadata.arel_table[:metadata], string)
         end
       end
 

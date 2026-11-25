@@ -65,5 +65,127 @@ class AggregatableTest < ActiveSupport::TestCase
       assert_equal 1, dataframe.each_row.find { |row| row["date"] == Time.utc(2026, 3, 2) }["count"]
       assert_equal 1, dataframe.each_row.find { |row| row["date"] == Time.utc(2026, 3, 16) }["count"]
     end
+
+    should "count records created at any time on the end date" do
+      create(:post, created_at: Time.utc(2026, 3, 3, 23, 59)) # on the end date, must be counted
+      create(:post, created_at: Time.utc(2026, 3, 4)) # after the end date, must not be counted
+
+      dataframe = Post.timeseries(period: "day", from: Date.new(2026, 3, 2), to: Date.new(2026, 3, 3))
+
+      assert_equal [Time.utc(2026, 3, 3), Time.utc(2026, 3, 2)], dataframe["date"].to_a
+      assert_equal [1, 0], dataframe["count"].to_a
+    end
+
+    context "with groups" do
+      setup do
+        @alice = create(:user)
+        @bob = create(:builder_user)
+        create(:post, uploader: @alice, created_at: Time.utc(2026, 3, 2, 1))
+        create(:post, uploader: @alice, created_at: Time.utc(2026, 3, 2, 2))
+        create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 3, 1))
+      end
+
+      should "count each group's records in each bucket" do
+        dataframe = Post.timeseries(period: "day", from: Date.new(2026, 3, 2), to: Date.new(2026, 3, 3), groups: ["uploader"], columns: { posts: Arel.sql("COUNT(*)"), uploaders: Arel.sql("COUNT(distinct uploader_id)") })
+        rows = dataframe.each_row.map { |row| [row["date"], row["uploader"].id, row["posts"], row["uploaders"]] }
+
+        assert_equal([
+          [Time.utc(2026, 3, 2), @alice.id, 2, 1],
+          [Time.utc(2026, 3, 2), @bob.id, 0, 0],
+          [Time.utc(2026, 3, 3), @alice.id, 0, 0],
+          [Time.utc(2026, 3, 3), @bob.id, 1, 1],
+        ], rows.sort)
+      end
+
+      should "count each group's records when grouping by an associated attribute" do
+        dataframe = Post.timeseries(period: "day", from: Date.new(2026, 3, 2), to: Date.new(2026, 3, 3), groups: ["uploader.level"])
+        rows = dataframe.each_row.map { |row| [row["date"], row["level"], row["count"]] }
+
+        assert_equal([
+          [Time.utc(2026, 3, 2), User::Levels::MEMBER, 2],
+          [Time.utc(2026, 3, 2), User::Levels::BUILDER, 0],
+          [Time.utc(2026, 3, 3), User::Levels::MEMBER, 0],
+          [Time.utc(2026, 3, 3), User::Levels::BUILDER, 1],
+        ].sort, rows.sort)
+      end
+
+      should "only include the top groups when there's a group limit" do
+        dataframe = Post.timeseries(period: "day", from: Date.new(2026, 3, 2), to: Date.new(2026, 3, 3), groups: ["uploader"], group_limit: 1)
+
+        assert_equal([@alice, @alice], dataframe["uploader"].to_a)
+        assert_equal([0, 2], dataframe["count"].to_a)
+      end
+    end
+  end
+
+  context "Aggregatable#aggregate" do
+    setup do
+      @alice = create(:user)
+      @bob = create(:builder_user)
+      create(:post, uploader: @alice, created_at: Time.utc(2026, 3, 2))
+      create(:post, uploader: @alice, created_at: Time.utc(2026, 3, 2))
+      create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 3))
+      create(:post, uploader: @bob, created_at: Time.utc(2026, 1, 1)) # outside the date range
+    end
+
+    should "count each group's records, ordered by the first column" do
+      dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: ["uploader"], columns: { posts: Arel.sql("COUNT(*)"), days: Arel.sql("COUNT(distinct date_trunc('day', created_at))") })
+
+      assert_equal([@alice, @bob], dataframe["uploader"].to_a)
+      assert_equal([2, 1], dataframe["posts"].to_a)
+      assert_equal([1, 1], dataframe["days"].to_a)
+    end
+
+    should "count each group's records when grouping by an associated attribute" do
+      dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: ["uploader.level"])
+
+      assert_equal([User::Levels::MEMBER, User::Levels::BUILDER], dataframe["level"].to_a)
+      assert_equal([2, 1], dataframe["count"].to_a)
+    end
+
+    should "respect the limit" do
+      dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: ["uploader"], limit: 1)
+
+      assert_equal([@alice], dataframe["uploader"].to_a)
+    end
+
+    should "count records created at any time on the end date" do
+      create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 4, 23, 59)) # on the end date, must be counted
+      create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 5)) # after the end date, must not be counted
+
+      dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: ["uploader"])
+
+      assert_equal([@alice, @bob], dataframe["uploader"].to_a)
+      assert_equal([2, 2], dataframe["count"].to_a)
+    end
+
+    should "not count records created after the end time when the end is a time" do
+      create(:post, uploader: @bob, created_at: Time.utc(2026, 3, 3, 6)) # after the end time, must not be counted
+
+      dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Time.utc(2026, 3, 3, 1), groups: ["uploader"])
+
+      assert_equal([@alice, @bob], dataframe["uploader"].to_a)
+      assert_equal([2, 1], dataframe["count"].to_a)
+    end
+  end
+
+  context "Aggregatable" do
+    should "not allow raw SQL strings as columns" do
+      assert_raises(ArgumentError) { Post.timeseries(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), columns: { count: "COUNT(*)" }) }
+      assert_raises(ArgumentError) { Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), columns: { count: "COUNT(*)" }) }
+    end
+
+    should "not allow grouping by anything other than a column or an association's column" do
+      ["id; SELECT 1", "1", "uploader.id; SELECT 1", "uploader.password_hash ", "nonexistent.id"].each do |group|
+        assert_raises(ArgumentError) { Post.timeseries(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: [group]) }
+        assert_raises(ArgumentError) { Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: [group]) }
+      end
+    end
+
+    should "quote column aliases" do
+      dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), columns: { 'a" b': Arel.sql("COUNT(*)") })
+
+      assert_equal(['a" b'], dataframe.names)
+    end
   end
 end

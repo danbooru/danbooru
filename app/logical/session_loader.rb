@@ -241,7 +241,7 @@ class SessionLoader
 
   def set_statement_timeout
     timeout = CurrentUser.user.statement_timeout
-    ActiveRecord::Base.connection.execute("SET statement_timeout = #{timeout}")
+    ActiveRecord::Base.connection.execute("SET statement_timeout = #{Integer(timeout)}")
   end
 
   # Sets the current API user based on either the `login` + `api_key` URL params,

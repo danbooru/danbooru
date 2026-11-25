@@ -35,6 +35,10 @@ module ArtistFinder
       # "https://example.com/A/B/" => "example.com/a/b". This matches how the URL index normalizes artist URLs.
       path = url.downcase.gsub(%r{\Ahttps?://|/\z}, "")
 
+      # Prefixes longer than an artist URL can be can't match anything, so cut the path at the last "/" within the limit,
+      # e.g. "example.com/a/bbbb..." => "example.com/a". Otherwise listing the prefixes of a long URL takes quadratic time.
+      path = path.first(ArtistURL::MAX_URL_LENGTH + 1).sub(%r{/[^/]*\z}, "") if path.length > ArtistURL::MAX_URL_LENGTH
+
       # ["example.com/a/b", "example.com/a", "example.com"]. When there's no parent left, File.dirname returns "." (or
       # "/" for paths starting with "/", which would otherwise loop forever), so we stop there.
       paths = Enumerator.produce(path) { File.dirname(it) }.take_while { it != "." && it != "/" }
@@ -74,7 +78,11 @@ module ArtistFinder
     normalized_url = "regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'" # this is indexed
 
     # A table with one row per prefix and the range it covers, e.g. ("example.com/a/", "example.com/a0").
-    prefixes_table = ArtistURL.sanitize_sql_array(["unnest(ARRAY[:lo]::text[], ARRAY[:hi]::text[]) AS prefixes(lo, hi)", { lo: prefixes, hi: prefixes.map { "#{it.chop}0" }}])
+    # The prefixes are quoted inline instead of bound, so queries with different numbers of prefixes don't each become a
+    # new prepared statement.
+    lo = prefixes.map { Arel::Nodes.build_quoted(it) }
+    hi = prefixes.map { Arel::Nodes.build_quoted("#{it.chop}0") }
+    prefixes_table = Arel.sql("unnest(ARRAY[?]::text[], ARRAY[?]::text[]) AS prefixes(lo, hi)", lo, hi)
 
     # The artist URLs of active artists in one prefix's range. The `LIMIT 10` applies to each prefix separately.
     matches = ArtistURL.joins(:artist).merge(Artist.active).where("#{normalized_url} ~>=~ prefixes.lo AND #{normalized_url} ~<~ prefixes.hi").limit(10)
@@ -82,7 +90,8 @@ module ArtistFinder
     # `CROSS JOIN LATERAL` runs the `matches` subquery once for each prefix row, with `prefixes.lo` and `prefixes.hi`
     # set to that row's values. Each run is an index range scan, so this works like one query per prefix, but in a
     # single round trip. Returns rows of [prefix, artist_id].
-    rows = ArtistURL.unscoped.from(prefixes_table).joins("CROSS JOIN LATERAL (#{matches.select(:artist_id).to_sql}) AS matches").pluck("prefixes.lo", "matches.artist_id")
+    lateral_join = Arel::Nodes::StringJoin.new(Arel.sql("CROSS JOIN LATERAL (?) AS matches", matches.select(:artist_id).arel.ast))
+    rows = ArtistURL.unscoped.from(prefixes_table).joins(lateral_join).pluck("prefixes.lo", "matches.artist_id")
     rows.group_by(&:first).transform_values { |prefix_rows| prefix_rows.map(&:second) }
   end
 end

@@ -67,23 +67,23 @@ class MediaAssetQuery
     when "id"
       relation.attribute_matches(value, :id)
     when "md5"
-      relation.attribute_matches(value, "media_assets.md5", :md5, exact: MediaAsset.policy(current_user).search_modes[:md5] != :all)
+      relation.attribute_matches(value, MediaAsset.arel_table[:md5], :md5, exact: MediaAsset.policy(current_user).search_modes[:md5] != :all)
     when "pixelhash"
-      relation.attribute_matches(value, "media_assets.pixel_hash", :md5, exact: MediaAsset.policy(current_user).search_modes[:pixel_hash] != :all)
+      relation.attribute_matches(value, MediaAsset.arel_table[:pixel_hash], :md5, exact: MediaAsset.policy(current_user).search_modes[:pixel_hash] != :all)
     when "width"
-      relation.attribute_matches(value, "media_assets.image_width")
+      relation.attribute_matches(value, MediaAsset.arel_table[:image_width])
     when "height"
-      relation.attribute_matches(value, "media_assets.image_height")
+      relation.attribute_matches(value, MediaAsset.arel_table[:image_height])
     when "duration"
-      relation.attribute_matches(value, "media_assets.duration", :float)
+      relation.attribute_matches(value, MediaAsset.arel_table[:duration], :float)
     when "mpixels"
-      relation.attribute_matches(value, "(media_assets.image_width * media_assets.image_height) / 1000000.0", :float)
+      relation.attribute_matches(value, Arel.sql("(media_assets.image_width * media_assets.image_height) / 1000000.0"), :float)
     when "ratio"
-      relation.attribute_matches(value, "ROUND(media_assets.image_width::numeric / media_assets.image_height::numeric, 2)", :ratio)
+      relation.attribute_matches(value, Arel.sql("ROUND(media_assets.image_width::numeric / media_assets.image_height::numeric, 2)"), :ratio)
     when "filesize"
-      relation.attribute_matches(value, "media_assets.file_size", :filesize)
+      relation.attribute_matches(value, MediaAsset.arel_table[:file_size], :filesize)
     when "filetype"
-      relation.attribute_matches(value, "media_assets.file_ext", :enum)
+      relation.attribute_matches(value, MediaAsset.arel_table[:file_ext], :enum)
     when "date"
       relation.attribute_matches(value, :created_at, :date)
     when "age"

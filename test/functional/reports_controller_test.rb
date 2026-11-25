@@ -21,6 +21,40 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
+      should "work for every report and group" do
+        {
+          "posts" => %w[uploader uploader.level approver rating is_deleted],
+          "post_approvals" => %w[user],
+          "post_appeals" => %w[creator status],
+          "post_flags" => %w[status],
+          "post_replacements" => %w[creator],
+          "post_votes" => %w[],
+          "media_assets" => %w[file_ext status],
+          "pools" => %w[category is_deleted],
+          "comments" => %w[creator do_not_bump_post is_deleted is_sticky],
+          "comment_votes" => %w[],
+          "forum_posts" => %w[creator is_deleted],
+          "bulk_update_requests" => %w[user approver status],
+          "tag_aliases" => %w[status approver],
+          "tag_implications" => %w[status approver],
+          "artist_versions" => %w[updater],
+          "artist_commentary_versions" => %w[updater],
+          "note_versions" => %w[updater],
+          "wiki_page_versions" => %w[updater],
+          "mod_actions" => %w[creator category subject_type],
+          "bans" => %w[banner duration],
+          "users" => %w[level],
+        }.each do |report, groups|
+          [nil, *groups].each do |group|
+            get_auth report_path(report, search: { group: group }.compact), @user
+            assert_response :success, "#{report} grouped by #{group.inspect}"
+
+            get_auth report_path(report, search: { group: group, period: "day" }.compact), @user
+            assert_response :success, "#{report} grouped by #{group.inspect} over time"
+          end
+        end
+      end
+
       context "posts report" do
         setup do
           @post = create(:post)

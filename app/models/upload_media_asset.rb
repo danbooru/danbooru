@@ -37,7 +37,7 @@ class UploadMediaAsset < ApplicationRecord
     when *UploadMediaAsset.statuses.keys
       where(status: value)
     when *MediaAsset::FILE_TYPES
-      attribute_matches(value, :file_ext, :enum)
+      attribute_matches(value, MediaAsset.arel_table[:file_ext], :enum)
     else
       none
     end

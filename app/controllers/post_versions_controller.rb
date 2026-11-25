@@ -35,7 +35,7 @@ class PostVersionsController < ApplicationController
   private
 
   def set_timeout
-    PostVersion.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")
+    PostVersion.connection.execute("SET statement_timeout = #{Integer(CurrentUser.user.statement_timeout)}")
     yield
   ensure
     PostVersion.connection.execute("SET statement_timeout = 0")

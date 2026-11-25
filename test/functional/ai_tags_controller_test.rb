@@ -47,6 +47,16 @@ class AITagsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "work for search[score_not]" do
+        @ai_tag = AITag.first
+        @ai_tag.update!(score: 0.5)
+
+        get_auth ai_tags_path(search: { score_not: "1" }), @user, as: :json
+
+        assert_response :success
+        assert_equal([[@ai_tag.media_asset_id, @ai_tag.tag_id]], response.parsed_body.map { [it["media_asset_id"], it["tag_id"]] })
+      end
+
       context "with deprecated tags" do
         setup do
           @deprecated_tag = create(:tag, name: "eyebrows_visible_through_hair", is_deprecated: true)

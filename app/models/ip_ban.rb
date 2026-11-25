@@ -36,9 +36,9 @@ class IpBan < ApplicationRecord
 
     case params[:order]
     when /\A(created_at|updated_at|last_hit_at)(?:_(asc|desc))?\z/
-      column = $1
-      dir = $2 || :desc
-      q = q.order(Arel.sql("#{column} #{dir} NULLS LAST")).order(id: :desc)
+      column = arel_table[$1]
+      order = ($2 == "asc") ? column.asc : column.desc
+      q = q.order(order.nulls_last).order(id: :desc)
     else
       q = q.apply_default_order(params)
     end

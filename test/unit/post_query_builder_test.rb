@@ -168,6 +168,34 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
     end
 
+    should "quote metatag values in the generated SQL" do
+      value = "zqx'zqx"
+      user = create(:superadmin_user)
+      checked = 0
+
+      (PostQueryBuilder::METATAGS + PostQueryBuilder::ORDER_METATAGS).uniq.each do |name|
+        [
+          "#{name}:#{value}",
+          "#{name}:\"#{value} #{value}\"",
+          "-#{name}:#{value}",
+          "~#{name}:#{value} ~#{name}:#{value}",
+          "order:#{name} #{name}:#{value}",
+          "order:#{value}",
+        ].each do |query|
+          sql = begin
+            Post.user_tag_match(query, user).to_sql
+          rescue PostQuery::Error
+            next
+          end
+
+          assert_not_includes(sql, value, "#{query.inspect} didn't quote the value")
+          checked += 1
+        end
+      end
+
+      assert_operator(checked, :>, 100)
+    end
+
     context "for an invalid metatag value" do
       should "return nothing" do
         create(:post_with_file, created_at: Time.zone.parse("2021-06-15 12:00:00"), score: 42)

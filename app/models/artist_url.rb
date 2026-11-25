@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class ArtistURL < ApplicationRecord
+  MAX_URL_LENGTH = 300
+
   normalizes :url, with: ->(url) { ArtistURL.normalize_url(url) }
 
-  validates :url, presence: true, length: { maximum: 300, message: "'%{value}' is too long (maximum is 300 characters)" }, uniqueness: { scope: :artist_id }
+  validates :url, presence: true, length: { maximum: MAX_URL_LENGTH, message: "'%{value}' is too long (maximum is #{MAX_URL_LENGTH} characters)" }, uniqueness: { scope: :artist_id }
   validate :validate_url_format
   belongs_to :artist, touch: true
 
@@ -60,7 +62,7 @@ class ArtistURL < ApplicationRecord
   def self.normalized_url_like(url)
     url = url.downcase.gsub(%r{\Ahttps?://|/\z}i, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
     url += "/" unless url.include?("*")
-    where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", url) # this is indexed
+    where_like(Arel.sql("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'"), url) # this is indexed
   end
 
   def self.normalized_url_equals_any(urls)

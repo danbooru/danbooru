@@ -345,7 +345,7 @@ class Tag < ApplicationRecord
 
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def order_similarity(name)
-      order(Arel.sql("levenshtein(left(name, 255), #{connection.quote(name)}), tags.post_count DESC, tags.name ASC"))
+      order(Arel.sql("levenshtein(left(tags.name, 255), ?), tags.post_count DESC, tags.name ASC", name))
     end
 
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
@@ -374,7 +374,7 @@ class Tag < ApplicationRecord
       abbrev = abbrev.downcase.delete_prefix("/")
       return none if abbrev !~ /\A[a-z0-9*]*\z/
 
-      where_like("array_initials(words)", abbrev)
+      where_like(Arel.sql("array_initials(words)"), abbrev)
     end
 
     def named_or_aliased(names)

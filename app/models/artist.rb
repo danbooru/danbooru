@@ -79,7 +79,7 @@ class Artist < ApplicationRecord
     class_methods do
       # Find all artist URLs matching `regex`, and replace the `from` regex with the `to` string.
       def rewrite_urls(regex, from, to)
-        Artist.joins(:urls).where_regex("artist_urls.url", regex).find_each do |artist|
+        Artist.joins(:urls).where_regex(ArtistURL.arel_table[:url], regex).find_each do |artist|
           artist.update!(url_string: artist.url_string.gsub(from, to))
         end
       end
@@ -240,11 +240,11 @@ class Artist < ApplicationRecord
     end
 
     def any_other_name_matches(regex)
-      where(id: Artist.from("unnest(other_names) AS other_name").where_regex("other_name", regex))
+      where(id: Artist.from("unnest(other_names) AS other_name").where_regex(Arel.sql("other_name"), regex))
     end
 
     def any_other_name_like(name)
-      where(id: Artist.from("unnest(other_names) AS other_name").where_ilike("other_name", name))
+      where(id: Artist.from("unnest(other_names) AS other_name").where_ilike(Arel.sql("other_name"), name))
     end
 
     def any_name_matches(query)
@@ -255,7 +255,7 @@ class Artist < ApplicationRecord
         where_ilike(:name, normalized_name).or(any_other_name_like(normalized_name)).or(where_ilike(:group_name, normalized_name))
       else
         normalized_name = normalize_name(query)
-        where_array_includes_any("lower(ARRAY[artists.name, artists.group_name]::text[] || artists.other_names)", [normalized_name])
+        where_array_includes_any(Arel.sql("lower(ARRAY[artists.name, artists.group_name]::text[] || artists.other_names)"), [normalized_name])
       end
     end
 
@@ -320,7 +320,7 @@ class Artist < ApplicationRecord
       end
 
       if params[:url_count].present?
-        q = q.with_url_count.where_numeric_matches(:url_count, params[:url_count])
+        q = q.with_url_count.where_numeric_matches(arel_table[:url_count], params[:url_count])
       end
 
       case params[:order]

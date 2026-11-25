@@ -18,8 +18,8 @@ User.transaction do
   User.where(inviter_id: User.system.id).update_all(inviter_id: nil)
 
   # Clear inviter for users where there is a promotion feedback from the inviter.
-  p User.joins(:feedback).where.not(inviter_id: nil).where_regex(:body, "^(You have been promoted|You gained the ability|Promoted from|Promoted by)").where("inviter_id = user_feedback.creator_id").count
-  User.joins(:feedback).where.not(inviter_id: nil).where_regex(:body, "^(You have been promoted|You gained the ability|Promoted from|Promoted by)").where("inviter_id = user_feedback.creator_id").update_all(inviter_id: nil)
+  p User.joins(:feedback).where.not(inviter_id: nil).where_regex(UserFeedback.arel_table[:body], "^(You have been promoted|You gained the ability|Promoted from|Promoted by)").where("inviter_id = user_feedback.creator_id").count
+  User.joins(:feedback).where.not(inviter_id: nil).where_regex(UserFeedback.arel_table[:body], "^(You have been promoted|You gained the ability|Promoted from|Promoted by)").where("inviter_id = user_feedback.creator_id").update_all(inviter_id: nil)
 
   # Clear inviter for users where there is a promotion modaction from the inviter.
   sql = "JOIN (SELECT (regexp_matches(description, '/users/([0-9]+)'))[1]::integer as user_id, * FROM mod_actions) AS subquery ON subquery.user_id = users.id"
