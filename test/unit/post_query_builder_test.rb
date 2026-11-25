@@ -171,6 +171,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "quote metatag values in the generated SQL" do
       value = "zqx'zqx"
       user = create(:superadmin_user)
+      checked = 0
 
       (PostQueryBuilder::METATAGS + PostQueryBuilder::ORDER_METATAGS).uniq.each do |name|
         [
@@ -183,13 +184,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         ].each do |query|
           sql = begin
             Post.user_tag_match(query, user).to_sql
-          rescue PostQuery::Error, ArgumentError
+          rescue PostQuery::Error
             next
           end
 
           assert_not_includes(sql, value, "#{query.inspect} didn't quote the value")
+          checked += 1
         end
       end
+
+      assert_operator(checked, :>, 100)
     end
 
     context "for an invalid metatag value" do

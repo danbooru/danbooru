@@ -764,6 +764,7 @@ class SearchableTest < ActiveSupport::TestCase
       ]
       array_suffixes = %w[_array _lower_array _include_any_array _include_all_array _include_any_lower_array _include_all_lower_array]
       models = ApplicationRecord.descendants.select { |model| model.respond_to?(:search) && !model.abstract_class? }
+      checked = 0
 
       models.each do |model|
         model.policy(user).search_modes.each_key do |attr|
@@ -779,15 +780,18 @@ class SearchableTest < ActiveSupport::TestCase
           searches.each do |params|
             sql = begin
               model.search(params.with_indifferent_access, user).to_sql
-            rescue Searchable::SearchError, ArgumentError, NoMethodError, TypeError
+            rescue Searchable::SearchError
               # Some malformed values raise errors before any SQL is built.
               next
             end
 
             assert_not_includes(sql, value, "#{model.name}.search(#{params.inspect}) didn't quote the value")
+            checked += 1
           end
         end
       end
+
+      assert_operator(checked, :>, 1000)
     end
   end
 end
