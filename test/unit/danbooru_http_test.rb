@@ -23,6 +23,26 @@ class DanbooruHttpTest < ActiveSupport::TestCase
     thread&.join
   end
 
+  # Start a local server where `/redirect?to=<url>` redirects to the given URL, and `/headers` returns the request
+  # headers as JSON. The server is reachable as both 127.0.0.1 and localhost, which are different origins.
+  def with_redirect_server
+    server = WEBrick::HTTPServer.new(BindAddress: "127.0.0.1", Port: 0, Logger: WEBrick::Log.new(File::NULL), AccessLog: [])
+    server.mount_proc("/redirect") do |request, response|
+      response.status = 302
+      response["Location"] = request.query["to"]
+    end
+    server.mount_proc("/headers") do |request, response|
+      response.content_type = "application/json"
+      response.body = request.header.transform_values(&:first).to_json
+    end
+    thread = Thread.new { server.start }
+
+    yield server.config[:Port]
+  ensure
+    server&.shutdown
+    thread&.join
+  end
+
   context "Danbooru::Http" do
     context "#get method" do
       should "work for all basic methods" do
@@ -212,6 +232,32 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "work for POST requests with JSON encoded bodies" do
         response = Danbooru::Http.post(httpbin_url("/post"), json: { foo: "bar" })
         assert_equal(200, response.status)
+      end
+    end
+
+    context "redirector feature" do
+      should "remove custom headers when redirecting to a different host" do
+        with_redirect_server do |port|
+          to = Danbooru::URL.escape("http://localhost:#{port}/headers")
+          http = Danbooru::Http.new.headers("X-Api-Key": "secret", "X-Csrf-Token": "token", "User-Agent": "test", "Accept": "application/json")
+          headers = http.parsed_get("http://127.0.0.1:#{port}/redirect?to=#{to}")
+
+          assert_equal("localhost:#{port}", headers["host"])
+          assert_equal("test", headers["user-agent"])
+          assert_equal("application/json", headers["accept"])
+          assert_nil(headers["x-api-key"])
+          assert_nil(headers["x-csrf-token"])
+        end
+      end
+
+      should "keep custom headers when redirecting to the same host" do
+        with_redirect_server do |port|
+          to = Danbooru::URL.escape("http://127.0.0.1:#{port}/headers")
+          http = Danbooru::Http.new.headers("X-Api-Key": "secret")
+          headers = http.parsed_get("http://127.0.0.1:#{port}/redirect?to=#{to}")
+
+          assert_equal("secret", headers["x-api-key"])
+        end
       end
     end
 

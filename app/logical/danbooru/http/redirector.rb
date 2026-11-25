@@ -6,6 +6,9 @@
 module Danbooru
   class Http
     class Redirector < HTTP::Feature
+      # The request headers that are kept when a redirect goes to a different origin.
+      CROSS_ORIGIN_HEADERS = %w[host connection user-agent accept accept-encoding accept-language referer content-type content-length].freeze
+
       attr_reader :max_redirects
 
       def initialize(max_redirects: 5)
@@ -38,7 +41,15 @@ module Danbooru
         verb = request.verb
         verb = :get if response.status.in?([302, 303]) && !request.verb.in?([:get, :head])
 
-        request.redirect(uri, verb)
+        redirect = request.redirect(uri, verb)
+
+        # httprb only removes the Authorization and Cookie headers when redirecting to a different origin. Remove every
+        # header that isn't known to be safe, so custom credential headers like X-Api-Key aren't sent to other hosts.
+        if redirect.uri.origin != request.uri.origin
+          (redirect.headers.keys.map(&:downcase) - CROSS_ORIGIN_HEADERS).each { |name| redirect.headers.delete(name) }
+        end
+
+        redirect
       end
     end
   end
