@@ -13,6 +13,13 @@ class PoolTest < ActiveSupport::TestCase
   end
 
   context "Searching pools" do
+    should "only find pools by ID when the whole name is a number" do
+      @pool = create(:pool)
+
+      assert_equal(@pool, Pool.find_by_name(@pool.id.to_s))
+      assert_nil(Pool.find_by_name("#{@pool.id}\nfoo"))
+    end
+
     should "find pools by name" do
       @pool = create(:pool, name: "Test Pool")
       @pool2 = create(:pool, name: "Yuru_Yuri_-_\\\\Akarin!!//")

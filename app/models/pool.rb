@@ -96,7 +96,7 @@ class Pool < ApplicationRecord
   end
 
   def self.named(name)
-    if name =~ /^\d+$/
+    if name.to_s.match?(/\A\d+\z/)
       where(id: name.to_i)
     elsif name
       where_ilike(:name, normalize_name_for_search(name))
