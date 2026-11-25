@@ -56,6 +56,55 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(["Note must be inside the image"], @note.errors.full_messages)
       end
 
+      should "not validate if the note has zero width" do
+        @note = build(:note, x: 500, y: 500, width: 0, height: 100, post: @post)
+
+        assert_equal(false, @note.valid?)
+        assert_equal(["Width must be at least 10 pixels"], @note.errors.full_messages)
+      end
+
+      should "not validate if the note has zero height" do
+        @note = build(:note, x: 500, y: 500, width: 100, height: 0, post: @post)
+
+        assert_equal(false, @note.valid?)
+        assert_equal(["Height must be at least 10 pixels"], @note.errors.full_messages)
+      end
+
+      should "not validate if the note is smaller than 10x10" do
+        @note = build(:note, x: 500, y: 500, width: 9, height: 9, post: @post)
+
+        assert_equal(false, @note.valid?)
+        assert_equal(["Width must be at least 10 pixels", "Height must be at least 10 pixels"], @note.errors.full_messages)
+      end
+
+      should "validate if the note is 10x10" do
+        @note = build(:note, x: 500, y: 500, width: 10, height: 10, post: @post)
+
+        assert_equal(true, @note.valid?)
+      end
+
+      should "allow notes the size of the whole image on images smaller than 10x10" do
+        @note = build(:note, x: 0, y: 0, width: 5, height: 8, post: create(:post, image_width: 5, image_height: 8))
+
+        assert_equal(true, @note.valid?)
+      end
+
+      should "not shrink the note below 10x10 when copying it to a smaller post" do
+        @note = create(:note, x: 980, y: 980, width: 20, height: 20, post: @post)
+        @small_post = create(:post, image_width: 100, image_height: 100)
+        @note.copy_to(@small_post)
+
+        assert_equal([[90, 90, 10, 10]], @small_post.notes.pluck(:x, :y, :width, :height))
+      end
+
+      should "not shrink the note below 10x10 when rescaling it" do
+        @note = create(:note, x: 980, y: 980, width: 20, height: 20, post: @post)
+        @post.update!(image_width: 100, image_height: 100)
+        @note.rescale!(0.1, 0.1)
+
+        assert_equal([90, 90, 10, 10], [@note.reload.x, @note.y, @note.width, @note.height])
+      end
+
       should "not validate if the body is blank" do
         @note = build(:note, body: "   ", post: @post)
 

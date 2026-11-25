@@ -140,14 +140,14 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
     context "preview action" do
       should "not work for a logged out user" do
-        note = { x: 0, y: 0, width: 1, height: 1, body: "test", post_id: @note.post_id }
+        note = { x: 0, y: 0, width: 10, height: 10, body: "test", post_id: @note.post_id }
         post preview_notes_path, params: { note: note, format: "json" }
 
         assert_response 403
       end
 
       should "work for a POST method" do
-        note = { x: 0, y: 0, width: 1, height: 1, body: '<p>test</p> <script>alert("owned")</script>', post_id: @note.post_id }
+        note = { x: 0, y: 0, width: 10, height: 10, body: '<p>test</p> <script>alert("owned")</script>', post_id: @note.post_id }
         post_auth preview_notes_path, @user, params: { note: note, format: "json" }
 
         assert_response :success
@@ -155,7 +155,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "work for a GET method" do
-        note = { x: 0, y: 0, width: 1, height: 1, body: '<p>test</p> <script>alert("owned")</script>', post_id: @note.post_id }
+        note = { x: 0, y: 0, width: 10, height: 10, body: '<p>test</p> <script>alert("owned")</script>', post_id: @note.post_id }
         get_auth preview_notes_path, @user, params: { note: note, format: "json" }
 
         assert_response :success
@@ -163,7 +163,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "reject oversized bodies before sanitizing" do
-        note = { x: 0, y: 0, width: 1, height: 1, body: "x" * 10_000, post_id: @note.post_id }
+        note = { x: 0, y: 0, width: 10, height: 10, body: "x" * 10_000, post_id: @note.post_id }
         post_auth preview_notes_path, @user, params: { note: note, format: "json" }
 
         assert_response 422
@@ -173,7 +173,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
         Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
         create(:rate_limit, action: "notes:preview", key: @user.cache_key, limited: true)
 
-        note = { x: 0, y: 0, width: 1, height: 1, body: "test", post_id: @note.post_id }
+        note = { x: 0, y: 0, width: 10, height: 10, body: "test", post_id: @note.post_id }
         post_auth preview_notes_path, @user, params: { note: note, format: "json" }
 
         assert_response 429

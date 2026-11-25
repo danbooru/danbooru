@@ -4,6 +4,7 @@ class Note < ApplicationRecord
   class RevertError < StandardError; end
 
   MAX_NOTES_PER_POST = 1200
+  MIN_NOTE_SIZE = 10
 
   attr_accessor :html_id
 
@@ -15,6 +16,7 @@ class Note < ApplicationRecord
   validates :y, presence: true
   validates :width, presence: true
   validates :height, presence: true
+  validate :validate_note_size, if: -> { new_record? || width_changed? || height_changed? }
   validates :body, visible_string: true, length: { maximum: 5000 }, if: -> { new_record? || body_changed? }
   validate :validate_note_within_image
   validate :validate_post_can_have_notes, on: :create
@@ -41,6 +43,15 @@ class Note < ApplicationRecord
     end
   end
 
+  # Notes must be at least 10x10, or the size of the whole image if the image is smaller than that.
+  def validate_note_size
+    min_width = [MIN_NOTE_SIZE, post&.image_width].compact.min
+    min_height = [MIN_NOTE_SIZE, post&.image_height].compact.min
+
+    errors.add(:width, "must be at least #{MIN_NOTE_SIZE} pixels") if width.present? && width < min_width
+    errors.add(:height, "must be at least #{MIN_NOTE_SIZE} pixels") if height.present? && height < min_height
+  end
+
   def validate_post_can_have_notes
     errors.add(:post, "cannot have notes") if post.present? && !post.can_have_notes?
   end
@@ -52,11 +63,21 @@ class Note < ApplicationRecord
   end
 
   def rescale!(x_scale, y_scale)
-    self.x *= x_scale
-    self.y *= y_scale
-    self.width *= x_scale
-    self.height *= y_scale
+    scale(x_scale, y_scale, post.image_width, post.image_height)
     save!
+  end
+
+  # Scale the note by the given ratios, keeping it at least the minimum size and inside an image of the given size.
+  #
+  # @param x_scale [Float] The horizontal scaling ratio.
+  # @param y_scale [Float] The vertical scaling ratio.
+  # @param image_width [Integer] The width of the image the note will be on.
+  # @param image_height [Integer] The height of the image the note will be on.
+  def scale(x_scale, y_scale, image_width, image_height)
+    self.width = (width * x_scale).round.clamp([MIN_NOTE_SIZE, image_width].min, image_width)
+    self.height = (height * y_scale).round.clamp([MIN_NOTE_SIZE, image_height].min, image_height)
+    self.x = (x * x_scale).round.clamp(0, image_width - width)
+    self.y = (y * y_scale).round.clamp(0, image_height - height)
   end
 
   def update_post
@@ -135,10 +156,7 @@ class Note < ApplicationRecord
 
     width_ratio = new_post.image_width.to_f / post.image_width
     height_ratio = new_post.image_height.to_f / post.image_height
-    new_note.x = x * width_ratio
-    new_note.y = y * height_ratio
-    new_note.width = width * width_ratio
-    new_note.height = height * height_ratio
+    new_note.scale(width_ratio, height_ratio, new_post.image_width, new_post.image_height)
 
     new_note.save
   end
