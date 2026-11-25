@@ -41,18 +41,18 @@ class PoolVersion < ApplicationRecord
     def search(params, current_user)
       q = search_attributes(params, current_user: current_user)
 
-      parsed = parse_search_params!(params, post_id: :integer)
+      parsed = parse_search_params!(params, post_id: :integer, name_contains: :string, updater_name: :string)
 
       if parsed[:post_id]
         q = q.for_post_id(parsed[:post_id])
       end
 
-      if params[:name_contains].present?
-        q = q.name_contains(params[:name_contains])
+      if parsed[:name_contains]
+        q = q.name_contains(parsed[:name_contains])
       end
 
-      if params[:updater_name].present?
-        q = q.where(updater_id: User.name_to_id(params[:updater_name]))
+      if parsed[:updater_name]
+        q = q.where(updater_id: User.name_to_id(parsed[:updater_name]))
       end
 
       if params[:is_new].to_s.truthy?

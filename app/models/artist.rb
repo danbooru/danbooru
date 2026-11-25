@@ -305,7 +305,7 @@ class Artist < ApplicationRecord
         q = q.any_other_name_like(params[:any_other_name_like])
       end
 
-      parsed = parse_search_params!(params, any_name_matches: :string, any_name_or_url_matches: :string)
+      parsed = parse_search_params!(params, any_name_matches: :string, any_name_or_url_matches: :string, url_matches: [:string])
 
       if parsed[:any_name_matches]
         q = q.any_name_matches(parsed[:any_name_matches])
@@ -315,8 +315,8 @@ class Artist < ApplicationRecord
         q = q.any_name_or_url_matches(parsed[:any_name_or_url_matches])
       end
 
-      if params[:url_matches].present?
-        q = q.urls_match(params[:url_matches])
+      if parsed[:url_matches]
+        q = q.urls_match(parsed[:url_matches])
       end
 
       if params[:url_count].present?

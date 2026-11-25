@@ -409,7 +409,7 @@ class Tag < ApplicationRecord
       end
 
       if params[:name_normalize].present?
-        q = q.where("tags.name": normalize_name(params[:name_normalize]).split(","))
+        q = q.where("tags.name": limit_search_list!(:name_normalize, normalize_name(params[:name_normalize]).split(",")))
       end
 
       if params[:name_or_alias_matches].present?

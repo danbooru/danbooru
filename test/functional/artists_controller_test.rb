@@ -170,6 +170,32 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         assert_response 422
       end
 
+      should "return 422 for search params with the wrong type" do
+        get artists_path, params: { search: { name_like: ["a"] }}, as: :json
+        assert_response 422
+        assert_equal("name_like must be a string or integer", response.parsed_body["message"])
+
+        get artists_path(format: :json, search: { name_lower_array: "a" })
+        assert_response :success
+
+        get artists_path, params: { search: { url_matches: { a: "x" }}}, as: :json
+        assert_response 422
+        assert_equal("url_matches must be a list of strings", response.parsed_body["message"])
+
+        get artists_path, params: { search: { url_matches: [["a"]] }}, as: :json
+        assert_response 422
+
+        get artists_path, params: { search: { url_matches: ["a", "b"] }}, as: :json
+        assert_response :success
+      end
+
+      should "return 422 for an invalid regex" do
+        get artists_path(format: :json, search: { name_regex: "*x" })
+        assert_response 422
+        assert_match(/Invalid regular expression/, response.parsed_body["message"])
+        assert_no_match(/SELECT/, response.parsed_body["message"])
+      end
+
       should "render" do
         get artists_path
         assert_response :success

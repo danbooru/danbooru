@@ -27,6 +27,12 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
         create(:mod_action, category: :post_rating_lock_delete, description: "unlocked ratineg for post ##{@post.id}", subject: @post)
       end
 
+      should "return 422 for a category param that isn't a string" do
+        get post_events_path, params: { search: { category: ["Approval"] }}, as: :json
+        assert_response 422
+        assert_equal("category must be a string", response.parsed_body["message"])
+      end
+
       should "render for a global listing" do
         get post_events_path
 

@@ -68,6 +68,13 @@ class BansControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(reason_matches: "blah").with { @ban2 }
       should respond_to_search(expired: "false").with { @ban2 }
       should respond_to_search(duration: "<1w").with { @ban1 }
+      should respond_to_search(duration_lt: "1w").with { @ban1 }
+
+      should "return 422 for an invalid duration" do
+        get bans_path(format: :json, search: { duration_eq: "x" })
+        assert_response 422
+        assert_match(/duration_eq must be a duration/, response.parsed_body["message"])
+      end
 
       should respond_to_search(banner_name: -> { @mod.name }).with { @ban2 }
       should respond_to_search(banner: { level: User::Levels::MODERATOR }).with { @ban2 }

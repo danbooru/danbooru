@@ -49,6 +49,21 @@ module Searchable
     end
   end
 
+  # The maximum number of items in a list search param, like `search[name_comma]=a,b,c` or `search[name][]=a`. Postgres
+  # stops using indexes for long lists, which makes the search slow.
+  MAX_SEARCH_LIST_ITEMS = 500
+
+  # Raise an error if a list search param has too many items.
+  #
+  # @param name [String, Symbol] The name of the param, for the error message.
+  # @param items [Array] The items in the list.
+  # @return [Array] The items.
+  # @raise [SearchError] If there are more than MAX_SEARCH_LIST_ITEMS items.
+  def limit_search_list!(name, items)
+    raise SearchError, "#{name} can't have more than #{MAX_SEARCH_LIST_ITEMS} items" if items.size > MAX_SEARCH_LIST_ITEMS
+    items
+  end
+
   def negate_relation
     relation = unscoped
     relation = relation.from(all.from_clause.value) if all.from_clause.value.present?
@@ -140,7 +155,7 @@ module Searchable
 
   def where_inet_matches(attr, value)
     if value.match?(/[, ]/)
-      ips = value.split(/[, ]+/).map { |ip| Danbooru::IpAddress.parse(ip).to_s }
+      ips = limit_search_list!(attr, value.split(/[, ]+/)).map { |ip| Danbooru::IpAddress.parse(ip).to_s }
       return none if ips.any?(&:blank?)
       where("#{qualified_column_for(attr)} <<= ANY(ARRAY[?]::inet[])", ips)
     else
@@ -165,16 +180,16 @@ module Searchable
   end
 
   def where_array_includes_any_lower(attr, values)
-    where("lower(#{qualified_column_for(attr)}::text)::text[] && ARRAY[?]", values.map(&:downcase))
+    where("lower(#{qualified_column_for(attr)}::text)::text[] && ARRAY[?]", values.map { it.to_s.downcase })
   end
 
   def where_array_includes_all_lower(attr, values)
-    where("lower(#{qualified_column_for(attr)}::text)::text[] @> ARRAY[?]", values.map(&:downcase))
+    where("lower(#{qualified_column_for(attr)}::text)::text[] @> ARRAY[?]", values.map { it.to_s.downcase })
   end
 
   # `~<<` is a custom Postgres operator. It's the `~` regex operator with reversed arguments.
   def where_any_in_array_matches_regex(attr, regex, flags: "e")
-    where("? ~<< ANY(#{qualified_column_for(attr)})", "(?#{flags})#{regex}")
+    where("? ~<< ANY(#{qualified_column_for(attr)}::text[])", "(?#{flags})#{regex}")
   end
 
   # Perform a Postgres full-text search on an array of strings. Assumes the query is already escaped.
@@ -215,7 +230,7 @@ module Searchable
   end
 
   def where_text_includes_lower(attr, values)
-    where("lower(#{qualified_column_for(attr)}) IN (?)", values.map(&:downcase))
+    where("lower(#{qualified_column_for(attr)}) IN (?)", values.map { it.to_s.downcase })
   end
 
   def where_array_count(attr, value)
@@ -385,7 +400,7 @@ module Searchable
       next [name, nil] if value.blank?
 
       if type.is_a?(Array)
-        items = value.is_a?(String) ? value.split : Array.wrap(value)
+        items = limit_search_list!(name, value.is_a?(String) ? value.split : Array.wrap(value))
         parsed = items.map { |item| parse[item, type.first] }
         raise SearchError, "#{name} must be a list of #{type.first}s" if parsed.any?(nil)
       else
@@ -437,6 +452,7 @@ module Searchable
     # @param search_modes [Hash<Symbol, Symbol>] The attributes to search and their search modes (see ApplicationPolicy#search_modes).
     def search_attributes(search_modes)
       raise ArgumentError, "max parameter depth of 10 exceeded" if parameter_depth(params) > 10
+      validate_array_sizes!(params)
 
       search_modes.reduce(relation) do |relation, (attribute, mode)|
         search_context(relation).search_attribute(attribute, mode)
@@ -502,32 +518,49 @@ module Searchable
       relation = visible(relation, attr).where(attr => params[:"#{attr}_eq"].to_s) if params[:"#{attr}_eq"].present?
       relation = visible(relation, attr).where.not(attr => params[:"#{attr}_not_eq"].to_s) if params[:"#{attr}_not_eq"].present?
       relation = visible(relation, attr).where(attr => Array.wrap(params[:"#{attr}_array"]).map(&:to_s)) if params[:"#{attr}_array"].present?
-      relation = visible(relation, attr).where(attr => params[:"#{attr}_comma"].to_s.split(",")) if params[:"#{attr}_comma"].present?
-      relation = visible(relation, attr).where(attr => params[:"#{attr}_space"].to_s.split) if params[:"#{attr}_space"].present?
+      relation = visible(relation, attr).where(attr => list_param(:"#{attr}_comma", params[:"#{attr}_comma"].to_s.split(","))) if params[:"#{attr}_comma"].present?
+      relation = visible(relation, attr).where(attr => list_param(:"#{attr}_space", params[:"#{attr}_space"].to_s.split)) if params[:"#{attr}_space"].present?
       relation
     end
 
-    # Raise an error for search params with the wrong type, like `search[name][x]=1` or `search[is_deleted][]=1`. Hashes
-    # are never valid for non-array attributes, and arrays are only valid for some operators.
+    # Raise an error for search params with the wrong type, like `search[name][x]=1` or `search[name_like][]=a`. Most
+    # operators take a single value, and some take either a single value or a list of values.
     def validate_value_types!(name, type)
+      numeric_operators = ["", "_not", "_present", "_eq", "_not_eq", "_gt", "_gteq", "_lt", "_lteq"]
+      singular_name = name.to_s.singularize
+
       case type
-      when :array then return
+      when :string, :text
+        list_keys = ["", "_eq", "_not_eq", "_array", "_lower_array"].map { "#{name}#{it}" }
+        single_keys = %w[_present _like _ilike _not_like _not_ilike _regex _not_regex _comma _space _lower_comma _lower_space].map { "#{name}#{it}" }
+        single_keys << "#{name}_matches" if type == :text
+      when :uuid
+        list_keys = ["", "_eq", "_not_eq"].map { "#{name}#{it}" }
+      when :boolean, :inet
+        single_keys = [name.to_s]
+      when :integer, :float, :datetime, :interval
+        single_keys = numeric_operators.map { "#{name}#{it}" }
+      when :enum
+        single_keys = [name.to_s, "#{name}_not", *numeric_operators.map { "#{name}_id#{it}" }]
       when :jsonb
         raise SearchError, "#{name} has an invalid value" if params[name].present? && !params[name].is_a?(Hash)
-        return
-      when :boolean, :inet then array_keys = [name.to_s]
-      when :enum then array_keys = [name.to_s, "#{name}_not"]
-      when :text then array_keys = ["#{name}_matches"]
-      when :integer, :float, :datetime, :interval then array_keys = ["#{name}_not"]
-      else array_keys = []
+        single_keys = ["#{name}_has_key", "has_#{name}"]
+      when :array
+        list_keys = %w[_include_any_array _include_all_array _include_any_lower_array _include_all_lower_array].map { "#{name}#{it}" }
+        single_keys = [*%w[_include_any _include_all _include_any_lower _include_all_lower].map { "#{name}#{it}" }, "any_#{singular_name}_matches_regex", "#{singular_name}_count"]
       end
 
-      params.each do |key, value|
-        next unless key == name.to_s || key.start_with?("#{name}_")
+      # JSON request bodies can contain numbers and booleans, which are converted to strings where needed.
+      single_value = ->(value) { value in String | Integer | Float | true | false }
 
-        if value.is_a?(Hash) || (value.is_a?(Array) && key.in?(array_keys))
-          raise SearchError, "#{key} has an invalid value"
-        end
+      Array(single_keys).each do |key|
+        raise SearchError, "#{key} must be a string or integer" unless params[key].nil? || single_value.call(params[key])
+      end
+
+      Array(list_keys).each do |key|
+        value = params[key]
+        next if value.nil? || single_value.call(value) || (value.is_a?(Array) && value.all?(&single_value))
+        raise SearchError, "#{key} must be a string or integer, or a list of them"
       end
     end
 
@@ -551,39 +584,49 @@ module Searchable
         relation = visible(relation, attr).where.not(id: visible(relation, attr).where_numeric_matches(attr, params[:"#{key}_not"], type))
       end
 
-      if params[:"#{key}_present"].present? && params[:"#{key}_present"].truthy?
+      if params[:"#{key}_present"].to_s.truthy?
         relation = visible(relation, attr).where.not(attr => nil)
       end
 
-      if params[:"#{key}_present"].present? && params[:"#{key}_present"].falsy?
+      if params[:"#{key}_present"].to_s.falsy?
         relation = visible(relation, attr).where(attr => nil)
       end
 
       if params[:"#{key}_eq"].present?
-        relation = visible(relation, attr).where_operator(attr, :eq, params[:"#{key}_eq"])
+        relation = visible(relation, attr).where_operator(attr, :eq, comparison_value(:"#{key}_eq", type))
       end
 
       if params[:"#{key}_not_eq"].present?
-        relation = visible(relation, attr).where_operator(attr, :not_eq, params[:"#{key}_not_eq"])
+        relation = visible(relation, attr).where_operator(attr, :not_eq, comparison_value(:"#{key}_not_eq", type))
       end
 
       if params[:"#{key}_gt"].present?
-        relation = visible(relation, attr).where_operator(attr, :gt, params[:"#{key}_gt"])
+        relation = visible(relation, attr).where_operator(attr, :gt, comparison_value(:"#{key}_gt", type))
       end
 
       if params[:"#{key}_gteq"].present?
-        relation = visible(relation, attr).where_operator(attr, :gteq, params[:"#{key}_gteq"])
+        relation = visible(relation, attr).where_operator(attr, :gteq, comparison_value(:"#{key}_gteq", type))
       end
 
       if params[:"#{key}_lt"].present?
-        relation = visible(relation, attr).where_operator(attr, :lt, params[:"#{key}_lt"])
+        relation = visible(relation, attr).where_operator(attr, :lt, comparison_value(:"#{key}_lt", type))
       end
 
       if params[:"#{key}_lteq"].present?
-        relation = visible(relation, attr).where_operator(attr, :lteq, params[:"#{key}_lteq"])
+        relation = visible(relation, attr).where_operator(attr, :lteq, comparison_value(:"#{key}_lteq", type))
       end
 
       relation
+    end
+
+    # Parse the value of a comparison operator like `search[duration_gt]=1d`. Intervals are parsed here because Postgres
+    # raises an error for intervals it can't parse.
+    def comparison_value(key, type)
+      return params[key] unless type == :interval
+
+      DurationParser.parse_duration(params[key].to_s)
+    rescue ArgumentError
+      raise SearchError, "#{key} must be a duration, like 1d or 2 weeks"
     end
 
     def search_string_attribute(attr)
@@ -593,11 +636,11 @@ module Searchable
         relation = visible(relation, attr).where(attr => params[attr])
       end
 
-      if params[:"#{attr}_present"].present? && params[:"#{attr}_present"].truthy?
+      if params[:"#{attr}_present"].to_s.truthy?
         relation = visible(relation, attr).where.not(attr => "")
       end
 
-      if params[:"#{attr}_present"].present? && params[:"#{attr}_present"].falsy?
+      if params[:"#{attr}_present"].to_s.falsy?
         relation = visible(relation, attr).where(attr => "")
       end
 
@@ -610,27 +653,27 @@ module Searchable
       end
 
       if params[:"#{attr}_like"].present?
-        relation = visible(relation, attr).where_like(attr, params[:"#{attr}_like"])
+        relation = visible(relation, attr).where_like(attr, params[:"#{attr}_like"].to_s)
       end
 
       if params[:"#{attr}_ilike"].present?
-        relation = visible(relation, attr).where_ilike(attr, params[:"#{attr}_ilike"])
+        relation = visible(relation, attr).where_ilike(attr, params[:"#{attr}_ilike"].to_s)
       end
 
       if params[:"#{attr}_not_like"].present?
-        relation = visible(relation, attr).where_not_like(attr, params[:"#{attr}_not_like"])
+        relation = visible(relation, attr).where_not_like(attr, params[:"#{attr}_not_like"].to_s)
       end
 
       if params[:"#{attr}_not_ilike"].present?
-        relation = visible(relation, attr).where_not_ilike(attr, params[:"#{attr}_not_ilike"])
+        relation = visible(relation, attr).where_not_ilike(attr, params[:"#{attr}_not_ilike"].to_s)
       end
 
       if params[:"#{attr}_regex"].present?
-        relation = visible(relation, attr).where_regex(attr, params[:"#{attr}_regex"])
+        relation = visible(relation, attr).where_regex(attr, params[:"#{attr}_regex"].to_s)
       end
 
       if params[:"#{attr}_not_regex"].present?
-        relation = visible(relation, attr).where_not_regex(attr, params[:"#{attr}_not_regex"])
+        relation = visible(relation, attr).where_not_regex(attr, params[:"#{attr}_not_regex"].to_s)
       end
 
       if params[:"#{attr}_array"].present?
@@ -638,23 +681,23 @@ module Searchable
       end
 
       if params[:"#{attr}_comma"].present?
-        relation = visible(relation, attr).where(attr => params[:"#{attr}_comma"].split(","))
+        relation = visible(relation, attr).where(attr => list_param(:"#{attr}_comma", params[:"#{attr}_comma"].to_s.split(",")))
       end
 
       if params[:"#{attr}_space"].present?
-        relation = visible(relation, attr).where(attr => params[:"#{attr}_space"].split)
+        relation = visible(relation, attr).where(attr => list_param(:"#{attr}_space", params[:"#{attr}_space"].to_s.split))
       end
 
       if params[:"#{attr}_lower_array"].present?
-        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_array"])
+        relation = visible(relation, attr).where_text_includes_lower(attr, Array.wrap(params[:"#{attr}_lower_array"]))
       end
 
       if params[:"#{attr}_lower_comma"].present?
-        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_comma"].split(","))
+        relation = visible(relation, attr).where_text_includes_lower(attr, list_param(:"#{attr}_lower_comma", params[:"#{attr}_lower_comma"].to_s.split(",")))
       end
 
       if params[:"#{attr}_lower_space"].present?
-        relation = visible(relation, attr).where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split)
+        relation = visible(relation, attr).where_text_includes_lower(attr, list_param(:"#{attr}_lower_space", params[:"#{attr}_lower_space"].to_s.split))
       end
 
       relation
@@ -664,7 +707,7 @@ module Searchable
       relation = search_string_attribute(attr)
 
       if params[:"#{attr}_matches"].present?
-        relation = visible(relation, attr).where_text_matches(attr, params[:"#{attr}_matches"])
+        relation = visible(relation, attr).where_text_matches(attr, params[:"#{attr}_matches"].to_s)
       end
 
       relation
@@ -691,7 +734,7 @@ module Searchable
     def search_boolean_attribute(attr)
       relation = self.relation
 
-      if params[attr].present?
+      if params[attr].present? || params[attr] == false
         relation = visible(relation, attr).where_boolean_matches(attr, params[attr])
       end
 
@@ -702,7 +745,7 @@ module Searchable
       relation = self.relation
 
       if params[attr].present?
-        relation = visible(relation, attr).where_inet_matches(attr, params[attr])
+        relation = visible(relation, attr).where_inet_matches(attr, params[attr].to_s)
       end
 
       relation
@@ -716,7 +759,7 @@ module Searchable
       end
 
       if params["#{name}_has_key"]
-        relation = visible(relation, name).where_json_has_key(name, params["#{name}_has_key"])
+        relation = visible(relation, name).where_json_has_key(name, params["#{name}_has_key"].to_s)
       end
 
       if params["has_#{name}"].to_s.truthy?
@@ -736,11 +779,11 @@ module Searchable
       parse_values = ->(value) { value.split(",").map(&:strip).flat_map { |v| v.downcase.in?(enum_names) ? [v] : v.split } }
 
       if params[name].present?
-        relation = visible(relation, name).where(name => parse_values.call(params[name]))
+        relation = visible(relation, name).where(name => list_param(name, parse_values.call(params[name].to_s)))
       end
 
       if params[:"#{name}_not"].present?
-        relation = visible(relation, name).where.not(name => parse_values.call(params[:"#{name}_not"]))
+        relation = visible(relation, name).where.not(name => list_param(:"#{name}_not", parse_values.call(params[:"#{name}_not"].to_s)))
       end
 
       relation = search_context(relation).search_numeric_attribute(name, key: :"#{name}_id")
@@ -752,59 +795,58 @@ module Searchable
       relation = self.relation
       singular_name = name.to_s.singularize
 
-      if params[:"#{name}_include_any"]
-        items = params[:"#{name}_include_any"].to_s.scan(/[^[:space:]]+/)
-        items = items.map(&:to_i) if type == :integer
-
-        relation = visible(relation, name).where_array_includes_any(name, items)
+      if params[:"#{name}_include_any"].present?
+        relation = visible(relation, name).where_array_includes_any(name, array_items(name, :"#{name}_include_any", type))
       end
 
-      if params[:"#{name}_include_all"]
-        items = params[:"#{name}_include_all"].to_s.scan(/[^[:space:]]+/)
-        items = items.map(&:to_i) if type == :integer
-
-        relation = visible(relation, name).where_array_includes_all(name, items)
+      if params[:"#{name}_include_all"].present?
+        relation = visible(relation, name).where_array_includes_all(name, array_items(name, :"#{name}_include_all", type))
       end
 
-      if params[:"#{name}_include_any_array"]
-        relation = visible(relation, name).where_array_includes_any(name, params[:"#{name}_include_any_array"])
+      if params[:"#{name}_include_any_array"].present?
+        relation = visible(relation, name).where_array_includes_any(name, array_items(name, :"#{name}_include_any_array", type))
       end
 
-      if params[:"#{name}_include_all_array"]
-        relation = visible(relation, name).where_array_includes_all(name, params[:"#{name}_include_all_array"])
+      if params[:"#{name}_include_all_array"].present?
+        relation = visible(relation, name).where_array_includes_all(name, array_items(name, :"#{name}_include_all_array", type))
       end
 
-      if params[:"#{name}_include_any_lower"]
-        items = params[:"#{name}_include_any_lower"].to_s.scan(/[^[:space:]]+/)
-        items = items.map(&:to_i) if type == :integer
-
-        relation = visible(relation, name).where_array_includes_any_lower(name, items)
+      if params[:"#{name}_include_any_lower"].present?
+        relation = visible(relation, name).where_array_includes_any_lower(name, list_param(:"#{name}_include_any_lower", params[:"#{name}_include_any_lower"].to_s.scan(/[^[:space:]]+/)))
       end
 
-      if params[:"#{name}_include_all_lower"]
-        items = params[:"#{name}_include_all_lower"].to_s.scan(/[^[:space:]]+/)
-        items = items.map(&:to_i) if type == :integer
-
-        relation = visible(relation, name).where_array_includes_all_lower(name, items)
+      if params[:"#{name}_include_all_lower"].present?
+        relation = visible(relation, name).where_array_includes_all_lower(name, list_param(:"#{name}_include_all_lower", params[:"#{name}_include_all_lower"].to_s.scan(/[^[:space:]]+/)))
       end
 
-      if params[:"#{name}_include_any_lower_array"]
-        relation = visible(relation, name).where_array_includes_any_lower(name, params[:"#{name}_include_any_lower_array"])
+      if params[:"#{name}_include_any_lower_array"].present?
+        relation = visible(relation, name).where_array_includes_any_lower(name, Array.wrap(params[:"#{name}_include_any_lower_array"]))
       end
 
-      if params[:"#{name}_include_all_lower_array"]
-        relation = visible(relation, name).where_array_includes_all_lower(name, params[:"#{name}_include_all_lower_array"])
+      if params[:"#{name}_include_all_lower_array"].present?
+        relation = visible(relation, name).where_array_includes_all_lower(name, Array.wrap(params[:"#{name}_include_all_lower_array"]))
       end
 
-      if params[:"any_#{singular_name}_matches_regex"]
-        relation = visible(relation, name).where_any_in_array_matches_regex(name, params[:"any_#{singular_name}_matches_regex"])
+      if params[:"any_#{singular_name}_matches_regex"].present?
+        relation = visible(relation, name).where_any_in_array_matches_regex(name, params[:"any_#{singular_name}_matches_regex"].to_s)
       end
 
-      if params[:"#{singular_name}_count"]
+      if params[:"#{singular_name}_count"].present?
         relation = visible(relation, name).where_array_count(name, params[:"#{singular_name}_count"])
       end
 
       relation
+    end
+
+    # Parse the items of an array search, like `search[post_ids_include_any]=1 2` (a space-separated list) or
+    # `search[post_ids_include_any_array][]=1` (an array). The items are converted to the column's type, because
+    # Postgres can't compare arrays of different types.
+    def array_items(name, key, type)
+      items = key.end_with?("_array") ? Array.wrap(params[key]) : list_param(key, params[key].to_s.scan(/[^[:space:]]+/))
+      return items.map(&:to_s) unless type == :integer
+
+      items = items.map { Integer(it.to_s, 10, exception: false) || raise(SearchError, "#{key} must be a list of integers") }
+      relation.clamp_to_column_range(items, name)
     end
 
     def search_association_attribute(attr)
@@ -905,6 +947,21 @@ module Searchable
     # Restrict the results that are visible to the user based on what they're searching for.
     def visible(relation, attr)
       relation.policy(current_user).visible_for_search(relation, attr.to_sym)
+    end
+
+    # Raise an error for array params with too many items, like `search[name][]=a&search[name][]=b&...`.
+    def validate_array_sizes!(params)
+      params.each do |key, value|
+        if value.is_a?(Array)
+          list_param(key, value.flatten)
+        elsif parameter_hash?(value)
+          validate_array_sizes!(value)
+        end
+      end
+    end
+
+    def list_param(name, items)
+      relation.limit_search_list!(name, items)
     end
 
     def parameter_depth(params)

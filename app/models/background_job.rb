@@ -33,13 +33,14 @@ class BackgroundJob < GoodJob::Job
 
       def search(params, current_user)
         q = search_attributes(params, current_user: current_user)
+        parsed = parse_search_params!(params, name: :string, status: :string)
 
-        if params[:name].present?
-          q = q.name_matches(params[:name])
+        if parsed[:name]
+          q = q.name_matches(parsed[:name])
         end
 
-        if params[:status].present?
-          q = q.status_matches(params[:status])
+        if parsed[:status]
+          q = q.status_matches(parsed[:status])
         end
 
         case params[:order]

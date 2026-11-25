@@ -31,9 +31,10 @@ class PostEvent < ApplicationRecord
 
   def self.search(params, current_user)
     q = search_attributes(params, current_user: current_user)
+    parsed = parse_search_params!(params, category: :string)
 
-    if params[:category]
-      q = q.category_matches(params[:category])
+    if parsed[:category]
+      q = q.category_matches(parsed[:category])
     end
 
     case params[:order]

@@ -384,6 +384,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "h1", "Search Error"
         end
 
+        should "render an error for a random: metatag that isn't a number" do
+          get posts_path(format: :json), params: { tags: "random:abc" }
+
+          assert_response 422
+          assert_equal("'random:abc' must be a number", response.parsed_body["message"])
+        end
+
         should "tell anonymous users to sign up when searching for too many tags" do
           get posts_path, params: { tags: "1 2 3" }
 

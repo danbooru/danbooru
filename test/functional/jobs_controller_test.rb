@@ -18,6 +18,15 @@ class JobsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(status: "finished").with { [] }
       should respond_to_search(status: "discarded").with { [] }
 
+      should "return 422 for name and status params that aren't strings" do
+        get jobs_path, params: { search: { name: ["a"] }}, as: :json
+        assert_response 422
+        assert_equal("name must be a string", response.parsed_body["message"])
+
+        get jobs_path, params: { search: { status: ["queued"] }}, as: :json
+        assert_response 422
+      end
+
       context "searching by params" do
         setup do
           @victim = create(:user)
