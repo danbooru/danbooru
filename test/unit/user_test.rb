@@ -569,5 +569,18 @@ class UserTest < ActiveSupport::TestCase
         should_not allow_value(".#{"x" * 40_001} { color: blue; }").for(:custom_style)
       end
     end
+
+    context "#sockpuppet_accounts method" do
+      should "return at most `limit` accounts, and not load more rows than that" do
+        user = create(:user)
+        mod = create(:moderator_user)
+        event = create(:user_event, user: user, category: :login)
+        create_list(:user, 3).each { |other| create(:user_event, user: other, category: :login, session_id: event.session_id) }
+
+        accounts = assert_queries_match(/LIMIT \$\d+|LIMIT 2\b/, count: 2) { user.sockpuppet_accounts(mod, limit: 2) }
+
+        assert_equal(2, accounts[:session_ids][event.session_id].size)
+      end
+    end
   end
 end

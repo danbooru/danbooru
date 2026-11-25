@@ -427,8 +427,8 @@ class User < ApplicationRecord
     # @param viewer [User] The user viewing the accounts. Only accounts visible to them are returned.
     # @return [Hash<Symbol, Hash>] A hash of users that share session IDs or IP addresses with this user.
     def sockpuppet_accounts(viewer, limit: 100)
-      shared_session_ids = UserEvent.visible(viewer).shared_session_ids_for(self).includes(:user)
-      shared_ip_addresses = UserEvent.visible(viewer).shared_ip_addresses_for(self).includes(:user, :ip_geolocation)
+      shared_session_ids = UserEvent.visible(viewer).shared_session_ids_for(self).limit(limit).includes(:user)
+      shared_ip_addresses = UserEvent.visible(viewer).shared_ip_addresses_for(self).limit(limit).includes(:user, :ip_geolocation)
       events = (shared_session_ids + shared_ip_addresses).take(limit)
       accounts = { session_ids: {}, ip_addresses: {}, ip_geolocations: {}}
 
