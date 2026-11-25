@@ -87,10 +87,6 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#instance action" do
-      setup do
-        ApplicationMetrics.reset_metrics
-      end
-
       should "work for text format" do
         ApplicationMetrics.update_process_metrics
         get instance_metrics_path
@@ -107,14 +103,6 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
         assert_includes(response.body, "pod_name=")
         assert_not_includes(response.body, "rails_version=")
         assert_not_includes(response.body, "ffmpeg_version=")
-      end
-
-      should "cache the metrics on the server even when the query string changes" do
-        ApplicationMetrics.instance.expects(:instance_metrics).once.returns(Danbooru::Metric::Set.new)
-        get instance_metrics_path(foo: 1)
-        get instance_metrics_path(foo: 2)
-
-        assert_response :success
       end
     end
   end

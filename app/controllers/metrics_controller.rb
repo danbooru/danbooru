@@ -19,7 +19,7 @@ class MetricsController < ApplicationController
   end
 
   def instance
-    @metrics = authorize ApplicationMetrics.cached_instance_metrics, policy_class: MetricsPolicy
+    @metrics = authorize ApplicationMetrics.instance_metrics, policy_class: MetricsPolicy
 
     expires_in 1.minute, public: true unless response.cache_control.present?
     respond_with(@metrics) do |format|

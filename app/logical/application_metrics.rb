@@ -23,7 +23,6 @@ class ApplicationMetrics
   def initialize
     @counters_mutex = Mutex.new
     @last_counter_snapshots = {}
-    @instance_metrics_cache = ActiveSupport::Cache::MemoryStore.new
   end
 
   # @param [ApplicationMetrics] The singleton instance. Class methods are delegated to this.
@@ -616,7 +615,6 @@ class ApplicationMetrics
   # Resets the process metrics (by flushing the memoize cache).
   def reset_metrics
     flush_cache
-    @instance_metrics_cache.clear
     process_metrics
     self
   end
@@ -824,17 +822,6 @@ class ApplicationMetrics
     end
 
     metrics.reduce(&:merge) || Danbooru::Metric::Set.new
-  end
-
-  # Returns the instance metrics, cached in this process so that requests with random query strings can't bypass the
-  # HTTP cache and make every request query every worker.
-  #
-  # @param expires_in [ActiveSupport::Duration] How long to cache the metrics.
-  # @return [Danbooru::Metric::Set] The combined set of metrics from each Puma worker process.
-  def cached_instance_metrics(expires_in = 1.minute)
-    @instance_metrics_cache.fetch("instance-metrics", expires_in: expires_in, race_condition_ttl: 10.seconds) do
-      instance_metrics
-    end
   end
 
   # The path of the Unix domain socket that a Puma process serves its metrics on.
