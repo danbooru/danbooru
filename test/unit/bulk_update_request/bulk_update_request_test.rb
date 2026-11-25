@@ -127,7 +127,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal(true, @bur.valid?)
           @bur.approve!(@admin)
-          assert_equal("processing", @bur.reload.status)
+          assert_equal("queued", @bur.reload.status)
 
           perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
           assert_equal("approved", @bur.reload.status)
@@ -417,6 +417,14 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal(%{The "bulk update request ##{@req.id}":/bulk_update_requests?search%5Bid%5D=#{@req.id} (forum ##{@post.id}) has been approved by @#{@admin.name}.}, @topic.forum_posts.last.body)
         assert_equal(User.system, @topic.forum_posts.last.creator)
         assert_equal(User.system, @topic.forum_posts.last.updater)
+      end
+
+      should "create a forum post when a queued BUR is approved" do
+        bur = create(:bulk_update_request, forum_topic: @topic, script: "mass update aaa -> bbb")
+        bur.approve!(@admin)
+
+        assert_equal("queued", bur.status)
+        assert_equal(%{The "bulk update request ##{bur.id}":/bulk_update_requests?search%5Bid%5D=#{bur.id} (forum ##{bur.forum_post.id}) has been approved by @#{@admin.name}.}, @topic.forum_posts.last.body)
       end
 
       should "not send @mention dmails to the approver" do

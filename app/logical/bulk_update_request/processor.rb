@@ -90,14 +90,20 @@ class BulkUpdateRequest::Processor
 
   # Schedule the bulk update request to be processed later, in the background.
   def process_later!
-    ProcessBulkUpdateRequestJob.perform_later(bulk_update_request)
+    if bulk_update_request.is_queued?
+      ProcessBulkUpdateRequestJob.set(wait: BulkUpdateRequest::PROCESSING_DELAY).perform_later(bulk_update_request:)
+    else
+      ProcessBulkUpdateRequestJob.perform_later(bulk_update_request:)
+    end
   end
 
   # Process the bulk update request immediately.
-  def process!
+  #
+  # @param approved_at [Time, nil] when the BUR was approved. Defaults to when it was last updated.
+  def process!(approved_at: nil)
     CurrentUser.scoped(User.system) do
       # Read this before updating the status, which changes `updated_at` if the BUR wasn't already marked as processing.
-      approved_at = bulk_update_request.updated_at
+      approved_at ||= bulk_update_request.updated_at
       bulk_update_request.update!(status: "processing")
 
       commands.each do |command|

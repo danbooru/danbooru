@@ -319,6 +319,16 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal('<p>tag <a class="dtext-link dtext-id-link dtext-tag-implication-id-link" href="/tag_implications/0">implication #0</a> does not exist.</p>', format_text("[ti:0]"))
       end
 
+      should "say when an embedded BUR is queued for processing" do
+        approver = create(:admin_user)
+        bur = create(:bulk_update_request, script: "alias foo -> bar", status: "queued", approver: approver)
+
+        html = format_text("[bur:#{bur.id}]")
+        assert_includes(html, "has been approved by")
+        assert_includes(html, ">@#{approver.name}</a>")
+        assert_includes(html, "and is waiting to be processed.")
+      end
+
       should "only expand each tag request embed once per document" do
         bur = create(:bulk_update_request, script: "alias foo -> bar")
         ta = create(:tag_alias, antecedent_name: "a1", consequent_name: "b1")
