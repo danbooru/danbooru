@@ -125,11 +125,17 @@ module Danbooru
         Date.new(year, month, day)
       end
 
-      # Parse a string containing HTML into a HTML object.
+      # Parse a string containing HTML into a HTML object. Returns an empty fragment if the HTML is nested too deeply.
       #
+      # @param max_errors [Integer] The max number of parse errors to record, or -1 for no limit.
+      # @param max_tree_depth [Integer] The max depth of the HTML tree, or -1 for no limit.
       # @return [Nokogiri::HTML5::DocumentFragment] The HTML object.
-      def parse_html(max_errors: -1, max_tree_depth: -1)
+      def parse_html(max_errors: -1, max_tree_depth: Nokogiri::Gumbo::DEFAULT_MAX_TREE_DEPTH)
         Nokogiri::HTML5.fragment(self, max_errors:, max_tree_depth:)
+      rescue ArgumentError => e
+        raise if e.message.exclude?("Document tree depth limit exceeded")
+
+        Nokogiri::HTML5.fragment("")
       end
 
       # @return [Boolean] True if the string contains only balanced parentheses; false if the string contains unbalanced parentheses.

@@ -472,7 +472,14 @@ class DTextTest < ActiveSupport::TestCase
       end
 
       should "not fail for deeply nested HTML" do
-        assert_equal("foo", DText.from_html("#{"<div>" * 1_000}foo#{"</div>" * 1_000}"))
+        assert_equal("foo", DText.from_html("#{"<div>" * 300}foo#{"</div>" * 300}"))
+        assert_equal("", DText.from_html("#{"<div>" * 5_000}foo#{"</div>" * 5_000}"))
+
+        fragment = Nokogiri::HTML5.fragment("#{"<div>" * 5_000}foo#{"</div>" * 5_000}", max_tree_depth: -1)
+        assert_equal("", DText.from_html(fragment))
+
+        # Should not walk ancestors quadratically for many <br> tags inside deeply nested elements.
+        assert_equal("foo\n\nbar", DText.from_html("#{"<span>" * 350}foo#{"<br>" * 2_000}bar#{"</span>" * 350}"))
       end
 
       should "convert links to dtext" do

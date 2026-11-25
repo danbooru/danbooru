@@ -138,4 +138,20 @@ class StringTest < ActiveSupport::TestCase
       assert_equal("1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111... is not a valid date", error.message)
     end
   end
+
+  context "String#parse_html" do
+    should "parse HTML into a document fragment" do
+      fragment = "<p>foo</p>".parse_html
+
+      assert_instance_of(Nokogiri::HTML5::DocumentFragment, fragment)
+      assert_equal("foo", fragment.at("p").text)
+    end
+
+    should "return an empty fragment if the HTML is nested too deeply" do
+      fragment = "#{"<div>" * 1_000}foo#{"</div>" * 1_000}".parse_html
+
+      assert_instance_of(Nokogiri::HTML5::DocumentFragment, fragment)
+      assert_equal("", fragment.text)
+    end
+  end
 end

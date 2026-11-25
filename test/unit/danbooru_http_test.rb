@@ -121,6 +121,12 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         end
       end
 
+      should "return nil from parsed_get if the html is nested too deeply" do
+        with_local_server("#{"<div>" * 1_000}foo#{"</div>" * 1_000}") do |url|
+          assert_nil(Danbooru::Http.parsed_get(url))
+        end
+      end
+
       should "automatically parse html responses" do
         response = Danbooru::Http.get(httpbin_url("html"))
         assert_equal(200, response.status)

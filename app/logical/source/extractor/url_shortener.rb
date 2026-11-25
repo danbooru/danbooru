@@ -89,7 +89,7 @@ class Source::Extractor::URLShortener < Source::Extractor
     # HEAD not supported; returns an HTML page with the URL in `<input id="target" value="...">`.
     in "reurl.cc", id
       response = http.no_follow.get(https_url)
-      response.parse.at("#target")&.attr("value") if response.status.code == 200
+      response.parse&.at("#target")&.attr("value") if response.status.code == 200
 
     # curl -I https://ow.ly/WmrYu
     # Returns 301 on success and 301 redirect to https://www.hootsuite.com/error/lost-owly on error.

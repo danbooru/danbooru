@@ -619,16 +619,19 @@ class DText
   # @param allowed_shortlinks [Array<String>] The list of shortlinks to allow in the DText (e.g. ["pixiv"] to not escape `pixiv #1234` shortlinks).
   # @return [String] the DText output
   def self.from_html(html, base_url: nil, inline: false, allowed_shortlinks: [], &block)
-    # HTML from other sites isn't limited to DText's nesting depth.
-    html = parse_html(html, max_tree_depth: -1) if html.is_a?(String)
+    html = parse_html(html) if html.is_a?(String)
     dtext = html_to_dtext(html, base_url:, inline:, allowed_shortlinks:, &block)
     dtext.gsub(/^ +| +$/, "").gsub(/\n{3,}/, "\n\n").strip
+  rescue DText::Error
+    ""
   end
 
-  def self.html_to_dtext(html, base_url: nil, inline: false, allowed_shortlinks: [], &block)
-    return "" if html.nil?
+  def self.html_to_dtext(html, base_url: nil, inline: false, allowed_shortlinks: [], depth: 0, ancestors: Hash.new(0), &block)
+    return "" if html.nil? || depth > Nokogiri::Gumbo::DEFAULT_MAX_TREE_DEPTH
 
-    options = { base_url:, inline:, allowed_shortlinks: }
+    tag_name = html.name
+    ancestors[tag_name] += 1
+    options = { base_url:, inline:, allowed_shortlinks:, depth: depth + 1, ancestors: }
 
     # Allow caller to rewrite elements before processing them.
     html.children.each(&block) if block.present?
@@ -659,9 +662,9 @@ class DText
       case element.name
       in "text"
         escape(element.content, allowed_shortlinks:).normalize_whitespace.gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
-      in "br" if element.ancestors.any? { |e| e.name.in?(%w[a h1 h2 h3 h4 h5 h6]) }
+      in "br" if %w[a h1 h2 h3 h4 h5 h6].any? { |tag| ancestors[tag] > 0 }
         " "
-      in "br" if element.ancestors.any? { |e| e.name == "li" } && element.next.present?
+      in "br" if ancestors["li"] > 0 && element.next.present?
         "[br]"
       in "br"
         "\n"
@@ -690,22 +693,22 @@ class DText
       in "inline-spoiler" # fake tag added by source extractors
         content = html_to_dtext(element, **options, &block).strip
         "[spoiler]#{content}[/spoiler]" if content.present?
-      in "small" unless element.ancestors.any? { |e| e.name.in?(%w[a small]) }
+      in "small" unless ancestors["a"] > 0 || ancestors["small"] > 0
         content = html_to_dtext(element, **options, &block)
         "[tn]#{content}[/tn]" if content.present?
-      in "b" unless element.ancestors.any? { |e| e.name == "b" }
+      in "b" unless ancestors["b"] > 0
         content = html_to_dtext(element, **options, &block)
         "[b]#{content}[/b]" if content.present?
-      in "i" unless element.ancestors.any? { |e| e.name == "i" }
+      in "i" unless ancestors["i"] > 0
         content = html_to_dtext(element, **options, &block)
         "[i]#{content}[/i]" if content.present?
-      in "u" unless element.ancestors.any? { |e| e.name == "u" }
+      in "u" unless ancestors["u"] > 0
         content = html_to_dtext(element, **options, &block)
         "[u]#{content}[/u]" if content.present?
-      in "s" unless element.ancestors.any? { |e| e.name == "s" }
+      in "s" unless ancestors["s"] > 0
         content = html_to_dtext(element, **options, &block)
         "[s]#{content}[/s]" if content.present?
-      in "code" unless element.ancestors.any? { |e| e.name == "code" }
+      in "code" unless ancestors["code"] > 0
         content = html_to_dtext(element, **options, &block)
         "[code]#{content}[/code]" if content.present?
       in "li" if element.parent&.name == "ol"
@@ -713,8 +716,8 @@ class DText
         "#{element["value"]}. #{content}\n" if content.present?
       in "li"
         content = html_to_dtext(element, **options, &block).squeeze("\n").strip
-        depth = element.ancestors.count { it.name == "ul" }.clamp(1..)
-        list = "*" * depth
+        list_depth = ancestors["ul"].clamp(1..)
+        list = "*" * list_depth
         "#{list} #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")
         hn = element.name
@@ -777,6 +780,8 @@ class DText
         html_to_dtext(element, **options, &block)
       end
     end.join
+  ensure
+    ancestors[tag_name] -= 1 if tag_name
   end
 
   # Build a DText link. If the link text is the same as the URL, then format it as `<url>`, otherwise as `"title":[url]`.

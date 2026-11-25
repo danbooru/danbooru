@@ -91,7 +91,7 @@ module Source
         update_credentials!(response)
         return nil unless response.status == 200
 
-        response.parse.at("body > div > a > img[src^='//img.tinami.com']")&.attr("src")&.prepend("https:")
+        response.parse&.at("body > div > a > img[src^='//img.tinami.com']")&.attr("src")&.prepend("https:")
       end
 
       memoize def page

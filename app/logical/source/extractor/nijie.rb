@@ -126,7 +126,7 @@ module Source
 
         response = client.cache(1.minute).get(url)
 
-        if response.status != 200 || response.parse.search("#login_illust").present? || response.uri.path == "/login.php"
+        if response.status != 200 || response.parse&.search("#login_illust").present? || response.uri.path == "/login.php"
           clear_cached_session_cookie!
         else
           response.parse
