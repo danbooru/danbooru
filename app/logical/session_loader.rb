@@ -28,6 +28,7 @@ class SessionLoader
   # @param password [String] the user's password
   # @return [User, nil] the user if the password was correct, otherwise nil
   # @raise [RateLimiter::RateLimitError] If the account has had too many login attempts.
+  # @raise [User::PrivilegeError] If the IP is banned, unless the user is a moderator and the password is correct.
   def login(name_or_email, password)
     user = User.find_by_name_or_email(name_or_email)
 
@@ -39,6 +40,9 @@ class SessionLoader
     RateLimiter.new("sessions:login", [login_rate_limit_key(name_or_email)], rate: 1.0 / 5.minutes, burst: 10).limit! unless trusted_ip?(user)
 
     password_valid = user.present? ? user.authenticate_password(password) : User.verify_dummy_password?(password)
+
+    # Check after the password, so the response doesn't reveal whether an email address belongs to a moderator.
+    ip_ban_check!(password_valid ? user : nil)
 
     if password_valid
       # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
@@ -94,6 +98,7 @@ class SessionLoader
   # @param code [String] The user's 6-digit 2FA code, or their 8-digit backup code.
   # @return [Boolean] True if the 2FA code is correct, or false if it's incorrect.
   def verify_totp!(user, code)
+    ip_ban_check!(user)
     user.limit_2fa_attempts!
 
     if user.totp.verify(code)
@@ -216,6 +221,14 @@ class SessionLoader
   #
   # @param name_or_email [String] The submitted username or email address.
   # @return [String] The rate limit key.
+  # Moderators aren't affected by IP bans, so they can't be locked out by another moderator's IP ban.
+  #
+  # @param user [User, nil] The user logging in, or nil if they don't exist.
+  # @raise [User::PrivilegeError] If the user isn't a moderator and their IP is banned.
+  def ip_ban_check!(user)
+    raise User::PrivilegeError if !user&.is_moderator? && IpBan.hit!(:full, request.remote_ip)
+  end
+
   def login_rate_limit_key(name_or_email)
     normalized = Danbooru::EmailAddress.canonicalize(name_or_email)&.to_s || User.normalize_name(name_or_email)
     "login/#{Digest::SHA256.hexdigest(normalized)}"

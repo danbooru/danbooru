@@ -307,6 +307,34 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert(@ip_ban.last_hit_at > 1.minute.ago)
       end
 
+      should "allow IP banned moderators to login" do
+        @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
+        @mod = create(:moderator_user, password: "password")
+        post session_path, params: { session: { name: @mod.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+        assert_redirected_to root_path
+        assert_equal(@mod.id, session[:user_id])
+        assert_equal(0, @ip_ban.reload.hit_count)
+      end
+
+      should "not allow IP banned moderators to login with an incorrect password" do
+        @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
+        @mod = create(:moderator_user, :with_email, password: "password")
+        post session_path, params: { session: { name: @mod.email_address.address, password: "wrong" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+        assert_response 403
+        assert_nil(session[:user_id])
+        assert_equal(false, @mod.user_events.failed_login.exists?)
+      end
+
+      should "not allow IP banned users to login with an incorrect password" do
+        @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
+        post session_path, params: { session: { name: @user.name, password: "wrong" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+        assert_response 403
+        assert_equal(false, @user.user_events.failed_login.exists?)
+      end
+
       should "allow partial IP banned users to login" do
         @ip_ban = create(:ip_ban, category: :partial, ip_addr: "1.2.3.4")
         post session_path, params: { session: { name: @user.name, password: "password" }}, headers: { REMOTE_ADDR: "1.2.3.4" }
@@ -651,6 +679,24 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to root_path
         assert_equal(@user.id, session[:user_id])
+      end
+
+      should "not log IP banned users in" do
+        @user = create(:user_with_2fa, password: "password")
+        create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@user), code: @user.totp.code }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+        assert_response 403
+        assert_nil(session[:user_id])
+      end
+
+      should "log IP banned moderators in" do
+        @mod = create(:user_with_2fa, level: User::Levels::MODERATOR, password: "password")
+        create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
+        post verify_totp_session_path, params: { totp: { user_id: verify_totp_token(@mod), code: @mod.totp.code }}, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+        assert_redirected_to root_path
+        assert_equal(@mod.id, session[:user_id])
       end
 
       should "log the user in if they enter the correct 2FA code" do

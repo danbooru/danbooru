@@ -662,6 +662,29 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "from a fully IP banned address" do
+      setup do
+        @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
+        @post = create(:post)
+      end
+
+      should "block write requests from members" do
+        post_auth favorites_path(post_id: @post.id), create(:user), as: :json, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+        assert_response 403
+        assert_equal(0, @post.reload.fav_count)
+        assert_equal(1, @ip_ban.reload.hit_count)
+      end
+
+      should "not block write requests from moderators" do
+        post_auth favorites_path(post_id: @post.id), create(:moderator_user), as: :json, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+        assert_response :success
+        assert_equal(1, @post.reload.fav_count)
+        assert_equal(0, @ip_ban.reload.hit_count)
+      end
+    end
+
     context "accessing an unauthorized page" do
       should "render the access denied page" do
         get news_updates_path

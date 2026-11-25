@@ -5,6 +5,7 @@ class SessionsController < ApplicationController
 
   verify_captcha only: :create
   skip_before_action :redirect_if_name_invalid?, only: [:confirm_password, :reauthenticate]
+  skip_before_action :ip_ban_check, only: [:create, :verify_totp] # Moderators can log in from IP banned addresses; checked in SessionLoader.
 
   rescue_from ActiveSupport::MessageVerifier::InvalidSignature do
     redirect_to login_path, notice: "Login expired. Login again to continue", status: 303
