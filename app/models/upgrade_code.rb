@@ -40,6 +40,7 @@ class UpgradeCode < ApplicationRecord
 
   def redeem!(redeemer)
     with_lock do
+      raise InvalidCodeError, "This upgrade code is invalid" if unsold?
       raise RedeemedCodeError, "This upgrade code has already been used" if redeemed?
       raise AlreadyUpgradedError, "Your account is already Gold or higher" if redeemer.is_gold?
 

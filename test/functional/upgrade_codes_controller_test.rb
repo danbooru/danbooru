@@ -85,8 +85,19 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, user.reload.is_gold?)
       end
 
+      should "return an error for an unsold code" do
+        code = create(:upgrade_code, status: :unsold)
+        user = create(:user)
+        post_auth upgrade_upgrade_codes_path, user, params: { upgrade_code: { code: code.code }}, xhr: true
+
+        assert_response 422
+        assert_equal(false, user.reload.is_gold?)
+        assert_equal(true, code.reload.unsold?)
+        assert_nil(code.redeemer)
+      end
+
       should "return an error for an already upgraded user" do
-        code = create(:upgrade_code)
+        code = create(:upgrade_code, status: :unredeemed)
         user = create(:builder_user)
         post_auth upgrade_upgrade_codes_path, user, params: { upgrade_code: { code: code.code }}, xhr: true
 
@@ -97,7 +108,7 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "upgrade the user for a unredeemed code" do
-        code = create(:upgrade_code)
+        code = create(:upgrade_code, status: :unredeemed)
         user = create(:user)
         post_auth upgrade_upgrade_codes_path, user, params: { upgrade_code: { code: code.code }}, xhr: true
 
