@@ -157,7 +157,7 @@ class AutocompleteChromeTest < ChromeSystemTestCase
     end
 
     should "work in inline editors" do
-      fast_signin create(:moderator_user)
+      fast_signin create(:moderator_user), reauthenticate: true
       visit new_ban_path
       selector = "input#ban_reason"
 

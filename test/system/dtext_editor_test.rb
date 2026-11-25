@@ -180,7 +180,7 @@ class DtextEditorChromeTest < ChromeSystemTestCase
       setup do
         @moderator = create(:moderator_user)
 
-        fast_signin @moderator
+        fast_signin @moderator, reauthenticate: true
         visit new_ban_path
       end
 
@@ -274,7 +274,7 @@ end
 class DtextEditorFirefoxTest < FirefoxSystemTestCase
   context "The inline DText editor" do
     should "not cut off the bottom of the text in previews" do
-      fast_signin create(:moderator_user)
+      fast_signin create(:moderator_user), reauthenticate: true
       visit new_ban_path
       find_field("Reason").set("asd [[1girl]]")
       find("a[title^='Preview']").click
@@ -287,7 +287,7 @@ class DtextEditorFirefoxTest < FirefoxSystemTestCase
 
     # Firefox doesn't let inputs have a line height below `normal`, so the preview has to copy it.
     should "use the same line height in the preview as in the input" do
-      fast_signin create(:moderator_user)
+      fast_signin create(:moderator_user), reauthenticate: true
       visit new_ban_path
       find_field("Reason").set("asd test")
       input_line_height = page.evaluate_script("getComputedStyle(document.querySelector('#ban_reason')).lineHeight")

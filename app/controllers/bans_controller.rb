@@ -3,6 +3,8 @@
 class BansController < ApplicationController
   respond_to :html, :xml, :json, :js
 
+  before_action :requires_reauthentication, only: [:new, :create, :edit, :update, :destroy]
+
   def index
     @bans = authorize Ban.paginated_search(params, count_pages: true)
     @bans = @bans.includes(:user, :banner) if request.format.html?

@@ -4,13 +4,19 @@ class BansControllerTest < ActionDispatch::IntegrationTest
   context "A bans controller" do
     context "new action" do
       should "render for a mod" do
-        get_auth new_ban_path, create(:moderator_user)
+        get_auth new_ban_path, create(:moderator_user), reauthenticate: true
 
         assert_response :success
       end
 
+      should "redirect to the confirm password page if the moderator hasn't recently reauthenticated" do
+        get_auth new_ban_path, create(:moderator_user)
+
+        assert_redirected_to confirm_password_session_path(url: new_ban_path)
+      end
+
       should "not render for a regular user" do
-        get_auth new_ban_path, create(:user)
+        get_auth new_ban_path, create(:user), reauthenticate: true
 
         assert_response 403
       end
@@ -18,13 +24,20 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
     context "edit action" do
       should "render for a mod" do
-        get_auth edit_ban_path(create(:ban)), create(:moderator_user)
+        get_auth edit_ban_path(create(:ban)), create(:moderator_user), reauthenticate: true
 
         assert_response :success
       end
 
+      should "redirect to the confirm password page if the moderator hasn't recently reauthenticated" do
+        @ban = create(:ban)
+        get_auth edit_ban_path(@ban), create(:moderator_user)
+
+        assert_redirected_to confirm_password_session_path(url: edit_ban_path(@ban))
+      end
+
       should "not render for a regular user" do
-        get_auth edit_ban_path(create(:ban)), create(:user)
+        get_auth edit_ban_path(create(:ban)), create(:user), reauthenticate: true
 
         assert_response 403
       end
@@ -65,7 +78,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_difference("Ban.count", 1) do
           @user = create(:user)
           @mod = create(:mod_user)
-          post_auth bans_path, @mod, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @user.id }}
+          post_auth bans_path, @mod, reauthenticate: true, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @user.id }}
 
           assert_redirected_to @user
           assert_equal(true, @user.reload.is_banned?)
@@ -79,18 +92,26 @@ class BansControllerTest < ActionDispatch::IntegrationTest
       should "demote mods to member when an admin bans them" do
         @admin = create(:admin_user)
         @mod = create(:mod_user)
-        post_auth bans_path, @admin, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @mod.id }}
+        post_auth bans_path, @admin, reauthenticate: true, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @mod.id }}
 
         assert_redirected_to @mod
         assert_equal(true, @mod.reload.is_banned?)
         assert_equal(User::Levels::MEMBER, @mod.level)
       end
 
+      should "not ban the user if the moderator hasn't recently reauthenticated" do
+        @user = create(:user)
+        post_auth bans_path, create(:mod_user), params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @user.id }}
+
+        assert_redirected_to confirm_password_session_path(url: bans_path)
+        assert_equal(false, @user.reload.is_banned?)
+      end
+
       should "not allow mods to ban admins" do
         assert_difference("Ban.count", 0) do
           @admin = create(:admin_user)
           @mod = create(:mod_user)
-          post_auth bans_path, @mod, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @admin.id }}
+          post_auth bans_path, @mod, reauthenticate: true, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @admin.id }}
 
           assert_response 403
           assert_equal(false, @admin.reload.is_banned?)
@@ -101,7 +122,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_difference("Ban.count", 0) do
           @mod = create(:mod_user)
           @mod2 = create(:mod_user)
-          post_auth bans_path, @mod, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @mod2.id }}
+          post_auth bans_path, @mod, reauthenticate: true, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @mod2.id }}
 
           assert_response 403
           assert_equal(false, @mod2.reload.is_banned?)
@@ -112,7 +133,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_difference("Ban.count", 0) do
           @user = create(:user)
           @mod = create(:mod_user)
-          post_auth bans_path, @user, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @mod.id }}
+          post_auth bans_path, @user, reauthenticate: true, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @mod.id }}
 
           assert_response 403
           assert_equal(false, @mod.reload.is_banned?)
@@ -124,14 +145,14 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         @mod = create(:mod_user)
 
         assert_difference("Ban.count", 0) do
-          post_auth bans_path, @mod, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @ban.user.id }}
+          post_auth bans_path, @mod, reauthenticate: true, params: { ban: { duration: 1.day.iso8601, reason: "xxx", user_id: @ban.user.id }}
           assert_response :success
         end
       end
 
       should "not raise an exception on a blank username" do
         @mod = create(:mod_user)
-        post_auth bans_path, @mod, params: {}
+        post_auth bans_path, @mod, reauthenticate: true, params: {}
         assert_response :success
       end
     end
@@ -140,7 +161,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
       should "allow mods to change the ban reason" do
         @ban = create(:ban, reason: "old reason")
         @mod = create(:moderator_user)
-        put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx" }}
+        put_auth ban_path(@ban.id), @mod, reauthenticate: true, params: { ban: { reason: "xxx" }}
 
         assert_redirected_to @ban.user
         assert_equal("xxx", @ban.reload.reason)
@@ -158,7 +179,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.year)
         assert_equal(true, @user.reload.is_banned?)
 
-        put_auth ban_path(@ban.id), @mod, params: { ban: { duration: 1.day.iso8601 }}
+        put_auth ban_path(@ban.id), @mod, reauthenticate: true, params: { ban: { duration: 1.day.iso8601 }}
 
         assert_redirected_to @user
         assert_equal(1.day, @ban.reload.duration)
@@ -176,7 +197,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         @ban = create(:ban, user: @user, created_at: 6.months.ago, duration: 1.day)
         assert_equal(false, @user.reload.is_banned?)
 
-        put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx", duration: 1.year.iso8601 }}
+        put_auth ban_path(@ban.id), @mod, reauthenticate: true, params: { ban: { reason: "xxx", duration: 1.year.iso8601 }}
 
         assert_response :success
         assert_equal(1.day, @ban.reload.duration)
@@ -184,9 +205,17 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, ModAction.user_ban_update.exists?)
       end
 
+      should "not update the ban if the moderator hasn't recently reauthenticated" do
+        @ban = create(:ban, reason: "old reason")
+        put_auth ban_path(@ban), create(:mod_user), params: { ban: { reason: "xxx" }}
+
+        assert_redirected_to confirm_password_session_path(url: ban_path(@ban))
+        assert_equal("old reason", @ban.reload.reason)
+      end
+
       should "not allow regular users to update a ban" do
         @ban = create(:ban)
-        put_auth ban_path(@ban.id), create(:user), params: { ban: { reason: "xxx", duration: 1.day.iso8601 }}
+        put_auth ban_path(@ban.id), create(:user), reauthenticate: true, params: { ban: { reason: "xxx", duration: 1.day.iso8601 }}
 
         assert_response 403
         assert_not_equal("xxx", @ban.reload.reason)
@@ -199,7 +228,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         @mod = create(:mod_user)
 
         assert_difference("Ban.count", -1) do
-          delete_auth ban_path(@ban.id), @mod
+          delete_auth ban_path(@ban.id), @mod, reauthenticate: true
 
           assert_redirected_to @ban.user
           assert_equal(false, @ban.user.reload.is_banned?)
@@ -214,15 +243,23 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         @mod = create(:mod_user)
 
         assert_no_difference("Ban.count") do
-          delete_auth ban_path(@ban.id), @mod
+          delete_auth ban_path(@ban.id), @mod, reauthenticate: true
         end
 
         assert_redirected_to @ban.user
       end
 
+      should "not destroy the ban if the moderator hasn't recently reauthenticated" do
+        @ban = create(:ban)
+        delete_auth ban_path(@ban), create(:mod_user)
+
+        assert_redirected_to confirm_password_session_path(url: ban_path(@ban))
+        assert_equal(true, @ban.reload.persisted?)
+      end
+
       should "not allow regular users to destroy a ban" do
         @ban = create(:ban)
-        delete_auth ban_path(@ban.id), create(:user)
+        delete_auth ban_path(@ban.id), create(:user), reauthenticate: true
 
         assert_response 403
         assert_equal(true, @ban.user.reload.is_banned?)

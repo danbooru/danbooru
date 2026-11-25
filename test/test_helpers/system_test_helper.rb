@@ -108,10 +108,17 @@ module SystemTestHelper
 
   # Log in as the given user, without going through the login form.
   # @param user [User] the user to log in as, or a fresh one if omitted.
-  def fast_signin(user = create(:user))
+  # @param reauthenticate [Boolean] if true, also confirm the password so the user can access pages that use
+  #   `requires_reauthentication`.
+  def fast_signin(user = create(:user), reauthenticate: false)
     session = ActionDispatch::Integration::Session.new(Rails.application)
     session.post session_path, params: { session: { name: user.name, password: user.password }}
     raise "login as #{user.name} failed (#{session.response.status})" unless session.response.redirect?
+
+    if reauthenticate
+      session.post reauthenticate_session_path, params: { session: { password: user.password }}
+      raise "reauthentication as #{user.name} failed (#{session.response.status})" unless session.response.redirect?
+    end
 
     name, value = session.response.headers["Set-Cookie"].split(";").first.split("=", 2)
     page.driver.with_playwright_page do |playwright_page|
