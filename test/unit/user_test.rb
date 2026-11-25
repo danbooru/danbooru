@@ -318,6 +318,15 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(["Name already taken"], user.errors.full_messages)
       end
 
+      should "not conflict with a name another user recently changed away from" do
+        user = create(:user, name: "bkub")
+        create(:user_name_change_request, user: user, original_name: "bkub", desired_name: "bkub2")
+
+        new_user = build(:user, name: "BKUB")
+        new_user.save
+        assert_equal(["Name was recently used by another user"], new_user.errors.full_messages)
+      end
+
       should "be less than 25 characters long" do
         user = build(:user, name: "a" * 25)
         user.save

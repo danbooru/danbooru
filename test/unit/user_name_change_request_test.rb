@@ -24,6 +24,48 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
         end
       end
 
+      should "not allow taking a name another user recently changed away from" do
+        create(:user_name_change_request, user: @requester, original_name: "provence", desired_name: "abc")
+
+        user = create(:user)
+        req = build(:user_name_change_request, user: user, original_name: user.name, desired_name: "Provence")
+
+        assert_equal(false, req.valid?)
+        assert_equal(["Desired name was recently used by another user"], req.errors.full_messages)
+      end
+
+      should "allow taking a name another user changed away from more than a year ago" do
+        create(:user_name_change_request, user: @requester, original_name: "provence", desired_name: "abc")
+
+        travel_to(1.year.from_now + 1.day) do
+          user = create(:user)
+          req = build(:user_name_change_request, user: user, original_name: user.name, desired_name: "provence")
+
+          assert_equal(true, req.valid?)
+        end
+      end
+
+      should "allow a moderator to give a stolen name back to its original owner" do
+        alice = create(:user, name: "alice")
+        create(:user_name_change_request, user: alice, original_name: "alice", desired_name: "alice2")
+        bob = create(:user, name: "bob")
+        bob.update_columns(name: "alice") # rubocop:disable Rails/SkipsModelValidations -- name stolen before old names were reserved
+
+        create(:user_name_change_request, user: bob, updater: @admin, original_name: "alice", desired_name: "bob")
+        create(:user_name_change_request, user: alice.reload, updater: @admin, original_name: "alice2", desired_name: "alice")
+
+        assert_equal("alice", alice.reload.name)
+      end
+
+      should "allow the user to change back to their own old name" do
+        create(:user_name_change_request, user: @requester, original_name: "provence", desired_name: "abc")
+
+        travel_to(2.weeks.from_now) do
+          create(:user_name_change_request, user: @requester.reload, original_name: "abc", desired_name: "provence")
+          assert_equal("provence", @requester.reload.name)
+        end
+      end
+
       should "not convert the desired name to lower case" do
         create(:user_name_change_request, user: @requester, original_name: "provence.", desired_name: "Provence")
 

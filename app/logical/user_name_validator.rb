@@ -21,11 +21,12 @@ class UserNameValidator < ActiveModel::EachValidator
 
   def validate_each(rec, attr, name)
     name = name.to_s
-    forbidden_characters = name.delete(ALLOWED_PUNCTUATION).chars.grep(/[[:punct:]]/).uniq
     current_user = rec.is_a?(UserNameChangeRequest) ? rec.user : rec
 
     if !options[:skip_uniqueness] && User.without(current_user).find_by_name(name).present?
       rec.errors.add(attr, "already taken")
+    elsif !options[:skip_uniqueness] && !renamed_by_moderator?(rec) && recently_used_by_another_user?(name, current_user)
+      rec.errors.add(attr, "was recently used by another user")
     elsif name.length <= MIN_LENGTH
       rec.errors.add(attr, "must be more than #{MIN_LENGTH} character long")
     elsif name.length > MAX_LENGTH
@@ -41,8 +42,8 @@ class UserNameValidator < ActiveModel::EachValidator
       rec.errors.add(attr, "can't end with a file extension")
     elsif name.include?("__")
       rec.errors.add(attr, "can't contain multiple underscores in a row")
-    elsif forbidden_characters.present?
-      rec.errors.add(attr, "can't contain #{forbidden_characters.map { |c| "'#{c}'" }.to_sentence}")
+    elsif forbidden_characters(name).present?
+      rec.errors.add(attr, "can't contain #{forbidden_characters(name).map { |c| "'#{c}'" }.to_sentence}")
     elsif name !~ /\A([a-zA-Z0-9]|\p{Han}|\p{Hangul}|\p{Hiragana}|\p{Katakana}|[#{ALLOWED_PUNCTUATION}])+\z/o
       rec.errors.add(attr, "must contain only basic letters or numbers")
     elsif name =~ /\Auser_\d+\z/i
@@ -52,5 +53,24 @@ class UserNameValidator < ActiveModel::EachValidator
     elsif name =~ Regexp.union(Danbooru.config.user_name_blacklist)
       rec.errors.add(attr, "is not allowed")
     end
+  end
+
+  # @return [Array<String>] The punctuation characters in the name that aren't allowed.
+  def forbidden_characters(name)
+    name.delete(ALLOWED_PUNCTUATION).chars.grep(/[[:punct:]]/).uniq
+  end
+
+  # @return [Boolean] True if a moderator is changing another user's name.
+  def renamed_by_moderator?(rec)
+    rec.is_a?(UserNameChangeRequest) && rec.updater.present? && rec.updater != rec.user
+  end
+
+  # @return [Boolean] True if another user changed their name away from this name in the last year.
+  def recently_used_by_another_user?(name, user)
+    UserNameChangeRequest
+      .where.not(user: user)
+      .where(created_at: 1.year.ago..)
+      .where_iequals(:original_name, User.normalize_name(name))
+      .exists?
   end
 end
