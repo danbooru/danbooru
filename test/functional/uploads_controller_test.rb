@@ -645,6 +645,37 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a source with too many images" do
+        should "fail" do
+          Source::Extractor::Null.any_instance.stubs(:image_urls).returns(%w[https://example.com/1.jpg https://example.com/2.jpg https://example.com/3.jpg])
+
+          stub_const(Upload, :MAX_IMAGES_PER_SOURCE_UPLOAD, 2) do
+            create_upload!("https://example.com/post", user: @user)
+          end
+
+          assert_response 201
+          assert_equal(true, Upload.last.is_errored?)
+          assert_equal("https://example.com/post has too many images (images: 3; max: 2)", Upload.last.error)
+          assert_equal(0, Upload.last.upload_media_assets.count)
+        end
+      end
+
+      context "for a source that would put the user over the queued images limit" do
+        should "fail" do
+          create(:upload_media_asset, upload: create(:upload, uploader: @user), status: "pending")
+          Source::Extractor::Null.any_instance.stubs(:image_urls).returns(%w[https://example.com/1.jpg https://example.com/2.jpg])
+
+          stub_const(Upload, :MAX_QUEUED_ASSETS, 2) do
+            create_upload!("https://example.com/post", user: @user)
+          end
+
+          assert_response 201
+          assert_equal(true, Upload.last.is_errored?)
+          assert_equal("You have too many images queued for upload (queued: 1; new: 2; limit: 2). Try again later.", Upload.last.error)
+          assert_equal(0, Upload.last.upload_media_assets.count)
+        end
+      end
+
       should "work for a source URL containing unicode characters" do
         source = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=東方&two=a%20b"
 

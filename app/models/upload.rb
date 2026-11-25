@@ -11,6 +11,9 @@ class Upload < ApplicationRecord
   # The maximum number of files allowed per upload. If you change this, you should also change `RACK_MULTIPART_FILE_LIMIT` in config/puma.rb.
   MAX_FILES_PER_UPLOAD = 100
 
+  # The maximum number of images allowed per source upload. Higher than MAX_FILES_PER_UPLOAD because Pixiv posts can have up to 200 images.
+  MAX_IMAGES_PER_SOURCE_UPLOAD = 200
+
   # The maximum number of 'pending' or 'processing' media assets a single user can have at once.
   MAX_QUEUED_ASSETS = 250
 
@@ -227,13 +230,21 @@ class Upload < ApplicationRecord
 
     if image_urls.empty?
       raise Error, "#{source} doesn't contain any images"
+    elsif image_urls.size > MAX_IMAGES_PER_SOURCE_UPLOAD
+      raise Error, "#{source} has too many images (images: #{image_urls.size}; max: #{MAX_IMAGES_PER_SOURCE_UPLOAD})"
     end
 
     upload_media_assets = image_urls.map do |image_url|
       UploadMediaAsset.new(upload: self, source_url: image_url, page_url: page_url, media_asset: nil)
     end
 
-    transaction do
+    # Lock the uploader so concurrent uploads can't all pass the queued assets check at once.
+    uploader.with_lock do
+      queued_asset_count = uploader.upload_media_assets.unfinished.count
+      if queued_asset_count + upload_media_assets.size > MAX_QUEUED_ASSETS
+        raise Error, "You have too many images queued for upload (queued: #{queued_asset_count}; new: #{upload_media_assets.size}; limit: #{MAX_QUEUED_ASSETS}). Try again later."
+      end
+
       update!(media_asset_count: upload_media_assets.size)
       upload_media_assets.each(&:save!)
     end
