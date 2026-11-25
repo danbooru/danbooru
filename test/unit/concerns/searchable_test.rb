@@ -119,6 +119,15 @@ class SearchableTest < ActiveSupport::TestCase
           assert_search_equals(@g2, asn_present: "true")
           assert_search_equals(@g1, asn_present: "false")
         end
+
+        should "include null values for the _not operator" do
+          @g1 = create(:ip_geolocation, asn: nil)
+          @g2 = create(:ip_geolocation, asn: 1234)
+          @g3 = create(:ip_geolocation, asn: 5678)
+
+          assert_search_equals([@g3, @g1], asn_not: "1234")
+          assert_search_equals(@g1, asn_not: "1000..9999")
+        end
       end
     end
 

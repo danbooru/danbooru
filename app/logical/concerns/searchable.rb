@@ -581,7 +581,9 @@ module Searchable
       end
 
       if params[:"#{key}_not"].present?
-        relation = visible(relation, attr).where.not(id: visible(relation, attr).where_numeric_matches(attr, params[:"#{key}_not"], type))
+        # WHERE NOT (score = 1) OR score IS NULL. Not `id NOT IN (...)`, which doesn't work for composite primary keys.
+        matches = relation.unscoped.where_numeric_matches(attr, params[:"#{key}_not"], type)
+        relation = visible(relation, attr).where(matches.where_clause.ast.not.or(relation.arel_table[attr].eq(nil)))
       end
 
       if params[:"#{key}_present"].to_s.truthy?
