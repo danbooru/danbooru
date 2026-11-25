@@ -36,7 +36,7 @@ class Source::URL::Gelbooru < Source::URL
     # https://safebooru.org/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb
     # https://tbib.org/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb
     # https://rule34.xxx/index.php?page=post&s=list&md5=0a8fff70045826d2b39fcde4eed17584
-    in _, "index.php" if params[:page] == "post" && params[:s] == "list" && params[:md5].present?
+    in _, "index.php" if params[:page] == "post" && params[:s] == "list" && params[:md5].to_s.match?(/\A\h{32}\z/)
       @md5 = params[:md5]
 
     # https://gelbooru.com/index.php?page=dapi&s=post&q=index&id=7798045&json=1

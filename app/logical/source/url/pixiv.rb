@@ -97,16 +97,16 @@ module Source
 
       # https://www.pixiv.net/en/artworks/46324488
       # https://www.pixiv.net/artworks/46324488
-      in _, ("pixiv.net" | "phixiv.net"), *, "artworks", work_id
+      in _, ("pixiv.net" | "phixiv.net"), *, "artworks", /\A\d+\z/ => work_id
         @work_id = work_id
 
       # https://www.pixiv.net/novel/show.php?id=9434677
       # http://www.pixiv.net/novel/show.php?id=235466&mode=cover
-      in _, "pixiv.net", "novel", "show.php" if params[:id].present?
+      in _, "pixiv.net", "novel", "show.php" if params[:id].to_s.match?(/\A\d+\z/)
         @novel_id = params[:id]
 
       # https://embed.pixiv.net/novel.php?id=18588585&mdate=20221102100423 (twitter embed image)
-      in "embed", "pixiv.net", "novel.php" if params[:id].present?
+      in "embed", "pixiv.net", "novel.php" if params[:id].to_s.match?(/\A\d+\z/)
         @novel_id = params[:id]
 
       # https://www.pixiv.net/novel/series/9593812
@@ -114,14 +114,14 @@ module Source
         @novel_series_id = novel_series_id
 
       # http://www.pixiv.net/i/18557054
-      in _, "pixiv.net", "i", work_id
+      in _, "pixiv.net", "i", /\A\d+\z/ => work_id
         @work_id = work_id
 
       # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
       # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
-      in _, ("pixiv.net" | "phixiv.net"), "member_illust.php" if params[:illust_id].present?
+      in _, ("pixiv.net" | "phixiv.net"), "member_illust.php" if params[:illust_id].to_s.match?(/\A\d+\z/)
         @work_id = params[:illust_id]
 
       # https://www.pixiv.net/member.php?id=339253
@@ -155,7 +155,7 @@ module Source
         @username = username
 
       # http://p.tl/i/40009777
-      in _, "p.tl", "i", work_id
+      in _, "p.tl", "i", /\A\d+\z/ => work_id
         @work_id = work_id
 
       # http://p.tl/m/755548

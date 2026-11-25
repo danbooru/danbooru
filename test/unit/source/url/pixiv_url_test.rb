@@ -122,6 +122,13 @@ module Source::Tests::URL
         should parse_url("https://www.pixiv.net/novel/show.php?id=10617324").into(work_id: nil)
 
         should parse_url("https://www.pixiv.net/member_illust.php").into(work_id: nil)
+        should parse_url("https://www.pixiv.net/member_illust.php?illust_id=../../ajax/user/self").into(work_id: nil)
+        should parse_url("https://www.pixiv.net/artworks/1&x=1").into(work_id: nil)
+        should parse_url("https://www.pixiv.net/i/1&x=1").into(work_id: nil)
+        should parse_url("http://p.tl/i/1&x=1").into(work_id: nil)
+        should parse_url("https://www.pixiv.net/novel/show.php?id=../../x?q=1").into(novel_id: nil)
+        should parse_url("https://embed.pixiv.net/novel.php?id=../../x?q=1").into(novel_id: nil)
+        should parse_url("https://www.pixiv.net/novel/show.php?id=10617324").into(novel_id: "10617324")
         should parse_url("https://www.pixiv.net/member_illust.php?illust_id=64476642&mode=medium").into(work_id: "64476642")
 
         should parse_url("http://img25.pixiv.net/img/master4th/16024681").into(work_id: nil)

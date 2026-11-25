@@ -159,6 +159,10 @@ module Source::Tests::URL
       should parse_url("https://tbib.org//images/10754/afadcf830778bd1c9bf94899ace2c889d6bf2903.png").into(
         full_image_url: "https://tbib.org//images/10754/afadcf830778bd1c9bf94899ace2c889d6bf2903.png",
       )
+
+      should parse_url("https://gelbooru.com/index.php?page=post&s=list&md5=99d9977d6c3aa185083a2da22bd8acfb").into(md5: "99d9977d6c3aa185083a2da22bd8acfb")
+      should parse_url("https://gelbooru.com/index.php?page=post&s=list&md5=1%26x%3D1").into(md5: nil, api_url: nil)
+      should parse_url("https://rule34.xxx/index.php?page=post&s=list&md5=1%26x%3D1").into(md5: nil, api_url: nil)
     end
   end
 end

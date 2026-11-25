@@ -83,5 +83,11 @@ module Source::Tests::URL
     end
 
     should parse_url("http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf").into(site_name: "Nico Seiga")
+
+    should parse_url("https://seiga.nicovideo.jp/image/source?id=3521156").into(image_id: "3521156")
+    should parse_url("https://seiga.nicovideo.jp/image/source/3521156").into(image_id: "3521156")
+    should parse_url("https://seiga.nicovideo.jp/image/source?id=/../../my/account").into(image_id: nil)
+    should parse_url("https://seiga.nicovideo.jp/image/redirect?id=1?x=1").into(image_id: nil)
+    should parse_url("https://seiga.nicovideo.jp/image/source/1&x=1").into(image_id: nil)
   end
 end

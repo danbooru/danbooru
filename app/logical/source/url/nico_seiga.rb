@@ -68,14 +68,14 @@ module Source
       #
       # https://seiga.nicovideo.jp/image/source/3521156 redirects to the html page https://lohas.nicoseiga.jp/o/e69bba4bd6c1baaae460452bac3f29e7080ad723/1646902784/3521156, which contains the image https://lohas.nicoseiga.jp/priv/e69bba4bd6c1baaae460452bac3f29e7080ad723/1646902784/3521156.
       # https://seiga.nicovideo.jp/image/source/4744553 redirects to the direct image https://lohas.nicoseiga.jp/priv/54142f438f4effb937e6b484395b478305ca17f2/1646905053/4744553
-      in /seiga$/, "nicovideo.jp", "image", "source", image_id
+      in /seiga$/, "nicovideo.jp", "image", "source", /\A\d+\z/ => image_id
         @image_id = image_id
 
       # https://seiga.nicovideo.jp/image/source?id=3521156 (redirects to https://lohas.nicoseiga.jp/o/75dfbf6404732969ded3937b89bc41d77420debe/1646906075/3521156)
       # https://seiga.nicovideo.jp/image/redirect?id=3583893 (redirects to https://seiga.nicovideo.jp/seiga/im3583893)
       # https://sp.seiga.nicovideo.jp/image/source?id=3521156
       # https://sp.seiga.nicovideo.jp/image/redirect?id=3521156 (doesn't work)
-      in /seiga$/, "nicovideo.jp", "image", ("redirect" | "source") if params[:id].present?
+      in /seiga$/, "nicovideo.jp", "image", ("redirect" | "source") if params[:id].to_s.match?(/\A\d+\z/)
         @image_id = params[:id]
 
       # https://lohas.nicoseiga.jp/o/971eb8af9bbcde5c2e51d5ef3a2f62d6d9ff5552/1589933964/3583893 (page: https://seiga.nicovideo.jp/seiga/im3583893)
