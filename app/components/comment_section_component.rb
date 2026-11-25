@@ -20,7 +20,10 @@ class CommentSectionComponent < ApplicationComponent
   # instead of one per post.
   # @return [Hash<Integer, CommentSectionComponent>] The comment section for each post, keyed by post id.
   def self.for_posts(posts, limit:, current_user:)
-    comments = Comment.where(post: posts)
+    post_ids = posts.map(&:id)
+    return {} if post_ids.empty? # don't run an extra query if there's no posts
+
+    comments = Comment.where(post_id: post_ids)
     comments_by_post_id = comments_for(comments.last_per_post(limit), current_user: current_user).group_by(&:post_id)
     comment_counts = comments.group(:post_id).count
 
