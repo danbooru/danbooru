@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class ArtistURL < ApplicationRecord
+  MAX_URL_LENGTH = 300
+
   normalizes :url, with: ->(url) { ArtistURL.normalize_url(url) }
 
-  validates :url, presence: true, length: { maximum: 300, message: "'%{value}' is too long (maximum is 300 characters)" }, uniqueness: { scope: :artist_id }
+  validates :url, presence: true, length: { maximum: MAX_URL_LENGTH, message: "'%{value}' is too long (maximum is #{MAX_URL_LENGTH} characters)" }, uniqueness: { scope: :artist_id }
   validate :validate_url_format
   belongs_to :artist, touch: true
 

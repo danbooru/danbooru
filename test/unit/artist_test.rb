@@ -221,6 +221,14 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(false, Timeout.timeout(10) { artist.valid? })
     end
 
+    should "find duplicates by the prefixes of urls longer than an artist url can be" do
+      create(:artist, name: "warhol", url_string: "http://warhol.com/x/a/image.jpg")
+      artist = Artist.new(name: "copycat", url_string: "http://warhol.com/x/#{"a/" * 20_000}image.jpg http://warhol.com/x/#{"b" * 40_000}")
+
+      assert_equal(false, Timeout.timeout(10) { artist.valid? })
+      assert_equal(["Potential duplicate of [[warhol]]"], artist.warnings.full_messages)
+    end
+
     should "not return duplicates if too many artists found" do
       create_list(:artist, 5, url_string: "https://www.example.com")
       assert_artist_not_found("https://www.example.com/image.jpg")
