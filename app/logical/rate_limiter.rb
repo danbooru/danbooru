@@ -43,7 +43,7 @@ class RateLimiter
     keys = []
     keys << user.cache_key unless user.is_anonymous?
     keys << "ip/#{ip_addr.subnet.to_s}" if ip_addr.present?
-    keys << "session/#{request.session.id}" if request&.session.present?
+    keys << "session/#{request.session.id}" if request&.cookies&.key?(Danbooru.config.session_cookie_name) && request.session.present?
 
     RateLimiter.new(action, keys, **options)
   end

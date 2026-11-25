@@ -741,6 +741,26 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal("s", post.reload.rating)
       end
     end
+
+    context "the per-session rate limit" do
+      setup do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+      end
+
+      should "not be used for requests without a session cookie" do
+        post session_path, params: { session: { name: "nobody", password: "wrong" }}
+
+        assert_equal(["ip/127.0.0.1"], JSON.parse(response.headers["X-Rate-Limit"])["limits"].keys)
+        assert_equal(false, RateLimit.where_like(:key, "session/*").exists?)
+      end
+
+      should "be used for requests with a session cookie" do
+        post session_path, params: { session: { name: "nobody", password: "wrong" }}
+        post session_path, params: { session: { name: "nobody", password: "wrong" }}
+
+        assert_equal(["ip/127.0.0.1", "session/#{session.id}"], JSON.parse(response.headers["X-Rate-Limit"])["limits"].keys.sort)
+      end
+    end
   end
 
   context "all index methods" do
