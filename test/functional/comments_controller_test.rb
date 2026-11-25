@@ -300,6 +300,23 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
           assert_not_equal("blah", @comment.reload.body)
         end
+
+        should "not allow the creator to undelete and edit the comment" do
+          @comment.update!(is_deleted: true)
+          put_auth comment_path(@comment.id), @comment.creator, params: { comment: { body: "blah", is_deleted: false }}, xhr: true
+
+          assert_response 403
+          assert_equal(true, @comment.reload.is_deleted?)
+          assert_not_equal("blah", @comment.body)
+        end
+
+        should "allow a moderator to undelete the comment" do
+          @comment.update!(is_deleted: true)
+          put_auth comment_path(@comment.id), create(:moderator_user), params: { comment: { is_deleted: false }}, xhr: true
+
+          assert_response :success
+          assert_equal(false, @comment.reload.is_deleted?)
+        end
       end
 
       should "update the body" do

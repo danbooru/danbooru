@@ -6,7 +6,7 @@ class CommentPolicy < ApplicationPolicy
   end
 
   def update?
-    unbanned? && (user.is_moderator? || (record.creator == user && (!record.is_deleted? || record.is_deleted_change == [false, true])))
+    unbanned? && (user.is_moderator? || (record.creator == user && !record.is_deleted_was))
   end
 
   def reportable?
