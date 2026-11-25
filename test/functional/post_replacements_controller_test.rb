@@ -82,6 +82,22 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "replacing a post with an image that is too small" do
+        should "fail" do
+          @post = create(:post, file_size: 789)
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
+          MediaFile::Image.any_instance.stubs(:dimensions).returns([9, 9])
+
+          assert_no_difference("PostReplacement.count") do
+            post_auth post_replacements_path(format: :json), create(:moderator_user), params: { post_id: @post.id, post_replacement: { replacement_file: file }}
+          end
+
+          assert_response 422
+          assert_equal(["File dimensions are too small (size: 9x9; min size: 10x10)"], response.parsed_body.dig("errors", "base"))
+          assert_equal(789, @post.reload.file_size)
+        end
+      end
+
       context "replacing a post with a file with an invalid filename" do
         should "fail if the filename isn't valid UTF-8" do
           @post = create(:post, file_size: 789)

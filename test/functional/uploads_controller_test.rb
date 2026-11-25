@@ -381,6 +381,39 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for an image that is too narrow" do
+        should "fail" do
+          MediaFile::Image.any_instance.stubs(:dimensions).returns([9, 100])
+          create_upload!("test/files/jpg/test.jpg", user: @user)
+
+          assert_equal("error", Upload.last.status)
+          assert_equal("File dimensions are too small (size: 9x100; min size: 10x10)", Upload.last.error)
+          assert_equal(0, MediaAsset.count)
+        end
+      end
+
+      context "for an image that is too short" do
+        should "fail" do
+          MediaFile::Image.any_instance.stubs(:dimensions).returns([100, 9])
+          create_upload!("test/files/jpg/test.jpg", user: @user)
+
+          assert_equal("error", Upload.last.status)
+          assert_equal("File dimensions are too small (size: 100x9; min size: 10x10)", Upload.last.error)
+          assert_equal(0, MediaAsset.count)
+        end
+      end
+
+      context "for a video that is too small" do
+        should "fail" do
+          MediaFile::Video.any_instance.stubs(:dimensions).returns([9, 9])
+          create_upload!("test/files/mp4/test-300x300-av1.mp4", user: @user)
+
+          assert_equal("error", Upload.last.status)
+          assert_equal("File dimensions are too small (size: 9x9; min size: 10x10)", Upload.last.error)
+          assert_equal(0, MediaAsset.count)
+        end
+      end
+
       context "for a file that fails with a very long error message" do
         should "mark the upload as failed" do
           MediaFile::Image.any_instance.stubs(:dimensions).raises(StandardError, SecureRandom.alphanumeric(10_000))

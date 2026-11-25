@@ -12,6 +12,7 @@ class MediaAsset < ApplicationRecord
   MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
   MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
   MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
+  MIN_IMAGE_SIZE = 10
 
   # Images are decoded by bin/image, which can use at most 4 GB of memory (`ExternalCommand::MEMORY_LIMIT`). An image
   # that needs more fails partway through decoding, which looks the same as a corrupt file. The two limits below reject
@@ -443,6 +444,8 @@ class MediaAsset < ApplicationRecord
         # Checked after `is_corrupt?`, because corrupt files often have no dimensions, and "corrupt" is the better error.
         elsif media_file.width.to_i <= 0 || media_file.height.to_i <= 0
           raise Error, "Couldn't read the file's dimensions"
+        elsif media_file.width < MIN_IMAGE_SIZE || media_file.height < MIN_IMAGE_SIZE
+          raise Error, "File dimensions are too small (size: #{media_file.width}x#{media_file.height}; min size: #{MIN_IMAGE_SIZE}x#{MIN_IMAGE_SIZE})"
         elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
           raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
         end
