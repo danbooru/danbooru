@@ -550,10 +550,34 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "for a user with an unverified email address" do
-        should "show the resend confirmation email page" do
+        should "say the confirmation email was already sent and offer to resend it" do
           get_auth verify_user_email_path(@user), @user
           assert_response :success
-          assert_select "input.button-primary[type=submit][value=?]", "Send confirmation email"
+          assert_select "#a-verify", text: /We sent a confirmation email to bob@ogres\.net/
+          assert_select "input.button-primary[type=submit][value=?]", "Resend confirmation email"
+        end
+      end
+
+      context "for a user with a verified email address" do
+        should "say the email address is already verified" do
+          @user.email_address.update!(is_verified: true)
+          get_auth verify_user_email_path(@user), @user
+
+          assert_response :success
+          assert_select "#a-verify", text: /bob@ogres\.net is verified/
+          assert_select "input[type=submit]", count: 0
+        end
+      end
+
+      context "for a user with an undeliverable email address" do
+        should "ask the user to change their email address" do
+          @user.email_address.update!(is_deliverable: false)
+          get_auth verify_user_email_path(@user), @user
+
+          assert_response :success
+          assert_select "#a-verify", text: /can't send email to bob@ogres\.net/
+          assert_select "#a-verify a[href=?]", edit_user_email_path(@user)
+          assert_select "input[type=submit]", count: 0
         end
       end
 

@@ -4,17 +4,27 @@
   <div id="a-verify" class="fixed-width-container">
     <h1>Verify account</h1>
 
-    <% if @user.is_restricted? %>
-      <p>Your account is restricted because you signed up from a VPN or proxy.
-      You can still use the site, but you must verify your email address to be
-      able to leave comments, edit tags, or upload posts.</p>
-    <% end %>
+    <% if @email_address.is_verified? %>
+      <p>Your email address <strong><%= @email_address.address %></strong> is verified.</p>
+    <% else %>
+      <% if @user.is_restricted? %>
+        <p>Your account is restricted because you signed up from a VPN or proxy.
+        You can still use the site, but you must verify your email address to be
+        able to leave comments, edit tags, or upload posts.</p>
+      <% end %>
 
-    <p>Your email address is unverified. Click below to send an email to
-    <strong><%= @email_address.address %></strong> to verify your email address.</p>
+      <% if @email_address.is_deliverable? %>
+        <p>We sent a confirmation email to <strong><%= @email_address.address %></strong>.
+        Click the link in the email to verify your address. It can take a few minutes
+        to arrive. If you don't see it, check your spam folder.</p>
 
-    <%= edit_form_for(@user, method: :post, url: send_confirmation_user_email_path(@user)) do |f| %>
-      <%= f.submit_button "Send confirmation email" %>
+        <%= edit_form_for(@user, method: :post, url: send_confirmation_user_email_path(@user)) do |f| %>
+          <%= f.submit_button "Resend confirmation email" %>
+        <% end %>
+      <% else %>
+        <p>We can't send email to <strong><%= @email_address.address %></strong>.
+        <%= link_to "Change your email address", edit_user_email_path(@user) %> to verify your account.</p>
+      <% end %>
     <% end %>
   </div>
 </div>
