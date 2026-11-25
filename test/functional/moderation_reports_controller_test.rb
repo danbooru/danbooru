@@ -93,6 +93,22 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_equal(@dmail.body, response.parsed_body.sole.dig("model", "body"))
         end
+
+        should "not show the reported dmail's share key" do
+          get_auth moderation_reports_path, @mod
+
+          assert_response :success
+          assert_select "a[href='#{dmail_path(@dmail)}']"
+          assert_no_match(@dmail.key, response.body)
+        end
+
+        should "not include the reported dmail's share key in the API" do
+          get_auth moderation_reports_path(search: { id: @dmail_report.id }, only: "id,model"), @mod, as: :json
+
+          assert_response :success
+          assert_equal(@dmail.id, response.parsed_body.sole.dig("model", "id"))
+          assert_equal(false, response.parsed_body.sole["model"].key?("key"))
+        end
       end
     end
 

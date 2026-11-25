@@ -60,6 +60,10 @@ class DmailPolicy < ApplicationPolicy
   end
 
   def api_attributes
-    super + [:key]
+    if record.owner_id == user.id
+      super + [:key]
+    else
+      super
+    end
   end
 end

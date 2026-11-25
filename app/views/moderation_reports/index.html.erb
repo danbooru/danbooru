@@ -15,7 +15,7 @@
     <%= table_for @moderation_reports, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Reported" do |report| %>
         <% if report.model_type == "Dmail" %>
-          <%= link_to report.model.dtext_shortlink, dmail_path(report.model, key: report.model.key) %>
+          <%= link_to report.model.dtext_shortlink, dmail_path(report.model) %>
         <% else %>
           <%= link_to report.model.dtext_shortlink, report.model %>
         <% end %>

@@ -131,6 +131,36 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
+      should "include the share key in the api for the owner" do
+        get_auth dmail_path(@dmail), @user, as: :json
+
+        assert_response :success
+        assert_equal(@dmail.key, response.parsed_body["key"])
+      end
+
+      should "not include the share key in the api for moderators viewing reported dmails" do
+        create(:moderation_report, model: @dmail, creator: @user)
+        get_auth dmail_path(@dmail), @unrelated_user, as: :json
+
+        assert_response :success
+        assert_equal(@dmail.id, response.parsed_body["id"])
+        assert_not(response.parsed_body.key?("key"))
+      end
+
+      should "not include the share key in the api for superadmins" do
+        get_auth dmail_path(@dmail), create(:superadmin_user), as: :json
+
+        assert_response :success
+        assert_not(response.parsed_body.key?("key"))
+      end
+
+      should "not include the share key in the api for other users viewing a dmail with a key" do
+        get_auth dmail_path(@dmail, key: @dmail.key), @unrelated_user, as: :json
+
+        assert_response :success
+        assert_not(response.parsed_body.key?("key"))
+      end
+
       should "show any dmail to a superadmin" do
         get_auth dmail_path(@dmail), create(:superadmin_user)
         assert_response :success
