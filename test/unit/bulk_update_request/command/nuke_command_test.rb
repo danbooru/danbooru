@@ -34,6 +34,18 @@ class NukeCommandTest < ActiveSupport::TestCase
           errors: ["Can't nuke {{pool:cute_*}} (pool doesn't exist)"],
         )
       end
+
+      should "raise an error when trying to nuke something that isn't a tag or a pool" do
+        assert_invalid_bur(
+          script: "nuke cute_*",
+          errors: ["Can't nuke {{cute_*}} (must be a tag or a pool)"],
+        )
+
+        assert_invalid_bur(
+          script: "nuke rating:g",
+          errors: ["Can't nuke {{rating:g}} (must be a tag or a pool)"],
+        )
+      end
     end
 
     context "on approval" do

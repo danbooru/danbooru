@@ -52,6 +52,8 @@ class BulkUpdateRequest::Command::Nuke < BulkUpdateRequest::Command
   def validate(errors:, **)
     if query.is_metatag?(:pool) && affected_pool.nil?
       errors.add(:base, "Can't nuke {{#{query}}} (pool doesn't exist)")
+    elsif !query.is_metatag?(:pool) && !query.is_simple_tag?
+      errors.add(:base, "Can't nuke {{#{@tag_or_pool}}} (must be a tag or a pool)")
     end
   end
 end
