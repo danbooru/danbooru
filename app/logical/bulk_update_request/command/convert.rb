@@ -9,7 +9,7 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   def initialize(params)
     @antecedent = params[:antecedent]
     @consequent = params[:consequent]
-    @consequent = Tag.normalize_name(@consequent) if PostQuery.normalize(@consequent, apply_aliases: false).is_simple_tag?
+    @consequent = Tag.normalize_name(@consequent) if category_term.nil? && PostQuery.normalize(@consequent, apply_aliases: false).is_simple_tag?
   end
 
   def affected_tags
@@ -20,8 +20,20 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     @from_query ||= PostQuery.normalize(@antecedent)
   end
 
+  def tag_edit
+    @tag_edit ||= PostEdit.new(nil, "", "", @consequent)
+  end
+
+  def category_term
+    tag_edit.single_categorization_term
+  end
+
+  def tag_name
+    category_term&.value || @consequent
+  end
+
   def to_query
-    @to_query ||= PostQuery.normalize(@consequent)
+    @to_query ||= PostQuery.normalize(tag_name)
   end
 
   def searched_pools
@@ -33,9 +45,15 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     searched_pools
   end
 
-  def approval_level(tags: nil) # rubocop:disable Lint/UnusedMethodArgument
-    return User::Levels::MODERATOR if from_query.is_single_favgroup?
-    User::Levels::ADMIN
+  def approval_level(tags: nil)
+    return User::Levels::ADMIN unless from_query.is_single_favgroup?
+
+    if category_term.present?
+      tag = tags.present? ? tags.find { |tag| tag.name == tag_name } : to_query.tag
+      return User::Levels::ADMIN if tag.present? && !tag.is_small_tag? && tag.category != category_term.category
+    end
+
+    User::Levels::MODERATOR
   end
 
   def process!(approved_at: nil, **)
@@ -47,7 +65,11 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   end
 
   def to_dtext
-    "convert {{#{@antecedent}}} -> [[#{@consequent}]]"
+    if category_term.present?
+      "convert {{#{@antecedent}}} -> [[#{category_term.value}|#{category_term}]]"
+    else
+      "convert {{#{@antecedent}}} -> [[#{@consequent}]]"
+    end
   end
 
   def validate(context:, errors:, approver: nil, **)
@@ -56,17 +78,16 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
       return
     end
 
-    prefix, unprefixed_name = @consequent.downcase.split(":", 2)
-    target_tag = Tag.new(name: @consequent)
+    target_tag = Tag.new(name: tag_name)
 
-    if to_query.ast.tag? && unprefixed_name.present? && TagCategory.mapping.key?(prefix)
-      errors.add(:base, "Can't #{to_dtext} (change the category in a separate line)")
-    elsif !to_query.is_simple_tag?
+    if !to_query.is_simple_tag?
       errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (must convert a pool or favgroup to a tag)")
     elsif target_tag.invalid?(:name)
       errors.add(:base, "Can't #{to_dtext} (#{target_tag.errors.full_messages.join("; ")})")
     elsif to_query.tag&.is_deprecated?
       errors.add(:base, "Can't #{to_dtext} ([[#{to_query.tag_name}]] is deprecated)")
+    elsif context == :request && category_term.present? && to_query.tag&.artist.present? && category_term.category != Tag.categories.artist
+      errors.add(:base, "Can't #{to_dtext} ([[#{to_query.tag_name}]] has an artist entry)")
     elsif from_query.is_single_pool? && pool.nil?
       errors.add(:base, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)")
     elsif from_query.is_single_favgroup?
@@ -79,6 +100,8 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
         errors.add(:base, "Can't approve #{to_dtext} ({{#{@antecedent}}} is too large; requires Admin)")
       end
     end
+
+    BulkUpdateRequest::Command::MassUpdate.simulate_category_change(to_query.tag_name, category_term.category) if errors.empty? && category_term.present?
   end
 
   private
@@ -92,19 +115,24 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
     pool = self.pool
     raise BulkUpdateRequest::Processor::Error, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)" if pool.nil?
 
-    BulkUpdateRequest::Command::MassUpdate.mass_update(from_query, to_query, approved_at: approved_at)
+    apply_tag_update(approved_at: approved_at)
 
     wiki_page = WikiPage.find_by_title(to_query) || WikiPage.new(title: to_query.tag_name)
     wiki_page.is_deleted = false
     wiki_page.body = pool.description if wiki_page.body.blank?
     wiki_page.save
 
-    pool.update(is_deleted: true, description: "This pool has been moved to [[#{@consequent}]].", post_ids: [])
+    pool.update(is_deleted: true, description: "This pool has been moved to [[#{tag_name}]].", post_ids: [])
   end
 
   def convert_favgroup_to_tag(approved_at: nil)
     raise BulkUpdateRequest::Processor::Error, "Can't #{to_dtext} ({{#{@antecedent}}} does not exist)" if from_query.favgroup.nil?
 
+    apply_tag_update(approved_at: approved_at)
+  end
+
+  def apply_tag_update(approved_at: nil)
     BulkUpdateRequest::Command::MassUpdate.mass_update(from_query, to_query, approved_at: approved_at)
+    Tag.find_or_create_by_name(to_query.tag_name, category: category_term.name, current_user: User.system, is_bulk_update_request: true) if category_term.present?
   end
 end

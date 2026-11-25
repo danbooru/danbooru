@@ -96,4 +96,10 @@ class BulkUpdateRequest::Command
     self.subclasses_loaded ||= autoloader&.eager_load_namespace(BulkUpdateRequest::Command).present?
     BulkUpdateRequest::Command.descendants.reject { |k| k == BulkUpdateRequest::Command::InvalidLine }
   end
+
+  # Returns a random negative ID for rows inserted during BUR validation, so PostgreSQL sequences aren't advanced
+  # before the validation transaction rolls back and concurrent validations don't contend on the same ID.
+  def self.next_simulated_id
+    -rand(1..2_147_483_647)
+  end
 end

@@ -41,6 +41,18 @@ class CreateAliasCommandTest < ActiveSupport::TestCase
           errors: ["Can't create alias [[blah]] -> [[char:bar]] ('char:bar' cannot begin with 'char:')"],
         )
       end
+
+      should "not advance tag_aliases_id_seq during validation" do
+        create(:tag_alias, antecedent_name: "existing_a", consequent_name: "existing_b")
+        create(:tag, name: "aaa")
+        create(:tag, name: "bbb")
+        create(:tag, name: "ccc")
+        seq_before = TagAlias.connection.select_value("SELECT last_value FROM tag_aliases_id_seq")
+
+        bur = build(:bulk_update_request, script: "alias aaa -> bbb\nalias ccc -> bbb")
+        assert_equal(true, bur.valid?, bur.errors.full_messages.join(", "))
+        assert_equal(seq_before, TagAlias.connection.select_value("SELECT last_value FROM tag_aliases_id_seq"))
+      end
     end
 
     context "on approval" do

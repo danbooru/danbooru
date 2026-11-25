@@ -8,7 +8,15 @@ class PostEdit
   extend Memoist
 
   Tag = Struct.new(:name, :negated, keyword_init: true)
-  Metatag = Struct.new(:name, :value, keyword_init: true)
+  Metatag = Struct.new(:name, :value, keyword_init: true) do
+    def category
+      TagCategory.mapping[name]
+    end
+
+    def to_s
+      "#{name}:#{value}"
+    end
+  end
 
   # Metatags that change the tag's category: `art:bkub`, `char:chen`, `copy:touhou`, `gen:1girl`, `meta:animated`.
   CATEGORIZATION_METATAGS = TagCategory.mapping.keys
@@ -77,6 +85,12 @@ class PostEdit
     # @return [Array<Metatag>] The list of tags with a category prefix (e.g. `artist:bkub`).
     def tag_categorization_terms
       metatag_terms.select { |term| term.name.in?(TagCategory.categories) }
+    end
+
+    # @return [Metatag, nil] The single tag categorization term (e.g. `artist:bkub`) if the edit consists solely of one with a non-empty tag name.
+    def single_categorization_term
+      term = tag_categorization_terms.first
+      term if terms.one? && term&.value.present?
     end
 
     # @return [Array<String>] The list of tags actually added by the user, excluding invalid or deprecated tags.

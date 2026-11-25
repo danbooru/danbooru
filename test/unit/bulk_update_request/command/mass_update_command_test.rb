@@ -207,6 +207,33 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
 
         assert_equal(%w[aaa bbb ccc ddd eee], @bur.tags)
       end
+
+      should "simulate category changes for subsequent lines without modifying the database or cache" do
+        existing_tag = create(:tag, name: "existing_tag", category: Tag.categories.general, post_count: 10)
+        create(:tag, name: "char_tag", category: Tag.categories.character, post_count: 10)
+        create(:wiki_page, title: "existing_tag")
+        create(:wiki_page, title: "char_tag")
+        seq_before = Tag.connection.select_value("SELECT last_value FROM tags_id_seq")
+
+        %i[write write_multi delete delete_multi increment decrement].each { |method| Rails.cache.expects(method).never }
+        assert_no_enqueued_jobs do
+          bur = build(:bulk_update_request, script: "mass update aaa -> char:existing_tag char:new_tag char:new_tag2\nimply existing_tag -> char_tag\ncategory new_tag -> copyright\ncategory new_tag2 -> meta")
+          assert_equal(true, bur.valid?, bur.errors.full_messages.join(", "))
+        end
+
+        assert_equal(seq_before, Tag.connection.select_value("SELECT last_value FROM tags_id_seq"))
+        assert_equal(true, existing_tag.reload.general?)
+        assert_nil(Tag.find_by_name("new_tag"))
+        assert_nil(Tag.find_by_name("new_tag2"))
+      end
+
+      should "safely ignore empty, invalid, or oversized tag names when simulating category changes" do
+        bur = build(:bulk_update_request, script: "mass update aaa -> char: char:foo,bar char:#{"a" * 3000}")
+
+        assert_equal(true, bur.valid?, bur.errors.full_messages.join(", "))
+        assert_nil(Tag.find_by_name(""))
+        assert_nil(Tag.find_by_name("foo,bar"))
+      end
     end
 
     context "on approval" do
