@@ -402,15 +402,6 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
-      should "not allow commenting on taken down posts" do
-        @post.update!(is_taken_down: true)
-
-        assert_no_difference("Comment.count") do
-          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" }}
-        end
-        assert_response 403
-      end
-
       should "allow approvers to comment on banned posts" do
         @post.update!(is_banned: true)
 

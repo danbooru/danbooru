@@ -748,10 +748,10 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(posts[0])
       end
 
-      should "skip banned and taken down posts the user can't see" do
+      should "skip banned posts the user can't see" do
         posts = create_list(:post, 5)
         posts[1].update!(is_banned: true)
-        posts[3].update!(is_taken_down: true)
+        posts[3].update!(is_banned: true)
 
         get_auth show_seq_post_path(posts[2].id), @user, params: { seq: "next" }
         assert_redirected_to(posts[0])

@@ -43,7 +43,7 @@ class Post < ApplicationRecord
   }.with_indifferent_access
 
   deletable
-  has_bit_flags %w[has_embedded_notes _unused_has_cropped is_taken_down]
+  has_bit_flags %w[has_embedded_notes _unused_has_cropped _unused_is_taken_down]
 
   normalizes :source, with: ->(source) { Post.normalize_source(source) }, apply_to_nil: true
   before_validation :merge_old_changes
@@ -2020,10 +2020,7 @@ class Post < ApplicationRecord
   end
 
   def banblocked?(user = CurrentUser.user)
-    return true if is_taken_down? && !user.is_moderator?
-    return true if is_banned? && has_tag?("paid_reward") && !user.is_approver?
-    return true if is_banned? && !user.is_approver?
-    false
+    is_banned? && !user.is_approver?
   end
 
   def visible?(user = CurrentUser.user)
