@@ -266,6 +266,13 @@ class CommentTest < ActiveSupport::TestCase
         assert_equal([c1, c2], Comment.search({ order: "score_asc" }, create(:moderator_user)).to_a)
       end
 
+      should "be searchable by words that are stopwords" do
+        c1 = create(:comment, body: "I don't know")
+        c2 = create(:comment, body: "eee")
+
+        assert_search_equals([c1], body_matches: "don't")
+      end
+
       should "default to id_desc order when searched with no options specified" do
         comms = create_list(:comment, 3)
 
