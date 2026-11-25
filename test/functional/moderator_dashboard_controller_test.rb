@@ -41,6 +41,36 @@ class ModeratorDashboardControllerTest < ActionDispatch::IntegrationTest
         get_auth moderator_dashboard_path, @admin
         assert_match(/secret_user_name/, response.body)
       end
+
+      should "not count banned artist edits for anonymous users" do
+        @banned_editor = create(:user)
+        as(@banned_editor) { create(:artist, is_banned: true) }
+
+        get moderator_dashboard_path
+        assert_response :success
+        assert_select "a[href=?]", artist_versions_path(search: { updater_id: @banned_editor.id }), count: 0
+
+        get_auth moderator_dashboard_path, @user
+        assert_response :success
+        assert_select "a[href=?]", artist_versions_path(search: { updater_id: @banned_editor.id }), count: 1
+      end
+
+      should "not show deleted comments to non-moderators" do
+        @deleted_comment = as(@user) { create(:comment, post: @post, body: "secret_comment_body", is_deleted: true) }
+        create_list(:comment_vote, 3, score: -1, comment: @deleted_comment)
+
+        get moderator_dashboard_path
+        assert_response :success
+        assert_no_match(/secret_comment_body/, response.body)
+
+        get_auth moderator_dashboard_path, @user
+        assert_response :success
+        assert_no_match(/secret_comment_body/, response.body)
+
+        get_auth moderator_dashboard_path, @admin
+        assert_response :success
+        assert_match(/secret_comment_body/, response.body)
+      end
     end
   end
 end

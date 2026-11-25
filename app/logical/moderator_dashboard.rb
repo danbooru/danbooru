@@ -10,6 +10,7 @@ class ModeratorDashboard
 
   def artists
     ArtistVersion
+      .visible(CurrentUser.user)
       .joins(:updater)
       .where("artist_versions.created_at > ?", min_date)
       .where(users: { level: ..max_level })
@@ -23,6 +24,7 @@ class ModeratorDashboard
   def comments
     CommentVote
       .joins(comment: [:creator])
+      .merge(Comment.visible_for_search(:body, CurrentUser.user))
       .where("comments.score < 0")
       .where("comment_votes.created_at > ?", min_date)
       .where(users: { level: ..max_level })
