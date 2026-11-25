@@ -73,7 +73,7 @@ class ApplicationController < ActionController::Base
   # @param notice [String, nil] An optional notice message to display for HTML or JS responses. The notice should be in DText.
   #
   # @see https://github.com/heartcombo/responders
-  def respond_with(subject, *args, model: model_name, notice: nil, **options, &block)
+  def respond_with(subject, *args, notice: nil, **options, &block)
     if params[:redirect].to_s.present? && params[:action] == "index" && action_methods.include?("show")
       redirect_to_show(subject) and return
     end
@@ -83,15 +83,20 @@ class ApplicationController < ActionController::Base
       records = subject.is_a?(ActiveRecord::Relation) ? subject.load.to_a : Array.wrap(subject)
 
       if records.present? && records.all?(ApplicationRecord)
-        associations = ParameterBuilder.new(params[:only], model).includes_parameters
-        ActiveRecord::Associations::Preloader.new(records: records, associations: associations).call
+        includes = records.group_by(&:class).map do |model, model_records|
+          associations = ParameterBuilder.new(params[:only], model).includes_parameters
+          ActiveRecord::Associations::Preloader.new(records: model_records, associations: associations).call
+          [model_records, associations]
+        end
 
         # Serializing included records is slow, so limit how many can be included to prevent DoS with huge responses.
-        if ApplicationRecord.included_records(records, associations).size > ParameterBuilder::MAX_INCLUDED_RECORDS
+        if includes.sum { |model_records, associations| ApplicationRecord.included_records(model_records, associations).size } > ParameterBuilder::MAX_INCLUDED_RECORDS
           raise ParameterBuilder::Error, "Too many included records (max: #{ParameterBuilder::MAX_INCLUDED_RECORDS}). Use a lower limit or fewer includes."
         end
 
-        ApplicationRecord.hide_invisible_includes!(records, associations, CurrentUser.user)
+        includes.each do |model_records, associations|
+          ApplicationRecord.hide_invisible_includes!(model_records, associations, CurrentUser.user)
+        end
       end
     end
 
@@ -132,10 +137,6 @@ class ApplicationController < ActionController::Base
 
   def set_version_comparison(default_type = "previous")
     params[:type] = %w[previous current].include?(params[:type]) ? params[:type] : default_type
-  end
-
-  def model_name
-    controller_name.classify
   end
 
   def item_matches_params(*)

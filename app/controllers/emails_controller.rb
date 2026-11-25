@@ -7,7 +7,7 @@ class EmailsController < ApplicationController
   def index
     @email_addresses = authorize EmailAddress.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @email_addresses = @email_addresses.includes(:user) if request.format.html?
-    respond_with(@email_addresses, model: "EmailAddress")
+    respond_with(@email_addresses)
   end
 
   def show

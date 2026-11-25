@@ -45,6 +45,6 @@ class ModqueueController < ApplicationController
       @character_tags = @tags.select(&:character?).sort_by(&:overlap_count).reverse.take(10)
     end
 
-    respond_with(@posts, model: "Post")
+    respond_with(@posts)
   end
 end

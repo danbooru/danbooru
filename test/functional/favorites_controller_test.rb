@@ -70,6 +70,19 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "not include records the user can't see with only=" do
+        tag = create(:tag)
+        create(:ai_tag, tag: tag, media_asset: @post.media_asset)
+        mod_topic = create(:mod_up_forum_topic)
+        create(:forum_post, topic: mod_topic, body: "mod-only [[#{tag.name}]]")
+        create(:forum_post, body: "deleted [[#{tag.name}]]", is_deleted: true)
+
+        post_auth favorites_path(post_id: @post.id, only: "id,ai_tags[tag[dtext_links[model[body]]]]"), @user, as: :json
+
+        assert_response :success
+        assert_equal([], response.parsed_body.dig("ai_tags", 0, "tag", "dtext_links"))
+      end
+
       should "not allow banned users to create favorites" do
         @banned_user = create(:banned_user)
 

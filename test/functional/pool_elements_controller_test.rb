@@ -29,6 +29,12 @@ class PoolElementsControllerTest < ActionDispatch::IntegrationTest
         assert_equal([@post.id], @pool.reload.post_ids)
       end
 
+      should "work with only=" do
+        post_auth pool_element_path, @user, params: { pool_id: @pool.id, post_id: @post.id, only: "id,name", format: "json" }
+        assert_response :success
+        assert_equal({ "id" => @pool.id, "name" => "abc" }, response.parsed_body)
+      end
+
       should "add a post to a pool once and only once" do
         as(@user) { @pool.add!(@post) }
         post_auth pool_element_path, @user, params: { pool_id: @pool.id, post_id: @post.id, format: "json" }
