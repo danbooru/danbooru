@@ -257,6 +257,56 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("File is not an image or video", Upload.last.error)
       end
 
+      should "show a generic error and log the error for an unexpected error" do
+        ExifTool.any_instance.stubs(:metadata).raises(NoMethodError, "undefined method 'secret_internal_detail'")
+        DanbooruLogger.expects(:log).with(instance_of(NoMethodError))
+
+        create_upload!("test/files/jpg/test.jpg", user: @user)
+
+        assert_response 201
+        assert_equal("error", Upload.last.status)
+        assert_equal("Unexpected error while processing the file", Upload.last.error)
+        assert_equal("Unexpected error while processing the file", Upload.last.upload_media_assets.sole.error)
+      end
+
+      should "show a generic error and log the error for an unexpected error before the files are processed" do
+        Upload.any_instance.stubs(:process_file_upload!).raises(NoMethodError, "undefined method 'secret_internal_detail'")
+        DanbooruLogger.expects(:log).with(instance_of(NoMethodError))
+
+        create_upload!("test/files/jpg/test.jpg", user: @user)
+
+        assert_response 201
+        assert_equal("error", Upload.last.status)
+        assert_equal("Unexpected error while processing the file", Upload.last.error)
+      end
+
+      should "show the message of an expected error raised while generating variants in parallel" do
+        MediaAsset.any_instance.stubs(:distribute_files!).raises(Concurrent::MultipleErrors.new([MediaFile::Image::Error.new("libvips error"), MediaFile::Image::Error.new("libvips error")]))
+
+        create_upload!("test/files/jpg/test.jpg", user: @user)
+
+        assert_response 201
+        assert_equal("libvips error", Upload.last.error)
+      end
+
+      should "show the message of an external command that timed out" do
+        ExifTool.any_instance.stubs(:metadata).raises(ExternalCommand::TimeoutError, "exiftool timed out after 30 seconds")
+
+        create_upload!("test/files/jpg/test.jpg", user: @user)
+
+        assert_response 201
+        assert_equal("exiftool timed out after 30 seconds", Upload.last.error)
+      end
+
+      should "mark the upload as failed for non-StandardError exceptions" do
+        Upload.any_instance.stubs(:process_file_upload!).raises(SystemStackError)
+
+        create_upload!("test/files/jpg/test.jpg", user: @user)
+
+        assert_response 201
+        assert_equal("Unexpected error while processing the file", Upload.last.error)
+      end
+
       should "fail for a Flash file" do
         create_upload!("test/files/swf/compressed.swf", user: @user)
 

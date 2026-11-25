@@ -44,6 +44,22 @@ class Upload < ApplicationRecord
   scope :failed, -> { where(status: "error") }
   scope :expired, -> { processing.where(created_at: ..4.hours.ago) }
 
+  # Only show expected errors to users so that unexpected errors don't expose internal details.
+  def self.error_message(error)
+    # Errors raised by `parallel_each`, like when generating variants.
+    error = error.errors.first if error.is_a?(Concurrent::MultipleErrors) && error.errors.present?
+
+    case error
+    when Upload::Error, MediaAsset::Error, PostReplacementProcessor::Error, Danbooru::Http::Error, Danbooru::Archive::Error,
+         MediaFile::Image::Error, MediaFile::Ugoira::Error, ExternalCommand::SyscallError, ExternalCommand::TimeoutError, ExternalCommand::OutputLimitError,
+         FFmpeg::Error, AutotaggerClient::Error, ActiveRecord::RecordInvalid
+      error.message
+    else
+      DanbooruLogger.log(error)
+      "Unexpected error while processing the file"
+    end
+  end
+
   def self.prune!
     expired.update_all(status: "error", error: "Stuck processing for more than 4 hours")
   end
@@ -221,7 +237,7 @@ class Upload < ApplicationRecord
       raise Error, "No file or source given" # Should never happen
     end
   rescue Exception => e
-    update!(status: "error", error: e.message)
+    update!(status: "error", error: Upload.error_message(e))
   end
 
   def process_source_upload!

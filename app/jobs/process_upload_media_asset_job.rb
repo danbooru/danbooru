@@ -11,7 +11,7 @@ class ProcessUploadMediaAssetJob < ApplicationJob
     upload_media_asset.process_upload!
   rescue Exception => e
     # This should never happen. It will only happen if `process_upload!` raises an unexpected exception inside its own exception handler.
-    upload_media_asset.update!(status: :failed, error: e.message)
+    upload_media_asset.update!(status: :failed, error: Upload.error_message(e))
     raise
   end
 end

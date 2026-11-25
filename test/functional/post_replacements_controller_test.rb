@@ -21,6 +21,23 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "replacing a post when an unexpected error happens" do
+        should "show a generic error and log the error" do
+          @post = create(:post, file_size: 789)
+          MediaFile::Image.any_instance.stubs(:preview!).raises(NoMethodError, "undefined method 'secret_internal_detail'")
+          DanbooruLogger.expects(:log).with(instance_of(NoMethodError))
+
+          file = Rack::Test::UploadedFile.new("test/files/jpg/test.jpg")
+          assert_no_difference("PostReplacement.count") do
+            post_auth post_replacements_path(format: :json), create(:moderator_user), params: { post_id: @post.id, post_replacement: { replacement_file: file }}
+          end
+
+          assert_response 422
+          assert_equal(["Unexpected error while processing the file"], response.parsed_body.dig("errors", "base"))
+          assert_equal(789, @post.reload.file_size)
+        end
+      end
+
       context "replacing a post from a source url" do
         should "replace the post" do
           assert_difference("PostReplacement.count") do

@@ -150,7 +150,7 @@ class UploadMediaAsset < ApplicationRecord
     update!(status: :active)
   rescue Exception => e
     MediaAsset.handle_blocked_file(e, media_file:, user:, action: "Upload ##{upload_id}", source: source_url, page: page_url)
-    update!(status: :failed, error: e.message)
+    update!(status: :failed, error: Upload.error_message(e))
   ensure
     media_file&.close
   end
