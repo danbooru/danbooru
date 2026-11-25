@@ -434,8 +434,9 @@ class ApplicationController < ActionController::Base
   end
 
   # Return the URL if it's a local path, or nil otherwise. `url_from` isn't enough because it allows `javascript://<host>/...`.
+  # Control characters are rejected because browsers ignore tabs and newlines in URLs, so `/<tab>/host` means `//host`.
   def local_path(url)
-    url.to_s if url.to_s.match?(%r{\A/(?![/\\])})
+    url.to_s if url.to_s.match?(%r{\A/(?![/\\])[^[:cntrl:]]*\z})
   end
 
   # Remove blank `search` params from the url.

@@ -279,6 +279,16 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to root_path
       end
 
+      should "not allow redirects to URLs with a tab after the first slash" do
+        post session_path, params: { session: { name: @user.name, password: "password" }, url: "/\t/example.com" }
+        assert_redirected_to root_path
+      end
+
+      should "not allow redirects to URLs with a newline after the first slash" do
+        post session_path, params: { session: { name: @user.name, password: "password" }, url: "/\n/example.com" }
+        assert_redirected_to root_path
+      end
+
       should "not allow deleted users to login" do
         @user.update!(is_deleted: true)
         BCrypt::Password.any_instance.expects(:==).once.returns(true)

@@ -575,6 +575,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_select "input[name='user[url]'][value='#{root_path}']"
       end
 
+      should "not pass URLs with control characters to the signup form" do
+        get new_user_path(url: "/\t/example.com")
+
+        assert_response :success
+        assert_select "input[name='user[url]'][value='#{root_path}']"
+      end
+
       should "fail for a logged in user" do
         get_auth new_user_path, @user
         assert_response 403
