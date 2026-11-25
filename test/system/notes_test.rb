@@ -181,6 +181,29 @@ class NotesChromeTest < ChromeSystemTestCase
       end
     end
 
+    context "an embedded note positioned outside the image" do
+      setup do
+        @post = create(:post, has_embedded_notes: true)
+        as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: %{<div class="fixed inset-0 z-9999">cover</div>}) }
+        visit post_path(@post)
+      end
+
+      should "be kept inside the image" do
+        assert_selector ".note-box.embedded", text: "cover"
+
+        # The point just above the image should be outside the note, not covered by it.
+        covered = evaluate_script(<<~JS)
+          (() => {
+            const image = document.querySelector("#image").getBoundingClientRect();
+            const element = document.elementFromPoint(image.left + 10, image.top - 5);
+            return element.closest(".note-box") !== null;
+          })()
+        JS
+
+        assert_equal(false, covered)
+      end
+    end
+
     context "an existing note" do
       setup do
         @note = as(@user) { create(:note, post: @post, x: 50, y: 50, width: 100, height: 80, body: "Existing note") }

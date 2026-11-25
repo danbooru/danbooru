@@ -39,12 +39,16 @@ class Note {
     constructor(note) {
       this.note = note;
       this.$note_box = $('<div class="note-box">');
-      this.note.$note_container.append(this.$note_box);
 
       if (note.embed) {
+        // The embedded notes layer clips notes to the image, so their contents can't cover the rest of the page.
+        this.note.$note_container.children(".embedded-notes").append(this.$note_box);
+
         this.$note_box.addClass("embedded");
         this.$inner_border = $('<div class="note-box-inner-border">');
         this.$note_box.append(this.$inner_border);
+      } else {
+        this.note.$note_container.append(this.$note_box);
       }
 
       if (this.note.is_new()) {

@@ -286,6 +286,10 @@
       </picture>
     <% end %>
 
+    <% if @post.has_embedded_notes? %>
+      <div class="embedded-notes"></div>
+    <% end %>
+
     <div id="note-preview"></div>
   <% end -%>
 

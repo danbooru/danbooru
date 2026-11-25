@@ -7,6 +7,20 @@
     visibility: hidden;
   }
 
+  /* Embedded notes may overflow their note box, but not the image. `contain: paint` also clips fixed-position content. */
+  div.embedded-notes {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    contain: paint;
+    pointer-events: none;
+    z-index: 100;
+
+    div.note-box {
+      pointer-events: auto;
+    }
+  }
+
   div.note-body {
     display: none;
     position: absolute;
