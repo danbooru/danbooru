@@ -280,6 +280,7 @@ aliased_post_search_link = search_prefix '{{' ws* tags ws* '|' ws* search_title 
 
 id = digit+ >mark_a1 %mark_a2;
 alnum_id = alnum+ >mark_a1 %mark_a2;
+hex_id = xdigit+ >mark_a1 %mark_a2;
 page = digit+ >mark_b1 %mark_b2;
 dmail_key = (alnum | '=' | '-')+ >mark_b1 %mark_b2;
 
@@ -415,7 +416,7 @@ inline := |*
 
   'issue #'i id            => { append_id_link("issue", "github", "https://github.com/danbooru/danbooru/issues/", { a1, a2 }); };
   'pull #'i id             => { append_id_link("pull", "github-pull", "https://github.com/danbooru/danbooru/pull/", { a1, a2 }); };
-  'commit #'i id           => { append_id_link("commit", "github-commit", "https://github.com/danbooru/danbooru/commit/", { a1, a2 }); };
+  'commit #'i hex_id       => { append_id_link("commit", "github-commit", "https://github.com/danbooru/danbooru/commit/", { a1, a2 }); };
   'artstation #'i alnum_id => { append_id_link("artstation", "artstation", "https://www.artstation.com/artwork/", { a1, a2 }); };
   'deviantart #'i id       => { append_id_link("deviantart", "deviantart", "https://www.deviantart.com/deviation/", { a1, a2 }); };
   'nijie #'i id            => { append_id_link("nijie", "nijie", "https://nijie.info/view.php?id=", { a1, a2 }); };
