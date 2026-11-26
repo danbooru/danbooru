@@ -35,6 +35,18 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A deleted or nonexistent Apple Music album page" do
+      strategy_should_work(
+        "https://music.apple.com/jp/album/1",
+        deleted: true,
+        image_urls: [],
+        page_url: "https://music.apple.com/jp/album/1",
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
     context "A direct mzstatic image thumb URL with a referer" do
       strategy_should_work(
         "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg/296x296bb.webp",

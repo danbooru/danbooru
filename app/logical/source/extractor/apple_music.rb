@@ -8,11 +8,11 @@ class Source::Extractor::AppleMusic < Source::Extractor
     end
 
     node = page&.at("source[srcset]")
-    if node.present?
-      found_url = node["srcset"].split(",").first.to_s.split.first.to_s
-      full_url = Source::URL.parse(found_url)&.full_image_url || found_url
-      [full_url].compact_blank
-    end
+    return [] if node.blank?
+
+    found_url = node["srcset"].split(",").first.to_s.split.first.to_s
+    full_url = Source::URL.parse(found_url)&.full_image_url || found_url
+    [full_url].compact_blank
   end
 
   def page_url
