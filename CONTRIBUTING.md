@@ -52,13 +52,48 @@ Existing code doesn't always follow these rules. Try to follow them in new code,
 
 ## Commit messages
 
+A good commit message is a short, plain-English summary of what the commit changes or fixes, and why. The diff already shows the how.
+
+**Titles:**
+
 - If the commit fixes an issue, write `Fix #XXX: <Issue title>` as the title, e.g. `Fix #6431: Upload validation failures cause the error to be [object Object].` GitHub closes the issue when the commit is merged.
-- Otherwise, use `<area>: <description>` as the title, e.g. `posts: fix N+1 queries for child post previews.`
-- In the body, explain what was broken and what the fix is, with enough context that someone reading it years from now can understand the change.
-- Hard wrap the body at about 100 columns. Limit the title to 72 columns (that's the cutoff on GitHub).
-- When fixing a regression, name the commit that caused it, e.g. `Fix regression in c6720ed4d.`
-- If there are any breaking changes to the API, list them in the body.
-- If there are any manual upgrade steps that people running their own Danbooru instance will have to do, like running a script or changing their config, list them in the body.
+- Otherwise, use `<area>: <description>.` as the title, e.g. `posts: fix N+1 queries for child post previews.`
+- Pick the area from where the change lives, and reuse areas from past commits.
+- For bug fixes, say in the title what was broken, not how the code changed: `comments: fix commenters being able to undelete moderator-deleted comments.`, not `comments: check the saved deleted status when updating comments.` Explain the cause in the body.
+- Limit the title to 72 columns (that's the cutoff on GitHub).
+
+**Bodies:**
+
+- Lead with the main point: what was broken, or why the change was needed, then the fix in a clause. The first sentence can restate the title in better words. If the body has several sentences or paragraphs, the first paragraph should sum up the commit in one sentence. A few sentences or less is usually enough. If the title says it all, leave the body out.
+- Only explain what the diff doesn't show. Don't list the files or methods you changed, walk through how the code works step by step, or describe how you found the bug, unless the bug is tricky enough to need it.
+- Write the fix in the imperative, like the title: `Fix reports leaving out the last day by ending the range at the start of the next day.`
+- Leave out details that go stale: local benchmarks, timings, and dates, and status like "tested locally".
+- For design changes, say why the new design is better than the old one, and mention alternatives you rejected if a reader would wonder about them.
+- When fixing a regression, name the commit that caused it, e.g. `Fix regression in c6720ed4d.` When a change follows up on another commit, reference it instead of explaining it again.
+- List any breaking changes to the API, and any manual upgrade steps that people running their own Danbooru instance have to do, like running a script or changing their config.
+- Hard wrap the body at about 100 columns.
+- For security fixes, describe what was fixed and what it protects, but not how to exploit it: no reproduction steps or payloads. Linking to the private report, issue, or unpublished GHSA advisory is fine, and exploit details can go there.
+
+Before committing, reread the message and delete each sentence a reviewer wouldn't miss. For example, this is too long:
+
+```
+reports: fix reports not including the last day.
+
+ReportsController#show passed `from` and `to` to Reports::Base#records, which built the range
+with `created_at: from..to`. Since `to` was parsed with `parse_date!`, it was midnight on the end
+date, so a report for 2026-11-01 to 2026-11-21 left out 9,812 of the 10,344 comments created on
+the 21st. I found this while comparing the comments report to /comments?search[created_at]=...
+Changed Reports::Base#records and added tests in reports_controller_test.rb. Tested locally.
+```
+
+This says the same thing:
+
+```
+reports: fix reports not including the last day.
+
+Reports only included records from the end date if they were created exactly at midnight. End the
+range at the start of the next day instead, so the whole end date is included.
+```
 
 ## Code style
 
@@ -67,8 +102,7 @@ Existing code doesn't always follow these rules. Try to follow them in new code,
 - Add YARD comments (`@param`, `@return`) to public methods, and update the folder's `README.md` when you change how its code fits together.
 - Avoid loops that build up results with mutation. Prefer functional transformations like `map`, `select`, and `sum`, and immutable data instead. A plain loop is fine when it's clearer, like checking each item and raising an error on the first bad one.
 - When writing regexes or parsing code, put examples of what the input looks like in a comment next to it, so readers can see what it matches without working it out.
-- Consider using `memoize` to memoize expensive methods that are called multiple times.
-  - Only memoize methods that return the same result every time; don't memoize things that can change and have to be recalculated.
+- Use `memoize` for expensive methods that are called more than once, like ones that make HTTP requests. Repeated database queries are usually cached already. Don't memoize values that can change, since then you have to remember to clear the cache whenever they do.
 - Avoid `method_missing`, `define_method`, and other metaprogramming that makes code hard to search for.
 - Avoid adding methods to core classes (like `String` in `config/initializers/core_extensions.rb`) unless really necessary.
 - Use parentheses around method call arguments (`foo(bar, baz)`), but leave them off macro-style calls like `validates :name`, `has_many :posts`, `before_action :foo`, or `assert_equal`.
@@ -83,15 +117,14 @@ Existing code doesn't always follow these rules. Try to follow them in new code,
 - Rescue only the specific errors you expect. Rescuing `Exception` or `StandardError` and carrying on makes failures disappear silently ([d73895312], [2b8767d7f], [3414d27c7]).
 - Log unexpected errors with `DanbooruLogger.log` when you rescue them and carry on, so they don't go unnoticed.
 - Test `rescue` blocks and error pages. A bug in the handler hides the original error or crashes the error page ([a1d4408c2], [627e8e101], [ece0b1b17]).
-- Make empty or unresolvable filters match nothing, not everything. A search for a user, tag, or post that doesn't exist should return no results, not skip the filter (see [Controllers and API](#controllers-and-api) for malformed values) ([7a7bebd02], [ad22e42e6], [be27423af], [3691404a8]).
 - Normalize the same input the same way everywhere. Use Rails' `normalizes`, and watch for Unicode when changing case ([cf4b86950], [a139d31c1], [057125161], [db7623feb], [21c0d55aa]).
 - Don't rely on the current user implicitly. Only use `CurrentUser.user` in controllers and views, and pass the user in explicitly everywhere else: models, components, and service objects. Implicit current users make code harder to understand and test, and background jobs and the console don't have the user who made the request ([361936d5b], [eca4eac5e], [92e4635af]).
 - Be careful with Unicode input. Normalize text to NFC before storing or comparing it (most text fields already do this with `normalizes`). Use NFKC only when lookalike forms should count as the same, like wiki page titles. Don't normalize URLs, because servers treat differently encoded paths as different ([cac1b93fa]). Watch out for lookalike, invisible, and zero-width characters, and normalization differences in tag names, usernames, and URLs.
 - Don't use `/regex/i` when you expect ASCII input. Ruby does Unicode case folding, so `/s/i` matches `ſ` and `/k/i` matches the Kelvin sign `K`. Use explicit character classes like `[a-zA-Z]` instead.
 - Use `[[:space:]]` instead of `\s`, and `VisibleStringValidator` instead of `blank?`. The first two miss Unicode spaces, zero-width characters, and other invisible characters ([03abbd068], [6966b74e1], [d9dc84325]).
 - Anchor validation regexes with `\A` and `\z`, not `^` and `$`, which match on any line ([d76d54369], [dcefb842d]).
-- Convert text from HTTP headers, external programs, file metadata, and decoded URLs to valid UTF-8 with `encode("UTF-8", invalid: :replace, undef: :replace)` before using it. `force_encoding` alone doesn't fix invalid bytes ([8813970ed], [43a8adbde], [b48161783], [396590321]).
-- Use `Date.current` and `Time.zone.now`, not `Date.today` or `Time.now`, which use the server's time zone ([9ab799ef3]).
+- Don't assume text from HTTP headers, external programs, file metadata, or decoded URLs is valid UTF-8. Convert it with `encode("UTF-8", invalid: :replace, undef: :replace)` before using it. `force_encoding` alone doesn't fix invalid bytes ([8813970ed], [43a8adbde], [b48161783], [396590321]).
+- Use `Date.current` and `Time.zone.now`, which use the current user's time zone, not `Date.today` or `Time.now`, which use the server's time zone ([9ab799ef3]).
 - Don't parse dates from user input with `Date.parse` or `String#to_date`. They guess a date from almost any text, so `"1.month.ago".to_date` returns today's date. Use `String#parse_date!`, which raises `Date::Error` for anything that isn't a date.
 - Make code work, or fail cleanly, when optional services, API keys, or config values aren't set, as in a fresh install or in tests ([3f35a9ab6], [127e4e385], [4c55c809b], [432b3e19a]).
 - Add new config options to `config/danbooru_default_config.rb` with a safe default and a comment explaining them, and read them with `Danbooru.config`, not `ENV`. People running their own instance configure their site there.
@@ -106,12 +139,12 @@ Existing code doesn't always follow these rules. Try to follow them in new code,
 - Follow the [Security](#security) rules for every action: use `authorize` and `permitted_attributes`, hide the same things in the API as in HTML, don't redirect to user-supplied URLs, and rate limit write and expensive read endpoints.
 - Test every new action with each relevant user level. It should work for the levels that can use it, and be denied for the levels that can't.
 - Use RESTful routes and the standard actions (`index`, `show`, `create`, `update`, `destroy`) instead of custom actions.
+- Make helper methods in controllers private. Rails treats public methods as actions, and `protected` doesn't apply inside `concerning` blocks ([63eb593ae]).
 - Use `respond_with`, so the action works as HTML, JSON, and XML like every other page.
 - Add search params through the model's `search` method and the `Searchable` helpers, so they work like every other search.
 - Handle bad search params the same way everywhere:
-  - Return a 422 error for malformed values that can't be parsed, like `search[is_deleted]=abc`, `search[name][x]=1`, or an invalid date. Say what's wrong in the error message. Don't ignore it or return empty results, as that would hide the mistake.
-  - Return no results for well-formed values that don't match anything, like a user or tag that doesn't exist.
-  - Never ignore a filter you can't parse. Ignoring it returns more results than the user asked for, which can mislead them, or make an API script act on the wrong records.
+  - Return a 422 error for malformed values that can't be parsed, like `search[is_deleted]=abc`, `search[name][x]=1`, or an invalid date. Say what's wrong in the error message. Never ignore a filter you can't parse. That returns more results than the user asked for, which can make an API script act on the wrong records ([2edaaf716], [f15c285dc]).
+  - Return no results for well-formed values that don't match anything, like a user or tag that doesn't exist. Don't skip the filter ([7a7bebd02], [ad22e42e6], [be27423af], [3691404a8]).
   - Ignore unknown params, so old clients keep working when params are renamed or removed. Options that only change how results are displayed, like a report's chart mode, can fall back to their default.
 - Expect any param to be a string, an array, or a hash (`?id[]=1`, `?id[x]=1`), including params read in model `search` methods and `*_matches` scopes. Check the type before calling string methods on it, and test actions with array and hash values.
   - Check types with an allowlist, like `value.nil? || value.is_a?(String) || value.is_a?(Integer)`, not by rejecting arrays and hashes. JSON request bodies can also contain booleans and floats.
@@ -128,24 +161,24 @@ Existing code doesn't always follow these rules. Try to follow them in new code,
 
 ## Models and database
 
-- Don't interpolate user input into SQL. Use `where` with a hash or bind params, and `where_like`/`where_ilike` from `Searchable` for `LIKE` patterns.
+- Don't interpolate values into SQL strings, even ones you think are safe. Use `where` with a hash or bind params, `where_like`/`where_ilike` from `Searchable` for `LIKE` patterns, and Arel for subqueries and `ORDER BY` instead of interpolating `to_sql` ([4fb2894f0], [5c0b3557d]).
 - Preload associations used in views to avoid N+1 queries ([c2da8e485], [de6f386e9], [808fe0411]).
-- Use `with_lock` to lock records before reading, modifying, and writing them back, e.g. when appending to an array or string column. Otherwise concurrent edits can overwrite each other ([31b58e17b], [80e115b60], [06e12973e]) or both get past the check ([f286cb003], [5110b4bfa], [f0a593609], [e72446463]).
+  - Avoid association lookups in policies. These may run once for every record on the page, so a lookup there is an N+1 query everywhere the policy is used. If you must add one, find every caller of the policy, preload the association, and check the queries on each of those pages and API endpoints ([a0638daf1]).
+- Use `with_lock` (or `locked_update`) to lock records before reading, modifying, and writing them back, e.g. when appending to an array or string column. Otherwise concurrent edits can overwrite each other ([31b58e17b], [80e115b60], [06e12973e]) or both get past the check ([f286cb003], [5110b4bfa], [f0a593609], [e72446463], [a1ae09a18]).
   - Use `with_lock`, not `lock!`, outside a transaction. `lock!` doesn't lock anything without one ([7a24d08bb]).
   - Lock multiple rows in a consistent order with `order(:id).lock`. Otherwise concurrent transactions can deadlock ([aeb5edaff]).
   - Check preconditions inside the lock, not before it ([651dfc095]).
-  - Writing to a record inside an ActiveRecord callback also implicitly locks out other writers to the same record until the transaction commits. This is subtle, so lock the record explicitly instead of relying on it.
-- Enforce locks, limits, and permissions in the policy or model, not in one code path. The API, metatags, reverts, undeletes, and bulk edits can all reach the same record ([0006b76c4], [fb91bbc6c], [7726e85e3], [96a468b51]).
-- Pass the user to `visible` scopes and `search` explicitly. Use `system_tag_match` for internal post searches, not `user_tag_match`, which depends on the current user's settings ([92e4635af], [ce0550569]).
+- Put permission checks in the policy, and call it from the controller, where the current user is known. Avoid permission checks in models, which shouldn't depend on who the current user is. Make sure every path that changes the record goes through the policy, including the API, metatags, reverts, undeletes, and bulk edits ([0006b76c4], [fb91bbc6c], [7726e85e3], [96a468b51]).
+- Pass the current user in explicitly, to `visible`, `search`, and everything else. Don't use default arguments that silently fall back to the current user. For example, use `system_tag_match` for internal post searches, not `user_tag_match`, which depends on the current user's settings ([92e4635af], [ce0550569]).
 - Don't use `update_attribute`, `update_column`, or `update_columns` for user changes. They skip validations and callbacks, so they skip lock and permission checks too ([010008eab], [07921d2c8]).
 - Consider the performance of queries on large tables. Queries that are fast in development can time out in production ([99416d47b], [d34592650], [5f6fc9f3e]).
 - Use `find_each` to iterate over large tables, not `.all.each` or `.map`.
-- Use `exists?` instead of `present?` or `any?` on relations that aren't loaded yet, `pluck` when you only need a few columns, and `size` instead of `count` on relations that are already loaded.
-  - Don't use `exists?` on loaded relations; it hits the database again.
+- Use `exists?` on relations that aren't loaded yet, and `size` or `present?` on relations that are. `exists?` and `count` always query the database again.
 - Update cached counts (`*_count`, `has_children`) on every code path that changes them, including delete, undelete, expunge, and bulk updates. Use `update_counters` or SQL increments in the same transaction, not read-modify-write in Ruby ([5baeb3eec], [69facb22b], [1ec02dbe4], [e8b92781c]).
 - Recompute derived flags and limits (`is_banned`, upload limits) from the source records on every change, not in one place ([0d03e7c5c], [0b3d95c73], [1d5bb39cc]).
 - Don't keep database transactions open during slow work, like HTTP requests, external commands, file processing, or updating many records. Long transactions hold locks that block other requests, and can deadlock ([463e6d7b4]).
-- Use `after_commit`, not `after_save` or `after_destroy`, for side effects outside the database (deleting files, calling services, logging that work is done). Otherwise they happen even if the transaction rolls back ([b27f98dc5], [8fff3315f], [88d14b30e]).
+- Remember that Rails saves records and runs their callbacks inside a transaction. Once the row is written, other writes to it are blocked until the transaction commits, so slow work in callbacks holds that lock and can cause deadlocks. Before the row is written, other writers aren't blocked, so lock the record explicitly if it mustn't be changed concurrently.
+- Use `after_commit`, not `after_save` or `after_destroy`, for side effects that can't be taken back, like sending emails, deleting files, or calling services. Otherwise they happen even if the transaction rolls back ([b27f98dc5], [8fff3315f], [88d14b30e]).
 - Don't create a new version or change `updater_id` when nothing changed ([4b635628c], [bb5f29111], [160829d26]).
 - Don't set `updater_id` or `*_ip_addr` with `||=`. A default or the previous value may already be there, so the edit gets credited to the wrong user ([feb3ec075], [02122343c], [3dc854c0c]).
 - Add `id` as a tiebreaker when sorting on a non-unique column. Otherwise rows come back in random order and pages overlap ([d74eda2b9], [6ad774b93], [57c4d2a54], [5ea61c692]).
@@ -153,7 +186,6 @@ Existing code doesn't always follow these rules. Try to follow them in new code,
 - Watch out for string vs. symbol keys in JSON columns. Hashes loaded from the database have string keys ([0ef8e2dc8]).
 - Use `PostQuery#posts_with_timeout` for post searches embedded in other pages (wiki, artist, or profile previews), so a slow search doesn't time out the whole page ([e5b2adc37], [461da6505]).
 - Check self-referencing data (parent posts, implications, nested extractors) for cycles and unlimited depth. Check the whole chain, not only direct self-references ([1183341a4], [6fdc41a1b], [365e04b5f], [fde15d979]).
-- Don't use `.sole` on a relation with a limit. It ignores the limit ([1a3ce57ff]).
 - Add a maximum length validation to every string and array attribute users can edit ([58e471948], [02ba1e37b], [c3f834f79], [46027e9eb]).
 - Only run validations when the attribute changes, with `if: :name_changed?`. Otherwise old records that don't pass a newer validation can't be saved at all, and slow validations like uniqueness checks run on every save.
   - For required attributes, use `if: -> { new_record? || name_changed? }`. A blank attribute on a new record doesn't count as changed, so `if: :name_changed?` skips the validation, and saving fails with a database NOT NULL error instead of a validation error.
@@ -164,7 +196,7 @@ Existing code doesn't always follow these rules. Try to follow them in new code,
 
 - Index new columns and tables for how they'll be queried: foreign keys, columns you search, filter, or sort by, and columns you query together. Think about the queries before you design the table.
 - Don't add indexes blindly. Every index slows down writes and takes up space, so don't index columns nobody will search, and remove indexes that aren't used ([766113a44]).
-- Think twice before indexing columns that change often, like counts, scores, and `last_*_at` timestamps. Postgres can only do a HOT (heap-only tuple) update, which skips updating the table's indexes, when none of the changed columns are indexed. Otherwise every update writes to every index on the table, and the table and indexes bloat.
+- Be careful about indexing columns that change often, like counts, scores, and `last_*_at` timestamps. Writes to indexed columns are more expensive than writes to unindexed ones, because Postgres can't do a HOT update, and has to update every index on the table, not only the one for that column. This is most expensive on tables with many indexes, especially GIN indexes on arrays.
 - Pick the right type of index. Use btree for exact matches, ranges, and sorting. Use GIN for arrays (`post_ids`, `other_names`) and `jsonb`, a `to_tsvector` GIN index for full-text search, and a trigram index (`gin_trgm_ops`) for wildcard searches on short text like names and URLs ([d84201273], [4066ee52b]).
 - Don't put btree indexes on free-form text like comments, descriptions, or error messages. They don't help search it, and Postgres can't index values over about 2700 bytes, so long values fail to save ([6f3f92088]). Use a full-text index if the text needs to be searchable.
 - Use partial indexes (`WHERE is_deleted = false`) when queries only look at a small part of the table, like rows where a flag is set.
@@ -207,16 +239,13 @@ Deploys are rolling restarts, so the new code will be running alongside the old 
 - Don't use inline `<script>` tags. See [XSS, open redirects, and unsafe URLs](#xss-open-redirects-and-unsafe-urls).
 - Use `href="#"` with `.prevent` or `preventDefault`, not `href="javascript:void(0)"`, which breaks the CSP ([cf1a82a3b]).
 - Use semantic HTML: `<a href>` for navigation, `<button>` for actions, and `<label>` for form fields.
-- Don't add `id`s to elements unless you have to. Use classes instead.
-  - It's hard to tell if we have any Javascript or CSS relying on that `id`.
-  - It's hard to tell if users have any userscripts or custom CSS relying on that `id` that will break if we change it.
-  - IDs are global, so they can conflict with other elements on the page if used inside partials that render more than once per page.
-  - Use `namespace:` on forms ([e4096460e], [f7f72e29b], [804a2ef9a]).
+- Don't add `id`s to elements unless you have to. Use classes instead. IDs break in components that render more than once per page, and once they exist, it's hard to tell what Javascript, CSS, or userscripts depend on them. Use `namespace:` on forms to keep their field IDs unique ([e4096460e], [f7f72e29b], [804a2ef9a]).
 
 ## Javascript
 
 - Add system tests (`test/system`) for any Javascript functionality you add or change.
 - Use Alpine.js for client-side interactions. Avoid adding new jQuery code, though `$(...)` is fine for selecting and traversing the DOM.
+- Keep logic out of Alpine attributes (`x-data`, `@click`, `:class`), and put it in `Alpine.data` components or magics. We use Alpine's CSP build, which can't evaluate arrow functions, `?.`, `new`, regexes, globals like `Danbooru.*`, or assignments to DOM properties, and doesn't support `x-html` ([28cdd0599], [975cf9609], [1fd18d470], [a90b4fba2], [bdd6ae766]).
 - Test UI changes on mobile, including touch and swipe gestures ([64a8719e0], [f425fa7ce]).
 - Test that errors are handled properly. Don't show `[object Object]` to the user ([6d62e3e48]).
 - Don't use newer JS features that old mobile browsers don't support, like regex lookbehinds ([1ff98b41a], [fb13ffdd9]). Syntax that old browsers can't parse breaks the entire Javascript bundle, not just one feature.
@@ -228,14 +257,11 @@ Deploys are rolling restarts, so the new code will be running alongside the old 
 ## CSS
 
 - Use the Tailwind-style utility classes in `app/javascript/src/styles/common/utilities.scss` to style HTML, like `flex items-center gap-2`, not new CSS rules. They use the same names as Tailwind, so the Tailwind docs explain what each one does.
-- Don't add new CSS rules unless you can't do it with utilities.
-  - Global CSS rules are hard to maintain because it's hard to tell where they're used, what will break if they're changed, and which other rules apply to the same element.
-  - Put the CSS for a component in the `.scss` file next to the component, not in the global stylesheets.
+- Don't add new CSS rules unless you can't do it with utilities. Global rules are hard to maintain, because it's hard to tell where they're used and what will break if they change. Put a component's CSS in the `.scss` file next to the component.
 - Don't add new utility classes unless the existing ones can't do what you need. If you do add a utility class, give it the same name and behavior as the Tailwind class.
 - Use the color variables from `040_colors.scss` (`var(--link-color)`), never hardcoded colors, so every theme works. If you add a new variable, define it for each theme, and check your change in dark mode ([8dca5cd8e]).
 - Use the `sm:` and `md:` utility variants for mobile layouts, and check your change on a narrow screen.
-- Use `rem` units for spacing and font sizes. Use multiples of `0.25rem` whenever possible.
-- Don't make up random values for paddings, margins, or sizes. Use Tailwind-style spacing classes instead.
+- Use the Tailwind-style spacing classes for padding, margins, and sizes, not made-up values. When you have to write CSS, use `rem` units in multiples of `0.25rem`.
 - Avoid inline `style=` attributes, and style with classes, not `id`s.
 
 ## Background jobs
@@ -250,7 +276,7 @@ Deploys are rolling restarts, so the new code will be running alongside the old 
 - Make jobs safe to retry or run twice. A retried job may find its work half done.
 - Pass records or IDs to jobs, not large amounts of data.
 - Pass the acting user to the job when it matters. Jobs run as `User.system`, not as the user who queued them.
-- The record may change by the time the job runs. Don't assume that it hasn't been edited or deleted. Re-check the record's state when the job starts.
+- The record may change by the time the job runs. Don't assume that it hasn't been edited or deleted. Re-check the record's state when the job starts, and anything else it depends on, like the posts in a pool ([e05d8d173]).
 - Save the failure when a job fails, so records don't get stuck in a "processing" state. Make sure this works even when the error itself is huge or saving it fails ([6f3f92088], [9430e6505], [c584ca5b1], [87a00a118]).
 - Add `ApplicationMetrics` counters for new background processes and external services, so you can see when they fail.
 
@@ -261,7 +287,6 @@ Deploys are rolling restarts, so the new code will be running alongside the old 
 - Don't fork child processes. The app is multithreaded, and forking a multithreaded process can deadlock the child. Run programs with `ExternalCommand`, which uses `Process.spawn` ([777893bb9]).
   - In code that runs after a fork anyway (like Puma workers or parallel tests), don't close or delete resources the parent process still uses ([520f54d77], [d2018b04e]).
   - Use `wait_for_fork` with a timeout in tests that wait on forked processes, so a hung child doesn't hang the whole run ([777893bb9]).
-- Run programs with `ExternalCommand.run`, and don't trust an uploaded file's extension, contents, or size. See [Files, media, and external commands](#files-media-and-external-commands).
 - Check the status and content type of external API responses before parsing them. Deleted posts, 429s, and HTML error pages are common ([be721db44], [bdb08b780], [00531dd2c]).
 - Keep private user data (IPs, API keys, email addresses) out of emails, logs, and metrics unless it's needed ([a6844e9c3], [6c9f5809b]).
 - Give every cache entry an expiry, and don't push it back every time the entry is read ([442515029], [3af352c76]).
@@ -280,8 +305,7 @@ Deploys are rolling restarts, so the new code will be running alongside the old 
 - Write unit tests (`test/unit`) for a class's public interface, not for internal methods that only the class itself uses.
 - Test model validations in unit tests (`test/unit`), including the error message for each invalid value.
 - Add system tests (`test/system`) for any Javascript functionality. Functional and unit tests don't run Javascript.
-- Use one test file per class, e.g. `test/unit/artist_test.rb` for `Artist` and `test/functional/artists_controller_test.rb` for `ArtistsController`.
-- Use one system test file per page or component, unless the test covers a flow that spans multiple pages.
+- Use one test file per class, e.g. `test/unit/artist_test.rb` for `Artist` and `test/functional/artists_controller_test.rb` for `ArtistsController`, and one system test file per page or component.
 - Keep tests simple. Avoid loops and layers of abstraction, and repeat the same assertions when needed. Only add a new assertion helper if it will be used in many places, not just a few.
 - Check that a new test fails without your change. Revert the fix or invert the condition, and run it again.
 - Don't delete or skip a failing test because you can't fix it.
@@ -345,8 +369,10 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 - Use `authorize` and `permitted_attributes` in every controller action to check that the current user has permission to perform the action (see `app/controllers/README.md`).
 - Use `visible` in both `index` and `show` actions to check that the user can view the item ([37b43a702], [b8aa223ec], [28d2753c5], [16d27c0c0]).
 - Use `permitted_attributes_for_create` or `permitted_attributes_for_update` to allowlist which attributes the user can set. Don't include attributes that users shouldn't set, like owner, level, status, or another record's ID ([8df1496d2], [a16b91e2b], [3da90ca25]).
-- Check `unbanned?` in policies for write actions, not only the user's level. Banned users keep their level, and should only be able to change things that affect themselves ([89bffbe87], [105553a1d], [6c6931399], [2537145b0]).
+- Check saved values in policies (`is_deleted_was`), not new ones. Some controllers assign the request's attributes before calling `authorize`, so the policy sees the value the user is trying to set ([551f29b7e]).
+- Check `unbanned?` in policies for write actions, not only the user's level. Banned users below Moderator keep their level, and should only be able to change things that affect themselves ([89bffbe87], [105553a1d], [6c6931399], [2537145b0], [954370be6]).
 - Check the parent record in policies when creating child records, not only the child (e.g. check that the user has permission to view or edit the post when creating comments, notes, flags, etc.). In views, call `policy(Model.new(post: post))`, not `policy(Model)` ([37b43a702], [25978ca75], [835cc23f6]).
+- Hide child records whose parent the user can't see, like BURs in private forum topics, or the replaced files of hidden posts ([03f1c9cb3], [a0638daf1]).
 - Check that the user has permission to update every record you change as a side effect (metatags, callbacks, bulk actions) ([9282fd968]).
 - Hide soft-deleted records on every path that can reach them, not only the index: show pages, the API, votes, quotes and replies, metatags, and DText links ([7f8a6adb0], [ccb38a5bc], [20cc2cd18], [d5ae2b1bc]).
 - Scope records loaded by ID params other than `:id` (`version_id`, `respond_to_id`) through the parent, e.g. `@artist.versions.find(...)`, or authorize them separately. Don't use a global `Model.find` ([c46b31aa9], [4eb0a6413]).
@@ -361,11 +387,11 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 - Don't accidentally leak hidden data.
   - Don't leak hidden data in exceptions. Only show users the messages of known exception types. `NoMethodError` messages can include a whole `User` or `Post`, and database errors can include other users' data ([7bed81812], [b695c4ccb], [d053e135a], [80e0ae6a3]).
   - Don't leak private details (IPs, private reasons, private topic titles) in public ModAction descriptions. Add the category to `ModAction::MOD_ONLY_CATEGORIES` instead of filtering the text in `serializable_hash`, which `only=` gets around ([6c6916578], [3d03de1c5], [a8799b1ae]).
-  - Don't leak the number of records the user can't see in counts and aggregates (`*_count`, `has_*`) ([899798431], [a442658f8]).
+  - Don't leak the number of records the user can't see in counts and aggregates (`*_count`, `has_*`, reports that group or aggregate records) ([899798431], [a442658f8], [9e86282f0], [bc4b7c4fb]).
   - Don't send notifications (dmails, mentions) with content the recipient can't see ([c7a47cadf]).
   - Don't allow hidden data to be inferred through searches, such as by partial matches on hidden attributes (`_like`, `_regex`, wildcards, ranges) that allow them to be found one character at a time ([db60981eb], [8ce870da5], [dedd509dd]), or by allowing searches on private attributes (`creator_id`, `user_id`, `ip_addr`, etc.) that can be used to infer hidden data, e.g. who flagged a post ([b46400bac], [899798431], [a442658f8]).
-  - Don't allow hidden data to be inferred through side channels or timing attacks, such as by determining passwords or API keys by differences in response time.
-  - Don't reveal the existence of hidden data, like email addresses or private forum topics, through error messages or differences in HTTP responses.
+  - Don't allow hidden data to be inferred through side channels or timing attacks, such as differences in response time, rate limits, or error codes that reveal whether an account or email address exists ([fa39094da], [92c5f9a64]).
+  - Don't reveal the existence of hidden data, like email addresses or private forum topics, through error messages or differences in HTTP responses, including timing. Authorize before looking up the hidden data ([1af7bf6fb]).
     - Look up parent records through `visible`, like `ForumTopic.visible(user).find(...)`, so a hidden record gives the same response as one that doesn't exist.
 
 ### XSS, open redirects, and unsafe URLs
@@ -379,12 +405,12 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 
 ### Code injection and unsafe deserialization
 
-- Don't call `send`, `public_send`, `constantize`, or `render` with user input unless you check it against an allowlist first.
+- Don't call `send`, `public_send`, `constantize`, or `render` with user input. Write out the allowed calls instead (`type == "current" ? current : previous`), so it's obvious at the call site that nothing else can be called, even if the input was checked earlier ([c944ba4f8], [90b2a2c4f]).
 - Don't deserialize untrusted data with `Marshal` or `YAML.load`. Use `YAML.safe_load` if you must, and cache plain strings and hashes, not Ruby objects ([42fb81ffd]).
 
 ### Authentication, sessions, and 2FA
 
-- Require reauthentication (`before_action :requires_reauthentication`) before sensitive account actions like changing emails or passwords, deactivating the account, viewing API keys, enabling 2FA, etc. Logging in doesn't count as reauthentication ([b0f4d573c], [5a7966336], [9fb2e4911]).
+- Require reauthentication (`before_action :requires_reauthentication`) before sensitive account actions like changing emails or passwords, deactivating the account, viewing API keys, enabling 2FA, etc, and before staff actions that a hijacked session could abuse, like banning, promoting, or demoting users. Logging in doesn't count as reauthentication ([b0f4d573c], [5a7966336], [9fb2e4911], [111a24184], [b59586203]).
 - Don't add `skip_before_action :verify_authenticity_token` ([f1e31868d]).
 - Rate limit sensitive account actions like login and 2FA attempts, including on reauthentication paths ([d72623abd]).
 - Bind tokens, signed links, and sessions to the user, session, and current email or password, so they stop working when any of those change ([e3ee3b1cd], [7ad1b8717], [9548dad16], [d7cdd3f19], [18503fcf0]).
@@ -396,14 +422,17 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 
 ### Denial of service
 
-- Cap how many items searches and params accept (space-separated terms, URLs, IDs) ([19bbc165d], [2f37b8773], [a219ab393], [a54c15e47], [72d00b7fd]).
+- Cap how many items searches and params accept (space-separated terms, URLs, IDs) ([19bbc165d], [2f37b8773], [a219ab393], [a54c15e47], [72d00b7fd], [8f97937dc], [73478613f]).
+- Lower the page size limit on pages where each row is expensive to render, like long DText or version diffs. The default of 1000 is too many ([24ea0921e], [802229065]).
+- Cap how much output a short input can expand into, like a DText message repeating the same embed hundreds of times, or a URL param with no length limit that's embedded in the page many times ([8d986e4f7]).
 - Rate limit every write endpoint, and any expensive or abusable read endpoint, with `rate_limit_for_<action>`, `rate_limit_for_read`, or `rate_limit_for_write` in the policy (see `ApplicationPolicy#rate_limit`). Don't rate limit heavily viewed pages, because checking a rate limit needs a database write ([86f88ac72]).
+- Rate limit anything that sends email by the recipient's account, not only by IP, so it can't be used to flood someone's inbox from many IPs. Keep the limit silent, so it doesn't reveal whether the address exists ([8c1ea77fb], [e74afa017]).
 - Don't allow anonymous users to use write endpoints, unless they need them, like for logging in.
 - Don't write quadratic algorithms or regexes on user text (diffs, DText, tag lists). Watch for nested quantifiers and backtracking, and test with very large or deeply nested input ([f3abe1db5], [3ebff34b4], [2f3d49112], [ee072e323], [4029dfd8e], [fc2242849], [20c42ce8d]).
 - Don't make an outbound request or query for each user-supplied item ([2f37b8773]).
 - Escape user input with `Regexp.escape` before building a regex from it ([3949338b9]).
 - Limit work done in Ruby yourself. The database statement timeout doesn't cover it.
-- Reject huge URLs or input before parsing them ([bda798258]).
+- Reject huge URLs or input before parsing them, or cut them to the longest length that could matter ([bda798258], [b13086a63]).
 
 ### SSRF and outgoing requests
 
@@ -419,16 +448,19 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 - Don't trust file extensions, sizes, or archive contents. Check that contents match the extension, and watch for nested archives, hardlinks, and path traversal ([e54fdf3a9], [5eb147058], [5ad06a403]).
 - Restrict programs to the expected file format. Format auto-detection can make them read other files (ffmpeg concat playlists) or formats we don't support (libarchive reading tar as zip) ([da6fa4b7e], [5eb147058]).
 - Limit the size of metadata, frames, and decompressed data ([245602601]).
+- Decode untrusted files with native libraries in a sandboxed helper script run by `ExternalCommand.run_script`, not in the Rails process. Validate the helper's output too, since a compromised helper can print anything ([cb48619bc], [0b2fd85fa]).
 
 ### Caching
 
 - Don't publicly cache responses (e.g. `expires_in ..., public: true`) if they depend on the current user, their level, or their settings (safe mode, blacklist, hidden posts). `skip_session_if_publicly_cached` only drops the session cookie, it doesn't make the content safe to share ([cb63d16a2], [a63662302]).
 - Include the user or their level in `Cache.get`/`Rails.cache` keys for data that depends on the user.
+- Don't publicly cache error pages, or fallback results from timeouts that depend on the user's level ([a49425e0c], [6f2e0a00d]).
 
 ### Secrets and logging
 
 - Don't log secrets or put them in exception messages. Filter new secrets in `config.filter_parameters`, and hide them from `inspect` ([790d585b6]).
 - Don't hardcode keys in config defaults ([e25c00ef5]).
+- Send API keys to other sites in headers or POST bodies, not in URL query strings, which end up in logs ([9fe61fd9e], [ea32361ed]).
 - Don't pass the Rails environment to child processes. `ExternalCommand` only passes `ExternalCommand::ENVIRONMENT` ([fb5fb418c]).
 - Restrict Unix sockets and files with sensitive data to the owner ([10a129f53]).
 
@@ -513,6 +545,7 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 [c2da8e485]: https://github.com/danbooru/danbooru/commit/c2da8e485
 [de6f386e9]: https://github.com/danbooru/danbooru/commit/de6f386e9
 [808fe0411]: https://github.com/danbooru/danbooru/commit/808fe0411
+[a0638daf1]: https://github.com/danbooru/danbooru/commit/a0638daf1
 [31b58e17b]: https://github.com/danbooru/danbooru/commit/31b58e17b
 [80e115b60]: https://github.com/danbooru/danbooru/commit/80e115b60
 [06e12973e]: https://github.com/danbooru/danbooru/commit/06e12973e
@@ -558,7 +591,6 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 [fde15d979]: https://github.com/danbooru/danbooru/commit/fde15d979
 [7a24d08bb]: https://github.com/danbooru/danbooru/commit/7a24d08bb
 [aeb5edaff]: https://github.com/danbooru/danbooru/commit/aeb5edaff
-[1a3ce57ff]: https://github.com/danbooru/danbooru/commit/1a3ce57ff
 [58e471948]: https://github.com/danbooru/danbooru/commit/58e471948
 [02ba1e37b]: https://github.com/danbooru/danbooru/commit/02ba1e37b
 [c3f834f79]: https://github.com/danbooru/danbooru/commit/c3f834f79
@@ -667,9 +699,6 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 [fc95d7585]: https://github.com/danbooru/danbooru/commit/fc95d7585
 [ea6d799de]: https://github.com/danbooru/danbooru/commit/ea6d799de
 [692355592]: https://github.com/danbooru/danbooru/commit/692355592
-[faedd95a7]: https://github.com/danbooru/danbooru/commit/faedd95a7
-[807d8577a]: https://github.com/danbooru/danbooru/commit/807d8577a
-[c1c1dfb43]: https://github.com/danbooru/danbooru/commit/c1c1dfb43
 [1682ad927]: https://github.com/danbooru/danbooru/commit/1682ad927
 [a889cc6a6]: https://github.com/danbooru/danbooru/commit/a889cc6a6
 [6d99f50ee]: https://github.com/danbooru/danbooru/commit/6d99f50ee
@@ -784,3 +813,41 @@ Security bugs we've fixed before. This list doesn't cover everything, only the m
 [fb5fb418c]: https://github.com/danbooru/danbooru/commit/fb5fb418c
 [10a129f53]: https://github.com/danbooru/danbooru/commit/10a129f53
 [5b61bbd1c]: https://github.com/danbooru/danbooru/commit/5b61bbd1c
+[63eb593ae]: https://github.com/danbooru/danbooru/commit/63eb593ae
+[2edaaf716]: https://github.com/danbooru/danbooru/commit/2edaaf716
+[f15c285dc]: https://github.com/danbooru/danbooru/commit/f15c285dc
+[4fb2894f0]: https://github.com/danbooru/danbooru/commit/4fb2894f0
+[5c0b3557d]: https://github.com/danbooru/danbooru/commit/5c0b3557d
+[a1ae09a18]: https://github.com/danbooru/danbooru/commit/a1ae09a18
+[28cdd0599]: https://github.com/danbooru/danbooru/commit/28cdd0599
+[975cf9609]: https://github.com/danbooru/danbooru/commit/975cf9609
+[1fd18d470]: https://github.com/danbooru/danbooru/commit/1fd18d470
+[a90b4fba2]: https://github.com/danbooru/danbooru/commit/a90b4fba2
+[bdd6ae766]: https://github.com/danbooru/danbooru/commit/bdd6ae766
+[e05d8d173]: https://github.com/danbooru/danbooru/commit/e05d8d173
+[551f29b7e]: https://github.com/danbooru/danbooru/commit/551f29b7e
+[954370be6]: https://github.com/danbooru/danbooru/commit/954370be6
+[03f1c9cb3]: https://github.com/danbooru/danbooru/commit/03f1c9cb3
+[9e86282f0]: https://github.com/danbooru/danbooru/commit/9e86282f0
+[bc4b7c4fb]: https://github.com/danbooru/danbooru/commit/bc4b7c4fb
+[fa39094da]: https://github.com/danbooru/danbooru/commit/fa39094da
+[92c5f9a64]: https://github.com/danbooru/danbooru/commit/92c5f9a64
+[1af7bf6fb]: https://github.com/danbooru/danbooru/commit/1af7bf6fb
+[c944ba4f8]: https://github.com/danbooru/danbooru/commit/c944ba4f8
+[90b2a2c4f]: https://github.com/danbooru/danbooru/commit/90b2a2c4f
+[111a24184]: https://github.com/danbooru/danbooru/commit/111a24184
+[b59586203]: https://github.com/danbooru/danbooru/commit/b59586203
+[8f97937dc]: https://github.com/danbooru/danbooru/commit/8f97937dc
+[73478613f]: https://github.com/danbooru/danbooru/commit/73478613f
+[24ea0921e]: https://github.com/danbooru/danbooru/commit/24ea0921e
+[802229065]: https://github.com/danbooru/danbooru/commit/802229065
+[8d986e4f7]: https://github.com/danbooru/danbooru/commit/8d986e4f7
+[8c1ea77fb]: https://github.com/danbooru/danbooru/commit/8c1ea77fb
+[e74afa017]: https://github.com/danbooru/danbooru/commit/e74afa017
+[b13086a63]: https://github.com/danbooru/danbooru/commit/b13086a63
+[cb48619bc]: https://github.com/danbooru/danbooru/commit/cb48619bc
+[0b2fd85fa]: https://github.com/danbooru/danbooru/commit/0b2fd85fa
+[a49425e0c]: https://github.com/danbooru/danbooru/commit/a49425e0c
+[6f2e0a00d]: https://github.com/danbooru/danbooru/commit/6f2e0a00d
+[9fe61fd9e]: https://github.com/danbooru/danbooru/commit/9fe61fd9e
+[ea32361ed]: https://github.com/danbooru/danbooru/commit/ea32361ed
