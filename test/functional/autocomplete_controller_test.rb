@@ -44,6 +44,17 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
         assert_equal(["azur_lane"], response.parsed_body.css("li").map { |html| html["data-autocomplete-value"] })
       end
 
+      should "include whether each tag is deprecated" do
+        create(:tag, name: "azur_lane", post_count: 2)
+        create(:tag, name: "azur_lane_(old)", post_count: 1, is_deprecated: true)
+
+        get autocomplete_index_path(search: { query: "azur", type: "tag_query" })
+
+        assert_response :success
+        assert_select "li[data-autocomplete-value='azur_lane'][data-autocomplete-is-deprecated='false']"
+        assert_select "li[data-autocomplete-value='azur_lane_(old)'][data-autocomplete-is-deprecated='true']"
+      end
+
       should "work for opensearch queries" do
         create(:tag, name: "azur_lane")
 
