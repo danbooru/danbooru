@@ -3,7 +3,7 @@ import UndoStack from './undo_stack';
 import Utility from './utility';
 
 export default class Autocomplete {
-  static VERSION = 3; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
+  static VERSION = 4; // This should be bumped whenever the /autocomplete API changes in order to invalid client caches.
   static MAX_RESULTS = 20;
 
   static TAG_SEPARATORS = ' \\t\\r\\n';
