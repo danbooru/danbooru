@@ -90,6 +90,18 @@ module Danbooru
       ["safebooru.donmai.us"]
     end
 
+    # Which beta features this site has, and whether they're on by default (see app/logical/beta_feature.rb). One of:
+    #
+    # * "testbooru": every beta feature, on by default.
+    # * "betabooru": features released to betabooru or production, on by default.
+    # * "production": only features released to production, off by default.
+    #
+    # Downstream boorus don't need to touch this setting unless they also have
+    # multiple production environments.
+    def release_stage
+      Rails.env.development? ? "testbooru" : "production"
+    end
+
     # The URL for your site, if you have a custom domain name for your site.
     #
     # For example, if your domain name is `booru.example.com`, then you would set this to "http://booru.example.com".

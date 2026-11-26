@@ -13,5 +13,14 @@ class RobotsControllerTest < ActionDispatch::IntegrationTest
       get robots_path(format: :text)
       assert_response :success
     end
+
+    should "not delete stale beta feature cookies, because the response is publicly cached" do
+      cookies[:beta_feature_removed_feature] = "true"
+      get robots_path(format: :text)
+
+      assert_response :success
+      assert_equal(true, response.cache_control[:public])
+      assert_no_match(/beta_feature/, response.headers["Set-Cookie"].to_s)
+    end
   end
 end

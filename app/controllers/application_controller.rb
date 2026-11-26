@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   before_action :redirect_if_name_invalid?
   after_action :verify_authorized, if: -> { Rails.env.local? }
   after_action :skip_session_if_publicly_cached
+  after_action :delete_stale_beta_feature_cookies
   after_action :reset_current_user
   layout "default"
 
@@ -326,6 +327,11 @@ class ApplicationController < ActionController::Base
       request.session_options[:skip] = true
       response.headers.delete("X-Rate-Limit")
     end
+  end
+
+  # Don't delete cookies in publicly cached responses, because the Set-Cookie header would be sent to other users.
+  def delete_stale_beta_feature_cookies
+    BetaFeature.delete_stale_cookies(cookies) unless response.cache_control[:public] == true
   end
 
   def set_variant
