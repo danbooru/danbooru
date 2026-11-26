@@ -8,16 +8,18 @@ class Source::Extractor::E621 < Source::Extractor
     if parsed_url.full_image_url.present?
       [parsed_url.full_image_url]
     elsif api_response.present?
-      url = api_response.dig(:file, :url)
+      url = api_response.dig(:files, :original, :url)
 
       if url.nil?
         # young -rating:s
-        md5 = api_response.dig(:file, :md5)
-        ext = api_response.dig(:file, :ext)
+        md5 = api_response.dig(:files, :meta, :md5)
+        ext = api_response.dig(:files, :meta, :ext)
         url = "https://static1.e621.net/data/#{md5[0..1]}/#{md5[2..3]}/#{md5}.#{ext}"
       end
 
       [url]
+    else
+      []
     end
   end
 
@@ -28,7 +30,7 @@ class Source::Extractor::E621 < Source::Extractor
   def tags
     return [] if api_response.blank?
 
-    tags = api_response[:tags].to_h.values.flatten + ["rating:#{api_response[:rating]}"]
+    tags = api_response[:tags].to_a + ["rating:#{api_response[:rating]}"]
     tags.map do |tag|
       url = "https://e621.net/posts?tags=#{Danbooru::URL.escape(tag)}"
       [tag, url]
@@ -64,19 +66,20 @@ class Source::Extractor::E621 < Source::Extractor
     sub_extractor&.username || uploader_linked_artists.pick(:name) || super
   end
 
-  # https://github.com/e621ng/e621ng/blob/59f5fda98f0877190bb5816f766c17bd6b9affb9/app/models/post.rb#L1710
+  # The artists tagged on the post that are linked to the uploader's account.
   memoize def uploader_linked_artists
-    api_response.dig(:tags, :artist).filter_map do |artist_name|
-      url = "https://e621.net/artists.json?search[name]=#{Danbooru::URL.escape(artist_name)}"
-      artist = request(url)&.first.to_h.with_indifferent_access
-      artist if artist[:linked_user_id] == api_response[:uploader_id]
-    end
+    return [] if api_response[:uploader_id].blank?
+
+    url = "https://e621.net/artists.json?search[linked_user_id]=#{Danbooru::URL.escape(api_response[:uploader_id].to_s)}"
+    artists = request(url).to_a.map { |artist| artist.to_h.with_indifferent_access }
+    artists.select { |artist| artist[:name].in?(api_response[:tags].to_a) }
   end
 
   memoize def api_response
     return {} if page_url.blank?
 
-    request(page_url)&.dig(:post) || {}
+    response = request(page_url)
+    response.is_a?(Hash) ? response : {}
   end
 
   def request(url, **)
@@ -86,7 +89,7 @@ class Source::Extractor::E621 < Source::Extractor
   def sub_extractor
     return nil if parent_extractor.present?
 
-    url = api_response[:sources].filter_map do |url|
+    url = api_response[:sources].to_a.filter_map do |url|
       url = Source::URL.parse(url)
       url if url&.page_url.present?
     end.first

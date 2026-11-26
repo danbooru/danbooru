@@ -155,6 +155,17 @@ module Source::Tests::Extractor
       )
     end
 
+    context "A deleted or nonexistent post" do
+      strategy_should_work(
+        "https://e621.net/posts/1",
+        deleted: true,
+        image_urls: [],
+        page_url: "https://e621.net/posts/1",
+        profile_urls: [],
+        tags: [],
+      )
+    end
+
     context "A post with a non-web source" do
       strategy_should_work(
         "https://e621.net/posts/5473882",
