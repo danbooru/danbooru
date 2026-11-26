@@ -370,14 +370,15 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "for a video whose previews fail for a reason other than the sandbox" do
+      context "for a video that fails after its files are stored for a reason other than the sandbox" do
         should "keep the stored files" do
-          MediaFile::Video.any_instance.stubs(:preview!).raises(FFmpeg::Error, "ffmpeg failed")
+          MediaMetadata.stubs(:new).raises(FFmpeg::Error, "ffprobe failed")
           create_upload!("test/files/mp4/test-300x300-av1.mp4", user: @user)
           media_asset = MediaAsset.last
 
           assert_equal("failed", media_asset.status)
-          assert_nothing_raised { Danbooru.config.storage_manager.open(media_asset.variant(:original).file_path) }
+          assert_equal("ffprobe failed", Upload.last.error)
+          assert(media_asset.variants.all? { File.exist?(File.join(Danbooru.config.storage_manager.base_dir, it.file_path)) })
         end
       end
 

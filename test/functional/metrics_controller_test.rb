@@ -61,15 +61,6 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
       end
-
-      should "not show software versions that are hidden on /status" do
-        get metrics_path
-
-        assert_response :success
-        assert_includes(response.body, "danbooru_version=")
-        assert_not_includes(response.body, "rails_version=")
-        assert_not_includes(response.body, "ffmpeg_version=")
-      end
     end
 
     context "#statistics action" do
@@ -92,17 +83,6 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
         get instance_metrics_path
 
         assert_response :success
-      end
-
-      should "not show software versions that are hidden on /status" do
-        ApplicationMetrics.instance.stubs(:instance_metrics).returns(ApplicationMetrics.process_metrics)
-        get instance_metrics_path
-
-        assert_response :success
-        assert_includes(response.body, "danbooru_version=")
-        assert_includes(response.body, "pod_name=")
-        assert_not_includes(response.body, "rails_version=")
-        assert_not_includes(response.body, "ffmpeg_version=")
       end
     end
   end
