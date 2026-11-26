@@ -75,6 +75,15 @@ class AutocompleteChromeTest < ChromeSystemTestCase
       assert_search_autocomplete_results([], "one two")
     end
 
+    should "show a message when there are no results" do
+      query = "no_result_#{SecureRandom.hex(8)}"
+
+      assert_search_autocomplete_results([], query)
+
+      visit favorite_groups_path
+      assert_autocomplete_results([], query, selector: "#search_name_contains")
+    end
+
     should "not complete tags after a space" do
       create(:tag, name: "bkub", post_count: 42)
       assert_search_autocomplete_results([], "bkub ")
@@ -145,6 +154,12 @@ class AutocompleteChromeTest < ChromeSystemTestCase
       assert_autocomplete_results(["@oneuser"], "@oneuser", selector: @selector)
       assert_autocomplete_results(["@oneuser"], "@ONEUSER", selector: @selector)
       assert_autocomplete_results(["@oneuser"], "one two @oneuser", selector: @selector)
+    end
+
+    should "show a message when there are no results" do
+      query = "@no_such_user_#{SecureRandom.hex(8)}"
+
+      assert_autocomplete_results([], query, selector: @selector)
     end
 
     should "work for searches" do

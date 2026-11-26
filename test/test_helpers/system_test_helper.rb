@@ -169,7 +169,12 @@ module SystemTestHelper
   def assert_autocomplete_results(expected_results, text, selector:)
     autocomplete(selector, text)
 
-    assert_selector "ul.ui-autocomplete li", count: expected_results.size
+    if expected_results.empty? && text.present? && text.rstrip == text
+      assert_selector "ul.ui-autocomplete li", text: "No results", exact_text: true, count: 1
+    else
+      assert_selector "ul.ui-autocomplete li", count: expected_results.size
+    end
+
     expected_results.each do |result|
       assert_selector "li[data-autocomplete-value='#{result}']", count: 1
     end
