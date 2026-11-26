@@ -100,8 +100,8 @@ class Source::Extractor::Boosty < Source::Extractor
 
   # Ranges are [style code, offset, length] in UTF-16 code units, so an emoji takes up two cells.
   def content_to_html(content)
-    text, _style, ranges = JSON.parse(content.presence || '[""]')
-    cells = text.each_char.flat_map { |char| [CGI.escapeHTML(char).gsub("\n", "<br>"), *("" if char.ord > 0xFFFF)] }
+    text, _style, ranges = content.to_s.parse_json
+    cells = text.to_s.each_char.flat_map { |char| [CGI.escapeHTML(char).gsub("\n", "<br>"), *("" if char.ord > 0xFFFF)] }
 
     # Wrap the first and last cell of each range in its tag.
     ranges.to_a.sort.each do |code, offset, length|

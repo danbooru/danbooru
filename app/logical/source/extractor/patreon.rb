@@ -165,9 +165,7 @@ class Source::Extractor::Patreon < Source::Extractor
   end
 
   def teaser
-    JSON.parse(post["teaser_text_json_string"].to_s)
-  rescue JSON::ParserError
-    {}
+    post["teaser_text_json_string"].to_s.parse_json || {}
   end
 
   def user

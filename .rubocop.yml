@@ -11,6 +11,10 @@ plugins:
   - rubocop-factory_bot
   - rubocop-performance
 
+# Custom cops for rules in CONTRIBUTING.md.
+require:
+  - ./lib/rubocop/cop/danbooru/extractor_helpers.rb
+
 AllCops:
   NewCops: enable
   ActiveSupportExtensionsEnabled: true
@@ -39,6 +43,13 @@ AllCops:
 
 Bundler/OrderedGems:
   Enabled: false
+
+Danbooru/ExtractorHelpers:
+  Enabled: true
+  Include:
+    - "app/logical/source/**/*.rb"
+  Exclude:
+    - "app/logical/source/extractor.rb"
 
 Layout/CaseIndentation:
   EnforcedStyle: end

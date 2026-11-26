@@ -116,10 +116,6 @@ class Source::Extractor::Postype < Source::Extractor
     script = page&.css("body script").to_a.find { |script| script.text =~ /self.__next_f.push\(.*post-content*/ }
     return nil unless script.present?
     script_text = script.text[/self.__next_f.push\(\[1,(".*")\]\)$/, 1]
-    begin
-      JSON.parse(script_text)
-    rescue StandardError
-      nil
-    end
+    script_text.to_s.parse_json
   end
 end

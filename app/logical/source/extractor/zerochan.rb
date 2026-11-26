@@ -15,7 +15,7 @@ module Source
 
       def tags
         api_response[:tags].to_a.map do |tag|
-          [tag, "https://www.zerochan.net/#{CGI.escape(tag)}"]
+          [tag, "https://www.zerochan.net/#{Danbooru::URL.escape(tag).tr(" ", "+")}"]
         end
       end
 
