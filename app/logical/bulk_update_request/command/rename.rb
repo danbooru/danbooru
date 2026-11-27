@@ -19,7 +19,9 @@ class BulkUpdateRequest::Command::Rename < BulkUpdateRequest::Command::CreateAli
     "rename [[#{@old_name}]] -> [[#{@new_name}]]"
   end
 
-  def validate(errors:, **)
+  def validate(context:, errors:, approver:)
+    validate_approver(context:, errors:, approver:)
+
     new_tag ||= Tag.new(name: @new_name)
 
     if old_tag.nil?

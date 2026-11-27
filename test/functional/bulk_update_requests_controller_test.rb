@@ -591,6 +591,67 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b", status: "active"))
         end
 
+        should "succeed when renaming a small tag to a large tag" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
+          create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
+
+          assert_approve_succeeds("rename char1a -> char1b", @mod)
+        end
+
+        should "fail when renaming a small tag with implications to a large tag" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
+          create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
+          create(:tag_implication, antecedent_name: "char1a", consequent_name: "copyright1")
+
+          assert_approve_fails("rename char1a -> char1b", @mod, "Can't approve rename [[char1a]] -> [[char1b]] ([[char1a]] has implications; requires Admin)")
+          assert_equal(false, TagImplication.exists?(antecedent_name: "char1b", consequent_name: "copyright1"))
+        end
+
+        should "fail when renaming a small banned artist to a large artist" do
+          create(:tag, name: "art1a", category: Tag.categories.artist, post_count: 10)
+          create(:tag, name: "art1b", category: Tag.categories.artist, post_count: 1000)
+          create(:artist, name: "art1a", is_banned: true)
+          artist = create(:artist, name: "art1b")
+
+          assert_approve_fails("rename art1a -> art1b", @mod, "Can't approve rename [[art1a]] -> [[art1b]] ([[art1a]] is a banned artist; requires Admin)")
+          assert_equal(false, artist.reload.is_banned?)
+        end
+
+        should "fail when renaming a small tag with a large cosplay tag to a large tag" do
+          create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
+          create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
+          create(:tag, name: "char1a_(cosplay)", category: Tag.categories.character, post_count: 1000)
+
+          assert_approve_fails("rename char1a -> char1b", @mod, "Can't approve rename [[char1a]] -> [[char1b]] ([[char1a_(cosplay)]] is too large; requires Admin)")
+        end
+
+        should "fail when renaming a small artist with a large style tag to a large artist" do
+          create(:tag, name: "art1a", category: Tag.categories.artist, post_count: 10)
+          create(:tag, name: "art1b", category: Tag.categories.artist, post_count: 1000)
+          create(:tag, name: "art1a_(style)", category: Tag.categories.general, post_count: 1000)
+
+          assert_approve_fails("rename art1a -> art1b", @mod, "Can't approve rename [[art1a]] -> [[art1b]] ([[art1a_(style)]] is too large; requires Admin)")
+        end
+
+        should "fail when renaming a small general tag with a large style tag to a large artist" do
+          create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
+          create(:tag, name: "art1b", category: Tag.categories.artist, post_count: 1000)
+          create(:tag, name: "gen1a_(style)", category: Tag.categories.general, post_count: 1000)
+
+          assert_approve_fails("rename gen1a -> art1b", @mod, "Can't approve rename [[gen1a]] -> [[art1b]] ([[gen1a_(style)]] is too large; requires Admin)")
+        end
+
+        should "fail when an earlier line adds an implication to the small tag before renaming it to a large tag" do
+          create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
+          create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
+          create(:tag, name: "gen1c", category: Tag.categories.general, post_count: 5)
+          create(:wiki_page, title: "gen1a")
+          create(:wiki_page, title: "gen1c")
+
+          assert_approve_fails("imply gen1a -> gen1c\nrename gen1a -> gen1b", @mod, "Can't approve rename [[gen1a]] -> [[gen1b]] ([[gen1a]] has implications; requires Admin)")
+          assert_equal(false, TagImplication.exists?(antecedent_name: "gen1b", consequent_name: "gen1c"))
+        end
+
         should "succeed when deprecating an empty tag" do
           create(:tag, name: "no_tag", post_count: 0)
           create(:wiki_page, title: "no_tag", body: "asd")

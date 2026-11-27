@@ -33,9 +33,13 @@ class BulkUpdateRequest::Command::CreateAlias < BulkUpdateRequest::Command
       errors.add(:base, "Can't create alias [[#{tag_alias.antecedent_name}]] -> [[#{tag_alias.consequent_name}]] (#{tag_alias.errors.full_messages.join("; ")})")
     end
 
-    # Aliasing also moves the old tag's implications and *_(cosplay) and *_(style) tags to the new tag, and copies the
-    # old artist's ban to the new artist (see TagMover). Only admins can do this to big tags. Checked here instead of in
-    # `approval_level` because it needs extra queries.
+    validate_approver(context:, errors:, approver:)
+  end
+
+  # Aliasing and renaming also move the old tag's implications and *_(cosplay) and *_(style) tags to the new tag, and
+  # copy the old artist's ban to the new artist (see TagMover). Only admins can do this to big tags. Checked here instead
+  # of in `approval_level` because it needs extra queries.
+  def validate_approver(context:, errors:, approver:)
     return unless context == :approval && !approver.is_admin? && old_tag.present? && new_tag.present? && !new_tag.empty? && !new_tag.is_small_tag?
 
     # A general old tag becomes an artist tag when it's aliased to an artist tag (see TagMover#move_tag_category!).
