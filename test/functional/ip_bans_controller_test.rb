@@ -23,16 +23,12 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
         assert_response 422
       end
 
-      should "create a new ip ban" do
+      should "create a new ip ban and log a mod action" do
         assert_difference("IpBan.count", 1) do
           post_auth ip_bans_path, @admin, params: { ip_ban: { ip_addr: "1.2.3.4", reason: "xyz" }}
 
           assert_response :redirect
         end
-      end
-
-      should "log a mod action" do
-        post_auth ip_bans_path, @admin, params: { ip_ban: { ip_addr: "1.2.3.4", reason: "xyz" }}
 
         assert_equal("ip_ban_create", ModAction.last&.category)
         assert_match(/created ip ban for 1\.2\.3\.4/, ModAction.last.description)

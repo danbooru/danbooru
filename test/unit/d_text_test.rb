@@ -236,7 +236,7 @@ class DTextTest < ActiveSupport::TestCase
       end
 
       should "not embed the old asset of a replacement on a post the user can't see" do
-        replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        replacement = create(:post_replacement)
         replacement.post.update!(is_banned: true)
         old_asset = replacement.old_media_asset
 

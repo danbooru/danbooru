@@ -265,27 +265,28 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "for a file larger than the file size limit" do
-        setup do
-          skip "flaky test"
-          Danbooru.config.stubs(:max_file_size).returns(1.kilobyte)
-        end
-
         should "fail for a direct file upload" do
-          create_upload!("test/files/jpg/test.jpg", user: @user)
+          stub_const(MediaAsset, :MAX_FILE_SIZE, 1.kilobyte) do
+            create_upload!("test/files/jpg/test.jpg", user: @user)
+          end
 
           assert_response 201
           assert_match("File size too large", Upload.last.error)
         end
 
         should "fail for a source upload with a Content-Length header" do
-          create_upload!("https://nghttp2.org/httpbin/bytes/2000", user: @user)
+          stub_const(MediaAsset, :MAX_FILE_SIZE, 1.kilobyte) do
+            create_upload!("https://httpbingo.org/bytes/2000", user: @user)
+          end
 
           assert_response 201
           assert_match("File size too large", Upload.last.error)
         end
 
         should "fail for a source upload without a Content-Length header" do
-          create_upload!("https://nghttp2.org/httpbin/stream-bytes/2000", user: @user)
+          stub_const(MediaAsset, :MAX_FILE_SIZE, 1.kilobyte) do
+            create_upload!("https://httpbingo.org/stream-bytes/2000", user: @user)
+          end
 
           assert_response 201
           assert_match("File size too large", Upload.last.error)
@@ -531,16 +532,19 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a video longer than the video length limit" do
         should "fail for a regular user" do
-          create_upload!("https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm", user: @user)
+          stub_const(MediaAsset, :MAX_VIDEO_DURATION, 1) do
+            create_upload!("test/files/mp4/test-300x300.mp4", user: @user)
+          end
 
           assert_response 201
-          assert_match("Duration must be less than", Upload.last.error)
+          assert_equal("error", Upload.last.status)
+          assert_equal("Duration must be less than 1 seconds", Upload.last.error)
         end
-      end
 
-      context "for a video longer than the video length limit" do
         should "work for an admin" do
-          create_upload!("https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm", user: create(:admin_user))
+          stub_const(MediaAsset, :MAX_VIDEO_DURATION, 1) do
+            create_upload!("test/files/mp4/test-300x300.mp4", user: create(:admin_user))
+          end
 
           assert_response 201
           assert_equal("completed", Upload.last.status)
@@ -681,6 +685,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a source with too many images" do
         should "fail" do
+          Source::Extractor::Null.any_instance.stubs(:response).returns(nil)
           Source::Extractor::Null.any_instance.stubs(:image_urls).returns(%w[https://example.com/1.jpg https://example.com/2.jpg https://example.com/3.jpg])
 
           stub_const(Upload, :MAX_IMAGES_PER_SOURCE_UPLOAD, 2) do
@@ -697,6 +702,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       context "for a source that would put the user over the queued images limit" do
         should "fail" do
           create(:upload_media_asset, upload: create(:upload, uploader: @user), status: "pending")
+          Source::Extractor::Null.any_instance.stubs(:response).returns(nil)
           Source::Extractor::Null.any_instance.stubs(:image_urls).returns(%w[https://example.com/1.jpg https://example.com/2.jpg])
 
           stub_const(Upload, :MAX_QUEUED_ASSETS, 2) do

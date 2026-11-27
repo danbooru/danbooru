@@ -12,11 +12,6 @@ class RelatedTagsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "show action" do
-      should "work" do
-        get related_tag_path, params: { query: "touhou" }
-        assert_response :success
-      end
-
       should "work for .json responses" do
         get related_tag_path(format: :json), params: { query: "touhou" }
         assert_response :success

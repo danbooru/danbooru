@@ -3,7 +3,7 @@ require "test_helper"
 class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
   context "The user upgrades controller" do
     setup do
-      skip unless UserUpgrade.enabled?
+      Danbooru.config.stubs(:user_upgrades_enabled?).returns(true)
     end
 
     context "new action" do
@@ -149,7 +149,6 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
     context "receipt action" do
       setup do
         @user_upgrade = create(:gift_gold_upgrade, status: "complete")
-        @user_upgrade.create_checkout!
       end
 
       should "not allow unauthorized users to view the receipt" do
@@ -189,7 +188,6 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
     context "payment action" do
       setup do
         @user_upgrade = create(:gift_gold_upgrade, status: "complete")
-        @user_upgrade.create_checkout!
       end
 
       should "not allow unauthorized users to view the receipt" do
@@ -239,7 +237,6 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow unauthorized users to create a refund" do
         @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
-        @user_upgrade.create_checkout!
 
         put_auth refund_user_upgrade_path(@user_upgrade), @user_upgrade.purchaser, xhr: true
 

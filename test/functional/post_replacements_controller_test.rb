@@ -374,8 +374,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         @admin = create(:admin_user)
         @mod = create(:moderator_user)
 
-        @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"), replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
-        @admin_replacement = create(:post_replacement, creator: @admin, replacement_file: Rack::Test::UploadedFile.new("test/files/jpg/test.jpg"))
+        @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"))
+        @admin_replacement = create(:post_replacement, creator: @admin)
       end
 
       should "render" do
@@ -390,7 +390,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a replacement on a post the user can't see" do
         setup do
-          @hidden_replacement = create(:post_replacement, creator: @mod, replacement_file: Rack::Test::UploadedFile.new("test/files/gif/test-static-32x32.gif"))
+          @hidden_replacement = create(:post_replacement, creator: @mod)
           @hidden_replacement.post.update!(is_banned: true)
         end
 

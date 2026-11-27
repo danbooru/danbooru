@@ -163,7 +163,7 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not show the image for the old asset of a replacement on a post not visible to the current user" do
-        @replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        @replacement = create(:post_replacement)
         @replacement.post.update!(is_banned: true)
         @old_asset = @replacement.old_media_asset
 
@@ -190,7 +190,7 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "show the image for the old asset of a replacement to users who can see the post" do
-        @replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        @replacement = create(:post_replacement)
         @replacement.post.update!(is_banned: true)
         @old_asset = @replacement.old_media_asset
 
@@ -201,7 +201,7 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "show the image for the old asset of a replacement on a visible post" do
-        @replacement = create(:post_replacement, replacement_file: Rack::Test::UploadedFile.new("test/files/png/test.png"))
+        @replacement = create(:post_replacement)
         @old_asset = @replacement.old_media_asset
 
         get media_asset_path(@old_asset), as: :json
