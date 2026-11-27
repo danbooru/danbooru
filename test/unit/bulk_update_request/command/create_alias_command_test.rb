@@ -59,12 +59,11 @@ class CreateAliasCommandTest < ActiveSupport::TestCase
       should "create an alias" do
         create(:wiki_page, title: "foo")
         create(:artist, name: "foo")
-        @bur = create_bur!("create alias foo -> bar", @admin)
+        create_bur!("create alias foo -> bar", @admin)
 
         @alias = TagAlias.find_by(antecedent_name: "foo", consequent_name: "bar")
         assert_equal(true, @alias.present?)
         assert_equal(true, @alias.is_active?)
-        assert_equal("approved", @bur.reload.status)
       end
 
       should "rename the aliased tag's artist entry and wiki page" do

@@ -64,10 +64,9 @@ class RenameCommandTest < ActiveSupport::TestCase
         create(:artist, name: "foo")
         create(:wiki_page, title: "foo", body: "[[foo]]")
         @post = create(:post, tag_string: "foo blah")
-        @bur = create_bur!("rename foo -> bar", @admin)
+        create_bur!("rename foo -> bar", @admin)
 
         assert_equal("bar blah", @post.reload.tag_string)
-        assert_equal("approved", @bur.reload.status)
         assert_equal(User.system, @post.versions.last.updater)
       end
 

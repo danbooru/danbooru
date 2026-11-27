@@ -17,15 +17,18 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     end
 
     context "when approving a BUR" do
-      context "that the approver doesn't have the level to approve" do
-        should "not change anything in the database or the cache" do
+      context "with small and large tags" do
+        setup do
           @mod = create(:mod_user)
           create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
           create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
           create(:tag, name: "gen1c", category: Tag.categories.general, post_count: 5)
           create(:wiki_page, title: "gen1a")
           create(:wiki_page, title: "gen1c")
-          @bur = create(:bulk_update_request, script: "imply gen1a -> gen1c\ncategory gen1a -> character\nalias gen1a -> gen1b")
+        end
+
+        should "not change anything in the database or the cache if the approver doesn't have the level to approve it" do
+          bur = create(:bulk_update_request, script: "imply gen1a -> gen1c\ncategory gen1a -> character\nalias gen1a -> gen1b")
 
           table_counts = -> { ApplicationRecord.connection.tables.index_with { |table| ApplicationRecord.connection.select_value("SELECT COUNT(*) FROM #{table}") } }
           rows = -> { [Tag.order(:id).map(&:attributes), BulkUpdateRequest.order(:id).map(&:attributes), ForumTopic.order(:id).map(&:attributes), ForumPost.order(:id).map(&:attributes)] }
@@ -34,50 +37,40 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           # Simulated lines are rolled back in the database, but cache writes aren't (see 9ff162afe).
           %i[write write_multi delete delete_multi increment decrement].each { |method| Rails.cache.expects(method).never }
-          assert_no_enqueued_jobs { @bur.approve!(@mod) }
+          assert_no_enqueued_jobs { assert_cannot_approve_bur(bur, @mod, "Can't approve create alias [[gen1a]] -> [[gen1b]] (requires Admin)") }
 
-          assert_includes(@bur.errors.full_messages, "Can't approve create alias [[gen1a]] -> [[gen1b]] (requires Admin)")
           assert_equal(counts_before, table_counts.call)
           assert_equal(rows_before, rows.call)
         end
-      end
 
-      context "while another BUR with the same tags is still processing" do
-        setup do
-          @mod = create(:mod_user)
-          create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
-          create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
-          create(:tag, name: "gen1c", category: Tag.categories.general, post_count: 5)
-          create(:wiki_page, title: "gen1a")
-          create(:wiki_page, title: "gen1c")
-          @imply = create(:bulk_update_request, script: "imply gen1a -> gen1c")
-          @alias = create(:bulk_update_request, script: "alias gen1a -> gen1b")
-          @imply.approve!(@mod)
-        end
+        context "while another BUR with the same tags is still processing" do
+          setup do
+            @alias = create(:bulk_update_request, script: "alias gen1a -> gen1b")
+            @imply = assert_can_approve_bur("imply gen1a -> gen1c", @mod)
+          end
 
-        should "not let a mod approve it" do
-          @alias.approve!(@mod)
+          should "not let a mod approve it" do
+            @alias.approve!(@mod)
 
-          assert_includes(@alias.errors.full_messages, "Can't approve this request while BUR ##{@imply.id} is still being processed")
-          assert_equal("pending", @alias.reload.status)
+            assert_includes(@alias.errors.full_messages, "Can't approve this request while BUR ##{@imply.id} is still being processed")
+            assert_equal("pending", @alias.reload.status)
 
-          perform_enqueued_jobs
-          assert_equal(false, TagImplication.active.exists?(antecedent_name: "gen1b", consequent_name: "gen1c"))
-        end
+            perform_enqueued_jobs
+            assert_equal(false, TagImplication.active.exists?(antecedent_name: "gen1b", consequent_name: "gen1c"))
+          end
 
-        should "not let an admin approve it" do
-          @alias.approve!(create(:admin_user))
+          should "not let an admin approve it" do
+            @alias.approve!(@admin)
 
-          assert_includes(@alias.errors.full_messages, "Can't approve this request while BUR ##{@imply.id} is still being processed")
-          assert_equal("pending", @alias.reload.status)
-        end
+            assert_includes(@alias.errors.full_messages, "Can't approve this request while BUR ##{@imply.id} is still being processed")
+            assert_equal("pending", @alias.reload.status)
+          end
 
-        should "let a mod approve it once the other BUR is processed" do
-          perform_enqueued_jobs
-          @alias.approve!(@mod)
-
-          assert_includes(@alias.errors.full_messages, "Can't approve create alias [[gen1a]] -> [[gen1b]] ([[gen1a]] has implications; requires Admin)")
-          assert_not_includes(@alias.errors.full_messages, "Can't approve this request while BUR ##{@imply.id} is still being processed")
+          should "let a mod approve it once the other BUR is processed" do
+            perform_enqueued_jobs
+            assert_cannot_approve_bur(@alias, @mod, "Can't approve create alias [[gen1a]] -> [[gen1b]] ([[gen1a]] has implications; requires Admin)")
+            assert_not_includes(@alias.errors.full_messages, "Can't approve this request while BUR ##{@imply.id} is still being processed")
+          end
         end
       end
 
@@ -88,8 +81,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
 
         should "not allow approving a BUR that searches a pool another BUR searches" do
-          processing = create(:bulk_update_request, script: "update pool:cute_pool -> foo")
-          processing.approve!(@admin)
+          processing = assert_can_approve_bur("update pool:cute_pool -> foo", @admin)
           bur = create(:bulk_update_request, script: "convert pool:#{@pool.id} -> cute")
 
           bur.approve!(@admin)
@@ -99,8 +91,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
 
         should "not allow approving a BUR that searches a pool another BUR adds posts to" do
-          processing = create(:bulk_update_request, script: "update bar -> pool:cute_pool")
-          processing.approve!(@admin)
+          processing = assert_can_approve_bur("update bar -> pool:cute_pool", @admin)
           bur = create(:bulk_update_request, script: "update pool:cute_pool -> foo")
 
           bur.approve!(@admin)
@@ -110,25 +101,18 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
 
         should "allow approving a BUR that uses a different pool" do
-          processing = create(:bulk_update_request, script: "update pool:other_pool -> foo")
-          processing.approve!(@admin)
-          bur = create(:bulk_update_request, script: "update pool:cute_pool -> baz")
-
-          bur.approve!(@admin)
-
-          assert_equal([], bur.errors.full_messages)
-          assert_equal("processing", bur.reload.status)
+          assert_can_approve_bur("update pool:other_pool -> foo", @admin)
+          assert_can_approve_bur("update pool:cute_pool -> baz", @admin)
         end
       end
 
       context "that has both implications and unimplications" do
         should "process them sequentially" do
-          @bur = create_bur!("imply foo -> bar\nunimply foo -> bar", @admin)
+          create_bur!("imply foo -> bar\nunimply foo -> bar", @admin)
 
           @ti = TagImplication.find_by(antecedent_name: "foo", consequent_name: "bar")
           assert_equal(true, @ti.present?)
           assert_equal(true, @ti.is_deleted?)
-          assert_equal("approved", @bur.reload.status)
         end
 
         should "allow the flattening of an implication tree, ie (a -> b -> c) to (a -> c)" do
@@ -160,22 +144,20 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @p1 = create(:post, tag_string: "maid_dress")
           @p2 = create(:post, tag_string: "maid")
 
-          @bur = create_bur!("mass update maid_dress -> maid dress\nalias maid_dress -> maid", @admin)
+          create_bur!("mass update maid_dress -> maid dress\nalias maid_dress -> maid", @admin)
 
           assert_equal("dress maid", @p1.reload.tag_string)
           assert_equal("maid", @p2.reload.tag_string)
-          assert_equal("approved", @bur.reload.status)
         end
       end
 
       context "that reverses an alias by removing and recreating it" do
         should "not fail with an alias conflict" do
           @ta = create(:tag_alias, antecedent_name: "rabbit", consequent_name: "bunny")
-          @bur = create_bur!("unalias rabbit -> bunny\nalias bunny -> rabbit", @admin)
+          create_bur!("unalias rabbit -> bunny\nalias bunny -> rabbit", @admin)
 
           assert_equal("deleted", @ta.reload.status)
           assert_equal("active", TagAlias.find_by(antecedent_name: "bunny", consequent_name: "rabbit").status)
-          assert_equal("approved", @bur.reload.status)
         end
       end
     end
@@ -235,9 +217,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           post = create(:post, tag_string: "bar")
           pool = create(:pool, name: "cute_pool", post_ids: [post.id])
 
-          bur = create_bur!("update pool:cute_pool -> foo\nconvert pool:#{pool.id} -> cute", @admin)
+          create_bur!("update pool:cute_pool -> foo\nconvert pool:#{pool.id} -> cute", @admin)
 
-          assert_equal("approved", bur.reload.status)
           assert_equal("bar cute foo", post.reload.tag_string)
           assert_equal(true, pool.reload.is_deleted?)
         end
@@ -446,24 +427,19 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     end
 
     context "that doesn't belong to a forum post" do
+      setup do
+        @bur = create(:bulk_update_request)
+        @bur.update!(forum_post: nil)
+      end
+
       should "not fail to be rejected" do
-        bur = create(:bulk_update_request)
-        bur.update!(forum_post: nil)
+        @bur.reject!
 
-        assert_nil(bur.forum_post)
-        bur.reject!
-
-        assert_equal("rejected", bur.status)
+        assert_equal("rejected", @bur.status)
       end
 
       should "not fail to be approved" do
-        bur = create(:bulk_update_request)
-        bur.update!(forum_post: nil)
-
-        assert_nil(bur.forum_post)
-        bur.approve!(create(:admin_user))
-
-        assert_equal("processing", bur.status)
+        assert_can_approve_bur(@bur, @admin)
       end
     end
 
@@ -637,9 +613,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal(true, Pundit.policy!(@mod, bur).approve?)
 
-          bur.approve!(@mod)
-          assert_includes(bur.errors.full_messages, "Can't approve create alias [[#{@character_tag1.name}]] -> [[large_character]] ([[#{@character_tag1.name}_(cosplay)]] is too large; requires Admin)")
-          assert_equal("pending", bur.reload.status)
+          assert_cannot_approve_bur(bur, @mod, "Can't approve create alias [[#{@character_tag1.name}]] -> [[large_character]] ([[#{@character_tag1.name}_(cosplay)]] is too large; requires Admin)")
         end
       end
     end

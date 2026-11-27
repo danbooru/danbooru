@@ -12,10 +12,12 @@ class ConvertCommandTest < ActiveSupport::TestCase
 
   context "the convert command" do
     context "on creation" do
-      should "refuse to convert to a pool or favgroup" do
+      setup do
         @pool = create(:pool, name: "cute_pool", description: "asd")
         @favgroup = create(:favorite_group)
+      end
 
+      should "refuse to convert to a pool or favgroup" do
         assert_invalid_bur(
           script: "convert cute -> pool:cute_pool",
           errors: ["Can't convert {{cute}} -> {{pool:cute_pool}} (must convert a pool or favgroup to a tag)"],
@@ -51,8 +53,6 @@ class ConvertCommandTest < ActiveSupport::TestCase
       end
 
       should "refuse to convert wildcard pools" do
-        create(:pool, name: "cute_pool")
-
         assert_invalid_bur(
           script: "convert pool:cute_* -> cute",
           errors: ["Can't convert {{pool:cute_*}} -> [[cute]] ({{pool:cute_*}} does not exist)"],
@@ -82,9 +82,6 @@ class ConvertCommandTest < ActiveSupport::TestCase
       end
 
       should "allow converting to a tag with a category prefix" do
-        @pool = create(:pool, name: "cute_pool", description: "asd")
-        @favgroup = create(:favorite_group)
-
         pool_bur = create(:bulk_update_request, script: "convert pool:cute_pool -> COPY:Cute_Series")
         favgroup_bur = create(:bulk_update_request, script: "convert favgroup:#{@favgroup.id} -> meta:cute_tag")
 
@@ -95,8 +92,6 @@ class ConvertCommandTest < ActiveSupport::TestCase
       end
 
       should "refuse malformed or invalid tags with a category prefix" do
-        @pool = create(:pool, name: "cute_pool", description: "asd")
-        @favgroup = create(:favorite_group)
         create(:tag, name: "old_tag", is_deprecated: true)
         create(:artist, name: "some_artist")
 
@@ -164,242 +159,184 @@ class ConvertCommandTest < ActiveSupport::TestCase
       end
 
       should "refuse to convert to an invalid or deprecated tag" do
-        favgroup = create(:favorite_group)
         create(:tag, name: "old_tag", is_deprecated: true)
 
         assert_invalid_bur(
-          script: "convert favgroup:#{favgroup.id} -> foo,bar",
-          errors: ["Can't convert {{favgroup:#{favgroup.id}}} -> [[foo,bar]] ('foo,bar' cannot contain commas (','))"],
+          script: "convert favgroup:#{@favgroup.id} -> foo,bar",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[foo,bar]] ('foo,bar' cannot contain commas (','))"],
         )
         assert_invalid_bur(
-          script: "convert favgroup:#{favgroup.id} -> old_tag",
-          errors: ["Can't convert {{favgroup:#{favgroup.id}}} -> [[old_tag]] ([[old_tag]] is deprecated)"],
+          script: "convert favgroup:#{@favgroup.id} -> old_tag",
+          errors: ["Can't convert {{favgroup:#{@favgroup.id}}} -> [[old_tag]] ([[old_tag]] is deprecated)"],
         )
       end
     end
 
     context "on approval" do
-      should "convert a pool to a new tag" do
-        description = "foo [[aaa]] bar"
-        @pool = create(:pool, name: "cute_pool", description: description)
-        @post = create(:post, tag_string: "bar pool:cute_pool")
-
-        @bur = create_bur!("convert pool:cute_pool -> cute", @admin)
-
-        wiki = WikiPage.find_by_title("cute")
-        assert_equal(true, @pool.reload.is_deleted?)
-        assert_equal(description, wiki.body)
-        assert_equal("bar cute", @post.reload.tag_string)
-        assert_equal("This pool has been moved to [[cute]].", @pool.description)
-      end
-
-      should "convert a pool to an existing tag" do
-        description = "foo [[aaa]] bar"
-        @pool = create(:pool, name: "cute_pool", description: description)
-        @post = create(:post, tag_string: "bar pool:cute_pool")
-        @wiki = create(:wiki_page, title: "cute", body: "Exists.")
-
-        @bur = create_bur!("convert pool:cute_pool -> cute", @admin)
-
-        assert_equal(true, @pool.reload.is_deleted?)
-        assert_equal("Exists.", @wiki.body)
-        assert_equal("bar cute", @post.reload.tag_string)
-        assert_equal("This pool has been moved to [[cute]].", @pool.description)
-      end
-
-      should "convert a pool to a deleted tag and undelete it" do
-        description = "foo [[aaa]] bar"
-        @pool = create(:pool, name: "cute_pool", description: description)
-        @post = create(:post, tag_string: "bar pool:cute_pool")
-        @wiki = create(:wiki_page, title: "cute", body: "", is_deleted: true)
-
-        @bur = create_bur!("convert pool:cute_pool -> cute", @admin)
-
-        assert_equal(true, @pool.reload.is_deleted?)
-        assert_equal(false, @wiki.reload.is_deleted?)
-        assert_equal(description, @wiki.body)
-        assert_equal("bar cute", @post.reload.tag_string)
-        assert_equal("This pool has been moved to [[cute]].", @pool.description)
-      end
-
-      should "convert a pool to a new tag with a category prefix" do
-        description = "foo [[aaa]] bar"
-        @pool = create(:pool, name: "cute_pool", description: description)
-        @post = create(:post, tag_string: "bar pool:cute_pool")
-
-        @bur = create_bur!("convert pool:cute_pool -> meta:cute", @admin)
-
-        wiki = WikiPage.find_by_title("cute")
-        assert_equal(true, @pool.reload.is_deleted?)
-        assert_equal(description, wiki.body)
-        assert_nil(WikiPage.find_by_title("meta:cute"))
-        assert_equal("bar cute", @post.reload.tag_string)
-        assert_equal(true, Tag.find_by_name("cute").meta?)
-        assert_equal("This pool has been moved to [[cute]].", @pool.description)
-      end
-
-      should "convert a pool to an existing tag and change its category" do
-        @pool = create(:pool, name: "cute_pool", description: "asd")
-        @post = create(:post, tag_string: "bar pool:cute_pool")
-        @tag = create(:tag, name: "cute", category: Tag.categories.general)
-
-        @bur = create_bur!("convert pool:cute_pool -> meta:cute", @admin)
-
-        assert_equal(true, @pool.reload.is_deleted?)
-        assert_equal("bar cute", @post.reload.tag_string)
-        assert_equal(true, @tag.reload.meta?)
-        assert_equal("This pool has been moved to [[cute]].", @pool.description)
-      end
-
-      should "allow moderators to convert a favgroup to a tag with a category prefix" do
-        mod = create(:mod_user)
-        post = create(:post, tag_string: "bar")
-        favgroup = create(:favorite_group, post_ids: [post.id])
-
-        create_bur!("convert favgroup:#{favgroup.id} -> meta:cute", mod)
-
-        assert_equal("bar cute", post.reload.tag_string)
-        assert_equal(true, Tag.find_by_name("cute").meta?)
-        assert_equal([post.id], favgroup.reload.post_ids)
-      end
-
-      should "not allow moderators to change a large tag's category via favgroup conversion" do
-        mod = create(:mod_user)
-        post = create(:post, tag_string: "bar")
-        favgroup = create(:favorite_group, post_ids: [post.id])
-        large_tag = create(:tag, name: "large_tag", category: Tag.categories.general, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
-
-        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> meta:large_tag")
-        bur.approve!(mod)
-        assert_includes(bur.errors.full_messages, "Can't approve convert {{favgroup:#{favgroup.id}}} -> [[large_tag|meta:large_tag]] (requires Admin)")
-        assert_equal("pending", bur.reload.status)
-        assert_equal(true, large_tag.reload.general?)
-
-        bur.approve!(@admin)
-        assert_equal("processing", bur.reload.status)
-      end
-
-      should "allow moderators to convert a favgroup to a large tag already in that category" do
-        mod = create(:mod_user)
-        post = create(:post, tag_string: "bar")
-        favgroup = create(:favorite_group, post_ids: [post.id])
-        create(:tag, name: "large_meta", category: Tag.categories.meta, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
-
-        create_bur!("convert favgroup:#{favgroup.id} -> meta:large_meta", mod)
-
-        assert_equal("bar large_meta", post.reload.tag_string)
-      end
-
-      should "not allow moderators to alias a newly categorized tag from a favgroup conversion to a large general tag" do
-        mod = create(:mod_user)
-        post = create(:post, tag_string: "bar")
-        favgroup = create(:favorite_group, post_ids: [post.id])
-        large_tag = create(:tag, name: "large_general", category: Tag.categories.general, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
-
-        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> char:new_char\nalias new_char -> large_general")
-
-        %i[write write_multi delete delete_multi increment decrement].each { |method| Rails.cache.expects(method).never }
-        assert_no_enqueued_jobs { bur.approve!(mod) }
-
-        assert_includes(bur.errors.full_messages, "Can't approve create alias [[new_char]] -> [[large_general]] (requires Admin)")
-        assert_equal("pending", bur.reload.status)
-        assert_equal(true, large_tag.reload.general?)
-        assert_nil(Tag.find_by_name("new_char"))
-      end
-
-      should "allow moderators to convert a favgroup to a tag" do
-        mod = create(:mod_user)
-        post = create(:post, tag_string: "bar")
-        favgroup = create(:favorite_group, post_ids: [post.id])
-
-        create_bur!("convert favgroup:#{favgroup.id} -> cute", mod)
-
-        assert_equal("bar cute", post.reload.tag_string)
-        assert_equal([post.id], favgroup.reload.post_ids)
-      end
-
-      should "not allow moderators to approve pool conversions" do
-        mod = create(:mod_user)
-        create(:pool, name: "cute_pool", description: "asd")
-
-        bur = create(:bulk_update_request, script: "convert pool:cute_pool -> cute")
-        bur.approve!(mod)
-        assert_includes(bur.errors.full_messages, "Can't approve convert {{pool:cute_pool}} -> [[cute]] (requires Admin)")
-        assert_equal("pending", bur.reload.status)
-      end
-
-      should "not allow moderators to approve large favgroup conversions" do
-        mod = create(:mod_user)
-        favgroup = build(:favorite_group, post_ids: (1..(Tag::SMALL_TAG_THRESHOLD + 1)).to_a)
-        favgroup.save!(validate: false)
-
-        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> cute")
-
-        bur.approve!(mod)
-        assert_includes(bur.errors.full_messages, "Can't approve convert {{favgroup:#{favgroup.id}}} -> [[cute]] ({{favgroup:#{favgroup.id}}} is too large; requires Admin)")
-        assert_equal("pending", bur.reload.status)
-
-        bur.approve!(@admin)
-        assert_equal("processing", bur.reload.status)
-      end
-
-      should "fail if the favgroup was modified after approval" do
-        mod = create(:mod_user)
-        post1 = create(:post, tag_string: "bar")
-        post2 = create(:post, tag_string: "bar")
-        favgroup = create(:favorite_group, post_ids: [post1.id])
-
-        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> cute")
-        bur.approve!(mod)
-
-        travel 1.second do
-          favgroup.update!(post_ids: [post2.id])
+      context "for a pool" do
+        setup do
+          @description = "foo [[aaa]] bar"
+          @pool = create(:pool, name: "cute_pool", description: @description)
+          @post = create(:post, tag_string: "bar pool:cute_pool")
         end
 
-        error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
-        assert_equal("{{favgroup:#{favgroup.id}}} was modified after approval", error.message)
-        assert_equal("failed", bur.reload.status)
-        assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
-        assert_equal("bar", post1.reload.tag_string)
-        assert_equal("bar", post2.reload.tag_string)
-      end
+        should "convert a pool to a new tag" do
+          create_bur!("convert pool:cute_pool -> cute", @admin)
 
-      should "fail if the favgroup was made private after approval" do
-        mod = create(:mod_user)
-        post = create(:post, tag_string: "bar")
-        favgroup = create(:favorite_group, creator: create(:gold_user), post_ids: [post.id])
-
-        bur = create(:bulk_update_request, script: "convert favgroup:#{favgroup.id} -> cute")
-        bur.approve!(mod)
-
-        favgroup.update!(is_public: false)
-
-        error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
-        assert_equal("Can't convert {{favgroup:#{favgroup.id}}} -> [[cute]] ({{favgroup:#{favgroup.id}}} does not exist)", error.message)
-        assert_equal("failed", bur.reload.status)
-        assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
-        assert_equal("bar", post.reload.tag_string)
-      end
-
-      should "fail if the pool was modified after approval" do
-        post1 = create(:post, tag_string: "bar")
-        post2 = create(:post, tag_string: "bar")
-        pool = create(:pool, name: "cute_pool", description: "asd", post_ids: [post1.id])
-
-        bur = create(:bulk_update_request, script: "convert pool:cute_pool -> cute")
-        bur.approve!(@admin)
-
-        travel 1.second do
-          pool.update!(post_ids: [post2.id])
+          assert_equal(true, @pool.reload.is_deleted?)
+          assert_equal(@description, WikiPage.find_by_title("cute").body)
+          assert_equal("bar cute", @post.reload.tag_string)
+          assert_equal("This pool has been moved to [[cute]].", @pool.description)
         end
 
-        error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
-        assert_equal("{{pool:cute_pool}} was modified after approval", error.message)
-        assert_equal("failed", bur.reload.status)
-        assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
-        assert_equal(false, pool.reload.is_deleted?)
-        assert_equal("bar", post1.reload.tag_string)
-        assert_equal("bar", post2.reload.tag_string)
+        should "convert a pool to an existing tag" do
+          wiki = create(:wiki_page, title: "cute", body: "Exists.")
+
+          create_bur!("convert pool:cute_pool -> cute", @admin)
+
+          assert_equal(true, @pool.reload.is_deleted?)
+          assert_equal("Exists.", wiki.reload.body)
+          assert_equal("bar cute", @post.reload.tag_string)
+          assert_equal("This pool has been moved to [[cute]].", @pool.description)
+        end
+
+        should "convert a pool to a deleted tag and undelete it" do
+          wiki = create(:wiki_page, title: "cute", body: "", is_deleted: true)
+
+          create_bur!("convert pool:cute_pool -> cute", @admin)
+
+          assert_equal(true, @pool.reload.is_deleted?)
+          assert_equal(false, wiki.reload.is_deleted?)
+          assert_equal(@description, wiki.body)
+          assert_equal("bar cute", @post.reload.tag_string)
+          assert_equal("This pool has been moved to [[cute]].", @pool.description)
+        end
+
+        should "convert a pool to a new tag with a category prefix" do
+          create_bur!("convert pool:cute_pool -> meta:cute", @admin)
+
+          assert_equal(true, @pool.reload.is_deleted?)
+          assert_equal(@description, WikiPage.find_by_title("cute").body)
+          assert_nil(WikiPage.find_by_title("meta:cute"))
+          assert_equal("bar cute", @post.reload.tag_string)
+          assert_equal(true, Tag.find_by_name("cute").meta?)
+          assert_equal("This pool has been moved to [[cute]].", @pool.description)
+        end
+
+        should "convert a pool to an existing tag and change its category" do
+          tag = create(:tag, name: "cute", category: Tag.categories.general)
+
+          create_bur!("convert pool:cute_pool -> meta:cute", @admin)
+
+          assert_equal(true, @pool.reload.is_deleted?)
+          assert_equal("bar cute", @post.reload.tag_string)
+          assert_equal(true, tag.reload.meta?)
+          assert_equal("This pool has been moved to [[cute]].", @pool.description)
+        end
+
+        should "not allow moderators to approve pool conversions" do
+          assert_cannot_approve_bur("convert pool:cute_pool -> cute", create(:mod_user), "Can't approve convert {{pool:cute_pool}} -> [[cute]] (requires Admin)")
+        end
+
+        should "fail if the pool was modified after approval" do
+          other_post = create(:post, tag_string: "bar")
+          bur = assert_can_approve_bur("convert pool:cute_pool -> cute", @admin)
+
+          travel(1.second) { @pool.update!(post_ids: [other_post.id]) }
+
+          error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
+          assert_equal("{{pool:cute_pool}} was modified after approval", error.message)
+          assert_equal("failed", bur.reload.status)
+          assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
+          assert_equal(false, @pool.reload.is_deleted?)
+          assert_equal("bar", @post.reload.tag_string)
+          assert_equal("bar", other_post.reload.tag_string)
+        end
+      end
+
+      context "for a favgroup" do
+        setup do
+          @mod = create(:mod_user)
+          @post = create(:post, tag_string: "bar")
+          @favgroup = create(:favorite_group, creator: create(:gold_user), post_ids: [@post.id])
+        end
+
+        should "allow moderators to convert a favgroup to a tag" do
+          create_bur!("convert favgroup:#{@favgroup.id} -> cute", @mod)
+
+          assert_equal("bar cute", @post.reload.tag_string)
+          assert_equal([@post.id], @favgroup.reload.post_ids)
+        end
+
+        should "allow moderators to convert a favgroup to a tag with a category prefix" do
+          create_bur!("convert favgroup:#{@favgroup.id} -> meta:cute", @mod)
+
+          assert_equal("bar cute", @post.reload.tag_string)
+          assert_equal(true, Tag.find_by_name("cute").meta?)
+          assert_equal([@post.id], @favgroup.reload.post_ids)
+        end
+
+        should "allow moderators to convert a favgroup to a large tag already in that category" do
+          create(:tag, name: "large_meta", category: Tag.categories.meta, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
+
+          create_bur!("convert favgroup:#{@favgroup.id} -> meta:large_meta", @mod)
+
+          assert_equal("bar large_meta", @post.reload.tag_string)
+        end
+
+        should "not allow moderators to change a large tag's category via favgroup conversion" do
+          large_tag = create(:tag, name: "large_tag", category: Tag.categories.general, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
+
+          bur = assert_cannot_approve_bur("convert favgroup:#{@favgroup.id} -> meta:large_tag", @mod, "Can't approve convert {{favgroup:#{@favgroup.id}}} -> [[large_tag|meta:large_tag]] (requires Admin)")
+          assert_equal(true, large_tag.reload.general?)
+
+          assert_can_approve_bur(bur, @admin)
+        end
+
+        should "not allow moderators to alias a newly categorized tag from a favgroup conversion to a large general tag" do
+          large_tag = create(:tag, name: "large_general", category: Tag.categories.general, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
+          bur = create(:bulk_update_request, script: "convert favgroup:#{@favgroup.id} -> char:new_char\nalias new_char -> large_general")
+
+          %i[write write_multi delete delete_multi increment decrement].each { |method| Rails.cache.expects(method).never }
+          assert_no_enqueued_jobs { assert_cannot_approve_bur(bur, @mod, "Can't approve create alias [[new_char]] -> [[large_general]] (requires Admin)") }
+
+          assert_equal(true, large_tag.reload.general?)
+          assert_nil(Tag.find_by_name("new_char"))
+        end
+
+        should "not allow moderators to approve large favgroup conversions" do
+          favgroup = build(:favorite_group, post_ids: (1..(Tag::SMALL_TAG_THRESHOLD + 1)).to_a)
+          favgroup.save!(validate: false)
+
+          bur = assert_cannot_approve_bur("convert favgroup:#{favgroup.id} -> cute", @mod, "Can't approve convert {{favgroup:#{favgroup.id}}} -> [[cute]] ({{favgroup:#{favgroup.id}}} is too large; requires Admin)")
+          assert_can_approve_bur(bur, @admin)
+        end
+
+        should "fail if the favgroup was modified after approval" do
+          other_post = create(:post, tag_string: "bar")
+          bur = assert_can_approve_bur("convert favgroup:#{@favgroup.id} -> cute", @mod)
+
+          travel(1.second) { @favgroup.update!(post_ids: [other_post.id]) }
+
+          error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
+          assert_equal("{{favgroup:#{@favgroup.id}}} was modified after approval", error.message)
+          assert_equal("failed", bur.reload.status)
+          assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
+          assert_equal("bar", @post.reload.tag_string)
+          assert_equal("bar", other_post.reload.tag_string)
+        end
+
+        should "fail if the favgroup was made private after approval" do
+          bur = assert_can_approve_bur("convert favgroup:#{@favgroup.id} -> cute", @mod)
+
+          @favgroup.update!(is_public: false)
+
+          error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
+          assert_equal("Can't convert {{favgroup:#{@favgroup.id}}} -> [[cute]] ({{favgroup:#{@favgroup.id}}} does not exist)", error.message)
+          assert_equal("failed", bur.reload.status)
+          assert_equal("The #{bur.bulk_update_request_link} (forum ##{bur.forum_post.id}) failed: #{error.message}.", bur.forum_topic.forum_posts.last.body)
+          assert_equal("bar", @post.reload.tag_string)
+        end
       end
     end
   end

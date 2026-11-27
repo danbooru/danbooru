@@ -32,12 +32,11 @@ class RemoveAliasCommandTest < ActiveSupport::TestCase
     context "on approval" do
       should "remove an alias" do
         create(:tag_alias, antecedent_name: "foo", consequent_name: "bar")
-        @bur = create_bur!("remove alias foo -> bar", @admin)
+        create_bur!("remove alias foo -> bar", @admin)
 
         @alias = TagAlias.find_by(antecedent_name: "foo", consequent_name: "bar")
         assert_equal(true, @alias.present?)
         assert_equal(true, @alias.is_deleted?)
-        assert_equal("approved", @bur.reload.status)
       end
 
       should "allow reapproving a failed BUR when the alias has already been removed" do
@@ -53,12 +52,11 @@ class RemoveAliasCommandTest < ActiveSupport::TestCase
       end
 
       should "be processed sequentially after the create alias command" do
-        @bur = create_bur!("create alias foo -> bar\nremove alias foo -> bar", @admin)
+        create_bur!("create alias foo -> bar\nremove alias foo -> bar", @admin)
 
         @alias = TagAlias.find_by(antecedent_name: "foo", consequent_name: "bar")
         assert_equal(true, @alias.present?)
         assert_equal(true, @alias.is_deleted?)
-        assert_equal("approved", @bur.reload.status)
       end
     end
   end

@@ -1,6 +1,37 @@
 require "test_helper"
 
 class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
+  # Approve the BUR through the controller, and assert that it was approved and processed.
+  #
+  # @param bur [BulkUpdateRequest, String] the BUR, or a script to create a new BUR from
+  def assert_approve_succeeds(bur, approver)
+    bur = create(:bulk_update_request, script: bur) if bur.is_a?(String)
+    perform_enqueued_jobs { post_auth approve_bulk_update_request_path(bur), approver }
+
+    assert_redirected_to bulk_update_request_path(bur)
+    assert_equal("approved", bur.reload.status)
+    assert_equal(approver, bur.approver)
+    bur
+  end
+
+  # Try to approve the BUR through the controller, and assert that it was refused and left pending.
+  #
+  # @param bur [BulkUpdateRequest, String] the BUR, or a script to create a new BUR from
+  # @param error [String, nil] the expected error notice. If given, the request is made as JS so the notice can be checked.
+  def assert_approve_fails(bur, approver, error = nil)
+    bur = create(:bulk_update_request, script: bur) if bur.is_a?(String)
+    format = error.present? ? :js : nil
+    perform_enqueued_jobs { post_auth approve_bulk_update_request_path(bur, format: format), approver }
+
+    if error.present?
+      assert_js_notice(:error, error)
+    else
+      assert_response 403
+    end
+    assert_equal("pending", bur.reload.status)
+    bur
+  end
+
   context "BulkUpdateRequestsController" do
     setup do
       @user = create(:user)
@@ -338,9 +369,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     context "#approve" do
       context "for a member" do
         should "fail" do
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @user
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails(@bulk_update_request, @user)
         end
       end
 
@@ -349,15 +378,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "artist1a", category: Tag.categories.artist, post_count: 10)
           create(:tag, name: "artist1b", category: Tag.categories.general, post_count: 0)
           create(:tag, name: "artist2a", category: Tag.categories.artist, post_count: 20)
-          @bulk_update_request = create(:bulk_update_request, script: "rename artist1a -> artist1b\ncreate alias artist2a -> artist2b")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
-          assert_equal(@builder, @bulk_update_request.approver)
+          assert_approve_succeeds("rename artist1a -> artist1b\ncreate alias artist2a -> artist2b", @builder)
           assert_equal(true, TagAlias.exists?(antecedent_name: "artist2a", consequent_name: "artist2b", status: "active"))
         end
 
@@ -366,13 +388,9 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "artist1b", category: Tag.categories.general, post_count: 0)
           create(:tag, name: "artist1c", category: Tag.categories.artist, post_count: 101)
           create(:tag, name: "artist1d", category: Tag.categories.general, post_count: 300)
-          @bulk_update_request = create(:bulk_update_request, script: "rename artist1a -> artist1b\ncreate alias artist1c -> artist1d")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
-          assert_equal(false, TagAlias.exists?(antecedent_name: "test1", consequent_name: "test2"))
+          assert_approve_fails("rename artist1a -> artist1b\ncreate alias artist1c -> artist1d", @builder)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "artist1c", consequent_name: "artist1d"))
         end
 
         should "fail if the script is changed to a disallowed script while approving the BUR" do
@@ -386,57 +404,36 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           @bulk_update_request.update!(script: "create alias artist1c -> artist1d")
           BulkUpdateRequest.stubs(:find).with(@bulk_update_request.id.to_s).returns(stale_bur)
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
-          end
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails(@bulk_update_request, @builder)
           assert_equal(false, TagAlias.exists?(antecedent_name: "artist1c", consequent_name: "artist1d"))
         end
 
         should "fail when moving a non-artist tag" do
           create(:tag, name: "foo", post_count: 0)
-          @bulk_update_request = create(:bulk_update_request, script: "alias foo -> bar")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("alias foo -> bar", @builder)
           assert_equal(false, TagAlias.exists?(antecedent_name: "foo", consequent_name: "bar"))
         end
 
         should "fail for a large artist move" do
           create(:tag, name: "artist1", category: Tag.categories.artist, post_count: 1000)
-          @bulk_update_request = create(:bulk_update_request, script: "create alias artist1 -> artist2")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("create alias artist1 -> artist2", @builder)
           assert_equal(false, TagAlias.exists?(antecedent_name: "artist1", consequent_name: "artist2"))
         end
 
         should "fail when deprecating a tag" do
           create(:tag, name: "small_tag", post_count: 10)
           create(:wiki_page, title: "small_tag", body: "asd")
-          @bulk_update_request = create(:bulk_update_request, script: "deprecate small_tag")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("deprecate small_tag", @builder)
           assert_equal(false, Tag.find_by(name: "small_tag").is_deprecated?)
         end
 
         should "fail when changing the category of a small tag" do
           create(:tag, name: "small_tag", post_count: 10)
-          @bulk_update_request = create(:bulk_update_request, script: "category small_tag -> character")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("category small_tag -> character", @builder)
           assert_equal(true, Tag.find_by(name: "small_tag").general?)
         end
       end
@@ -447,15 +444,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "foo", category: Tag.categories.character, post_count: 200)
           create(:wiki_page, title: "foo_(summer)", body: "asd")
           create(:wiki_page, title: "foo", body: "asd")
-          @bulk_update_request = create(:bulk_update_request, script: "imply foo_(summer) -> foo")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
-          assert_equal(@mod, @bulk_update_request.approver)
+          assert_approve_succeeds("imply foo_(summer) -> foo", @mod)
           assert_equal(true, TagImplication.exists?(antecedent_name: "foo_(summer)", consequent_name: "foo", status: "active"))
         end
 
@@ -464,14 +454,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "foo", post_count: 1000)
           create(:wiki_page, title: "foo_(summer)", body: "asd")
           create(:wiki_page, title: "foo", body: "asd")
-          @bulk_update_request = create(:bulk_update_request, script: "imply foo_(summer) -> foo")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_approve_succeeds("imply foo_(summer) -> foo", @mod)
           assert_equal(true, TagImplication.exists?(antecedent_name: "foo_(summer)", consequent_name: "foo", status: "active"))
         end
 
@@ -480,79 +464,47 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "foo", category: Tag.categories.character, post_count: 1000)
           create(:wiki_page, title: "foo_(summer)", body: "asd")
           create(:wiki_page, title: "foo", body: "asd")
-          @bulk_update_request = create(:bulk_update_request, script: "imply foo_(summer) -> foo")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("imply foo_(summer) -> foo", @mod)
           assert_equal(false, TagImplication.exists?(antecedent_name: "foo_(summer)", consequent_name: "foo", status: "active"))
         end
 
         should "succeed when aliasing two small non-artist tags" do
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 20)
-          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
-          assert_equal(@mod, @bulk_update_request.approver)
+          assert_approve_succeeds("alias char1a -> char1b", @mod)
           assert_equal(true, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b", status: "active"))
         end
 
         should "succeed when adding an utility alias" do
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 20)
-          @bulk_update_request = create(:bulk_update_request, script: "alias no_tag -> char1b")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
-          assert_equal(@mod, @bulk_update_request.approver)
+          assert_approve_succeeds("alias no_tag -> char1b", @mod)
           assert_equal(true, TagAlias.exists?(antecedent_name: "no_tag", consequent_name: "char1b", status: "active"))
         end
 
         should "succeed when aliasing a small tag to a large tag" do
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
-          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_approve_succeeds("alias char1a -> char1b", @mod)
           assert_equal(true, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b", status: "active"))
         end
 
         should "fail when aliasing a large tag to a large tag" do
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 201)
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 300)
-          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("alias char1a -> char1b", @mod)
           assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
         end
 
         should "fail when aliasing a small tag to a large tag that would change the large tag's category" do
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
           create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
-          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> gen1b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("alias char1a -> gen1b", @mod)
           assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "gen1b"))
         end
 
@@ -560,12 +512,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
           create(:tag_implication, antecedent_name: "char1a", consequent_name: "copyright1")
-          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
-
-          assert_js_notice(:error, "Can't approve create alias [[char1a]] -> [[char1b]] ([[char1a]] has implications; requires Admin)")
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("alias char1a -> char1b", @mod, "Can't approve create alias [[char1a]] -> [[char1b]] ([[char1a]] has implications; requires Admin)")
           assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
         end
 
@@ -574,12 +522,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "art1b", category: Tag.categories.artist, post_count: 1000)
           create(:artist, name: "art1a", is_banned: true)
           artist = create(:artist, name: "art1b")
-          @bulk_update_request = create(:bulk_update_request, script: "alias art1a -> art1b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
-
-          assert_js_notice(:error, "Can't approve create alias [[art1a]] -> [[art1b]] ([[art1a]] is a banned artist; requires Admin)")
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("alias art1a -> art1b", @mod, "Can't approve create alias [[art1a]] -> [[art1b]] ([[art1a]] is a banned artist; requires Admin)")
           assert_equal(false, artist.reload.is_banned?)
         end
 
@@ -587,12 +531,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
           create(:tag, name: "char1a_(cosplay)", category: Tag.categories.character, post_count: 1000)
-          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
-
-          assert_js_notice(:error, "Can't approve create alias [[char1a]] -> [[char1b]] ([[char1a_(cosplay)]] is too large; requires Admin)")
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("alias char1a -> char1b", @mod, "Can't approve create alias [[char1a]] -> [[char1b]] ([[char1a_(cosplay)]] is too large; requires Admin)")
           assert_equal(false, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b"))
         end
 
@@ -600,14 +540,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 10)
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 1000)
           create(:tag, name: "char1a_(cosplay)", category: Tag.categories.character, post_count: 5)
-          @bulk_update_request = create(:bulk_update_request, script: "alias char1a -> char1b")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_approve_succeeds("alias char1a -> char1b", @mod)
           assert_equal(true, TagAlias.exists?(antecedent_name: "char1a", consequent_name: "char1b", status: "active"))
         end
 
@@ -615,12 +549,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "art1a", category: Tag.categories.artist, post_count: 10)
           create(:tag, name: "art1b", category: Tag.categories.artist, post_count: 1000)
           create(:tag, name: "art1a_(style)", category: Tag.categories.general, post_count: 1000)
-          @bulk_update_request = create(:bulk_update_request, script: "alias art1a -> art1b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
-
-          assert_js_notice(:error, "Can't approve create alias [[art1a]] -> [[art1b]] ([[art1a_(style)]] is too large; requires Admin)")
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("alias art1a -> art1b", @mod, "Can't approve create alias [[art1a]] -> [[art1b]] ([[art1a_(style)]] is too large; requires Admin)")
           assert_equal(false, TagAlias.exists?(antecedent_name: "art1a", consequent_name: "art1b"))
         end
 
@@ -628,25 +558,15 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
           create(:tag, name: "art1b", category: Tag.categories.artist, post_count: 1000)
           create(:tag, name: "gen1a_(style)", category: Tag.categories.general, post_count: 1000)
-          @bulk_update_request = create(:bulk_update_request, script: "alias gen1a -> art1b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
-
-          assert_js_notice(:error, "Can't approve create alias [[gen1a]] -> [[art1b]] ([[gen1a_(style)]] is too large; requires Admin)")
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("alias gen1a -> art1b", @mod, "Can't approve create alias [[gen1a]] -> [[art1b]] ([[gen1a_(style)]] is too large; requires Admin)")
         end
 
         should "fail when an earlier line changes the small tag's category before aliasing it to a large tag" do
           create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
           create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 1000)
-          @bulk_update_request = create(:bulk_update_request, script: "category gen1a -> character\nalias gen1a -> gen1b")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
-          end
-
-          assert_js_notice(:error, "Can't approve create alias [[gen1a]] -> [[gen1b]] (requires Admin)")
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("category gen1a -> character\nalias gen1a -> gen1b", @mod, "Can't approve create alias [[gen1a]] -> [[gen1b]] (requires Admin)")
           assert_equal(false, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b"))
           assert_equal(true, Tag.find_by_name("gen1b").general?)
         end
@@ -657,14 +577,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "gen1c", category: Tag.categories.general, post_count: 5)
           create(:wiki_page, title: "gen1a")
           create(:wiki_page, title: "gen1c")
-          @bulk_update_request = create(:bulk_update_request, script: "imply gen1a -> gen1c\nalias gen1a -> gen1b")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request, format: :js), @mod
-          end
-
-          assert_js_notice(:error, "Can't approve create alias [[gen1a]] -> [[gen1b]] ([[gen1a]] has implications; requires Admin)")
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("imply gen1a -> gen1c\nalias gen1a -> gen1b", @mod, "Can't approve create alias [[gen1a]] -> [[gen1b]] ([[gen1a]] has implications; requires Admin)")
           assert_equal(false, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b"))
           assert_equal(false, TagImplication.exists?(antecedent_name: "gen1b", consequent_name: "gen1c"))
         end
@@ -672,81 +586,46 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         should "succeed when an earlier line changes the small tag's category before aliasing it to a small tag" do
           create(:tag, name: "gen1a", category: Tag.categories.general, post_count: 10)
           create(:tag, name: "gen1b", category: Tag.categories.general, post_count: 20)
-          @bulk_update_request = create(:bulk_update_request, script: "category gen1a -> character\nalias gen1a -> gen1b")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_approve_succeeds("category gen1a -> character\nalias gen1a -> gen1b", @mod)
           assert_equal(true, TagAlias.exists?(antecedent_name: "gen1a", consequent_name: "gen1b", status: "active"))
         end
 
         should "succeed when deprecating an empty tag" do
           create(:tag, name: "no_tag", post_count: 0)
           create(:wiki_page, title: "no_tag", body: "asd")
-          @bulk_update_request = create(:bulk_update_request, script: "deprecate no_tag")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
-          assert_equal(@mod, @bulk_update_request.approver)
+          assert_approve_succeeds("deprecate no_tag", @mod)
           assert_equal(true, Tag.find_by(name: "no_tag").is_deprecated?)
         end
 
         should "succeed when deprecating a small tag" do
           create(:tag, name: "small_tag", post_count: 10)
           create(:wiki_page, title: "small_tag", body: "asd")
-          @bulk_update_request = create(:bulk_update_request, script: "deprecate small_tag")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
-          assert_equal(@mod, @bulk_update_request.approver)
+          assert_approve_succeeds("deprecate small_tag", @mod)
           assert_equal(true, Tag.find_by(name: "small_tag").is_deprecated?)
         end
 
         should "fail when deprecating a tag that's too large" do
           create(:tag, name: "large_tag", post_count: 300)
           create(:wiki_page, title: "large_tag", body: "asd")
-          @bulk_update_request = create(:bulk_update_request, script: "deprecate large_tag")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("deprecate large_tag", @mod)
           assert_equal(false, Tag.find_by(name: "large_tag").is_deprecated?)
         end
 
         should "succeed when changing the category of a small tag" do
           create(:tag, name: "small_tag", post_count: 200)
-          @bulk_update_request = create(:bulk_update_request, script: "category small_tag -> character")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
-          assert_equal(@mod, @bulk_update_request.approver)
+          assert_approve_succeeds("category small_tag -> character", @mod)
           assert_equal(true, Tag.find_by(name: "small_tag").character?)
         end
 
         should "fail when changing the category of a tag that's too large" do
           create(:tag, name: "large_tag", post_count: 201)
-          @bulk_update_request = create(:bulk_update_request, script: "category large_tag -> character")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("category large_tag -> character", @mod)
           assert_equal(true, Tag.find_by(name: "large_tag").general?)
         end
 
@@ -754,15 +633,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "artist1", category: Tag.categories.artist, post_count: 0)
           create(:tag, name: "artist2", category: Tag.categories.artist, post_count: 20)
           create(:tag_alias, antecedent_name: "artist1", consequent_name: "artist2")
-          @bulk_update_request = create(:bulk_update_request, script: "remove alias artist1 -> artist2")
 
-          perform_enqueued_jobs do
-            post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-          end
-
-          assert_redirected_to bulk_update_request_path(@bulk_update_request)
-          assert_equal("approved", @bulk_update_request.reload.status)
-          assert_equal(@mod, @bulk_update_request.approver)
+          assert_approve_succeeds("remove alias artist1 -> artist2", @mod)
           assert_equal(true, TagAlias.find_by(antecedent_name: "artist1", consequent_name: "artist2").is_deleted?)
         end
 
@@ -770,12 +642,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "artist1", category: Tag.categories.artist, post_count: 0)
           create(:tag, name: "artist2", category: Tag.categories.artist, post_count: 300)
           create(:tag_alias, antecedent_name: "artist1", consequent_name: "artist2")
-          @bulk_update_request = create(:bulk_update_request, script: "remove alias artist1 -> artist2")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("remove alias artist1 -> artist2", @mod)
           assert_equal(false, TagAlias.find_by(antecedent_name: "artist1", consequent_name: "artist2").is_deleted?)
         end
 
@@ -783,12 +651,8 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "char1a", category: Tag.categories.character, post_count: 0)
           create(:tag, name: "char1b", category: Tag.categories.character, post_count: 20)
           create(:tag_alias, antecedent_name: "char1a", consequent_name: "char1b")
-          @bulk_update_request = create(:bulk_update_request, script: "remove alias char1a -> char1b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @mod
-
-          assert_response 403
-          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_approve_fails("remove alias char1a -> char1b", @mod)
           assert_equal(false, TagAlias.find_by(antecedent_name: "char1a", consequent_name: "char1b").is_deleted?)
         end
       end

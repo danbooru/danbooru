@@ -36,7 +36,7 @@ class DeprecateCommandTest < ActiveSupport::TestCase
       should "deprecate the tag" do
         @tag = create(:tag, name: "bad_tag")
         create(:wiki_page, title: "bad_tag")
-        @bur = create_bur!("deprecate bad_tag", @admin)
+        create_bur!("deprecate bad_tag", @admin)
 
         assert_equal(true, @tag.reload.is_deprecated?)
       end
@@ -46,12 +46,11 @@ class DeprecateCommandTest < ActiveSupport::TestCase
         @ti2 = create(:tag_implication, antecedent_name: "my_literal_dog", consequent_name: "grey_hair")
         @ta = create(:tag_alias, antecedent_name: "silver_hair", consequent_name: "grey_hair")
         @wiki = create(:wiki_page, title: "grey_hair")
-        @bur = create_bur!("deprecate grey_hair", @admin)
+        create_bur!("deprecate grey_hair", @admin)
 
         assert_equal("deleted", @ti1.reload.status)
         assert_equal("deleted", @ti2.reload.status)
         assert_equal("deleted", @ta.reload.status)
-        assert_equal("approved", @bur.reload.status)
       end
     end
   end

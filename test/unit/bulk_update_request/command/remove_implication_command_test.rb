@@ -32,12 +32,11 @@ class RemoveImplicationCommandTest < ActiveSupport::TestCase
     context "on approval" do
       should "remove an implication" do
         create(:tag_implication, antecedent_name: "foo", consequent_name: "bar", status: "active")
-        @bur = create_bur!("remove implication foo -> bar", @admin)
+        create_bur!("remove implication foo -> bar", @admin)
 
         @implication = TagImplication.find_by(antecedent_name: "foo", consequent_name: "bar")
         assert_equal(true, @implication.present?)
         assert_equal(true, @implication.is_deleted?)
-        assert_equal("approved", @bur.reload.status)
       end
 
       should "allow reapproving a failed BUR when the implication has already been removed" do

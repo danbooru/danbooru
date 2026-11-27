@@ -239,82 +239,72 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
     context "on approval" do
       should "update the tags" do
         @post = create(:post, tag_string: "foo")
-        @bur = create_bur!("mass update foo -> bar baz", @admin)
+        create_bur!("mass update foo -> bar baz", @admin)
 
         assert_equal("bar baz foo", @post.reload.tag_string)
-        assert_equal("approved", @bur.reload.status)
         assert_equal(User.system, @post.versions.last.updater)
       end
 
       should "be case-sensitive" do
         @post = create(:post, source: "imageboard")
-        @bur = create_bur!("mass update source:imageboard -> source:Imageboard", @admin)
+        create_bur!("mass update source:imageboard -> source:Imageboard", @admin)
 
         assert_equal("Imageboard", @post.reload.source)
-        assert_equal("approved", @bur.reload.status)
       end
 
-      should "fail if a referenced pool or favgroup was modified after approval" do
-        post1 = create(:post, tag_string: "bar")
-        post2 = create(:post, tag_string: "bar")
-        pool = create(:pool, name: "cute_pool", post_ids: [post1.id])
-        favgroup = create(:favorite_group, post_ids: [post1.id])
-
-        pool_bur = create(:bulk_update_request, script: "update pool:cute_pool -> foo")
-        favgroup_bur = create(:bulk_update_request, script: "update favgroup:#{favgroup.id} -> baz")
-        pool_bur.approve!(@admin)
-        favgroup_bur.approve!(@admin)
-        assert_equal("processing", favgroup_bur.reload.status)
-
-        travel 1.second do
-          pool.update!(post_ids: [post2.id])
-          favgroup.update!(post_ids: [post2.id])
+      context "with a pool" do
+        setup do
+          @post1 = create(:post, tag_string: "bar")
+          @post2 = create(:post, tag_string: "bar")
+          @pool = create(:pool, name: "cute_pool", post_ids: [@post1.id])
         end
 
-        pool_error = assert_raises(BulkUpdateRequest::Processor::Error) { pool_bur.processor.process! }
-        assert_equal("{{pool:cute_pool}} was modified after approval", pool_error.message)
-        assert_equal("failed", pool_bur.reload.status)
+        should "fail if a referenced pool or favgroup was modified after approval" do
+          favgroup = create(:favorite_group, post_ids: [@post1.id])
+          pool_bur = assert_can_approve_bur("update pool:cute_pool -> foo", @admin)
+          favgroup_bur = assert_can_approve_bur("update favgroup:#{favgroup.id} -> baz", @admin)
 
-        favgroup_error = assert_raises(BulkUpdateRequest::Processor::Error) { favgroup_bur.processor.process! }
-        assert_equal("{{favgroup:#{favgroup.id}}} was modified after approval", favgroup_error.message)
-        assert_equal("failed", favgroup_bur.reload.status)
+          travel 1.second do
+            @pool.update!(post_ids: [@post2.id])
+            favgroup.update!(post_ids: [@post2.id])
+          end
 
-        assert_equal("bar", post1.reload.tag_string)
-        assert_equal("bar", post2.reload.tag_string)
-      end
+          pool_error = assert_raises(BulkUpdateRequest::Processor::Error) { pool_bur.processor.process! }
+          assert_equal("{{pool:cute_pool}} was modified after approval", pool_error.message)
+          assert_equal("failed", pool_bur.reload.status)
 
-      should "compare against the approval time when processing a BUR that isn't marked as processing" do
-        post = create(:post, tag_string: "bar")
-        pool = create(:pool, name: "cute_pool", post_ids: [post.id])
+          favgroup_error = assert_raises(BulkUpdateRequest::Processor::Error) { favgroup_bur.processor.process! }
+          assert_equal("{{favgroup:#{favgroup.id}}} was modified after approval", favgroup_error.message)
+          assert_equal("failed", favgroup_bur.reload.status)
 
-        bur = create(:bulk_update_request, script: "update pool:cute_pool -> foo")
-        bur.approve!(@admin)
-        bur.update!(status: "failed")
-        travel(1.second) { pool.update!(description: "changed") }
-
-        travel(2.seconds) do
-          error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
-          assert_equal("{{pool:cute_pool}} was modified after approval", error.message)
+          assert_equal("bar", @post1.reload.tag_string)
+          assert_equal("bar", @post2.reload.tag_string)
         end
-        assert_equal("bar", post.reload.tag_string)
-      end
 
-      should "not update posts added to the pool after the pool was checked" do
-        post1 = create(:post, tag_string: "bar")
-        post2 = create(:post, tag_string: "bar")
-        pool = create(:pool, name: "cute_pool", post_ids: [post1.id])
+        should "compare against the approval time when processing a BUR that isn't marked as processing" do
+          bur = assert_can_approve_bur("update pool:cute_pool -> foo", @admin)
+          bur.update!(status: "failed")
+          travel(1.second) { @pool.update!(description: "changed") }
 
-        bur = create(:bulk_update_request, script: "update pool:cute_pool -> foo")
-        bur.approve!(@admin)
+          travel(2.seconds) do
+            error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
+            assert_equal("{{pool:cute_pool}} was modified after approval", error.message)
+          end
+          assert_equal("bar", @post1.reload.tag_string)
+        end
 
-        # Simulate a user adding a post to the pool right after the pool is checked for modifications. update_columns
-        # is used so the edit is invisible to the updated_at check, as if it happened after the check.
-        Pool.stubs(:find_by_name).with { pool.update_columns(post_ids: [post1.id, post2.id]) }.returns(pool) # rubocop:disable Rails/SkipsModelValidations
-        bur.processor.process!
+        should "not update posts added to the pool after the pool was checked" do
+          bur = assert_can_approve_bur("update pool:cute_pool -> foo", @admin)
 
-        assert_equal("approved", bur.reload.status)
-        assert_equal("bar foo", post1.reload.tag_string)
-        assert_equal("bar", post2.reload.tag_string)
+          # Simulate a user adding a post to the pool right after the pool is checked for modifications. update_columns
+          # is used so the edit is invisible to the updated_at check, as if it happened after the check.
+          Pool.stubs(:find_by_name).with { @pool.update_columns(post_ids: [@post1.id, @post2.id]) }.returns(@pool) # rubocop:disable Rails/SkipsModelValidations
+          bur.processor.process!
+
+          assert_equal("approved", bur.reload.status)
+          assert_equal("bar foo", @post1.reload.tag_string)
+          assert_equal("bar", @post2.reload.tag_string)
+        end
       end
     end
   end

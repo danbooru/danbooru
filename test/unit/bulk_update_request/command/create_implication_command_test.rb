@@ -143,24 +143,22 @@ class CreateImplicationCommandTest < ActiveSupport::TestCase
 
     context "on approval" do
       should "create an implication" do
-        @bur = create_bur!("create implication foo -> bar", @admin)
+        create_bur!("create implication foo -> bar", @admin)
 
         @implication = TagImplication.find_by(antecedent_name: "foo", consequent_name: "bar")
         assert_equal(true, @implication.present?)
         assert_equal(true, @implication.is_active?)
-        assert_equal("approved", @bur.reload.status)
       end
 
       should "assign the right category to a new umbrella tag" do
         create(:tag, name: "daniel_booru_(bald)", category: Tag.categories.character)
         create(:wiki_page, title: "daniel_booru_(bald)")
         create(:wiki_page, title: "daniel_booru")
-        @bur = create_bur!("create implication daniel_booru_(bald) -> daniel_booru", @admin)
+        create_bur!("create implication daniel_booru_(bald) -> daniel_booru", @admin)
 
         @implication = TagImplication.find_by(antecedent_name: "daniel_booru_(bald)", consequent_name: "daniel_booru")
         assert_equal(true, @implication.present?)
         assert_equal(true, @implication.is_active?)
-        assert_equal("approved", @bur.reload.status)
         assert_equal(Tag.categories.character, Tag.find_by_name("daniel_booru").category)
       end
     end

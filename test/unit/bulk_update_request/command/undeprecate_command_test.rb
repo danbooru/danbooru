@@ -25,7 +25,7 @@ class UndeprecateCommandTest < ActiveSupport::TestCase
     context "on approval" do
       should "undeprecate the tag" do
         @tag = create(:tag, name: "silver_hair", is_deprecated: true)
-        @bur = create_bur!("undeprecate silver_hair", @admin)
+        create_bur!("undeprecate silver_hair", @admin)
 
         assert_equal(false, @tag.reload.is_deprecated?)
       end
