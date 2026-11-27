@@ -48,12 +48,19 @@ class ForumPostPolicy < ApplicationPolicy
   def rate_limit_for_create(**_options)
     if record.invalid?
       { action: "forum_posts:create:invalid", rate: 1.0 / 1.second, burst: 1 }
-    elsif user.is_builder?
-      { rate: 1.0 / 1.minute, burst: 10 }
-    elsif user.forum_posts.exists?(created_at: ..24.hours.ago)
-      { rate: 1.0 / 1.minute, burst: 3 }
     else
-      { rate: 1.0 / 2.minutes, burst: 2 }
+      valid_create_rate_limit
+    end
+  end
+
+  # The rate limit for creating a valid post. Also used for BURs, which create a post.
+  def valid_create_rate_limit
+    if user.is_builder?
+      { action: "forum_posts:create", rate: 1.0 / 1.minute, burst: 10 }
+    elsif user.forum_posts.exists?(created_at: ..24.hours.ago)
+      { action: "forum_posts:create", rate: 1.0 / 1.minute, burst: 3 }
+    else
+      { action: "forum_posts:create", rate: 1.0 / 2.minutes, burst: 2 }
     end
   end
 

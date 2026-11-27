@@ -113,6 +113,26 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "#notice", text: /mentioned too many users recently/
       end
+
+      should "count requests that create a new topic against the user's forum topic limit" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        post_auth forum_topics_path, @user, params: { forum_topic: { title: "test", original_post_attributes: { body: "test" }}}
+
+        assert_no_difference(["BulkUpdateRequest.count", "ForumTopic.count", "ForumPost.count"]) do
+          post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request) }
+          assert_response 429
+        end
+      end
+
+      should "count requests in an existing topic against the user's forum post limit" do
+        Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+        2.times { post_auth forum_posts_path, @user, params: { forum_post: { topic_id: @forum_topic.id, body: "test" }} }
+
+        assert_no_difference(["BulkUpdateRequest.count", "ForumPost.count"]) do
+          post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request).merge(forum_topic_id: @forum_topic.id) }
+          assert_response 429
+        end
+      end
     end
 
     context "#update" do

@@ -40,6 +40,17 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
     user.is_admin?
   end
 
+  # Creating a BUR also creates a forum topic or post, so for non-Builders it's counted against the forum limits.
+  def rate_limit_for_create(**options)
+    if record.invalid? || user.is_builder?
+      rate_limit_for_write(**options)
+    elsif record.forum_topic.present?
+      policy(ForumPost).valid_create_rate_limit
+    else
+      policy(ForumTopic).valid_create_rate_limit
+    end
+  end
+
   def rate_limit_for_write(**_options)
     if record.invalid?
       { action: "bulk_update_requests:write:invalid", rate: 1.0 / 1.second, burst: 1 }
