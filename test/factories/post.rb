@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :post do
     md5 { SecureRandom.hex(16) }
     uploader
+    updater { CurrentUser.user || uploader }
     tag_string { "tag1 tag2" }
     tag_count { 2 }
     tag_count_general { 2 }
@@ -12,11 +13,6 @@ FactoryBot.define do
     rating { "q" }
     source { Faker::Internet.url }
     media_asset
-
-    # Post versions need a current user, so default to the uploader if none is set.
-    to_create do |post|
-      CurrentUser.user ? post.save! : CurrentUser.scoped(post.uploader) { post.save! }
-    end
 
     factory :post_with_file do
       transient do

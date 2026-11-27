@@ -7,6 +7,15 @@
 class PostEdit
   extend Memoist
 
+  # The maximum number of new tags that can be created by a single user. Default is 20 tags per minute.
+  MAX_NEW_TAGS = 20
+  MAX_NEW_TAGS_INTERVAL = 1.minute
+
+  # The maximum number of tags that can be added or removed by a user per minute. Default is 100 tags per minute.
+  # Builders and the uploader aren't subject to this restriction.
+  MAX_CHANGED_TAGS = 100
+  MAX_CHANGED_TAGS_INTERVAL = 1.minute
+
   Tag = Struct.new(:name, :negated, keyword_init: true)
   Metatag = Struct.new(:name, :value, keyword_init: true) do
     def category
@@ -32,29 +41,379 @@ class PostEdit
   # Matches a metatag name, like `rating:` or `-pool:`, with an optional leading '-'. Don't use /i, because that matches Unicode characters.
   METATAG_NAME_REGEX = /-?[a-zA-Z0-9_]+:/
 
-  private attr_reader :post, :current_tag_names, :old_tag_names, :new_tag_string, :parser
+  private attr_reader :post, :current_tag_names, :old_tag_names, :new_tag_string, :user, :parser
   private delegate :accept, :expect, :error, :skip, :zero_or_more, :one_of, to: :parser
 
-  # @param post [Post] The post being edited.
-  # @param current_tag_string [String] The space-separated list of tags currently on the post.
-  # @param old_tag_string [String] The space-separated list of tags the user saw before the edit.
-  # @param new_tag_string [String] The space-separated list of tags after the edit.
-  def initialize(post, current_tag_string, old_tag_string, new_tag_string)
+  # Parse a tag edit string without a Post (e.g. for bulk update requests).
+  #
+  # @param tag_string [String] The tag edit string to parse.
+  # @return [PostEdit]
+  def self.parse(tag_string)
+    new(nil, new_tag_string: tag_string)
+  end
+
+  # @param post [Post, nil] The post being edited.
+  # @param user [User, nil] The user performing the edit (required when `post` is present).
+  # @param new_tag_string [String, nil] Override for the edited tag string (used by {.parse}).
+  def initialize(post, user: nil, new_tag_string: post&.tag_string)
+    raise ArgumentError, "user is required" if post.present? && user.nil?
+
     @post = post
-    @current_tag_names = current_tag_string.to_s.split
-    @old_tag_names = old_tag_string.to_s.split
+    @user = user
+    @current_tag_names = post&.tag_string_was.to_s.split
+    @old_tag_names = (post&.old_tag_string || post&.tag_string_was).to_s.split
     @new_tag_string = new_tag_string.to_s.gsub(/[[:space:]]/, " ")
     @parser = StringParser.new(@new_tag_string)
+  end
+
+  concerning :EditMethods do
+    def merge_old_changes
+      if !post.old_parent_id.nil?
+        old_parent_id = post.old_parent_id.presence&.to_i
+        if old_parent_id == post.parent_id
+          post.parent_id = post.parent_id_before_last_save || post.parent_id_was
+        end
+      end
+
+      if post.old_source == post.source.to_s
+        post.source = post.source_before_last_save || post.source_was
+      end
+
+      if post.old_rating == post.rating
+        post.rating = post.rating_before_last_save || post.rating_was
+      end
+    end
+
+    def apply_pre_metatags
+      pre_metatag_terms.each do |metatag|
+        case [metatag.name, metatag.value]
+        in "parent", ("none" | "0")
+          post.parent_id = nil
+
+        in "-parent", /^\d+$/ => new_parent_id
+          if post.parent_id == new_parent_id.to_i
+            post.parent_id = nil
+          end
+
+        in "parent", new_parent_id
+          post.parent_id = new_parent_id
+
+        in "rating", /\A([#{Post::RATINGS.keys.join}])/o
+          post.rating = $1
+
+        in "source", "none"
+          post.source = ""
+
+        in "source", value
+          post.source = value
+
+        in "status", "pending"
+          post.is_pending = true if post.new_record?
+
+        in category, name if category.in?(CATEGORIZATION_METATAGS)
+          ::Tag.find_or_create_by_name(name, category: category, current_user: user)
+
+        else
+          nil
+
+        end
+      end
+
+      post.parent.updater = user if post.parent&.changed?
+    end
+
+    # XXX should be a `validate` hook instead of `before_validation` hook
+    def validate_new_tags
+      return if user.is_builder?
+
+      new_tags = effective_added_tag_names.reject { |name| ::Tag.exists?(name: name) }
+
+      if RateLimiter.limited?(action: "post:validate_new_tags", user: user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
+        post.errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
+        throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
+      end
+    end
+
+    def normalize_tags
+      post.tag_string = ::Tag.create_for_list(tag_names).uniq.sort.join(" ")
+    end
+
+    def validate_changed_tags
+      return if post.uploader == user || user.is_builder?
+
+      changed_tags = post.added_tags + post.removed_tags
+
+      if RateLimiter.limited?(action: "post:validate_changed_tags", user: user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f / MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
+        post.errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
+        throw :abort
+      end
+    end
+
+    def apply_post_metatags
+      post_metatag_terms.each do |metatag|
+        case [metatag.name, metatag.value]
+        in "-pool", /^\d+$/ => pool_id
+          pool = Pool.find_by_id(pool_id)
+          pool&.remove!(post)
+
+        in "-pool", name
+          pool = Pool.find_by_name(name)
+          pool&.remove!(post)
+
+        in "pool", /^\d+$/ => pool_id
+          pool = Pool.find_by_id(pool_id)
+          pool&.add!(post)
+
+        in "pool", "none"
+          post.remove_from_all_pools
+
+        in "pool", name
+          pool = Pool.find_by_name(name)
+          pool&.add!(post)
+
+        in "newpool", name
+          pool = Pool.find_by_name(name)
+
+          # XXX race condition
+          if pool.nil?
+            Pool.create!(name: name, description: "This pool was automatically generated", post_ids: [post.id])
+          else
+            pool.add!(post)
+          end
+
+        in "newfavgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id(name, user)
+
+          # XXX race condition
+          if favgroup.nil?
+            raise User::PrivilegeError unless Pundit.policy!(user, FavoriteGroup).create?
+            FavoriteGroup.create!(name: name, creator: user, post_ids: [post.id])
+          else
+            raise User::PrivilegeError unless Pundit.policy!(user, favgroup).update?
+            favgroup.add(post)
+          end
+
+        in "fav", name
+          raise User::PrivilegeError unless Pundit.policy!(user, Favorite).create?
+          Favorite.create(post: post, user: user)
+
+        in "-fav", name
+          raise User::PrivilegeError unless Pundit.policy!(user, Favorite).create?
+          Favorite.destroy_by(post: post, user: user)
+
+        in "upvote", name
+          post.vote!(1, user)
+
+        in "downvote", name
+          post.vote!(-1, user)
+
+        in "-upvote", name
+          post.unvote!(1, user)
+
+        in "-downvote", name
+          post.unvote!(-1, user)
+
+        in "status", "active"
+          raise User::PrivilegeError unless user.is_approver?
+          post.approvals.create!(user: user)
+
+        in "status", "banned"
+          raise User::PrivilegeError unless user.is_approver?
+          post.ban!(user)
+
+        in "-status", "banned"
+          raise User::PrivilegeError unless user.is_approver?
+          post.unban!(user)
+
+        in "disapproved", reason
+          raise User::PrivilegeError unless user.is_approver?
+          post.disapprovals.find_or_initialize_by(user: user).update!(reason: reason.downcase)
+
+        in "child", "none"
+          post.children.select { |child| Pundit.policy!(user, child).update? }.each do |child|
+            child.update!(parent_id: nil, updater: user)
+          end
+
+        in "-child", ids
+          next if ids.blank?
+
+          post.children.where_numeric_matches(:id, ids).select { |child| Pundit.policy!(user, child).update? }.each do |child|
+            child.update!(parent_id: nil, updater: user)
+          end
+
+        in "child", ids
+          next if ids.blank?
+
+          Post.where_numeric_matches(:id, ids).where.not(id: [post.id, post.parent_id].compact).limit(10).select { |child| Pundit.policy!(user, child).update? }.each do |child|
+            child.update!(parent_id: post.id, updater: user)
+          end
+
+        in "-favgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id!(name, user)
+          raise User::PrivilegeError unless Pundit.policy!(user, favgroup).update?
+          favgroup&.remove(post)
+
+        in "favgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id!(name, user)
+          raise User::PrivilegeError unless Pundit.policy!(user, favgroup).update?
+          favgroup&.add(post)
+
+        end
+      end
+    rescue StandardError
+      # XXX Silently ignore errors so that the edit doesn't fail. We can't let
+      # the edit fail because then it will create a new post version even if
+      # the edit didn't go through.
+      nil
+    end
+
+    def added_tags_are_valid
+      new_tags = post.added_tags.select(&:empty?)
+      new_artist_tags, new_general_tags = new_tags.partition(&:artist?)
+
+      if new_general_tags.present?
+        n = new_general_tags.size
+        tag_wiki_links = new_general_tags.map { |tag| "[[#{tag.name}]]" }
+        post.warnings.add(:base, "Created #{n} new #{(n == 1) ? "tag" : "tags"}: #{tag_wiki_links.join(", ")}")
+      end
+
+      new_artist_tags.each do |tag|
+        if tag.artist.blank?
+          new_artist_path = Routes.new_artist_path(artist: { name: tag.name })
+          post.warnings.add(:base, "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[#{new_artist_path}]")
+        end
+      end
+
+      invalid_added_tags.each do |tag|
+        tag.errors.messages.each_value do |messages|
+          post.warnings.add(:base, "Couldn't add tag: #{messages.join(";")}")
+        end
+      end
+
+      deprecated_tags = deprecated_added_tag_names
+      if deprecated_tags.present?
+        tag_list = deprecated_tags.map { |tag| "[[#{tag}]]" }.to_sentence
+        post.warnings.add(:base, "The following tags are deprecated and could not be added: #{tag_list}")
+      end
+    end
+
+    def removed_tags_are_valid
+      unremoved_tags = post.tag_array & user_removed_tag_names
+
+      if unremoved_tags.present?
+        unremoved_tags_list = unremoved_tags.map { |t| "[[#{t}]]" }.to_sentence
+        post.warnings.add(:base, "#{unremoved_tags_list} could not be removed. Check for implications and try again")
+      end
+    end
   end
 
   concerning :HelperMethods do
     # @return [Array<String>] The final list of tags on the post after the edit.
     def tag_names
       tag_names = current_tag_names + effective_added_tag_names - user_removed_tag_names
-      tag_names = post.add_automatic_tags(tag_names)
+      tag_names = add_automatic_tags(tag_names)
       tag_names += ::Tag.automatic_tags_for(tag_names)
       tag_names += TagImplication.tags_implied_by(tag_names).map(&:name)
       tag_names.uniq.sort
+    end
+
+    # @param tags [Array<String>] The list of tags to add automatic tags to.
+    # @return [Array<String>] The list of tags with automatic tags added or removed.
+    def add_automatic_tags(tags)
+      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png animated_webp exif_rotation non-repeating_animation non-web_source wide_image tall_image]
+
+      if tags.size >= 30
+        tags -= ["tagme"]
+      elsif tags.empty?
+        tags << "tagme"
+      end
+
+      tags = add_automatic_file_tags(tags)
+      tags = add_automatic_source_tags(tags)
+      tags
+    end
+
+    # @param tags [Array<String>] The list of tags to add automatic file tags to.
+    # @return [Array<String>] The list of tags with automatic file tags added or removed.
+    def add_automatic_file_tags(tags)
+      if post.image_width >= 10_000 || post.image_height >= 10_000
+        tags << "incredibly_absurdres"
+      end
+      if post.image_width >= 3200 || post.image_height >= 2400
+        tags << "absurdres"
+      end
+      if post.image_width >= 1600 || post.image_height >= 1200
+        tags << "highres"
+      end
+      if post.image_width <= 500 && post.image_height <= 500
+        tags << "lowres"
+      end
+
+      if post.image_width >= 1024 && post.image_width.to_f / post.image_height >= 4
+        tags << "wide_image"
+      elsif post.image_height >= 1024 && post.image_height.to_f / post.image_width >= 4
+        tags << "tall_image"
+      end
+
+      if post.is_flash?
+        tags << "flash"
+      end
+
+      if post.is_video?
+        tags << "video"
+      end
+
+      if post.is_ugoira?
+        tags << "ugoira"
+      end
+
+      # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, WebPs, videos, and ugoiras are automatically tagged.
+      tags -= ["animated"] unless post.is_flash?
+      tags << "animated" if post.media_asset.is_animated?
+      tags << "animated_gif" if post.media_asset.is_animated_gif?
+      tags << "animated_png" if post.media_asset.is_animated_png?
+      tags << "animated_webp" if post.media_asset.is_animated_webp?
+
+      tags << "greyscale" if post.media_asset.is_greyscale?
+      tags << "exif_rotation" if post.media_asset.is_rotated?
+      tags << "non-repeating_animation" if post.media_asset.is_non_repeating_animation?
+      tags << "ai-generated" if post.media_asset.is_ai_generated?
+
+      # Allow Flash files to be manually tagged as `sound`; other files are automatically tagged.
+      tags -= ["sound"] unless post.is_flash?
+      tags << "sound" if post.media_asset.has_sound?
+
+      tags
+    end
+
+    # @param tags [Array<String>] The list of tags to add automatic source tags to.
+    # @return [Array<String>] The list of tags with automatic source tags added or removed.
+    def add_automatic_source_tags(tags)
+      if post.source.present? && !post.web_source?
+        tags << "non-web_source"
+      end
+
+      # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
+      case post.parsed_source&.bad_link?
+      when true
+        tags << "bad_link"
+      when false
+        tags -= ["bad_link"]
+      when nil
+        # it's unknown whether it's a bad link or not; don't add or remove the tag
+      end
+
+      # A bad_source is a source from a recognized site that isn't an image url or a page url.
+      case post.parsed_source&.bad_source?
+      when true
+        tags << "bad_source"
+      when false
+        tags -= ["bad_source"]
+      when nil
+        # it's unknown whether it's a bad source or not; don't add or remove the tag
+      end
+
+      tags
     end
 
     # @return [Array<String>] The list of tags in the edited tag string, including regular tags and tags with a category prefix (e.g. `artist:bkub`)

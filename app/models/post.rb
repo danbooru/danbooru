@@ -7,15 +7,6 @@ class Post < ApplicationRecord
   # The maximum number of tags a post can have.
   MAX_TAG_COUNT = 1250
 
-  # The maximum number of new tags that can be created by a single user. Default is 20 tags per minute.
-  MAX_NEW_TAGS = 20
-  MAX_NEW_TAGS_INTERVAL = 1.minute
-
-  # The maximum number of tags that can be added or removed by a user per minute. Default is 100 tags per minute.
-  # Builders and the uploader aren't subject to this restriction.
-  MAX_CHANGED_TAGS = 100
-  MAX_CHANGED_TAGS_INTERVAL = 1.minute
-
   # The maximum number of levels in a parent-child hierarchy. By default, a parent-child hierarchy can be no more than 4
   # levels deep. That is, a post can have children, grandchildren, and great-grandchildren, but no great-great-grandchildren.
   MAX_PARENT_DEPTH = 4
@@ -47,15 +38,15 @@ class Post < ApplicationRecord
 
   normalizes :source, with: ->(source) { Post.normalize_source(source) }, apply_to_nil: true
   before_validation :merge_old_changes
-  before_validation :apply_pre_metatags
-  before_validation :validate_new_tags
-  before_validation :normalize_tags
+  before_validation -> { post_edit.apply_pre_metatags }
+  before_validation -> { post_edit.validate_new_tags }
+  before_validation -> { post_edit.normalize_tags }
   validate :uploader_is_not_limited, on: :create
   validate :post_is_not_allowed, on: :create
   validate :validate_no_parent_cycles
   validate :validate_parent_depth
   validate :validate_child_count
-  validate :validate_changed_tags
+  validate -> { post_edit.validate_changed_tags }
   validate :validate_tag_count
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
@@ -63,8 +54,8 @@ class Post < ApplicationRecord
   validates :source, length: { maximum: 1200 }
   validates :parent, presence: { message: "post does not exist" }, if: -> { parent_id.present? && parent_id_changed? }
   before_save :parse_pixiv_id
-  before_save :added_tags_are_valid
-  before_save :removed_tags_are_valid
+  before_save -> { post_edit.added_tags_are_valid }
+  before_save -> { post_edit.removed_tags_are_valid }
   before_save :has_artist_tag
   before_save :has_copyright_tag
   before_save :has_enough_tags
@@ -74,7 +65,7 @@ class Post < ApplicationRecord
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
-  after_save :apply_post_metatags
+  after_save -> { post_edit.apply_post_metatags }
   after_create_commit :update_iqdb
 
   belongs_to :approver, class_name: "User", optional: true
@@ -101,7 +92,7 @@ class Post < ApplicationRecord
   has_many :dtext_links, -> { embedded_post }, foreign_key: :link_target
   has_many :embedding_wiki_pages, through: :dtext_links, source: :model, source_type: "WikiPage"
 
-  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :post_edit
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :post_edit, :updater
 
   scope :pending, -> { where(is_pending: true) }
   scope :flagged, -> { where(is_flagged: true) }
@@ -135,6 +126,7 @@ class Post < ApplicationRecord
 
     Post.new(
       uploader: upload.uploader,
+      updater: upload.uploader,
       md5: media_asset&.md5,
       file_ext: media_asset&.file_ext,
       file_size: media_asset&.file_size,
@@ -390,277 +382,8 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
-      if old_parent_id == ""
-        old_parent_id = nil
-      else
-        old_parent_id = old_parent_id.to_i
-      end
-      if old_parent_id == parent_id
-        self.parent_id = parent_id_before_last_save || parent_id_was
-      end
-
-      if old_source == source.to_s
-        self.source = source_before_last_save || source_was
-      end
-
-      if old_rating == rating
-        self.rating = rating_before_last_save || rating_was
-      end
-
-      @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
-    end
-
-    # XXX should be a `validate` hook instead of `before_validation` hook
-    def validate_new_tags
-      return if CurrentUser.user.nil? || CurrentUser.user.is_builder?
-
-      new_tags = post_edit.effective_added_tag_names.reject { |name| Tag.exists?(name: name) }
-
-      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
-        errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
-        throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
-      end
-    end
-
-    def normalize_tags
-      self.tag_string = Tag.create_for_list(post_edit.tag_names).uniq.sort.join(" ")
-    end
-
-    def add_automatic_tags(tags)
-      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png animated_webp exif_rotation non-repeating_animation non-web_source wide_image tall_image]
-
-      if tags.size >= 30
-        tags -= ["tagme"]
-      elsif tags.empty?
-        tags << "tagme"
-      end
-
-      if image_width >= 10_000 || image_height >= 10_000
-        tags << "incredibly_absurdres"
-      end
-      if image_width >= 3200 || image_height >= 2400
-        tags << "absurdres"
-      end
-      if image_width >= 1600 || image_height >= 1200
-        tags << "highres"
-      end
-      if image_width <= 500 && image_height <= 500
-        tags << "lowres"
-      end
-
-      if image_width >= 1024 && image_width.to_f / image_height >= 4
-        tags << "wide_image"
-      elsif image_height >= 1024 && image_height.to_f / image_width >= 4
-        tags << "tall_image"
-      end
-
-      if is_flash?
-        tags << "flash"
-      end
-
-      if is_video?
-        tags << "video"
-      end
-
-      if is_ugoira?
-        tags << "ugoira"
-      end
-
-      if source.present? && !web_source?
-        tags << "non-web_source"
-      end
-
-      # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
-      case parsed_source&.bad_link?
-      when true
-        tags << "bad_link"
-      when false
-        tags -= ["bad_link"]
-      when nil
-        # it's unknown whether it's a bad link or not; don't add or remove the tag
-      end
-
-      # A bad_source is a source from a recognized site that isn't an image url or a page url.
-      case parsed_source&.bad_source?
-      when true
-        tags << "bad_source"
-      when false
-        tags -= ["bad_source"]
-      when nil
-        # it's unknown whether it's a bad source or not; don't add or remove the tag
-      end
-
-      # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, WebPs, videos, and ugoiras are automatically tagged.
-      tags -= ["animated"] unless is_flash?
-      tags << "animated" if media_asset.is_animated?
-      tags << "animated_gif" if media_asset.is_animated_gif?
-      tags << "animated_png" if media_asset.is_animated_png?
-      tags << "animated_webp" if media_asset.is_animated_webp?
-
-      tags << "greyscale" if media_asset.is_greyscale?
-      tags << "exif_rotation" if media_asset.is_rotated?
-      tags << "non-repeating_animation" if media_asset.is_non_repeating_animation?
-      tags << "ai-generated" if media_asset.is_ai_generated?
-
-      # Allow Flash files to be manually tagged as `sound`; other files are automatically tagged.
-      tags -= ["sound"] unless is_flash?
-      tags << "sound" if media_asset.has_sound?
-
-      tags
-    end
-
-    def apply_post_metatags
-      post_edit.post_metatag_terms.each do |metatag|
-        case [metatag.name, metatag.value]
-        in "-pool", /^\d+$/ => pool_id
-          pool = Pool.find_by_id(pool_id)
-          pool&.remove!(self)
-
-        in "-pool", name
-          pool = Pool.find_by_name(name)
-          pool&.remove!(self)
-
-        in "pool", /^\d+$/ => pool_id
-          pool = Pool.find_by_id(pool_id)
-          pool&.add!(self)
-
-        in "pool", "none"
-          remove_from_all_pools
-
-        in "pool", name
-          pool = Pool.find_by_name(name)
-          pool&.add!(self)
-
-        in "newpool", name
-          pool = Pool.find_by_name(name)
-
-          # XXX race condition
-          if pool.nil?
-            Pool.create!(name: name, description: "This pool was automatically generated", post_ids: [id])
-          else
-            pool.add!(self)
-          end
-
-        in "newfavgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id(name, CurrentUser.user)
-
-          # XXX race condition
-          if favgroup.nil?
-            raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, FavoriteGroup).create?
-            FavoriteGroup.create!(name: name, creator: CurrentUser.user, post_ids: [id])
-          else
-            raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
-            favgroup.add(self)
-          end
-
-        in "fav", name
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
-          Favorite.create(post: self, user: CurrentUser.user)
-
-        in "-fav", name
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
-          Favorite.destroy_by(post: self, user: CurrentUser.user)
-
-        in "upvote", name
-          vote!(1, CurrentUser.user)
-
-        in "downvote", name
-          vote!(-1, CurrentUser.user)
-
-        in "-upvote", name
-          unvote!(1, CurrentUser.user)
-
-        in "-downvote", name
-          unvote!(-1, CurrentUser.user)
-
-        in "status", "active"
-          raise User::PrivilegeError unless CurrentUser.is_approver?
-          approvals.create!(user: CurrentUser.user)
-
-        in "status", "banned"
-          raise User::PrivilegeError unless CurrentUser.is_approver?
-          ban!(CurrentUser.user)
-
-        in "-status", "banned"
-          raise User::PrivilegeError unless CurrentUser.is_approver?
-          unban!(CurrentUser.user)
-
-        in "disapproved", reason
-          raise User::PrivilegeError unless CurrentUser.is_approver?
-          disapprovals.find_or_initialize_by(user: CurrentUser.user).update!(reason: reason.downcase)
-
-        in "child", "none"
-          children.select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
-            post.update!(parent_id: nil)
-          end
-
-        in "-child", ids
-          next if ids.blank?
-
-          children.where_numeric_matches(:id, ids).select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
-            post.update!(parent_id: nil)
-          end
-
-        in "child", ids
-          next if ids.blank?
-
-          Post.where_numeric_matches(:id, ids).where.not(id: [id, parent_id].compact).limit(10).select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
-            post.update!(parent_id: id)
-          end
-
-        in "-favgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id!(name, CurrentUser.user)
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
-          favgroup&.remove(self)
-
-        in "favgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id!(name, CurrentUser.user)
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
-          favgroup&.add(self)
-
-        end
-      end
-    rescue StandardError
-      # XXX Silently ignore errors so that the edit doesn't fail. We can't let
-      # the edit fail because then it will create a new post version even if
-      # the edit didn't go through.
-      nil
-    end
-
-    def apply_pre_metatags
-      post_edit.pre_metatag_terms.each do |metatag|
-        case [metatag.name, metatag.value]
-        in "parent", ("none" | "0")
-          self.parent_id = nil
-
-        in "-parent", /^\d+$/ => new_parent_id
-          if parent_id == new_parent_id.to_i
-            self.parent_id = nil
-          end
-
-        in "parent", new_parent_id
-          self.parent_id = new_parent_id
-
-        in "rating", /\A([#{RATINGS.keys.join}])/o
-          self.rating = $1
-
-        in "source", "none"
-          self.source = ""
-
-        in "source", value
-          self.source = value
-
-        in "status", "pending"
-          self.is_pending = true if new_record?
-
-        in category, name if category.in?(PostEdit::CATEGORIZATION_METATAGS)
-          Tag.find_or_create_by_name(name, category: category, current_user: CurrentUser.user)
-
-        else
-          nil
-
-        end
-      end
+      @post_edit = PostEdit.new(self, user: updater)
+      @post_edit.merge_old_changes
     end
 
     def web_source?
@@ -807,15 +530,15 @@ class Post < ApplicationRecord
     end
 
     def update_has_children_flag
-      update(has_children: children.exists?, has_active_children: children.undeleted.exists?)
+      update(has_children: children.exists?, has_active_children: children.undeleted.exists?, updater: User.system)
     end
 
     def update_parent_on_destroy
       parent&.update_has_children_flag
     end
 
-    def update_children_on_destroy
-      children.update(parent: nil)
+    def update_children_on_destroy(updater: User.system)
+      children.update(parent: nil, updater: updater)
     end
 
     def update_parent_on_save
@@ -870,7 +593,7 @@ class Post < ApplicationRecord
 
           # Move the files before updating tag counts so the tag rows aren't locked during slow file transfers.
           media_asset.trash!(current_user, log: false)
-          update_children_on_destroy
+          update_children_on_destroy(updater: current_user)
           Tag.decrement_post_counts(tag_array)
           remove_from_all_pools
           remove_from_fav_groups
@@ -908,7 +631,7 @@ class Post < ApplicationRecord
           raise ActiveRecord::Rollback
         end
 
-        update!(is_deleted: true, is_pending: false, is_flagged: false)
+        update!(is_deleted: true, is_pending: false, is_flagged: false, updater: user)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
         give_favorites_to_parent if move_favorites
@@ -938,11 +661,11 @@ class Post < ApplicationRecord
 
     def merge_version?
       prev = versions.last
-      prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
+      prev && prev.updater_id == updater.id && prev.updated_at > 1.hour.ago
     end
 
     def create_new_version
-      User.where(id: CurrentUser.id).update_all("post_update_count = post_update_count + 1")
+      User.where(id: updater.id).update_all("post_update_count = post_update_count + 1")
       PostVersion.queue(self) if PostVersion.enabled?
     end
 
@@ -957,8 +680,9 @@ class Post < ApplicationRecord
       self.parent_id = target.parent_id
     end
 
-    def revert_to!(target)
+    def revert_to!(target, updater:)
       revert_to(target)
+      self.updater = updater
       save!
     end
   end
@@ -972,7 +696,7 @@ class Post < ApplicationRecord
       last_noted_at.present?
     end
 
-    def copy_notes_to(other_post, copy_tags: NOTE_COPY_TAGS)
+    def copy_notes_to(other_post, updater:, copy_tags: NOTE_COPY_TAGS)
       transaction do
         if id == other_post.id
           errors.add(:base, "Source and destination posts are the same")
@@ -1004,6 +728,7 @@ class Post < ApplicationRecord
         end
 
         other_post.has_embedded_notes = has_embedded_notes
+        other_post.updater = updater
         other_post.save
       end
     end
@@ -1915,60 +1640,9 @@ class Post < ApplicationRecord
       end
     end
 
-    def validate_changed_tags
-      return if CurrentUser.user.nil? || uploader == CurrentUser.user || CurrentUser.user.is_builder?
-
-      changed_tags = added_tags + removed_tags
-
-      if RateLimiter.limited?(action: "post:validate_changed_tags", user: CurrentUser.user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f / MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
-        errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
-        throw :abort
-      end
-    end
-
     def validate_tag_count
       if tag_array.size > MAX_TAG_COUNT
         errors.add(:base, "Post cannot have more than #{MAX_TAG_COUNT} tags")
-      end
-    end
-
-    def added_tags_are_valid
-      new_tags = added_tags.select(&:empty?)
-      new_artist_tags, new_general_tags = new_tags.partition(&:artist?)
-
-      if new_general_tags.present?
-        n = new_general_tags.size
-        tag_wiki_links = new_general_tags.map { |tag| "[[#{tag.name}]]" }
-        warnings.add(:base, "Created #{n} new #{(n == 1) ? "tag" : "tags"}: #{tag_wiki_links.join(", ")}")
-      end
-
-      new_artist_tags.each do |tag|
-        if tag.artist.blank?
-          new_artist_path = Routes.new_artist_path(artist: { name: tag.name })
-          warnings.add(:base, "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[#{new_artist_path}]")
-        end
-      end
-
-      post_edit.invalid_added_tags.each do |tag|
-        tag.errors.messages.each_value do |messages|
-          warnings.add(:base, "Couldn't add tag: #{messages.join(";")}")
-        end
-      end
-
-      deprecated_tags = post_edit.deprecated_added_tag_names
-      if deprecated_tags.present?
-        tag_list = deprecated_tags.map { |tag| "[[#{tag}]]" }.to_sentence
-        warnings.add(:base, "The following tags are deprecated and could not be added: #{tag_list}")
-      end
-    end
-
-    def removed_tags_are_valid
-      attempted_removed_tags = post_edit.user_removed_tag_names
-      unremoved_tags = tag_array & attempted_removed_tags
-
-      if unremoved_tags.present?
-        unremoved_tags_list = unremoved_tags.map { |t| "[[#{t}]]" }.to_sentence
-        warnings.add(:base, "#{unremoved_tags_list} could not be removed. Check for implications and try again")
       end
     end
 
@@ -2032,6 +1706,7 @@ class Post < ApplicationRecord
     @pools = nil
     @tag_categories = nil
     @typed_tags = nil
+    @updater = nil
     self
   end
 
@@ -2043,7 +1718,7 @@ class Post < ApplicationRecord
     end
   end
 
-  def mark_as_translated(params)
+  def mark_as_translated(params, updater:)
     add_tag("check_translation") if params["check_translation"].to_s.truthy?
     remove_tag("check_translation") if params["check_translation"].to_s.falsy?
 
@@ -2058,6 +1733,7 @@ class Post < ApplicationRecord
       remove_tag("translation_request")
     end
 
+    self.updater = updater
     save
   end
 

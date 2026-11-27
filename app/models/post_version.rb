@@ -103,7 +103,7 @@ class PostVersion < ApplicationRecord
           "rating" => post.rating,
           "parent_id" => post.parent_id,
           "source" => post.source,
-          "updater_id" => CurrentUser.id,
+          "updater_id" => post.updater.id,
           "updated_at" => post.updated_at&.iso8601(6),
           "created_at" => post.created_at&.iso8601(6),
           "tags" => post.tag_string,
@@ -241,8 +241,8 @@ class PostVersion < ApplicationRecord
     source.gsub(%r{^http://}, "").sub(%r{/.+}, "")
   end
 
-  def undo!
-    raise RevertError unless post.visible?
+  def undo!(updater:)
+    raise RevertError unless post.visible?(updater)
 
     added = changes[:added_tags] - changes[:obsolete_added_tags]
     removed = changes[:removed_tags] - changes[:obsolete_removed_tags]
@@ -266,6 +266,7 @@ class PostVersion < ApplicationRecord
       end
     end
 
+    post.updater = updater
     post.save!
   end
 

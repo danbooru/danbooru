@@ -19,7 +19,7 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
   end
 
   def tag_edit
-    @tag_edit ||= PostEdit.new(nil, "", "", @second_search)
+    @tag_edit ||= PostEdit.parse(@second_search)
   end
 
   def affected_tags
@@ -131,6 +131,7 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
         batch.parallel_find_each do |post|
           post.with_lock do
             post.tag_string += " #{consequent}"
+            post.updater = user
             post.save
           end
         end

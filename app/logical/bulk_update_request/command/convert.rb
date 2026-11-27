@@ -21,7 +21,7 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   end
 
   def tag_edit
-    @tag_edit ||= PostEdit.new(nil, "", "", @consequent)
+    @tag_edit ||= PostEdit.parse(@consequent)
   end
 
   def category_term

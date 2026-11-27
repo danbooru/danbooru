@@ -27,7 +27,7 @@ class PostVersionsController < ApplicationController
 
   def undo
     @post_version = authorize PostVersion.find(params[:id])
-    @post_version.undo!
+    @post_version.undo!(updater: CurrentUser.user)
 
     respond_with(@post_version, location: post_versions_path(search: { post_id: @post_version.post_id }))
   end

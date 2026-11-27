@@ -176,6 +176,7 @@ class Tag < ApplicationRecord
     def update_tag_category_post_counts
       posts.parallel_find_each do |post|
         post.with_lock do
+          post.updater = User.system
           post.save! # Saving the post will automatically update the counts via update_tag_category_counts
         end
       end
