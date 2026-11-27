@@ -2,7 +2,9 @@
 
 # @see Source::Extractor::Piapro
 class Source::URL::Piapro < Source::URL
-  site "Piapro.jp", url: "https://piapro.jp"
+  site "Piapro.jp", url: "https://piapro.jp" do
+    credential :session_cookie, default: Danbooru.config.piapro_session_cookie, help: %{Your Piapro `piapro_s` cookie.}
+  end
 
   extractors { [Source::Extractor::Piapro, Source::Extractor::URLShortener] }
 
