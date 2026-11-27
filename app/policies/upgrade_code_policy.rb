@@ -2,7 +2,7 @@
 
 class UpgradeCodePolicy < ApplicationPolicy
   def index?
-    user.is_superadmin?
+    false
   end
 
   def redeem?
@@ -14,9 +14,7 @@ class UpgradeCodePolicy < ApplicationPolicy
   end
 
   def visible(relation)
-    if user.is_superadmin?
-      relation
-    elsif user.is_anonymous?
+    if user.is_anonymous?
       relation.none
     else
       relation.where(redeemer: user).or(relation.where(creator: user))

@@ -8,11 +8,18 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      should "render for superadmins" do
+      should "not render for superadmins" do
         create(:upgrade_code)
         get_auth upgrade_codes_path, create(:superadmin_user)
 
-        assert_response :success
+        assert_response 403
+      end
+
+      should "not render for superadmins in the API" do
+        create(:upgrade_code)
+        get_auth upgrade_codes_path(format: :json), create(:superadmin_user)
+
+        assert_response 403
       end
 
       should "not render for non-privileged users" do

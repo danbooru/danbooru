@@ -87,6 +87,21 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "#user-upgrade-#{@gift_upgrade.id}", count: 0
       end
+
+      should "not show other users' upgrades to superadmins" do
+        get_auth user_upgrades_path, create(:superadmin_user)
+
+        assert_response :success
+        assert_select "#user-upgrade-#{@self_upgrade.id}", count: 0
+        assert_select "#user-upgrade-#{@gift_upgrade.id}", count: 0
+      end
+
+      should "not show other users' upgrades to superadmins in the API" do
+        get_auth user_upgrades_path(format: :json), create(:superadmin_user)
+
+        assert_response :success
+        assert_equal([], response.parsed_body)
+      end
     end
 
     context "show action" do
@@ -112,11 +127,11 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
-        should "render for superadmins" do
+        should "be inaccessible to superadmins" do
           @user_upgrade = create(:self_gold_upgrade, status: "complete")
           get_auth user_upgrade_path(@user_upgrade), create(:superadmin_user)
 
-          assert_response :success
+          assert_response 403
         end
 
         should "be inaccessible to other users" do
@@ -177,11 +192,10 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to "xxx"
       end
 
-      # XXX not supported yet by stripe-ruby-mock
-      should_eventually "allow superadmins to view the receipt" do
+      should "not allow superadmins to view the receipt" do
         get_auth receipt_user_upgrade_path(@user_upgrade), create(:superadmin_user)
 
-        assert_redirected_to "xxx"
+        assert_response 403
       end
     end
 
@@ -196,43 +210,22 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
       end
 
-      # XXX not supported yet by stripe-ruby-mock
-      should_eventually "allow superadmins to view the receipt" do
+      should "not allow superadmins to view the payment" do
         get_auth payment_user_upgrade_path(@user_upgrade), create(:superadmin_user)
 
-        assert_redirected_to "xxx"
+        assert_response 403
       end
     end
 
     context "refund action" do
-      context "for a self upgrade" do
-        context "to Gold" do
-          should_eventually "refund the upgrade" do
-            @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
-            @user_upgrade.create_checkout!
+      should "not allow superadmins to create a refund" do
+        @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
 
-            put_auth refund_user_upgrade_path(@user_upgrade), create(:superadmin_user), xhr: true
+        put_auth refund_user_upgrade_path(@user_upgrade), create(:superadmin_user), xhr: true
 
-            assert_response :success
-            assert_equal("refunded", @user_upgrade.reload.status)
-            assert_equal(User::Levels::MEMBER, @user_upgrade.recipient.level)
-          end
-        end
-      end
-
-      context "for a gifted upgrade" do
-        context "to Platinum" do
-          should_eventually "refund the upgrade" do
-            @user_upgrade = create(:gift_platinum_upgrade, recipient: create(:platinum_user), status: "complete")
-            @user_upgrade.create_checkout!
-
-            put_auth refund_user_upgrade_path(@user_upgrade), create(:superadmin_user), xhr: true
-
-            assert_response :success
-            assert_equal("refunded", @user_upgrade.reload.status)
-            assert_equal(User::Levels::MEMBER, @user_upgrade.recipient.level)
-          end
-        end
+        assert_response 403
+        assert_equal("complete", @user_upgrade.reload.status)
+        assert_equal(User::Levels::GOLD, @user_upgrade.recipient.level)
       end
 
       should "not allow unauthorized users to create a refund" do

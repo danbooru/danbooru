@@ -14,27 +14,23 @@ class UserUpgradePolicy < ApplicationPolicy
   end
 
   def show?
-    record.recipient == user || record.purchaser == user || user.is_superadmin?
+    record.recipient == user || record.purchaser == user
   end
 
   def refund?
-    user.is_superadmin? && record.complete?
+    false
   end
 
   def receipt?
-    (record.purchaser == user || user.is_superadmin?) && record.has_receipt?
+    record.purchaser == user && record.has_receipt?
   end
 
   def payment?
-    user.is_superadmin? && record.has_payment?
+    false
   end
 
   def visible(relation)
-    if user.is_superadmin?
-      relation
-    else
-      relation.where(recipient: user).or(relation.where(purchaser: user))
-    end
+    relation.where(recipient: user).or(relation.where(purchaser: user))
   end
 
   def searchable_attributes
