@@ -61,10 +61,109 @@ class PostEdit
     # @return [Array<String>] The final list of tags on the post after the edit.
     def tag_names
       tag_names = current_tag_names + effective_added_tag_names - user_removed_tag_names
-      tag_names = post.add_automatic_tags(tag_names)
+      tag_names = add_automatic_tags(tag_names)
       tag_names += ::Tag.automatic_tags_for(tag_names)
       tag_names += TagImplication.tags_implied_by(tag_names).map(&:name)
       tag_names.uniq.sort
+    end
+
+    # @param tags [Array<String>] The list of tags to add automatic tags to.
+    # @return [Array<String>] The list of tags with automatic tags added or removed.
+    def add_automatic_tags(tags)
+      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png animated_webp exif_rotation non-repeating_animation non-web_source wide_image tall_image]
+
+      if tags.size >= 30
+        tags -= ["tagme"]
+      elsif tags.empty?
+        tags << "tagme"
+      end
+
+      tags = add_automatic_file_tags(tags)
+      tags = add_automatic_source_tags(tags)
+      tags
+    end
+
+    # @param tags [Array<String>] The list of tags to add automatic file tags to.
+    # @return [Array<String>] The list of tags with automatic file tags added or removed.
+    def add_automatic_file_tags(tags)
+      if post.image_width >= 10_000 || post.image_height >= 10_000
+        tags << "incredibly_absurdres"
+      end
+      if post.image_width >= 3200 || post.image_height >= 2400
+        tags << "absurdres"
+      end
+      if post.image_width >= 1600 || post.image_height >= 1200
+        tags << "highres"
+      end
+      if post.image_width <= 500 && post.image_height <= 500
+        tags << "lowres"
+      end
+
+      if post.image_width >= 1024 && post.image_width.to_f / post.image_height >= 4
+        tags << "wide_image"
+      elsif post.image_height >= 1024 && post.image_height.to_f / post.image_width >= 4
+        tags << "tall_image"
+      end
+
+      if post.is_flash?
+        tags << "flash"
+      end
+
+      if post.is_video?
+        tags << "video"
+      end
+
+      if post.is_ugoira?
+        tags << "ugoira"
+      end
+
+      # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, WebPs, videos, and ugoiras are automatically tagged.
+      tags -= ["animated"] unless post.is_flash?
+      tags << "animated" if post.media_asset.is_animated?
+      tags << "animated_gif" if post.media_asset.is_animated_gif?
+      tags << "animated_png" if post.media_asset.is_animated_png?
+      tags << "animated_webp" if post.media_asset.is_animated_webp?
+
+      tags << "greyscale" if post.media_asset.is_greyscale?
+      tags << "exif_rotation" if post.media_asset.is_rotated?
+      tags << "non-repeating_animation" if post.media_asset.is_non_repeating_animation?
+      tags << "ai-generated" if post.media_asset.is_ai_generated?
+
+      # Allow Flash files to be manually tagged as `sound`; other files are automatically tagged.
+      tags -= ["sound"] unless post.is_flash?
+      tags << "sound" if post.media_asset.has_sound?
+
+      tags
+    end
+
+    # @param tags [Array<String>] The list of tags to add automatic source tags to.
+    # @return [Array<String>] The list of tags with automatic source tags added or removed.
+    def add_automatic_source_tags(tags)
+      if post.source.present? && !post.web_source?
+        tags << "non-web_source"
+      end
+
+      # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
+      case post.parsed_source&.bad_link?
+      when true
+        tags << "bad_link"
+      when false
+        tags -= ["bad_link"]
+      when nil
+        # it's unknown whether it's a bad link or not; don't add or remove the tag
+      end
+
+      # A bad_source is a source from a recognized site that isn't an image url or a page url.
+      case post.parsed_source&.bad_source?
+      when true
+        tags << "bad_source"
+      when false
+        tags -= ["bad_source"]
+      when nil
+        # it's unknown whether it's a bad source or not; don't add or remove the tag
+      end
+
+      tags
     end
 
     # @return [Array<String>] The list of tags in the edited tag string, including regular tags and tags with a category prefix (e.g. `artist:bkub`)
