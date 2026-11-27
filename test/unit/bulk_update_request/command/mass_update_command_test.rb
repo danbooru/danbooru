@@ -306,6 +306,54 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
           assert_equal("bar", @post2.reload.tag_string)
         end
       end
+
+      context "by a moderator" do
+        setup do
+          @mod = create(:mod_user)
+          @post = create(:post, tag_string: "bar")
+        end
+
+        should "allow adding a tag to a list of post IDs" do
+          other_post = create(:post, tag_string: "bar")
+          unchanged_post = create(:post, tag_string: "bar")
+          create(:tag, name: "large_tag", post_count: Tag::SMALL_TAG_THRESHOLD + 1)
+
+          create_bur!("mass update id:#{@post.id},#{other_post.id} -> large_tag", @mod)
+
+          assert_equal("bar large_tag", @post.reload.tag_string)
+          assert_equal("bar large_tag", other_post.reload.tag_string)
+          assert_equal("bar", unchanged_post.reload.tag_string)
+        end
+
+        should "allow adding a tag with a category prefix to a list of post IDs" do
+          create_bur!("mass update id:#{@post.id} -> char:new_char", @mod)
+
+          assert_equal("bar new_char", @post.reload.tag_string)
+          assert_equal(true, Tag.find_by_name("new_char").character?)
+        end
+
+        should "not allow changing a large tag's category through a list of post IDs" do
+          create(:tag, name: "large_tag", category: Tag.categories.general, post_count: Tag::SMALL_TAG_THRESHOLD + 1)
+
+          bur = assert_cannot_approve_bur("mass update id:#{@post.id} -> char:large_tag", @mod, "Can't approve mass update {{id:#{@post.id}}} -> [[large_tag|char:large_tag]] (requires Admin)")
+          assert_can_approve_bur(bur, @admin)
+        end
+
+        should "not allow approving other mass updates" do
+          too_many_ids = (1..(Tag::SMALL_TAG_THRESHOLD + 1)).to_a.join(",")
+
+          assert_cannot_approve_bur("mass update bar -> foo", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update id:#{@post.id} bar -> foo", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update -id:#{@post.id} -> foo", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update id:>#{@post.id} -> foo", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update id:#{@post.id}..#{@post.id + 10} -> foo", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update id:#{too_many_ids} -> foo", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update id:#{@post.id} -> foo baz", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update id:#{@post.id} -> -bar", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update id:#{@post.id} -> rating:e", @mod, /requires Admin/)
+          assert_cannot_approve_bur("mass update id:#{@post.id} -> parent:#{@post.id}", @mod, /requires Admin/)
+        end
+      end
     end
   end
 end

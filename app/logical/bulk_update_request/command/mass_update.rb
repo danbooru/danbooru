@@ -34,6 +34,13 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
     tag_edit.metatag_terms.select { |metatag| metatag.name.in?(%w[pool -pool newpool]) }.filter_map { |metatag| Pool.find_by_name(metatag.value.escape_wildcards) }
   end
 
+  # Moderators can approve adding a single tag to a few posts, like `mass update id:1,2,3 -> tag`.
+  def approval_level(tags: nil)
+    return User::Levels::MODERATOR if searches_few_post_ids? && tag_edit.adds_single_tag? && !tag_edit.changes_large_tag_category?(tags:)
+
+    User::Levels::ADMIN
+  end
+
   def process!(approved_at: nil, **)
     self.class.mass_update(@first_search, @second_search, approved_at: approved_at)
   end
@@ -155,6 +162,12 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
   end
 
   private
+
+  # True if the search is a short list of post IDs, like `id:1,2,3`.
+  def searches_few_post_ids?
+    query = PostQuery.normalize(@first_search, apply_aliases: false)
+    query.is_list_of_ids? && query.find_metatag(:id).split(",").uniq.size <= Tag::SMALL_TAG_THRESHOLD
+  end
 
   def disallowed_metatags
     metatags = tag_edit.metatag_terms.map(&:name).reject { |name| name.in?(ALLOWED_METATAGS) }

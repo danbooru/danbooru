@@ -93,6 +93,24 @@ class PostEdit
       term if terms.one? && term&.value.present?
     end
 
+    # @return [Boolean] True if the edit adds a single tag, like `tag` or `char:tag`, but not `-tag`, `tag1 tag2`, or `rating:g`.
+    def adds_single_tag?
+      tag_name = single_categorization_term&.value || @new_tag_string
+      # Aliases don't change whether it's a single tag. Skip them to avoid an alias lookup query for each BUR on the BUR index.
+      PostQuery.normalize(tag_name, apply_aliases: false).is_simple_tag?
+    end
+
+    # @param tags [Array<Tag>, nil] Preloaded tags to look up instead of querying the database.
+    # @return [Boolean] True if the edit changes the category of a large tag, like `char:large_tag` when `large_tag` is a general tag.
+    def changes_large_tag_category?(tags: nil)
+      term = single_categorization_term
+      return false if term.nil?
+
+      tag_name = ::Tag.normalize_name(term.value)
+      tag = tags.present? ? tags.find { |tag| tag.name == tag_name } : ::Tag.find_by_name(tag_name)
+      tag.present? && !tag.is_small_tag? && tag.category != term.category
+    end
+
     # @return [Array<String>] The list of tags actually added by the user, excluding invalid or deprecated tags.
     def effective_added_tag_names
       user_added_tag_names - invalid_added_tags.map(&:name) - deprecated_added_tag_names

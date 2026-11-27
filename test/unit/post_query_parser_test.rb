@@ -549,5 +549,18 @@ class PostQueryParserTest < ActiveSupport::TestCase
         assert_equal(false, PostQuery.normalize("1girl 1boy").is_simple_tag?)
       end
     end
+
+    context "#is_list_of_ids?" do
+      should "return true only for a single id: metatag with a comma-separated list of IDs" do
+        assert_equal(true, PostQuery.normalize("id:1").is_list_of_ids?)
+        assert_equal(true, PostQuery.normalize("id:1,2,3").is_list_of_ids?)
+        assert_equal(false, PostQuery.normalize("id:>1").is_list_of_ids?)
+        assert_equal(false, PostQuery.normalize("id:1..10").is_list_of_ids?)
+        assert_equal(false, PostQuery.normalize("id:1,").is_list_of_ids?)
+        assert_equal(false, PostQuery.normalize("-id:1,2").is_list_of_ids?)
+        assert_equal(false, PostQuery.normalize("id:1,2 1girl").is_list_of_ids?)
+        assert_equal(false, PostQuery.normalize("1girl").is_list_of_ids?)
+      end
+    end
   end
 end

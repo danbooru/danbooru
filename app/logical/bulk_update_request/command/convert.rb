@@ -46,14 +46,9 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
   end
 
   def approval_level(tags: nil)
-    return User::Levels::ADMIN unless from_query.is_single_favgroup?
+    return User::Levels::MODERATOR if from_query.is_single_favgroup? && !tag_edit.changes_large_tag_category?(tags:)
 
-    if category_term.present?
-      tag = tags.present? ? tags.find { |tag| tag.name == tag_name } : to_query.tag
-      return User::Levels::ADMIN if tag.present? && !tag.is_small_tag? && tag.category != category_term.category
-    end
-
-    User::Levels::MODERATOR
+    User::Levels::ADMIN
   end
 
   def process!(approved_at: nil, **)
@@ -80,7 +75,7 @@ class BulkUpdateRequest::Command::Convert < BulkUpdateRequest::Command
 
     target_tag = Tag.new(name: tag_name)
 
-    if !to_query.is_simple_tag?
+    if !tag_edit.adds_single_tag?
       errors.add(:base, "Can't convert {{#{@antecedent}}} -> {{#{@consequent}}} (must convert a pool or favgroup to a tag)")
     elsif target_tag.invalid?(:name)
       errors.add(:base, "Can't #{to_dtext} (#{target_tag.errors.full_messages.join("; ")})")

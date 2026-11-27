@@ -25,12 +25,18 @@ module BulkUpdateRequestTestHelper
   # Assert that approving the BUR fails and leaves it pending.
   #
   # @param bur [BulkUpdateRequest, String] the BUR, or a script to create a new BUR from
-  # @param error [String, nil] the exact error message, if it should be checked
+  # @param error [String, Regexp, nil] the exact error message, or a pattern one of the error messages should match
   def assert_cannot_approve_bur(bur, approver, error = nil)
     bur = create(:bulk_update_request, script: bur) if bur.is_a?(String)
     bur.approve!(approver)
     assert_not_empty(bur.errors.full_messages, bur.script)
-    assert_includes(bur.errors.full_messages, error) if error.present?
+
+    if error.is_a?(Regexp)
+      assert_equal(true, bur.errors.full_messages.any? { |message| message.match?(error) }, "#{bur.script}: expected an error matching #{error.inspect}, got #{bur.errors.full_messages}")
+    elsif error.present?
+      assert_includes(bur.errors.full_messages, error)
+    end
+
     assert_equal("pending", bur.reload.status, bur.script)
     bur
   rescue Minitest::Assertion => e

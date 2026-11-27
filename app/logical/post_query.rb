@@ -173,6 +173,11 @@ class PostQuery
     is_metatag?(:favgroup)
   end
 
+  # True if the search is a list of post IDs, like `id:1` or `id:1,2,3`, but not `id:>1` or `id:1..10`.
+  def is_list_of_ids?
+    is_metatag?(:id) && find_metatag(:id).match?(/\A[0-9]+(,[0-9]+)*\z/)
+  end
+
   # True if the search depends on the current user because of permissions or privacy settings.
   def is_user_dependent_search?
     metatags.any? do |metatag|
