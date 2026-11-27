@@ -36,6 +36,10 @@ class Source::Extractor::Postype < Source::Extractor
     parsed_url.blogname || parsed_referer&.blogname || post.dig(:channel, :name)
   end
 
+  def published_at
+    Time.at(post[:firstPublishedAt]).utc if post[:firstPublishedAt].is_a?(Integer)
+  end
+
   def artist_commentary_title
     post[:title]
   end
@@ -96,6 +100,25 @@ class Source::Extractor::Postype < Source::Extractor
 
   def http
     super.cookies(PSE3: credentials[:session_cookie]).headers(Referer: "https://postype.com")
+  end
+
+  # Postype doesn't reject expired cookies, it treats the user as logged out instead. The post page includes the
+  # logged in user's settings when the cookie works:
+  #
+  #   {"id":7898141,"email":"...","currentProfile":{...},"useContentsBlind":false,"adultReadable":true,...}
+  def update_credentials!(response, **metadata)
+    return if site_credential.nil?
+    return super unless response.status.success?
+    return unless response.mime_type == "text/html"
+
+    case response.to_s[/\\?"adultReadable\\?":(true|false)/, 1]
+    in "true"
+      site_credential.success!(**metadata)
+    in "false" # The "Viewing adult content by foreigners" setting is disabled.
+      site_credential.error!(:invalid, **metadata)
+    in nil
+      site_credential.error!(:expired, **metadata)
+    end
   end
 
   memoize def post_content

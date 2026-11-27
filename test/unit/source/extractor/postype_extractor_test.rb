@@ -8,6 +8,15 @@ module Source::Tests::Extractor
         image_urls: %w[https://d3mcojo3jv0dbr.cloudfront.net/2024/04/03/12/46/1ffb36f1881b16a5c5881fc6eaa06179.jpeg],
         media_files: [{ file_size: 35_970 }],
         page_url: nil,
+        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -17,6 +26,15 @@ module Source::Tests::Extractor
         image_urls: %w[https://d2ufj6gm1gtdrc.cloudfront.net/2018/09/10/22/49/e91aea7d82404cdfcb12ecbc99ef856f.jpg],
         media_files: [{ file_size: 791_613 }],
         page_url: nil,
+        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -26,184 +44,66 @@ module Source::Tests::Extractor
         image_urls: %w[https://d2ufj6gm1gtdrc.cloudfront.net/2018/09/10/22/49/e91aea7d82404cdfcb12ecbc99ef856f.jpg],
         media_files: [{ file_size: 791_613 }],
         page_url: nil,
+        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
       )
     end
 
     context "A NSFW Postype post" do
-      setup do
-        skip "NSFW posts require account identify verification (through credit card, ID card, etc)"
-      end
+      setup { skip "Postype credentials required for NSFW posts" unless SiteCredential.for_site("Postype").present? }
 
       strategy_should_work(
-        "https://rottenmustard.postype.com/post/15534076",
+        "https://www.postype.com/@rottenmustard/post/21814822",
         image_urls: %w[
-          https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/23/19/35/71b8456e7e1b09d4abb1aaa20c68e1b8.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2023/11/10/14/41/5a9d1241dae9d2b3afc26ae83ee1348a.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2023/12/22/16/16/18591b8a834172711b58ec461ce3b063.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2024/02/02/11/11/529ac3af609fc14cc2d20b6fe2a0624d.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2024/02/11/18/54/0fa63596456cb473a45b66f3ea7a993c.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2024/03/11/15/39/ec5bf8328059bc2fff3fa5d9c5997e30.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2024/03/24/23/31/111c201da1b34e1b10a9224b3fddbf4a.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/10/01/12/c3beaf6cf39540eac3c7f777d04868b1.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/10/01/12/9e395efb744332f5a58eb5a02a28c6b2.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/16/15/19/a558ad7fb6a7743359ea80e2b6f369cc.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2024/05/02/18/18/1f222c14c268b27e84e898b168f03b4e.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/03/09/17/50/9d877e10134619106926672042.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/03/28/02/22/a73b75637499276956841083.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/03/28/02/22/530d5c14702127082872520822.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/14/20/43/2794fb8368572809054138769.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/25/00/29/63a66217972697968418083295.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/75ec3915095232435142738584.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/07f72417152836831668158350.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/d93da214214883177591385839.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/e0495910488976549975147777.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/95d9e88921357639619368656.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/12/15/00/38fb5b8972115121705918853.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/28/01/39/3e98433563532317057209358.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/06/05/00/01/52d1ec13725900644314259440.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/07/07/23/57/12ed6a275744369663735498.png
-          https://d2ufj6gm1gtdrc.cloudfront.net/2025/07/07/23/57/de8cb66353441080547094378.png
+          https://d2ufj6gm1gtdrc.cloudfront.net/2026/03/08/21/16/e235e93841347773728715340.png
+          https://d2ufj6gm1gtdrc.cloudfront.net/2026/03/08/21/16/4f55a514656093801329044156.png
         ],
         media_files: [
-          { file_size: 8_537 },
-          { file_size: 1_206_150 },
-          { file_size: 435_371 },
-          { file_size: 902_258 },
-          { file_size: 2_566_623 },
-          { file_size: 1_083_740 },
-          { file_size: 417_397 },
-          { file_size: 297_318 },
-          { file_size: 462_469 },
-          { file_size: 566_921 },
-          { file_size: 1_631_025 },
-          { file_size: 1_357_795 },
-          { file_size: 2_278_703 },
-          { file_size: 3_418_023 },
-          { file_size: 3_855_443 },
-          { file_size: 3_780_100 },
-          { file_size: 1_326_900 },
-          { file_size: 2_500_660 },
-          { file_size: 2_502_081 },
-          { file_size: 1_737_186 },
-          { file_size: 1_056_481 },
-          { file_size: 1_284_638 },
-          { file_size: 1_461_479 },
-          { file_size: 1_138_476 },
-          { file_size: 717_037 },
-          { file_size: 777_858 },
+          { file_size: 3_393_506 },
+          { file_size: 1_470_891 },
         ],
-        page_url: "https://www.postype.com/@rottenmustard/post/15534076",
+        page_url: "https://www.postype.com/@rottenmustard/post/21814822",
+        profile_url: "https://www.postype.com/profile/@46axcn",
         profile_urls: %w[https://www.postype.com/@rottenmustard https://www.postype.com/profile/@46axcn],
         display_name: "라쿤맨",
         username: "46axcn",
+        published_at: Time.parse("2026-03-08T12:24:37.000000Z"),
+        updated_at: nil,
         tags: [
-          ["커미션", "https://www.postype.com/search?options_tags=1&keyword=커미션"],
+          ["떡대수", "https://www.postype.com/search?options_tags=1&keyword=떡대수"],
+          ["미남수", "https://www.postype.com/search?options_tags=1&keyword=미남수"],
         ],
-        dtext_artist_commentary_title: "수위 커미션",
+        dtext_artist_commentary_title: "몬스터의 신부가 되는 일",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          h5. 천천히 진행합니다. 오픈카톡으로 와주세요!
+          간만에 3페이지 짧그림을 그려왔습니다 ^_^
 
-          h5. (카톡 입장이 가능하다면 커미션 슬롯이 남아있는 것입니다)
+          근황: 리디북스에 웹툰 런칭했습니다! 궁금하신 분은
 
-          "[s]https://open.kakao.com/o/sLKkfiOf[/s]":[https://open.kakao.com/o/sLKkfiOf]
+          <https://ridibooks.com/books/1632012441?_rdt_sid=keyword_finder_page&_rdt_idx=0>
 
-          [u]For foreigner: Paypal Commission OK!-> come to my mail, rac000000n818@gmail.com[/u]
+          "
 
-          [hr]
+          h5. 노가다 로맨스 - 리디
 
-          h4. 타입 설명
+          웹툰, 웹소설, 전자책 모두 여기에! 이야기를 즐기는 나만의 공간, RIDI 리디 ":[https://ridibooks.com/books/1632012441?_rdt_sid=keyword_finder_page&_rdt_idx=0]
 
-          h4. 흑백타입
+          이쪽으로...
 
-          * [b]반신[/b] 6.0 (허벅지까지)
-          * [b]전신[/b] 8.0
+          주의: 촉수, 실금, 양성구유화, 착유
 
-          h4. 컬러(깔끔한 셀채색)타입
+          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2026/03/08/21/16/e235e93841347773728715340.png?w=1000&q=90]
 
-          * [b]반신[/b] 8.0 (허벅지까지)
-          * [b]전신[/b] 12.0
+          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2026/03/08/21/16/4f55a514656093801329044156.png?w=1000&q=90]
 
-          작업 순서: 구도(컨펌) -> 러프(컨펌) -> 선화(컨펌) -> 완성본 전달(큰 오류 아닐 시 수정 X)
-
-          작업 기간: 1[b]개월[/b] (기간 초과시 전액 환불 & 완성본까지 드립니다.)
-
-          [hr]
-
-          h4. [b]주의사항[/b]
-
-          * 오로지 [b]근육떡대남[/b]만 그립니다. (정말 자신이 없어요!!: 여캐x, 마른체형x, 중년x)
-          * 2인 구도 어려워해요.... (노력합니다... 결과물이 어떻게 나올진 장담 못합니다... 구도가 어려우면 거절할 수도 있습니다.) [b][u]1인 신청 권장[/u]드립니다!!![/b]
-          * [b]자신있는요소: [u]근육떡대감자왕가슴남. 인외공. 촉수.[/u][/b]
-          * 선호소재: 모브(인원추가로 안칩니다. 명암묘사 생락/신체 일부만 나옵니다), 야시시한 옷, 촉수, 구속, 오모라시, 수간, 본디지...etc
-          * 작업불가소재: 스카톨로지(브라운), 너무 고어틱한 소재 etc (보고 거절할 수 있습니다)
-          * [b]작업불가장르: 헤타리아, 림버스컴퍼니(or 프문 장르), 원신[/b]
-
-          [hr]
-
-          h4. 신청서 양식
-
-          * 닉네임:
-          * 메일주소: [u](모든 작업과정/완성본은 [b]메일[/b]로 전달드립니다.)[/u]
-          * 원하는 커미션 타입: 흑백/컬러 전신/반신
-          * 캐릭터 자료: (채팅으로 여러 장 보내시면 자료 관리가 어렵습니다. 에버노트와 같은 외부링크를 활용해주시거나 1~2장으로 정돈해서 보내주세요!)
-          * 구도/소재: ([b][u]오마카세 불가능[/u][/b]합니다. 꼭 말씀주세요!!!!!!!!!)
-          * 기타: (빠지면 안되는 주요사항. 불호소재. etc)
-
-          [hr]
-
-          실제 작업물 (마지막이 가장 최근 작업물입니다)
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2023/10/23/19/35/71b8456e7e1b09d4abb1aaa20c68e1b8.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2023/11/10/14/41/5a9d1241dae9d2b3afc26ae83ee1348a.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2023/12/22/16/16/18591b8a834172711b58ec461ce3b063.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/02/02/11/11/529ac3af609fc14cc2d20b6fe2a0624d.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/02/11/18/54/0fa63596456cb473a45b66f3ea7a993c.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/03/11/15/39/ec5bf8328059bc2fff3fa5d9c5997e30.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/03/24/23/31/111c201da1b34e1b10a9224b3fddbf4a.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/10/01/12/c3beaf6cf39540eac3c7f777d04868b1.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/10/01/12/9e395efb744332f5a58eb5a02a28c6b2.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/04/16/15/19/a558ad7fb6a7743359ea80e2b6f369cc.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2024/05/02/18/18/1f222c14c268b27e84e898b168f03b4e.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/03/09/17/50/9d877e10134619106926672042.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/03/28/02/22/a73b75637499276956841083.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/03/28/02/22/530d5c14702127082872520822.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/14/20/43/2794fb8368572809054138769.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/25/00/29/63a66217972697968418083295.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/75ec3915095232435142738584.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/07f72417152836831668158350.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/04/27/20/45/d93da214214883177591385839.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/e0495910488976549975147777.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/10/23/00/95d9e88921357639619368656.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/12/15/00/38fb5b8972115121705918853.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/05/28/01/39/3e98433563532317057209358.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/06/05/00/01/52d1ec13725900644314259440.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/07/07/23/57/12ed6a275744369663735498.png?w=1000&q=90]
-
-          "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2025/07/07/23/57/de8cb66353441080547094378.png?w=1000&q=90]
+          * 텍스트 [b]55[/b]자 [tn]공백 제외[/tn]
+          * 이미지 [b]5[/b]장
         EOS
       )
     end
@@ -256,9 +156,12 @@ module Source::Tests::Extractor
           { file_size: 1_559_593 },
         ],
         page_url: "https://www.postype.com/@jadedrop/post/11998130",
+        profile_url: "https://www.postype.com/profile/@gbv1wt",
         profile_urls: %w[https://www.postype.com/@jadedrop https://www.postype.com/profile/@gbv1wt],
         display_name: "제이드",
         username: "gbv1wt",
+        published_at: Time.parse("2022-03-08T07:03:37.000000Z"),
+        updated_at: nil,
         tags: [
           ["도로헤도로", "https://www.postype.com/search?options_tags=1&keyword=도로헤도로"],
           ["팬창작", "https://www.postype.com/search?options_tags=1&keyword=팬창작"],
@@ -357,9 +260,12 @@ module Source::Tests::Extractor
         "https://somebody.postype.com/post/999999999999",
         image_urls: [],
         page_url: "https://www.postype.com/@somebody/post/999999999999",
+        profile_url: nil,
         profile_urls: %w[https://www.postype.com/@somebody],
         display_name: nil,
         username: nil,
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
@@ -530,9 +436,12 @@ module Source::Tests::Extractor
           { file_size: 789_692 },
         ],
         page_url: "https://www.postype.com/@dee0333/post/21240419",
+        profile_url: "https://www.postype.com/profile/@17hzi5",
         profile_urls: %w[https://www.postype.com/@dee0333 https://www.postype.com/profile/@17hzi5],
         display_name: "ㄷ1",
         username: "17hzi5",
+        published_at: Time.parse("2025-12-31T15:56:36.000000Z"),
+        updated_at: nil,
         tags: [
           ["레뷰", "https://www.postype.com/search?options_tags=1&keyword=레뷰"],
           ["레뷰스타", "https://www.postype.com/search?options_tags=1&keyword=레뷰스타"],
@@ -707,6 +616,32 @@ module Source::Tests::Extractor
           "[image]":[https://d2ufj6gm1gtdrc.cloudfront.net/2026/01/01/00/48/d893bd3817887640630639468.png?w=1000&q=90]
         EOS
       )
+    end
+
+    context "The Postype site credential" do
+      setup do
+        @url = "https://www.postype.com/@rottenmustard/post/21814822"
+      end
+
+      should "be marked as valid when the cookie is logged in" do
+        skip "Postype credentials not configured" if Danbooru.config.postype_session_cookie.blank?
+
+        credential = create(:site_credential, site: "Postype", credential: { session_cookie: Danbooru.config.postype_session_cookie })
+        extractor = Source::Extractor.find(@url)
+        extractor.stubs(:site_credentials).returns([credential])
+
+        assert_equal(2, extractor.image_urls.size)
+        assert_equal("valid", credential.reload.status)
+      end
+
+      should "be marked as expired when the cookie is logged out" do
+        credential = create(:site_credential, site: "Postype", credential: { session_cookie: "invalid" })
+        extractor = Source::Extractor.find(@url)
+        extractor.stubs(:site_credentials).returns([credential])
+
+        assert_equal([], extractor.image_urls)
+        assert_equal("expired", credential.reload.status)
+      end
     end
   end
 end
