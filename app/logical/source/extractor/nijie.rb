@@ -122,56 +122,43 @@ module Source
       end
 
       def request(url)
-        return nil if url.blank? || client.blank?
+        return nil if url.blank?
 
-        response = client.cache(1.minute).get(url)
+        response = http.cache(1.minute).get(url)
+        return nil if response.status != 200
 
-        if response.status != 200 || response.parse&.search("#login_illust").present? || response.uri.path == "/login.php"
-          clear_cached_session_cookie!
+        # When logged out, view.php shows a login prompt (#login_illust) instead of the artist, commentary, and tags.
+        if response.parse&.at("#login_illust").present?
+          site_credential&.error!(:expired)
+          nil
         else
+          update_credentials!(response)
+          save_nijie_tok!(response)
           response.parse
         end
       end
 
-      def client
-        return nil if cached_session_cookie.nil?
-        http.cookies(R18: 1, **cached_session_cookie)
-      end
-
       def http
-        super.timeout(60).use(retriable: { max_retries: 20 })
+        cookies = { R18: 1, NIJIEIJIEID: credentials[:session_id], nijie_tok: nijie_tok }.compact
+        super.timeout(60).use(retriable: { max_retries: 20 }).cookies(**cookies)
       end
 
-      # { "NIJIEIJIEID" => "5ca3f816c0c1f3e647940b08b8ab7a45", "nijie_tok" => <long-base64-string> }
-      def cached_session_cookie
-        Cache.get("nijie-session-cookie", 60.minutes, skip_nil: true) do
-          session_cookie
-        end
+      # Nijie sends a new nijie_tok cookie with each response, which expires 60 days later. Cache the newest one so the
+      # login stays alive past the expiry of the nijie_tok cookie in the site credential.
+      def nijie_tok
+        (Cache.get(nijie_tok_cache_key) if nijie_tok_cache_key.present?) || credentials[:nijie_tok]
       end
 
-      def clear_cached_session_cookie!
-        flush_cache # clear memoized session cookie
-        Cache.delete("nijie-session-cookie")
+      def save_nijie_tok!(response)
+        cookie = response.cookies.find { |c| c.name == "nijie_tok" }
+        return if cookie&.value.blank? || cookie.expires.nil? || cookie.expires <= Time.zone.now || nijie_tok_cache_key.nil?
+
+        Cache.put(nijie_tok_cache_key, cookie.value, cookie.expires - Time.zone.now)
       end
 
-      def session_cookie
-        login_page = http.get("https://nijie.info/login.php").parse
-
-        form = {
-          email: credentials[:login],
-          password: credentials[:password],
-          url: login_page.at("input[name='url']")&.attr("value"),
-          save: "on",
-          ticket: "",
-        }
-
-        response = http.no_follow.post("https://nijie.info/login_int.php", form: form)
-        update_credentials!(response)
-
-        response.cookies.to_h { |c| [c.name, c.value] } if response.status.redirect?
+      def nijie_tok_cache_key
+        "nijie-tok:#{Cache.hash(credentials[:session_id])}" if credentials[:session_id].present?
       end
-
-      memoize :client, :cached_session_cookie
     end
   end
 end

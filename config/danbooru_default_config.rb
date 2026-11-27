@@ -503,11 +503,13 @@ module Danbooru
       nil
     end
 
-    def nijie_login
+    # Your Nijie "NIJIEIJIEID" and "nijie_tok" cookies. Login to Nijie then use
+    # the devtools to find the cookies.
+    def nijie_session_id
       nil
     end
 
-    def nijie_password
+    def nijie_tok
       nil
     end
 

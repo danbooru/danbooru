@@ -14,8 +14,8 @@ class Source::URL::Nijie < Source::URL
     url "https://nijie.info"
     domains %w[nijie.net nijie.info]
 
-    credential :login, default: Danbooru.config.nijie_login, help: %{Your Nijie login}
-    credential :password, default: Danbooru.config.nijie_password, help: %{Your nijie password}
+    credential :session_id, default: Danbooru.config.nijie_session_id, help: %{Your Nijie `NIJIEIJIEID` cookie.}
+    credential :nijie_tok, default: Danbooru.config.nijie_tok, help: %{Your Nijie `nijie_tok` cookie.}
   end
 
   extractors { [Source::Extractor::Nijie, Source::Extractor::URLShortener] }

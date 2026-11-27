@@ -317,15 +317,25 @@ module Source::Tests::Extractor
       )
     end
 
-    context "when the cached session cookie is invalid" do
-      should "clear the cached cookie after failing to fetch the data" do
+    context "when the nijie_tok cookie is refreshed" do
+      should "use the refreshed cookie in later requests" do
+        session_id = Source::Extractor.find("https://nijie.info/view.php?id=213043").credentials[:session_id]
+        assert_equal("莚", Source::Extractor.find("https://nijie.info/view.php?id=213043").display_name)
+
+        site = Source::Extractor.find("https://nijie.info/view.php?id=203688", credentials: { session_id: session_id, nijie_tok: "expired" })
+        assert_equal("satosi", site.display_name)
+      end
+    end
+
+    context "when the session cookies are invalid" do
+      should "mark the credential as expired" do
+        credential = create(:site_credential, site: "Nijie", credential: { session_id: "fake", nijie_tok: "fake" })
         site = Source::Extractor.find("https://nijie.info/view.php?id=203688")
+        site.stubs(:site_credentials).returns([credential])
 
-        Cache.put("nijie-session-cookie", { "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" })
-        assert_equal({ "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" }, site.cached_session_cookie)
-
-        site.tags
-        assert_nil(Cache.get("nijie-session-cookie"))
+        assert_equal([], site.tags)
+        assert_nil(site.display_name)
+        assert_equal(true, credential.reload.is_expired?)
       end
     end
 
