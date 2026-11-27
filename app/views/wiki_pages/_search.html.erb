@@ -2,6 +2,8 @@
   <%= f.input :title_normalize, label: "Title", input_html: { value: params[:search][:title_normalize], "data-autocomplete": "wiki-page"} %>
   <%= f.input :other_names_match, label: "Other names", input_html: { value: params[:search][:other_names_match] } %>
   <%= f.input :title_or_body_matches, label: "Text", input_html: { value: params[:search][:title_or_body_matches] } %>
+  <%= f.input :body_present, label: "Has body?", as: :select, include_blank: true, selected: params[:search][:body_present] %>
+  <%= f.input :other_names_present, label: "Has other names?", as: :select, include_blank: true, selected: params[:search][:other_names_present] %>
   <%= f.input :linked_to, hint: "Find wikis linking to this wiki", input_html: { value: params[:search][:linked_to], "data-autocomplete": "wiki-page" } %>
   <%= f.simple_fields_for :tag do |fa| %>
     <%= fa.input :category, collection: TagCategory.canonical_mapping.to_a, include_blank: true, selected: params.dig(:search, :tag, :category) %>
