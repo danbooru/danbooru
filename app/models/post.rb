@@ -390,13 +390,11 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
-      if old_parent_id == ""
-        old_parent_id = nil
-      else
-        old_parent_id = old_parent_id.to_i
-      end
-      if old_parent_id == parent_id
-        self.parent_id = parent_id_before_last_save || parent_id_was
+      if !old_parent_id.nil?
+        old_parent = old_parent_id.presence&.to_i
+        if old_parent == parent_id
+          self.parent_id = parent_id_before_last_save || parent_id_was
+        end
       end
 
       if old_source == source.to_s

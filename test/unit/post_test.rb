@@ -2160,6 +2160,30 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("http://example.com", final_post.source)
           assert_equal("s", final_post.rating)
         end
+
+        should "preserve a concurrent parent change when old_parent_id is non-empty" do
+          parent1 = create(:post)
+          parent2 = create(:post)
+          post = create(:post, parent: parent1, source: "")
+
+          # user a changes parent from parent1 to parent2
+          post_edited_by_user_a = Post.find(post.id)
+          post_edited_by_user_a.old_parent_id = parent1.id.to_s
+          post_edited_by_user_a.parent_id = parent2.id
+          post_edited_by_user_a.save!
+
+          # user b edits source without changing parent (still sees parent1)
+          post_edited_by_user_b = Post.find(post.id)
+          post_edited_by_user_b.old_parent_id = parent1.id.to_s
+          post_edited_by_user_b.parent_id = parent1.id
+          post_edited_by_user_b.old_source = ""
+          post_edited_by_user_b.source = "http://example.com"
+          post_edited_by_user_b.save!
+
+          final_post = Post.find(post.id)
+          assert_equal(parent2.id, final_post.parent_id)
+          assert_equal("http://example.com", final_post.source)
+        end
       end
 
       context "that has been tagged with a metatag" do
