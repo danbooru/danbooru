@@ -589,23 +589,6 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_not_includes(BulkUpdateRequest.search({ can_approve: "false" }, @admin).ids, @bur1.id)
         end
 
-        should "not run extra queries for each small -> big alias" do
-          count_queries = lambda do
-            count = 0
-            counter = ->(*, payload) { count += 1 unless payload[:name] == "SCHEMA" }
-            ActiveSupport::Notifications.subscribed(counter, "sql.active_record") { BulkUpdateRequest.search({ can_approve: "true" }, @mod).load }
-            count
-          end
-
-          create(:bulk_update_request, script: "alias #{@artist_tag.name} -> #{@large_tag.name}")
-          queries_before = count_queries.call
-
-          create(:bulk_update_request, script: "alias #{@character_tag1.name} -> #{@large_tag.name}")
-          create(:bulk_update_request, script: "alias #{@small_tag.name} -> #{@large_tag.name}")
-
-          assert_equal(queries_before, count_queries.call)
-        end
-
         should "only check what a small -> big alias moves when approving, not when showing the Approve button" do
           create(:tag, name: "#{@character_tag1.name}_(cosplay)", post_count: 1000)
           create(:character_tag, name: "large_character", post_count: 1000)

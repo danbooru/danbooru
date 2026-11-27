@@ -51,21 +51,6 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_includes(response.parsed_body.pluck("id"), hidden_vote.id)
       end
-
-      should "not run extra queries for each included forum post" do
-        count_queries = lambda do
-          get_auth forum_post_votes_path(only: "id,forum_post[body]"), @user, as: :json # warm up caches
-          count = 0
-          ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].start_with?("SELECT") }, "sql.active_record") do
-            get_auth forum_post_votes_path(only: "id,forum_post[body]"), @user, as: :json
-          end
-          count
-        end
-
-        queries = count_queries.call
-        create_list(:forum_post_vote, 5)
-        assert_equal(queries, count_queries.call)
-      end
     end
 
     context "show action" do

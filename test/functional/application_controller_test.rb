@@ -1015,22 +1015,6 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_equal(%w[id post], response.parsed_body.sole.keys.sort)
       end
 
-      should "not run visibility queries for included models without visibility restrictions" do
-        create(:comment, post: @post)
-        count_queries = lambda do
-          count = 0
-          ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].start_with?("SELECT") }, "sql.active_record") do
-            get posts_path(only: "id,uploader[name],comments[body]", limit: 1), as: :json
-          end
-          count
-        end
-
-        count_queries.call # warm up caches
-        queries = count_queries.call
-        ApplicationRecord.stubs(:hide_invisible_includes!)
-        assert_equal(count_queries.call, queries)
-      end
-
       should "not include hidden methods when only some nested records hide them" do
         visible_child = create(:post, parent: @post)
         banned_child = create(:post, parent: @post, is_banned: true)

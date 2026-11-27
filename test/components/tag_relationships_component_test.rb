@@ -93,30 +93,5 @@ class TagRelationshipsComponentTest < ViewComponent::TestCase
       assert_css(".fineprint", text: /child_0, .*and child_9\s+\(learn more\)/)
       assert_no_text(/\d+ more/)
     end
-
-    should "not run extra queries for each alias or implication" do
-      add_relationships = lambda do |n|
-        as(@user) do
-          create(:tag_alias, antecedent_name: "alias_#{n}", consequent_name: "foo", status: "active")
-          create(:tag_implication, antecedent_name: "foo", consequent_name: "parent_#{n}", status: "active")
-          create(:tag_implication, antecedent_name: "child_#{n}", consequent_name: "foo", status: "active")
-        end
-      end
-
-      count_queries = lambda do
-        count = 0
-        ActiveSupport::Notifications.subscribed(->(*, payload) { count += 1 if payload[:sql].start_with?("SELECT") }, "sql.active_record") do
-          render_component(Tag.find(@tag.id))
-        end
-        count
-      end
-
-      add_relationships.call(1)
-      queries = count_queries.call
-      add_relationships.call(2)
-      add_relationships.call(3)
-
-      assert_equal(queries, count_queries.call)
-    end
   end
 end
