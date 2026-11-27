@@ -297,18 +297,24 @@ class ServerStatus
     end
 
     def postgres_version
+      return nil unless postgres_up?
+
       ApplicationRecord.connection.select_value("SELECT version()")
     rescue ActiveRecord::ActiveRecordError
       nil
     end
 
     def postgres_active_connections
+      return nil unless postgres_up?
+
       ApplicationRecord.connection.select_value("SELECT COUNT(*) FROM pg_stat_activity WHERE state = 'active'")
     rescue ActiveRecord::ActiveRecordError
       nil
     end
 
     def postgres_connection_stats
+      return nil unless postgres_up?
+
       result = ApplicationRecord.connection.select_all("SELECT now() - xact_start AS transaction_duration, now() - query_start AS query_duration, application_name AS source, wait_event FROM pg_stat_activity WHERE state = 'active' ORDER BY 2 DESC, pid")
       serialize_result(result)
     rescue ActiveRecord::ActiveRecordError
@@ -331,4 +337,5 @@ class ServerStatus
   end
 
   memoize :redis_info, :kernel_version, :distro_version, :ffmpeg_version, :libvips_version
+  memoize :postgres_error
 end
