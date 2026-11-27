@@ -161,6 +161,15 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
         assert_equal({ phpsessid: "old" }, @site_credential.reload.credential.symbolize_keys)
       end
 
+      should "allow admins to disable credentials for sites that no longer exist" do
+        @site_credential = create(:site_credential)
+        @site_credential.update_columns(site: 12_345)
+        put_auth site_credential_path(@site_credential), @admin, params: { site_credential: { is_enabled: false }, format: :js }, xhr: true, reauthenticate: true
+
+        assert_response :success
+        assert_equal(false, @site_credential.reload.is_enabled?)
+      end
+
       should "not allow non-admins to update credentials" do
         @site_credential = create(:site_credential)
         put_auth site_credential_path(@site_credential), @member, params: { site_credential: { is_enabled: false }}, reauthenticate: true
@@ -186,6 +195,15 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
         assert_match(/deleted a site credential for/, ModAction.last.description)
         assert_equal(@user, ModAction.last.creator)
         assert_equal(false, ModAction.exists?(category: "site_credential_create"))
+      end
+
+      should "allow a superadmin to delete credentials for sites that no longer exist" do
+        @site_credential = create(:site_credential)
+        @site_credential.update_columns(site: 12_345)
+        delete_auth site_credential_path(@site_credential), create(:superadmin_user), params: { format: :js }, xhr: true, reauthenticate: true
+
+        assert_response :success
+        assert_equal(0, SiteCredential.count)
       end
 
       should "not allow non-owners to delete credentials" do

@@ -14,7 +14,7 @@ class SiteCredential < ApplicationRecord
 
   attr_accessor :updater
 
-  enum :site, SITES.to_h { |site| [site.name, site.site_id] }, scopes: false, instance_methods: false, validate: true
+  enum :site, SITES.to_h { |site| [site.name, site.site_id] }, scopes: false, instance_methods: false, validate: { if: -> { new_record? || site_changed? }}
 
   enum :status, {
     unknown: 0,        # The credential hasn't been used yet, or failed for an unknown reason.
@@ -28,7 +28,7 @@ class SiteCredential < ApplicationRecord
   belongs_to :creator, class_name: "User"
   has_many :mod_actions, as: :subject, dependent: :destroy
 
-  validates :site, presence: true, inclusion: { in: sites.keys, allow_nil: true }
+  validates :site, presence: true, if: -> { new_record? || site_changed? }
   validates :credential, presence: true
   validate :validate_credential, if: :credential_changed?
 
