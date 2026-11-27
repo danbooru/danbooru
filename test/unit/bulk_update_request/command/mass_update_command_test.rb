@@ -257,6 +257,15 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
         end
       end
 
+      should "update posts that already have the maximum number of tags" do
+        stub_const(Post, :MAX_TAG_COUNT, 3) do
+          @post = create(:post, tag_string: "a b foo")
+          create_bur!("mass update foo -> bar", @admin)
+
+          assert_equal("a b bar foo", @post.reload.tag_string)
+        end
+      end
+
       should "fail if the first post can't be updated" do
         parent = create(:post, tag_string: "foo")
         child = create(:post, tag_string: "foo")

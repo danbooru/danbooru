@@ -1927,6 +1927,8 @@ class Post < ApplicationRecord
     end
 
     def validate_tag_count
+      return if CurrentUser.user == User.system
+
       if tag_array.size > MAX_TAG_COUNT
         errors.add(:base, "Post cannot have more than #{MAX_TAG_COUNT} tags")
       end
