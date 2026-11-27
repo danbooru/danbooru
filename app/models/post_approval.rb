@@ -30,7 +30,7 @@ class PostApproval < ApplicationRecord
     post.flags.pending.update!(status: :rejected)
     post.appeals.pending.update!(status: :succeeded)
 
-    post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
+    post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false, updater: user)
     ModAction.log("undeleted post ##{post_id}", :post_undelete, subject: post, user: user) if is_undeletion
 
     post.uploader.upload_limit.update_limit!(is_pending, true)

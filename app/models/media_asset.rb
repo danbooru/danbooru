@@ -496,9 +496,7 @@ class MediaAsset < ApplicationRecord
       media_metadata.update!(file: original_file)
 
       if saved_changes? && post.present?
-        CurrentUser.scoped(User.system) do
-          post.update!(md5: md5, file_ext: file_ext, file_size: file_size, image_width: image_width, image_height: image_height)
-        end
+        post.update!(md5: md5, file_ext: file_ext, file_size: file_size, image_width: image_width, image_height: image_height, updater: User.system)
       end
     end
 

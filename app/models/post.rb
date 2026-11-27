@@ -101,7 +101,7 @@ class Post < ApplicationRecord
   has_many :dtext_links, -> { embedded_post }, foreign_key: :link_target
   has_many :embedding_wiki_pages, through: :dtext_links, source: :model, source_type: "WikiPage"
 
-  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :post_edit
+  attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :post_edit, :updater
 
   scope :pending, -> { where(is_pending: true) }
   scope :flagged, -> { where(is_flagged: true) }
@@ -135,6 +135,7 @@ class Post < ApplicationRecord
 
     Post.new(
       uploader: upload.uploader,
+      updater: upload.uploader,
       md5: media_asset&.md5,
       file_ext: media_asset&.file_ext,
       file_size: media_asset&.file_size,
@@ -405,16 +406,17 @@ class Post < ApplicationRecord
         self.rating = rating_before_last_save || rating_was
       end
 
+      raise ArgumentError, "updater is required" if updater.nil?
       @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
     end
 
     # XXX should be a `validate` hook instead of `before_validation` hook
     def validate_new_tags
-      return if CurrentUser.user.nil? || CurrentUser.user.is_builder?
+      return if updater.is_builder?
 
       new_tags = post_edit.effective_added_tag_names.reject { |name| Tag.exists?(name: name) }
 
-      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
+      if RateLimiter.limited?(action: "post:validate_new_tags", user: updater, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
         errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
         throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
       end
@@ -540,80 +542,80 @@ class Post < ApplicationRecord
           end
 
         in "newfavgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id(name, CurrentUser.user)
+          favgroup = FavoriteGroup.find_by_name_or_id(name, updater)
 
           # XXX race condition
           if favgroup.nil?
-            raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, FavoriteGroup).create?
-            FavoriteGroup.create!(name: name, creator: CurrentUser.user, post_ids: [id])
+            raise User::PrivilegeError unless Pundit.policy!(updater, FavoriteGroup).create?
+            FavoriteGroup.create!(name: name, creator: updater, post_ids: [id])
           else
-            raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
+            raise User::PrivilegeError unless Pundit.policy!(updater, favgroup).update?
             favgroup.add(self)
           end
 
         in "fav", name
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
-          Favorite.create(post: self, user: CurrentUser.user)
+          raise User::PrivilegeError unless Pundit.policy!(updater, Favorite).create?
+          Favorite.create(post: self, user: updater)
 
         in "-fav", name
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
-          Favorite.destroy_by(post: self, user: CurrentUser.user)
+          raise User::PrivilegeError unless Pundit.policy!(updater, Favorite).create?
+          Favorite.destroy_by(post: self, user: updater)
 
         in "upvote", name
-          vote!(1, CurrentUser.user)
+          vote!(1, updater)
 
         in "downvote", name
-          vote!(-1, CurrentUser.user)
+          vote!(-1, updater)
 
         in "-upvote", name
-          unvote!(1, CurrentUser.user)
+          unvote!(1, updater)
 
         in "-downvote", name
-          unvote!(-1, CurrentUser.user)
+          unvote!(-1, updater)
 
         in "status", "active"
-          raise User::PrivilegeError unless CurrentUser.is_approver?
-          approvals.create!(user: CurrentUser.user)
+          raise User::PrivilegeError unless updater.is_approver?
+          approvals.create!(user: updater)
 
         in "status", "banned"
-          raise User::PrivilegeError unless CurrentUser.is_approver?
-          ban!(CurrentUser.user)
+          raise User::PrivilegeError unless updater.is_approver?
+          ban!(updater)
 
         in "-status", "banned"
-          raise User::PrivilegeError unless CurrentUser.is_approver?
-          unban!(CurrentUser.user)
+          raise User::PrivilegeError unless updater.is_approver?
+          unban!(updater)
 
         in "disapproved", reason
-          raise User::PrivilegeError unless CurrentUser.is_approver?
-          disapprovals.find_or_initialize_by(user: CurrentUser.user).update!(reason: reason.downcase)
+          raise User::PrivilegeError unless updater.is_approver?
+          disapprovals.find_or_initialize_by(user: updater).update!(reason: reason.downcase)
 
         in "child", "none"
-          children.select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
-            post.update!(parent_id: nil)
+          children.select { |post| Pundit.policy!(updater, post).update? }.each do |post|
+            post.update!(parent_id: nil, updater: updater)
           end
 
         in "-child", ids
           next if ids.blank?
 
-          children.where_numeric_matches(:id, ids).select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
-            post.update!(parent_id: nil)
+          children.where_numeric_matches(:id, ids).select { |post| Pundit.policy!(updater, post).update? }.each do |post|
+            post.update!(parent_id: nil, updater: updater)
           end
 
         in "child", ids
           next if ids.blank?
 
-          Post.where_numeric_matches(:id, ids).where.not(id: [id, parent_id].compact).limit(10).select { |post| Pundit.policy!(CurrentUser.user, post).update? }.each do |post|
-            post.update!(parent_id: id)
+          Post.where_numeric_matches(:id, ids).where.not(id: [id, parent_id].compact).limit(10).select { |post| Pundit.policy!(updater, post).update? }.each do |post|
+            post.update!(parent_id: id, updater: updater)
           end
 
         in "-favgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id!(name, CurrentUser.user)
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
+          favgroup = FavoriteGroup.find_by_name_or_id!(name, updater)
+          raise User::PrivilegeError unless Pundit.policy!(updater, favgroup).update?
           favgroup&.remove(self)
 
         in "favgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id!(name, CurrentUser.user)
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
+          favgroup = FavoriteGroup.find_by_name_or_id!(name, updater)
+          raise User::PrivilegeError unless Pundit.policy!(updater, favgroup).update?
           favgroup&.add(self)
 
         end
@@ -652,13 +654,15 @@ class Post < ApplicationRecord
           self.is_pending = true if new_record?
 
         in category, name if category.in?(PostEdit::CATEGORIZATION_METATAGS)
-          Tag.find_or_create_by_name(name, category: category, current_user: CurrentUser.user)
+          Tag.find_or_create_by_name(name, category: category, current_user: updater)
 
         else
           nil
 
         end
       end
+
+      parent.updater = updater if parent&.changed?
     end
 
     def web_source?
@@ -805,15 +809,15 @@ class Post < ApplicationRecord
     end
 
     def update_has_children_flag
-      update(has_children: children.exists?, has_active_children: children.undeleted.exists?)
+      update(has_children: children.exists?, has_active_children: children.undeleted.exists?, updater: User.system)
     end
 
     def update_parent_on_destroy
       parent&.update_has_children_flag
     end
 
-    def update_children_on_destroy
-      children.update(parent: nil)
+    def update_children_on_destroy(updater: User.system)
+      children.update(parent: nil, updater: updater)
     end
 
     def update_parent_on_save
@@ -868,7 +872,7 @@ class Post < ApplicationRecord
 
           # Move the files before updating tag counts so the tag rows aren't locked during slow file transfers.
           media_asset.trash!(current_user, log: false)
-          update_children_on_destroy
+          update_children_on_destroy(updater: current_user)
           Tag.decrement_post_counts(tag_array)
           remove_from_all_pools
           remove_from_fav_groups
@@ -906,7 +910,7 @@ class Post < ApplicationRecord
           raise ActiveRecord::Rollback
         end
 
-        update!(is_deleted: true, is_pending: false, is_flagged: false)
+        update!(is_deleted: true, is_pending: false, is_flagged: false, updater: user)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
         give_favorites_to_parent if move_favorites
@@ -936,11 +940,11 @@ class Post < ApplicationRecord
 
     def merge_version?
       prev = versions.last
-      prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
+      prev && prev.updater_id == updater.id && prev.updated_at > 1.hour.ago
     end
 
     def create_new_version
-      User.where(id: CurrentUser.id).update_all("post_update_count = post_update_count + 1")
+      User.where(id: updater.id).update_all("post_update_count = post_update_count + 1")
       PostVersion.queue(self) if PostVersion.enabled?
     end
 
@@ -955,8 +959,9 @@ class Post < ApplicationRecord
       self.parent_id = target.parent_id
     end
 
-    def revert_to!(target)
+    def revert_to!(target, updater:)
       revert_to(target)
+      self.updater = updater
       save!
     end
   end
@@ -970,7 +975,7 @@ class Post < ApplicationRecord
       last_noted_at.present?
     end
 
-    def copy_notes_to(other_post, copy_tags: NOTE_COPY_TAGS)
+    def copy_notes_to(other_post, updater:, copy_tags: NOTE_COPY_TAGS)
       transaction do
         if id == other_post.id
           errors.add(:base, "Source and destination posts are the same")
@@ -1002,6 +1007,7 @@ class Post < ApplicationRecord
         end
 
         other_post.has_embedded_notes = has_embedded_notes
+        other_post.updater = updater
         other_post.save
       end
     end
@@ -1914,11 +1920,11 @@ class Post < ApplicationRecord
     end
 
     def validate_changed_tags
-      return if CurrentUser.user.nil? || uploader == CurrentUser.user || CurrentUser.user.is_builder?
+      return if uploader == updater || updater.is_builder?
 
       changed_tags = added_tags + removed_tags
 
-      if RateLimiter.limited?(action: "post:validate_changed_tags", user: CurrentUser.user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f / MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
+      if RateLimiter.limited?(action: "post:validate_changed_tags", user: updater, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f / MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
         errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
         throw :abort
       end
@@ -2030,6 +2036,7 @@ class Post < ApplicationRecord
     @pools = nil
     @tag_categories = nil
     @typed_tags = nil
+    @updater = nil
     self
   end
 
@@ -2041,7 +2048,7 @@ class Post < ApplicationRecord
     end
   end
 
-  def mark_as_translated(params)
+  def mark_as_translated(params, updater:)
     add_tag("check_translation") if params["check_translation"].to_s.truthy?
     remove_tag("check_translation") if params["check_translation"].to_s.falsy?
 
@@ -2056,6 +2063,7 @@ class Post < ApplicationRecord
       remove_tag("translation_request")
     end
 
+    self.updater = updater
     save
   end
 

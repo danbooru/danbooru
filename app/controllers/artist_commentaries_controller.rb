@@ -28,7 +28,7 @@ class ArtistCommentariesController < ApplicationController
 
     post = Post.find(post_id)
     @artist_commentary = ArtistCommentary.find_or_initialize_by(post: post)
-    @artist_commentary.attributes = permitted_attributes(@artist_commentary)
+    @artist_commentary.attributes = { updater: CurrentUser.user, **permitted_attributes(@artist_commentary) }
     authorize(@artist_commentary).save
 
     respond_with(@artist_commentary)

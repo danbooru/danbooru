@@ -50,6 +50,7 @@ class PostReplacementProcessor
     post.tag_string = "#{post.tag_string} #{replacement.tags}"
 
     rescale_notes(post)
+    post.updater = replacement.creator
     post.save!
     post.update_iqdb
   rescue Exception => exception

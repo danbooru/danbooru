@@ -131,6 +131,7 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
         batch.parallel_find_each do |post|
           post.with_lock do
             post.tag_string += " #{consequent}"
+            post.updater = user
             post.save
           end
         end

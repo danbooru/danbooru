@@ -49,17 +49,17 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
       end
 
       should "add tags if requested" do
-        as(@user) { @artcomm.update(translated_title: "bar", commentary_tags: "commentary") }
+        as(@user) { @artcomm.update(translated_title: "bar", commentary_tags: "commentary", updater: @user) }
         assert_equal(true, @artcomm.post.reload.has_tag?("commentary"))
 
-        as(@user) { @artcomm.update(commentary_tags: "partial_commentary") }
+        as(@user) { @artcomm.update(commentary_tags: "partial_commentary", updater: @user) }
         assert_equal(false, @artcomm.post.reload.has_tag?("commentary"))
         assert_equal(true, @artcomm.post.has_tag?("partial_commentary"))
       end
 
       should "remove tags if requested" do
-        @artcomm.post.update!(tag_string: "partial_commentary commentary")
-        as(@user) { @artcomm.update!(commentary_tags: "none") }
+        @artcomm.post.update!(tag_string: "partial_commentary commentary", updater: @user)
+        as(@user) { @artcomm.update!(commentary_tags: "none", updater: @user) }
 
         assert_not(@artcomm.post.reload.has_tag?("commentary"))
         assert_not(@artcomm.post.has_tag?("partial_commentary"))

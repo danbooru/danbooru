@@ -662,7 +662,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "hide restricted posts" do
-          Post.update(is_banned: true)
+          Post.update(is_banned: true, updater: User.system)
           get posts_path(format: :atom)
 
           assert_response :success
@@ -1023,7 +1023,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "escape quotes and backslashes in the source search link in the tooltip" do
-          @post.update!(source: 'a "b" c\\')
+          @post.update!(source: 'a "b" c\\', updater: @user)
           get_auth post_path(@post, variant: "tooltip", preview: "true"), @user
 
           assert_response :success
@@ -1031,7 +1031,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "escape quotes and backslashes in the file source search link in the tooltip" do
-          @post.update!(source: 'file://C:\\a "b"\\')
+          @post.update!(source: 'file://C:\\a "b"\\', updater: @user)
           get_auth post_path(@post, variant: "tooltip", preview: "true"), @user
 
           assert_response :success

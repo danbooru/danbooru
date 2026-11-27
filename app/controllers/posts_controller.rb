@@ -72,7 +72,7 @@ class PostsController < ApplicationController
 
       # Don't let users edit posts they can't see, so they can't make them visible by removing restricted tags or changing the rating.
       if policy(@original_post).update?
-        @original_post.update(rating: @post.rating.presence || @original_post.rating, parent_id: @post.parent_id || @original_post.parent_id, tag_string: "#{@original_post.tag_string} #{params.dig(:post, :tag_string)}")
+        @original_post.update(rating: @post.rating.presence || @original_post.rating, parent_id: @post.parent_id || @original_post.parent_id, tag_string: "#{@original_post.tag_string} #{params.dig(:post, :tag_string)}", updater: CurrentUser.user)
         flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       else
         flash[:notice] = "Duplicate of post ##{@original_post.id}"
@@ -87,7 +87,7 @@ class PostsController < ApplicationController
 
   def update
     @post = authorize Post.find(params[:id])
-    @post.update(permitted_attributes(@post))
+    @post.update(updater: CurrentUser.user, **permitted_attributes(@post))
     respond_with_post_after_update(@post)
   end
 
@@ -106,7 +106,7 @@ class PostsController < ApplicationController
   def revert
     @post = authorize Post.find(params[:id])
     @version = @post.versions.find(params[:version_id])
-    @post.revert_to!(@version)
+    @post.revert_to!(@version, updater: CurrentUser.user)
 
     respond_with(@post) do |format|
       format.js
@@ -116,7 +116,7 @@ class PostsController < ApplicationController
   def copy_notes
     @post = Post.find(params[:id])
     @other_post = authorize Post.find(params.expect(:other_post_id))
-    @post.copy_notes_to(@other_post)
+    @post.copy_notes_to(@other_post, updater: CurrentUser.user)
 
     if @post.errors.any?
       @error_message = @post.errors.full_messages.join("; ")
@@ -138,7 +138,7 @@ class PostsController < ApplicationController
 
   def mark_as_translated
     @post = authorize Post.find(params[:id])
-    @post.mark_as_translated(params[:post])
+    @post.mark_as_translated(params[:post], updater: CurrentUser.user)
     respond_with_post_after_update(@post)
   end
 

@@ -29,6 +29,7 @@ class AITagsController < ApplicationController
       notice = "Post ##{@post.id}: Added [[#{@ai_tag.tag.pretty_name}]]."
     end
 
+    @post.updater = CurrentUser.user
     @post.save
     @ai_tag.errors.add(:base, "Couldn't update post ##{@post.id}: #{@post.errors.full_messages.join("; ")}") if @post.invalid?
 

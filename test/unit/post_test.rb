@@ -475,11 +475,12 @@ class PostTest < ActiveSupport::TestCase
 
       context "with an artist tag that is then changed to copyright" do
         setup do
-          CurrentUser.user = create(:builder_user)
+          builder = create(:builder_user)
+          CurrentUser.user = builder
           @post = Post.find(@post.id)
-          @post.update(tag_string: "art:abc")
+          @post.update(tag_string: "art:abc", updater: builder)
           @post = Post.find(@post.id)
-          @post.update(tag_string: "copy:abc")
+          @post.update(tag_string: "copy:abc", updater: builder)
           @post.reload
         end
 
@@ -512,7 +513,7 @@ class PostTest < ActiveSupport::TestCase
         setup do
           create(:tag_alias, antecedent_name: "abc", consequent_name: "xyz")
           @post = Post.find(@post.id)
-          @post.update(tag_string: "art:abc")
+          @post.update(tag_string: "art:abc", updater: @user)
           @post.reload
         end
 
@@ -1072,38 +1073,38 @@ class PostTest < ActiveSupport::TestCase
         context "for a rating" do
           context "that is valid" do
             should "update the rating" do
-              @post.update(tag_string: "aaa rating:e")
+              @post.update(tag_string: "aaa rating:e", updater: @user)
               assert_equal("e", @post.reload.rating)
 
-              @post.update(tag_string: "aaa rating:q")
+              @post.update(tag_string: "aaa rating:q", updater: @user)
               assert_equal("q", @post.reload.rating)
 
-              @post.update(tag_string: "aaa rating:s")
+              @post.update(tag_string: "aaa rating:s", updater: @user)
               assert_equal("s", @post.reload.rating)
 
-              @post.update(tag_string: "aaa rating:g")
+              @post.update(tag_string: "aaa rating:g", updater: @user)
               assert_equal("g", @post.reload.rating)
 
-              @post.update(tag_string: "aaa rating:E")
+              @post.update(tag_string: "aaa rating:E", updater: @user)
               assert_equal("e", @post.reload.rating)
             end
 
             should "update the rating for a long name" do
-              @post.update(tag_string: "aaa rating:explicit")
+              @post.update(tag_string: "aaa rating:explicit", updater: @user)
               assert_equal("e", @post.reload.rating)
 
-              @post.update(tag_string: "aaa rating:questionable")
+              @post.update(tag_string: "aaa rating:questionable", updater: @user)
               assert_equal("q", @post.reload.rating)
 
-              @post.update(tag_string: "aaa rating:sensitive")
+              @post.update(tag_string: "aaa rating:sensitive", updater: @user)
               assert_equal("s", @post.reload.rating)
 
-              @post.update(tag_string: "aaa rating:general")
+              @post.update(tag_string: "aaa rating:general", updater: @user)
               assert_equal("g", @post.reload.rating)
             end
 
             should "update the rating for rating:safe" do
-              @post.update(tag_string: "aaa rating:safe")
+              @post.update(tag_string: "aaa rating:safe", updater: @user)
               assert_equal("s", @post.reload.rating)
             end
           end
@@ -1134,88 +1135,92 @@ class PostTest < ActiveSupport::TestCase
 
         context "for a fav" do
           should "add/remove the current user to the post's favorite listing" do
-            @post.update(tag_string: "aaa fav:self")
+            @post.update(tag_string: "aaa fav:self", updater: @user)
             assert_equal(1, @post.reload.score)
             assert_equal(1, @post.favorites.where(user: @user).count)
             assert_equal(1, @post.votes.active.positive.where(user: @user).count)
 
-            @post.update(tag_string: "aaa -fav:self")
+            @post.update(tag_string: "aaa -fav:self", updater: @user)
             assert_equal(0, @post.reload.score)
             assert_equal(0, @post.favorites.count)
             assert_equal(0, @post.votes.active.positive.where(user: @user).count)
           end
 
           should "not allow banned users to fav" do
+            banned_user = create(:banned_user)
+
             assert_no_difference("@post.favorites.count") do
-              as(create(:banned_user)) { @post.update(tag_string: "aaa fav:self") }
+              @post.update(tag_string: "aaa fav:self", updater: banned_user)
             end
 
             assert_no_difference("@post.favorites.count") do
-              as(create(:banned_user)) { @post.update(tag_string: "aaa -fav:self") }
+              @post.update(tag_string: "aaa -fav:self", updater: banned_user)
             end
           end
 
           should "not allow restricted users to fav" do
+            restricted_user = create(:restricted_user)
+
             assert_no_difference("@post.favorites.count") do
-              as(create(:restricted_user)) { @post.update(tag_string: "aaa fav:self") }
+              @post.update(tag_string: "aaa fav:self", updater: restricted_user)
             end
 
             assert_no_difference("@post.favorites.count") do
-              as(create(:restricted_user)) { @post.update(tag_string: "aaa -fav:self") }
+              @post.update(tag_string: "aaa -fav:self", updater: restricted_user)
             end
           end
 
           should "not fail when the fav: metatag is used twice" do
-            @post.update(tag_string: "aaa fav:self fav:me")
+            @post.update(tag_string: "aaa fav:self fav:me", updater: @user)
             assert_equal(1, @post.favorites.where(user: @user).count)
 
-            @post.update(tag_string: "aaa -fav:self -fav:me")
+            @post.update(tag_string: "aaa -fav:self -fav:me", updater: @user)
             assert_equal(0, @post.favorites.count)
           end
         end
 
         context "for an upvote or downvote" do
           should "remove the current user's upvote with -upvote:self" do
-            @post.update(tag_string: "aaa upvote:self")
+            @post.update(tag_string: "aaa upvote:self", updater: @user)
             assert_equal(1, @post.reload.score)
 
-            @post.update(tag_string: "aaa -upvote:self")
+            @post.update(tag_string: "aaa -upvote:self", updater: @user)
             assert_equal(0, @post.reload.score)
             assert_equal(0, @post.votes.active.where(user: @user).count)
           end
 
           should "remove the current user's downvote with -downvote:self" do
-            @post.update(tag_string: "aaa downvote:self")
+            @post.update(tag_string: "aaa downvote:self", updater: @user)
             assert_equal(-1, @post.reload.score)
 
-            @post.update(tag_string: "aaa -downvote:self")
+            @post.update(tag_string: "aaa -downvote:self", updater: @user)
             assert_equal(0, @post.reload.score)
             assert_equal(0, @post.votes.active.where(user: @user).count)
           end
 
           should "not remove a downvote with -upvote:self" do
-            @post.update(tag_string: "aaa downvote:self")
+            @post.update(tag_string: "aaa downvote:self", updater: @user)
             assert_equal(-1, @post.reload.score)
 
-            @post.update(tag_string: "aaa -upvote:self")
+            @post.update(tag_string: "aaa -upvote:self", updater: @user)
             assert_equal(-1, @post.reload.score)
             assert_equal(1, @post.votes.active.where(user: @user).count)
           end
 
           should "not remove an upvote with -downvote:self" do
-            @post.update(tag_string: "aaa upvote:self")
+            @post.update(tag_string: "aaa upvote:self", updater: @user)
             assert_equal(1, @post.reload.score)
 
-            @post.update(tag_string: "aaa -downvote:self")
+            @post.update(tag_string: "aaa -downvote:self", updater: @user)
             assert_equal(1, @post.reload.score)
             assert_equal(1, @post.votes.active.where(user: @user).count)
           end
 
           should "do nothing if the user hasn't voted" do
-            @post.update(tag_string: "aaa -upvote:self")
+            @post.update(tag_string: "aaa -upvote:self", updater: @user)
             assert_equal(0, @post.reload.score)
 
-            @post.update(tag_string: "aaa -downvote:self")
+            @post.update(tag_string: "aaa -downvote:self", updater: @user)
             assert_equal(0, @post.reload.score)
           end
         end
@@ -1282,19 +1287,18 @@ class PostTest < ActiveSupport::TestCase
 
         context "for status:active" do
           should "approve the post if the user has permission" do
-            as(create(:approver)) do
-              @post.update!(is_pending: true)
-              @post.update(tag_string: "aaa status:active")
-            end
+            approver = create(:approver)
+            @post.update!(is_pending: true, updater: approver)
+            @post.update(tag_string: "aaa status:active", updater: approver)
 
             assert_equal(false, @post.reload.is_pending?)
           end
 
           should "not approve the post if the user is doesn't have permission" do
-            @post.update!(is_pending: true)
+            @post.update!(is_pending: true, updater: @user)
 
             assert_no_difference("@post.approvals.count") do
-              @post.update(tag_string: "aaa status:active")
+              @post.update(tag_string: "aaa status:active", updater: @user)
             end
 
             assert_equal(true, @post.reload.is_pending?)
@@ -1303,25 +1307,23 @@ class PostTest < ActiveSupport::TestCase
 
         context "for status:banned" do
           should "ban the post if the user has permission" do
-            as(create(:approver)) do
-              @post.update(tag_string: "aaa status:banned")
-            end
+            approver = create(:approver)
+            @post.update(tag_string: "aaa status:banned", updater: approver)
 
             assert_equal(true, @post.reload.is_banned?)
           end
 
           should "not ban the post if the user doesn't have permission" do
             assert_no_changes("@post.reload.is_banned?") do
-              @post.update(tag_string: "aaa status:banned")
+              @post.update(tag_string: "aaa status:banned", updater: @user)
             end
 
             assert_equal(false, @post.reload.is_banned?)
           end
 
           should "not ban the post if status:banned is contained in a source string" do
-            as(create(:approver)) do
-              @post.update(tag_string: 'aaa source:"status:banned"')
-            end
+            approver = create(:approver)
+            @post.update(tag_string: 'aaa source:"status:banned"', updater: approver)
 
             assert_equal(false, @post.reload.is_banned?)
           end
@@ -1329,19 +1331,18 @@ class PostTest < ActiveSupport::TestCase
 
         context "for -status:banned" do
           should "unban the post if the user has permission" do
-            as(create(:approver)) do
-              @post.update!(is_banned: true)
-              @post.update(tag_string: "aaa -status:banned")
-            end
+            approver = create(:approver)
+            @post.update!(is_banned: true, updater: approver)
+            @post.update(tag_string: "aaa -status:banned", updater: approver)
 
             assert_equal(false, @post.reload.is_banned?)
           end
 
           should "not unban the post if the user doesn't have permission" do
-            @post.update!(is_banned: true)
+            @post.update!(is_banned: true, updater: @user)
 
             assert_no_changes("@post.reload.is_banned?") do
-              @post.update(tag_string: "aaa -status:banned")
+              @post.update(tag_string: "aaa -status:banned", updater: @user)
             end
 
             assert_equal(true, @post.reload.is_banned?)
@@ -1352,10 +1353,8 @@ class PostTest < ActiveSupport::TestCase
           should "disapprove the post if the user has permission" do
             @user = create(:approver)
 
-            as(@user) do
-              @post.update!(is_pending: true)
-              @post.update(tag_string: "aaa disapproved:disinterest")
-            end
+            @post.update!(is_pending: true, updater: @user)
+            @post.update(tag_string: "aaa disapproved:disinterest", updater: @user)
 
             assert_equal(@post.id, PostDisapproval.last.post_id)
             assert_equal(@user.id, PostDisapproval.last.user_id)
@@ -1364,8 +1363,8 @@ class PostTest < ActiveSupport::TestCase
 
           should "not disapprove the post if the user is doesn't have permission" do
             assert_no_difference("@post.disapprovals.count") do
-              @post.update!(is_pending: true)
-              @post.update(tag_string: "aaa disapproved:disinterest")
+              @post.update!(is_pending: true, updater: @user)
+              @post.update(tag_string: "aaa disapproved:disinterest", updater: @user)
             end
 
             assert_equal(0, @post.disapprovals.count)
@@ -1373,7 +1372,7 @@ class PostTest < ActiveSupport::TestCase
 
           should "not allow disapproving active posts" do
             assert_no_difference("@post.disapprovals.count") do
-              @post.update(tag_string: "aaa disapproved:disinterest")
+              @post.update(tag_string: "aaa disapproved:disinterest", updater: @user)
             end
 
             assert_equal(0, @post.disapprovals.count)
@@ -1382,13 +1381,11 @@ class PostTest < ActiveSupport::TestCase
           should "update the reason if the post was already disapproved by the same user with a different reason" do
             @user = create(:approver)
 
-            as(@user) do
-              @post.update!(is_pending: true)
-              @post.update(tag_string: "aaa disapproved:disinterest")
+            @post.update!(is_pending: true, updater: @user)
+            @post.update(tag_string: "aaa disapproved:disinterest", updater: @user)
 
-              assert_no_difference("@post.disapprovals.count") do
-                @post.update(tag_string: "aaa disapproved:poor_quality")
-              end
+            assert_no_difference("@post.disapprovals.count") do
+              @post.update(tag_string: "aaa disapproved:poor_quality", updater: @user)
             end
 
             assert_equal("poor_quality", PostDisapproval.last.reason)
@@ -1543,10 +1540,10 @@ class PostTest < ActiveSupport::TestCase
           create(:tag, name: "hair_ribbon", post_count: 300_000)
           create(:tag, name: "hakurei_reimu", post_count: 50_000)
 
-          @post.update!(tag_string: "aaa hair_ribbon hakurei_reimu")
+          @post.update!(tag_string: "aaa hair_ribbon hakurei_reimu", updater: @user)
           assert_equal("aaa hair_ribbon hakurei_reimu", @post.reload.tag_string)
 
-          @post.update!(tag_string: "aaa hair_ribbon hakurei_reimu -/hr")
+          @post.update!(tag_string: "aaa hair_ribbon hakurei_reimu -/hr", updater: @user)
           assert_equal("aaa hakurei_reimu", @post.reload.tag_string)
         end
 
@@ -1604,8 +1601,8 @@ class PostTest < ActiveSupport::TestCase
       context "a static image tagged with animated_gif" do
         should "remove the tag" do
           @media_asset = create(:media_asset, file: "test/files/gif/test-static-32x32.gif")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme animated animated_gif")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme animated animated_gif", updater: @user)
           assert_equal("tagme", @post.tag_string)
         end
       end
@@ -1613,8 +1610,8 @@ class PostTest < ActiveSupport::TestCase
       context "a static image tagged with animated_png" do
         should "remove the tag" do
           @media_asset = create(:media_asset, file: "test/files/png/test.png")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme animated animated_png")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme animated animated_png", updater: @user)
           assert_equal("tagme", @post.tag_string)
         end
       end
@@ -1622,8 +1619,8 @@ class PostTest < ActiveSupport::TestCase
       context "an animated gif missing the animated_gif tag" do
         should "automatically add the animated_gif tag" do
           @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52.gif")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("animated animated_gif tagme", @post.tag_string)
         end
       end
@@ -1631,8 +1628,8 @@ class PostTest < ActiveSupport::TestCase
       context "an animated png missing the animated_png tag" do
         should "automatically add the animated_png tag" do
           @media_asset = MediaAsset.upload!("test/files/apng/normal-256x256.png")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("animated animated_png tagme", @post.tag_string)
         end
       end
@@ -1640,8 +1637,8 @@ class PostTest < ActiveSupport::TestCase
       context "a static image tagged with animated_webp" do
         should "remove the tag" do
           @media_asset = create(:media_asset, file: "test/files/webp/test.webp")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme animated animated_webp")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme animated animated_webp", updater: @user)
           assert_equal("tagme", @post.tag_string)
         end
       end
@@ -1649,8 +1646,8 @@ class PostTest < ActiveSupport::TestCase
       context "an animated webp missing the animated_webp tag" do
         should "automatically add the animated_webp tag" do
           @media_asset = MediaAsset.upload!("test/files/webp/nyancat.webp")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("animated animated_webp tagme", @post.tag_string)
         end
       end
@@ -1658,15 +1655,15 @@ class PostTest < ActiveSupport::TestCase
       context "a greyscale image missing the greyscale tag" do
         should "automatically add the greyscale tag for a monochrome JPEG file" do
           @media_asset = MediaAsset.upload!("test/files/jpg/test-grey-no-profile.jpg")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("greyscale tagme", @post.tag_string)
         end
 
         should "automatically add the greyscale tag for a monochrome AVIF file" do
           @media_asset = MediaAsset.upload!("test/files/avif/fox.profile0.8bpc.yuv420.monochrome.avif")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("greyscale tagme", @post.tag_string)
         end
       end
@@ -1674,8 +1671,8 @@ class PostTest < ActiveSupport::TestCase
       context "an exif-rotated image missing the exif_rotation tag" do
         should "automatically add the exif_rotation tag" do
           @media_asset = MediaAsset.upload!("test/files/jpg/test-rotation-90cw.jpg")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("exif_rotation tagme", @post.tag_string)
         end
       end
@@ -1683,8 +1680,8 @@ class PostTest < ActiveSupport::TestCase
       context "a PNG with a valid exif orientation flag" do
         should "automatically add the exif_rotation tag" do
           @media_asset = MediaAsset.upload!("test/files/png/test-rotation-good-chunk.png")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("exif_rotation tagme", @post.tag_string)
         end
       end
@@ -1692,8 +1689,8 @@ class PostTest < ActiveSupport::TestCase
       context "a PNG with an invalid exif orientation flag" do
         should "not add the exif_rotation tag" do
           @media_asset = MediaAsset.upload!("test/files/png/test-rotation-bad-chunk.png")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("tagme", @post.tag_string)
         end
       end
@@ -1701,13 +1698,13 @@ class PostTest < ActiveSupport::TestCase
       context "a non-repeating GIF missing the non-repeating_animation tag" do
         should "automatically add the non-repeating_animation tag" do
           @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52-loop-1.gif")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
 
           @media_asset = MediaAsset.upload!("test/files/gif/test-animated-86x52-loop-2.gif")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
         end
       end
@@ -1715,8 +1712,8 @@ class PostTest < ActiveSupport::TestCase
       context "a silent video with the sound tag" do
         should "automatically remove the sound tag" do
           @media_asset = MediaAsset.upload!("test/files/mp4/test-silent-audio.mp4")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "sound")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "sound", updater: @user)
           assert_equal("animated", @post.tag_string)
         end
       end
@@ -1724,8 +1721,8 @@ class PostTest < ActiveSupport::TestCase
       context "an audible video without the sound tag" do
         should "automatically add the sound tag" do
           @media_asset = MediaAsset.upload!("test/files/mp4/test-audio.mp4")
-          @post.update!(md5: @media_asset.md5)
-          @post.reload.update!(tag_string: "tagme")
+          @post.update!(md5: @media_asset.md5, updater: @user)
+          @post.reload.update!(tag_string: "tagme", updater: @user)
           assert_equal("animated sound tagme", @post.tag_string)
         end
       end
@@ -2058,6 +2055,7 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(3, Tag.find_by_name("ccc").post_count)
           post3.reload
           post3.tag_string = "xxx"
+          post3.updater = @user
           post3.save
           assert_equal(1, Tag.find_by_name("aaa").post_count)
           assert_equal(2, Tag.find_by_name("bbb").post_count)
@@ -2094,12 +2092,14 @@ class PostTest < ActiveSupport::TestCase
           post_edited_by_user_a = Post.find(post.id)
           post_edited_by_user_a.old_tag_string = "aaa bbb ccc"
           post_edited_by_user_a.tag_string = "aaa bbb ccc ddd"
+          post_edited_by_user_a.updater = @user
           post_edited_by_user_a.save
 
           # user b removes <ccc> adds <eee>
           post_edited_by_user_b = Post.find(post.id)
           post_edited_by_user_b.old_tag_string = "aaa bbb ccc"
           post_edited_by_user_b.tag_string = "aaa bbb eee"
+          post_edited_by_user_b.updater = @user
           post_edited_by_user_b.save
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
@@ -2117,12 +2117,14 @@ class PostTest < ActiveSupport::TestCase
           post_edited_by_user_a = Post.find(post.id)
           post_edited_by_user_a.old_tag_string = "aaa bbb ccc"
           post_edited_by_user_a.tag_string = "aaa bbb eee"
+          post_edited_by_user_a.updater = @user
           post_edited_by_user_a.save
 
           # user b adds <ddd>
           post_edited_by_user_b = Post.find(post.id)
           post_edited_by_user_b.old_tag_string = "aaa bbb ccc"
           post_edited_by_user_b.tag_string = "aaa bbb ccc ddd"
+          post_edited_by_user_b.updater = @user
           post_edited_by_user_b.save
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
@@ -2142,6 +2144,7 @@ class PostTest < ActiveSupport::TestCase
           post_edited_by_user_a.parent_id = parent_post.id
           post_edited_by_user_a.source = nil
           post_edited_by_user_a.rating = "s"
+          post_edited_by_user_a.updater = @user
           post_edited_by_user_a.save
 
           # user b adds source
@@ -2152,6 +2155,7 @@ class PostTest < ActiveSupport::TestCase
           post_edited_by_user_b.parent_id = nil
           post_edited_by_user_b.source = "http://example.com"
           post_edited_by_user_b.rating = "q"
+          post_edited_by_user_b.updater = @user
           post_edited_by_user_b.save
 
           # final post should be rated safe and have the set parent and source
@@ -2170,6 +2174,7 @@ class PostTest < ActiveSupport::TestCase
           post_edited_by_user_a = Post.find(post.id)
           post_edited_by_user_a.old_parent_id = parent1.id.to_s
           post_edited_by_user_a.parent_id = parent2.id
+          post_edited_by_user_a.updater = @user
           post_edited_by_user_a.save!
 
           # user b edits source without changing parent (still sees parent1)
@@ -2178,6 +2183,7 @@ class PostTest < ActiveSupport::TestCase
           post_edited_by_user_b.parent_id = parent1.id
           post_edited_by_user_b.old_source = ""
           post_edited_by_user_b.source = "http://example.com"
+          post_edited_by_user_b.updater = @user
           post_edited_by_user_b.save!
 
           final_post = Post.find(post.id)
@@ -2252,10 +2258,10 @@ class PostTest < ActiveSupport::TestCase
         should "warn when a tag removal failed due to implications or automatic tags" do
           create(:tag_implication, antecedent_name: "cat", consequent_name: "animal")
           @post.reload
-          @post.update(old_tag_string: @post.tag_string, tag_string: "chen_(cosplay) char:chen cosplay cat animal")
+          @post.update(old_tag_string: @post.tag_string, tag_string: "chen_(cosplay) char:chen cosplay cat animal", updater: @user)
           @post.warnings.clear
           @post.reload
-          @post.update(old_tag_string: @post.tag_string, tag_string: "chen_(cosplay) chen cosplay cat -cosplay")
+          @post.update(old_tag_string: @post.tag_string, tag_string: "chen_(cosplay) chen cosplay cat -cosplay", updater: @user)
 
           assert_match(/\[\[animal\]\] and \[\[cosplay\]\] could not be removed./, @post.warnings.full_messages.join)
         end
@@ -2285,7 +2291,7 @@ class PostTest < ActiveSupport::TestCase
       should "call Tag.increment_post_counts with the correct params" do
         @post.reload
         Tag.expects(:increment_post_counts).once.with(["abc"])
-        @post.update(tag_string: "tag1 abc")
+        @post.update(tag_string: "tag1 abc", updater: @user)
       end
     end
 
@@ -2509,13 +2515,13 @@ class PostTest < ActiveSupport::TestCase
         @post = create(:post, rating: "q", tag_string: "aaa", source: "")
         travel(2.hours)
         @post.reload
-        @post.update(tag_string: "aaa bbb ccc ddd")
+        @post.update(tag_string: "aaa bbb ccc ddd", updater: @user)
         travel(2.hours)
         @post.reload
-        @post.update(tag_string: "bbb xxx yyy", source: "http://xyz.com")
+        @post.update(tag_string: "bbb xxx yyy", source: "http://xyz.com", updater: @user)
         travel(2.hours)
         @post.reload
-        @post.update(tag_string: "bbb mmm yyy", source: "http://abc.com")
+        @post.update(tag_string: "bbb mmm yyy", source: "http://abc.com", updater: @user)
         @post.reload
       end
 

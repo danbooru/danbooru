@@ -12,6 +12,8 @@ class ArtistCommentary < ApplicationRecord
 
   class RevertError < StandardError; end
 
+  attr_accessor :updater
+
   dtext_attribute :original_title, disable_mentions: true, inline: true
   dtext_attribute :translated_title, disable_mentions: true, inline: true
   dtext_attribute :original_description, disable_mentions: true
@@ -169,6 +171,7 @@ class ArtistCommentary < ApplicationRecord
     return unless @commentary_tag.present?
     post.remove_tag(*COMMENTARY_TAGS)
     post.add_tag(@commentary_tag) unless @commentary_tag == "none"
+    post.updater = updater
     post.save!
   end
 

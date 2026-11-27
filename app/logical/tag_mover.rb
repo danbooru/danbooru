@@ -76,6 +76,7 @@ class TagMover
       post.with_lock do
         post.remove_tag(old_tag.name)
         post.add_tag(new_tag.name)
+        post.updater = user
         post.save! # XXX should do `validate: false`, but validations are currently need to parse the tags
       end
     end
