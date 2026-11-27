@@ -139,18 +139,102 @@ module Source::Tests::Extractor
       )
     end
 
-    # XXX Not supported.
-    context "A Youtube video" do
+    context "A Youtube video with hashtags, mentions, and external links" do
       strategy_should_work(
-        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "https://www.youtube.com/watch?v=YZV4d6Ssqdo",
         image_urls: [],
-        page_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        page_url: "https://www.youtube.com/watch?v=YZV4d6Ssqdo",
+        profile_url: "https://www.youtube.com/@ilekkim",
+        profile_urls: %w[https://www.youtube.com/@ilekkim https://www.youtube.com/channel/UCl8FRguXVySAHDnKdqn3QOg],
+        display_name: "ilekkim",
+        username: "ilekkim",
+        published_at: nil,
+        updated_at: nil,
+        tags: [
+          ["hololive", "https://www.youtube.com/hashtag/hololive"],
+          ["hololiveenglish", "https://www.youtube.com/hashtag/hololiveenglish"],
+          ["gigimurin", "https://www.youtube.com/hashtag/gigimurin"],
+          ["hololiveen", "https://www.youtube.com/hashtag/hololiveen"],
+        ],
+        dtext_artist_commentary_title: "Gigi Remembers【Hololive Animation】",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          based on true events that happens during September 21st
+
+          inspired by
+          "@vensen5150":[https://www.youtube.com/@vensen5150]
+          "@themathewflames":[https://www.youtube.com/@themathewflames]
+          "@ColonelFanzipantzen":[https://www.youtube.com/@ColonelFanzipantzen]
+          check out their amazing work its very cool and inspiring
+
+          Models:
+          Gigi @morandoblend
+          Cece, Liz & IRyS @sunekosurisuri_
+          Raora @syn0104
+          Mori @genoge_cg
+          Ina @tihi_a
+          Bae @antro3dcg
+          mmd.hololive.tv
+          Hololive Office by @plum_wine_053
+          Amelia Chibi @Om Abhyankar on sketchfab
+          bloop @ayaelghan on sketchfab
+          HoloCouncil Plushies @Seafoam on sketchfab
+          Other assets and environments from sketchfab
+          Made in Goo Engine 4.2
+          Edited on Davinci Resolve
+          Music: "September" by Earth, Wind and Fire
+
+          Follow me on X/Twitter: <https://x.com/ilekkim>
+          Support me: <https://ko-fi.com/ilekkim>
+
+          Check the tubers in this video out!
+          "@holoen_gigimurin":[https://www.youtube.com/@holoen_gigimurin], "@holoen_ceciliaimmergreen":[https://www.youtube.com/@holoen_ceciliaimmergreen], "@holoen_raorapanthera":[https://www.youtube.com/@holoen_raorapanthera],"@holoen_erbloodflame":[https://www.youtube.com/@holoen_erbloodflame], "@NerissaRavencroft":[https://www.youtube.com/@NerissaRavencroft], "@KosekiBijou":[https://www.youtube.com/@KosekiBijou], "@ShioriNovella":[https://www.youtube.com/@ShioriNovella], "@FUWAMOCOch":[https://www.youtube.com/@FUWAMOCOch], "@NinomaeInanis":[https://www.youtube.com/@NinomaeInanis], "@TakanashiKiara":[https://www.youtube.com/@TakanashiKiara], "@MoriCalliope":[https://www.youtube.com/@MoriCalliope], "@IRyS":[https://www.youtube.com/@IRyS], "@HakosBaelz":[https://www.youtube.com/@HakosBaelz] & "@OuroKronii":[https://www.youtube.com/@OuroKronii]
+
+          This is a fan-made animation. I do not own the music or the characters. All rights belong to their respective owners. Please support the original creators!
+
+          yipeee new video! i know theres alot of cleaning up i could've done but i was already late for when i wanted to post this because not only was i busy settling in my new place but also got sick when i first arrived. but anyways this one i really wanted to practice and not rely 100% on references on some scenes because i felt like i was only copying references 1 to 1, especially in acting and expressions i feel very bad at it. though ngl i still feel like im copying references w this one buuuuut whatever. also was itching to do actions scenes so i sneaked some there. i also couldve fixed the positions a little bit with everyone dancing cuz it looks too spacious but my laptops memory was leaking w everyones model in the scene (rip laptop). and at the end i also planned to do a proper dance for Kronii but her rig was broken so i tried to hide it instead lmao. anw thank you so much for the recent support it really motivates me to learn more and share my work w u guys!! also opening up to be a freelance animator or accepting commissions if anyones interested feel free to dm me on X or email me link in my bio!
+          (post upload) some people have been mentioning it and I have came to realize that IRyS's pants somehow didn't render and she looks unclothed. But I promise you she is wearing something under there. It was my mistake for not noticing, apologies for that.
+
+          "#hololive":[https://www.youtube.com/hashtag/hololive] "#hololiveenglish":[https://www.youtube.com/hashtag/hololiveenglish] "#gigimurin":[https://www.youtube.com/hashtag/gigimurin] "#hololiveen":[https://www.youtube.com/hashtag/hololiveen]
+        EOS
+      )
+    end
+
+    context "A Youtube short" do
+      strategy_should_work(
+        "https://www.youtube.com/shorts/GSR2ghvoTDY",
+        image_urls: [],
+        page_url: "https://www.youtube.com/watch?v=GSR2ghvoTDY",
+        profile_url: "https://www.youtube.com/@BlueSechi",
+        profile_urls: %w[https://www.youtube.com/@BlueSechi https://www.youtube.com/channel/UCOvfZCGGft-KwjVh7XihUOg],
+        display_name: "BlueSechi",
+        username: "BlueSechi",
+        published_at: nil,
+        updated_at: nil,
+        tags: [
+          ["bluesechi", "https://www.youtube.com/hashtag/bluesechi"],
+          ["ブルーセチ", "https://www.youtube.com/hashtag/ブルーセチ"],
+          ["フリーレン", "https://www.youtube.com/hashtag/フリーレン"],
+        ],
+        dtext_artist_commentary_title: "フリーレンやめろ!!  #bluesechi #フリーレン #ブルーセチ",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          Twitter : <https://twitter.com/sechihyeo>
+          Twitch : <https://twitch.tv/nunggom>
+          "#bluesechi":[https://www.youtube.com/hashtag/bluesechi] "#ブルーセチ":[https://www.youtube.com/hashtag/ブルーセチ] "#フリーレン":[https://www.youtube.com/hashtag/フリーレン]
+        EOS
+      )
+    end
+
+    context "A deleted or nonexistent Youtube video" do
+      strategy_should_work(
+        "https://www.youtube.com/watch?v=aaaaaaaaaaa",
+        image_urls: [],
+        page_url: "https://www.youtube.com/watch?v=aaaaaaaaaaa",
         profile_url: nil,
         profile_urls: [],
         display_name: nil,
         username: nil,
-        tag_name: nil,
-        other_names: [],
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",

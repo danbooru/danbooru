@@ -11,7 +11,8 @@ class Source::Extractor::Youtube < Source::Extractor
       # A community post with multiple images has "postMultiImageRenderer"; a post with a single image doesn't.
       # Single image: https://www.youtube.com/post/UgkxWevNfezmf-a7CRIO0haWiaDSjTI8mGsf
       # Multiple images: https://www.youtube.com/post/UgkxBkJE1Eu_6S9sADZF5IuK5MPRSWf4VVz3
-      attachments = community_post.dig("backstageAttachment", "postMultiImageRenderer", "images") || [community_post["backstageAttachment"]].compact
+      attachment = community_post["backstageAttachment"]
+      attachments = attachment&.dig("postMultiImageRenderer", "images") || [attachment].compact
       attachments.filter_map do |attachment|
         url = attachment.dig("backstageImageRenderer", "image", "thumbnails", 0, "url")
         Source::URL.parse(url).try(:full_image_url) || url
@@ -30,7 +31,7 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def display_name
-    community_post.dig("authorText", "runs", 0, "text")
+    community_post.dig("authorText", "runs", 0, "text") || video_owner.dig("title", "runs", 0, "text")
   end
 
   def username
@@ -38,8 +39,11 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def tags
-    community_post.dig(:contentText, :runs).to_a.filter_map do |run|
-      url = run.dig(:navigationEndpoint, :commandMetadata, :webCommandMetadata, :url)&.then { |u| Danbooru::URL.unescape(u) }
+    post_commands = community_post.dig(:contentText, :runs).to_a.pluck(:navigationEndpoint)
+    video_commands = video_description[:commandRuns].to_a.map { |run| run.dig(:onTap, :innertubeCommand) }
+
+    (post_commands + video_commands).compact.filter_map do |command|
+      url = command.dig(:commandMetadata, :webCommandMetadata, :url)&.then { |u| Danbooru::URL.unescape(u) }
       next unless url&.starts_with?("/hashtag/")
 
       [url.delete_prefix("/hashtag/"), "https://www.youtube.com#{url}"]
@@ -47,14 +51,66 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def artist_commentary_title
+    video_primary_info.dig(:title, :runs)&.pluck(:text)&.join
   end
 
   def artist_commentary_desc
-    community_post[:contentText]&.to_json
+    community_post[:contentText]&.to_json || video_commentary_desc
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(html_artist_commentary_desc, base_url: "https://www.youtube.com")
+    html = community_post.present? ? html_artist_commentary_desc : video_commentary_desc
+    DText.from_html(html, base_url: "https://www.youtube.com")
+  end
+
+  # The description is plain text, with links given as UTF-16 offsets into the text:
+  #
+  #   "content": "Twitter :   / sechihyeo  \n#bluesechi",
+  #   "commandRuns": [{ "startIndex": 10, "length": 15, "onTap": { "innertubeCommand": {...} } }, ...]
+  def video_commentary_desc
+    return if video_description[:content].nil?
+
+    text = video_description[:content].encode("UTF-16LE")
+    runs = video_description[:commandRuns].to_a.sort_by { |run| run[:startIndex].to_i }
+    html = +""
+    pos = 0
+
+    runs.each do |run|
+      start, length = run[:startIndex].to_i, run[:length].to_i
+      next if start < pos || length <= 0
+
+      html << video_text_to_html(text.byteslice(pos * 2, (start - pos) * 2))
+      link_text = video_text_to_html(text.byteslice(start * 2, length * 2))
+      html << video_link_to_html(run.dig(:onTap, :innertubeCommand), link_text)
+      pos = start + length
+    end
+
+    html << video_text_to_html(text.byteslice((pos * 2)..))
+  end
+
+  def video_text_to_html(utf16_text)
+    # Remove the U+202A and U+202C bidi marks around mentions ("\u202A@vensen5150\u202C").
+    text = utf16_text.to_s.encode("UTF-8", invalid: :replace, undef: :replace).delete("\u202A\u202C")
+    CGI.escapeHTML(text).gsub("\r\n", "\n").delete("\r").gsub("\n", "<br>")
+  end
+
+  def video_link_to_html(command, link_text)
+    url = command&.dig(:commandMetadata, :webCommandMetadata, :url).to_s
+
+    if url.starts_with?("/")
+      %{<a href="https://www.youtube.com#{CGI.escapeHTML(Danbooru::URL.unescape(url))}">#{link_text}</a>}
+    elsif url.starts_with?("https://www.youtube.com/redirect")
+      # https://www.youtube.com/redirect?event=video_description&redir_token=...&q=https%3A%2F%2Fx.com%2Filekkim
+      target = CGI.escapeHTML(Danbooru::URL.parse(url)&.params&.dig(:q).to_s)
+
+      if target.match?(%r{\Ahttps?://})
+        %{<a href="#{target}">#{target}</a>}
+      else
+        link_text
+      end
+    else
+      link_text
+    end
   end
 
   def html_artist_commentary_desc
@@ -82,13 +138,24 @@ class Source::Extractor::Youtube < Source::Extractor
     parsed_url.try(:post_id) || parsed_referer.try(:post_id)
   end
 
+  def video_id
+    parsed_url.try(:video_id) || parsed_referer.try(:video_id)
+  end
+
   def channel_id
-    parsed_url.try(:channel_id) || parsed_referer.try(:channel_id) || community_post.dig("authorEndpoint", "browseEndpoint", "browseId")
+    parsed_url.try(:channel_id) || parsed_referer.try(:channel_id) || author_endpoint["browseId"]
   end
 
   def handle
     # "/@Mirae_Somang" -> "Mirae_Somang"
-    parsed_url.try(:handle) || parsed_referer.try(:handle) || community_post.dig("authorEndpoint", "browseEndpoint", "canonicalBaseUrl")&.delete_prefix("/@")
+    parsed_url.try(:handle) || parsed_referer.try(:handle) || author_endpoint["canonicalBaseUrl"]&.delete_prefix("/@")
+  end
+
+  # { "browseId": "UCl8FRguXVySAHDnKdqn3QOg", "canonicalBaseUrl": "/@ilekkim" }
+  def author_endpoint
+    post_author = community_post.dig("authorEndpoint", "browseEndpoint")
+    video_author = video_owner.dig("navigationEndpoint", "browseEndpoint")
+    post_author || video_author || {}
   end
 
   def channel_url
@@ -100,7 +167,7 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   memoize def page
-    http.cache(1.minute).parsed_get(page_url) if community_post_id.present?
+    http.cache(1.minute).parsed_get(page_url) if community_post_id.present? || video_id.present?
   end
 
   memoize def community_post_json
@@ -110,7 +177,28 @@ class Source::Extractor::Youtube < Source::Extractor
   memoize def community_post
     community_post_json.dig(
       "contents", "twoColumnBrowseResultsRenderer", "tabs", 0, "tabRenderer", "content", "sectionListRenderer",
-      "contents", 0, "itemSectionRenderer", "contents", 0, "backstagePostThreadRenderer", "post", "backstagePostRenderer",
+      "contents", 0, "itemSectionRenderer", "contents", 0,
+      "backstagePostThreadRenderer", "post", "backstagePostRenderer",
     ) || {}
+  end
+
+  def video_contents
+    community_post_json.dig("contents", "twoColumnWatchNextResults", "results", "results", "contents").to_a
+  end
+
+  def video_primary_info
+    video_contents.pluck("videoPrimaryInfoRenderer").compact.first || {}
+  end
+
+  def video_secondary_info
+    video_contents.pluck("videoSecondaryInfoRenderer").compact.first || {}
+  end
+
+  def video_description
+    video_secondary_info["attributedDescription"] || {}
+  end
+
+  def video_owner
+    video_secondary_info.dig("owner", "videoOwnerRenderer") || {}
   end
 end
