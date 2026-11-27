@@ -187,7 +187,7 @@ export default class Autocomplete {
       // If the caret is in the middle of tag, treat it as a wildcard asterisk.
       // This allows the user to get useful autocomplete results by only typing the first few characters of a word between two other words.
       term += "*" + term_after_caret;
-      if (!term_before_caret.includes("*") && !term_after_caret.includes("*")) {
+      if (!term_before_caret.match(/\S*$/)[0].includes("*") && !term_after_caret.includes("*")) {
         // If the user did not manually type an asterisk then we need to add one at the end to simulate the normal prefix search behavior.
         term += "*";
       }

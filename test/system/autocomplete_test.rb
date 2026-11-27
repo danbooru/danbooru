@@ -80,6 +80,26 @@ class AutocompleteChromeTest < ChromeSystemTestCase
       assert_search_autocomplete_results([], "bkub ")
     end
 
+    should "complete tags when the caret is in the middle of a word, even after a wildcard search" do
+      create(:tag, name: "hatsune_miku", post_count: 42)
+      create(:tag, name: "hatsune_miku_(append)", post_count: 42)
+      visit_without_reloading posts_path
+
+      field = autocomplete("#tags", "long_hair hatmiku")
+      field.send_keys(:left, :left, :left, :left, "s") # "long_hair hats|miku"
+
+      assert_selector "ul.ui-autocomplete li", count: 2
+      assert_selector "li[data-autocomplete-value='hatsune_miku']", count: 1
+      assert_selector "li[data-autocomplete-value='hatsune_miku_(append)']", count: 1
+
+      field = autocomplete("#tags", "*_hair hatmiku")
+      field.send_keys(:left, :left, :left, :left, "s") # "*_hair hats|miku"
+
+      assert_selector "ul.ui-autocomplete li", count: 2
+      assert_selector "li[data-autocomplete-value='hatsune_miku']", count: 1
+      assert_selector "li[data-autocomplete-value='hatsune_miku_(append)']", count: 1
+    end
+
     should "correct invalid operator combinations" do
       create(:tag, name: "bkub", post_count: 42)
 
