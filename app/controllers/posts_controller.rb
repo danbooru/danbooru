@@ -18,7 +18,8 @@ class PostsController < ApplicationController
       authorize Post
       redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol)
     else
-      @posts = authorize post_set.posts, policy_class: PostPolicy
+      authorize Post
+      @posts = post_set.posts
       raise PageRemovedError if request.format.html? && post_set.banned_artist?
       @tags_by_name = Tag.where(name: @posts.flat_map(&:tag_array).uniq).index_by(&:name) if request.format.atom?
 

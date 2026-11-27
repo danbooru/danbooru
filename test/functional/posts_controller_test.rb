@@ -619,6 +619,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "entry title", text: "cirno (touhou) drawn by bkub"
         end
 
+        should "check the rate limit before running the search" do
+          user = create(:user)
+          Danbooru.config.stubs(:rate_limits_enabled?).returns(true)
+          create(:rate_limit, action: "posts:index:atom", key: user.cache_key, limited: true)
+
+          assert_no_queries_match(/atom_search_tag/) do
+            get_auth posts_path(format: :atom), user, params: { tags: "atom_search_tag" }
+          end
+
+          assert_response 429
+        end
+
         should "hide restricted posts" do
           Post.update(is_banned: true)
           get posts_path(format: :atom)
