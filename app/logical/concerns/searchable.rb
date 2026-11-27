@@ -841,10 +841,12 @@ module Searchable
     end
 
     # Parse the items of an array search, like `search[post_ids_include_any]=1 2` (a space-separated list) or
-    # `search[post_ids_include_any_array][]=1` (an array). The items are converted to the column's type, because
-    # Postgres can't compare arrays of different types.
+    # `search[post_ids_include_any_array][]=1` (an array). Integer lists may also be comma-separated, like
+    # `search[post_ids_include_any]=1,2`. The items are converted to the column's type, because Postgres can't
+    # compare arrays of different types.
     def array_items(name, key, type)
-      items = key.end_with?("_array") ? Array.wrap(params[key]) : list_param(key, params[key].to_s.scan(/[^[:space:]]+/))
+      item = (type == :integer) ? /[^[:space:],]+/ : /[^[:space:]]+/
+      items = key.end_with?("_array") ? Array.wrap(params[key]) : list_param(key, params[key].to_s.scan(item))
       return items.map(&:to_s) unless type == :integer
 
       items = items.map { Integer(it.to_s, 10, exception: false) || raise(SearchError, "#{key} must be a list of integers") }

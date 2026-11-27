@@ -528,6 +528,17 @@ class SearchableTest < ActiveSupport::TestCase
           assert_search_equals(@fg1, any_post_id_matches_regex: "^#{@p1.id}$")
           assert_search_equals([], post_ids_include_any_array: ["99999999999999999999"])
         end
+
+        should "accept comma-separated lists" do
+          @p1, @p2, @p3 = create_list(:post, 3)
+          @fg1 = create(:favorite_group, post_ids: [@p1.id, @p2.id])
+          @fg2 = create(:favorite_group, post_ids: [@p3.id])
+
+          assert_search_equals([@fg2, @fg1], post_ids_include_any: "#{@p1.id},#{@p3.id}")
+          assert_search_equals([@fg2, @fg1], post_ids_include_any: "#{@p1.id}, #{@p3.id}")
+          assert_search_equals(@fg1, post_ids_include_all: "#{@p1.id},#{@p2.id}")
+          assert_search_equals([], post_ids_include_all: "#{@p1.id},#{@p3.id}")
+        end
       end
 
       should "support multiple operators on the same attribute" do
