@@ -15,6 +15,31 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render in list mode" do
+        create(:post, is_pending: true)
+        get_auth modqueue_index_path(mode: "list"), @admin
+
+        assert_response :success
+        assert_select ".post-gallery", count: 0
+        assert_select "a.tab[title=Gallery]"
+      end
+
+      should "fall back to gallery mode for an unknown mode" do
+        create(:post, is_pending: true)
+        get_auth modqueue_index_path(mode: "foo"), @admin
+
+        assert_response :success
+        assert_select ".post-gallery .mod-queue-preview"
+      end
+
+      should "fall back to gallery mode for a mode that isn't a string" do
+        create(:post, is_pending: true)
+        get_auth modqueue_index_path(mode: ["list"]), @admin
+
+        assert_response :success
+        assert_select ".post-gallery .mod-queue-preview"
+      end
+
       should "escape quotes and backslashes in the source search link" do
         create(:post, is_pending: true, source: 'a "b" c\\')
         get_auth modqueue_index_path, @admin

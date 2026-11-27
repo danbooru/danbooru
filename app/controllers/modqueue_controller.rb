@@ -6,7 +6,7 @@ class ModqueueController < ApplicationController
 
   def index
     authorize :modqueue
-    @mode = params.fetch(:mode, "gallery")
+    @mode = (params[:mode] == "list") ? "list" : "gallery"
     @order = params.dig(:search, :order) || "modqueue"
     @tags = params.dig(:search, :tags)
 
