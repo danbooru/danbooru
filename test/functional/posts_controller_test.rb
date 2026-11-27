@@ -101,6 +101,21 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "a.post-upvote-link[href=?]", login_path(url: posts_path(page: 1)), count: 1
         end
 
+        should "include the search in the thumbnail links" do
+          get posts_path(tags: "order:id")
+
+          assert_response :success
+          assert_select "a.post-preview-link[href=?]", post_path(Post.last, q: "order:id")
+        end
+
+        should "leave long searches out of the thumbnail links" do
+          tags = "id:#{([Post.last.id] + ([0] * 500)).join(",")}"
+          get posts_path(tags: tags)
+
+          assert_response :success
+          assert_select "a.post-preview-link[href=?]", post_path(Post.last), count: 1
+        end
+
         should "use the size and show_votes cookies" do
           cookies[:post_preview_size] = "225"
           cookies[:post_preview_show_votes] = "true"

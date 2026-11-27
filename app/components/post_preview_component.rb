@@ -17,7 +17,7 @@ class PostPreviewComponent < ApplicationComponent
   delegate :media_asset, to: :post
 
   # @param post [Post] The post to show the thumbnail for.
-  # @param tags [String] The current tag search, if any.
+  # @param tags [String] The current tag search, if any. Left out of the thumbnail link if it's over 1000 characters.
   # @param size [String] The size of the thumbnail. One of "150", "180", "225",
   #   "225w", "270", "270w", or "360".
   # @param classes [String] A list of CSS classes to apply to the container.
@@ -35,7 +35,7 @@ class PostPreviewComponent < ApplicationComponent
   def initialize(post:, tags: "", size: DEFAULT_SIZE, classes: nil, html: {}, show_deleted: false, show_votes: false, link_target: post, save_data: CurrentUser.save_data, fit: :compact, current_user: CurrentUser.user, **options)
     super
     @post = post
-    @tags = tags.presence
+    @tags = tags.presence if tags.to_s.length <= 1000 # Long searches would be repeated in every thumbnail on the page.
     @size = size.presence || DEFAULT_SIZE
     @classes = classes
     @html = html
