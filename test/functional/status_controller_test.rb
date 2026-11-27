@@ -27,6 +27,14 @@ class StatusControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
 
+    should "work when the parent process isn't visible" do
+      Process.stubs(:ppid).returns(0)
+      get status_path(format: :json)
+
+      assert_response :success
+      assert_nil(response.parsed_body.dig("instance", "instance_uptime"))
+    end
+
     should "work when the database is down" do
       without_database do
         get status_path

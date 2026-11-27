@@ -158,6 +158,8 @@ class ServerStatus
       started_at = File.stat("/proc/#{Process.ppid}").mtime
       uptime = Time.zone.now - started_at
       Danbooru::Helpers.distance_of_time_in_words(uptime)
+    rescue Errno::ENOENT # The parent process is outside our PID namespace, e.g. when started by `docker exec`.
+      nil
     end
 
     def worker_uptime
