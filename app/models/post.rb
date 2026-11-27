@@ -406,8 +406,7 @@ class Post < ApplicationRecord
         self.rating = rating_before_last_save || rating_was
       end
 
-      raise ArgumentError, "updater is required" if updater.nil?
-      @post_edit = PostEdit.new(self, tag_string_was, old_tag_string || tag_string_was, tag_string)
+      @post_edit = PostEdit.new(self, user: updater)
     end
 
     # XXX should be a `validate` hook instead of `before_validation` hook

@@ -19,7 +19,7 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
   end
 
   def tag_edit
-    @tag_edit ||= PostEdit.new(nil, "", "", @second_search)
+    @tag_edit ||= PostEdit.parse(@second_search)
   end
 
   def affected_tags

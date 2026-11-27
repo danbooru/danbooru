@@ -32,17 +32,27 @@ class PostEdit
   # Matches a metatag name, like `rating:` or `-pool:`, with an optional leading '-'. Don't use /i, because that matches Unicode characters.
   METATAG_NAME_REGEX = /-?[a-zA-Z0-9_]+:/
 
-  private attr_reader :post, :current_tag_names, :old_tag_names, :new_tag_string, :parser
+  private attr_reader :post, :current_tag_names, :old_tag_names, :new_tag_string, :user, :parser
   private delegate :accept, :expect, :error, :skip, :zero_or_more, :one_of, to: :parser
 
-  # @param post [Post] The post being edited.
-  # @param current_tag_string [String] The space-separated list of tags currently on the post.
-  # @param old_tag_string [String] The space-separated list of tags the user saw before the edit.
-  # @param new_tag_string [String] The space-separated list of tags after the edit.
-  def initialize(post, current_tag_string, old_tag_string, new_tag_string)
+  # Parse a tag edit string without a Post (e.g. for bulk update requests).
+  #
+  # @param tag_string [String] The tag edit string to parse.
+  # @return [PostEdit]
+  def self.parse(tag_string)
+    new(nil, new_tag_string: tag_string)
+  end
+
+  # @param post [Post, nil] The post being edited.
+  # @param user [User, nil] The user performing the edit (required when `post` is present).
+  # @param new_tag_string [String, nil] Override for the edited tag string (used by {.parse}).
+  def initialize(post, user: nil, new_tag_string: post&.tag_string)
+    raise ArgumentError, "user is required" if post.present? && user.nil?
+
     @post = post
-    @current_tag_names = current_tag_string.to_s.split
-    @old_tag_names = old_tag_string.to_s.split
+    @user = user
+    @current_tag_names = post&.tag_string_was.to_s.split
+    @old_tag_names = (post&.old_tag_string || post&.tag_string_was).to_s.split
     @new_tag_string = new_tag_string.to_s.gsub(/[[:space:]]/, " ")
     @parser = StringParser.new(@new_tag_string)
   end
