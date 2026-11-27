@@ -1,4 +1,4 @@
-import { clamp, isBeforeInputEventAvailable } from './utility'
+import { clamp, isBeforeInputEventAvailable, tagCategoryPrefixes, wordAtCaret } from './utility'
 import UndoStack from './undo_stack';
 import Utility from './utility';
 
@@ -177,22 +177,18 @@ export default class Autocomplete {
   }
 
   currentTerm() {
-    let $input = this.$element;
-    let caret = $input.get(0).selectionStart;
-    let query = $input.get(0).value;
-    let term_before_caret = query.substring(0, caret);
-    let term_after_caret = query.substring(caret).match(/\S*/)[0];
+    let [term_before_caret, term_after_caret] = wordAtCaret(this.$element.get(0));
     let term = term_before_caret;
     if (term_after_caret) {
       // If the caret is in the middle of tag, treat it as a wildcard asterisk.
       // This allows the user to get useful autocomplete results by only typing the first few characters of a word between two other words.
       term += "*" + term_after_caret;
-      if (!term_before_caret.match(/\S*$/)[0].includes("*") && !term_after_caret.includes("*")) {
+      if (!term_before_caret.includes("*") && !term_after_caret.includes("*")) {
         // If the user did not manually type an asterisk then we need to add one at the end to simulate the normal prefix search behavior.
         term += "*";
       }
     }
-    let { term: tagTerm } = Autocomplete.parseTerm(term.match(/\S*$/)[0]);
+    let { term: tagTerm } = Autocomplete.parseTerm(term);
     return tagTerm.toLowerCase();
   }
 
@@ -374,8 +370,9 @@ export default class Autocomplete {
     return items;
   }
 
+  // @returns {Array<String>} The tag category prefixes (e.g. ["art:", "char:", ...]).
   static tagPrefixes() {
-    return JSON.parse($("meta[name=autocomplete-tag-prefixes]").attr("content"));
+    return Object.keys(tagCategoryPrefixes()).map(prefix => `${prefix}:`);
   }
 
   // Split a tag search term into its operator (e.g. `-`, `~`, `(`),

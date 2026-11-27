@@ -126,6 +126,15 @@ module SystemTestHelper
     end
   end
 
+  # Turn a beta feature on or off, like the user toggling it in the Beta tab of their settings.
+  # @param name [String] the name of the beta feature, e.g. "colored_tag_input".
+  # @param enabled [Boolean] whether to turn the feature on or off.
+  def set_beta_feature(name, enabled)
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.add_cookies([{ name: BetaFeature.find(name).cookie_name, value: enabled.to_s, domain: URI(Capybara.app_host).host, path: "/" }])
+    end
+  end
+
   # Send a key press to whatever is currently focused in the page (the <body>, by default).
   # @param key [String] the key to send, e.g. "Escape".
   def send_global_key(key)

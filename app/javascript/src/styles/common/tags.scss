@@ -1,4 +1,4 @@
-.tag-type-0 a, a.tag-type-0 {
+.tag-type-0 a, a.tag-type-0, .colored-tag-input-overlay .tag-type-0 {
   color: var(--general-tag-color);
 
   &:link, &:visited {
@@ -10,7 +10,7 @@
   }
 }
 
-.tag-type-1 a, a.tag-type-1 {
+.tag-type-1 a, a.tag-type-1, .colored-tag-input-overlay .tag-type-1 {
   color: var(--artist-tag-color);
 
   &:link, &:visited {
@@ -22,7 +22,7 @@
   }
 }
 
-.tag-type-3 a, a.tag-type-3 {
+.tag-type-3 a, a.tag-type-3, .colored-tag-input-overlay .tag-type-3 {
   color: var(--copyright-tag-color);
 
   &:link, &:visited {
@@ -34,7 +34,7 @@
   }
 }
 
-.tag-type-4 a, a.tag-type-4 {
+.tag-type-4 a, a.tag-type-4, .colored-tag-input-overlay .tag-type-4 {
   color: var(--character-tag-color);
 
   &:link, &:visited {
@@ -46,7 +46,7 @@
   }
 }
 
-.tag-type-5 a, a.tag-type-5 {
+.tag-type-5 a, a.tag-type-5, .colored-tag-input-overlay .tag-type-5 {
   color: var(--meta-tag-color);
 
   &:link, &:visited {

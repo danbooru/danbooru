@@ -106,7 +106,14 @@
 
     <%= edit_form_for(:post, html: { id: "quick-edit-form" }) do |f| %>
       <%= f.input :old_tag_string, as: :hidden %>
-      <%= f.input :tag_string, label: "Tags", as: :text, input_html: { class: "text-sm", "data-autocomplete": "tag-edit" } %>
+      <% if BetaFeature.find("colored_tag_input")&.enabled?(cookies) %>
+        <div class="colored-tag-input" x-data="coloredTagInput($root)">
+          <div class="colored-tag-input-overlay" aria-hidden="true"></div>
+          <%= f.input :tag_string, label: "Tags", as: :text, input_html: { class: "text-sm", "data-autocomplete": "tag-edit" } %>
+        </div>
+      <% else %>
+        <%= f.input :tag_string, label: "Tags", as: :text, input_html: { class: "text-sm", "data-autocomplete": "tag-edit" } %>
+      <% end %>
       <%= f.submit_button "Update", data: { disable_with: false } %>
       <%= f.cancel_button %>
     <% end %>

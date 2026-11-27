@@ -26,7 +26,7 @@ class RelatedTagCalculator
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
 
-    delegate :name, :pretty_name, :category, :post_count, :general?, to: :tag
+    delegate :name, :pretty_name, :category, :post_count, :general?, :is_deprecated?, to: :tag
 
     # https://en.wikipedia.org/wiki/Cosine_similarity#Otsuka%E2%80%93Ochiai_coefficient
     def cosine_similarity
