@@ -4326,7 +4326,7 @@ CREATE INDEX index_favorite_groups_on_lower_name ON public.favorite_groups USING
 -- Name: index_favorite_groups_on_post_ids; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_favorite_groups_on_post_ids ON public.favorite_groups USING gin (post_ids);
+CREATE INDEX index_favorite_groups_on_post_ids ON public.favorite_groups USING gin (post_ids) WITH (fastupdate=off);
 
 
 --
@@ -7332,6 +7332,7 @@ ALTER TABLE ONLY public.user_upgrades
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261125052017'),
 ('20261121120001'),
 ('20261121120000'),
 ('20261104064770'),
