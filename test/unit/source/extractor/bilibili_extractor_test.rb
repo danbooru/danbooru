@@ -440,5 +440,65 @@ module Source::Tests::Extractor
         EOS
       )
     end
+
+    context "A www.bilibili.com/video/BV:id post" do
+      strategy_should_work(
+        "https://www.bilibili.com/video/BV1dY4y1u7Vi/",
+        image_urls: [],
+        page_url: "https://www.bilibili.com/video/BV1dY4y1u7Vi/",
+        profile_url: "https://space.bilibili.com/21208709",
+        profile_urls: %w[https://space.bilibili.com/21208709],
+        display_name: "河童重工工作室",
+        username: nil,
+        published_at: Time.parse("2022-08-30T08:36:23.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "第一人称弹幕射击！《幻想乡：定域失界》首曝概念PV",
+        dtext_artist_commentary_desc: "梦幻联动！梦幻联动！如果【数据删除】联动东方project？！《幻想乡：定域失界》首曝概念PV 感谢\"@Structure_Sound\":[https://space.bilibili.com/444407402/dynamic] 的视频制作，以及\"@放电症状\":[https://space.bilibili.com/780176/dynamic] p站搜索@geralt7 两位老师的原画！更多内容详见评论区置顶",
+      )
+    end
+
+    context "A www.bilibili.com/video/av:id post" do
+      strategy_should_work(
+        "https://www.bilibili.com/video/av598699440/",
+        image_urls: [],
+        page_url: "https://www.bilibili.com/video/av598699440/",
+        profile_url: "https://space.bilibili.com/11742550",
+        profile_urls: %w[https://space.bilibili.com/11742550],
+        display_name: "哈米伦的弄笛者",
+        username: nil,
+        published_at: Time.parse("2022-07-23T03:00:00.000000Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "【崩坏3】少女，泳装，夏日时光！",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          本视频含有，少女穿泳装，渡鸦小海岛，爱莉埋胸抱妹杀，格蕾修的小脚丫，劫哥爆杀烧鸡老师，凯文嗦面条等大量元素，纯属娱乐切勿当真，希望大家可以看的开开心心，乐土的大家也开开心心，之后的剧情也开开心心呜呜呜呜呜。
+          监制/总策划：哈米伦的弄笛者
+          主笔：一只野生咔叽，鵺心NUECO
+          画师：魔法少女蟒蛇绞，夏至君X2one，蘭chiyo，企鹅犬犬，祓筱，芝士卷毛羊，空亭丶，一枔，大写的TY，Kuma-ra，一只野生咔叽，鵺心NUECO，千牵签，vikki
+          后期：游手好闲的青大人吼
+          分镜：一只野生咔叽
+          封面：北霄
+          bgm：bet on me
+        EOS
+      )
+    end
+
+    context "A nonexistent www.bilibili.com/video/:id post" do
+      strategy_should_work(
+        "https://www.bilibili.com/video/BV1aaaaaaaaa/",
+        image_urls: [],
+        page_url: "https://www.bilibili.com/video/BV1aaaaaaaaa/",
+        profile_url: nil,
+        profile_urls: [],
+        display_name: nil,
+        username: nil,
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: "",
+      )
+    end
   end
 end

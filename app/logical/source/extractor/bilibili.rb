@@ -67,6 +67,8 @@ module Source
           pub_ts = article_json.dig("modules", "module_author", "pub_ts")
         elsif post_json.present?
           pub_ts = post_json.dig("modules", "module_author", "pub_ts")
+        elsif video_json.present?
+          pub_ts = video_json["pubdate"]
         end
 
         Time.at(pub_ts.to_i).utc if pub_ts
@@ -90,11 +92,11 @@ module Source
 
       def artist_commentary_title
         # Is modules.module_dynamic.title supported in t.bilibili.com/:id works?
-        article_json.dig("modules", "module_title", "text") || post_json.dig("modules", "module_dynamic", "title") || post_json.dig("modules", "module_dynamic", "major", "opus", "title")
+        article_json.dig("modules", "module_title", "text") || post_json.dig("modules", "module_dynamic", "title") || post_json.dig("modules", "module_dynamic", "major", "opus", "title") || video_json["title"]
       end
 
       def artist_commentary_desc
-        post_commentary_desc.presence || article_commentary_desc.presence
+        post_commentary_desc.presence || article_commentary_desc.presence || video_commentary_desc.presence
       end
 
       # https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/opus/rich_text_nodes.md
@@ -239,6 +241,21 @@ module Source
         end.join
       end
 
+      # [{"raw_text": "感谢", "type": 1, "biz_id": 0}, {"raw_text": "Structure_Sound", "type": 2, "biz_id": 444407402}]
+      def video_commentary_desc
+        nodes = video_json["desc_v2"].presence || [{ "raw_text" => video_json["desc"].to_s, "type" => 1 }]
+
+        nodes.map do |node|
+          text = CGI.escapeHTML(node["raw_text"].to_s)
+
+          if node["type"] == 2 && node["biz_id"].to_i > 0
+            %{<a href="https://space.bilibili.com/#{node["biz_id"].to_i}/dynamic">@#{text}</a>}
+          else
+            text.gsub("\n", "<br>")
+          end
+        end.join
+      end
+
       def dtext_artist_commentary_desc
         DText.from_html(artist_commentary_desc, base_url: "https://www.bilibili.com")
       end
@@ -290,7 +307,7 @@ module Source
       end
 
       def display_name
-        article_json.dig("modules", "module_author", "name") || post_json.dig("modules", "module_author", "name")
+        article_json.dig("modules", "module_author", "name") || post_json.dig("modules", "module_author", "name") || video_json.dig("owner", "name")
       end
 
       def tag_name
@@ -302,7 +319,7 @@ module Source
       end
 
       def artist_id_from_data
-        article_json.dig("modules", "module_author", "mid") || post_json.dig("modules", "module_author", "mid")
+        article_json.dig("modules", "module_author", "mid") || post_json.dig("modules", "module_author", "mid") || video_json.dig("owner", "mid")
       end
 
       def profile_url
@@ -311,6 +328,10 @@ module Source
 
       def t_work_id
         parsed_url.t_work_id || parsed_referer&.t_work_id
+      end
+
+      def video_id
+        parsed_url.video_id || parsed_referer&.video_id
       end
 
       def article_id
@@ -333,6 +354,19 @@ module Source
 
         data = http.headers("User-Agent": user_agent).cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=#{t_work_id}&features=itemOpusStyle") || {}
         data.dig("data", "item").to_h
+      end
+
+      # https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/video/info.md
+      memoize def video_json
+        # BV1dY4y1u7Vi, av598699440
+        params = case video_id
+        when /\ABV[0-9a-zA-Z]+\z/ then { bvid: video_id }
+        when /\Aav(\d+)\z/ then { aid: $1 }
+        else return {}
+        end
+
+        data = http.headers("User-Agent": user_agent).cookies(buvid3: buvid3).cache(1.minute).parsed_get("https://api.bilibili.com/x/web-interface/view", params: params) || {}
+        data["data"].to_h
       end
 
       memoize def article_json
