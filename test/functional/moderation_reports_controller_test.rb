@@ -50,6 +50,18 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
           assert_select "tr#moderation-report-#{@dmail_report.id}", count: 0
         end
 
+        should "not return more than 200 reports per page in HTML, or 1000 in the API" do
+          ModerationReport.insert_all!(Array.new(200) { @comment_report.attributes.except("id") }) # rubocop:disable Rails/SkipsModelValidations
+
+          get_auth moderation_reports_path(limit: 1000), @user, as: :json
+          assert_response :success
+          assert_operator(response.parsed_body.size, :>, 200)
+
+          get_auth moderation_reports_path(limit: 1000), @user
+          assert_response :success
+          assert_select "tbody tr", count: 200
+        end
+
         should "not show reports submitted by other users" do
           get_auth moderation_reports_path, create(:user)
 

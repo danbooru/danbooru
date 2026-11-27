@@ -15,6 +15,18 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "grouped by post" do
+        should "not show more than 200 posts per page" do
+          @post.update_columns(last_comment_bumped_at: Time.zone.now) # rubocop:disable Rails/SkipsModelValidations
+          md5s = Array.new(200) { SecureRandom.hex(16) }
+          media_asset_ids = MediaAsset.insert_all!(md5s.map { |md5| @post.media_asset.attributes.except("id").merge("md5" => md5, "file_key" => MediaAsset.generate_file_key) }, returning: :id).pluck("id") # rubocop:disable Rails/SkipsModelValidations
+          MediaMetadata.insert_all!(media_asset_ids.map { |id| { media_asset_id: id } }) # rubocop:disable Rails/SkipsModelValidations
+          Post.insert_all!(md5s.map { |md5| @post.attributes.except("id").merge("md5" => md5) }) # rubocop:disable Rails/SkipsModelValidations
+
+          get comments_path(group_by: "post", limit: 1000)
+          assert_response :success
+          assert_select "#p-index-by-post > div.post", count: 200
+        end
+
         should "render all comments for .js" do
           @comment = create(:comment, post: @post)
           get comments_path(post_id: @post.id), xhr: true
@@ -92,6 +104,23 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response :success
           assert_select "a.comment-upvote-link[href=?]", login_path(url: comments_path(group_by: "comment", page: "b#{comment.id + 1}"))
+        end
+
+        should "not return more than 200 comments per page in HTML, or 1000 in the API" do
+          comment = create(:comment)
+          Comment.insert_all!(Array.new(200) { comment.attributes.except("id") }) # rubocop:disable Rails/SkipsModelValidations
+
+          get comments_path(group_by: "comment", limit: 1000), as: :json
+          assert_response :success
+          assert_equal(201, response.parsed_body.size)
+
+          get comments_path(group_by: "comment", limit: 1000)
+          assert_response :success
+          assert_select "article.comment", count: 200
+
+          get comments_path(limit: 1000, format: :atom)
+          assert_response :success
+          assert_equal(200, Nokogiri::XML(response.body).remove_namespaces!.xpath("//entry").size)
         end
 
         should "be the default for .json" do

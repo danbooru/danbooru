@@ -4,7 +4,7 @@ class UserFeedbacksController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @user_feedbacks = authorize UserFeedback.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @user_feedbacks = authorize UserFeedback.visible(CurrentUser.user).paginated_search(params, max_limit: request.format.html? ? 200 : 1_000, count_pages: true)
     @user_feedbacks = @user_feedbacks.includes(:user, :creator) if request.format.html?
 
     respond_with(@user_feedbacks)

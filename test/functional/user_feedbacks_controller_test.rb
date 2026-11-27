@@ -47,6 +47,18 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not return more than 200 feedbacks per page in HTML, or 1000 in the API" do
+        UserFeedback.insert_all!(Array.new(200) { @user_feedback.attributes.except("id") }) # rubocop:disable Rails/SkipsModelValidations
+
+        get_auth user_feedbacks_path(limit: 1000), @user, as: :json
+        assert_response :success
+        assert_operator(response.parsed_body.size, :>, 200)
+
+        get_auth user_feedbacks_path(limit: 1000), @user
+        assert_response :success
+        assert_select "tbody tr", count: 200
+      end
+
       context "as a user" do
         user_feedbacks = respond_to_search.as_user { @user }
 

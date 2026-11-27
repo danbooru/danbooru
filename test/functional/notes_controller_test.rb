@@ -28,6 +28,18 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not return more than 200 notes per page in HTML, or 1000 in the API" do
+        Note.insert_all!(Array.new(200) { @note.attributes.except("id") }) # rubocop:disable Rails/SkipsModelValidations
+
+        get notes_path(limit: 1000), as: :json
+        assert_response :success
+        assert_operator(response.parsed_body.size, :>, 200)
+
+        get notes_path(limit: 1000)
+        assert_response :success
+        assert_select "tbody tr", count: 200
+      end
+
       should respond_to_search.with { [@deleted_note, @post_note, @note] }
       should respond_to_search(body_matches: "000").with { @note }
       should respond_to_search(is_active: "true").with { [@post_note, @note] }

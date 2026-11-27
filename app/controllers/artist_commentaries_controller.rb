@@ -4,7 +4,7 @@ class ArtistCommentariesController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @commentaries = authorize ArtistCommentary.paginated_search(params)
+    @commentaries = authorize ArtistCommentary.paginated_search(params, max_limit: request.format.html? ? 200 : 1_000)
     @commentaries = @commentaries.includes(post: [:uploader, :media_asset]) if request.format.html?
 
     respond_with(@commentaries)

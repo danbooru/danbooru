@@ -20,6 +20,23 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not return more than 200 commentaries per page in HTML, or 1000 in the API" do
+        post = @commentary.post
+        md5s = Array.new(200) { SecureRandom.hex(16) }
+        media_asset_ids = MediaAsset.insert_all!(md5s.map { |md5| post.media_asset.attributes.except("id").merge("md5" => md5, "file_key" => MediaAsset.generate_file_key) }, returning: :id).pluck("id") # rubocop:disable Rails/SkipsModelValidations
+        MediaMetadata.insert_all!(media_asset_ids.map { |id| { media_asset_id: id } }) # rubocop:disable Rails/SkipsModelValidations
+        post_ids = Post.insert_all!(md5s.map { |md5| post.attributes.except("id").merge("md5" => md5) }, returning: :id).pluck("id") # rubocop:disable Rails/SkipsModelValidations
+        ArtistCommentary.insert_all!(post_ids.map { |post_id| @commentary.attributes.except("id").merge("post_id" => post_id) }) # rubocop:disable Rails/SkipsModelValidations
+
+        get artist_commentaries_path(limit: 1000), as: :json
+        assert_response :success
+        assert_operator(response.parsed_body.size, :>, 200)
+
+        get artist_commentaries_path(limit: 1000)
+        assert_response :success
+        assert_select "tbody tr", count: 200
+      end
+
       should respond_to_search.with { [@deleted_commentary, @other_commentary, @commentary] }
       should respond_to_search(text_matches: "ot1").with { @commentary }
       should respond_to_search(original_present: "true").with { [@other_commentary, @commentary] }

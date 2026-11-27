@@ -64,6 +64,18 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "not return more than 200 bans per page in HTML, or 1000 in the API" do
+        Ban.insert_all!(Array.new(200) { @ban1.attributes.slice(*Ban.column_names).except("id") }) # rubocop:disable Rails/SkipsModelValidations
+
+        get bans_path(limit: 1000), as: :json
+        assert_response :success
+        assert_operator(response.parsed_body.size, :>, 200)
+
+        get bans_path(limit: 1000)
+        assert_response :success
+        assert_select "tbody tr", count: 200
+      end
+
       should respond_to_search.with { [@ban2, @ban1] }
       should respond_to_search(reason_matches: "blah").with { @ban2 }
       should respond_to_search(expired: "false").with { @ban2 }

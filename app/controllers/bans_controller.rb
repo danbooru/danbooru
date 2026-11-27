@@ -6,7 +6,7 @@ class BansController < ApplicationController
   before_action :requires_reauthentication, only: [:new, :create, :edit, :update, :destroy]
 
   def index
-    @bans = authorize Ban.paginated_search(params, count_pages: true)
+    @bans = authorize Ban.paginated_search(params, max_limit: request.format.html? ? 200 : 1_000, count_pages: true)
     @bans = @bans.includes(:user, :banner) if request.format.html?
 
     respond_with(@bans)

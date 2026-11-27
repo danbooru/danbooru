@@ -4,7 +4,7 @@ class ModerationReportsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @moderation_reports = authorize ModerationReport.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @moderation_reports = authorize ModerationReport.visible(CurrentUser.user).paginated_search(params, max_limit: request.format.html? ? 200 : 1_000, count_pages: true)
     @moderation_reports = @moderation_reports.includes(:creator, :model) if request.format.html?
 
     respond_with(@moderation_reports)
