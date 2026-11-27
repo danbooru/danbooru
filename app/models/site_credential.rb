@@ -109,17 +109,22 @@ class SiteCredential < ApplicationRecord
     end
   end
 
+  # @return [String] The site's name, or "unknown site #<id>" if the site no longer exists.
+  def site_name
+    site || "unknown site ##{site_before_type_cast}"
+  end
+
   def create_mod_action
     return if !is_public?
 
     if previously_new_record?
-      ModAction.log("created a site credential for #{site}", :site_credential_create, subject: self, user: creator)
+      ModAction.log("created a site credential for #{site_name}", :site_credential_create, subject: self, user: creator)
     elsif destroyed?
-      ModAction.log("deleted a site credential for #{site}", :site_credential_delete, subject: nil, user: updater)
+      ModAction.log("deleted a site credential for #{site_name}", :site_credential_delete, subject: nil, user: updater)
     elsif is_enabled? == true && is_enabled_before_last_save == false
-      ModAction.log("enabled a site credential for #{site}", :site_credential_enable, subject: self, user: updater)
+      ModAction.log("enabled a site credential for #{site_name}", :site_credential_enable, subject: self, user: updater)
     elsif is_enabled? == false && is_enabled_before_last_save == true
-      ModAction.log("disabled a site credential for #{site}", :site_credential_disable, subject: self, user: updater)
+      ModAction.log("disabled a site credential for #{site_name}", :site_credential_disable, subject: self, user: updater)
     end
   end
 end

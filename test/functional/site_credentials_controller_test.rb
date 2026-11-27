@@ -168,6 +168,7 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal(false, @site_credential.reload.is_enabled?)
+        assert_equal("disabled a site credential for unknown site #12345", ModAction.last.description)
       end
 
       should "not allow non-admins to update credentials" do
@@ -204,6 +205,7 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal(0, SiteCredential.count)
+        assert_equal("deleted a site credential for unknown site #12345", ModAction.last.description)
       end
 
       should "not allow non-owners to delete credentials" do
