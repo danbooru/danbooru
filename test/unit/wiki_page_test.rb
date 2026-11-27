@@ -96,6 +96,7 @@ class WikiPageTest < ActiveSupport::TestCase
       should normalize_attribute(:other_names).from([nil, "", " "]).to([])
       should normalize_attribute(:other_names).from(["pokémon".unicode_normalize(:nfd)]).to(["pokémon".unicode_normalize(:nfkc)])
       should normalize_attribute(:other_names).from(["ＡＢＣ"]).to(["ABC"])
+      should normalize_attribute(:other_names).from(["asd´asd", "a˜b", "a¨b"]).to(["asd´asd", "a˜b", "a¨b"])
       should normalize_attribute(:other_names).from(["foo", "foo"]).to(["foo"])
       should normalize_attribute(:other_names).from(%w[foo*bar baz baz 加賀（艦これ）]).to(%w[foo*bar baz 加賀(艦これ)])
 
