@@ -121,7 +121,7 @@ class SavedSearchTest < ActiveSupport::TestCase
   end
 
   context "during validation" do
-    subject { build(:saved_search) }
+    subject { build(:saved_search, user: build(:gold_user)) }
 
     should allow_value("x" * 3000).for(:query)
     should allow_value((["x"] * 150).join(" ")).for(:query)
@@ -187,6 +187,26 @@ class SavedSearchTest < ActiveSupport::TestCase
 
       @saved_search.labels = ["Artist 1", "Artist 2"]
       assert_equal(%w[artist_1 artist_2], @saved_search.labels)
+    end
+  end
+
+  context "A saved search for a Member" do
+    should "not allow more tags than the user can search for" do
+      saved_search = build(:saved_search, user: @user, query: "a b c d")
+
+      assert_equal(false, saved_search.valid?)
+      assert_equal(["Query can't have more than 3 tags"], saved_search.errors.full_messages)
+    end
+
+    should "allow as many tags as the user can search for" do
+      assert_equal(true, build(:saved_search, user: @user, query: "a b c").valid?)
+    end
+
+    should "allow editing the labels of an existing search with more tags" do
+      saved_search = build(:saved_search, user: @user, query: "a b c d")
+      saved_search.save!(validate: false)
+
+      assert_equal(true, saved_search.update(label_string: "foo"))
     end
   end
 

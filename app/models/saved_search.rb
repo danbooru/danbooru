@@ -193,6 +193,8 @@ class SavedSearch < ApplicationRecord
   def validate_query
     if post_query.total_term_count > MAX_TAGS
       errors.add(:query, "can't have more than #{MAX_TAGS} tags")
+    elsif user.present? && post_query.term_count > user.tag_query_limit
+      errors.add(:query, "can't have more than #{user.tag_query_limit} tags")
     end
   end
 
