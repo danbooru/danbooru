@@ -526,7 +526,7 @@ class Tag < ApplicationRecord
   end
 
   def self.available_includes
-    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links]
+    [:wiki_page, :artist, :antecedent_alias, :aliased_tag, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links]
   end
 
   include ApiMethods

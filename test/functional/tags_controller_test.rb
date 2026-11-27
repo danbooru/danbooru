@@ -82,6 +82,15 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(wiki_page: { body_matches: "*vocaloid*" }).with { @hatsune_miku }
           should respond_to_search(artist: { is_banned: "false" }).with { @wokada }
           should respond_to_search(has_dtext_links: "true").with { @vocaloid }
+
+          should "include the aliased tag with only=aliased_tag" do
+            get tags_path(format: :json), params: { search: { name_space: "miku vocaloid" }, only: "name,aliased_tag[name,category,is_deprecated]" }
+            tags = response.parsed_body.index_by { it["name"] }
+
+            assert_response :success
+            assert_equal({ "name" => "hatsune_miku", "category" => Tag.categories.character, "is_deprecated" => false }, tags["miku"]["aliased_tag"])
+            assert_nil(tags["vocaloid"]["aliased_tag"])
+          end
         end
       end
 
