@@ -7,6 +7,15 @@
 class PostEdit
   extend Memoist
 
+  # The maximum number of new tags that can be created by a single user. Default is 20 tags per minute.
+  MAX_NEW_TAGS = 20
+  MAX_NEW_TAGS_INTERVAL = 1.minute
+
+  # The maximum number of tags that can be added or removed by a user per minute. Default is 100 tags per minute.
+  # Builders and the uploader aren't subject to this restriction.
+  MAX_CHANGED_TAGS = 100
+  MAX_CHANGED_TAGS_INTERVAL = 1.minute
+
   Tag = Struct.new(:name, :negated, keyword_init: true)
   Metatag = Struct.new(:name, :value, keyword_init: true) do
     def category
@@ -58,6 +67,23 @@ class PostEdit
   end
 
   concerning :EditMethods do
+    def merge_old_changes
+      if !post.old_parent_id.nil?
+        old_parent_id = post.old_parent_id.presence&.to_i
+        if old_parent_id == post.parent_id
+          post.parent_id = post.parent_id_before_last_save || post.parent_id_was
+        end
+      end
+
+      if post.old_source == post.source.to_s
+        post.source = post.source_before_last_save || post.source_was
+      end
+
+      if post.old_rating == post.rating
+        post.rating = post.rating_before_last_save || post.rating_was
+      end
+    end
+
     def apply_pre_metatags
       pre_metatag_terms.each do |metatag|
         case [metatag.name, metatag.value]
@@ -94,6 +120,33 @@ class PostEdit
       end
 
       post.parent.updater = user if post.parent&.changed?
+    end
+
+    # XXX should be a `validate` hook instead of `before_validation` hook
+    def validate_new_tags
+      return if user.is_builder?
+
+      new_tags = effective_added_tag_names.reject { |name| ::Tag.exists?(name: name) }
+
+      if RateLimiter.limited?(action: "post:validate_new_tags", user: user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
+        post.errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
+        throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
+      end
+    end
+
+    def normalize_tags
+      post.tag_string = ::Tag.create_for_list(tag_names).uniq.sort.join(" ")
+    end
+
+    def validate_changed_tags
+      return if post.uploader == user || user.is_builder?
+
+      changed_tags = post.added_tags + post.removed_tags
+
+      if RateLimiter.limited?(action: "post:validate_changed_tags", user: user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f / MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
+        post.errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
+        throw :abort
+      end
     end
 
     def apply_post_metatags
@@ -212,6 +265,45 @@ class PostEdit
       # the edit fail because then it will create a new post version even if
       # the edit didn't go through.
       nil
+    end
+
+    def added_tags_are_valid
+      new_tags = post.added_tags.select(&:empty?)
+      new_artist_tags, new_general_tags = new_tags.partition(&:artist?)
+
+      if new_general_tags.present?
+        n = new_general_tags.size
+        tag_wiki_links = new_general_tags.map { |tag| "[[#{tag.name}]]" }
+        post.warnings.add(:base, "Created #{n} new #{(n == 1) ? "tag" : "tags"}: #{tag_wiki_links.join(", ")}")
+      end
+
+      new_artist_tags.each do |tag|
+        if tag.artist.blank?
+          new_artist_path = Routes.new_artist_path(artist: { name: tag.name })
+          post.warnings.add(:base, "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[#{new_artist_path}]")
+        end
+      end
+
+      invalid_added_tags.each do |tag|
+        tag.errors.messages.each_value do |messages|
+          post.warnings.add(:base, "Couldn't add tag: #{messages.join(";")}")
+        end
+      end
+
+      deprecated_tags = deprecated_added_tag_names
+      if deprecated_tags.present?
+        tag_list = deprecated_tags.map { |tag| "[[#{tag}]]" }.to_sentence
+        post.warnings.add(:base, "The following tags are deprecated and could not be added: #{tag_list}")
+      end
+    end
+
+    def removed_tags_are_valid
+      unremoved_tags = post.tag_array & user_removed_tag_names
+
+      if unremoved_tags.present?
+        unremoved_tags_list = unremoved_tags.map { |t| "[[#{t}]]" }.to_sentence
+        post.warnings.add(:base, "#{unremoved_tags_list} could not be removed. Check for implications and try again")
+      end
     end
   end
 

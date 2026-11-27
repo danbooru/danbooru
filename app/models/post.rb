@@ -7,15 +7,6 @@ class Post < ApplicationRecord
   # The maximum number of tags a post can have.
   MAX_TAG_COUNT = 1250
 
-  # The maximum number of new tags that can be created by a single user. Default is 20 tags per minute.
-  MAX_NEW_TAGS = 20
-  MAX_NEW_TAGS_INTERVAL = 1.minute
-
-  # The maximum number of tags that can be added or removed by a user per minute. Default is 100 tags per minute.
-  # Builders and the uploader aren't subject to this restriction.
-  MAX_CHANGED_TAGS = 100
-  MAX_CHANGED_TAGS_INTERVAL = 1.minute
-
   # The maximum number of levels in a parent-child hierarchy. By default, a parent-child hierarchy can be no more than 4
   # levels deep. That is, a post can have children, grandchildren, and great-grandchildren, but no great-great-grandchildren.
   MAX_PARENT_DEPTH = 4
@@ -48,14 +39,14 @@ class Post < ApplicationRecord
   normalizes :source, with: ->(source) { Post.normalize_source(source) }, apply_to_nil: true
   before_validation :merge_old_changes
   before_validation -> { post_edit.apply_pre_metatags }
-  before_validation :validate_new_tags
-  before_validation :normalize_tags
+  before_validation -> { post_edit.validate_new_tags }
+  before_validation -> { post_edit.normalize_tags }
   validate :uploader_is_not_limited, on: :create
   validate :post_is_not_allowed, on: :create
   validate :validate_no_parent_cycles
   validate :validate_parent_depth
   validate :validate_child_count
-  validate :validate_changed_tags
+  validate -> { post_edit.validate_changed_tags }
   validate :validate_tag_count
   validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
   validates :rating, presence: { message: "not selected" }
@@ -63,8 +54,8 @@ class Post < ApplicationRecord
   validates :source, length: { maximum: 1200 }
   validates :parent, presence: { message: "post does not exist" }, if: -> { parent_id.present? && parent_id_changed? }
   before_save :parse_pixiv_id
-  before_save :added_tags_are_valid
-  before_save :removed_tags_are_valid
+  before_save -> { post_edit.added_tags_are_valid }
+  before_save -> { post_edit.removed_tags_are_valid }
   before_save :has_artist_tag
   before_save :has_copyright_tag
   before_save :has_enough_tags
@@ -391,38 +382,8 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
-      if !old_parent_id.nil?
-        old_parent = old_parent_id.presence&.to_i
-        if old_parent == parent_id
-          self.parent_id = parent_id_before_last_save || parent_id_was
-        end
-      end
-
-      if old_source == source.to_s
-        self.source = source_before_last_save || source_was
-      end
-
-      if old_rating == rating
-        self.rating = rating_before_last_save || rating_was
-      end
-
       @post_edit = PostEdit.new(self, user: updater)
-    end
-
-    # XXX should be a `validate` hook instead of `before_validation` hook
-    def validate_new_tags
-      return if updater.is_builder?
-
-      new_tags = post_edit.effective_added_tag_names.reject { |name| Tag.exists?(name: name) }
-
-      if RateLimiter.limited?(action: "post:validate_new_tags", user: updater, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
-        errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
-        throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
-      end
-    end
-
-    def normalize_tags
-      self.tag_string = Tag.create_for_list(post_edit.tag_names).uniq.sort.join(" ")
+      @post_edit.merge_old_changes
     end
 
     def web_source?
@@ -1679,60 +1640,9 @@ class Post < ApplicationRecord
       end
     end
 
-    def validate_changed_tags
-      return if uploader == updater || updater.is_builder?
-
-      changed_tags = added_tags + removed_tags
-
-      if RateLimiter.limited?(action: "post:validate_changed_tags", user: updater, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f / MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
-        errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
-        throw :abort
-      end
-    end
-
     def validate_tag_count
       if tag_array.size > MAX_TAG_COUNT
         errors.add(:base, "Post cannot have more than #{MAX_TAG_COUNT} tags")
-      end
-    end
-
-    def added_tags_are_valid
-      new_tags = added_tags.select(&:empty?)
-      new_artist_tags, new_general_tags = new_tags.partition(&:artist?)
-
-      if new_general_tags.present?
-        n = new_general_tags.size
-        tag_wiki_links = new_general_tags.map { |tag| "[[#{tag.name}]]" }
-        warnings.add(:base, "Created #{n} new #{(n == 1) ? "tag" : "tags"}: #{tag_wiki_links.join(", ")}")
-      end
-
-      new_artist_tags.each do |tag|
-        if tag.artist.blank?
-          new_artist_path = Routes.new_artist_path(artist: { name: tag.name })
-          warnings.add(:base, "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[#{new_artist_path}]")
-        end
-      end
-
-      post_edit.invalid_added_tags.each do |tag|
-        tag.errors.messages.each_value do |messages|
-          warnings.add(:base, "Couldn't add tag: #{messages.join(";")}")
-        end
-      end
-
-      deprecated_tags = post_edit.deprecated_added_tag_names
-      if deprecated_tags.present?
-        tag_list = deprecated_tags.map { |tag| "[[#{tag}]]" }.to_sentence
-        warnings.add(:base, "The following tags are deprecated and could not be added: #{tag_list}")
-      end
-    end
-
-    def removed_tags_are_valid
-      attempted_removed_tags = post_edit.user_removed_tag_names
-      unremoved_tags = tag_array & attempted_removed_tags
-
-      if unremoved_tags.present?
-        unremoved_tags_list = unremoved_tags.map { |t| "[[#{t}]]" }.to_sentence
-        warnings.add(:base, "#{unremoved_tags_list} could not be removed. Check for implications and try again")
       end
     end
 
