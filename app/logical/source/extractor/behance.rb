@@ -105,9 +105,19 @@ module Source
         api_response.dig("project", "project") || {}
       end
 
+      # Behance may return a 403 with a challenge page that sets a cookie and reloads the page. If so, retry with the cookie.
       memoize def page
         url = parsed_url.page_url || parsed_referer&.page_url
-        parsed_get(url)
+        return nil if url.blank?
+
+        response = http.cache(1.minute).get(url)
+
+        # <script>document.cookie = "js_challenge_value=fcbc4ff354f2...; Path=/"; window.location.reload();</script>
+        challenge = response.body.to_s[/js_challenge_value=(\h{1,256});/, 1] if response.status == 403
+        response = http.cookies(**session_cookies, js_challenge_value: challenge).cache(1.minute).get(url) if challenge.present?
+
+        update_credentials!(response)
+        response.parse if response.status.success?
       end
 
       memoize def api_response
@@ -115,7 +125,11 @@ module Source
       end
 
       def http
-        super.cookies(ilo0: true, iat0: credentials[:session_cookie])
+        super.cookies(session_cookies)
+      end
+
+      def session_cookies
+        { ilo0: true, iat0: credentials[:session_cookie] }
       end
     end
   end
