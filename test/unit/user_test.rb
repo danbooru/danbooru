@@ -574,12 +574,45 @@ class UserTest < ActiveSupport::TestCase
       should "return at most `limit` accounts, and not load more rows than that" do
         user = create(:user)
         mod = create(:moderator_user)
-        event = create(:user_event, user: user, category: :login)
-        create_list(:user, 3).each { |other| create(:user_event, user: other, category: :login, session_id: event.session_id) }
+        event = create(:user_event, user: user, category: :login, ip_addr: "1.2.3.4")
+        create(:ip_geolocation, ip_addr: "1.2.3.4", is_proxy: false)
+        create_list(:user, 3).each { |other| create(:user_event, user: other, category: :login, session_id: event.session_id, ip_addr: "1.2.3.5") }
 
         accounts = assert_queries_match(/LIMIT \$\d+|LIMIT 2\b/, count: 2) { user.sockpuppet_accounts(mod, limit: 2) }
 
         assert_equal(2, accounts[:session_ids][event.session_id].size)
+      end
+
+      should "not match other users on nil session IDs" do
+        user = create(:user)
+        other = create(:user)
+        mod = create(:moderator_user)
+        create(:user_event, user: user, category: :login, session_id: nil, login_session: nil, ip_addr: "1.2.3.4")
+        create(:user_event, user: other, category: :login, session_id: nil, login_session: nil, ip_addr: "5.6.7.8")
+
+        accounts = user.sockpuppet_accounts(mod)
+
+        assert_empty(accounts[:session_ids])
+        assert_empty(accounts[:ip_addresses])
+      end
+
+      should "find accounts sharing a non-proxy IP subnet and ignore proxy IPs" do
+        user = create(:user)
+        other = create(:user)
+        proxy_other = create(:user)
+        mod = create(:moderator_user)
+
+        create(:ip_geolocation, ip_addr: "1.2.3.4", is_proxy: false)
+        create(:ip_geolocation, ip_addr: "5.6.7.8", is_proxy: true)
+        create(:user_event, user: user, category: :login, ip_addr: "1.2.3.4")
+        create(:user_event, user: user, category: :login, ip_addr: "5.6.7.8")
+        create(:user_event, user: other, category: :login, ip_addr: "1.2.3.99")
+        create(:user_event, user: proxy_other, category: :login, ip_addr: "5.6.7.99")
+
+        accounts = user.sockpuppet_accounts(mod)
+
+        assert_equal([other], accounts[:ip_addresses][Danbooru::IpAddress.new("1.2.3.0/24")])
+        assert_nil(accounts[:ip_addresses][Danbooru::IpAddress.new("5.6.7.0/24")])
       end
     end
   end

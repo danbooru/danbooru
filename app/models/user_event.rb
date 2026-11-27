@@ -76,9 +76,12 @@ class UserEvent < ApplicationRecord
     class_methods do
       # @return [ActiveRecord::Relation<UserEvent>] A list of user events that share a session ID with the given user.
       def shared_session_ids_for(user)
+        session_ids = authorized.where(user: user).where.not(session_id: nil).distinct.pluck(:session_id)
+        return none if session_ids.empty?
+
         authorized
           .where.not(user_id: user.id)
-          .where(session_id: authorized.where(user: user).select(:session_id))
+          .where(session_id: session_ids)
           .group([:session_id, :user_id])
           .select(:session_id, :user_id)
       end
@@ -86,10 +89,12 @@ class UserEvent < ApplicationRecord
       # @return [ActiveRecord::Relation<UserEvent>] A list of user events that share an IP /24 or /64 subnet with the given user.
       def shared_ip_addresses_for(user)
         subnet = "network(set_masklen(user_events.ip_addr, CASE WHEN family(user_events.ip_addr) = 4 THEN 24 ELSE 64 END))"
+        subnets = authorized.where(user: user).joins(:ip_geolocation).where(ip_geolocation: { is_proxy: false }).distinct.pluck(Arel.sql(subnet)).map(&:to_s)
+        return none if subnets.empty?
 
         authorized
           .where.not(user_id: user.id)
-          .where("#{subnet} IN (?)", authorized.where(user: user).joins(:ip_geolocation).where(ip_geolocation: { is_proxy: false }).select(subnet))
+          .where("#{subnet} IN (?)", subnets)
           .group([subnet, :ip_addr, :user_id])
           .select(Arel.sql("#{subnet} AS subnet, ip_addr, user_id"))
       end
