@@ -195,6 +195,14 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render the atom feed when a topic has no forum posts" do
+        ForumPost.where(topic: @other_topic).delete_all
+
+        get forum_topics_path, params: { format: :atom }
+        assert_response :success
+        assert_includes(response.parsed_body.css("entry title").map(&:text), "[#{@other_topic.category}] #{@other_topic.title}")
+      end
+
       should "not show a deleted original post in the atom feed to users who can't see it" do
         @other_topic.original_post.update!(body: "secret deleted op")
         @other_topic.update!(is_deleted: true, updater: @mod)
