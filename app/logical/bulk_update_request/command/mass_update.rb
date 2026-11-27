@@ -132,16 +132,30 @@ class BulkUpdateRequest::Command::MassUpdate < BulkUpdateRequest::Command
 
     CurrentUser.scoped(user) do
       # Each batch is limited to the IDs found before the check, so posts added to a pool mid-update aren't updated.
-      Post.anon_tag_match(antecedent).reorder(nil).in_batches(use_ranges: false) do |batch|
+      Post.anon_tag_match(antecedent).reorder(nil).in_batches(use_ranges: false).each_with_index do |batch, i|
         validate_unmodified!(query, approved_at) if approved_at.present?
 
-        batch.parallel_find_each do |post|
-          post.with_lock do
-            post.tag_string += " #{consequent}"
-            post.save
+        # Update the first post by itself, so any new tags are created before the other posts are updated in
+        # parallel. Otherwise the parallel updates race to create the same tags, and all but one of them fail.
+        if i == 0
+          first_post = batch.first
+          if !update_post(first_post, consequent)
+            raise BulkUpdateRequest::Processor::Error, "post ##{first_post.id} couldn't be updated: #{first_post.errors.full_messages.join("; ")}"
           end
+          batch = batch.where.not(id: first_post.id)
+        end
+
+        batch.parallel_find_each do |post|
+          update_post(post, consequent)
         end
       end
+    end
+  end
+
+  def self.update_post(post, consequent)
+    post.with_lock do
+      post.tag_string += " #{consequent}"
+      post.save
     end
   end
 

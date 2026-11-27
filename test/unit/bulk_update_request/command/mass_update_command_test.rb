@@ -245,6 +245,30 @@ class MassUpdateCommandTest < ActiveSupport::TestCase
         assert_equal(User.system, @post.versions.last.updater)
       end
 
+      should "create new tags and update each post once" do
+        posts = create_list(:post, 3, tag_string: "foo")
+        create_bur!("mass update foo -> char:new_char new_cosplay_(cosplay)", @admin)
+
+        assert_equal(Tag.categories.character, Tag.find_by_name("new_char").category)
+        assert_equal(Tag.categories.character, Tag.find_by_name("new_cosplay").category)
+        posts.each do |post|
+          assert_equal("cosplay foo new_char new_cosplay new_cosplay_(cosplay)", post.reload.tag_string)
+          assert_equal(2, post.versions.count)
+        end
+      end
+
+      should "fail if the first post can't be updated" do
+        parent = create(:post, tag_string: "foo")
+        child = create(:post, tag_string: "foo")
+        bur = assert_can_approve_bur("mass update foo -> parent:#{parent.id} new_tag", @admin)
+
+        error = assert_raises(BulkUpdateRequest::Processor::Error) { bur.processor.process! }
+        assert_equal("post ##{parent.id} couldn't be updated: Post cannot have itself as a parent", error.message)
+        assert_equal("failed", bur.reload.status)
+        assert_nil(child.reload.parent_id)
+        assert_equal("foo", child.tag_string)
+      end
+
       should "be case-sensitive" do
         @post = create(:post, source: "imageboard")
         create_bur!("mass update source:imageboard -> source:Imageboard", @admin)
