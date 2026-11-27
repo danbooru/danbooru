@@ -594,6 +594,84 @@ class DText
     end.join
   end
 
+  # Convert a Tiptap rich text document to HTML. Tiptap is a web text editor that saves documents as JSON instead of HTML.
+  #
+  # @example
+  #   DText.tiptap_to_html({ type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "foo", marks: [{ type: "bold" }] }] }] })
+  #   # => "<p><strong>foo</strong></p>"
+  #
+  # @param node [Hash, Array, String, nil] The Tiptap document (with indifferent access), or a node inside it.
+  # @param depth [Integer] The nesting depth of the current node. Nodes nested deeper than `max_depth` are skipped.
+  # @return [String] The HTML output.
+  def self.tiptap_to_html(node, depth: 0, max_depth: 100)
+    return "" if depth >= max_depth
+
+    case node
+    in Array
+      node.map { |child| tiptap_to_html(child, depth:, max_depth:) }.join
+    in Hash
+      children_html = tiptap_to_html(node[:content], depth: depth + 1, max_depth:)
+      attrs = node[:attrs].is_a?(Hash) ? node[:attrs] : {}
+
+      case node[:type]
+      in "doc"
+        html = children_html
+      in "text"
+        html = CGI.escapeHTML(node[:text].to_s).gsub("\n", "<br>")
+      in "paragraph"
+        html = "<p>#{children_html}</p>"
+      in "hardBreak"
+        html = "<br>"
+      in "heading"
+        level = attrs[:level].to_s.to_i.clamp(1, 6)
+        html = "<h#{level}>#{children_html}</h#{level}>"
+      in "bulletList"
+        html = "<ul>#{children_html}</ul>"
+      in "orderedList"
+        html = "<ol>#{children_html}</ol>"
+      in "listItem"
+        html = "<li>#{children_html}</li>"
+      in "blockquote"
+        html = "<blockquote>#{children_html}</blockquote>"
+      in "image"
+        image_url = attrs[:src]
+        html = (image_url.is_a?(String) && image_url.present?) ? %{<img src="#{CGI.escapeHTML(image_url)}">} : ""
+      in "link"
+        href = attrs[:href]
+        html = (href.is_a?(String) && href.present?) ? %{<a href="#{CGI.escapeHTML(href)}">#{children_html}</a>} : children_html
+      else
+        html = children_html
+      end
+
+      # Apply each type of mark only once, so that repeated marks can't make the output wrap the text thousands of times.
+      marks = node[:marks].is_a?(Array) ? node[:marks].grep(Hash).uniq { |mark| mark[:type] } : []
+
+      marks.reduce(html) do |body, mark|
+        mark_attrs = mark[:attrs].is_a?(Hash) ? mark[:attrs] : {}
+
+        case mark[:type]
+        in "bold"
+          "<strong>#{body}</strong>"
+        in "italic"
+          "<em>#{body}</em>"
+        in "underline"
+          "<u>#{body}</u>"
+        in "strike"
+          "<s>#{body}</s>"
+        in "code"
+          "<code>#{body}</code>"
+        in "link"
+          href = mark_attrs[:href]
+          (href.is_a?(String) && href.present?) ? %{<a href="#{CGI.escapeHTML(href)}">#{body}</a>} : body
+        else
+          body
+        end
+      end
+    else
+      CGI.escapeHTML(node.to_s)
+    end
+  end
+
   # Convert plain text to DText.
   #
   # @param text [String] The plain text input.

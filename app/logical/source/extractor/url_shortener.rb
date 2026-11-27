@@ -80,6 +80,11 @@ class Source::Extractor::URLShortener < Source::Extractor
       url = http.redirect_url(https_url)&.to_s
       url unless url.in?(%w[https://www.postype.com https://www.postype.com/404])
 
+    # curl -v https://kre.pe/E0f0
+    # Returns 302 on success and 404 on error.
+    in "kre.pe", id
+      http.redirect_url(https_url, method: "GET")&.to_s
+
     # curl -I https://skfb.ly/GXzZ
     # https://skfb.ly/GXzZ -> https://sketchfab.com:443/s/GXzZa -> https://sketchfab.com/3d-models/my-dnd-map-falkirk-91a1199bda5e45cb84260bac20502f28
     in "skfb.ly", id

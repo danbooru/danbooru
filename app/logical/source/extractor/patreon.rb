@@ -94,70 +94,7 @@ class Source::Extractor::Patreon < Source::Extractor
   end
 
   memoize def content_html
-    rich_text_to_html(content_json)
-  end
-
-  def rich_text_to_html(node)
-    case node
-    in Array
-      node.map { |child| rich_text_to_html(child) }.join
-    in Hash
-      children_html = rich_text_to_html(node[:content])
-
-      case node[:type]
-      in "doc"
-        html = children_html
-      in "text"
-        html = CGI.escapeHTML(node[:text].to_s).gsub("\n", "<br>")
-      in "paragraph"
-        html = "<p>#{children_html}</p>"
-      in "hardBreak"
-        html = "<br>"
-      in "heading"
-        level = node.dig(:attrs, :level).to_i.clamp(1, 6)
-        html = "<h#{level}>#{children_html}</h#{level}>"
-      in "bulletList"
-        html = "<ul>#{children_html}</ul>"
-      in "orderedList"
-        html = "<ol>#{children_html}</ol>"
-      in "listItem"
-        html = "<li>#{children_html}</li>"
-      in "blockquote"
-        html = "<blockquote>#{children_html}</blockquote>"
-      in "image"
-        image_url = node.dig(:attrs, :src)
-        html = image_url.present? ? %{<img src="#{CGI.escapeHTML(image_url)}">} : ""
-      in "link"
-        href = node.dig(:attrs, :href)
-        html = href.present? ? %{<a href="#{CGI.escapeHTML(href)}">#{children_html}</a>} : children_html
-      else
-        html = children_html
-      end
-
-      node[:marks].to_a.reduce(html) do |body, mark|
-        mark_type = mark[:type]
-
-        case mark_type
-        in "bold"
-          "<strong>#{body}</strong>"
-        in "italic"
-          "<em>#{body}</em>"
-        in "underline"
-          "<u>#{body}</u>"
-        in "strike"
-          "<s>#{body}</s>"
-        in "code"
-          "<code>#{body}</code>"
-        in "link"
-          href = mark.dig(:attrs, :href)
-          href.present? ? %{<a href="#{CGI.escapeHTML(href)}">#{body}</a>} : body
-        else
-          body
-        end
-      end
-    else
-      CGI.escapeHTML(node.to_s)
-    end
+    DText.tiptap_to_html(content_json)
   end
 
   def post

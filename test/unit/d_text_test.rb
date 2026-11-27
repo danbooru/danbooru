@@ -653,6 +653,97 @@ class DTextTest < ActiveSupport::TestCase
       end
     end
 
+    context ".tiptap_to_html" do
+      should "convert text and paragraphs" do
+        doc = { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "foo\nbar" }, { type: "hardBreak" }, { type: "text", text: "baz" }] }] }
+        assert_equal("<p>foo<br>bar<br>baz</p>", DText.tiptap_to_html(doc.with_indifferent_access))
+      end
+
+      should "convert marks" do
+        doc = {
+          type: "doc",
+          content: [{
+            type: "paragraph",
+            content: [
+              { type: "text", text: "a", marks: [{ type: "bold" }, { type: "italic" }] },
+              { type: "text", text: "b", marks: [{ type: "underline" }, { type: "strike" }, { type: "code" }] },
+              { type: "text", text: "c", marks: [{ type: "link", attrs: { href: "https://crepe.cm" }}] },
+              { type: "text", text: "d", marks: [{ type: "unknown" }, { type: "link", attrs: {}}] },
+            ],
+          }],
+        }
+
+        assert_equal(%{<p><em><strong>a</strong></em><code><s><u>b</u></s></code><a href="https://crepe.cm">c</a>d</p>}, DText.tiptap_to_html(doc.with_indifferent_access))
+      end
+
+      should "convert block nodes" do
+        doc = {
+          type: "doc",
+          content: [
+            { type: "heading", attrs: { level: 9 }, content: [{ type: "text", text: "title" }] },
+            { type: "bulletList", content: [{ type: "listItem", content: [{ type: "text", text: "one" }] }] },
+            { type: "orderedList", content: [{ type: "listItem", content: [{ type: "text", text: "two" }] }] },
+            { type: "blockquote", content: [{ type: "text", text: "quote" }] },
+            { type: "image", attrs: { src: "https://crepe.land/a.png" }},
+            { type: "link", attrs: { href: "https://crepe.cm" }, content: [{ type: "text", text: "link" }] },
+            { type: "unknown", content: [{ type: "text", text: "other" }] },
+          ],
+        }
+
+        assert_equal(%{<h6>title</h6><ul><li>one</li></ul><ol><li>two</li></ol><blockquote>quote</blockquote><img src="https://crepe.land/a.png"><a href="https://crepe.cm">link</a>other}, DText.tiptap_to_html(doc.with_indifferent_access))
+      end
+
+      should "escape HTML in text and attributes" do
+        doc = {
+          type: "doc",
+          content: [
+            { type: "text", text: "<script>", marks: [{ type: "link", attrs: { href: %{"><script>} }}] },
+            { type: "image", attrs: { src: %{"><script>} }},
+          ],
+        }
+
+        assert_equal(%{<a href="&quot;&gt;&lt;script&gt;">&lt;script&gt;</a><img src="&quot;&gt;&lt;script&gt;">}, DText.tiptap_to_html(doc.with_indifferent_access))
+      end
+
+      should "handle missing or invalid documents" do
+        assert_equal("", DText.tiptap_to_html(nil))
+        assert_equal("", DText.tiptap_to_html({}))
+        assert_equal("", DText.tiptap_to_html([]))
+        assert_equal("&lt;b&gt;", DText.tiptap_to_html("<b>"))
+      end
+
+      should "ignore attributes and marks with invalid types" do
+        doc = {
+          type: "doc",
+          content: [
+            { type: "heading", attrs: { level: true }, content: "a" },
+            { type: "heading", attrs: "x", content: "b" },
+            { type: "image", attrs: { src: { a: 1 }}},
+            { type: "image", attrs: ["x"] },
+            { type: "link", attrs: { href: ["x"] }, content: "c" },
+            { type: "text", text: "d", marks: "bold" },
+            { type: "text", text: "e", marks: { type: "bold" }},
+            { type: "text", text: "f", marks: ["bold", nil, { type: "link", attrs: { href: 1 }}, { type: "link", attrs: "x" }] },
+          ],
+        }
+
+        assert_equal("<h1>a</h1><h1>b</h1>cdef", DText.tiptap_to_html(doc.with_indifferent_access))
+      end
+
+      should "apply each mark type only once" do
+        doc = { type: "text", text: "a" * 100, marks: ([{ type: "bold" }] * 10_000) + ([{ type: "italic" }] * 10_000) }
+        assert_equal("<em><strong>#{"a" * 100}</strong></em>", DText.tiptap_to_html(doc.with_indifferent_access))
+      end
+
+      should "stop converting deeply nested documents" do
+        doc = 200.times.reduce({ type: "text", text: "a" }) { |node, _| { type: "blockquote", content: [node] } }
+        html = DText.tiptap_to_html(doc.with_indifferent_access)
+
+        assert_equal(100, html.scan("<blockquote>").size)
+        assert_not_includes(html, "a")
+      end
+    end
+
     context "#mentions" do
       should "parse mentions in dtext" do
         assert_equal(["foo", "bar"], DText.new("@foo @bar").mentions)
