@@ -16,6 +16,7 @@ module Source::Tests::URL
       should be_page_url(
         "https://www.foriio.com/works/600743",
         "https://www.foriio.com/embeded/works/600743",
+        "https://www.foriio.com/Gldnxpuff/wk_AZvoPMeMrrjD3vADRdbO7ERFLRigKXSawFcEERoBP68duQUftQ",
       )
 
       should be_profile_url(
@@ -26,6 +27,13 @@ module Source::Tests::URL
     end
 
     should parse_url("https://foriio.imgix.net/store/46d77f4f772f191d04c9360180cc907d.jpg?ixlib=rb-4.1.0&w=2184&auto=compress&s=a9a14e871e2f6dbdc28f87c915e8684f").into(site_name: "Foriio")
+
+    should parse_url("https://www.foriio.com/Gldnxpuff/wk_AZvoPMeMrrjD3vADRdbO7ERFLRigKXSawFcEERoBP68duQUftQ").into(
+      page_url: "https://www.foriio.com/Gldnxpuff/wk_AZvoPMeMrrjD3vADRdbO7ERFLRigKXSawFcEERoBP68duQUftQ",
+      profile_url: "https://www.foriio.com/Gldnxpuff",
+      work_id: nil,
+      signed_ref: "wk_AZvoPMeMrrjD3vADRdbO7ERFLRigKXSawFcEERoBP68duQUftQ",
+    )
 
     should parse_url("https://img.foriio.com/images/r/im_AT9deWzUD-NWfS8237_Cm4JuoWaq9gc-xQnT7-cTcDS_WJ5xqb4?w=1092").into(
       full_image_url: "https://img.foriio.com/images/r/im_AT9deWzUD-NWfS8237_Cm4JuoWaq9gc-xQnT7-cTcDS_WJ5xqb4?w=10000&fit=max",

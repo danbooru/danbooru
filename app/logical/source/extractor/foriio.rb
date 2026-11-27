@@ -30,6 +30,10 @@ class Source::Extractor::Foriio < Source::Extractor
     work.dig("data", "author", "screen_name")
   end
 
+  def published_at
+    Time.zone.parse(work.dig("data", "published_at")) if work.dig("data", "published_at").present?
+  end
+
   def artist_commentary_title
     work.dig("data", "title")
   end
@@ -50,8 +54,13 @@ class Source::Extractor::Foriio < Source::Extractor
     parsed_url.work_id || parsed_referer&.work_id
   end
 
+  def signed_ref
+    parsed_url.signed_ref || parsed_referer&.signed_ref
+  end
+
+  # The page's JSON contains the work keyed by both its numeric ID and its signed ref.
   memoize def work
-    page_json.dig("works", work_id.to_s) || {}
+    page_json.dig("works", (work_id || signed_ref).to_s) || {}
   end
 
   memoize def page_json

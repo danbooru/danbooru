@@ -5,7 +5,7 @@ class Source::URL::Foriio < Source::URL
 
   RESERVED_USERNAMES = %w[about benefits business company contests discover keywords legal pro]
 
-  attr_reader :username, :work_id, :file, :image_id
+  attr_reader :username, :work_id, :signed_ref, :file, :image_id
 
   def self.match?(url)
     url.domain.in?(%w[foriio.com fori.io]) ||
@@ -46,6 +46,11 @@ class Source::URL::Foriio < Source::URL
     in _, _, "embeded", "works", work_id
       @work_id = work_id
 
+    # https://www.foriio.com/Gldnxpuff/wk_AZvoPMeMrrjD3vADRdbO7ERFLRigKXSawFcEERoBP68duQUftQ
+    in _, _, username, /\Awk_/ => signed_ref unless username.in?(RESERVED_USERNAMES)
+      @username = username
+      @signed_ref = signed_ref
+
     # https://fori.io/comori22
     # https://www.foriio.com/comori22
     # https://www.foriio.com/comori22/categories/Illustration
@@ -73,7 +78,11 @@ class Source::URL::Foriio < Source::URL
   end
 
   def page_url
-    "https://www.foriio.com/works/#{work_id}" if work_id.present?
+    if username.present? && signed_ref.present?
+      "https://www.foriio.com/#{username}/#{signed_ref}"
+    elsif work_id.present?
+      "https://www.foriio.com/works/#{work_id}"
+    end
   end
 
   def profile_url

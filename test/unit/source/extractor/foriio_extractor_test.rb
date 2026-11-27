@@ -13,6 +13,7 @@ module Source::Tests::Extractor
         display_name: "moko",
         username: "mokoxmoko2",
         other_names: ["moko", "mokoxmoko2"],
+        published_at: Time.parse("2022-10-04T23:32:25.451Z"),
         dtext_artist_commentary_title: "221004 2",
         dtext_artist_commentary_desc: "",
       )
@@ -36,6 +37,7 @@ module Source::Tests::Extractor
         display_name: "𝗇𝖾𝗄𝗈𝗆𝗈🐾",
         username: "yumenkmc",
         tags: [],
+        published_at: Time.parse("2023-08-09T12:10:20.499Z"),
         dtext_artist_commentary_title: "おどロボ / 海茶 feat. 琴葉姉妹 with ずんだもん - MV用イラスト・ドットアニメーション",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           海茶さんの「おどロボ / 琴葉姉妹 with ずんだもん」のMV用イラストとピクセルアートを制作させていただきました。
@@ -68,6 +70,7 @@ module Source::Tests::Extractor
         display_name: "ぴゆるる",
         username: "piyu-ruru",
         other_names: ["ぴゆるる", "piyu-ruru"],
+        published_at: Time.parse("2023-03-09T07:34:33.249Z"),
         dtext_artist_commentary_title: "●●★●●●●● / Sample",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           Skeb向けサンプル① / 脱ぎ差分
@@ -75,6 +78,24 @@ module Source::Tests::Extractor
           Sample for NSFW Skeb requests①
           take off difference
         EOS
+      )
+    end
+
+    context "A Foriio post with a signed work URL" do
+      strategy_should_work(
+        "https://www.foriio.com/Gldnxpuff/wk_AZvoPMeMrrjD3vADRdbO7ERFLRigKXSawFcEERoBP68duQUftQ",
+        image_urls: %w[https://img.foriio.com/images/r/im_Aeq6aPthGlTKCRRXgVe3yOSvH8EHDhdYHDTafyvCMsM1IUqVrE8?w=10000&fit=max],
+        media_files: [{ file_size: 1_220_910 }],
+        page_url: "https://www.foriio.com/Gldnxpuff/wk_AZvoPMeMrrjD3vADRdbO7ERFLRigKXSawFcEERoBP68duQUftQ",
+        profile_url: "https://www.foriio.com/Gldnxpuff",
+        profile_urls: %w[https://www.foriio.com/Gldnxpuff https://www.twitter.com/gldnxpuff],
+        display_name: "Puffymii",
+        username: "Gldnxpuff",
+        published_at: Time.parse("2025-10-11T20:13:16.015Z"),
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "Pretty",
+        dtext_artist_commentary_desc: "",
       )
     end
 
@@ -88,6 +109,7 @@ module Source::Tests::Extractor
         display_name: nil,
         username: nil,
         other_names: [],
+        published_at: nil,
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: "",
       )
