@@ -178,6 +178,14 @@ module Source
       profile_url.present? && !page_url? && !image_url?
     end
 
+    # The sort order of this site in artist URL lists. Lower values come first. Sites with extractors come before
+    # known sites without them, which come before unknown sites (1000, see Source::URL::Null).
+    #
+    # @return [Integer]
+    def sorting_priority
+      self.class.extractors.any? ? 500 : 750
+    end
+
     # True if the URL is a secondary profile page URL.
     # A secondary URL is an artist URL that we don't normally want to display,
     # usually because it's redundant with the primary profile URL.

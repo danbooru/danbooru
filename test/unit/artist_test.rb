@@ -23,6 +23,31 @@ class ArtistTest < ActiveSupport::TestCase
       CurrentUser.user = nil
     end
 
+    should "sort urls with Pixiv and Twitter first, then sites with extractors, then known sites, then unknown sites" do
+      urls = %w[
+        https://aaa.com/abc
+        https://www.instagram.com/abc/
+        https://ych.art/user/abc
+        -https://www.pixiv.net/users/456
+        https://skima.jp/profile?id=123
+        https://bsky.app/profile/abc.bsky.social
+        https://x.com/abc
+        https://www.pixiv.net/users/123
+      ]
+      @artist = create(:artist, url_string: urls.join("\n"))
+
+      assert_equal(%w[
+        https://www.pixiv.net/users/123
+        https://x.com/abc
+        https://bsky.app/profile/abc.bsky.social
+        https://skima.jp/profile?id=123
+        https://www.instagram.com/abc/
+        https://ych.art/user/abc
+        https://aaa.com/abc
+        -https://www.pixiv.net/users/456
+      ], @artist.sorted_urls.map(&:to_s))
+    end
+
     should "parse inactive urls" do
       @artist = create(:artist, name: "blah", url_string: "-http://monet.com")
       assert_equal(["-http://monet.com"], @artist.urls.map(&:to_s))

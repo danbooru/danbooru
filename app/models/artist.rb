@@ -43,7 +43,7 @@ class Artist < ApplicationRecord
 
     def sorted_urls
       Danbooru.natural_sort_by(urls, &:url).sort_by.with_index do |url, i|
-        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, i]
+        [url.is_active? ? 0 : 1, url.sorting_priority, url.domain, url.secondary_url? ? 1 : 0, i]
       end
     end
 

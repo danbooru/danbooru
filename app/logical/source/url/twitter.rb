@@ -219,6 +219,10 @@ class Source::URL::Twitter < Source::URL
     end
   end
 
+  def sorting_priority
+    0
+  end
+
   def secondary_url?
     profile_url? && username.blank?
   end

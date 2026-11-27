@@ -9,7 +9,28 @@ class Source::URL::Null < Source::URL
     true
   end
 
+  # Sites listed in `known_site_name` go before unknown sites. Both go after sites with extractors, even though
+  # Source::Extractor::Null exists.
+  def sorting_priority
+    known_site_name.present? ? 750 : 1000
+  end
+
   def site_name
+    name = known_site_name
+
+    if name.present?
+      name
+    elsif domain.nil?
+      # "http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52" => "125.6.189.215"
+      authority
+    else
+      # "www.melonbooks.co.jp" => "Melonbooks"
+      parsed_domain.sld.titleize
+    end
+  end
+
+  # @return [String, nil] The name of the site, or nil if it's not a site we know about.
+  def known_site_name
     case [subdomain, domain]
     in "myship", "7-11.com.tw"
       "7-Eleven MyShip"
@@ -65,6 +86,8 @@ class Source::URL::Null < Source::URL
       "Drawcrowd"
     in _, "eth.co"
       "Eth.co"
+    in "erogamescape", "dyndns.org"
+      "Erogamescape"
     in _, "exblog.jp"
       "Excite Blog"
     in _, "fanfiction.net"
@@ -119,10 +142,14 @@ class Source::URL::Null < Source::URL
       "Manga Library Z"
     in _, "manga-no.com"
       "Mangano"
+    in _, "mangaupdates.com"
+      "Mangaupdates"
     in _, "marpple.shop"
       "MarppleShop"
     in _, ("mastodon.cloud" | "mstdn.jp")
       "Mastodon"
+    in _, ("melonbooks.co.jp" | "melonbooks.com")
+      "Melonbooks"
     in _, "msha.ke" | "milkshake.app"
       "Milkshake"
     in _, "myanimelist.net"
@@ -141,6 +168,8 @@ class Source::URL::Null < Source::URL
       "Overdoll"
     in _, ("paypal.com" | "paypal.me" | "paypalobjects.com")
       "PayPal"
+    in _, "picarto.tv"
+      "Picarto"
     in _, "pixeljoint.com"
       "Pixel Joint"
     in _, "planetminecraft.com"
@@ -173,6 +202,8 @@ class Source::URL::Null < Source::URL
       "Square"
     in _, ("steamstatic.com" | "steamcommunity.com")
       "Steam"
+    in _, "stickam.jp"
+      "Stickam"
     in _, "straw.page"
       "Straw.page"
     in _, ("strikingly.com" | "mystrikingly.com")
@@ -209,6 +240,8 @@ class Source::URL::Null < Source::URL
       "Trello"
     in _, "tsunagu.cloud"
       "tsunagu.cloud"
+    in _, "twitch.tv"
+      "Twitch"
     in _, ("vimeo.com" | "vimeocdn.com" | "livestream.com")
       "Vimeo"
     in _, "webtoons.com"
@@ -217,6 +250,8 @@ class Source::URL::Null < Source::URL
       "Webtoons"
     in _, ("weebly.com" | "weeblysite.com")
       "Weebly"
+    in _, "wikipedia.org"
+      "Wikipedia"
     in _, "wlo.link"
       "Willow"
     in _, ("wix.com" | "wixsite.com" | "wixstatic.com")
@@ -225,12 +260,8 @@ class Source::URL::Null < Source::URL
       "WordPress"
     in _, "ych.art"
       "YCH.art"
-    in _, nil
-      # "http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52" => "125.6.189.215"
-      authority
     else
-      # "www.melonbooks.co.jp" => "Melonbooks"
-      parsed_domain.sld.titleize
+      nil
     end
   end
 

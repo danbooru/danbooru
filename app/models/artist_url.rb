@@ -85,15 +85,8 @@ class ArtistURL < ApplicationRecord
   end
 
   # The sort order of sites in artist URL lists.
-  def priority
-    sites = %w[
-      Pixiv Twitter
-      Anifty ArtStation Baraag Bilibili BCY Booth Deviant\ Art Fantia Foundation Furaffinity Hentai\ Foundry Huashijie Lofter Newgrounds Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Reddit Arca.live DC\ Inside Skeb Tinami Tumblr Weibo Misskey.io Misskey.art Misskey.design Xfolio
-      Ask.fm Facebook FC2 Gumroad Huajia Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Twitch Youtube
-      Amazon Circle.ms DLSite Doujinshi.org Erogamescape Mangaupdates Melonbooks Toranoana Wikipedia
-    ]
-
-    sites.index(site_name) || 1000
+  def sorting_priority
+    parsed_url&.sorting_priority || 1000
   end
 
   def self.normalize_url(url)

@@ -31,6 +31,7 @@ module Source::Tests::URL
         assert_equal("Doujinshi.org", Source::URL.parse("http://www.doujinshi.org/browse/author/92838/Ojo").site_name)
         assert_equal("Doujinshi.org", Source::URL.parse("http://doujinshi.mugimugi.org/browse/author/47832/MisRoma/").site_name)
         assert_equal("E-Hentai", Source::URL.parse("https://e-hentai.org/uploader/Laundrymom").site_name)
+        assert_equal("Erogamescape", Source::URL.parse("https://erogamescape.dyndns.org/~ap2/ero/toukei_kaiseki/brandview.php?brand=1").site_name)
         assert_equal("Excite Blog", Source::URL.parse("http://spzinno.exblog.jp").site_name)
         assert_equal("FanFiction.Net", Source::URL.parse("https://www.fanfiction.net/u/1795942").site_name)
         assert_equal("GitHub", Source::URL.parse("https://github.com/Shimofumi").site_name)
@@ -69,9 +70,11 @@ module Source::Tests::URL
         assert_equal("Livedoor", Source::URL.parse("https://livedoor.livedoor.biz/archives/artist.html").site_name)
         assert_equal("Manga Library Z", Source::URL.parse("https://www.mangaz.com/person/detail/44761").site_name)
         assert_equal("Mangano", Source::URL.parse("https://manga-no.com/artist/123").site_name)
+        assert_equal("Mangaupdates", Source::URL.parse("https://www.mangaupdates.com/authors.html?id=1").site_name)
         assert_equal("MarppleShop", Source::URL.parse("https://marpple.shop/kr/@artist").site_name)
         assert_equal("Mastodon", Source::URL.parse("https://mastodon.cloud/@artist").site_name)
         assert_equal("Mastodon", Source::URL.parse("https://mstdn.jp/@oneb").site_name)
+        assert_equal("Melonbooks", Source::URL.parse("https://www.melonbooks.co.jp/circle/index.php?circle_id=1").site_name)
         assert_equal("Milkshake", Source::URL.parse("https://msha.ke/artist").site_name)
         assert_equal("Milkshake", Source::URL.parse("https://milkshake.app/artist").site_name)
         assert_equal("MyAnimeList", Source::URL.parse("https://myanimelist.net/profile/artist").site_name)
@@ -83,6 +86,7 @@ module Source::Tests::URL
         assert_equal("Overdoll", Source::URL.parse("https://dollycdn.net/artist").site_name)
         assert_equal("PayPal", Source::URL.parse("https://www.paypal.me/artist").site_name)
         assert_equal("PayPal", Source::URL.parse("https://www.paypal.com/donate/?hosted_button_id=ABC").site_name)
+        assert_equal("Picarto", Source::URL.parse("https://picarto.tv/artist").site_name)
         assert_equal("Pixel Joint", Source::URL.parse("https://pixeljoint.com/p/artist.htm").site_name)
         assert_equal("Planet Minecraft", Source::URL.parse("https://www.planetminecraft.com/member/artist").site_name)
         assert_equal("Pronouns.page", Source::URL.parse("https://en.pronouns.page/@artist").site_name)
@@ -100,6 +104,7 @@ module Source::Tests::URL
         assert_equal("Square", Source::URL.parse("https://artist.square.site").site_name)
         assert_equal("Square", Source::URL.parse("https://squareup.com/store/artist").site_name)
         assert_equal("Steam", Source::URL.parse("https://steamcommunity.com/id/artist").site_name)
+        assert_equal("Stickam", Source::URL.parse("http://www.stickam.jp/profile/artist").site_name)
         assert_equal("Straw.page", Source::URL.parse("https://straw.page/artist").site_name)
         assert_equal("SubscribeStar", Source::URL.parse("https://subscribestar.adult/artist").site_name)
         assert_equal("SubscribeStar", Source::URL.parse("https://subscribestar.com/artist").site_name)
@@ -118,11 +123,13 @@ module Source::Tests::URL
         assert_equal("Toyhouse", Source::URL.parse("https://toyhou.se/artist").site_name)
         assert_equal("Trello", Source::URL.parse("https://bxp-content-static.prod.public.atl-paas.net/board-bg.jpg").site_name)
         assert_equal("tsunagu.cloud", Source::URL.parse("https://tsunagu.cloud/artist").site_name)
+        assert_equal("Twitch", Source::URL.parse("https://www.twitch.tv/artist").site_name)
         assert_equal("Vimeo", Source::URL.parse("https://vimeo.com/artist").site_name)
         assert_equal("Vimeo", Source::URL.parse("https://livestream.com/artist").site_name)
         assert_equal("Webtoons", Source::URL.parse("https://www.webtoons.com/en/creator/artist").site_name)
         assert_equal("Weebly", Source::URL.parse("https://artist.weebly.com").site_name)
         assert_equal("Weebly", Source::URL.parse("https://artist.weeblysite.com").site_name)
+        assert_equal("Wikipedia", Source::URL.parse("https://en.wikipedia.org/wiki/Artist").site_name)
         assert_equal("Willow", Source::URL.parse("https://wlo.link/@artist").site_name)
         assert_equal("Wix", Source::URL.parse("https://artist.wixsite.com/home").site_name)
         assert_equal("Wix", Source::URL.parse("https://static.wixstatic.com/media/artist.jpg").site_name)
@@ -137,6 +144,23 @@ module Source::Tests::URL
         assert_equal("Tegaki", Source::URL.parse("https://tegaki.com/user/artist").site_name)
         assert_equal("YCH.art", Source::URL.parse("https://ych.art/user/artist").site_name)
         assert_equal("Youtube", Source::URL.parse("https://youtu.be/dQw4w9WgXcQ").site_name)
+      end
+    end
+
+    context "determining the sorting priority" do
+      should "put known sites before unknown sites" do
+        assert_equal(750, Source::URL.parse("https://erogamescape.dyndns.org/~ap2/ero/toukei_kaiseki/brandview.php?brand=1").sorting_priority)
+        assert_equal(750, Source::URL.parse("https://www.mangaupdates.com/authors.html?id=1").sorting_priority)
+        assert_equal(750, Source::URL.parse("https://www.melonbooks.co.jp/circle/index.php?circle_id=1").sorting_priority)
+        assert_equal(750, Source::URL.parse("https://www.melonbooks.com/circle/index.php?circle_id=1").sorting_priority)
+        assert_equal(750, Source::URL.parse("https://picarto.tv/artist").sorting_priority)
+        assert_equal(750, Source::URL.parse("http://www.stickam.jp/profile/artist").sorting_priority)
+        assert_equal(750, Source::URL.parse("https://www.twitch.tv/artist").sorting_priority)
+        assert_equal(750, Source::URL.parse("https://en.wikipedia.org/wiki/Artist").sorting_priority)
+
+        assert_equal(1000, Source::URL.parse("https://foo.com/artist").sorting_priority)
+        assert_equal(1000, Source::URL.parse("https://127.0.0.1").sorting_priority)
+        assert_equal(1000, Source::URL.parse("https://erogamescape.example.org/artist").sorting_priority)
       end
     end
 
