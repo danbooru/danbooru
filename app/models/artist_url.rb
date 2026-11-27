@@ -6,7 +6,7 @@ class ArtistURL < ApplicationRecord
   normalizes :url, with: ->(url) { ArtistURL.normalize_url(url) }
 
   validates :url, presence: true, length: { maximum: MAX_URL_LENGTH, message: "'%{value}' is too long (maximum is #{MAX_URL_LENGTH} characters)" }, uniqueness: { scope: :artist_id }
-  validate :validate_url_format
+  validate :validate_url_format, if: :url_changed?
   belongs_to :artist, touch: true
 
   scope :active, -> { where(is_active: true) }

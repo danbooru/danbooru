@@ -50,6 +50,29 @@ class ArtistTest < ActiveSupport::TestCase
       assert(@artist.urls[0].is_active?)
     end
 
+    context "with a URL that was saved before it became invalid" do
+      setup do
+        @artist = create(:artist, name: "blah")
+        @artist.urls.new(url: "http://example.co1").save!(validate: false)
+        @artist.reload
+      end
+
+      should "allow deactivating the url" do
+        assert_equal(true, @artist.update(url_string: "-http://example.co1"))
+        assert_equal(["-http://example.co1"], @artist.reload.urls.map(&:to_s))
+      end
+
+      should "allow adding other urls" do
+        assert_equal(true, @artist.update(url_string: "http://example.co1\nhttp://monet.com"))
+        assert_equal(["http://example.co1", "http://monet.com"], @artist.reload.urls.map(&:to_s).sort)
+      end
+
+      should "not allow adding new invalid urls" do
+        assert_equal(false, @artist.update(url_string: "http://example.co1\nhttp://example.co2"))
+        assert_equal(["URL 'http://example.co2' is not a valid URL"], @artist.errors.full_messages)
+      end
+    end
+
     context "with an invalid name" do
       subject { build(:artist) }
 
