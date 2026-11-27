@@ -48,6 +48,20 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "only keep the page param in the reply links for anonymous users" do
+        get forum_topic_path(@forum_topic, page: 1, q: "touhou")
+
+        assert_response :success
+        assert_select ".forum-post a[href=?]", login_path(url: forum_topic_path(@forum_topic, page: 1)), text: "Reply"
+      end
+
+      should "leave invalid page params out of the reply links for anonymous users" do
+        get forum_topic_path(@forum_topic, page: "1#{"x" * 200}")
+
+        assert_response :success
+        assert_select ".forum-post a[href=?]", login_path(url: forum_topic_path(@forum_topic)), text: "Reply"
+      end
+
       should "cut off old posts that are over the line limit" do
         forum_post = as(@user) { create(:forum_post, creator: @user, topic: @forum_topic) }
         forum_post.update_columns(body: "#{"a\n\n" * 500}too long")

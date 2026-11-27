@@ -47,7 +47,7 @@
       <% if votable? %>
         <span class="comment-votes">
           <% if current_user.is_anonymous? %>
-            <%= link_to upvote_icon, login_path(url: request.fullpath), class: "comment-upvote-link inactive-link" %>
+            <%= link_to upvote_icon, login_url, class: "comment-upvote-link inactive-link" %>
           <% elsif upvoted? %>
             <%= link_to upvote_icon, comment_vote_path(current_vote), class: "comment-upvote-link comment-unvote-link active-link", method: :delete, remote: true, "data-params": component_state.to_param %>
           <% else %>
@@ -63,7 +63,7 @@
           </span>
 
           <% if current_user.is_anonymous? %>
-            <%= link_to downvote_icon, login_path(url: request.fullpath), class: "comment-downvote-link inactive-link" %>
+            <%= link_to downvote_icon, login_url, class: "comment-downvote-link inactive-link" %>
           <% elsif downvoted? %>
             <%= link_to downvote_icon, comment_vote_path(current_vote), class: "comment-downvote-link comment-unvote-link active-link", method: :delete, remote: true, "data-params": component_state.to_param %>
           <% else %>
@@ -75,7 +75,7 @@
       <% if policy(comment).reply? %>
         <span class="comment-reply">
           <% if current_user.is_anonymous? %>
-            <%= link_to "Reply", login_path(url: request.fullpath) %>
+            <%= link_to "Reply", login_url %>
           <% elsif context == :index_by_comment %>
             <%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }) %>
           <% else %>

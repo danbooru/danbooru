@@ -82,6 +82,21 @@ module ApplicationHelper
     url_for(ActionController::Parameters.new(request.query_parameters).merge(params).permit!)
   end
 
+  # The path of the current page with only the given params.
+  #
+  # @param params [Hash] The params to keep. Values that are blank, aren't strings, or are over 300 characters are left out.
+  # @return [String] The path, with the params as the query string.
+  def current_path_with(**params)
+    query = params.select { |_name, value| value.is_a?(String) && value.present? && value.length <= 300 }.to_query
+    query.present? ? "#{request.path}?#{query}" : request.path
+  end
+
+  # @return [String, nil] The current `page` param, if it's a valid page like `2`, `a1234`, or `b1234`.
+  def current_page_param
+    page = request.query_parameters["page"]
+    page if page.is_a?(String) && page.match?(/\A[ab]?\d{1,10}\z/)
+  end
+
   def subnav_link_to(*args, **options, &block)
     li_link_to(*args, id_prefix: "subnav-", **options, &block)
   end

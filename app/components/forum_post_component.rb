@@ -29,6 +29,11 @@ class ForumPostComponent < ApplicationComponent
     @bur = @forum_post.bulk_update_request
   end
 
+  # Return to the same page of the topic after logging in.
+  def login_url
+    login_path(url: current_path_with(page: current_page_param))
+  end
+
   def render?
     !forum_post.is_deleted? || policy(forum_post).show_deleted?
   end

@@ -70,6 +70,30 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
+        should "only keep the page and group_by params in the login links for anonymous users" do
+          create(:comment)
+          get comments_path(group_by: "comment", page: 1, limit: 10)
+
+          assert_response :success
+          assert_select "a.comment-upvote-link[href=?]", login_path(url: comments_path(group_by: "comment", page: 1))
+        end
+
+        should "leave invalid page params out of the login links for anonymous users" do
+          create(:comment)
+          get comments_path(group_by: "comment", page: "1#{"x" * 200}")
+
+          assert_response :success
+          assert_select "a.comment-upvote-link[href=?]", login_path(url: comments_path(group_by: "comment"))
+        end
+
+        should "keep sequential page params in the login links for anonymous users" do
+          comment = create(:comment)
+          get comments_path(group_by: "comment", page: "b#{comment.id + 1}")
+
+          assert_response :success
+          assert_select "a.comment-upvote-link[href=?]", login_path(url: comments_path(group_by: "comment", page: "b#{comment.id + 1}"))
+        end
+
         should "be the default for .json" do
           comment = create(:comment)
           get comments_path, as: :json

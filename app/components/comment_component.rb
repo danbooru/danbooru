@@ -32,6 +32,11 @@ class CommentComponent < ApplicationComponent
     !comment.is_deleted? || current_user.is_moderator?
   end
 
+  # Return to the same page of /comments after logging in.
+  def login_url
+    login_path(url: current_path_with(page: current_page_param, group_by: ("comment" if request.query_parameters["group_by"] == "comment")))
+  end
+
   def upvoted?
     return false if current_user.is_anonymous?
     !!current_vote&.is_positive?

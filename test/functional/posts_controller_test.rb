@@ -86,6 +86,21 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "a.post-preview-hide-votes"
         end
 
+        should "only keep the page and tags params in the vote login links for anonymous users" do
+          get posts_path(tags: "order:id", page: 1, show_votes: true, size: 225)
+
+          assert_response :success
+          assert_select "a.post-upvote-link[href=?]", login_path(url: posts_path(page: 1, tags: "order:id")), count: Post.count
+        end
+
+        should "leave long searches out of the vote login links for anonymous users" do
+          tags = "id:#{([Post.last.id] + ([0] * 200)).join(",")}"
+          get posts_path(tags: tags, page: 1, show_votes: true)
+
+          assert_response :success
+          assert_select "a.post-upvote-link[href=?]", login_path(url: posts_path(page: 1)), count: 1
+        end
+
         should "use the size and show_votes cookies" do
           cookies[:post_preview_size] = "225"
           cookies[:post_preview_show_votes] = "true"
@@ -831,6 +846,25 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get post_path(@post), params: { id: @post.id }
         assert_response :success
+      end
+
+      should "not repeat the search query in the login links for anonymous users" do
+        create_list(:comment, 2, post: @post)
+        get post_path(@post, q: "touhou")
+
+        assert_response :success
+        assert_select "a.post-upvote-link[href=?]", login_path(url: post_path(@post))
+        assert_select "a.comment-upvote-link[href=?]", login_path(url: post_path(@post)), count: 2
+        assert_select "a.comment-downvote-link[href=?]", login_path(url: post_path(@post)), count: 2
+        assert_select "a[href=?]", login_path(url: post_path(@post, q: "touhou")), count: 1 # the navbar's login link
+      end
+
+      should "leave invalid page and group_by params out of the comment login links for anonymous users" do
+        create_list(:comment, 2, post: @post)
+        get post_path(@post, page: "1#{"x" * 200}", group_by: "x" * 200)
+
+        assert_response :success
+        assert_select "a.comment-upvote-link[href=?]", login_path(url: post_path(@post)), count: 2
       end
 
       should "not load the media assets of child posts one at a time" do

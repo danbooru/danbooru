@@ -16,6 +16,11 @@ class CommentSectionComponent < ApplicationComponent
     @dtext_references = DText.preprocess(@comments.map(&:body))
   end
 
+  # Return to the same page of /comments after logging in. Post pages don't need any params.
+  def login_url
+    login_path(url: current_path_with(page: current_page_param))
+  end
+
   # Build the comment sections for many posts at once, loading their comments and comment counts in one query each
   # instead of one per post.
   # @return [Hash<Integer, CommentSectionComponent>] The comment section for each post, keyed by post id.

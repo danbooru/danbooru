@@ -16,7 +16,7 @@
       <p><%= link_to "Leave a comment", new_comment_path(comment: { post_id: post.id }), class: "expand-comment-response" %></p>
       <%= render "comments/form", comment: post.comments.new, hidden: true %>
     <% elsif current_user.is_anonymous? %>
-      <p><%= link_to "Leave a comment", login_path(url: request.fullpath) %></p>
+      <p><%= link_to "Leave a comment", login_url %></p>
     <% end %>
   </div>
 </div>
