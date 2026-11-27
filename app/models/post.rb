@@ -47,7 +47,7 @@ class Post < ApplicationRecord
 
   normalizes :source, with: ->(source) { Post.normalize_source(source) }, apply_to_nil: true
   before_validation :merge_old_changes
-  before_validation :apply_pre_metatags
+  before_validation -> { post_edit.apply_pre_metatags }
   before_validation :validate_new_tags
   before_validation :normalize_tags
   validate :uploader_is_not_limited, on: :create
@@ -74,7 +74,7 @@ class Post < ApplicationRecord
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
-  after_save :apply_post_metatags
+  after_save -> { post_edit.apply_post_metatags }
   after_create_commit :update_iqdb
 
   belongs_to :approver, class_name: "User", optional: true
@@ -423,162 +423,6 @@ class Post < ApplicationRecord
 
     def normalize_tags
       self.tag_string = Tag.create_for_list(post_edit.tag_names).uniq.sort.join(" ")
-    end
-
-    def apply_post_metatags
-      post_edit.post_metatag_terms.each do |metatag|
-        case [metatag.name, metatag.value]
-        in "-pool", /^\d+$/ => pool_id
-          pool = Pool.find_by_id(pool_id)
-          pool&.remove!(self)
-
-        in "-pool", name
-          pool = Pool.find_by_name(name)
-          pool&.remove!(self)
-
-        in "pool", /^\d+$/ => pool_id
-          pool = Pool.find_by_id(pool_id)
-          pool&.add!(self)
-
-        in "pool", "none"
-          remove_from_all_pools
-
-        in "pool", name
-          pool = Pool.find_by_name(name)
-          pool&.add!(self)
-
-        in "newpool", name
-          pool = Pool.find_by_name(name)
-
-          # XXX race condition
-          if pool.nil?
-            Pool.create!(name: name, description: "This pool was automatically generated", post_ids: [id])
-          else
-            pool.add!(self)
-          end
-
-        in "newfavgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id(name, updater)
-
-          # XXX race condition
-          if favgroup.nil?
-            raise User::PrivilegeError unless Pundit.policy!(updater, FavoriteGroup).create?
-            FavoriteGroup.create!(name: name, creator: updater, post_ids: [id])
-          else
-            raise User::PrivilegeError unless Pundit.policy!(updater, favgroup).update?
-            favgroup.add(self)
-          end
-
-        in "fav", name
-          raise User::PrivilegeError unless Pundit.policy!(updater, Favorite).create?
-          Favorite.create(post: self, user: updater)
-
-        in "-fav", name
-          raise User::PrivilegeError unless Pundit.policy!(updater, Favorite).create?
-          Favorite.destroy_by(post: self, user: updater)
-
-        in "upvote", name
-          vote!(1, updater)
-
-        in "downvote", name
-          vote!(-1, updater)
-
-        in "-upvote", name
-          unvote!(1, updater)
-
-        in "-downvote", name
-          unvote!(-1, updater)
-
-        in "status", "active"
-          raise User::PrivilegeError unless updater.is_approver?
-          approvals.create!(user: updater)
-
-        in "status", "banned"
-          raise User::PrivilegeError unless updater.is_approver?
-          ban!(updater)
-
-        in "-status", "banned"
-          raise User::PrivilegeError unless updater.is_approver?
-          unban!(updater)
-
-        in "disapproved", reason
-          raise User::PrivilegeError unless updater.is_approver?
-          disapprovals.find_or_initialize_by(user: updater).update!(reason: reason.downcase)
-
-        in "child", "none"
-          children.select { |post| Pundit.policy!(updater, post).update? }.each do |post|
-            post.update!(parent_id: nil, updater: updater)
-          end
-
-        in "-child", ids
-          next if ids.blank?
-
-          children.where_numeric_matches(:id, ids).select { |post| Pundit.policy!(updater, post).update? }.each do |post|
-            post.update!(parent_id: nil, updater: updater)
-          end
-
-        in "child", ids
-          next if ids.blank?
-
-          Post.where_numeric_matches(:id, ids).where.not(id: [id, parent_id].compact).limit(10).select { |post| Pundit.policy!(updater, post).update? }.each do |post|
-            post.update!(parent_id: id, updater: updater)
-          end
-
-        in "-favgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id!(name, updater)
-          raise User::PrivilegeError unless Pundit.policy!(updater, favgroup).update?
-          favgroup&.remove(self)
-
-        in "favgroup", name
-          favgroup = FavoriteGroup.find_by_name_or_id!(name, updater)
-          raise User::PrivilegeError unless Pundit.policy!(updater, favgroup).update?
-          favgroup&.add(self)
-
-        end
-      end
-    rescue StandardError
-      # XXX Silently ignore errors so that the edit doesn't fail. We can't let
-      # the edit fail because then it will create a new post version even if
-      # the edit didn't go through.
-      nil
-    end
-
-    def apply_pre_metatags
-      post_edit.pre_metatag_terms.each do |metatag|
-        case [metatag.name, metatag.value]
-        in "parent", ("none" | "0")
-          self.parent_id = nil
-
-        in "-parent", /^\d+$/ => new_parent_id
-          if parent_id == new_parent_id.to_i
-            self.parent_id = nil
-          end
-
-        in "parent", new_parent_id
-          self.parent_id = new_parent_id
-
-        in "rating", /\A([#{RATINGS.keys.join}])/o
-          self.rating = $1
-
-        in "source", "none"
-          self.source = ""
-
-        in "source", value
-          self.source = value
-
-        in "status", "pending"
-          self.is_pending = true if new_record?
-
-        in category, name if category.in?(PostEdit::CATEGORIZATION_METATAGS)
-          Tag.find_or_create_by_name(name, category: category, current_user: updater)
-
-        else
-          nil
-
-        end
-      end
-
-      parent.updater = updater if parent&.changed?
     end
 
     def web_source?

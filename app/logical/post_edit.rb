@@ -57,6 +57,164 @@ class PostEdit
     @parser = StringParser.new(@new_tag_string)
   end
 
+  concerning :EditMethods do
+    def apply_pre_metatags
+      pre_metatag_terms.each do |metatag|
+        case [metatag.name, metatag.value]
+        in "parent", ("none" | "0")
+          post.parent_id = nil
+
+        in "-parent", /^\d+$/ => new_parent_id
+          if post.parent_id == new_parent_id.to_i
+            post.parent_id = nil
+          end
+
+        in "parent", new_parent_id
+          post.parent_id = new_parent_id
+
+        in "rating", /\A([#{Post::RATINGS.keys.join}])/o
+          post.rating = $1
+
+        in "source", "none"
+          post.source = ""
+
+        in "source", value
+          post.source = value
+
+        in "status", "pending"
+          post.is_pending = true if post.new_record?
+
+        in category, name if category.in?(CATEGORIZATION_METATAGS)
+          ::Tag.find_or_create_by_name(name, category: category, current_user: user)
+
+        else
+          nil
+
+        end
+      end
+
+      post.parent.updater = user if post.parent&.changed?
+    end
+
+    def apply_post_metatags
+      post_metatag_terms.each do |metatag|
+        case [metatag.name, metatag.value]
+        in "-pool", /^\d+$/ => pool_id
+          pool = Pool.find_by_id(pool_id)
+          pool&.remove!(post)
+
+        in "-pool", name
+          pool = Pool.find_by_name(name)
+          pool&.remove!(post)
+
+        in "pool", /^\d+$/ => pool_id
+          pool = Pool.find_by_id(pool_id)
+          pool&.add!(post)
+
+        in "pool", "none"
+          post.remove_from_all_pools
+
+        in "pool", name
+          pool = Pool.find_by_name(name)
+          pool&.add!(post)
+
+        in "newpool", name
+          pool = Pool.find_by_name(name)
+
+          # XXX race condition
+          if pool.nil?
+            Pool.create!(name: name, description: "This pool was automatically generated", post_ids: [post.id])
+          else
+            pool.add!(post)
+          end
+
+        in "newfavgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id(name, user)
+
+          # XXX race condition
+          if favgroup.nil?
+            raise User::PrivilegeError unless Pundit.policy!(user, FavoriteGroup).create?
+            FavoriteGroup.create!(name: name, creator: user, post_ids: [post.id])
+          else
+            raise User::PrivilegeError unless Pundit.policy!(user, favgroup).update?
+            favgroup.add(post)
+          end
+
+        in "fav", name
+          raise User::PrivilegeError unless Pundit.policy!(user, Favorite).create?
+          Favorite.create(post: post, user: user)
+
+        in "-fav", name
+          raise User::PrivilegeError unless Pundit.policy!(user, Favorite).create?
+          Favorite.destroy_by(post: post, user: user)
+
+        in "upvote", name
+          post.vote!(1, user)
+
+        in "downvote", name
+          post.vote!(-1, user)
+
+        in "-upvote", name
+          post.unvote!(1, user)
+
+        in "-downvote", name
+          post.unvote!(-1, user)
+
+        in "status", "active"
+          raise User::PrivilegeError unless user.is_approver?
+          post.approvals.create!(user: user)
+
+        in "status", "banned"
+          raise User::PrivilegeError unless user.is_approver?
+          post.ban!(user)
+
+        in "-status", "banned"
+          raise User::PrivilegeError unless user.is_approver?
+          post.unban!(user)
+
+        in "disapproved", reason
+          raise User::PrivilegeError unless user.is_approver?
+          post.disapprovals.find_or_initialize_by(user: user).update!(reason: reason.downcase)
+
+        in "child", "none"
+          post.children.select { |child| Pundit.policy!(user, child).update? }.each do |child|
+            child.update!(parent_id: nil, updater: user)
+          end
+
+        in "-child", ids
+          next if ids.blank?
+
+          post.children.where_numeric_matches(:id, ids).select { |child| Pundit.policy!(user, child).update? }.each do |child|
+            child.update!(parent_id: nil, updater: user)
+          end
+
+        in "child", ids
+          next if ids.blank?
+
+          Post.where_numeric_matches(:id, ids).where.not(id: [post.id, post.parent_id].compact).limit(10).select { |child| Pundit.policy!(user, child).update? }.each do |child|
+            child.update!(parent_id: post.id, updater: user)
+          end
+
+        in "-favgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id!(name, user)
+          raise User::PrivilegeError unless Pundit.policy!(user, favgroup).update?
+          favgroup&.remove(post)
+
+        in "favgroup", name
+          favgroup = FavoriteGroup.find_by_name_or_id!(name, user)
+          raise User::PrivilegeError unless Pundit.policy!(user, favgroup).update?
+          favgroup&.add(post)
+
+        end
+      end
+    rescue StandardError
+      # XXX Silently ignore errors so that the edit doesn't fail. We can't let
+      # the edit fail because then it will create a new post version even if
+      # the edit didn't go through.
+      nil
+    end
+  end
+
   concerning :HelperMethods do
     # @return [Array<String>] The final list of tags on the post after the edit.
     def tag_names
