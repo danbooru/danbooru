@@ -5,6 +5,9 @@ class SavedSearch < ApplicationRecord
   QUERY_LIMIT = 1000
   MAX_TAGS = 150
 
+  # Cached in place of the post IDs for searches with no results, because Redis can't store empty sets.
+  NO_RESULTS = 0
+
   attr_reader :disable_labels
 
   belongs_to :user
@@ -39,7 +42,7 @@ class SavedSearch < ApplicationRecord
         queries.each do |query|
           redis_key = "search:#{query}"
           if redis.exists?(redis_key)
-            sub_ids = redis.smembers(redis_key).map(&:to_i)
+            sub_ids = redis.smembers(redis_key).map(&:to_i) - [NO_RESULTS]
             post_ids.merge(sub_ids)
           else
             PopulateSavedSearchJob.perform_later(query)
@@ -61,7 +64,10 @@ class SavedSearch < ApplicationRecord
     def cached_size
       return 0 if SavedSearch.redis.nil?
 
-      SavedSearch.redis.scard("search:#{normalized_query}")
+      redis_key = "search:#{normalized_query}"
+      return 0 if SavedSearch.redis.sismember(redis_key, NO_RESULTS)
+
+      SavedSearch.redis.scard(redis_key)
     end
     memoize :cached_size
   end
@@ -133,10 +139,8 @@ class SavedSearch < ApplicationRecord
           Post.anon_tag_match(query).limit(QUERY_LIMIT).pluck(:id)
         end
 
-        if post_ids.present?
-          redis.sadd(redis_key, post_ids)
-          redis.expire(redis_key, REDIS_EXPIRY.to_i)
-        end
+        redis.sadd(redis_key, post_ids.presence || [NO_RESULTS])
+        redis.expire(redis_key, REDIS_EXPIRY.to_i)
       end
     end
   end

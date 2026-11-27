@@ -152,6 +152,17 @@ class SavedSearchTest < ActiveSupport::TestCase
       assert_equal([], SavedSearch.post_ids_for(@user.id))
     end
 
+    should "cache searches that return no posts" do
+      @saved_search.update!(query: "does_not_exist")
+      SavedSearch.populate("does_not_exist")
+
+      assert_no_enqueued_jobs do
+        assert_equal([], SavedSearch.post_ids_for(@user.id))
+      end
+      assert_equal(0, @saved_search.cached_size)
+      assert_not_nil(@saved_search.refreshed_at)
+    end
+
     should "not allow users to perform privileged searches" do
       @flag = create(:post_flag)
       @saved_search = create(:saved_search, query: "flagger:#{@flag.creator.name}", user: @user)
