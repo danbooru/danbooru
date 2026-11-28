@@ -650,6 +650,17 @@ module Danbooru
     def huashijie_session_cookie
     end
 
+    # Your Douyin "UIFID", "ttwid", and "s_v_web_id" cookies. Visit https://www.douyin.com then use the devtools to find
+    # the cookies. Logging in isn't required.
+    def douyin_uifid
+    end
+
+    def douyin_ttwid
+    end
+
+    def douyin_s_v_web_id
+    end
+
     # Your Gelbooru user ID.
     def gelbooru_user_id
     end
