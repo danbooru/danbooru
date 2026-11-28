@@ -12,7 +12,7 @@ class RateLimitsControllerTest < ActionDispatch::IntegrationTest
         get_auth rate_limits_path, create(:superadmin_user)
 
         assert_response :success
-        assert_select "tbody tr", count: 3 # 1 for @user, plus the 2 login creates: 1 for the IP and 1 for the session ID
+        assert_select "tbody tr", count: 2 # 1 for @user, plus 1 for the IP the login comes from (the login has no session cookie, so it doesn't get a session limit)
       end
 
       should "show the user their own rate limits" do
