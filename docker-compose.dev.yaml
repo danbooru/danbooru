@@ -138,12 +138,18 @@ services:
     <<: *base-template
     entrypoint: ["tini", "-g", "bin/devcontainer-entrypoint", "--"]
     command: ["sleep", "infinity"]
+    environment:
+      <<: *base-env
+
+      # Keep coding agent config, logins, sessions, and memory across devcontainer rebuilds.
+      CLAUDE_CONFIG_DIR: /home/danbooru/.agent-data/claude
     volumes:
       - ${DANBOORU_DIR:-./}:/danbooru
       - danbooru-images:/images
       - webpack-data:/danbooru/public/packs-dev
       - /danbooru/node_modules
       - /danbooru/public/packs
+      - agent-data:/home/danbooru/.agent-data
 
       - /var/run/docker.sock:/var/run/docker-host.sock
       - /usr/bin/docker:/usr/bin/docker:ro
@@ -301,3 +307,5 @@ volumes:
     name: ${COMPOSE_PROJECT_NAME}-webpack-data
   sqs-data:
     name: ${COMPOSE_PROJECT_NAME}-sqs-data
+  agent-data:
+    name: ${COMPOSE_PROJECT_NAME}-agent-data

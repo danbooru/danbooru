@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# Docker creates the agent data volume owned by root, because the folder doesn't exist in the image.
+sudo chown "$(id -u):$(id -g)" ~/.agent-data
+
+# Antigravity (agy) has no option to change its config folder, so link its folders into the agent data volume.
+mkdir -p ~/.agent-data/gemini ~/.agent-data/antigravity ~/.config
+ln -sfn ~/.agent-data/gemini ~/.gemini
+ln -sfn ~/.agent-data/antigravity ~/.config/antigravity
+
 # Proxy /var/run/docker.sock to /var/run/docker-host.sock so the Danbooru user has access to Docker without changing the Docker socket permissions on the host.
 sudo socat UNIX-LISTEN:/var/run/docker.sock,fork,user=$(whoami),mode=660,backlog=128 UNIX-CONNECT:/var/run/docker-host.sock > /dev/null 2>&1 &
 
