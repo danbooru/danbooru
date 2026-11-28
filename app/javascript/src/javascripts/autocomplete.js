@@ -371,6 +371,19 @@ export default class Autocomplete {
       return { value: $item.attr("data-autocomplete-value"), html: $item };
     });
 
+    if (items.length === 0 && query) {
+      if (query.indexOf("*") > -1) {
+        const input = document.activeElement;
+        const caret = input?.selectionEnd ?? 0,
+          value = input.value ?? "",
+          trimmedValue = value.substring(0, caret) + value.substring(caret).match(/\S*/)[0];
+        query = Autocomplete.parseTerm(trimmedValue.match(/\S*$/)[0]).term;
+      }
+      items.push({
+        value: query,
+        html: $('<li class="ui-menu-item" data-autocomplete-type="tag" data-autocomplete-value="" data-autocomplete-proper-name=""><div class="ui-menu-item-wrapper flex items-center" tabindex="-1"><span class="fineprint flex-grow-1">No results</span></div></li>')
+      });
+    }
     return items;
   }
 
