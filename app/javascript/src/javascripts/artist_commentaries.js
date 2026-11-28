@@ -1,5 +1,5 @@
 import Notice from "./notice";
-import Alpine from "alpinejs";
+import Alpine from "@alpinejs/csp";
 
 let ArtistCommentary = {};
 

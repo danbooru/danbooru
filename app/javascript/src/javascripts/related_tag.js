@@ -1,6 +1,6 @@
 import SourceDataComponent from "./source_data_component.js";
 import Utility, { splitWords } from './utility';
-import Alpine from 'alpinejs';
+import Alpine from '@alpinejs/csp';
 
 Alpine.store("relatedTags", {
   loading: false,

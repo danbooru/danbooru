@@ -1,5 +1,5 @@
 import { find as lodashFind, memoize } from "lodash";
-import Alpine from "alpinejs";
+import Alpine from "@alpinejs/csp";
 
 // Collects information about the user's browser and computer. Used for detecting bots and ban evaders.
 export default class Device {

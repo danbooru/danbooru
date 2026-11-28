@@ -1,7 +1,7 @@
 import Autocomplete from "./autocomplete";
 import Notice from "./notice";
 import { emojiMatches, uploadFilesOrURL } from "./utility";
-import Alpine from "alpinejs";
+import Alpine from "@alpinejs/csp";
 import { computePosition, autoPlacement, inline, shift } from "@floating-ui/dom";
 
 // @see app/components/dtext_editor_component.rb

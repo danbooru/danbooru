@@ -1,4 +1,4 @@
-import Alpine from "alpinejs";
+import Alpine from "@alpinejs/csp";
 import AlpineCookieStorage from "./alpine_cookie_storage";
 import Draggable from "./draggable";
 import Notice from "./notice";
