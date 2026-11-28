@@ -257,5 +257,92 @@ module Source::Tests::Extractor
         dtext_artist_commentary_desc: "",
       )
     end
+
+    context "A Youtube video with an English title and description that's auto-translated in other languages" do
+      strategy_should_work(
+        "https://www.youtube.com/watch?v=rMzdv7al7bU",
+        image_urls: [],
+        page_url: "https://www.youtube.com/watch?v=rMzdv7al7bU",
+        profile_url: "https://www.youtube.com/@tomatoshi2",
+        profile_urls: %w[https://www.youtube.com/@tomatoshi2 https://www.youtube.com/channel/UCMlwuU1RF0YYDnFlmnM_sJA],
+        display_name: "Tomatoshi2",
+        username: "tomatoshi2",
+        published_at: nil,
+        updated_at: nil,
+        tags: [
+          ["cavedweller", "https://www.youtube.com/hashtag/cavedweller"],
+          ["thebrokenscript", "https://www.youtube.com/hashtag/thebrokenscript"],
+          ["minecraft", "https://www.youtube.com/hashtag/minecraft"],
+          ["minecrafthorror", "https://www.youtube.com/hashtag/minecrafthorror"],
+          ["minecraftmods", "https://www.youtube.com/hashtag/minecraftmods"],
+          ["videoessay", "https://www.youtube.com/hashtag/videoessay"],
+        ],
+        dtext_artist_commentary_title: "Minecraft Mods Can NEVER Be Scary",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          In this video, I analyze why Minecraft horror mods have the reputation that it does. Mods like Cave Dwellers are not received positively, so I aimed to explain why that is the case. This is a combination of sandbox genre, modding, and the audience that make/play the mods.
+
+          Tags:
+          "#cavedweller":[https://www.youtube.com/hashtag/cavedweller] "#thebrokenscript":[https://www.youtube.com/hashtag/thebrokenscript] "#minecraft":[https://www.youtube.com/hashtag/minecraft] "#minecrafthorror":[https://www.youtube.com/hashtag/minecrafthorror] "#minecraftmods":[https://www.youtube.com/hashtag/minecraftmods] "#videoessay":[https://www.youtube.com/hashtag/videoessay]
+        EOS
+      )
+    end
+
+    context "A Youtube video with a Japanese title and description that's auto-translated in other languages" do
+      strategy_should_work(
+        "https://www.youtube.com/watch?v=MeIhmwXRo30",
+        image_urls: [],
+        page_url: "https://www.youtube.com/watch?v=MeIhmwXRo30",
+        profile_url: "https://www.youtube.com/@Tripl3jp",
+        profile_urls: %w[https://www.youtube.com/@Tripl3jp https://www.youtube.com/channel/UClcMHz6g52n0tmZ8QFt8uCA],
+        display_name: "とりぷる / Tripl3",
+        username: "Tripl3jp",
+        published_at: nil,
+        updated_at: nil,
+        tags: [
+          ["ホロライブ", "https://www.youtube.com/hashtag/ホロライブ"],
+          ["ホロライブ切り抜き", "https://www.youtube.com/hashtag/ホロライブ切り抜き"],
+          ["切り抜き", "https://www.youtube.com/hashtag/切り抜き"],
+          ["手描き", "https://www.youtube.com/hashtag/手描き"],
+          ["hololive", "https://www.youtube.com/hashtag/hololive"],
+          ["hololiveclip", "https://www.youtube.com/hashtag/hololiveclip"],
+          ["clip", "https://www.youtube.com/hashtag/clip"],
+          ["vtuber", "https://www.youtube.com/hashtag/vtuber"],
+          ["animation", "https://www.youtube.com/hashtag/animation"],
+        ],
+        dtext_artist_commentary_title: "【手描き】感情ジェットコースター兎田ぺこら【ホロライブ切り抜き/兎田ぺこら】",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          👯‍♀️🥕
+
+          ↓You can watch the English-subtitled version here!
+          " • Pekora - Damsel or Delinquent?【Hololive An... ":[https://www.youtube.com/watch?v=EpEO2bBtYds]
+
+          ●Source
+          【BIOHAZARD Re4】完全初見！はじめてのバイオハザード４やる！ぺこ！【ホロライブ/兎田ぺこら】※未成年視聴注意
+          " • #1【BIOHAZARD Re4】完全初見！はじめてのバイオハザード４やる！ぺこ！【... ":[https://www.youtube.com/watch?v=G_C-kFqxJEM&t=8883s]
+          #2【BIOHAZARD Re4】完全初見！はじめてのバイオハザード４やる！ぺこ！【ホロライブ/兎田ぺこら】※未成年視聴注意
+          " • #2【BIOHAZARD Re4】完全初見！はじめてのバイオハザード４やる！ぺこ！【... ":[https://www.youtube.com/watch?v=EBou0GACkXk&t=2526s]
+
+          ●Hololive / Vtuber
+          兎田ぺこら / Usada Pekora
+          " / @usadapekora ":[https://www.youtube.com/channel/UC1DCedRgGHBdm81E1llLhOQ]
+
+          ●Used Music
+          Monkeys Spinning Monkeys
+          " • Monkeys Spinning Monkeys ":[https://www.youtube.com/watch?v=2eZVbrO6Z1M]
+          リコーダー初級 (Recorder beginner)
+          " • リコーダー初級｜フリーBGM OpenTracks（旧DOVA-SYNDROME） ... ":[https://www.youtube.com/watch?v=DBex2Csd74c]
+
+          ●Used Sounds
+          OtoLogic : <https://otologic.jp>
+
+          ■My Account
+          X：<https://x.com/toripuru_3>
+          JP Account(とりぷる)：" / @tripl3jp ":[https://www.youtube.com/channel/UClcMHz6g52n0tmZ8QFt8uCA]
+          EN Account(Tripl3)：" / @tripl3en ":[https://www.youtube.com/channel/UCxDNOCU8jsyXtFWarU9mUVA]
+
+          "#ホロライブ":[https://www.youtube.com/hashtag/ホロライブ] "#ホロライブ切り抜き":[https://www.youtube.com/hashtag/ホロライブ切り抜き] "#切り抜き":[https://www.youtube.com/hashtag/切り抜き] "#手描き":[https://www.youtube.com/hashtag/手描き] "#Hololive":[https://www.youtube.com/hashtag/hololive] "#Hololiveclip":[https://www.youtube.com/hashtag/hololiveclip] "#Clip":[https://www.youtube.com/hashtag/clip] "#Vtuber":[https://www.youtube.com/hashtag/vtuber] "#Animation":[https://www.youtube.com/hashtag/animation]
+        EOS
+      )
+    end
   end
 end

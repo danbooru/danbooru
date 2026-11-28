@@ -98,7 +98,9 @@ class Source::Extractor::Youtube < Source::Extractor
     url = command&.dig(:commandMetadata, :webCommandMetadata, :url).to_s
 
     if url.starts_with?("/")
-      %{<a href="https://www.youtube.com#{CGI.escapeHTML(Danbooru::URL.unescape(url))}">#{link_text}</a>}
+      # Remove the random tracking param from video links ("/watch?v=EpEO2bBtYds&pp=0gcJCR0AztywvtLA").
+      target = Danbooru::URL.parse("https://www.youtube.com#{Danbooru::URL.unescape(url)}")&.without_params(:pp).to_s
+      %{<a href="#{CGI.escapeHTML(target)}">#{link_text}</a>}
     elsif url.starts_with?("https://www.youtube.com/redirect")
       # https://www.youtube.com/redirect?event=video_description&redir_token=...&q=https%3A%2F%2Fx.com%2Filekkim
       target = CGI.escapeHTML(Danbooru::URL.parse(url)&.params&.dig(:q).to_s)
@@ -166,8 +168,10 @@ class Source::Extractor::Youtube < Source::Extractor
     "https://www.youtube.com/@#{handle}" if handle.present?
   end
 
+  # YouTube auto-translates titles and descriptions into the page's language. It doesn't translate into Lao (`hl=lo`),
+  # so requesting the page in Lao gives the original text.
   memoize def page
-    http.cache(1.minute).parsed_get(page_url) if community_post_id.present? || video_id.present?
+    http.cache(1.minute).parsed_get(page_url, params: { hl: "lo" }) if community_post_id.present? || video_id.present?
   end
 
   memoize def community_post_json
