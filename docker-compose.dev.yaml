@@ -279,7 +279,7 @@ services:
 
   playwright:
     # playwright is required to run the e2e tests found @ `test/system`
-    image: mcr.microsoft.com/playwright:v1.62.1-noble
+    image: mcr.microsoft.com/playwright:v1.65.1-resolute
     command: "npx -y playwright@1.62.1 run-server --port 3000 --host 0.0.0.0"
     profiles: ["test"]
     init: true
