@@ -39,7 +39,7 @@ class MediaAssetPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = super + [:variants]
-    attributes -= [:md5, :file_key, :variants] if !can_see_image?
+    attributes -= [:md5, :pixel_hash, :file_key, :variants] if !can_see_image?
     attributes
   end
 end

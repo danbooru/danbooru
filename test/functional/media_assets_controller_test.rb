@@ -153,13 +153,36 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "not show the md5 for assets belonging to posts not visible to the current user" do
+      should "not show the md5 or pixel_hash for assets belonging to posts not visible to the current user" do
         @media_asset = create(:media_asset)
         @post = create(:post, md5: @media_asset.md5, is_banned: true)
-        get media_asset_path(@media_asset), as: :json
 
+        get media_asset_path(@media_asset), as: :json
         assert_response :success
         assert_nil(response.parsed_body[:md5])
+        assert_nil(response.parsed_body[:pixel_hash])
+        assert_nil(response.parsed_body[:file_key])
+        assert_nil(response.parsed_body[:variants])
+
+        get media_asset_path(@media_asset)
+        assert_response :success
+        assert_no_match(@media_asset.md5, response.body)
+        assert_no_match(@media_asset.pixel_hash, response.body)
+      end
+
+      should "show the md5 and pixel_hash for assets belonging to posts visible to the current user" do
+        @media_asset = create(:media_asset)
+        @post = create(:post, md5: @media_asset.md5, is_banned: true)
+
+        get_auth media_asset_path(@media_asset), create(:approver), as: :json
+        assert_response :success
+        assert_equal(@media_asset.md5, response.parsed_body[:md5])
+        assert_equal(@media_asset.pixel_hash, response.parsed_body[:pixel_hash])
+
+        get_auth media_asset_path(@media_asset), create(:approver)
+        assert_response :success
+        assert_match(@media_asset.md5, response.body)
+        assert_match(@media_asset.pixel_hash, response.body)
       end
 
       should "not show the image for the old asset of a replacement on a post not visible to the current user" do
@@ -171,18 +194,21 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_nil(response.parsed_body[:md5])
+        assert_nil(response.parsed_body[:pixel_hash])
         assert_nil(response.parsed_body[:file_key])
         assert_nil(response.parsed_body[:variants])
 
         get media_asset_path(@old_asset)
         assert_response :success
         assert_no_match(@old_asset.md5, response.body)
+        assert_no_match(@old_asset.pixel_hash, response.body)
         assert_no_match(@old_asset.file_key, response.body)
 
         get media_assets_path(search: { id: @old_asset.id }), as: :json
         assert_response :success
         assert_equal([@old_asset.id], response.parsed_body.pluck("id"))
         assert_nil(response.parsed_body.first["md5"])
+        assert_nil(response.parsed_body.first["pixel_hash"])
 
         get media_assets_path(search: { id: @old_asset.id })
         assert_response :success

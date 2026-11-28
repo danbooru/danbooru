@@ -161,12 +161,12 @@
                 <th class="text-left">MD5</th>
                 <td class="break-all"><%= @media_asset.md5 %></td>
               </tr>
-            <% end %>
 
-            <tr>
-              <th class="text-left">Pixel Hash</th>
-              <td class="break-all"><%= link_to @media_asset.pixel_hash, media_assets_path(search: { pixel_hash: @media_asset.pixel_hash }) %></td>
-            </tr>
+              <tr>
+                <th class="text-left">Pixel Hash</th>
+                <td class="break-all"><%= link_to @media_asset.pixel_hash, media_assets_path(search: { pixel_hash: @media_asset.pixel_hash }) %></td>
+              </tr>
+            <% end %>
 
             <tr>
               <th class="text-left">File Type</th>

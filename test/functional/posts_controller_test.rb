@@ -1140,6 +1140,8 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_nil(response.parsed_body["md5"])
           assert_nil(response.parsed_body["file_url"])
+          assert_nil(response.parsed_body.dig("media_asset", "md5"))
+          assert_nil(response.parsed_body.dig("media_asset", "pixel_hash"))
         end
       end
 
