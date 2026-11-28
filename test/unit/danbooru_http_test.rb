@@ -427,7 +427,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(591, response.status)
 
         response = Danbooru::Http.public_only.get("http://127.0.0.1./foo.txt")
-        assert_equal(598, response.status) # `127.0.0.1.` is treated as a domain name, which fails with a DNS resolution error
+        assert_includes([591, 598], response.status.to_i) # `127.0.0.1.` is a domain name; some DNS servers resolve it to 127.0.0.1 and some fail
 
         response = Danbooru::Http.public_only.get("http://0.0.0.0/foo.txt")
         assert_equal(591, response.status)
