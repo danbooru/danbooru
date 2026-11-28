@@ -17,6 +17,19 @@ class DtextEditorChromeTest < ChromeSystemTestCase
     JS
   end
 
+  def paste_dtext(text, selector:)
+    page.execute_script(<<~JS)
+      var el = document.querySelector(#{selector.to_json});
+      el.focus();
+      var clipboardData = new DataTransfer();
+      clipboardData.setData("text/plain", #{text.to_json});
+      var event = new ClipboardEvent("paste", { clipboardData, bubbles: true, cancelable: true });
+      if (el.dispatchEvent(event)) {
+        document.execCommand("insertText", false, #{text.to_json});
+      }
+    JS
+  end
+
   context "DText:" do
     context "the full editor" do
       setup do
@@ -158,6 +171,18 @@ class DtextEditorChromeTest < ChromeSystemTestCase
           assert_notice "Failed to load preview"
           assert_visible @full_editor_selector
           assert_equal "[[1girl]]", @full_editor_field.value
+        end
+      end
+
+      context "pasting a URL" do
+        should "convert a same-site URL to a shortlink" do
+          url = URI.join(current_url, "/posts/123").to_s
+          @full_editor_field.set("hello ")
+          select_dtext(6, 6, selector: @full_editor_selector)
+
+          paste_dtext(url, selector: @full_editor_selector)
+
+          assert_equal "hello post #123", @full_editor_field.value
         end
       end
 

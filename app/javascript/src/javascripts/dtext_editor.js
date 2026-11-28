@@ -64,13 +64,13 @@ export default class DTextEditor {
 
   // @param {Boolean} inline - Whether the editor is in inline mode.
   // @param {Boolean} mediaEmbeds - Whether to enable media embeds in the preview.
-  // @param {String[]} domains - The list of the domains for the current site.
+  // @param {String} domains - A comma-separated list of the domains for the current site.
   // @param {Number} previewTimeout - How long to wait for the preview HTML to load, in milliseconds, before giving up.
-  initialize({ inline = false, mediaEmbeds = false, domains = [], previewTimeout } = {}) {
+  initialize({ inline = false, mediaEmbeds = false, domains = "", previewTimeout } = {}) {
     this.root.editor = this;
     this.inline = inline;
     this.mediaEmbeds = mediaEmbeds;
-    this.domains = domains;
+    this.domains = domains.split(",").filter(Boolean);
     this.previewTimeout = previewTimeout;
 
     this.initializeAutocomplete();

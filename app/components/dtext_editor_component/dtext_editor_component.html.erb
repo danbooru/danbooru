@@ -8,7 +8,7 @@
 
   <div class="dtext-editor dtext-editor-inline"
        x-data="dtextEditorComponent($root)"
-       x-init="editor.initialize(<%= { inline: true, domains: domains, previewTimeout: PREVIEW_TIMEOUT_MS }.to_json %>)"
+       x-init="editor.initialize(<%= { inline: true, domains: domains.join(","), previewTimeout: PREVIEW_TIMEOUT_MS }.to_json %>)"
        x-on:keydown.ctrl.p.prevent="$refs.toggle.click()"
        spellcheck="true">
     <%= form.text_field(input_name, input_html.except(:maxlength).merge(
@@ -35,7 +35,7 @@
   <div class="dtext-editor relative w-fit <%= editor_html[:class] %>"
        x-bind:class="{ 'dtext-editor-loading inert': editor.loading }"
        x-data="dtextEditorComponent($root)"
-       x-init="editor.initialize(<%= { inline: inline?, mediaEmbeds: media_embeds?, domains: domains, previewTimeout: PREVIEW_TIMEOUT_MS }.to_json %>)"
+       x-init="editor.initialize(<%= { inline: inline?, mediaEmbeds: media_embeds?, domains: domains.join(","), previewTimeout: PREVIEW_TIMEOUT_MS }.to_json %>)"
        <% if media_embeds? %>
         x-on:dragover.prevent="true"
         x-on:drop="editor.insertImages($event.dataTransfer.files)"
