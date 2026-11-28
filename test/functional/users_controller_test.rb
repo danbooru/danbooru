@@ -905,6 +905,34 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth edit_user_path(@user), create(:admin_user)
         assert_response 403
       end
+
+      should "show the beta features in the Beta tab" do
+        BetaFeature.stubs(:features).returns([BetaFeature.new(name: "test_feature", label: "Test feature", description: "A feature for testing.", released_to: "production")])
+        cookies[:beta_feature_test_feature] = "true"
+        get_auth edit_user_path(@user), @user
+
+        assert_response :success
+        assert_select "a.tab.beta-tab", text: "Beta"
+        assert_select "input[type=checkbox][data-beta-feature='test_feature'][checked]"
+      end
+
+      should "not show the Beta tab when there aren't any beta features" do
+        BetaFeature.stubs(:features).returns([])
+        get_auth edit_user_path(@user), @user
+
+        assert_response :success
+        assert_select ".beta-tab", count: 0
+      end
+
+      should "not show beta features that aren't released to this site" do
+        Danbooru.config.stubs(:release_stage).returns("production")
+        BetaFeature.stubs(:features).returns([BetaFeature.new(name: "test_feature", label: "Test feature", description: "A feature for testing.", released_to: "testbooru")])
+        get_auth edit_user_path(@user), @user
+
+        assert_response :success
+        assert_select ".beta-tab", count: 0
+        assert_select "input[data-beta-feature]", count: 0
+      end
     end
 
     context "settings action" do

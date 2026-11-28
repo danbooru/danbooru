@@ -116,6 +116,79 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "a.post-preview-link[href=?]", post_path(Post.last), count: 1
         end
 
+        should "list the enabled beta features on the body" do
+          BetaFeature.stubs(:features).returns([BetaFeature.new(name: "test_feature", label: "Test feature", description: "A feature for testing.", released_to: "production")])
+          cookies[:beta_feature_test_feature] = "true"
+          get posts_path
+
+          assert_response :success
+          assert_select "body[data-beta-features='test_feature']"
+        end
+
+        should "not list beta features that aren't enabled" do
+          BetaFeature.stubs(:features).returns([BetaFeature.new(name: "test_feature", label: "Test feature", description: "A feature for testing.", released_to: "production")])
+          cookies[:beta_feature_test_feature] = "false"
+          cookies[:beta_feature_nonexistent_feature] = "true"
+          get posts_path
+
+          assert_response :success
+          assert_select "body[data-beta-features='']"
+        end
+
+        should "enable beta features by default on betabooru" do
+          Danbooru.config.stubs(:release_stage).returns("betabooru")
+          BetaFeature.stubs(:features).returns([BetaFeature.new(name: "test_feature", label: "Test feature", description: "A feature for testing.", released_to: "betabooru")])
+          get posts_path
+
+          assert_response :success
+          assert_select "body[data-beta-features='test_feature']"
+        end
+
+        should "not enable beta features that aren't released to this site, even with the cookie" do
+          Danbooru.config.stubs(:release_stage).returns("production")
+          BetaFeature.stubs(:features).returns([BetaFeature.new(name: "test_feature", label: "Test feature", description: "A feature for testing.", released_to: "testbooru")])
+          cookies[:beta_feature_test_feature] = "true"
+          get posts_path
+
+          assert_response :success
+          assert_select "body[data-beta-features='']"
+        end
+
+        should "delete the cookies of beta features that don't exist on this site" do
+          Danbooru.config.stubs(:release_stage).returns("production")
+          BetaFeature.stubs(:features).returns([
+            BetaFeature.new(name: "test_feature", label: "Test feature", description: "A feature for testing.", released_to: "production"),
+            BetaFeature.new(name: "testbooru_feature", label: "Testbooru feature", description: "A feature for testing.", released_to: "testbooru"),
+          ])
+          cookies[:beta_feature_test_feature] = "false"
+          cookies[:beta_feature_testbooru_feature] = "true"
+          cookies[:beta_feature_removed_feature] = "true"
+          cookies[:post_preview_size] = "225"
+          get posts_path
+
+          assert_response :success
+          assert_equal("false", cookies[:beta_feature_test_feature])
+          assert_equal("", cookies[:beta_feature_testbooru_feature].to_s)
+          assert_equal("", cookies[:beta_feature_removed_feature].to_s)
+          assert_equal("225", cookies[:post_preview_size])
+        end
+
+        should "ignore beta feature cookies with names we can't have set" do
+          get posts_path, headers: { "Cookie" => "beta_feature_x y=true; beta_feature_X=true; beta_feature_=true" }
+
+          assert_response :success
+          assert_no_match(/beta_feature/, response.headers["Set-Cookie"].to_s)
+        end
+
+        should "not send any cookies when there aren't any stale beta feature cookies" do
+          BetaFeature.stubs(:features).returns([BetaFeature.new(name: "test_feature", label: "Test feature", description: "A feature for testing.", released_to: "production")])
+          cookies[:beta_feature_test_feature] = "true"
+          get posts_path
+
+          assert_response :success
+          assert_no_match(/beta_feature/, response.headers["Set-Cookie"].to_s)
+        end
+
         should "use the size and show_votes cookies" do
           cookies[:post_preview_size] = "225"
           cookies[:post_preview_show_votes] = "true"

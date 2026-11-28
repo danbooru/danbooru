@@ -368,6 +368,7 @@ module ApplicationHelper
         "layout": layout,
         "current-user-ip-addr": request.remote_ip,
         "current-user-save-data": CurrentUser.save_data,
+        "beta-features": BetaFeature.enabled(cookies).map(&:name).join(" "),
         **data_attributes_for(current_user, "current-user", USER_DATA_ATTRIBUTES),
         **data_attributes_for(cookies, "cookie", COOKIE_DATA_ATTRIBUTES),
         **extra_attributes,

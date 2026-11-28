@@ -94,6 +94,18 @@
         <% end %>
       <% end %>
 
+      <% if BetaFeature.all.any? %>
+        <% t.panel("Beta") do %>
+          <%= simple_form_for(:beta_features, url: "#", html: { "x-data": "betaFeatureToggles" }) do |f| %>
+            <p class="fineprint mb-4">Try out new features before they're enabled for everyone. These settings are saved in this browser only.</p>
+
+            <% BetaFeature.all.each do |feature| %>
+              <%= f.input feature.name, as: :boolean, wrapper: "stacked-toggle-switch", label: feature.label, hint: feature.description, input_html: { checked: feature.enabled?(cookies), "data-beta-feature": feature.name, "data-cookie-name": feature.cookie_name, "x-on:change": "toggle($el)" } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+
       <% t.panel("Security") do %>
         <div class="space-y-4">
           <div class="flex justify-between gap-4">
