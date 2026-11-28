@@ -95,6 +95,11 @@ module Source::Tests::URL
       should parse_url("https://crepe.cm/ko/search?query=%23SD").into(username: nil, page_url: nil, profile_url: nil)
       should parse_url("https://crepe.cm/@yolrsona/t71oz0uls/reviews").into(username: nil, page_url: nil, profile_url: nil)
       should parse_url("https://help.crepe.cm/hc/ko").into(username: nil, page_url: nil, profile_url: nil)
+
+      should parse_url("https://crepe.cm/@yolrsona/..%2F..%2Fgraphql%3Fx=1").into(commission_slug: nil, page_url: nil)
+      should parse_url("https://crepe.cm/@yolrsona/t71oz0uls%3Fx=1").into(commission_slug: nil, page_url: nil)
+      should parse_url("https://crepe.cm/@yolrsona/portfolios/..%2F..%2Fadmin").into(portfolio_slug: nil, page_url: nil)
+      should parse_url("https://kre.pe/..%2Fx").into(redirect_id: nil)
     end
   end
 end

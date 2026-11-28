@@ -28,13 +28,13 @@ class Source::URL::Crepe < Source::URL
       @full_image_url = without(:query).to_s
 
     # https://kre.pe/E0f0 (redirects to https://crepe.cm/ko/@yolrsona/t71oz0uls)
-    in nil, "kre.pe", redirect_id
+    in nil, "kre.pe", /\A[a-zA-Z0-9]+\z/ => redirect_id
       @redirect_id = redirect_id
 
     # https://crepe.cm/@yolrsona/portfolios/abc123
     # https://crepe.cm/@yolrsona/portfolios/abc123/edit
-    in nil, "crepe.cm", /\A@([a-zA-Z0-9_]+)\z/, "portfolios", portfolio_slug, *rest if rest.in?([[], ["edit"]])
-      @username = $1
+    in nil, "crepe.cm", /\A@[a-zA-Z0-9_]+\z/ => username, "portfolios", /\A[a-zA-Z0-9]+\z/ => portfolio_slug, *rest if rest.in?([[], ["edit"]])
+      @username = username.delete_prefix("@")
       @portfolio_slug = portfolio_slug
 
     # https://crepe.cm/@yolrsona/portfolios
@@ -43,8 +43,8 @@ class Source::URL::Crepe < Source::URL
 
     # https://crepe.cm/@yolrsona/t71oz0uls
     # https://crepe.cm/@yolrsona/t71oz0uls/edit
-    in nil, "crepe.cm", /\A@([a-zA-Z0-9_]+)\z/, commission_slug, *rest if rest.in?([[], ["edit"]])
-      @username = $1
+    in nil, "crepe.cm", /\A@[a-zA-Z0-9_]+\z/ => username, /\A[a-zA-Z0-9]+\z/ => commission_slug, *rest if rest.in?([[], ["edit"]])
+      @username = username.delete_prefix("@")
       @commission_slug = commission_slug
 
     # https://crepe.cm/@yolrsona
