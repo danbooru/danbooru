@@ -29,6 +29,8 @@ case "$1" in
     ;;
 esac
 
+# A script can't change its parent shell's PATH, so the current shell won't find the new command.
+[[ ":$PATH:" == *":$HOME/.local/bin:"* ]] && path_ok=true || path_ok=false
 export PATH="$HOME/.local/bin:$PATH"
 
 if ! grep -qs '\.local/bin' "$HOME/.bashrc"; then
@@ -50,3 +52,4 @@ if ! command -v "$binary" > /dev/null 2>&1; then
 fi
 
 echo "Installed $binary: $(command -v "$binary")"
+$path_ok || echo "Run \`exec bash\` or open a new terminal to use $binary."
