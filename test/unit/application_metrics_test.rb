@@ -87,6 +87,25 @@ class ApplicationMetricsTest < ActiveSupport::TestCase
         assert_match(/^ruby_gc_total\{worker="3"\} 100$/, worker_prom)
         assert_no_match(/^ruby_gc_total.* 100$/, master_prom)
       end
+
+      should "report the summed histograms from the master" do
+        @worker[:rails_http_request_queue_duration_seconds].observe(0.003)
+        @master.poll_worker_counters
+        @worker[:rails_http_request_queue_duration_seconds].observe(0.2)
+        @master.poll_worker_counters
+
+        master_prom = @master.instance_process_metrics.to_prom
+        worker_prom = @worker.instance_process_metrics.to_prom
+
+        assert_includes(master_prom, "# TYPE rails_http_request_queue_duration_seconds histogram")
+        assert_includes(master_prom, %{rails_http_request_queue_duration_seconds_bucket{le="0.001"} 0})
+        assert_includes(master_prom, %{rails_http_request_queue_duration_seconds_bucket{le="0.005"} 1})
+        assert_includes(master_prom, %{rails_http_request_queue_duration_seconds_bucket{le="0.25"} 2})
+        assert_includes(master_prom, %{rails_http_request_queue_duration_seconds_bucket{le="+Inf"} 2})
+        assert_includes(master_prom, %{rails_http_request_queue_duration_seconds_sum 0.203})
+        assert_includes(master_prom, %{rails_http_request_queue_duration_seconds_count 2})
+        assert_no_match(/^rails_http_request_queue_duration_seconds/, worker_prom)
+      end
     end
   end
 end

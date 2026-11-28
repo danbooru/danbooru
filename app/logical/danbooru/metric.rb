@@ -26,6 +26,17 @@
 #     http_requests_total{env="production", method="GET"} 2
 #     http_requests_total{env="production", method="POST"} 1
 #
+#   # Histograms count how many observations fall into each bucket.
+#   metrics.register([{ name: :http_request_duration_seconds, type: :histogram, buckets: [0.1, 1], help: "..." }])
+#   metrics[:http_request_duration_seconds].observe(0.5, method: "GET")
+#
+#     # TYPE http_request_duration_seconds histogram
+#     http_request_duration_seconds_bucket{method="GET", le="0.1"} 0
+#     http_request_duration_seconds_bucket{method="GET", le="1"} 1
+#     http_request_duration_seconds_bucket{method="GET", le="+Inf"} 1
+#     http_request_duration_seconds_sum{method="GET"} 0.5
+#     http_request_duration_seconds_count{method="GET"} 1
+#
 # @see https://prometheus.io/docs/concepts/data_model/
 # @see https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.txt
 # @see https://github.com/prometheus/client_ruby
@@ -35,19 +46,21 @@ module Danbooru
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
 
-    attr_reader :name, :type, :help, :labels, :default_value, :value_hash
+    attr_reader :name, :type, :help, :labels, :buckets, :default_value, :value_hash
     protected attr_writer :labels, :value_hash
     delegate :increment, :set, to: :default_value
 
     # @param name [Symbol] The name of the metric.
-    # @param type [Symbol] The type of the metric (:counter or :gauge).
+    # @param type [Symbol] The type of the metric (:counter, :gauge, or :histogram).
     # @param help [String] The help text for the metric.
     # @param labels [Hash<Symbol, String>] An optional set of labels for the metric.
-    def initialize(name, type: :counter, help: nil, labels: {})
+    # @param buckets [Array<Numeric>] The upper bounds of the buckets, in increasing order, for histograms.
+    def initialize(name, type: :counter, help: nil, labels: {}, buckets: nil)
       @name = name.to_sym
       @type = type
       @help = help
       @labels = labels.transform_values(&:to_s).compact_blank
+      @buckets = buckets
       @value_hash = {}
     end
 
@@ -61,6 +74,25 @@ module Danbooru
     def [](labels = {})
       value_labels = self.labels.merge(labels)
       value_hash[value_labels] ||= Value.new(self, labels: value_labels)
+    end
+
+    # Record an observation in a histogram.
+    #
+    # A histogram is stored as a counter for each bucket with an `le` label, plus a counter for the sum of the
+    # observations with an `le="sum"` label. Storing them as plain counters lets them be added up across processes like
+    # any other counter.
+    #
+    # Each observation is only counted in the first bucket it fits in, and `#to_prom` adds them up into cumulative
+    # buckets. That way a scrape that happens in the middle of an observation can't see the buckets out of order.
+    #
+    # @param value [Numeric] The observed value.
+    # @param labels [Hash<Symbol, String>] The set of labels for the observation.
+    def observe(value, labels = {})
+      raise ArgumentError, "#{name} is not a histogram" unless type == :histogram
+
+      bound = buckets.find { |bucket| value <= bucket } || "+Inf"
+      self[**labels, le: bound.to_s].increment
+      self[**labels, le: "sum"].increment(value)
     end
 
     # @return [Array<Metric::Value>] The set of values for this metric.
@@ -91,8 +123,33 @@ module Danbooru
       str = +""
       str << "# HELP #{name} #{help}\n" if help
       str << "# TYPE #{name} #{type}\n"
-      str << (values.sort.map(&:to_prom).join("\n").presence || Value.new(self, labels: labels).to_prom)
+
+      if type == :histogram
+        str << histogram_lines.join("\n")
+      else
+        str << (values.sort.map(&:to_prom).join("\n").presence || Value.new(self, labels: labels).to_prom)
+      end
+
       str
+    end
+
+    # @return [Array<String>] The histogram's `_bucket`, `_sum`, and `_count` lines in Prometheus format, with the
+    #   buckets of each set of labels in increasing order.
+    def histogram_lines
+      values.group_by { |value| value.labels.except(:le) }.sort_by { |labels, _| labels.to_a }.flat_map do |labels, group|
+        counts = group.to_h { |value| [value.labels[:le], value.value] }
+        total = 0
+
+        bucket_lines = [*buckets.map(&:to_s), "+Inf"].map do |le|
+          total += counts[le] || 0
+          Value.new(self, total, labels: { **labels, le: le }).to_prom.sub(name.to_s, "#{name}_bucket")
+        end
+
+        sum_line = Value.new(self, counts["sum"] || 0, labels: labels).to_prom.sub(name.to_s, "#{name}_sum")
+        count_line = Value.new(self, total, labels: labels).to_prom.sub(name.to_s, "#{name}_count")
+
+        [*bucket_lines, sum_line, count_line]
+      end
     end
 
     # @return [Danbooru::DataFrame] A DataFrame containing the metric's labels and values.
@@ -148,7 +205,7 @@ module Danbooru
       # @return [Metric::Set] The metric set.
       def register(definitions = [], labels: {})
         definitions.each do |definition|
-          metrics[definition[:name]] = Metric.new(definition[:name], type: definition[:type], help: definition[:help], labels: labels)
+          metrics[definition[:name]] = Metric.new(definition[:name], type: definition[:type], help: definition[:help], labels: labels, buckets: definition[:buckets])
         end
 
         self
