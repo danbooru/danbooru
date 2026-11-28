@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require_relative "../config/environment"
+
+# A command-line tool for managing a Danbooru instance. See app/logical/danbooru/cli.rb for the implementation.
+#
+# Usage: `bin/booructl help [COMMAND]`
+Danbooru::CLI.start(ARGV)

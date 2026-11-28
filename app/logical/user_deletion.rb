@@ -26,9 +26,10 @@ class UserDeletion
 
   # Delete the account, if the deletion is allowed.
   #
+  # @param validate [Boolean] If false, skip the permission checks. Used by `booructl user deactivate`.
   # @return [Boolean] True if the deletion was successful, false otherwise.
-  def delete!
-    return false if invalid?
+  def delete!(validate: true)
+    return false if validate && invalid?
 
     user.with_lock do
       rename

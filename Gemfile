@@ -64,6 +64,7 @@ gem "webrick", "~> 1"
 gem "useragent", "~> 0.16"
 gem "dotenv-rails", "~> 3", require: false # This is loaded in application.rb
 gem "benchmark", "~> 0.5"
+gem "thor", "~> 1"
 gem "ed25519", "~> 1.4", require: false
 
 group :development do

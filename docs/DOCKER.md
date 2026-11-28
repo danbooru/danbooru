@@ -231,22 +231,7 @@ sudo docker compose down
 sudo docker compose up
 ```
 
-To backup your data:
-
-```bash
-sudo docker compose run --rm -T danbooru bin/rails danbooru:database:backup > danbooru-database.pg_dump
-sudo docker compose run --rm -T danbooru bin/rails danbooru:images:backup > danbooru-images.tar
-sudo docker compose cp iqdb:/iqdb/data/iqdb.sqlite ./
-```
-
-To restore your data:
-
-```bash
-sudo docker compose down --volumes
-sudo docker compose run --rm -T danbooru bin/rails danbooru:database:restore < danbooru-database.pg_dump
-sudo docker compose run --rm -T danbooru bin/rails danbooru:images:restore < danbooru-images.tar
-sudo docker compose cp ./iqdb.sqlite iqdb:/iqdb/data/iqdb.sqlite
-```
+To back up, restore, or manage your instance from the command line, see [Managing your instance](#managing-your-instance).
 
 To start a Bash shell inside your instance (for debugging).
 
@@ -307,6 +292,105 @@ To run a Danbooru container by itself without Docker Compose:
 ```bash
 sudo docker run --rm -it ghcr.io/danbooru/danbooru bash
 ```
+
+# Managing your instance
+
+Use `bin/booructl` to manage your instance from the command line: create users, back up and restore your data,
+regenerate thumbnails, and so on. It runs inside the `danbooru` container, so it's easiest to make an alias for it:
+
+```bash
+alias booructl="sudo docker compose run --rm danbooru bin/booructl" # In production mode
+alias booructl="bin/dev run --rm danbooru bin/booructl"             # In development mode
+```
+
+Run `booructl help` to list all commands, and `booructl user help create` (for example) to show help for a command.
+
+## Cheatsheet
+
+```bash
+booructl status                                    # Check that Postgres, Redis, IQDB, and storage are working
+
+# Users
+booructl user create alice --level Admin           # Create a user (prompts for the password)
+booructl user set-level alice Moderator            # Promote or demote a user
+booructl user show alice                           # Show a user's level, email, 2FA, bans, and sessions
+booructl user show alice@example.com               # Look up a user by email (or by ID with "#123" or id:123)
+booructl user ban alice --duration 3days --reason "Spam"  # Ban a user (1day, 3days, 7days, 1month, ..., forever)
+booructl user unban alice                          # Unban a user
+booructl user rename alice alicia                  # Change a user's name (use --no-dmail to not notify them)
+booructl user set-email alice alice@example.com    # Change a user's email (or remove it with --remove)
+booructl user deactivate alice                     # Deactivate a user's account
+
+# Account recovery
+booructl user reset-link alice                     # Print a password reset link to send to the user
+booructl user set-password alice                   # Set a user's password (prompts for the password)
+booructl user disable-2fa alice                    # Disable 2FA for a user who lost their 2FA device and backup codes
+booructl user send-backup-code alice               # Email one of the user's 2FA backup codes to them
+booructl user logout alice --api-keys              # Log a user out everywhere and delete their API keys
+
+# Backing up
+booructl db backup > danbooru-database.pg_dump     # Back up the database
+booructl images backup > danbooru-images.tar       # Back up all images
+booructl instance backup /backup                   # Back up the database and images to a directory (needs -v, see below)
+
+# Checking backups
+booructl db check < danbooru-database.pg_dump      # Check a database backup
+booructl images check < danbooru-images.tar        # Check an image backup
+booructl instance check /backup                    # Check a backup made by `instance backup`
+
+# Restoring
+booructl db restore < danbooru-database.pg_dump    # Restore the database (it must be empty, or use --force)
+booructl images restore < danbooru-images.tar      # Restore images
+booructl instance restore /backup                  # Restore a backup made by `instance backup`
+
+# Resetting
+booructl db reset                                  # Delete the database and create a fresh one
+booructl images reset                              # Delete all images
+booructl instance reset                            # Delete the database and all images
+
+# Maintenance
+booructl media regenerate "id:1..1000"             # Regenerate thumbnails, metadata, and AI tags
+booructl media regenerate "filetype:mp4" --no-ai-tags
+booructl iqdb reindex                              # Rebuild the IQDB index
+```
+
+Add `--dry-run` to any backup, check, restore, or reset command to see the commands it would run without running
+them.
+
+When reading from or writing to a file with `<` or `>`, add `-T` after `run` to make sure Docker doesn't attach a
+terminal, which can corrupt the file. For example:
+
+```bash
+sudo docker compose run --rm -T danbooru bin/booructl db backup > danbooru-database.pg_dump
+```
+
+## Backing up and restoring
+
+To back up your instance:
+
+```bash
+sudo docker compose run --rm -T danbooru bin/booructl db backup > danbooru-database.pg_dump
+sudo docker compose run --rm -T danbooru bin/booructl images backup > danbooru-images.tar
+sudo docker compose cp iqdb:/iqdb/data/iqdb.sqlite ./
+```
+
+Or, to back up the database and images to a directory:
+
+```bash
+sudo docker compose run --rm -v "$PWD/backup:/backup" danbooru bin/booructl instance backup /backup
+sudo docker compose run --rm -v "$PWD/backup:/backup" danbooru bin/booructl instance check /backup
+```
+
+To restore your instance:
+
+```bash
+sudo docker compose run --rm -T danbooru bin/booructl db restore --force < danbooru-database.pg_dump
+sudo docker compose run --rm -T danbooru bin/booructl images restore < danbooru-images.tar
+sudo docker compose cp ./iqdb.sqlite iqdb:/iqdb/data/iqdb.sqlite
+```
+
+`--force` deletes the current database before restoring the backup. If you don't have a backup of the IQDB database,
+rebuild it with `booructl iqdb reindex` instead.
 
 # Development tips
 

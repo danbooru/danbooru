@@ -653,6 +653,7 @@ DEPENDENCIES
   simplecov (~> 1)
   simplecov-cobertura (~> 4)
   stackprof (~> 0.2)
+  thor (~> 1)
   tzinfo-data (~> 1)
   useragent (~> 0.16)
   view_component (~> 4)
