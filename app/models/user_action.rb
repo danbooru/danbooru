@@ -8,7 +8,7 @@ class UserAction < ApplicationRecord
   attribute :model_id, :integer
   attribute :user_id, :integer
   attribute :event_type, :string
-  attribute :event_at, :time
+  attribute :event_at, :datetime
 
   def self.model_types
     %w[ArtistVersion ArtistCommentaryVersion Ban BulkUpdateRequest Comment

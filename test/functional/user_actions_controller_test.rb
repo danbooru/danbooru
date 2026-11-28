@@ -80,6 +80,15 @@ class UserActionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "return the full date and time of each event" do
+        comment = travel_to(Time.zone.parse("2025-06-15 12:34:56")) { create(:comment) }
+
+        get_auth user_user_actions_path(comment.creator, format: :json), create(:moderator_user)
+
+        assert_response :success
+        assert_equal(comment.created_at, Time.zone.parse(response.parsed_body.first["event_at"]))
+      end
+
       context "for flags on the moderator's own uploads" do
         setup do
           @mod = create(:moderator_user)
