@@ -49,6 +49,7 @@ class BackupCodesControllerTest < ActionDispatch::IntegrationTest
           get_auth user_backup_codes_path(@user), @user, reauthenticate: true
 
           assert_response :success
+          assert_equal("no-store", response.headers["Cache-Control"])
           assert_equal(true, @user.reload.backup_codes.present?)
           assert_equal(false, @user.user_events.backup_code_generate.exists?)
           assert_equal([1111_1111, 2222_2222, 3333_3333], @user.backup_codes)

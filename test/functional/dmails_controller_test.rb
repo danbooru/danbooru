@@ -50,6 +50,13 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get_auth dmails_path, @user
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
+      end
+
+      should "not allow caching with the expires_in param" do
+        get_auth dmails_path(expires_in: "1y"), @user, as: :json
+        assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "not list reported dmails owned by other users to moderators" do
@@ -91,6 +98,7 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       should "show dmails owned by the current user" do
         get_auth dmail_path(@dmail), @dmail.owner
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
 
         assert_select "#dmail-respond", count: 1, text: "Respond"
         assert_select "#dmail-forward", count: 1, text: "Forward"

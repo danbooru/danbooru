@@ -12,6 +12,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
       should "render for a mod" do
         get_auth edit_admin_user_path(@user), @mod
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "render for a superadmin" do

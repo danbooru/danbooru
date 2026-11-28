@@ -4,6 +4,7 @@ class BackupCodesController < ApplicationController
   respond_to :text, :html, :xml, :json
 
   before_action :requires_reauthentication, only: [:index, :create, :recover, :confirm_recover]
+  after_action :no_store
 
   def index
     @user = authorize User.find(params[:user_id]), policy_class: BackupCodePolicy

@@ -2,6 +2,7 @@
 
 class EmailsController < ApplicationController
   before_action :requires_reauthentication, only: [:edit, :update, :destroy]
+  after_action :no_store
   respond_to :html, :xml, :json
 
   def index

@@ -2,6 +2,7 @@
 
 class PasswordResetsController < ApplicationController
   respond_to :html, :xml, :json
+  after_action :no_store
 
   verify_captcha only: :create
 

@@ -9,6 +9,7 @@ class TOTPControllerTest < ActionDispatch::IntegrationTest
           get_auth edit_user_totp_path(user_id: @user.id), @user, reauthenticate: true
 
           assert_response :success
+          assert_equal("no-store", response.headers["Cache-Control"])
         end
 
         should "not allow a user to view a different user's 2FA edit page" do

@@ -906,6 +906,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       should "render for a logged in user" do
         get_auth confirm_password_session_path, @user
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "fail for a user who is not logged in" do
@@ -1044,6 +1045,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         delete_auth session_path, @user
 
         assert_redirected_to root_path
+        assert_equal('"cache"', response.headers["Clear-Site-Data"])
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_nil(session[:user_id])
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])
@@ -1057,6 +1060,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         delete session_path
 
         assert_redirected_to root_path
+        assert_equal('"cache"', response.headers["Clear-Site-Data"])
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_nil(session[:user_id])
         assert_nil(session[:login_id])
         assert_nil(session[:last_authenticated_at])

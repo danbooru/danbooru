@@ -2,6 +2,7 @@
 
 class DmailsController < ApplicationController
   respond_to :html, :xml, :js, :json
+  after_action :no_store
 
   def index
     @dmails = authorize Dmail.where(owner: CurrentUser.user).paginated_search(params, count_pages: true)

@@ -6,6 +6,7 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
       should "work for a logged-out user" do
         get password_reset_path
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "redirect to the profile page for a logged-in user" do

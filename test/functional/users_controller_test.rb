@@ -240,6 +240,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         delete_auth user_path(@user), @user, params: { user: { password: "password" }}, reauthenticate: true
 
         assert_redirected_to posts_path
+        assert_equal('"cache"', response.headers["Clear-Site-Data"])
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_equal(true, @user.reload.is_deleted?)
         assert_equal("Account deactivated", flash[:notice])
         assert_nil(session[:user_id])
@@ -264,6 +266,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         delete_auth user_path(@user), create(:superadmin), reauthenticate: true
 
         assert_redirected_to posts_path
+        assert_nil(response.headers["Clear-Site-Data"])
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_equal(true, @user.reload.is_deleted?)
         assert_equal("Account deactivated", flash[:notice])
         assert_not_nil(session[:user_id])
@@ -291,6 +295,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         @user.update!(custom_style: "span { color: red; }")
         get_auth custom_style_users_path(format: "css"), @user
         assert_response :success
+        assert_equal("max-age=#{10.years.to_i}, private", response.headers["Cache-Control"])
       end
     end
 
@@ -312,6 +317,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get user_path(@user)
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "say the search timed out instead of 'No posts found' when the uploads search times out" do
@@ -536,6 +542,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth profile_path, @user
 
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_select "#page h1", @user.name
       end
 
@@ -899,6 +906,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       should "allow a superadmin to view another user's settings" do
         get_auth edit_user_path(@user), create(:superadmin_user)
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "not allow a user to view another user's settings" do
@@ -912,6 +920,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get_auth settings_path, @user
 
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_select "#page h1", "Settings"
       end
 

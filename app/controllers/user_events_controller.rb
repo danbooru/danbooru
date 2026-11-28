@@ -2,6 +2,7 @@
 
 class UserEventsController < ApplicationController
   respond_to :html, :json, :xml
+  after_action :no_store
 
   def index
     user_id = params.expect(:user_id) if params[:user_id].present?

@@ -5,6 +5,7 @@ class UsersController < ApplicationController
 
   before_action :requires_reauthentication, only: [:deactivate, :destroy, :promote, :demote]
   around_action :set_timeout, only: [:profile, :show]
+  after_action :no_store, except: [:index, :new, :create, :custom_style]
   verify_captcha only: :create
 
   def index
@@ -112,6 +113,7 @@ class UsersController < ApplicationController
     user_deletion.delete!
 
     if user_deletion.errors.none?
+      response.headers["Clear-Site-Data"] = '"cache"' if @user == CurrentUser.user
       respond_with(user_deletion, notice: "Account deactivated", location: posts_path)
     else
       flash[:notice] = user_deletion.errors.full_messages.join("; ")

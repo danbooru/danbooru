@@ -25,6 +25,7 @@ class UserEventsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get_auth user_events_path, @user
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "show mods all events by lower-level users and themselves" do

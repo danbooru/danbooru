@@ -12,6 +12,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         get_auth user_api_keys_path(@user.id), @user, reauthenticate: true
 
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_select "#api-key-#{@api_key.id}", count: 1
       end
 

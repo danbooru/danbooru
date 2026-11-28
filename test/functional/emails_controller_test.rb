@@ -23,6 +23,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         get_auth emails_path, @mod1
 
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
         assert_select "#email-address-#{@user.email_address.id}", count: 1
         assert_select "#email-address-#{@other_user.email_address.id}", count: 1
         assert_select "#email-address-#{@mod1.email_address.id}", count: 1
@@ -34,6 +35,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get_auth user_email_path(@user), @user, as: :json, reauthenticate: true
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "return 404 for a user without an email address when authorized" do

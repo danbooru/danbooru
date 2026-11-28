@@ -2,6 +2,7 @@
 
 class ApiKeysController < ApplicationController
   before_action :requires_reauthentication
+  after_action :no_store
   respond_to :html, :json, :xml
 
   def index

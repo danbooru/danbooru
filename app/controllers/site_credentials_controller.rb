@@ -2,6 +2,7 @@
 
 class SiteCredentialsController < ApplicationController
   before_action :requires_reauthentication
+  after_action :no_store
   respond_to :html, :xml, :json, :js
 
   def index

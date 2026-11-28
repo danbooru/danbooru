@@ -3,6 +3,7 @@
 module Admin
   class UsersController < ApplicationController
     before_action :requires_reauthentication, only: [:update]
+    after_action :no_store
 
     def edit
       @user = authorize User.find(params[:id]), :promote?

@@ -8,6 +8,7 @@ class TOTPController < ApplicationController
   respond_to :html, :xml, :json
 
   before_action :requires_reauthentication, only: [:edit, :update, :destroy]
+  after_action :no_store
 
   def edit
     @user = authorize User.find(params[:user_id]), policy_class: TOTPPolicy

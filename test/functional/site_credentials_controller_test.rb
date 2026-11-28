@@ -68,6 +68,7 @@ class SiteCredentialsControllerTest < ActionDispatch::IntegrationTest
       should "be viewable by admins" do
         get_auth site_credentials_path, @admin, reauthenticate: true
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "redirect to the confirm password page if the user hasn't recently authenticated" do

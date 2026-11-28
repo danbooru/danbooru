@@ -2,6 +2,7 @@
 
 class PasswordsController < ApplicationController
   respond_to :html, :xml, :json
+  after_action :no_store
 
   def edit
     @user = authorize user, policy_class: PasswordPolicy

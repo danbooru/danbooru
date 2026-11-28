@@ -10,6 +10,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
       should "work for a user viewing their own change password page" do
         get_auth edit_user_password_path(@user), @user
         assert_response :success
+        assert_equal("no-store", response.headers["Cache-Control"])
       end
 
       should "not work for a user viewing another users's change password page" do
