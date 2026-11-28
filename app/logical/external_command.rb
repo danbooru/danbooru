@@ -191,6 +191,9 @@ class ExternalCommand
         pid = Process.spawn(
           ENV.slice(*ENVIRONMENT).merge(profile.fetch(:environment, {})), *command,
           in: stdin, out: output_writer, err: output_writer, unsetenv_others: true, close_others: true,
+          # Signals sent to our process group, like the SIGTERM that tini sends to everything when the pod stops, don't
+          # kill the command before Rails finishes with it.
+          pgroup: true,
           # Disable core dumps, otherwise a command that crashes when it hits the memory limit can fill the disk.
           rlimit_as: memory_limit.to_i, rlimit_core: 0, **(file_size_limit ? { rlimit_fsize: file_size_limit.to_i } : {}),
         )

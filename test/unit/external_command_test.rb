@@ -187,6 +187,25 @@ class ExternalCommandTest < ActiveSupport::TestCase
       assert_empty(`ps -eo args`.lines.map(&:strip).grep(/\Asleep 33\z/))
     end
 
+    should "not deliver SIGTERM signals sent to the Rails process group to the external command" do
+      Dir.mktmpdir do |dir|
+        ready = File.join(dir, "ready")
+        command = "ruby -e #{"File.write(ARGV[0], ''); sleep 2; print :done".shellescape} #{ready.shellescape}"
+        script = %{trap("TERM") {}; output, status = ExternalCommand.run(#{command.inspect}, write: [#{dir.inspect}], profile_name: "bin/archive"); print output if status.success?}
+        output, output_writer = IO.pipe
+        pid = Process.spawn("bin/rails", "runner", script, out: output_writer, pgroup: true)
+        output_writer.close
+
+        Timeout.timeout(60) { sleep 0.1 until File.exist?(ready) }
+        Process.kill(:TERM, -pid)
+        Process.wait(pid)
+
+        assert_equal("done", output.read)
+      ensure
+        output&.close
+      end
+    end
+
     should "not leak files if the sandbox can't be built" do
       open_files = Dir.children("/proc/self/fd").size
       Seccomp.stubs(:allow).raises(Errno::EINVAL)
