@@ -27,6 +27,24 @@ class PostAppealTest < ActiveSupport::TestCase
         assert_equal(["Post cannot be appealed"], @post_appeal.errors.full_messages)
       end
 
+      should "not be able to appeal a banned post" do
+        @post.update!(is_banned: true)
+        @post_appeal = build(:post_appeal, post: @post, creator: @user)
+
+        assert_equal(false, @post_appeal.valid?)
+        assert_equal(["Post cannot be appealed"], @post_appeal.errors.full_messages)
+      end
+
+      should "not be able to appeal a level-restricted post" do
+        stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+          @post.update!(tag_string: "restricted_tag")
+          @post_appeal = build(:post_appeal, post: @post, creator: @user)
+
+          assert_equal(false, @post_appeal.valid?)
+          assert_equal(["Post cannot be appealed"], @post_appeal.errors.full_messages)
+        end
+      end
+
       context "appeal limits" do
         context "for members" do
           should "not be able to appeal more than their upload limit" do

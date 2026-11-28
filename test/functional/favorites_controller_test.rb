@@ -107,6 +107,58 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
         end
       end
+
+      should "not allow members to favorite a banned post" do
+        @post.update!(is_banned: true)
+
+        assert_no_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @user.reload.favorite_count }] do
+          post_auth favorites_path(post_id: @post.id), @user, as: :json
+          assert_response 403
+        end
+      end
+
+      should "allow approvers to favorite a banned post" do
+        @post.update!(is_banned: true)
+        @approver = create(:approver)
+
+        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @approver.reload.favorite_count }], 1 do
+          post_auth favorites_path(post_id: @post.id), @approver, as: :json
+          assert_response 201
+        end
+      end
+
+      should "not allow members to favorite a level-restricted post" do
+        stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+          @post.update!(tag_string: "restricted_tag")
+
+          assert_no_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @user.reload.favorite_count }] do
+            post_auth favorites_path(post_id: @post.id), @user, as: :json
+            assert_response 403
+          end
+        end
+      end
+
+      should "allow gold users to favorite a level-restricted post" do
+        stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+          @post.update!(tag_string: "restricted_tag")
+          @gold_user = create(:gold_user)
+
+          assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @gold_user.reload.favorite_count }], 1 do
+            post_auth favorites_path(post_id: @post.id), @gold_user, as: :json
+            assert_response 201
+          end
+        end
+      end
+
+      should "not allow favoriting a post hidden by safe mode" do
+        @post.update!(rating: "e")
+        CurrentUser.stubs(:safe_mode?).returns(true)
+
+        assert_no_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @user.reload.favorite_count }] do
+          post_auth favorites_path(post_id: @post.id), @user, as: :json
+          assert_response 403
+        end
+      end
     end
 
     context "destroy action" do

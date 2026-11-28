@@ -20,7 +20,7 @@ class Favorite < ApplicationRecord
   end
 
   def upvote_post_on_create
-    if Pundit.policy!(user, PostVote).create? && !PostVote.active.exists?(post: post, user: user, score: 1)
+    if Pundit.policy!(user, PostVote.new(post: post)).create? && !PostVote.active.exists?(post: post, user: user, score: 1)
       PostVote.create!(post: post, user: user, score: 1)
     end
   end

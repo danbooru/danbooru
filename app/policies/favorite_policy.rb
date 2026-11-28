@@ -2,7 +2,7 @@
 
 class FavoritePolicy < ApplicationPolicy
   def create?
-    unbanned? && user.is_member?
+    unbanned? && user.is_member? && (!record.is_a?(Favorite) || record.post.visible?(user))
   end
 
   def destroy?

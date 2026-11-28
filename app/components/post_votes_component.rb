@@ -11,7 +11,7 @@ class PostVotesComponent < ApplicationComponent
   end
 
   def can_vote?
-    policy(PostVote).create?
+    policy(PostVote.new(post: post)).create?
   end
 
   # Return to the same page of search results after logging in. Long searches are left out, since this link is repeated

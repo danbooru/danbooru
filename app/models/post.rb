@@ -554,11 +554,11 @@ class Post < ApplicationRecord
           end
 
         in "fav", name
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
+          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite.new(post: self)).create?
           Favorite.create(post: self, user: CurrentUser.user)
 
         in "-fav", name
-          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
+          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite.new(post: self)).create?
           Favorite.destroy_by(post: self, user: CurrentUser.user)
 
         in "upvote", name
@@ -743,7 +743,7 @@ class Post < ApplicationRecord
   concerning :VoteMethods do
     def vote!(score, voter)
       # Ignore vote if user doesn't have permission to vote.
-      return unless Pundit.policy!(voter, PostVote).create?
+      return unless Pundit.policy!(voter, PostVote.new(post: self)).create?
 
       with_lock do
         votes.create!(user: voter, score: score) unless votes.active.exists?(user: voter, score: score)
@@ -753,7 +753,7 @@ class Post < ApplicationRecord
 
     def unvote!(score, voter)
       # Ignore unvote if user doesn't have permission to vote.
-      return unless Pundit.policy!(voter, PostVote).create?
+      return unless Pundit.policy!(voter, PostVote.new(post: self)).create?
 
       with_lock do
         votes.active.find_by(user: voter, score: score)&.soft_delete!(updater: voter)

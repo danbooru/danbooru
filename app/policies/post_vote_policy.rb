@@ -2,7 +2,7 @@
 
 class PostVotePolicy < ApplicationPolicy
   def create?
-    unbanned? && user.is_member?
+    unbanned? && user.is_member? && record.post.visible?(user)
   end
 
   def destroy?

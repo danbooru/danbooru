@@ -251,6 +251,51 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(1, @post.reload.score)
       end
 
+      should "not allow members to vote on a banned post" do
+        @post.update!(is_banned: true)
+        post_auth post_post_votes_path(post_id: @post.id, score: 1), create(:user), as: :json
+
+        assert_response 403
+        assert_equal(0, @post.reload.score)
+      end
+
+      should "allow approvers to vote on a banned post" do
+        @post.update!(is_banned: true)
+        post_auth post_post_votes_path(post_id: @post.id, score: 1), create(:approver), as: :json
+
+        assert_response 201
+        assert_equal(1, @post.reload.score)
+      end
+
+      should "not allow members to vote on a level-restricted post" do
+        stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+          @post.update!(tag_string: "restricted_tag")
+          post_auth post_post_votes_path(post_id: @post.id, score: 1), create(:user), as: :json
+
+          assert_response 403
+          assert_equal(0, @post.reload.score)
+        end
+      end
+
+      should "allow gold users to vote on a level-restricted post" do
+        stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+          @post.update!(tag_string: "restricted_tag")
+          post_auth post_post_votes_path(post_id: @post.id, score: 1), create(:gold_user), as: :json
+
+          assert_response 201
+          assert_equal(1, @post.reload.score)
+        end
+      end
+
+      should "not allow voting on a post hidden by safe mode" do
+        @post.update!(rating: "e")
+        CurrentUser.stubs(:safe_mode?).returns(true)
+        post_auth post_post_votes_path(post_id: @post.id, score: 1), create(:user), as: :json
+
+        assert_response 403
+        assert_equal(0, @post.reload.score)
+      end
+
       should "not allow invalid scores" do
         post_auth post_post_votes_path(post_id: @post.id, score: 3), @user, xhr: true
 

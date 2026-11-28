@@ -108,6 +108,56 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(["cannot be appealed"], response.parsed_body.dig("errors", "post"))
         end
       end
+
+      context "appealing a banned post" do
+        should "fail for a member" do
+          @post = create(:post, is_deleted: true, is_banned: true)
+
+          assert_no_difference("PostAppeal.count") do
+            post_auth post_appeals_path, @user, params: { post_appeal: { post_id: @post.id, reason: "xxx" }}, as: :json
+          end
+
+          assert_response 422
+          assert_equal(["cannot be appealed"], response.parsed_body.dig("errors", "post"))
+        end
+
+        should "succeed for an approver" do
+          @post = create(:post, is_deleted: true, is_banned: true)
+
+          assert_difference("PostAppeal.count", 1) do
+            post_auth post_appeals_path, create(:approver), params: { post_appeal: { post_id: @post.id, reason: "xxx" }}, as: :json
+          end
+
+          assert_response :success
+        end
+      end
+
+      context "appealing a level-restricted post" do
+        should "fail for a member" do
+          stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+            @post = create(:post, is_deleted: true, tag_string: "restricted_tag")
+
+            assert_no_difference("PostAppeal.count") do
+              post_auth post_appeals_path, @user, params: { post_appeal: { post_id: @post.id, reason: "xxx" }}, as: :json
+            end
+
+            assert_response 422
+            assert_equal(["cannot be appealed"], response.parsed_body.dig("errors", "post"))
+          end
+        end
+
+        should "succeed for a gold user" do
+          stub_const(Post, :RESTRICTED_TAGS_REGEX, /(?:^| )restricted_tag(?:$| )/) do
+            @post = create(:post, is_deleted: true, tag_string: "restricted_tag")
+
+            assert_difference("PostAppeal.count", 1) do
+              post_auth post_appeals_path, create(:gold_user), params: { post_appeal: { post_id: @post.id, reason: "xxx" }}, as: :json
+            end
+
+            assert_response :success
+          end
+        end
+      end
     end
 
     context "edit action" do

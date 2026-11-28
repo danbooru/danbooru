@@ -109,7 +109,7 @@
         </li>
       <% end %>
 
-      <% if policy(Favorite).create? %>
+      <% if policy(Favorite.new(post: @post)).create? %>
         <li id="post-option-add-to-favorites">
           <%= link_to "Favorite", favorites_path(post_id: @post.id), remote: true, method: :post, id: "add-to-favorites", "data-shortcut": "f", style: ("display: none;" if @post.favorited_by?(CurrentUser.user)) %>
         </li>
@@ -140,9 +140,9 @@
         <li id="post-option-add-fav-group"><%= link_to "Add to fav group", "#", id: "open-favgroup-dialog-link", "data-shortcut": "g" %></li>
       <% end %>
 
-      <% if @post.is_active? && policy(PostFlag).create? %>
+      <% if policy(@post).visible? && @post.is_active? && policy(PostFlag).create? %>
         <li id="post-option-flag"><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: @post.id }), remote: true %></li>
-      <% elsif @post.is_appealable? && policy(PostAppeal).create? %>
+      <% elsif policy(@post).visible? && @post.is_appealable? && policy(PostAppeal).create? %>
         <li id="post-option-appeal"><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: @post.id }), remote: true %></li>
       <% end %>
 
@@ -293,7 +293,7 @@
     <div id="note-preview"></div>
   <% end -%>
 
-  <% if policy(Favorite).create? %>
+  <% if policy(Favorite.new(post: @post)).create? %>
     <div class="fav-buttons-container">
       <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
         <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
