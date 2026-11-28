@@ -61,5 +61,8 @@ module Source::Tests::URL
     end
 
     should parse_url("https://c10.patreonusercontent.com/4/patreon-media/p/post/71057815/d48874de48aa49f7878d32144de631fc/eyJ3Ijo2MjB9/1.jpg?token-time=1668384000&token-hash=9ORWv7LJBzmvzmHTi_xGFQ47Uis9fNzTPp2WweThDj4%3D").into(site_name: "Patreon")
+
+    should parse_url("https://www.patreon.com/file?h=23563293&i=3053667").into(post_id: "23563293", attachment_id: "3053667")
+    should parse_url("https://www.patreon.com/file?h=1/../x&i=1%26x%3D1").into(post_id: nil, attachment_id: nil)
   end
 end

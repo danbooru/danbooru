@@ -38,5 +38,8 @@ module Source::Tests::URL
     should parse_url("https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8/6421b331000000002702901f?xsec_token=ABC=").into(page_url: "https://www.rednote.com/discovery/item/6421b331000000002702901f?xsec_token=ABC=")
     should parse_url("https://www.rednote.com/discovery/item/65880524000000000700a643?xsec_token=ABC=").into(page_url: "https://www.rednote.com/discovery/item/65880524000000000700a643?xsec_token=ABC=")
     should parse_url("https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8").into(page_url: nil)
+
+    should parse_url("https://www.xiaohongshu.com/explore/6421b331000000002702901f?xsec_token=AB8gckcRPuWL0Y50U9clOxH6rEXF2-hNGelhwvD7cefxM=").into(xsec_token: "AB8gckcRPuWL0Y50U9clOxH6rEXF2-hNGelhwvD7cefxM=")
+    should parse_url("https://www.xiaohongshu.com/explore/6421b331000000002702901f?xsec_token=1%26x%3D1").into(xsec_token: nil, page_url: "https://www.rednote.com/discovery/item/6421b331000000002702901f")
   end
 end

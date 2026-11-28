@@ -23,5 +23,9 @@ module Source::Tests::URL
     end
 
     should parse_url("https://huajia.fp.ps.netease.com/file/664ae65bd56ea97215dc3e25JM5jBQGB05").into(site_name: "Huajia")
+
+    should parse_url("https://huajia.163.com/main/works/8z4GdKoE&x=1").into(work_id: nil, page_url: nil)
+    should parse_url("https://huajia.163.com/main/goods/details/brOjJVME&x=1").into(goods_id: nil, page_url: nil)
+    should parse_url("https://huajia.163.com/main/projects/details/1rxjP93B&x=1").into(commission_id: nil, page_url: nil)
   end
 end

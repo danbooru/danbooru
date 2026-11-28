@@ -21,29 +21,29 @@ module Source
           @full_image_url = without(:query).to_s
 
         # https://huajia.163.com/main/works/8z4GdKoE
-        in "huajia", "163.com", "main", "works", work_id
+        in "huajia", "163.com", "main", "works", /\A[a-zA-Z0-9]+\z/ => work_id
           @work_id = work_id
 
         # https://huajia.163.com/main/goods/details/brOjJVME
-        in "huajia", "163.com", "main", "goods", "details", goods_id
+        in "huajia", "163.com", "main", "goods", "details", /\A[a-zA-Z0-9]+\z/ => goods_id
           @goods_id = goods_id
 
         # https://huajia.163.com/main/projects/details/1rxjP93B
         # https://huajia.163.com/main/projects/details/08nVl458
         # https://huajia.163.com/main/projects/details/vE7eDV68
-        in "huajia", "163.com", "main", "projects", "details", commission_id
+        in "huajia", "163.com", "main", "projects", "details", /\A[a-zA-Z0-9]+\z/ => commission_id
           @commission_id = commission_id
 
         # https://huajia.163.com/main/characterSetting/details/WEXKjKoB
         # https://huajia.163.com/main/characterSetting/details/VENW40Kr
         # https://huajia.163.com/main/characterSetting/details/vE79wa28
         # (cookie required)
-        in "huajia", "163.com", "main", "characterSetting", "details", cs_id
+        in "huajia", "163.com", "main", "characterSetting", "details", /\A[a-zA-Z0-9]+\z/ => cs_id
           @cs_id = cs_id
 
         # https://huajia.163.com/main/profile/MBmloOn8
         # https://huajia.163.com/main/profile/08nqxj4r?type=Works
-        in "huajia", "163.com", "main", "profile", user_id
+        in "huajia", "163.com", "main", "profile", /\A[a-zA-Z0-9]+\z/ => user_id
           @user_id = user_id
 
         else

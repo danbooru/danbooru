@@ -29,5 +29,9 @@ module Source::Tests::URL
     end
 
     should parse_url("https://galleria-img.emotionflow.com/user_img9/40775/i660870_869.jpeg").into(site_name: "Galleria")
+
+    should parse_url("https://galleria.emotionflow.com/IllustDetailV.jsp?ID=9599&TD=1").into(user_id: "9599", post_id: "1")
+    should parse_url("https://galleria.emotionflow.com/IllustDetailV.jsp?ID=1/../x&TD=1%26x%3D1").into(user_id: nil, post_id: nil)
+    should parse_url("https://galleria.emotionflow.com/GalleryListGridV.jsp?ID=1%26x%3D1").into(user_id: nil)
   end
 end

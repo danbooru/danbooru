@@ -45,7 +45,7 @@ class Source::URL::HentaiFoundry < Source::URL
       @work_id = $1
 
     # https://thumbs.hentai-foundry.com/thumb.php?pid=795025&size=350
-    in "thumbs", "hentai-foundry.com", "thumb.php" if params[:pid].present?
+    in "thumbs", "hentai-foundry.com", "thumb.php" if params[:pid].to_s.match?(/\A\d+\z/)
       @work_id = params[:pid]
 
     # https://www.hentai-foundry.com/user/kajinman

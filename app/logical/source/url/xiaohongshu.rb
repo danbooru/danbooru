@@ -42,18 +42,18 @@ class Source::URL::Xiaohongshu < Source::URL
     # https://www.xiaohongshu.com/explore/6421b331000000002702901f
     in _, ("xiaohongshu.com" | "rednote.com"), ("explore" | "search_result"), post_id
       @post_id = post_id
-      @xsec_token = params[:xsec_token]
+      @xsec_token = params[:xsec_token] if params[:xsec_token].to_s.match?(%r{\A[\w+/=-]+\z})
 
     # https://www.xiaohongshu.com/discovery/item/65880524000000000700a643
     in _, ("xiaohongshu.com" | "rednote.com"), "discovery", "item", post_id
       @post_id = post_id
-      @xsec_token = params[:xsec_token]
+      @xsec_token = params[:xsec_token] if params[:xsec_token].to_s.match?(%r{\A[\w+/=-]+\z})
 
     # https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8/6421b331000000002702901f
     in _, ("xiaohongshu.com" | "rednote.com"), "user", "profile", user_id, post_id
       @user_id = user_id
       @post_id = post_id
-      @xsec_token = params[:xsec_token]
+      @xsec_token = params[:xsec_token] if params[:xsec_token].to_s.match?(%r{\A[\w+/=-]+\z})
 
     # https://www.xiaohongshu.com/user/profile/6234917d0000000010008cf8
     in _, ("xiaohongshu.com" | "rednote.com"), "user", "profile", user_id

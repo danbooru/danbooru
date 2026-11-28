@@ -65,5 +65,8 @@ module Source::Tests::URL
     end
 
     should parse_url("https://pixiv.pximg.net/c/936x600_90_a2_g5/fanbox/public/images/plan/4635/cover/L6AZNneFuHW6r25CHHlkpHg4.jpeg").into(site_name: "Fanbox")
+
+    should parse_url("https://www.pixiv.net/fanbox/member.php?user_id=3410642").into(user_id: "3410642")
+    should parse_url("https://www.pixiv.net/fanbox/member.php?user_id=1/../x").into(user_id: nil)
   end
 end

@@ -23,5 +23,8 @@ module Source::Tests::URL
     end
 
     should parse_url("https://blog.naver.com/kkid9624/223421884109").into(site_name: "Naver Blog")
+
+    should parse_url("https://m.blog.naver.com/PostView.naver?blogId=fishtailia&logNo=223434964582").into(username: "fishtailia", post_id: "223434964582")
+    should parse_url("https://m.blog.naver.com/PostView.naver?blogId=../x&logNo=1?x=1").into(username: nil, post_id: nil)
   end
 end

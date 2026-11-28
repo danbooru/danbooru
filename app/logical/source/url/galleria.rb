@@ -32,15 +32,15 @@ class Source::URL::Galleria < Source::URL
 
     # https://galleria.emotionflow.com/IllustDetailV.jsp?ID=136703&TD=701021
     # https://galleria.emotionflow.com/s/IllustDetailV.jsp?ID=136703&TD=701021
-    in "galleria", "emotionflow.com", *subdirs, "IllustDetailV.jsp"
+    in "galleria", "emotionflow.com", *subdirs, "IllustDetailV.jsp" if params["ID"].to_s.match?(/\A\d+\z/)
       @user_id = params["ID"]
-      @post_id = params["TD"]
+      @post_id = params["TD"] if params["TD"].to_s.match?(/\A\d+\z/)
 
     # http://galleria.emotionflow.com/GalleryListGridV.jsp?ID=15878
     # http://galleria.emotionflow.com/s/GalleryListGridV.jsp?ID=1171
     # http://galleria.emotionflow.com/MyGalleryListV.jsp?ID=40948
     # http://galleria.emotionflow.com/s/MyGalleryListV.jsp?ID=40948
-    in "galleria", "emotionflow.com", *subdirs, ("GalleryListGridV.jsp" | "MyGalleryListV.jsp")
+    in "galleria", "emotionflow.com", *subdirs, ("GalleryListGridV.jsp" | "MyGalleryListV.jsp") if params["ID"].to_s.match?(/\A\d+\z/)
       @user_id = params["ID"]
 
     # https://galleria.emotionflow.com/40775/gallery.html

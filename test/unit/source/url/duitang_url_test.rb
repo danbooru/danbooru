@@ -39,5 +39,9 @@ module Source::Tests::URL
         page_url: nil,
       )
     end
+
+    should parse_url("https://www.duitang.com/blog/?id=1%26x%3D1").into(blog_id: nil)
+    should parse_url("https://www.duitang.com/people/?id=1%26x%3D1").into(user_id: nil)
+    should parse_url("https://www.duitang.com/album/?id=1%26x%3D1").into(album_id: nil)
   end
 end

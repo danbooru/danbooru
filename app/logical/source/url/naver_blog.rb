@@ -64,9 +64,9 @@ class Source::URL::NaverBlog < Source::URL
     # https://blog.naver.com/NBlogTop.naver?isHttpsRedirect=true&blogId=mgrtt3132003
     # https://blog.naver.com/prologue/PrologueList.nhn?blogId=tobsua
     # https://blog.naver.com/profile/intro.naver?blogId=rlackswnd58
-    in ("blog" | "m.blog"), "naver.com", *rest if params[:blogId].present?
+    in ("blog" | "m.blog"), "naver.com", *rest if params[:blogId].to_s.match?(/\A[a-zA-Z0-9_-]+\z/)
       @username = params[:blogId]
-      @post_id = params[:logNo]
+      @post_id = params[:logNo] if params[:logNo].to_s.match?(/\A\d+\z/)
 
     # https://rss.blog.naver.com/yanusunya.xml
     in "rss.blog", "naver.com", /\.xml$/

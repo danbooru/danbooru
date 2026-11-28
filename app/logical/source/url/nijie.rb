@@ -35,12 +35,12 @@ class Source::URL::Nijie < Source::URL
     # https://nijie.info/view_popup.php?id=218856#diff_1
     # https://www.nijie.info/view.php?id=218856
     # https://sp.nijie.info/view.php?id=218856
-    in "nijie.info", ("view.php" | "view_popup.php") if params[:id].present?
+    in "nijie.info", ("view.php" | "view_popup.php") if params[:id].to_s.match?(/\A\d+\z/)
       @work_id = params[:id]
 
     # https://nijie.info/members.php?id=236014
     # https://nijie.info/members_illust.php?id=236014
-    in "nijie.info", ("members.php" | "members_illust.php") if params[:id].present?
+    in "nijie.info", ("members.php" | "members_illust.php") if params[:id].to_s.match?(/\A\d+\z/)
       @user_id = params[:id]
 
     # https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg

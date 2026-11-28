@@ -48,5 +48,8 @@ module Source::Tests::URL
     should parse_url("https://vk.com/public111347180").into(profile_url: "https://vk.com/wall-111347180")
     should parse_url("https://vk.com/event111347180").into(profile_url: "https://vk.com/wall-111347180")
     should parse_url("https://vk.com/id194141788").into(profile_url: "https://vk.com/id194141788")
+
+    should parse_url("https://vk.com/doc-111670353_502376172?hash=TTii3BdlGkIC4jg5gogivpeGzfVnO641Tm1XojRZ5yk").into(doc_hash: "TTii3BdlGkIC4jg5gogivpeGzfVnO641Tm1XojRZ5yk")
+    should parse_url("https://vk.com/doc-111670353_502376172?hash=1%26x%3D1").into(doc_hash: nil)
   end
 end

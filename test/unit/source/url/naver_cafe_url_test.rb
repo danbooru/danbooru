@@ -41,5 +41,8 @@ module Source::Tests::URL
     end
 
     should parse_url("https://cafeptthumb-phinf.pstatic.net/MjAyMDA3MDZfMTM0/MDAxNTk0MDA2Mjk0MTcw.JA_GkVUpYytyzximdxyl9Y7wtMoBHkPn2p7S3dLLAzYg.XQfw46B7G2ae5nhw7xc3wkWZgYUS9Debf_XIlsED1jgg.PNG/1.png?type=w800").into(site_name: "Naver Cafe")
+
+    should parse_url("https://cafe.naver.com/ArticleRead.nhn?clubid=29767250&articleid=793").into(club_id: "29767250", article_id: "793")
+    should parse_url("https://cafe.naver.com/ArticleRead.nhn?clubid=../x&articleid=1?x=1").into(club_id: nil, article_id: nil)
   end
 end

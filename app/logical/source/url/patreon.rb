@@ -55,8 +55,8 @@ class Source::URL::Patreon < Source::URL
 
     # https://www.patreon.com/file?h=23563293&i=3053667
     in _, "patreon.com", "file"
-      @post_id = params[:h]
-      @attachment_id = params[:i]
+      @post_id = params[:h] if params[:h].to_s.match?(/\A\d+\z/)
+      @attachment_id = params[:i] if params[:i].to_s.match?(/\A\d+\z/)
 
     # https://www.patreon.com/api/posts/71057815
     in _, "patreon.com", "api", "posts", post_id

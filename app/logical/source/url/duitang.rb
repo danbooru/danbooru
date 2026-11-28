@@ -21,15 +21,15 @@ class Source::URL::Duitang < Source::URL
 
     # https://www.duitang.com/blog/?id=1026135391
     in _, "duitang.com", "blog", *_rest
-      @blog_id = params[:id]
+      @blog_id = params[:id] if params[:id].to_s.match?(/\A\d+\z/)
 
     # https://www.duitang.com/people/?id=9044306
     in _, "duitang.com", "people", *_rest
-      @user_id = params[:id]
+      @user_id = params[:id] if params[:id].to_s.match?(/\A\d+\z/)
 
     # https://www.duitang.com/album/?id=81953329
     in _, "duitang.com", "album", *_rest
-      @album_id = params[:id]
+      @album_id = params[:id] if params[:id].to_s.match?(/\A\d+\z/)
 
     else
       nil

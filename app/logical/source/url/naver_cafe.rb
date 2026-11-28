@@ -53,9 +53,9 @@ class Source::URL::NaverCafe < Source::URL
     # https://m.cafe.naver.com/ArticleRead.nhn?clubid=29767250&articleid=793
     # https://cafe.naver.com/MyCafeIntro.nhn?clubid=29314033
     # https://cafe.naver.com/ArticleList.nhn?search.clubid=29767250&search.menuid=19
-    in _, "naver.com", *rest if params[:clubid].present?
+    in _, "naver.com", *rest if params[:clubid].to_s.match?(/\A\d+\z/)
       @club_id = params[:clubid]
-      @article_id = params[:articleid]
+      @article_id = params[:articleid] if params[:articleid].to_s.match?(/\A\d+\z/)
 
     # https://cafe.naver.com/masterofeternity/793
     # https://m.cafe.naver.com/masterofeternity/793

@@ -21,18 +21,18 @@ class Source::URL::Artistree < Source::URL
     # https://dwxo6p939as9l.cloudfront.net/alysonsega/Lineart%20%20Flats/CapturadePantalla20221026alas16-rkdqzo.42.49.png
     # https://dwxo6p939as9l.cloudfront.net/alysonsega/e1e4b980-dfb4-4670-8b59-38c97adf0187/autoretrato-jaja-rqxg8p.jpg (profile pic)
     # https://dwxo6p939as9l.cloudfront.net/crestfallen163/81434378-aaf2-40a1-ab1a-7b5bd6a3f237/banner/Illustration201-2-s5bn67.png (profile banner)
-    in _, "cloudfront.net", username, *rest
+    in _, "cloudfront.net", /\A[\w.-]+\z/ => username, *rest
       @username = username
 
     # https://artistree.io/crestfallen163
     # https://artistree.io/crestfallen163#d2ca3306-0a5d-426e-925a-191593e6cfe1
-    in _, "artistree.io", username unless username.in?(RESERVED_USERNAMES)
+    in _, "artistree.io", /\A[\w.-]+\z/ => username unless username.in?(RESERVED_USERNAMES)
       @username = username
       @commission_id = fragment
 
     # https://artistree.io/request/adolfozapp
     # https://artistree.io/queue/akefesauce
-    in _, "artistree.io", ("request" | "queue"), username
+    in _, "artistree.io", ("request" | "queue"), /\A[\w.-]+\z/ => username
       @username = username
 
     else

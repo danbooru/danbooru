@@ -95,7 +95,7 @@ class Source::URL::Vk < Source::URL
     # https://vk.com/video-111670353_456239068
     # https://vk.com/id194141788
     in _, "vk.com" | "vk.ru" | "vkontakte.ru", ID_REGEX => id
-      @doc_hash = params[:hash]
+      @doc_hash = params[:hash] if params[:hash].to_s.match?(/\A\w+\z/)
       @id, @page_type, @owner_id, @item_id = parse_id(id)
       @parent_id, @parent_page_type, @parent_owner_id, @parent_item_id = parse_id(params[:list]) if params[:list]&.match?(ID_REGEX)
 

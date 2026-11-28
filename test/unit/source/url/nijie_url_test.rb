@@ -44,5 +44,8 @@ module Source::Tests::URL
     end
 
     should parse_url("https://pic04.nijie.info/omata/4829_20161128012012.png").into(site_name: "Nijie")
+
+    should parse_url("https://nijie.info/view.php?id=1%26x%3D1").into(work_id: nil)
+    should parse_url("https://nijie.info/members.php?id=1%26x%3D1").into(user_id: nil)
   end
 end

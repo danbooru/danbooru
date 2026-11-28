@@ -25,5 +25,9 @@ module Source::Tests::URL
     end
 
     should parse_url("https://dwxo6p939as9l.cloudfront.net/seraexecfia/Anime").into(site_name: "Artistree")
+
+    should parse_url("https://artistree.io/crestfallen163&x=1").into(username: nil)
+    should parse_url("https://artistree.io/request/crestfallen163&x=1").into(username: nil)
+    should parse_url("https://dwxo6p939as9l.cloudfront.net/seraexecfia&x=1/Anime").into(username: nil)
   end
 end

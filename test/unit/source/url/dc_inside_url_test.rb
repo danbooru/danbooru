@@ -40,5 +40,9 @@ module Source::Tests::URL
     should parse_url("https://gall.dcinside.com/mini/board/view?id=honkai3rd&no=5127").into(page_url: "https://gall.dcinside.com/mini/board/view/?id=honkai3rd&no=5127")
     should parse_url("https://gall.dcinside.com/mini/honkai3rd/5127").into(page_url: "https://gall.dcinside.com/mini/board/view/?id=honkai3rd&no=5127")
     should parse_url("https://m.dcinside.com/mini/honkai3rd/5127").into(page_url: "https://gall.dcinside.com/mini/board/view/?id=honkai3rd&no=5127")
+
+    should parse_url("https://gall.dcinside.com/board/view?id=idolmaster_new1&no=1%26x%3D1").into(board_name: nil, post_id: nil)
+    should parse_url("https://gall.dcinside.com/mgallery/board/view?id=x%26y%3D1&no=1").into(board_name: nil, post_id: nil)
+    should parse_url("https://dcimg1.dcinside.com/viewimage.php?no=24b0d769e1d32ca73de9%26x%3D1").into(full_image_url: nil)
   end
 end

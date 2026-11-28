@@ -29,5 +29,8 @@ module Source::Tests::URL
     end
 
     should parse_url("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png").into(site_name: "Hentai Foundry")
+
+    should parse_url("https://thumbs.hentai-foundry.com/thumb.php?pid=795025&size=350").into(work_id: "795025")
+    should parse_url("https://thumbs.hentai-foundry.com/thumb.php?pid=1/../x").into(work_id: nil)
   end
 end
