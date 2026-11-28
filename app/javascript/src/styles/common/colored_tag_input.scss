@@ -1,0 +1,32 @@
+// See colored_tag_input.js. The overlay draws the input's background and the colored text behind the textarea, whose
+// own text and background are transparent. The textarea comes after the overlay in the HTML, so it's drawn on top, with
+// its caret, scrollbar, and selection shown as usual. The selection's background hides the overlay's text under it.
+.colored-tag-input:not(.colored-tag-input-disabled) textarea {
+  position: relative;
+  color: transparent;
+  background-color: transparent;
+  caret-color: var(--text-color);
+}
+
+.colored-tag-input {
+  position: relative;
+}
+
+.colored-tag-input-overlay {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-style: solid;
+  border-color: transparent;
+  background-color: var(--form-input-background);
+
+  // Show the plain textarea when the text is too long, or in forced colors mode, where the browser shows the
+  // transparent text anyway.
+  .colored-tag-input-disabled & {
+    display: none;
+  }
+
+  @media (forced-colors: active) {
+    display: none;
+  }
+}

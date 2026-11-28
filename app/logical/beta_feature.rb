@@ -43,7 +43,12 @@ class BetaFeature
 
   # @return [Array<BetaFeature>] Every beta feature, including ones that aren't released to this site yet.
   def self.features
-    []
+    [
+      # When this is released to everyone, remove the deprecated `autocomplete-tag-prefixes` meta tag from
+      # app/views/layouts/default.html.erb, and AutocompleteService::TAG_PREFIXES if nothing else uses it. Also remove the
+      # `else` branches around the tag boxes (search for `colored_tag_input`).
+      new(name: "colored_tag_input", label: "Colored tag input", description: "Color the tags in the tag box by their tag category.", released_to: "testbooru"),
+    ]
   end
 
   # @return [Array<BetaFeature>] The beta features released to this site. The Beta tab is hidden when there aren't any.

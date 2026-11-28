@@ -30,7 +30,14 @@
       </span>
     </div>
 
-    <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { class: "text-sm", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
+    <% if BetaFeature.find("colored_tag_input")&.enabled?(cookies) %>
+      <div class="colored-tag-input" x-data="coloredTagInput($root)">
+        <div class="colored-tag-input-overlay" aria-hidden="true"></div>
+        <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { class: "text-sm", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
+      </div>
+    <% else %>
+      <%= f.input :tag_string, label: false, hint: tag.span("Ctrl+Enter to submit", class: "desktop-only"), input_html: { class: "text-sm", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
+    <% end %>
   </div>
 
   <div class="input">

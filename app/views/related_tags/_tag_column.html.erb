@@ -19,10 +19,10 @@
           <span>
             <% if t.is_a?(AITag) %>
               <% at = t.to_aliased_tag %>
-              <%= link_to at.pretty_name, posts_path(tags: at.name), class: "break-words #{tag_class(at)}", "data-tag-name": at.name %>
+              <%= link_to at.pretty_name, posts_path(tags: at.name), class: "break-words #{tag_class(at)}", "data-tag-name": at.name, "data-is-deprecated": at.is_deprecated? %>
               <%= tag.span "#{t.score}%", class: "text-muted text-xs" %>
             <% else %>
-              <%= link_to t.pretty_name, posts_path(tags: t.name), class: "break-words #{tag_class(t)}", "data-tag-name": t.name %>
+              <%= link_to t.pretty_name, posts_path(tags: t.name), class: "break-words #{tag_class(t)}", "data-tag-name": t.name, "data-is-deprecated": t.is_deprecated? %>
               <%= tag.span humanized_number(t.post_count), class: "post-count text-xs", title: t.post_count %>
             <% end %>
           </span>

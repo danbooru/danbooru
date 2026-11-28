@@ -22,6 +22,19 @@ Utility.meta = function(key) {
   return $("meta[name=" + key + "]").attr("content");
 }
 
+// @returns {Object} The tag category prefixes and the category each one sets (e.g. { "art": 1, "char": 4, ... }).
+export function tagCategoryPrefixes() {
+  return JSON.parse(Utility.meta("tag-category-prefixes"));
+}
+
+// @param {HTMLInputElement|HTMLTextAreaElement} input - A text field.
+// @returns {Array<String>} The parts of the word the caret is in, before and after the caret (e.g. ["hatsu", "ne_miku"]
+//   for "1girl hatsu|ne_miku" with the caret at |).
+export function wordAtCaret(input) {
+  let caret = input.selectionStart;
+  return [input.value.substring(0, caret).match(/\S*$/)[0], input.value.substring(caret).match(/^\S*/)[0]];
+}
+
 export function isTouchscreen() {
   return window.matchMedia("(pointer: coarse)").matches;
 }
@@ -265,6 +278,7 @@ $.fn.selectEnd = function() {
   })
 }
 
+Utility.tagCategoryPrefixes = tagCategoryPrefixes;
 Utility.copyToClipboard = copyToClipboard;
 Utility.printPage = printPage;
 Utility.alpineReady = alpineReady;
