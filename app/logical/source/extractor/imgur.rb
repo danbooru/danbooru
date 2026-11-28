@@ -53,7 +53,7 @@ module Source
 
       def tags
         api_response[:tags].to_a.pluck(:tag).map do |tag|
-          [tag, "https://imgur.com/t/#{CGI.escape(tag)}"]
+          [tag, "https://imgur.com/t/#{Danbooru::URL.escape(tag)}"]
         end
       end
 

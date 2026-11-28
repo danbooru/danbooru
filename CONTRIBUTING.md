@@ -107,6 +107,7 @@ range at the start of the next day instead, so the whole end date is included.
 - Avoid adding methods to core classes (like `String` in `config/initializers/core_extensions.rb`) unless really necessary.
 - Use parentheses around method call arguments (`foo(bar, baz)`), but leave them off macro-style calls like `validates :name`, `has_many :posts`, `before_action :foo`, or `assert_equal`.
 - Lint the files you changed with `bin/rubocop`, `npx eslint`, or `npx stylelint`. Fix the errors you introduced, but not unrelated errors that were already there.
+  - Some rules on this page are checked by custom cops in `lib/rubocop/cop/danbooru`. Don't add files to their `Exclude` lists in `.rubocop.yml` to get around them.
 
 ## General
 
