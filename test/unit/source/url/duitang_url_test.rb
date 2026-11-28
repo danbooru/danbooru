@@ -10,6 +10,16 @@ module Source::Tests::URL
         "https://img4.duitang.com/uploads/item/201812/02/20181202220613_cqgwb.jpeg",
       )
 
+      should be_image_sample(
+        "https://c-ssl.dtstatic.com/uploads/item/201812/02/20181202220613_cqgwb.thumb.400_0.jpg",
+        "https://c-ssl.dtstatic.com/uploads/avatar/202012/15/20201215234506_75e25.thumb.200_200_c.jpg",
+      )
+
+      should_not be_image_sample(
+        "https://c-ssl.dtstatic.com/uploads/item/201812/02/20181202220613_cqgwb.jpg",
+        "https://a-ssl.dtstatic.com/uploads/blog/202201/10/20220110201344_a992a.jpg",
+      )
+
       should be_page_url(
         "https://www.duitang.com/blog/?id=1026135391",
       )

@@ -9,6 +9,18 @@ module Source::Tests::URL
         "https://a1.mzstatic.com/us/r1000/0/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg",
       )
 
+      should be_image_sample(
+        "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg/296x296bb.webp",
+        "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg/10000x10000.png",
+        "https://is1-ssl.mzstatic.com/image/thumb/Features221/v4/cd/3d/11/cd3d1170-d972-2fda-0e5f-d2222f85b8d3/mzl.gxpkxsyd.jpg/190x190cc.webp",
+        "https://is1-ssl.mzstatic.com/image/thumb/WNmTtyvl_DbiE8TEAhz_3A/9999x0w.png",
+      )
+
+      should_not be_image_sample(
+        "https://a1.mzstatic.com/us/r1000/0/Music113/v4/9e/22/c2/9e22c2fb-ef9c-b79b-7417-8bc714b85e51/4580547326338.jpg",
+        "https://is1-ssl.mzstatic.com/image/thumb/WNmTtyvl_DbiE8TEAhz_3A/10000x10000w.png",
+      )
+
       should be_page_url(
         "https://music.apple.com/jp/album/mágico-catástrofe-digital-edition/1503302894",
         "https://music.apple.com/jp/album/1503302894",

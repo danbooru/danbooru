@@ -78,6 +78,10 @@ class Source::URL::AppleMusic < Source::URL
     domain == "mzstatic.com"
   end
 
+  def image_sample?
+    image_url? && full_image_url != to_s
+  end
+
   def page_url
     if album_id.present? && album_name.present?
       ["https://music.apple.com", country_code, "album", album_name, album_id].compact.join("/")

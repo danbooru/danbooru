@@ -53,6 +53,12 @@ class Source::URL::Boosty < Source::URL
     full_image_url.present?
   end
 
+  # https://images.boosty.to/image/ede74f96-b31b-4059-9f8d-8a3dd7314711?change_time=1716964397&mw=80
+  # https://images.boosty.to/image/ede74f96-b31b-4059-9f8d-8a3dd7314711?change_time=1716964397?mw=120&mh=120
+  def image_sample?
+    image_url? && query.to_s.match?(/(\A|[?&])m[wh]=/)
+  end
+
   def page_url
     "https://boosty.to/#{username}/posts/#{post_id}" if username.present? && post_id.present?
   end

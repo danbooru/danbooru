@@ -11,6 +11,18 @@ module Source::Tests::URL
         "https://images.boosty.to/blog/9186794/cover?change_time=1768400706",
       )
 
+      should be_image_sample(
+        "https://images.boosty.to/image/ede74f96-b31b-4059-9f8d-8a3dd7314711?change_time=1716964397&mw=80",
+        "https://images.boosty.to/image/ede74f96-b31b-4059-9f8d-8a3dd7314711?change_time=1716964397?mw=120&mh=120",
+      )
+
+      should_not be_image_sample(
+        "https://images.boosty.to/image/ede74f96-b31b-4059-9f8d-8a3dd7314711",
+        "https://images.boosty.to/image/ede74f96-b31b-4059-9f8d-8a3dd7314711?change_time=1716964397",
+        "https://images.boosty.to/user/9186794/avatar?change_time=1706076492",
+        "https://images.boosty.to/blog/9186794/cover?change_time=1768400706",
+      )
+
       should be_page_url(
         "https://boosty.to/rebeccagod/posts/f76e3d79-39b5-42fa-b7a1-0f8dc5261654",
         "https://boosty.to/rebeccagod/blog/media/f76e3d79-39b5-42fa-b7a1-0f8dc5261654/ede74f96-b31b-4059-9f8d-8a3dd7314711",

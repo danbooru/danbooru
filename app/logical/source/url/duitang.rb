@@ -40,6 +40,10 @@ class Source::URL::Duitang < Source::URL
     domain == "dtstatic.com" || full_image_url.present?
   end
 
+  def image_sample?
+    image_url? && filename.include?(".thumb.")
+  end
+
   def page_url
     "https://www.duitang.com/blog/?id=#{blog_id}" if blog_id.present?
   end
