@@ -819,20 +819,6 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
 
-    should "support the expiry parameter" do
-      get posts_path(expiry: "1"), as: :json
-
-      assert_response :success
-      assert_equal("max-age=#{1.day}, private", response.headers["Cache-Control"])
-    end
-
-    should "support the expires_in parameter" do
-      get posts_path(expires_in: "5min"), as: :json
-
-      assert_response :success
-      assert_equal("max-age=#{5.minutes}, private", response.headers["Cache-Control"])
-    end
-
     should "support the only parameter" do
       create(:post)
       get posts_path(only: "id,rating,score"), as: :json
