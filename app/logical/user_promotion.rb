@@ -17,7 +17,7 @@ class UserPromotion
     @new_level = new_level.to_i # A missing level becomes 0 (Anonymous), which User's level validation rejects.
   end
 
-  # @param validate [Boolean] if false, skip permission checks. Only for use from the command line.
+  # @param validate [Boolean] if false, skip permission checks. Only for use from the command line, or when the caller has already checked permissions.
   def promote!(validate: true)
     user.with_lock do
       user.level = new_level

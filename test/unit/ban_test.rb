@@ -125,6 +125,14 @@ class BanTest < ActiveSupport::TestCase
       assert_equal(true, admin.is_banned?)
     end
 
+    should "demote a banned admin when banned by the system user" do
+      admin = create(:admin_user)
+      create(:ban, user: admin, banner: User.system)
+
+      assert_equal(User::Levels::MEMBER, admin.reload.level)
+      assert_equal(true, admin.is_banned?)
+    end
+
     should "not demote banned non-staff users" do
       builder = create(:builder_user)
       create(:ban, user: builder, banner: create(:moderator_user))

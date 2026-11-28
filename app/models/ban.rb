@@ -152,8 +152,9 @@ class Ban < ApplicationRecord
   end
 
   # Staff powers don't check is_banned, so banned mods and admins are demoted to Member. Unbanning doesn't restore their level.
+  # The ban itself was already authorized, so skip the promotion checks, which fail when the banner is the system user.
   def demote_staff
-    UserPromotion.new(user, banner, User::Levels::MEMBER).promote! if user.is_moderator?
+    UserPromotion.new(user, banner, User::Levels::MEMBER).promote!(validate: false) if user.is_moderator?
   end
 
   def create_unban_mod_action
