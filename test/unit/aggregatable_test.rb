@@ -177,8 +177,7 @@ class AggregatableTest < ActiveSupport::TestCase
 
       dataframe = Post.aggregate(from: Date.new(2026, 3, 1), to: Date.new(2026, 3, 4), groups: ["uploader"])
 
-      assert_equal([@alice, @bob], dataframe["uploader"].to_a)
-      assert_equal([2, 2], dataframe["count"].to_a)
+      assert_equal({ @alice => 2, @bob => 2 }, dataframe["uploader"].to_a.zip(dataframe["count"].to_a).to_h)
     end
 
     should "not count records created after the end time when the end is a time" do
