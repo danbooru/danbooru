@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class BulkUpdateRequest < ApplicationRecord
-  STATUSES = %w[pending approved rejected processing failed]
+  STATUSES = %w[pending approved rejected queued processing failed]
+
+  # How long to wait before processing a BUR that needs an Admin to approve it, so it can be rejected if it was approved by mistake.
+  PROCESSING_DELAY = 10.minutes
 
   attr_accessor :title, :reason
 
@@ -36,7 +39,7 @@ class BulkUpdateRequest < ApplicationRecord
   before_save :update_tags, if: :script_changed?
   after_create :create_forum_topic
 
-  scope :pending_first, -> { order(Arel.sql("(case status when 'processing' then 0 when 'pending' then 1 when 'approved' then 2 when 'rejected' then 3 when 'failed' then 4 else 5 end)")) }
+  scope :pending_first, -> { order(Arel.sql("(case status when 'processing' then 0 when 'queued' then 0 when 'pending' then 1 when 'approved' then 2 when 'rejected' then 3 when 'failed' then 4 else 5 end)")) }
   scope :pending, -> { where(status: "pending") }
   scope :approved, -> { where(status: "approved") }
   scope :rejected, -> { where(status: "rejected") }
@@ -110,7 +113,7 @@ class BulkUpdateRequest < ApplicationRecord
       transaction do
         CurrentUser.scoped(approver) do
           self.approver = approver
-          self.status = "processing"
+          self.status = (approval_level >= User::Levels::ADMIN) ? "queued" : "processing"
 
           if save(context: :approval)
             processor.process_later!
@@ -150,7 +153,7 @@ class BulkUpdateRequest < ApplicationRecord
   def validate_approval
     # The approval checks look at the tags' current state, but an approved BUR that hasn't been processed yet can still
     # change it (e.g. `imply a -> b` before `alias a -> big_tag`).
-    processing_burs = BulkUpdateRequest.where(status: "processing").where.not(id: id)
+    processing_burs = BulkUpdateRequest.where(status: %w[queued processing]).where.not(id: id)
     processing_bur = processing_burs.where_array_includes_any(:tags, tags).first
 
     # A processing BUR could also add posts to a pool this BUR searches, sneaking them into this BUR. Pools aren't stored
@@ -207,7 +210,11 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def is_approved?
-    status.in?(%w[approved processing])
+    status.in?(%w[approved queued processing])
+  end
+
+  def is_queued?
+    status == "queued"
   end
 
   def is_rejected?

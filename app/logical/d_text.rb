@@ -276,6 +276,8 @@ class DText
         "BUR ##{id} is pending approval.\n\n#{embedded_script}"
       when "rejected"
         "BUR ##{id} has been rejected.\n\n#{embedded_script}"
+      when "queued"
+        "BUR ##{id} has been approved by <@#{bur.approver&.name}> and is waiting to be processed.\n\n#{embedded_script}"
       when "processing"
         "BUR ##{id} is being processed.\n\n#{embedded_script}"
       when "failed"

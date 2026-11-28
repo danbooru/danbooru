@@ -384,6 +384,87 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("pending", @bulk_update_request.reload.status)
         end
       end
+
+      context "for a BUR that is queued for processing" do
+        setup do
+          create(:tag, name: "big_tag_a", post_count: 10_000)
+          create(:tag, name: "big_tag_b", post_count: 10_000)
+          @bulk_update_request.update!(script: "alias big_tag_a -> big_tag_b")
+          @bulk_update_request.approve!(@admin)
+          assert_equal("queued", @bulk_update_request.reload.status)
+        end
+
+        should "allow moderators and above to cancel it" do
+          [@mod, @admin, create(:superadmin_user)].each do |user|
+            @bulk_update_request.update!(status: "queued")
+            delete_auth bulk_update_request_path(@bulk_update_request), user
+
+            assert_redirected_to bulk_update_request_path(@bulk_update_request)
+            assert_equal("rejected", @bulk_update_request.reload.status)
+          end
+
+          perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
+          assert_equal("rejected", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "big_tag_a", consequent_name: "big_tag_b"))
+        end
+
+        should "not allow members or builders to cancel it" do
+          [@user, @builder].each do |user|
+            delete_auth bulk_update_request_path(@bulk_update_request), user
+            assert_response 403
+          end
+
+          assert_equal("queued", @bulk_update_request.reload.status)
+        end
+
+        should "not run the job from an earlier approval if the BUR is approved again" do
+          delete_auth bulk_update_request_path(@bulk_update_request), @mod
+          assert_equal("rejected", @bulk_update_request.reload.status)
+
+          travel(5.minutes) do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @admin
+            assert_equal("queued", @bulk_update_request.reload.status)
+          end
+
+          earlier_job, later_job = enqueued_jobs.select { |job| job["job_class"] == "ProcessBulkUpdateRequestJob" }
+          ActiveJob::Base.execute(earlier_job)
+          assert_equal("queued", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "big_tag_a", consequent_name: "big_tag_b"))
+
+          ActiveJob::Base.execute(later_job)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(true, TagAlias.exists?(antecedent_name: "big_tag_a", consequent_name: "big_tag_b", status: "active"))
+        end
+
+        should "not run the job from an earlier approval if the BUR is edited and approved again" do
+          delete_auth bulk_update_request_path(@bulk_update_request), @mod
+          put_auth bulk_update_request_path(@bulk_update_request), @admin, params: { bulk_update_request: { script: "alias big_tag_b -> big_tag_a" }}
+          assert_equal("alias big_tag_b -> big_tag_a", @bulk_update_request.reload.script)
+
+          travel(5.minutes) do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @admin
+            assert_equal("queued", @bulk_update_request.reload.status)
+          end
+
+          earlier_job, later_job = enqueued_jobs.select { |job| job["job_class"] == "ProcessBulkUpdateRequestJob" }
+          ActiveJob::Base.execute(earlier_job)
+          assert_equal("queued", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "big_tag_b", consequent_name: "big_tag_a"))
+
+          ActiveJob::Base.execute(later_job)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(true, TagAlias.exists?(antecedent_name: "big_tag_b", consequent_name: "big_tag_a", status: "active"))
+        end
+
+        should "not allow anyone to edit it" do
+          [@user, @admin, create(:superadmin_user)].each do |user|
+            put_auth bulk_update_request_path(@bulk_update_request), user, params: { bulk_update_request: { script: "alias big_tag_b -> big_tag_a" }}
+
+            assert_response 403
+            assert_equal("alias big_tag_a -> big_tag_b", @bulk_update_request.reload.script)
+          end
+        end
+      end
     end
 
     context "#approve" do
@@ -757,6 +838,53 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response 403
           assert_equal(@mod, @bulk_update_request.reload.approver)
+        end
+
+        should "wait before processing a large BUR" do
+          create(:tag, name: "big_tag_a", post_count: 10_000)
+          create(:tag, name: "big_tag_b", post_count: 10_000)
+          @bulk_update_request.update!(script: "alias big_tag_a -> big_tag_b")
+
+          freeze_time do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @admin
+
+            assert_redirected_to bulk_update_request_path(@bulk_update_request)
+            assert_equal("queued", @bulk_update_request.reload.status)
+            assert_equal(@admin, @bulk_update_request.approver)
+            assert_enqueued_with(job: ProcessBulkUpdateRequestJob, at: 10.minutes.from_now)
+          end
+
+          assert_equal(false, TagAlias.exists?(antecedent_name: "big_tag_a", consequent_name: "big_tag_b"))
+
+          perform_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(true, TagAlias.exists?(antecedent_name: "big_tag_a", consequent_name: "big_tag_b", status: "active"))
+        end
+
+        should "wait before processing a mass update" do
+          @bulk_update_request.update!(script: "mass update aaa -> bbb")
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @admin
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("queued", @bulk_update_request.reload.status)
+        end
+
+        should "wait before processing a large BUR approved by a superadmin" do
+          create(:tag, name: "big_tag_a", post_count: 10_000)
+          create(:tag, name: "big_tag_b", post_count: 10_000)
+          @bulk_update_request.update!(script: "alias big_tag_a -> big_tag_b")
+          post_auth approve_bulk_update_request_path(@bulk_update_request), create(:superadmin_user)
+
+          assert_redirected_to bulk_update_request_path(@bulk_update_request)
+          assert_equal("queued", @bulk_update_request.reload.status)
+        end
+
+        should "not allow approving a queued BUR again" do
+          @bulk_update_request.update!(status: "queued", approver: @admin)
+          post_auth approve_bulk_update_request_path(@bulk_update_request), create(:superadmin_user)
+
+          assert_response 403
+          assert_no_enqueued_jobs(only: ProcessBulkUpdateRequestJob)
         end
       end
     end

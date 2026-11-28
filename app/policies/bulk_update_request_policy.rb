@@ -31,7 +31,9 @@ class BulkUpdateRequestPolicy < ApplicationPolicy
   end
 
   def destroy?(tags: nil)
-    return false if !unbanned? || !show? || record.is_approved?
+    return false if !unbanned? || !show?
+    return user.is_moderator? if record.is_queued?
+    return false if record.is_approved?
 
     record.is_pending? && (record.user_id == user.id || (user.is_moderator? && approve?(tags:)))
   end
