@@ -92,6 +92,41 @@ class DtextEditorChromeTest < ChromeSystemTestCase
             assert_equal expected_markup, @full_editor_field.value, "Ctrl+#{key} should wrap the selected word in #{expected_markup.inspect}"
           end
         end
+
+        should 'wrap selected text in quotes when pressing "' do
+          @full_editor_field.set("hello world foo")
+          select_dtext(6, 11, selector: @full_editor_selector)
+          @full_editor_field.send_keys('"')
+          assert_equal 'hello "world" foo', @full_editor_field.value
+
+          @full_editor_field.set("hello world")
+          select_dtext(5, 5, selector: @full_editor_selector)
+          @full_editor_field.send_keys('"')
+          assert_equal 'hello" world', @full_editor_field.value
+
+          @full_editor_field.set("hello   world")
+          select_dtext(5, 8, selector: @full_editor_selector)
+          @full_editor_field.send_keys('"')
+          assert_equal 'hello"world', @full_editor_field.value
+        end
+
+        should "wrap selected text properly when replying to a comment with CRLF newlines" do
+          comment = as(@user) { create(:comment, post: @post, body: "line1\r\nhello comment") }
+          visit post_path(@post)
+
+          within "#comment_#{comment.id}" do
+            click_link "Reply"
+          end
+
+          editor_field = find(@full_editor_selector, visible: :visible)
+          assert_includes editor_field.value, "line1\nhello comment"
+
+          start = editor_field.value.index("comment")
+          select_dtext(start, start + "comment".length, selector: @full_editor_selector)
+          editor_field.send_keys('"')
+
+          assert_includes editor_field.value, 'hello "comment"'
+        end
       end
 
       should "focus the emoji search box when the emoji menu is opened" do
@@ -183,6 +218,39 @@ class DtextEditorChromeTest < ChromeSystemTestCase
           paste_dtext(url, selector: @full_editor_selector)
 
           assert_equal "hello post #123", @full_editor_field.value
+        end
+
+        should "create a named link when text is selected" do
+          same_site_url = URI.join(current_url, "/posts/123").to_s
+          {
+            "https://example.com" => 'hello "world":[https://example.com]',
+            "https://example.com/posts?search[id]=1" => 'hello "world":[https://example.com/posts?search%5Bid%5D=1]',
+            same_site_url => %{hello "world":[#{same_site_url}]},
+          }.each do |url, expected|
+            @full_editor_field.set("hello world")
+            select_dtext(6, 11, selector: @full_editor_selector)
+            paste_dtext(url, selector: @full_editor_selector)
+            assert_equal expected, @full_editor_field.value
+          end
+        end
+
+        should "overwrite the selection when pasting over a URL, whitespace, or non-URL text" do
+          @full_editor_field.set("hello https://old.example.com")
+          select_dtext(6, 29, selector: @full_editor_selector)
+          paste_dtext("https://new.example.com", selector: @full_editor_selector)
+          assert_equal "hello https://new.example.com", @full_editor_field.value
+
+          @full_editor_field.set("hello   world")
+          select_dtext(5, 8, selector: @full_editor_selector)
+          paste_dtext("https://example.com", selector: @full_editor_selector)
+          assert_equal "hellohttps://example.comworld", @full_editor_field.value
+
+          ["rating:s", "javascript:alert(1)", "https://example.com extra"].each do |text|
+            @full_editor_field.set("hello world")
+            select_dtext(6, 11, selector: @full_editor_selector)
+            paste_dtext(text, selector: @full_editor_selector)
+            assert_equal "hello #{text}", @full_editor_field.value
+          end
         end
       end
 
@@ -291,6 +359,18 @@ class DtextEditorChromeTest < ChromeSystemTestCase
 
         assert_visible "input#ban_reason"
         assert_equal "[[1girl]]", find_field("Reason").value
+      end
+
+      should 'create links on URL paste and wrap selected text when pressing "' do
+        find_field("Reason").set("hello world")
+        select_dtext(6, 11, selector: "input#ban_reason")
+        paste_dtext("https://example.com", selector: "input#ban_reason")
+        assert_equal 'hello "world":[https://example.com]', find_field("Reason").value
+
+        find_field("Reason").set("hello world")
+        select_dtext(6, 11, selector: "input#ban_reason")
+        find_field("Reason").send_keys('"')
+        assert_equal 'hello "world"', find_field("Reason").value
       end
     end
   end

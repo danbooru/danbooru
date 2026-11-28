@@ -14,7 +14,9 @@
     <%= form.text_field(input_name, input_html.except(:maxlength).merge(
       "x-model.fill": "editor.dtext",
       "x-bind:class": "{ invisible: editor.previewMode }",
+      "x-on:keydown.capture": "editor.onKeyDown($event)",
       "x-on:pointerdown": "editor.autocomplete.close()",
+      "x-on:paste": "editor.onPaste($event)",
       "x-on:input": ("length = $event.target.value.length" if max_length.present?),
     )) %>
     <div class="dtext-preview prose" x-ref="preview" tabindex="-1" x-show="editor.previewMode" x-cloak>

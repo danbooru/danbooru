@@ -160,7 +160,7 @@ export default class DTextEditor {
     } else if (selectedText.startsWith(startTag) && selectedText.endsWith(endTag)) {
       this.insertText(selectedText.substring(startTag.length, selectedText.length - endTag.length), start, end);
     // If the selected text is immediately surrounded by the tags, remove them.
-    } else if (this.dtext.substring(start - startTag.length, end + endTag.length) === `${startTag}${selectedText}${endTag}`) {
+    } else if (this.input.value.substring(start - startTag.length, end + endTag.length) === `${startTag}${selectedText}${endTag}`) {
       this.insertText(selectedText, start - startTag.length, end + endTag.length);
     // Otherwise, insert the tags around the selected text or the current word.
     } else {
@@ -203,10 +203,20 @@ export default class DTextEditor {
 
   // Handle keyboard shortcuts.
   onKeyDown(event) {
-    let handler = DTextEditor.KEYS[event.key.toLowerCase()];
+    let key = event.key.toLowerCase();
+    let handler = DTextEditor.KEYS[key];
+    let noModifiers = !event.ctrlKey && !event.altKey && !event.metaKey;
 
-    if (event.ctrlKey && !event.shiftKey && handler) {
+    if (event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey && handler) {
+      // Inline preview toggle is handled on the root element so it can focus the preview.
+      if (this.inline && key === "p") {
+        return;
+      }
+
       handler(this);
+      event.preventDefault();
+    } else if (event.key === '"' && noModifiers && !event.isComposing && this.selectedText.trim().length > 0) {
+      this.insertMarkup('"', '"');
       event.preventDefault();
     } else if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
       // XXX Hack to prevent the autocomplete menu from popping up when the user is navigating with the keyboard.
@@ -214,16 +224,34 @@ export default class DTextEditor {
     }
   }
 
-  // Handle paste events. Convert links to DText format and inserts pasted images as embedded media assets.
+  // Handle paste events. Convert links to DText format and insert pasted images as embedded media assets.
   onPaste(event) {
-    let text = event.clipboardData.getData("text");
-
     if (event.clipboardData.files.length > 0) {
       this.insertImages(event.clipboardData.files);
-    } else if (URL.canParse(text) && this.domains.includes(URL.parse(text).hostname)) {
+      return;
+    }
+
+    let text = (event.clipboardData.getData("text") || event.clipboardData.getData("text/uri-list")).trim();
+    if (!this.isUrl(text)) {
+      return;
+    }
+
+    let selected = this.selectedText.trim();
+    if (selected.length > 0 && !this.isUrl(selected)) {
+      let url = text.replace(/\[/g, "%5B").replace(/\]/g, "%5D");
+      this.insertMarkup('"', `":[${url}]`);
+      event.preventDefault();
+    } else if (this.domains.includes(URL.parse(text).hostname)) {
       this.insertUrl(text);
       event.preventDefault();
     }
+  }
+
+  // @param {String} text - The text to check.
+  // @returns {Boolean} True if `text` is a valid HTTP(S) URL.
+  isUrl(text) {
+    let url = URL.parse(text);
+    return url !== null && !/\s/.test(text) && ["http:", "https:"].includes(url.protocol);
   }
 
   // Insert a URL. If the URL is a full link (e.g. "https://example.com/posts/123"), it will be converted to a shortlink (e.g. "post #123").
@@ -363,17 +391,17 @@ export default class DTextEditor {
 
   // @returns {String} The currently selected text in the <textarea> element.
   get selectedText() {
-    return this.dtext.substring(this.selectionStart, this.selectionEnd);
+    return this.input.value.substring(this.selectionStart, this.selectionEnd);
   }
 
   // @returns {String} The text before the current selection.
   get selectionPrefix() {
-    return this.dtext.substring(0, this.selectionStart);
+    return this.input.value.substring(0, this.selectionStart);
   }
 
   // @returns {String} The text after the current selection.
   get selectionSuffix() {
-    return this.dtext.substring(this.selectionEnd);
+    return this.input.value.substring(this.selectionEnd);
   }
 
   // @returns {String} The line of text before the current selection.
@@ -580,7 +608,7 @@ export default class DTextEditor {
 
     // Add a space after the completion. If there's already a space, move the cursor past it instead.
     formattedCompletion += " ";
-    if (this.dtext[end] === " ") {
+    if (this.input.value[end] === " ") {
       end += 1;
     }
 
