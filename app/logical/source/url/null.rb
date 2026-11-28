@@ -170,8 +170,6 @@ class Source::URL::Null < Source::URL
       "PayPal"
     in _, "picarto.tv"
       "Picarto"
-    in _, "pixeljoint.com"
-      "Pixel Joint"
     in _, "planetminecraft.com"
       "Planet Minecraft"
     in _, "pronouns.page"

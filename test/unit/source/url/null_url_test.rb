@@ -87,7 +87,6 @@ module Source::Tests::URL
         assert_equal("PayPal", Source::URL.parse("https://www.paypal.me/artist").site_name)
         assert_equal("PayPal", Source::URL.parse("https://www.paypal.com/donate/?hosted_button_id=ABC").site_name)
         assert_equal("Picarto", Source::URL.parse("https://picarto.tv/artist").site_name)
-        assert_equal("Pixel Joint", Source::URL.parse("https://pixeljoint.com/p/artist.htm").site_name)
         assert_equal("Planet Minecraft", Source::URL.parse("https://www.planetminecraft.com/member/artist").site_name)
         assert_equal("Pronouns.page", Source::URL.parse("https://en.pronouns.page/@artist").site_name)
         assert_equal("Pronouny.xyz", Source::URL.parse("https://pronouny.xyz/u/artist").site_name)
